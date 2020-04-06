@@ -30,11 +30,11 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
   public static final String A =
       "Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês";
 
-  private static final String C =
-      "Nº de pacientes Transferidos para (-) outras US em TARV durante o mês";
-
   private static final String B =
-      "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
+          "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
+
+  private static final String C =
+          "Nº de pacientes Transferidos para (-) outras US em TARV durante o mês";
 
   private EptsGeneralIndicator eptsGeneralIndicator;
 
