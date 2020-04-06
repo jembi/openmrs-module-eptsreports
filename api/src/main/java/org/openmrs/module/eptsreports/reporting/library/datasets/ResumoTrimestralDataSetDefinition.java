@@ -11,6 +11,7 @@ import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyC
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.HivCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -32,6 +33,8 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
 
   private static final String B =
       "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
+
+  private static final String D = "Actual Cohort during the month";
 
   private EptsGeneralIndicator eptsGeneralIndicator;
 
@@ -59,6 +62,16 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     dsd.addColumn("Bm1", B, getB(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Bm2", B, getB(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Bm3", B, getB(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
+    dsd.addColumn(
+        "DmT",
+        D,
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "DmT",
+                EptsReportUtils.map(
+                    getD(), "year=${year-1},quarter=${quarter},location=${location}")),
+            "year=${year},quarter=${quarter},location=${location}"),
+        NO_DIMENSION_OPTIONS);
     return dsd;
   }
 
@@ -116,5 +129,70 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
         new Parameter("quarter", "Quarter", EptsQuarterlyCohortDefinition.Quarter.class));
     parameters.add(ReportingConstants.LOCATION_PARAMETER);
     return parameters;
+  }
+
+  private CohortDefinition getD() {
+    CompositionCohortDefinition cdA = new CompositionCohortDefinition();
+    cdA.setName("Indicators A");
+    cdA.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cdA.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cdA.addParameter(new Parameter("location", "location", Location.class));
+    cdA.addSearch(
+        "startedArt",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtOnPeriod(false, true),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdA.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            hivCohortQueries.getPatientsTransferredFromOtherHealthFacility(),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdA.setCompositionString("startedArt AND NOT transferredIn");
+
+    CompositionCohortDefinition cdB = new CompositionCohortDefinition();
+    cdB.setName("indicators B");
+    cdB.setParameters(cdA.getParameters());
+    cdB.setCompositionString("startedArt AND transferredIn");
+
+    // create another composition to combine the quarters
+    EptsQuarterlyCohortDefinition.Month month = null;
+    CompositionCohortDefinition wrap = new CompositionCohortDefinition();
+    wrap.setName("Combine values for the quarter - D");
+    wrap.addParameters(getParameters());
+    wrap.addSearch(
+        "A1",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdA, EptsQuarterlyCohortDefinition.Month.M1),
+            "year=${year},quarter=${quarter},location=${location}"));
+    wrap.addSearch(
+        "A2",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdA, EptsQuarterlyCohortDefinition.Month.M2),
+            "year=${year},quarter=${quarter},location=${location}"));
+    wrap.addSearch(
+        "A3",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdA, EptsQuarterlyCohortDefinition.Month.M3),
+            "year=${year},quarter=${quarter},location=${location}"));
+
+    wrap.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdB, EptsQuarterlyCohortDefinition.Month.M1),
+            "year=${year},quarter=${quarter},location=${location}"));
+    wrap.addSearch(
+        "B2",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdB, EptsQuarterlyCohortDefinition.Month.M2),
+            "year=${year},quarter=${quarter},location=${location}"));
+    wrap.addSearch(
+        "B3",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdB, EptsQuarterlyCohortDefinition.Month.M3),
+            "year=${year},quarter=${quarter},location=${location}"));
+
+    wrap.setCompositionString("((A1 OR A2 OR A3 OR B1 OR B2 OR B3) AND NOT C)");
+
+    return wrap;
   }
 }
