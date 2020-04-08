@@ -32,7 +32,10 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
       "Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês";
 
   private static final String B =
-      "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
+          "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
+
+  private static final String C =
+          "Nº de pacientes Transferidos para (-) outras US em TARV durante o mês";
 
   private static final String D = "Actual Cohort during the month";
 
@@ -62,14 +65,17 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     dsd.addColumn("Bm1", B, getB(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Bm2", B, getB(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Bm3", B, getB(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Cm1", C, getC(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Cm2", C, getC(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Cm3", C, getC(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
     dsd.addColumn(
-        "DmT",
-        D,
-        map(
-            getCohortIndicator(
-                "DmT", map(getD(), "year=${year},quarter=${quarter},location=${location}")),
-            "year=${year-1},quarter=${quarter},location=${location}"),
-        NO_DIMENSION_OPTIONS);
+            "DmT",
+            D,
+            map(
+                    getCohortIndicator(
+                            "DmT", map(getD(), "year=${year},quarter=${quarter},location=${location}")),
+                    "year=${year-1},quarter=${quarter},location=${location}"),
+            NO_DIMENSION_OPTIONS);
     return dsd;
   }
 
@@ -103,6 +109,21 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     CohortDefinition quarterly = getQuarterlyCohort(wrap, month);
     String mappings = "year=${year-1},quarter=${quarter},location=${location}";
     return mapStraightThrough(getCohortIndicator(B, map(quarterly, mappings)));
+  }
+
+  private Mapped<CohortIndicator> getC(EptsQuarterlyCohortDefinition.Month month) {
+    CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
+    CohortDefinition transferredOut = hivCohortQueries.getPatientsTransferredOut();
+    CompositionCohortDefinition wrap = new CompositionCohortDefinition();
+    wrap.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    wrap.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    wrap.addParameter(new Parameter("location", "location", Location.class));
+    wrap.addSearch("startedArt", mapStraightThrough(startedArt));
+    wrap.addSearch("transferredOut", mapStraightThrough(transferredOut));
+    wrap.setCompositionString("startedArt AND transferredOut");
+    CohortDefinition quarterly = getQuarterlyCohort(wrap, month);
+    String mappings = "year=${year-1},quarter=${quarter},location=${location}";
+    return mapStraightThrough(getCohortIndicator(C, map(quarterly, mappings)));
   }
 
   private CohortIndicator getCohortIndicator(String name, Mapped<CohortDefinition> cohort) {
