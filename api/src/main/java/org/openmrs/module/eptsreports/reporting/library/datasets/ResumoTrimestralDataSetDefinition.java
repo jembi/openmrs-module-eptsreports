@@ -67,8 +67,8 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
         D,
         map(
             getCohortIndicator(
-                "DmT", map(getD(), "year=${year},quarter=${quarter},location=${location}")),
-            "year=${year-1},quarter=${quarter},location=${location}"),
+                "DmT", map(getD(), "year=${year-1},quarter=${quarter},location=${location}")),
+            "year=${year},quarter=${quarter},location=${location}"),
         NO_DIMENSION_OPTIONS);
     return dsd;
   }
@@ -190,10 +190,7 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
             genericCohortQueries.getStartedArtOnPeriod(false, true),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     cdC.addSearch(
-        "transferredOutC",
-        EptsReportUtils.map(
-            hivCohortQueries.getPatientsTransferredOut(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+        "transferredOutC", EptsReportUtils.map(hivCohortQueries.getPatientsTransferredOut(), ""));
     cdC.setCompositionString("startedArtC AND transferredOutC");
 
     // create another composition to combine the quarter
