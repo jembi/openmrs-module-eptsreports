@@ -65,12 +65,10 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     dsd.addColumn(
         "DmT",
         D,
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "DmT",
-                EptsReportUtils.map(
-                    getD(), "year=${year-1},quarter=${quarter},location=${location}")),
-            "year=${year},quarter=${quarter},location=${location}"),
+        map(
+            getCohortIndicator(
+                "DmT", map(getD(), "year=${year},quarter=${quarter},location=${location}")),
+            "year=${year-1},quarter=${quarter},location=${location}"),
         NO_DIMENSION_OPTIONS);
     return dsd;
   }
@@ -138,21 +136,50 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     cdA.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cdA.addParameter(new Parameter("location", "location", Location.class));
     cdA.addSearch(
-        "startedArt",
+        "startedArtA",
         EptsReportUtils.map(
             genericCohortQueries.getStartedArtOnPeriod(false, true),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     cdA.addSearch(
-        "transferredIn",
+        "transferredInA",
         EptsReportUtils.map(
             hivCohortQueries.getPatientsTransferredFromOtherHealthFacility(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdA.setCompositionString("startedArt AND NOT transferredIn");
-
+    cdA.setCompositionString("startedArtA AND NOT transferredInA");
+    // get indicators B
     CompositionCohortDefinition cdB = new CompositionCohortDefinition();
     cdB.setName("indicators B");
-    cdB.setParameters(cdA.getParameters());
-    cdB.setCompositionString("startedArt AND transferredIn");
+    cdB.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cdB.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cdB.addParameter(new Parameter("location", "location", Location.class));
+    cdB.addSearch(
+        "startedArtB",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtOnPeriod(false, true),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdB.addSearch(
+        "transferredInB",
+        EptsReportUtils.map(
+            hivCohortQueries.getPatientsTransferredFromOtherHealthFacility(),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdB.setCompositionString("startedArtB AND transferredInB");
+    // get indicators C
+    CompositionCohortDefinition cdC = new CompositionCohortDefinition();
+    cdC.setName("indicator C");
+    cdC.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cdC.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cdC.addParameter(new Parameter("location", "location", Location.class));
+    cdC.addSearch(
+        "startedArtC",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtOnPeriod(false, true),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdC.addSearch(
+        "transferredOutC",
+        EptsReportUtils.map(
+            hivCohortQueries.getPatientsTransferredOut(),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdC.setCompositionString("startedArtC AND transferredOutC");
 
     // create another composition to combine the quarters
     EptsQuarterlyCohortDefinition.Month month = null;
@@ -190,8 +217,23 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(
             getQuarterlyCohort(cdB, EptsQuarterlyCohortDefinition.Month.M3),
             "year=${year},quarter=${quarter},location=${location}"));
+    wrap.addSearch(
+        "C1",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdC, EptsQuarterlyCohortDefinition.Month.M1),
+            "year=${year},quarter=${quarter},location=${location}"));
+    wrap.addSearch(
+        "C2",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdC, EptsQuarterlyCohortDefinition.Month.M2),
+            "year=${year},quarter=${quarter},location=${location}"));
+    wrap.addSearch(
+        "C3",
+        EptsReportUtils.map(
+            getQuarterlyCohort(cdC, EptsQuarterlyCohortDefinition.Month.M3),
+            "year=${year},quarter=${quarter},location=${location}"));
 
-    wrap.setCompositionString("((A1 OR A2 OR A3 OR B1 OR B2 OR B3) AND NOT C)");
+    wrap.setCompositionString("(A1 OR A2 OR A3 OR B1 OR B2 OR B3) AND NOT (C1 OR C2 OR C3)");
 
     return wrap;
   }
