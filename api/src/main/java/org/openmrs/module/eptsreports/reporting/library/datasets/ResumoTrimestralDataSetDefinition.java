@@ -190,7 +190,10 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
             genericCohortQueries.getStartedArtOnPeriod(false, true),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     cdC.addSearch(
-        "transferredOutC", EptsReportUtils.map(hivCohortQueries.getPatientsTransferredOut(), ""));
+        "transferredOutC",
+        EptsReportUtils.map(
+            hivCohortQueries.getPatientsTransferredOut(),
+            "onOrBefore=${onOrBefore},location=${location}"));
     cdC.setCompositionString("startedArtC AND transferredOutC");
 
     // create another composition to combine the quarter
