@@ -10,7 +10,6 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.HivCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -32,14 +31,12 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
       "Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês";
 
   private static final String B =
-          "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
+      "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
 
   private static final String C =
-          "Nº de pacientes Transferidos para (-) outras US em TARV durante o mês";
+      "Nº de pacientes Transferidos para (-) outras US em TARV durante o mês";
 
   private static final String D = "Actual Cohort during the month";
-
-  private EptsGeneralIndicator eptsGeneralIndicator;
 
   private GenericCohortQueries genericCohortQueries;
 
@@ -47,10 +44,7 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
 
   @Autowired
   public ResumoTrimestralDataSetDefinition(
-      EptsGeneralIndicator eptsGeneralIndicator,
-      GenericCohortQueries genericCohortQueries,
-      HivCohortQueries hivCohortQueries) {
-    this.eptsGeneralIndicator = eptsGeneralIndicator;
+      GenericCohortQueries genericCohortQueries, HivCohortQueries hivCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
   }
@@ -69,13 +63,13 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     dsd.addColumn("Cm2", C, getC(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Cm3", C, getC(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
     dsd.addColumn(
-            "DmT",
-            D,
-            map(
-                    getCohortIndicator(
-                            "DmT", map(getD(), "year=${year},quarter=${quarter},location=${location}")),
-                    "year=${year-1},quarter=${quarter},location=${location}"),
-            NO_DIMENSION_OPTIONS);
+        "DmT",
+        D,
+        map(
+            getCohortIndicator(
+                "DmT", map(getD(), "year=${year},quarter=${quarter},location=${location}")),
+            "year=${year-1},quarter=${quarter},location=${location}"),
+        NO_DIMENSION_OPTIONS);
     return dsd;
   }
 
@@ -202,8 +196,7 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     cdC.setCompositionString("startedArtC AND transferredOutC");
 
-    // create another composition to combine the quarters
-    EptsQuarterlyCohortDefinition.Month month = null;
+    // create another composition to combine the quarter
     CompositionCohortDefinition wrap = new CompositionCohortDefinition();
     wrap.setName("Combine values for the quarter - D");
     wrap.addParameters(getParameters());
