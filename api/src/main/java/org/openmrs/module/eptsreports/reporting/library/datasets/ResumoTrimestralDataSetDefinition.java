@@ -10,6 +10,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.HivCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -31,10 +32,12 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
       "Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês";
 
   private static final String B =
-          "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
+      "Nº de pacientes Transferidos de (+) outras US em TARV durante o mês";
 
   private static final String C =
-          "Nº de pacientes Transferidos para (-) outras US em TARV durante o mês";
+      "Nº de pacientes Transferidos para (-) outras US em TARV durante o mês";
+
+  private static final String L = "Nº de pacientes óbitos durante o mês";
 
   private EptsGeneralIndicator eptsGeneralIndicator;
 
@@ -42,14 +45,18 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
 
   private HivCohortQueries hivCohortQueries;
 
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
+
   @Autowired
   public ResumoTrimestralDataSetDefinition(
       EptsGeneralIndicator eptsGeneralIndicator,
       GenericCohortQueries genericCohortQueries,
-      HivCohortQueries hivCohortQueries) {
+      HivCohortQueries hivCohortQueries,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.genericCohortQueries = genericCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   public DataSetDefinition constructResumoTrimestralDataset() {
@@ -65,6 +72,9 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     dsd.addColumn("Cm1", C, getC(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Cm2", C, getC(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Cm3", C, getC(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Lm1", L, getL(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Lm2", L, getL(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Lm3", L, getL(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
     return dsd;
   }
 
@@ -113,6 +123,26 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     CohortDefinition quarterly = getQuarterlyCohort(wrap, month);
     String mappings = "year=${year-1},quarter=${quarter},location=${location}";
     return mapStraightThrough(getCohortIndicator(C, map(quarterly, mappings)));
+  }
+
+  private Mapped<CohortIndicator> getL(EptsQuarterlyCohortDefinition.Month month) {
+    CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
+    CohortDefinition transferredOut = hivCohortQueries.getPatientsTransferredOut();
+    CohortDefinition transferredIn =
+        hivCohortQueries.getPatientsTransferredFromOtherHealthFacility();
+    CohortDefinition dead = resumoMensalCohortQueries.getPatientsWhoDied(true);
+    CompositionCohortDefinition wrap = new CompositionCohortDefinition();
+    wrap.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    wrap.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    wrap.addParameter(new Parameter("location", "location", Location.class));
+    wrap.addSearch("startedArt", mapStraightThrough(startedArt));
+    wrap.addSearch("transferredIn", mapStraightThrough(transferredIn));
+    wrap.addSearch("transferredOut", mapStraightThrough(transferredOut));
+    wrap.addSearch("dead", mapStraightThrough(dead));
+    wrap.setCompositionString("((startedArt AND transferredIn) AND NOT transferredOut) AND dead");
+    CohortDefinition quarterly = getQuarterlyCohort(wrap, month);
+    String mappings = "year=${year-1},quarter=${quarter},location=${location}";
+    return mapStraightThrough(getCohortIndicator(L, map(quarterly, mappings)));
   }
 
   private CohortIndicator getCohortIndicator(String name, Mapped<CohortDefinition> cohort) {
