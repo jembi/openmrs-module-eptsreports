@@ -36,7 +36,7 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
   private static final String C =
       "Nº de pacientes Transferidos para (-) outras US em TARV durante o mês";
 
-  private static final String D = "Actual Cohort during the month";
+  private static final String D = "Actual Cohort during the month((A+B) - C) - Total";
 
   private GenericCohortQueries genericCohortQueries;
 
