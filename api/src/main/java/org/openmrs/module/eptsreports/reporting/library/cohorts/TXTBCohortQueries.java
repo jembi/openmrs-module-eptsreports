@@ -582,7 +582,7 @@ public class TXTBCohortQueries {
   public CohortDefinition getPatientTransferredOutWithNODrugPickAfterTheTransferredDate() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("in tb in the previeus period");
+    cd.setName("Patient Transferred Out With No Drug Pick After TheTransferred out Date");
 
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
