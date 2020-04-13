@@ -20,16 +20,12 @@ public class ResumoTrimestralCohortQueries {
 
   private HivCohortQueries hivCohortQueries;
 
-  private ResumoMensalCohortQueries resumoMensalCohortQueries;
-
   @Autowired
   public ResumoTrimestralCohortQueries(
       GenericCohortQueries genericCohortQueries,
-      HivCohortQueries hivCohortQueries,
-      ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      HivCohortQueries hivCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
-    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   /** @return Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
@@ -130,13 +126,13 @@ public class ResumoTrimestralCohortQueries {
     CohortDefinition cohortA = getA();
     CohortDefinition cohortB = getB();
     CohortDefinition cohortC = getC();
-    CohortDefinition dead = resumoMensalCohortQueries.getPatientsWhoDied(true);
+    CohortDefinition dead = genericCohortQueries.getDeceasedPatients();
     cd.setParameters(getParameters());
     cd.addSearch("A", mapStraightThrough(cohortA));
     cd.addSearch("B", mapStraightThrough(cohortB));
     cd.addSearch("C", mapStraightThrough(cohortC));
     cd.addSearch("dead", mapStraightThrough(dead));
-    cd.setCompositionString("((A OR B) AND NOT C) AND dead");
+    cd.setCompositionString("((A OR B) AND NOT C) AND dead)");
     return cd;
   }
 
