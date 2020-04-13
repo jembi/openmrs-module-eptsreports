@@ -164,26 +164,6 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     return mapStraightThrough(getCohortIndicator(L, map(quarterly, mappings)));
   }
 
-  private Mapped<CohortIndicator> getL(EptsQuarterlyCohortDefinition.Month month) {
-    CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
-    CohortDefinition transferredOut = hivCohortQueries.getPatientsTransferredOut();
-    CohortDefinition transferredIn =
-        hivCohortQueries.getPatientsTransferredFromOtherHealthFacility();
-    CohortDefinition dead = resumoMensalCohortQueries.getPatientsWhoDied(true);
-    CompositionCohortDefinition wrap = new CompositionCohortDefinition();
-    wrap.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    wrap.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    wrap.addParameter(new Parameter("location", "location", Location.class));
-    wrap.addSearch("startedArt", mapStraightThrough(startedArt));
-    wrap.addSearch("transferredIn", mapStraightThrough(transferredIn));
-    wrap.addSearch("transferredOut", mapStraightThrough(transferredOut));
-    wrap.addSearch("dead", mapStraightThrough(dead));
-    wrap.setCompositionString("((startedArt AND transferredIn) AND NOT transferredOut) AND dead");
-    CohortDefinition quarterly = getQuarterlyCohort(wrap, month);
-    String mappings = "year=${year-1},quarter=${quarter},location=${location}";
-    return mapStraightThrough(getCohortIndicator(L, map(quarterly, mappings)));
-  }
-
   private CohortIndicator getCohortIndicator(String name, Mapped<CohortDefinition> cohort) {
     CohortIndicator indicator = new CohortIndicator(name);
     indicator.setCohortDefinition(cohort);
