@@ -402,6 +402,7 @@ public class TxMlCohortQueries {
     cd.setCompositionString(
         "(LeftARTProgramBeforeOrOnEndDate OR permanentStateTransferredOut OR MissedVisitCard) AND NOT  MostRecentDateHaveFilaOrConsultation ");
 
+    
     return cd;
   }
 
@@ -861,8 +862,13 @@ public class TxMlCohortQueries {
             + " INNER JOIN obs o ON o.encounter_id = e.encounter_id   "
             + " WHERE  e.voided = 0  "
             + "        AND o.voided = 0  "
-            + "        AND ( e.encounter_type = ${masterCardDrugPickupEncounterType} AND o.concept_id = ${artDatePickup} AND o.value_datetime > lastest.last_date AND  o.value_datetime < :endDate)  "
-            + "        OR  ( e.encounter_type IN (${adultoSeguimentoEncounterType},${pediatriaSeguimentoEncounterType},${pharmaciaEncounterType})  AND e.encounter_datetime > lastest.last_date AND  e.encounter_datetime < :endDate)  "
+            + "        AND (( e.encounter_type = ${masterCardDrugPickupEncounterType} "
+            + "					AND o.concept_id = ${artDatePickup} "
+            + "					AND o.value_datetime > lastest.last_date "
+            + "					AND  o.value_datetime <= :endDate)  "
+            + "        OR  ( e.encounter_type IN (${adultoSeguimentoEncounterType},${pediatriaSeguimentoEncounterType},${pharmaciaEncounterType})  "
+            + "					AND e.encounter_datetime > lastest.last_date "
+            + "					AND  e.encounter_datetime <= :endDate))  "
             + "        AND e.location_id = :location  "
             + " GROUP BY lastest.patient_id) mostrecent"
             + " GROUP BY mostrecent.patient_id";
