@@ -137,9 +137,7 @@ public class ResumoTrimestralCohortQueries {
 
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
     comp.setName("I indicator - Suspended Patients");
-    comp.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    comp.addParameter(new Parameter("endDate", "End Date", Date.class));
-    comp.addParameter(new Parameter("location", "Location", Location.class));
+    comp.setParameters(getParameters());
     comp.addSearch("A", mapStraightThrough(indicatorA));
     comp.addSearch("B", mapStraightThrough(indicatorB));
     comp.addSearch("C", mapStraightThrough(indicatorC));
