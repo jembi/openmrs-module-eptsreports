@@ -402,7 +402,6 @@ public class TxMlCohortQueries {
     cd.setCompositionString(
         "(LeftARTProgramBeforeOrOnEndDate OR permanentStateTransferredOut OR MissedVisitCard) AND NOT  MostRecentDateHaveFilaOrConsultation ");
 
-    
     return cd;
   }
 
