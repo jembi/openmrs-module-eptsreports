@@ -22,8 +22,7 @@ public class ResumoTrimestralCohortQueries {
 
   @Autowired
   public ResumoTrimestralCohortQueries(
-      GenericCohortQueries genericCohortQueries,
-      HivCohortQueries hivCohortQueries) {
+      GenericCohortQueries genericCohortQueries, HivCohortQueries hivCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
   }
@@ -132,7 +131,7 @@ public class ResumoTrimestralCohortQueries {
     cd.addSearch("B", mapStraightThrough(cohortB));
     cd.addSearch("C", mapStraightThrough(cohortC));
     cd.addSearch("dead", mapStraightThrough(dead));
-    cd.setCompositionString("((A OR B) AND NOT C) AND dead)");
+    cd.setCompositionString("((A OR B) AND NOT C) AND dead");
     return cd;
   }
 
