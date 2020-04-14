@@ -112,6 +112,10 @@ public class ResumoTrimestralCohortQueries {
 
   /** @return Number of Suspended patients in the actual cohort */
   public CohortDefinition getI() {
+    CohortDefinition indicatorA = getA();
+    CohortDefinition indicatorB = getB();
+    CohortDefinition indicatorC = getC();
+
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Number of patients with ART suspension during the current month");
     sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
@@ -131,7 +135,17 @@ public class ResumoTrimestralCohortQueries {
             hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId()));
 
-    return sqlCohortDefinition;
+    CompositionCohortDefinition comp = new CompositionCohortDefinition();
+    comp.setName("I indicator - Suspended Patients");
+    comp.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    comp.addParameter(new Parameter("endDate", "End Date", Date.class));
+    comp.addParameter(new Parameter("location", "Location", Location.class));
+    comp.addSearch("A", mapStraightThrough(indicatorA));
+    comp.addSearch("B", mapStraightThrough(indicatorB));
+    comp.addSearch("C", mapStraightThrough(indicatorC));
+    comp.addSearch("Suspended", mapStraightThrough(sqlCohortDefinition));
+    comp.setCompositionString("((A OR B) AND NOT C) AND Suspended");
+    return comp;
   }
 
   /** @return Number of Abandoned Patients in the actual cohort */
