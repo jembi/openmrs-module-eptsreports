@@ -119,7 +119,6 @@ public class ResumoTrimestralQueries {
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     return sub.replace(sql);
   }
-}
 
   public static String getPatientsInTheFirstLineOfTreatment(
       int adultoSeguimentoEncounterType, int therapeuticLineConcept, int firstLineConcept) {

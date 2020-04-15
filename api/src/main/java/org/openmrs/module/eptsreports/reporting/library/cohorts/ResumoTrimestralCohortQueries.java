@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.Arrays;
@@ -21,8 +20,6 @@ public class ResumoTrimestralCohortQueries {
 
   private GenericCohortQueries genericCohortQueries;
   private HivCohortQueries hivCohortQueries;
-  private HivMetadata hivMetadata;
-
   private HivMetadata hivMetadata;
 
   @Autowired
@@ -81,23 +78,24 @@ public class ResumoTrimestralCohortQueries {
 
   /** @return Number of patients who is in the 1st line treatment during the cohort month */
   public CohortDefinition getE() {
-        CohortDefinition preTarv = getA();
-        CohortDefinition transferredIn = getB();
-        CohortDefinition transferredOut = getC();
-        CohortDefinition suspended = getI();
-        CohortDefinition abandoned = getJ();
-        CohortDefinition dead = getL();
-        CohortDefinition inTheFirstLine = getPatientsInTheFirstLineOfTreatment();
-        String queryParamenters = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+    CohortDefinition preTarv = getA();
+    CohortDefinition transferredIn = getB();
+    CohortDefinition transferredOut = getC();
+    CohortDefinition suspended = getI();
+    CohortDefinition abandoned = getJ();
+    CohortDefinition dead = getL();
+    CohortDefinition inTheFirstLine = getPatientsInTheFirstLineOfTreatment();
 
-        CompositionCohortDefinition wrapper = new CompositionCohortDefinition();
-        wrapper.addSearch("preTarv", map(preTarv, queryParamenters));
-        wrapper.addSearch("transferredIn", map(transferredIn, queryParamenters));
-        wrapper.addSearch("transferredOut", map(transferredOut, queryParamenters));
-        wrapper.addSearch("suspended", map(suspended, queryParamenters));
-        wrapper.addSearch("abandoned", map(abandoned, queryParamenters));
-        wrapper.addSearch("dead", map(dead, queryParamenters));
-        wrapper.addSearch("inTheFirstLine", map(inTheFirstLine, queryParamenters));
+    CompositionCohortDefinition wrapper = new CompositionCohortDefinition();
+    wrapper.setParameters(getParameters());
+    wrapper.addSearch("preTarv", mapStraightThrough(preTarv));
+    wrapper.addSearch("transferredIn", mapStraightThrough(transferredIn));
+    wrapper.addSearch("transferredOut", mapStraightThrough(transferredOut));
+    wrapper.addSearch("suspended", mapStraightThrough(suspended));
+    wrapper.addSearch("abandoned", mapStraightThrough(abandoned));
+    wrapper.addSearch("dead", mapStraightThrough(dead));
+    wrapper.addSearch("inTheFirstLine", mapStraightThrough(inTheFirstLine));
+
     wrapper.setCompositionString(
         "((preTarv OR transferredIn) NOT (transferredOut AND suspended AND abandoned AND dead)) AND inTheFirstLine ");
     return wrapper;
