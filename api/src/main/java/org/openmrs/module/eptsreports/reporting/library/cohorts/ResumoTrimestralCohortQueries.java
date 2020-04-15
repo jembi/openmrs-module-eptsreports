@@ -22,8 +22,6 @@ public class ResumoTrimestralCohortQueries {
   private HivCohortQueries hivCohortQueries;
   private HivMetadata hivMetadata;
 
-  private HivMetadata hivMetadata;
-
   @Autowired
   public ResumoTrimestralCohortQueries(
       GenericCohortQueries genericCohortQueries,
