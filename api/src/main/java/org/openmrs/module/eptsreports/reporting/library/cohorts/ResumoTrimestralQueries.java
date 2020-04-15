@@ -14,22 +14,26 @@ public class ResumoTrimestralQueries {
         "SELECT tbl.patient_id  FROM "
             + " (SELECT patient_id, e.encounter_id FROM encounter e "
             + " JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "     AND e.encounter_type = 6 "
-            + "     AND o.concept_id = 21151 "
-            + "     AND o.value_coded = 21150 "
+            + "     AND e.encounter_type = ${adultoSeguimentoEncounterType} "
+            + "     AND o.concept_id = ${therapeuticLineConcept} "
+            + "     AND o.value_coded = ${firstLineConcept} "
+            + "     AND o.location_id = :location "
             + "     AND o.voided = 0 "
             + " UNION "
             + " SELECT patient_id, e.encounter_id FROM encounter e "
             + " JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "     AND e.encounter_type = 6 "
-            + "     AND o.concept_id = 21151 "
+            + "     AND e.encounter_type = ${adultoSeguimentoEncounterType} "
+            + "     AND o.concept_id = ${therapeuticLineConcept} "
             + "     AND isnull(o.value_coded) "
+            + "     AND o.location_id = :location "
             + "     AND o.voided = 0) tbl "
             + " JOIN patient p ON p.patient_id = tbl.patient_id "
             + " JOIN encounter enc ON enc.encounter_id = tbl.encounter_id "
             + "     AND enc.voided = 0 "
+            + "     AND enc.location_id = :location "
             + "     AND p.voided = 0 "
-            + "     AND enc.encounter_datetime <= '2019-12-20' ";
+            + "     AND enc.encounter_datetime <= :onOrBefore "
+            + "     GROUP BY patient_id ";
 
     Map<String, Integer> map = new HashMap<>();
     map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
