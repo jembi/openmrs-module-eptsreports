@@ -1,14 +1,17 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.AllPatientsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,11 +23,16 @@ public class ResumoTrimestralCohortQueries {
 
   private HivCohortQueries hivCohortQueries;
 
+  private HivMetadata hivMetadata;
+
   @Autowired
   public ResumoTrimestralCohortQueries(
-      GenericCohortQueries genericCohortQueries, HivCohortQueries hivCohortQueries) {
+      GenericCohortQueries genericCohortQueries,
+      HivCohortQueries hivCohortQueries,
+      HivMetadata hivMetadata) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
+    this.hivMetadata = hivMetadata;
   }
 
   /** @return Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
@@ -73,9 +81,29 @@ public class ResumoTrimestralCohortQueries {
 
   /** @return Number of patients who is in the 1st line treatment during the cohort month */
   public CohortDefinition getE() {
-    AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
-    cd.setParameters(getParameters());
-    return cd;
+    CohortDefinition preTarv = getA();
+    CohortDefinition transferredIn = getB();
+    CohortDefinition transferredOut = getC();
+    CohortDefinition suspended = getI();
+    CohortDefinition abandoned = getJ();
+    CohortDefinition dead = getL();
+    CohortDefinition inTheFirstLine = getPatientsInTheFirstLineOfTreatment();
+    String mapParamenters = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+
+    CompositionCohortDefinition wrapper = new CompositionCohortDefinition();
+    wrapper.setParameters(getParameters());
+    wrapper.addSearch("preTarv",mapStraightThrough(preTarv));
+    wrapper.addSearch("transferredIn",mapStraightThrough(transferredIn));
+    wrapper.addSearch("transferredOut",mapStraightThrough(transferredOut));
+    wrapper.addSearch("suspended",mapStraightThrough(suspended));
+    wrapper.addSearch("abandoned",mapStraightThrough(abandoned));
+    wrapper.addSearch("dead",mapStraightThrough(dead));
+    wrapper.addSearch("inTheFirstLine", map(inTheFirstLine, mapParamenters));
+
+    //wrapper.setCompositionString("inTheFirstLine");
+
+     wrapper.setCompositionString("((preTarv OR transferredIn) NOT (transferredOut AND suspended AND abandoned AND dead)) AND inTheFirstLine  ");
+    return wrapper;
   }
 
   /**
@@ -116,6 +144,21 @@ public class ResumoTrimestralCohortQueries {
   public CohortDefinition getJ() {
     AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
     cd.setParameters(getParameters());
+    return cd;
+  }
+
+  /** Fetches patients in the first line of treatment */
+  private CohortDefinition getPatientsInTheFirstLineOfTreatment() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients in the first Line of treatment during a period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setQuery(
+        ResumoTrimestralQueries.getPatientsInTheFirstLineOfTreatment(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getTherapeuticLineConcept().getConceptId(),
+            hivMetadata.getFirstLineConcept().getConceptId()));
     return cd;
   }
 

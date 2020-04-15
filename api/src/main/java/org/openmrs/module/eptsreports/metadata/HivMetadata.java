@@ -256,6 +256,21 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
+  // concept_id=21150
+  public Concept getFirstLineConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.firstLineConceptUuid");
+    return getConcept(uuid);
+  }
+
+  // concept_id=21151
+  public Concept getTherapeuticLineConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.therapeuticLineConceptUuid");
+    return getConcept(uuid);
+  }
+
   // concept_id=5356
   public Concept getcurrentWhoHivStageConcept() {
     String uuid =
