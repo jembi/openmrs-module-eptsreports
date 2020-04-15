@@ -86,11 +86,11 @@ public class ResumoTrimestralCohortQueries {
   }
 
   /**
-   * @return Number of patients in Cohort who completed 12 months ARV treatment in the 1st line
-   *     treatment who received one Viral load result
+   * SqlCohortDefinition for Viral Load Result
+   *
+   * @return
    */
-  public CohortDefinition getF() {
-    CohortDefinition cohortE = getE();
+  public CohortDefinition getViralLoadResult() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         "Patients in the 1st line treatment who received one Viral load result");
@@ -103,10 +103,21 @@ public class ResumoTrimestralCohortQueries {
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getBeyondDetectableLimitConcept().getConceptId()));
 
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * @return Number of patients in Cohort who completed 12 months ARV treatment in the 1st line
+   *     treatment who received one Viral load result
+   */
+  public CohortDefinition getF() {
+    CohortDefinition cohortE = getE();
+    CohortDefinition viralLoadResult = getViralLoadResult();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addSearch("E", mapStraightThrough(cohortE));
-    cd.addSearch("FI", mapStraightThrough(sqlCohortDefinition));
-    cd.setCompositionString("E AND NOT FI");
+    cd.addSearch("cohortE", mapStraightThrough(cohortE));
+    cd.addSearch("viralLoadResult", mapStraightThrough(viralLoadResult));
+    cd.setCompositionString("cohortE AND viralLoadResult");
+
     return cd;
   }
 

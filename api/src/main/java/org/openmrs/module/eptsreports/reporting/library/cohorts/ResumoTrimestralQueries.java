@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.text.StringSubstitutor;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,9 +16,15 @@ public class ResumoTrimestralQueries {
             + "ON p.patient_id = e.patient_id JOIN obs o "
             + "ON o.encounter_id = e.encounter_id "
             + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND "
-            + "e.encounter_type = %d AND (o.concept_id = %d AND o.value_numeric IS NOT NULL) "
-            + "OR (o.concept_id = %d AND o.value_numeric IS NOT NULL) "
+            + "e.encounter_type = ${encounterType} AND (o.concept_id = ${viralLoad} AND o.value_numeric IS NOT NULL) "
+            + "OR (o.concept_id = ${viralLoadQualitative} AND o.value_numeric IS NOT NULL) "
             + "AND e.encounter_datetime <= :onOrBefore group by patient_id";
-    return String.format(query, encounterType, viralLoad, viralLoadQualitative);
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("encounterType", encounterType);
+    valuesMap.put("viralLoad", viralLoad);
+    valuesMap.put("viralLoadQualitative", viralLoadQualitative);
+    StringSubstitutor sub = new StringSubstitutor(valuesMap);
+    return sub.replace(query);
   }
 }
