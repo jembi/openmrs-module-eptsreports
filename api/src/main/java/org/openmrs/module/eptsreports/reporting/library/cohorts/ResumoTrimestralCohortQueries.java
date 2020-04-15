@@ -191,7 +191,7 @@ public class ResumoTrimestralCohortQueries {
     // create another composition to combine the quarter
     CompositionCohortDefinition wrap = new CompositionCohortDefinition();
     wrap.setName("Combine values for the quarter - D");
-    wrap.addParameters(getParameters());
+    wrap.addParameters(getParameters);
     wrap.addSearch(
         "A1",
         EptsReportUtils.map(
