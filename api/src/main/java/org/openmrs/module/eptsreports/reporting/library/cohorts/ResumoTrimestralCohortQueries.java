@@ -6,9 +6,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.AllPatientsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,11 +22,16 @@ public class ResumoTrimestralCohortQueries {
 
   private HivCohortQueries hivCohortQueries;
 
+  private HivMetadata hivMetadata;
+
   @Autowired
   public ResumoTrimestralCohortQueries(
-      GenericCohortQueries genericCohortQueries, HivCohortQueries hivCohortQueries) {
+      GenericCohortQueries genericCohortQueries,
+      HivCohortQueries hivCohortQueries,
+      HivMetadata hivMetadata) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
+    this.hivMetadata = hivMetadata;
   }
 
   /** @return Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
@@ -83,8 +90,23 @@ public class ResumoTrimestralCohortQueries {
    *     treatment who received one Viral load result
    */
   public CohortDefinition getF() {
-    AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
-    cd.setParameters(getParameters());
+    CohortDefinition cohortE = getE();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Patients in the 1st line treatment who received one Viral load result");
+    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.setQuery(
+        ResumoTrimestralQueries.getPatientsWhoReceivedOneViralLoadResult(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getBeyondDetectableLimitConcept().getConceptId()));
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addSearch("E", mapStraightThrough(cohortE));
+    cd.addSearch("FI", mapStraightThrough(sqlCohortDefinition));
+    cd.setCompositionString("E AND NOT FI");
     return cd;
   }
 
