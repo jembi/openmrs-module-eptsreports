@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 public class ResumoTrimestralCohortQueries {
 
   private GenericCohortQueries genericCohortQueries;
-
   private HivCohortQueries hivCohortQueries;
+  private HivMetadata hivMetadata;
 
   private HivMetadata hivMetadata;
 
@@ -140,9 +140,37 @@ public class ResumoTrimestralCohortQueries {
 
   /** @return Number of Suspended patients in the actual cohort */
   public CohortDefinition getI() {
-    AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
-    cd.setParameters(getParameters());
-    return cd;
+    CohortDefinition indicatorA = getA();
+    CohortDefinition indicatorB = getB();
+    CohortDefinition indicatorC = getC();
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Number of patients with ART suspension during the current month");
+    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.setQuery(
+        ResumoTrimestralQueries.getPatientsWhoSuspendedTreatment(
+            hivMetadata.getARTProgram().getProgramId(),
+            hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getSuspendedTreatmentConcept().getConceptId(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+            hivMetadata.getArtDatePickupMasterCard().getConceptId()));
+
+    CompositionCohortDefinition comp = new CompositionCohortDefinition();
+    comp.setName("I indicator - Suspended Patients");
+    comp.setParameters(getParameters());
+    comp.addSearch("A", mapStraightThrough(indicatorA));
+    comp.addSearch("B", mapStraightThrough(indicatorB));
+    comp.addSearch("C", mapStraightThrough(indicatorC));
+    comp.addSearch("Suspended", mapStraightThrough(sqlCohortDefinition));
+    comp.setCompositionString("((A OR B) AND NOT C) AND Suspended");
+    return comp;
   }
 
   /** @return Number of Abandoned Patients in the actual cohort */
@@ -154,8 +182,17 @@ public class ResumoTrimestralCohortQueries {
 
   /** @return Number of Deceased patients in the actual cohort */
   public CohortDefinition getL() {
-    AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    CohortDefinition cohortA = getA();
+    CohortDefinition cohortB = getB();
+    CohortDefinition cohortC = getC();
+    CohortDefinition dead = genericCohortQueries.getDeceasedPatients();
     cd.setParameters(getParameters());
+    cd.addSearch("A", mapStraightThrough(cohortA));
+    cd.addSearch("B", mapStraightThrough(cohortB));
+    cd.addSearch("C", mapStraightThrough(cohortC));
+    cd.addSearch("dead", mapStraightThrough(dead));
+    cd.setCompositionString("((A OR B) AND NOT C) AND dead");
     return cd;
   }
 
