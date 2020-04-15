@@ -123,7 +123,6 @@ public class ResumoTrimestralCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
     sqlCohortDefinition.setQuery(
         ResumoTrimestralQueries.getPatientsWhoSuspendedTreatment(
-            true,
             hivMetadata.getARTProgram().getProgramId(),
             hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),

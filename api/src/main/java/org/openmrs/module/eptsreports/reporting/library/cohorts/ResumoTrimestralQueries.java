@@ -14,7 +14,6 @@ public class ResumoTrimestralQueries {
    * @return String
    */
   public static String getPatientsWhoSuspendedTreatment(
-      boolean useBothDates,
       int art,
       int suspendedState,
       int adultSeg,
@@ -55,11 +54,7 @@ public class ResumoTrimestralQueries {
     sql.append("              AND pp.location_id = :location ");
     sql.append("              AND ps.voided = 0 ");
     sql.append("              AND ps.state = ${suspendedState} ");
-    if (useBothDates) {
-      sql.append("            AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ");
-    } else {
-      sql.append("            AND ps.start_date  <= :onOrBefore ");
-    }
+    sql.append("            AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ");
     sql.append("              AND ps.end_date = NULL ");
     sql.append("            UNION ");
     sql.append("            SELECT p.patient_id, ");
@@ -73,11 +68,7 @@ public class ResumoTrimestralQueries {
     sql.append("              AND e.voided = 0 ");
     sql.append("              AND e.location_id = :location ");
     sql.append("              AND e.encounter_type = ${adultSeg} ");
-    if (useBothDates) {
-      sql.append("            AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore ");
-    } else {
-      sql.append("            AND e.encounter_datetime  <= :onOrBefore ");
-    }
+    sql.append("            AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore ");
     sql.append("              AND o.voided = 0 ");
     sql.append("              AND o.concept_id = ${artStateOfStay} ");
     sql.append("              AND o.value_coded = ${suspendedConcept} ");
@@ -95,11 +86,7 @@ public class ResumoTrimestralQueries {
     sql.append("              AND e.encounter_type = ${masterCard} ");
     sql.append("              AND o.voided = 0 ");
     sql.append("              AND o.concept_id = ${preArtStateOfStay} ");
-    if (useBothDates) {
-      sql.append("            AND o.obs_datetime BETWEEN :onOrAfter AND :onOrBefore ");
-    } else {
-      sql.append("            AND o.obs_datetime  <= :onOrBefore ");
-    }
+    sql.append("            AND o.obs_datetime BETWEEN :onOrAfter AND :onOrBefore ");
     sql.append("              AND o.value_coded = ${suspendedConcept}) transferout ");
     sql.append("      GROUP BY patient_id) max_transferout ");
     sql.append("WHERE patient_id NOT IN (SELECT p.patient_id ");
