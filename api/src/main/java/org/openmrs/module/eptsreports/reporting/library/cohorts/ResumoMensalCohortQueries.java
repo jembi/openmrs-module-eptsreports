@@ -458,9 +458,9 @@ public class ResumoMensalCohortQueries {
             + "              AND e.location_id = :locationList "
             + "              AND e.encounter_type = ${adultoSeguimento} ";
     if (hasStartDate) {
-      sql  += "AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore ";
+      sql += "AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore ";
     } else {
-      sql  += "AND e.encounter_datetime <= :onOrBefore ";
+      sql += "AND e.encounter_datetime <= :onOrBefore ";
     }
     sql =
         sql
@@ -480,9 +480,9 @@ public class ResumoMensalCohortQueries {
             + "              AND e.location_id = :locationList "
             + "              AND e.encounter_type = ${masterCard} ";
     if (hasStartDate) {
-      sql  += "AND o.obs_datetime BETWEEN :onOrAfter AND :onOrBefore ";
+      sql += "AND o.obs_datetime BETWEEN :onOrAfter AND :onOrBefore ";
     } else {
-      sql  += "AND o.obs_datetime <= :onOrBefore ";
+      sql += "AND o.obs_datetime <= :onOrBefore ";
     }
     sql =
         sql
@@ -498,9 +498,9 @@ public class ResumoMensalCohortQueries {
             + "       WHERE pg.voided=0 AND ps.voided=0 AND p.voided=0 "
             + "         AND pg.program_id=${arvProgram}  AND ps.state=${deadState} AND ps.end_date is null ";
     if (hasStartDate) {
-      sql  += "AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ";
+      sql += "AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ";
     } else {
-      sql  += "AND ps.start_date <= :onOrBefore ";
+      sql += "AND ps.start_date <= :onOrBefore ";
     }
     sql =
         sql
@@ -511,9 +511,9 @@ public class ResumoMensalCohortQueries {
             + "      FROM person p "
             + "      WHERE p.dead=1 AND p.voided = 0 ";
     if (hasStartDate) {
-      sql  += " AND p.death_date BETWEEN :onOrAfter AND :onOrBefore ";
+      sql += " AND p.death_date BETWEEN :onOrAfter AND :onOrBefore ";
     } else {
-      sql  += " AND p.death_date <= :onOrBefore ";
+      sql += " AND p.death_date <= :onOrBefore ";
     }
     sql =
         sql
