@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.Arrays;
@@ -20,11 +21,16 @@ public class ResumoTrimestralCohortQueries {
 
   private HivCohortQueries hivCohortQueries;
 
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
+
   @Autowired
   public ResumoTrimestralCohortQueries(
-      GenericCohortQueries genericCohortQueries, HivCohortQueries hivCohortQueries) {
+      GenericCohortQueries genericCohortQueries,
+      HivCohortQueries hivCohortQueries,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   /** @return Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
@@ -114,8 +120,17 @@ public class ResumoTrimestralCohortQueries {
 
   /** @return Number of Abandoned Patients in the actual cohort */
   public CohortDefinition getJ() {
-    AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
+    CohortDefinition abandoned =
+        resumoMensalCohortQueries.getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(true);
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setParameters(getParameters());
+    cd.addSearch("A", mapStraightThrough(getA()));
+    cd.addSearch("B", mapStraightThrough(getB()));
+    cd.addSearch("abandoned", map(abandoned, "date=${onOrBefore},location=${location}"));
+    cd.addSearch("C", mapStraightThrough(getC()));
+    cd.addSearch("I", mapStraightThrough(getI()));
+    cd.addSearch("L", mapStraightThrough(getL()));
+    cd.setCompositionString("(A OR B) AND abandoned NOT (C OR I OR L)");
     return cd;
   }
 
