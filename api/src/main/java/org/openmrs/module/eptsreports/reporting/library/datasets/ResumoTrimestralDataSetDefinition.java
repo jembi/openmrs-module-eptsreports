@@ -72,9 +72,12 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     dsd.addColumn("Cm1", C, getC(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Cm2", C, getC(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Cm3", C, getC(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Dm1", D, getD(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Dm2", D, getD(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Dm3", D, getD(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
+    dsd.addColumn(
+        "Dm1", D + " M1", getD(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
+    dsd.addColumn(
+        "Dm2", D + " M2", getD(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
+    dsd.addColumn(
+        "Dm3", D + " M3", getD(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Em1", E, getE(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Em2", E, getE(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Em3", E, getE(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
