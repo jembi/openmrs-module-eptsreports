@@ -586,7 +586,7 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getTransferredInForB10() {
+  public CohortDefinition getTransferredInForB10() {
     EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
     cd.setName(
         "Number of patients transferred-in from another HF during a period less than startDate B10 ");
@@ -627,8 +627,8 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B7A",
         map(
-            getNumberOfPatientsWhoAbandonedArtDuringCurrentMonthForB7(),
-            "location=${location},onOrBefore=${startDate-1d}"));
+            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(true),
+            "location=${location},date=${startDate}"));
     cd.addSearch(
         "B8A",
         map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
