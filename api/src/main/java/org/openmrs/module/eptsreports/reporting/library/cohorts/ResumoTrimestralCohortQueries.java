@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.Arrays;
@@ -115,7 +116,9 @@ public class ResumoTrimestralCohortQueries {
     comp.addSearch("I", mapStraightThrough(indicatorI));
     comp.addSearch("J", mapStraightThrough(indicatorJ));
     comp.addSearch("L", mapStraightThrough(indicatorL));
-    comp.addSearch("lastSecondTherapeuticLine", mapStraightThrough(lastSecondTherapeuticLine));
+    comp.addSearch(
+        "lastSecondTherapeuticLine",
+        map(lastSecondTherapeuticLine, "onOrBefore=${onOrBefore}, locationList=${location}"));
     comp.setCompositionString(
         "((A OR B) AND NOT (C OR I OR J OR L)) AND lastSecondTherapeuticLine");
     return comp;
@@ -198,7 +201,8 @@ public class ResumoTrimestralCohortQueries {
   private CohortDefinition
       getPatientsWithLastCodedObsInSecondTherapeuticLineInMasterCardBeforeMonthEndDate() {
     CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.setParameters(getParameters());
+    cd.addParameter(new Parameter("onOrBefore", "End date", Date.class));
+    cd.addParameter(new Parameter("locationList", "Location", Location.class));
     cd.addEncounterType(hivMetadata.getMasterCardEncounterType());
     cd.setTimeModifier(TimeModifier.LAST);
     cd.setQuestion(hivMetadata.getTherapeuticLineConcept());
