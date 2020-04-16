@@ -628,7 +628,7 @@ public class ResumoMensalCohortQueries {
         "B7A",
         map(
             getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(true),
-            "location=${location},date=${startDate}"));
+            "location=${location},date=${startDate-1d}"));
     cd.addSearch(
         "B8A",
         map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
@@ -1535,6 +1535,11 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
+        "F1",
+        map(
+            getNumberOfPatientsWhoHadClinicalAppointmentDuringTheReportingMonthF1(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
         "F2F",
         map(
             getPatientsWithTBScreening(),
@@ -1543,7 +1548,7 @@ public class ResumoMensalCohortQueries {
         "F2x",
         map(sqlCohortDefinition, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("F2F AND NOT F2x");
+    cd.setCompositionString("(F1 AND F2F) AND NOT F2x");
     return cd;
   }
 
@@ -1649,7 +1654,7 @@ public class ResumoMensalCohortQueries {
         "B7I",
         map(
             getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(false),
-            "date=${onOrBefore},location=${location}"));
+            "date=${onOrBefore-1d},location=${location}"));
     ccd.addSearch(
         "B7II",
         map(

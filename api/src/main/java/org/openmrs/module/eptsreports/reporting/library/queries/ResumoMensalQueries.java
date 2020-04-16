@@ -186,6 +186,7 @@ public class ResumoMensalQueries {
             + "  AND ee.location_id = :location  "
             + "  AND ee.encounter_type= ${adultoSeguimentoEncounterType} "
             + "    AND oo.concept_id = ${tBTreatmentPlanConcept} "
+            + "    AND oo.value_coded is not null"
             + "    AND ee.encounter_datetime = screening_date "
             + "GROUP BY pp.patient_id "
             + "";
@@ -571,7 +572,7 @@ public class ResumoMensalQueries {
         "                                 AND enc.encounter_type = ${arvPharmaciaEncounterType}   ");
     query.append("                                 AND enc.location_id = :location   ");
 
-    query.append("                                 AND enc.encounter_datetime <= :date   ");
+    query.append("                                 AND datediff(enc.encounter_datetime,:date) <=0");
 
     query.append("                             GROUP  BY pa.patient_id) fila   ");
     query.append("                         INNER JOIN encounter e on  ");
@@ -605,14 +606,14 @@ public class ResumoMensalQueries {
         "                             AND enc.encounter_type = ${masterCardDrugPickupEncounterType}   ");
     query.append("                             AND enc.location_id = :location   ");
 
-    query.append("                             AND obs.value_datetime <= :date   ");
+    query.append("                             AND datediff(obs.value_datetime,:date) <=0");
     query.append("                        GROUP  BY pa.patient_id   ");
     query.append("                    ) most_recent   ");
     query.append("                GROUP BY most_recent.patient_id   ");
     if (untilEndDate == true) {
-      query.append("                HAVING final_encounter_date <= :date   ");
+      query.append("                HAVING datediff(final_encounter_date,:date) <= 0");
     } else {
-      query.append("                HAVING final_encounter_date < :date   ");
+      query.append("                HAVING datediff(final_encounter_date,:date) < 0  ");
     }
     query.append("             ) final   ");
     query.append("             GROUP BY final.patient_id ");
