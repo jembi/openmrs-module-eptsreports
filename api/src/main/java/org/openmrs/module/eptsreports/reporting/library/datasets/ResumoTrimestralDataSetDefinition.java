@@ -72,17 +72,9 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     dsd.addColumn("Cm1", C, getC(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Cm2", C, getC(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Cm3", C, getC(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn(
-        "DmT",
-        D,
-        map(
-            getCohortIndicator(
-                "DmT",
-                map(
-                    resumoTrimestralCohortQueries.getD(getParameters()),
-                    "year=${year-1},quarter=${quarter},location=${location}")),
-            "year=${year},quarter=${quarter},location=${location}"),
-        NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Dm1", D, getD(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Dm2", D, getD(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
+    dsd.addColumn("Dm3", D, getD(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Em1", E, getE(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Em2", E, getE(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Em3", E, getE(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
@@ -129,6 +121,14 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
         resumoTrimestralCohortQueries.getQuarterlyCohort(getParameters(), wrap, month);
     String mappings = "year=${year-1},quarter=${quarter},location=${location}";
     return mapStraightThrough(getCohortIndicator(C, map(quarterly, mappings)));
+  }
+
+  private Mapped<CohortIndicator> getD(EptsQuarterlyCohortDefinition.Month month) {
+    CohortDefinition wrap = resumoTrimestralCohortQueries.getD();
+    CohortDefinition quarterly =
+        resumoTrimestralCohortQueries.getQuarterlyCohort(getParameters(), wrap, month);
+    String mappings = "year=${year-1},quarter=${quarter},location=${location}";
+    return mapStraightThrough(getCohortIndicator(D, map(quarterly, mappings)));
   }
 
   private Mapped<CohortIndicator> getE(EptsQuarterlyCohortDefinition.Month month) {

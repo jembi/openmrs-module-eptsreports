@@ -178,112 +178,27 @@ public class ResumoTrimestralCohortQueries {
   }
 
   /** @return ((A+B) - C) */
-  public CohortDefinition getD(List<Parameter> getParameters) {
-    CompositionCohortDefinition cdA = new CompositionCohortDefinition();
-    cdA.setName("Indicators A");
-    cdA.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cdA.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cdA.addParameter(new Parameter("location", "location", Location.class));
-    cdA.addSearch(
-        "startedArtA",
+  public CohortDefinition getD() {
+    CompositionCohortDefinition cdAbc = new CompositionCohortDefinition();
+    cdAbc.setName("Indicators A, B and C parameters");
+    cdAbc.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cdAbc.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cdAbc.addParameter(new Parameter("location", "location", Location.class));
+    cdAbc.addSearch(
+        "A",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdA.addSearch(
-        "transferredInA",
+            getA(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdAbc.addSearch(
+        "B",
         EptsReportUtils.map(
-            hivCohortQueries.getPatientsTransferredFromOtherHealthFacility(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdA.setCompositionString("startedArtA AND NOT transferredInA");
-    // get indicators B
-    CompositionCohortDefinition cdB = new CompositionCohortDefinition();
-    cdB.setName("indicators B");
-    cdB.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cdB.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cdB.addParameter(new Parameter("location", "location", Location.class));
-    cdB.addSearch(
-        "startedArtB",
+            getB(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdAbc.addSearch(
+        "C",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdB.addSearch(
-        "transferredInB",
-        EptsReportUtils.map(
-            hivCohortQueries.getPatientsTransferredFromOtherHealthFacility(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdB.setCompositionString("startedArtB AND transferredInB");
-    // get indicators C
-    CompositionCohortDefinition cdC = new CompositionCohortDefinition();
-    cdC.setName("indicator C");
-    cdC.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cdC.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cdC.addParameter(new Parameter("location", "location", Location.class));
-    cdC.addSearch(
-        "startedArtC",
-        EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdC.addSearch(
-        "transferredOutC",
-        EptsReportUtils.map(
-            hivCohortQueries.getPatientsTransferredOut(),
-            "onOrBefore=${onOrBefore},location=${location}"));
-    cdC.setCompositionString("startedArtC AND transferredOutC");
+            getC(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdAbc.setCompositionString("((A OR B) AND NOT C)");
 
-    // create another composition to combine the quarter
-    CompositionCohortDefinition wrap = new CompositionCohortDefinition();
-    wrap.setName("Combine values for the quarter - D");
-    wrap.addParameters(getParameters);
-    wrap.addSearch(
-        "A1",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdA, EptsQuarterlyCohortDefinition.Month.M1),
-            "year=${year},quarter=${quarter},location=${location}"));
-    wrap.addSearch(
-        "A2",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdA, EptsQuarterlyCohortDefinition.Month.M2),
-            "year=${year},quarter=${quarter},location=${location}"));
-    wrap.addSearch(
-        "A3",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdA, EptsQuarterlyCohortDefinition.Month.M3),
-            "year=${year},quarter=${quarter},location=${location}"));
-
-    wrap.addSearch(
-        "B1",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdB, EptsQuarterlyCohortDefinition.Month.M1),
-            "year=${year},quarter=${quarter},location=${location}"));
-    wrap.addSearch(
-        "B2",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdB, EptsQuarterlyCohortDefinition.Month.M2),
-            "year=${year},quarter=${quarter},location=${location}"));
-    wrap.addSearch(
-        "B3",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdB, EptsQuarterlyCohortDefinition.Month.M3),
-            "year=${year},quarter=${quarter},location=${location}"));
-    wrap.addSearch(
-        "C1",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdC, EptsQuarterlyCohortDefinition.Month.M1),
-            "year=${year},quarter=${quarter},location=${location}"));
-    wrap.addSearch(
-        "C2",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdC, EptsQuarterlyCohortDefinition.Month.M2),
-            "year=${year},quarter=${quarter},location=${location}"));
-    wrap.addSearch(
-        "C3",
-        EptsReportUtils.map(
-            getQuarterlyCohort(getParameters, cdC, EptsQuarterlyCohortDefinition.Month.M3),
-            "year=${year},quarter=${quarter},location=${location}"));
-
-    wrap.setCompositionString("(A1 OR A2 OR A3 OR B1 OR B2 OR B3) AND NOT (C1 OR C2 OR C3)");
-
-    return wrap;
+    return cdAbc;
   }
 
   public EptsQuarterlyCohortDefinition getQuarterlyCohort(
