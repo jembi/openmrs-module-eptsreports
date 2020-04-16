@@ -136,6 +136,7 @@ public class ResumoTrimestralCohortQueries {
     CohortDefinition cohortG = getG();
     CohortDefinition viralLoadResult = getNumberOfPatientsInFichaClinicaWithViralLoadResult();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setParameters(getParameters());
     cd.addSearch("cohortG", mapStraightThrough(cohortG));
     cd.addSearch("viralLoadResult", mapStraightThrough(viralLoadResult));
     cd.setCompositionString("cohortG AND viralLoadResult");
