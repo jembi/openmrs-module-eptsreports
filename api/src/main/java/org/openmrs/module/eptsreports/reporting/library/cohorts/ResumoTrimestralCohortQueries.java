@@ -88,7 +88,7 @@ public class ResumoTrimestralCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getViralLoadResult() {
+  public CohortDefinition getNumberOfPatientsInFichaClinicaWithViralLoadResult() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         "Patients in the 1st line treatment who received one Viral load result");
@@ -110,7 +110,7 @@ public class ResumoTrimestralCohortQueries {
    */
   public CohortDefinition getF() {
     CohortDefinition cohortE = getE();
-    CohortDefinition viralLoadResult = getViralLoadResult();
+    CohortDefinition viralLoadResult = getNumberOfPatientsInFichaClinicaWithViralLoadResult();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addSearch("cohortE", mapStraightThrough(cohortE));
     cd.addSearch("viralLoadResult", mapStraightThrough(viralLoadResult));
