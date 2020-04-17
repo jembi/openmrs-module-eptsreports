@@ -63,7 +63,9 @@ public class ResumoTrimestralCohortQueries {
     wrap.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     wrap.addParameter(new Parameter("location", "location", Location.class));
     wrap.addSearch("startedArt", mapStraightThrough(startedArt));
-    wrap.addSearch("transferredIn", map(transferredIn, "year=${year+1},quarter=${quarter},location=${location}"));
+    wrap.addSearch(
+        "transferredIn",
+        map(transferredIn, "year=${year+1},quarter=${quarter},location=${location}"));
     wrap.setCompositionString("startedArt AND transferredIn");
     return wrap;
   }
