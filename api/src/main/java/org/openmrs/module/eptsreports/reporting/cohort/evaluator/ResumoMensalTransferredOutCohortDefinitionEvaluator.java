@@ -42,8 +42,8 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
     SqlQueryBuilder q = new SqlQueryBuilder();
 
     q.append("SELECT patient_id ");
-    q.append("FROM (SELECT patient_id, ");
-    q.append("             Max(transferout_date) transferout_date ");
+    q.append("FROM (SELECT transferout.patient_id, ");
+    q.append("             Max(transferout.transferout_date) transferout_date ");
     q.append("      FROM (SELECT p.patient_id, ");
     q.append("                   Max(ps.start_date) AS transferout_date ");
     q.append("            FROM patient p ");
@@ -63,6 +63,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
     } else {
       q.append("            AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ");
     }
+    q.append("            GROUP BY p.patient_id");
     q.append("            UNION ");
     q.append("            SELECT p.patient_id, ");
     q.append("                   Max(e.encounter_datetime) AS transferout_date ");
@@ -83,6 +84,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
     q.append("              AND o.voided = 0 ");
     q.append("              AND o.concept_id = :artStateOfStay ");
     q.append("              AND o.value_coded = :transfOutConcept ");
+    q.append("            GROUP BY p.patient_id");
     q.append("            UNION ");
     q.append("            SELECT p.patient_id, ");
     q.append("                   Max(o.obs_datetime) AS transferout_date ");
@@ -102,9 +104,10 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
     }
     q.append("              AND o.voided = 0 ");
     q.append("              AND o.concept_id = :preArtStateOfStay ");
-    q.append("              AND o.value_coded = :transfOutConcept) transferout ");
-    q.append("      GROUP BY patient_id) max_transferout ");
-    q.append("WHERE patient_id NOT IN (SELECT p.patient_id ");
+    q.append("              AND o.value_coded = :transfOutConcept ");
+    q.append("            GROUP BY p.patient_id) transferout ");
+    q.append("      GROUP BY transferout.patient_id) max_transferout ");
+    q.append("WHERE max_transferout.patient_id NOT IN (SELECT p.patient_id ");
     q.append("                         FROM patient p ");
     q.append("                                  JOIN encounter e ");
     q.append("                                       ON p.patient_id = e.patient_id ");
