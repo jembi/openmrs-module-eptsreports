@@ -760,7 +760,7 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getNumberOfPatientTbScreenedInFirstEncounter() {
+  public CohortDefinition getNumberOfPatientTbScreenedInFirstEncounter() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.addParameter(new Parameter("startDate", "startDate", Date.class));
     definition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -774,13 +774,38 @@ public class ResumoMensalCohortQueries {
     map.put("yesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("noConcept", hivMetadata.getNoConcept().getConceptId());
     String query =
-        "SELECT tbl.patient_id FROM (SELECT p.patient_id,(SELECT e.encounter_id "
+    "SELECT p.patient_id FROM patient p" 
+    +"  INNER JOIN"
+    +"  (SELECT p.patient_id,e.encounter_id,min(e.encounter_datetime)"
+		+"  					FROM encounter e "
+    +"                              inner join patient p on p.patient_id = e.patient_id"
+    +"                              INNER JOIN obs o  "
+    +"                                  ON o.encounter_id = e.encounter_id"
+    +"                              WHERE  e.encounter_type = ${adultoSeguimentoEncounterType}"
+    +"                              AND e.location_id = :location "
+    +"                              AND e.voided = 0 "
+    +"                              and p.voided = 0"
+    +"                               and o.voided = 0"
+    +"                       AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+    +"                              group by p.patient_id,e.encounter_id) min_encounter "
+		+"  							on p.patient_id = min_encounter.patient_id"
+    +"                              inner join encounter e"
+		+"  							on e.encounter_id = min_encounter.encounter_id"
+    +"                              inner join obs o"
+		+"  							on o.encounter_id = e.encounter_id"
+		+"  						WHERE e.encounter_type = ${adultoSeguimentoEncounterType}"
+    +"                              AND e.location_id = :location "
+    +"                              AND e.voided = 0 "
+    +"                              AND p.voided = 0"
+		+"  						AND o.voided = 0 "
+    +"                      AND o.concept_id   = ${tbSymptomsConcept}"
+    +"                      AND o.value_coded  IN (${yesConcept}, ${noConcept})";
+        /*"SELECT tbl.patient_id FROM (SELECT p.patient_id,(SELECT e.encounter_id "
             + "                    FROM encounter e "
             + "                    WHERE  e.encounter_type = ${adultoSeguimentoEncounterType} "
             + "                    AND p.patient_id = e.patient_id "
             + "                    AND e.location_id = :location "
-            + "                    AND e.voided = 0 "
-            + "                    ORDER BY e.encounter_datetime ASC LIMIT 1)min_encounter "
+            + "                    AND e.voided = 0 ) min_encounter "
             + "                    FROM patient p WHERE p.voided = 0)tbl "
             + "                    INNER JOIN encounter enc "
             + "                    ON enc.encounter_id = tbl.min_encounter "
@@ -789,7 +814,7 @@ public class ResumoMensalCohortQueries {
             + "            AND o.voided = 0 "
             + "            AND o.concept_id   = ${tbSymptomsConcept} "
             + "            AND o.value_coded  IN   (${yesConcept}, ${noConcept}) "
-            + "             AND enc.encounter_datetime BETWEEN :startDate AND :endDate  ";
+            + "             AND enc.encounter_datetime BETWEEN :startDate AND :endDate  ";*/
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
