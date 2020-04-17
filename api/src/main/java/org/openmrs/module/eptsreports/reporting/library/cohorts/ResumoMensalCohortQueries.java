@@ -648,7 +648,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B7A",
         map(
-            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(true),
+            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
             "location=${location},date=${startDate-1d}"));
     cd.addSearch(
         "B8A",
@@ -1663,12 +1663,12 @@ public class ResumoMensalCohortQueries {
     ccd.addSearch(
         "B7I",
         map(
-            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(false),
+            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
             "date=${onOrBefore-1d},location=${location}"));
     ccd.addSearch(
         "B7II",
         map(
-            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(false),
+            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
             "date=${onOrAfter-1},location=${location}"));
 
     ccd.addSearch(
@@ -1686,8 +1686,7 @@ public class ResumoMensalCohortQueries {
     return ccd;
   }
 
-  public CohortDefinition getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(
-      boolean untilEndDate) {
+  public CohortDefinition getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patients who Abandoned the ART during the current month");
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1698,8 +1697,7 @@ public class ResumoMensalCohortQueries {
             hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
             hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
             hivMetadata.getArtDatePickupMasterCard().getConceptId(),
-            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-            untilEndDate));
+            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId()));
     return cd;
   }
 
@@ -1784,7 +1782,7 @@ public class ResumoMensalCohortQueries {
 
     CohortDefinition B6E = getPatientsWhoSuspendedTreatmentB6(false);
 
-    CohortDefinition B7E = getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(true);
+    CohortDefinition B7E = getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7();
 
     CohortDefinition B8E = getPatientsWhoDied(false);
 

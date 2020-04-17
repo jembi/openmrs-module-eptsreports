@@ -510,8 +510,7 @@ public class ResumoMensalQueries {
       int returnVisitDateForArvDrugConcept,
       int arvPharmaciaEncounterType,
       int artDatePickup,
-      int masterCardDrugPickupEncounterType,
-      boolean untilEndDate) {
+      int masterCardDrugPickupEncounterType) {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
@@ -582,11 +581,8 @@ public class ResumoMensalQueries {
     query.append("                        GROUP  BY pa.patient_id   ");
     query.append("                    ) most_recent   ");
     query.append("                GROUP BY most_recent.patient_id   ");
-    if (untilEndDate == true) {
-      query.append("                HAVING datediff(final_encounter_date,:date) <= 0");
-    } else {
-      query.append("                HAVING datediff(final_encounter_date,:date) < 0  ");
-    }
+    query.append("                HAVING datediff(final_encounter_date,:date) < 0  ");
+
     query.append("             ) final   ");
     query.append("             GROUP BY final.patient_id ");
 
