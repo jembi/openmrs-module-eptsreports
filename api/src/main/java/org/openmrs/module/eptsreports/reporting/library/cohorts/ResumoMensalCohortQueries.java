@@ -1329,7 +1329,7 @@ public class ResumoMensalCohortQueries {
             tbMetadata.getHasTbSymptomsConcept().getConceptId(),
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getNoConcept().getConceptId(),
-            tbMetadata.getHasTbSymptomsConcept().getConceptId()));
+            tbMetadata.getTBTreatmentPlanConcept().getConceptId()));
     return cd;
   }
 
@@ -1516,19 +1516,6 @@ public class ResumoMensalCohortQueries {
    */
   public CohortDefinition
       getNumberOfPatientsWhoHadClinicalAppointmentDuringTheReportingMonthAndScreenedForTbF2() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Exclusions");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlCohortDefinition.setQuery(
-        getPatientsForF2ForExclusionFromMainQuery(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            tbMetadata.getHasTbSymptomsConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getNoConcept().getConceptId(),
-            hivMetadata.getTBTreatmentPlanConcept().getConceptId()));
-
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName(
         "Number of patients who had clinical appointment during the reporting month and were screened for TB");
@@ -1536,20 +1523,11 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
-        "F1",
-        map(
-            getNumberOfPatientsWhoHadClinicalAppointmentDuringTheReportingMonthF1(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
         "F2F",
         map(
             getPatientsWithTBScreening(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "F2x",
-        map(sqlCohortDefinition, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("(F1 AND F2F) AND NOT F2x");
+    cd.setCompositionString("F2F");
     return cd;
   }
 
