@@ -43,12 +43,13 @@ public class ResumoTrimestralCohortQueries {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
     CohortDefinition transferredIn =
         hivCohortQueries.getPatientsTransferredFromOtherHealthFacility();
+    String mappings = "year=${year+1},quarter=${quarter},location=${location}";
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addSearch("startedArt", mapStraightThrough(startedArt));
-    cd.addSearch("transferredIn", mapStraightThrough(transferredIn));
+    cd.addSearch("transferredIn", map(transferredIn, mappings));
     cd.setCompositionString("startedArt NOT transferredIn");
     return cd;
   }
