@@ -279,7 +279,7 @@ public class ResumoMensalQueries {
   public static String getPatientsWithTBScreening(
       int adultoSeguimentoEncounterType, int tbScreening, int yesConcept, int noConcept, int tbSymptoms) {
     String query =
-        "SELECT screening.patient_id FROM (SELECT p.patient_id,e.encounter_datetime "
+        "SELECT p.patient_id"
             + " FROM patient p "
             + " 	INNER  JOIN encounter e "
             + "			ON p.patient_id=e.patient_id "
@@ -293,27 +293,7 @@ public class ResumoMensalQueries {
             + "	BETWEEN :startDate AND :endDate "
             + "   AND e.encounter_type=${adultoSeguimentoEncounterType} "
             + "   AND o.concept_id=${tbScreening} "
-            + "	  AND o.value_coded in (${yesConcept},${noConcept})"
-            + "   GROUP BY p.patient_id) as screening"
-            + "   LEFT JOIN "
-            + "(SELECT p.patient_id,e.encounter_datetime "
-            + " FROM patient p "
-            + " 	INNER  JOIN encounter e "
-            + "			ON p.patient_id=e.patient_id "
-            + "		INNER  JOIN obs o "
-            + "			ON e.encounter_id=o.encounter_id "
-            + " WHERE p.voided = 0 "
-            + "		AND e.voided = 0 "
-            + "		AND o.voided = 0 "
-            + "   AND e.location_id = :location "
-            + "	  AND e.encounter_datetime "
-            + "	BETWEEN :startDate AND :endDate "
-            + "   AND e.encounter_type=${adultoSeguimentoEncounterType} "
-            + "   AND o.concept_id=${tbSymptoms}"
-            + "   AND o.value_coded is not null"
-            + " GROUP BY p.patient_id) as symptoms" 
-            + "   ON screening.patient_id = symptoms.patient_id"
-            + "   AND screening.encounter_datetime = symptoms.encounter_datetime";
+            + "	  AND o.value_coded in (${yesConcept},${noConcept})";
 
     Map<String, Integer> map = new HashMap<>();
     map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
