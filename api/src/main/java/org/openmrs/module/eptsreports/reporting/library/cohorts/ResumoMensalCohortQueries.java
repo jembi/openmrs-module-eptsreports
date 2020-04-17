@@ -821,21 +821,6 @@ public class ResumoMensalCohortQueries {
             + "  						AND o.voided = 0 "
             + "                      AND o.concept_id   = ${tbSymptomsConcept}"
             + "                      AND o.value_coded  IN (${yesConcept}, ${noConcept})";
-    /*"SELECT tbl.patient_id FROM (SELECT p.patient_id,(SELECT e.encounter_id "
-    + "                    FROM encounter e "
-    + "                    WHERE  e.encounter_type = ${adultoSeguimentoEncounterType} "
-    + "                    AND p.patient_id = e.patient_id "
-    + "                    AND e.location_id = :location "
-    + "                    AND e.voided = 0 ) min_encounter "
-    + "                    FROM patient p WHERE p.voided = 0)tbl "
-    + "                    INNER JOIN encounter enc "
-    + "                    ON enc.encounter_id = tbl.min_encounter "
-    + "                    INNER JOIN obs o  "
-    + "                        ON o.encounter_id = enc.encounter_id "
-    + "            AND o.voided = 0 "
-    + "            AND o.concept_id   = ${tbSymptomsConcept} "
-    + "            AND o.value_coded  IN   (${yesConcept}, ${noConcept}) "
-    + "             AND enc.encounter_datetime BETWEEN :startDate AND :endDate  ";*/
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
