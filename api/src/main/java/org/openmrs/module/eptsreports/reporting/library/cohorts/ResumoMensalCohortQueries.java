@@ -519,7 +519,7 @@ public class ResumoMensalCohortQueries {
             + "         INNER JOIN patient_program pg ON p.patient_id=pg.patient_id"
             + "         INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id "
             + "       WHERE pg.voided=0 AND ps.voided=0 AND p.voided=0 "
-            + "         AND pg.program_id=${arvProgram}  AND ps.state=${deadState} AND ps.end_date is null ";
+            + "         AND pg.program_id=${arvProgram}  AND ps.state=${deadState}  ";
     if (hasStartDate) {
       sql += "AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ";
     } else {
