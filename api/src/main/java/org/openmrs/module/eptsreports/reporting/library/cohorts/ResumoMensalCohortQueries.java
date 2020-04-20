@@ -641,7 +641,7 @@ public class ResumoMensalCohortQueries {
 
     cd.addSearch(
         "B5A",
-        map(getPatientsTransferredOutB5(false), "onOrBefore=${startDate-1d},location=${location}"));
+        map(getPatientsTransferredOutB5(true), "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "B6A",
@@ -1682,7 +1682,7 @@ public class ResumoMensalCohortQueries {
 
     ccd.addSearch(
         "B7III",
-        map(getPatientsTransferredOutB5(false), "onOrBefore=${onOrBefore},location=${location}"));
+        map(getPatientsTransferredOutB5(true), "onOrBefore=${onOrBefore},location=${location}"));
     ccd.addSearch(
         "B7IV",
         map(
@@ -1789,7 +1789,7 @@ public class ResumoMensalCohortQueries {
     CohortDefinition masterCardPickup =
         getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod();
 
-    CohortDefinition B5E = getPatientsTransferredOutB5(false);
+    CohortDefinition B5E = getPatientsTransferredOutB5(true);
 
     CohortDefinition B6E = getPatientsWhoSuspendedTreatmentB6(false);
 

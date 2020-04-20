@@ -61,7 +61,9 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
     q.append("              AND pp.location_id = :location ");
     q.append("              AND ps.voided = 0 ");
     q.append("              AND ps.state = :transferOutState ");
-    q.append("              AND ps.end_date is null     ");
+    if (cd.getMaxDates()) {
+      q.append("              AND ps.end_date is null     ");
+    }
     if (cd.getOnOrAfter() == null) {
       q.append("            AND ps.start_date <= :onOrBefore ");
     } else {
