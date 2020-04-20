@@ -74,7 +74,9 @@ public class ResumoTrimestralCohortQueries {
     wrap.addSearch("startedArt", mapStraightThrough(startedArt));
     wrap.addSearch(
         "transferredIn",
-        map(transferredIn, "year=${year+1},quarter=${quarter},location=${location}"));
+        map(
+            transferredIn,
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore+12m},location=${location}"));
     wrap.setCompositionString("startedArt AND transferredIn");
     return wrap;
   }
