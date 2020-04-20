@@ -263,14 +263,6 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id=21151
-  public Concept getTherapeuticLineConcept() {
-    String uuid =
-        Context.getAdministrationService()
-            .getGlobalProperty("eptsreports.therapeuticLineConceptUuid");
-    return getConcept(uuid);
-  }
-
   // concept_id=5356
   public Concept getcurrentWhoHivStageConcept() {
     String uuid =
@@ -1514,6 +1506,21 @@ public class HivMetadata extends ProgramsMetadata {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.dateOfMasterCardFileOpeningConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /** Concept_id = 21148 SECOND LINE - THERAPEUTIC LINE */
+  public Concept getSecondLineConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.artSecondLineSwitchUuid");
+    return getConcept(uuid);
+  }
+
+  /** Concept_id = 21151 THERAPEUTIC LINE */
+  public Concept getTherapeuticLineConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.therapeuticLineConceptUuid");
     return getConcept(uuid);
   }
 }
