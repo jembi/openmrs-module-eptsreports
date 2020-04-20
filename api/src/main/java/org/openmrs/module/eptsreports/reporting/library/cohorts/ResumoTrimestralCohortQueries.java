@@ -90,7 +90,8 @@ public class ResumoTrimestralCohortQueries {
     CohortDefinition suspended = getI();
     CohortDefinition abandoned = getJ();
     CohortDefinition dead = getL();
-    CohortDefinition inTheFirstLine = getPatientsWithLastTherapeuticLineEqualsToFirstLine();
+    CohortDefinition inTheFirstLineOrNull =
+        getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull();
 
     CompositionCohortDefinition wrapper = new CompositionCohortDefinition();
     wrapper.setParameters(getParameters());
@@ -100,7 +101,7 @@ public class ResumoTrimestralCohortQueries {
     wrapper.addSearch("suspended", mapStraightThrough(suspended));
     wrapper.addSearch("abandoned", mapStraightThrough(abandoned));
     wrapper.addSearch("dead", mapStraightThrough(dead));
-    wrapper.addSearch("inTheFirstLine", mapStraightThrough(inTheFirstLine));
+    wrapper.addSearch("inTheFirstLineOrNull", mapStraightThrough(inTheFirstLineOrNull));
 
     wrapper.setCompositionString(
         "((preTarv OR transferredIn) NOT (transferredOut AND suspended AND abandoned AND dead)) AND inTheFirstLine ");
@@ -234,14 +235,14 @@ public class ResumoTrimestralCohortQueries {
    *
    * @return SqlCohortDefinition
    */
-  private CohortDefinition getPatientsWithLastTherapeuticLineEqualsToFirstLine() {
+  private CohortDefinition getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients in the first Line of treatment during a period");
     cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setQuery(
-        ResumoTrimestralQueries.getPatientsWithLastTherapeuticLineEqualsToFirstLine(
+        ResumoTrimestralQueries.getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getTherapeuticLineConcept().getConceptId(),
             hivMetadata.getFirstLineConcept().getConceptId()));

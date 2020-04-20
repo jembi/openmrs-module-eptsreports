@@ -145,7 +145,7 @@ public class ResumoTrimestralQueries {
    *
    * @return SqlCohortDefinition
    */
-  public static String getPatientsWithLastTherapeuticLineEqualsToFirstLine(
+  public static String getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull(
       int adultoSeguimentoEncounterType, int therapeuticLineConcept, int firstLineConcept) {
     String query =
         " SELECT base_tbl.patient_id "
