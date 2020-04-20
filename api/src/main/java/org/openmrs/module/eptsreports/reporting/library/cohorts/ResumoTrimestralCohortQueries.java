@@ -165,7 +165,7 @@ public class ResumoTrimestralCohortQueries {
     comp.addSearch("L", mapStraightThrough(indicatorL));
     comp.addSearch(
         "lastSecondTherapeuticLine",
-        map(lastSecondTherapeuticLine, "onOrBefore=${onOrBefore}, locationList=${location}"));
+        map(lastSecondTherapeuticLine, "onOrBefore=${onOrBefore}, location=${location}"));
     comp.setCompositionString(
         "((A OR B) AND NOT (C OR I OR J OR L)) AND lastSecondTherapeuticLine");
     return comp;
