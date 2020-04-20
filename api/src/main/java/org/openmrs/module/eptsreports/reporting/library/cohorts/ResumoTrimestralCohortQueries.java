@@ -84,7 +84,7 @@ public class ResumoTrimestralCohortQueries {
     CohortDefinition suspended = getI();
     CohortDefinition abandoned = getJ();
     CohortDefinition dead = getL();
-    CohortDefinition inTheFirstLine = getPatientsInTheFirstLineOfTreatment();
+    CohortDefinition inTheFirstLine = getPatientsWithLastTherapeuticLineEqualsToFirstLine();
 
     CompositionCohortDefinition wrapper = new CompositionCohortDefinition();
     wrapper.setParameters(getParameters());
@@ -170,15 +170,18 @@ public class ResumoTrimestralCohortQueries {
     return cd;
   }
 
-  /** Fetches patients in the first line of treatment */
-  private CohortDefinition getPatientsInTheFirstLineOfTreatment() {
+  /**
+   * Fetches Patients with Last registered Line Treatment equals to (1st Line)
+   * @return SqlCohortDefinition
+   */
+  private CohortDefinition getPatientsWithLastTherapeuticLineEqualsToFirstLine() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients in the first Line of treatment during a period");
     cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setQuery(
-        ResumoTrimestralQueries.getPatientsInTheFirstLineOfTreatment(
+        ResumoTrimestralQueries.getPatientsWithLastTherapeuticLineEqualsToFirstLine(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getTherapeuticLineConcept().getConceptId(),
             hivMetadata.getFirstLineConcept().getConceptId()));
