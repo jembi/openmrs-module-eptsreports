@@ -1664,7 +1664,7 @@ public class ResumoMensalCohortQueries {
         "B7I",
         map(
             getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
-            "date=${onOrBefore-1d},location=${location}"));
+            "date=${onOrBefore},location=${location}"));
     ccd.addSearch(
         "B7II",
         map(
