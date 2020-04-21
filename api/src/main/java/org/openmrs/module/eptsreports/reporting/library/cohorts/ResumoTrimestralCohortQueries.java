@@ -9,8 +9,8 @@ import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.cohort.definition.AllPatientsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -42,18 +42,43 @@ public class ResumoTrimestralCohortQueries {
     this.hivMetadata = hivMetadata;
   }
 
+  /**
+   * Number of patients transferred-in from another HFs during the current month
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition
+      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth() {
+
+    EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
+    cd.setProgramEnrolled(hivMetadata.getHIVCareProgram());
+    cd.setProgramEnrolled2(hivMetadata.getARTProgram());
+    cd.setPatientState(hivMetadata.getArtCareTransferredFromOtherHealthFacilityWorkflowState());
+    cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setB10Flag(new Boolean("false"));
+    return cd;
+  }
+
   /** @return Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
   public CohortDefinition getA() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
     CohortDefinition transferredIn =
-        hivCohortQueries.getPatientsTransferredFromOtherHealthFacility();
+        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addSearch("startedArt", mapStraightThrough(startedArt));
-    cd.addSearch("transferredIn", mapStraightThrough(transferredIn));
+    cd.addSearch(
+        "transferredIn",
+        map(
+            transferredIn,
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore+12m},location=${location}"));
     cd.setCompositionString("startedArt NOT transferredIn");
+
     return cd;
   }
 
