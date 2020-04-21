@@ -400,13 +400,11 @@ public class HivCohortQueries {
         "masterCardEncounterType", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put(
         "stateOfStayOfPreArtPatient", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("transferedOutOrSuspendedConcept",transferedOutOrSuspendedConcept );
+    map.put("transferedOutOrSuspendedConcept", transferedOutOrSuspendedConcept);
     map.put("autoTransferConcept", hivMetadata.getAutoTransferConcept().getConceptId());
     map.put("stateOfStayOfArtPatient", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("artProgram", hivMetadata.getARTProgram().getProgramId());
-    map.put(
-        "transferredOutToAnotherHealthFacilityWorkflowState",
-        patientStateId);
+    map.put("transferredOutToAnotherHealthFacilityWorkflowState", patientStateId);
 
     String query =
         "  SELECT mostrecent.patient_id "
