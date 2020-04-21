@@ -10,7 +10,6 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.cohort.definition.AllPatientsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -108,7 +107,7 @@ public class ResumoTrimestralCohortQueries {
     wrapper.addSearch("inTheFirstLineOrNull", mapStraightThrough(inTheFirstLineOrNull));
 
     wrapper.setCompositionString(
-        "((preTarv OR transferredIn) NOT (transferredOut AND suspended AND abandoned AND dead)) AND inTheFirstLine ");
+        "((preTarv OR transferredIn) NOT (transferredOut AND suspended AND abandoned AND dead)) AND inTheFirstLineOrNull ");
     return wrapper;
   }
 
