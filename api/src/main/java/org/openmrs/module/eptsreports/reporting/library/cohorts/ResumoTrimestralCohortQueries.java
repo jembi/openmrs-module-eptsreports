@@ -71,15 +71,45 @@ public class ResumoTrimestralCohortQueries {
   /** @return Nº de pacientes Transferidos para (-) outras US em TARV durante o mês */
   public CohortDefinition getC() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
-    CohortDefinition transferredOut = hivCohortQueries.getPatientsTransferredOut();
+    CohortDefinition transferredOut = getPatientsTransferredOutOrSuspended();
+
     CompositionCohortDefinition wrap = new CompositionCohortDefinition();
     wrap.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     wrap.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     wrap.addParameter(new Parameter("location", "location", Location.class));
     wrap.addSearch("startedArt", mapStraightThrough(startedArt));
-    wrap.addSearch("transferredOut", mapStraightThrough(transferredOut));
+    wrap.addSearch(
+        "transferredOut",
+        map(
+            transferredOut,
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore+12m},location=${location}"));
     wrap.setCompositionString("startedArt AND transferredOut");
+
     return wrap;
+  }
+
+  public CohortDefinition getPatientsTransferredOutOrSuspended() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("transferredOutPatients");
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setQuery(
+        ResumoTrimestralQueries.getTransferedOutPatients(
+            hivMetadata.getARTProgram().getProgramId(),
+            hivMetadata
+                .getTransferredOutToAnotherHealthFacilityWorkflowState()
+                .getProgramWorkflowStateId(),
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getTransferredOutConcept().getConceptId(),
+            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+            hivMetadata.getArtDatePickupMasterCard().getConceptId()));
+    return cd;
   }
 
   /** @return Number of patients who is in the 1st line treatment during the cohort month */
@@ -165,7 +195,7 @@ public class ResumoTrimestralCohortQueries {
     cd.addSearch("cohortG", mapStraightThrough(cohortG));
     cd.addSearch("viralLoadResult", mapStraightThrough(viralLoadResult));
     cd.setCompositionString("cohortG AND viralLoadResult");
-    
+
     return cd;
   }
 
