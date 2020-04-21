@@ -9,6 +9,7 @@ import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.AllPatientsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
@@ -28,17 +29,25 @@ public class ResumoTrimestralCohortQueries {
   private HivCohortQueries hivCohortQueries;
   private HivMetadata hivMetadata;
 
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
+
   @Autowired
   public ResumoTrimestralCohortQueries(
       GenericCohortQueries genericCohortQueries,
       HivCohortQueries hivCohortQueries,
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
       HivMetadata hivMetadata) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.hivMetadata = hivMetadata;
   }
 
-  /** @return Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
+  /**
+   * Indicator A
+   *
+   * @return Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês
+   */
   public CohortDefinition getA() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
     CohortDefinition transferredIn =
@@ -53,22 +62,34 @@ public class ResumoTrimestralCohortQueries {
     return cd;
   }
 
-  /** @return Nº de pacientes Transferidos de (+) outras US em TARV durante o mês */
+  /**
+   * Indicator B
+   *
+   * @return Nº de pacientes Transferidos de (+) outras US em TARV durante o mês
+   */
   public CohortDefinition getB() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
     CohortDefinition transferredIn =
-        hivCohortQueries.getPatientsTransferredFromOtherHealthFacility();
+        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth();
     CompositionCohortDefinition wrap = new CompositionCohortDefinition();
     wrap.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     wrap.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     wrap.addParameter(new Parameter("location", "location", Location.class));
     wrap.addSearch("startedArt", mapStraightThrough(startedArt));
-    wrap.addSearch("transferredIn", mapStraightThrough(transferredIn));
+    wrap.addSearch(
+        "transferredIn",
+        map(
+            transferredIn,
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore+12m},location=${location}"));
     wrap.setCompositionString("startedArt AND transferredIn");
     return wrap;
   }
 
-  /** @return Nº de pacientes Transferidos para (-) outras US em TARV durante o mês */
+  /**
+   * Indicator C
+   *
+   * @return Nº de pacientes Transferidos para (-) outras US em TARV durante o mês
+   */
   public CohortDefinition getC() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
     CohortDefinition transferredOut = hivCohortQueries.getPatientsTransferredOut();
@@ -82,35 +103,67 @@ public class ResumoTrimestralCohortQueries {
     return wrap;
   }
 
-  /** @return Number of patients who is in the 1st line treatment during the cohort month */
-  public CohortDefinition getE() {
-    AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
-    cd.setParameters(getParameters());
-    return cd;
-  }
-
   /**
-   * SqlCohortDefinition for Viral Load Result
+   * Indicator D
    *
-   * @return
+   * @return ((A+B) - C)
    */
-  public CohortDefinition getNumberOfPatientsInFichaClinicaWithViralLoadResult() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
-        "Patients in the 1st line treatment who received one Viral load result");
-    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.setQuery(
-        ResumoTrimestralQueries.getPatientsWhoReceivedOneViralLoadResult(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getHivViralLoadConcept().getConceptId(),
-            hivMetadata.getBeyondDetectableLimitConcept().getConceptId()));
+  public CohortDefinition getD() {
+    CompositionCohortDefinition cdAbc = new CompositionCohortDefinition();
+    cdAbc.setName("Indicators A, B and C parameters");
+    cdAbc.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cdAbc.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cdAbc.addParameter(new Parameter("location", "location", Location.class));
+    cdAbc.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getA(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdAbc.addSearch(
+        "B",
+        EptsReportUtils.map(
+            getB(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdAbc.addSearch(
+        "C",
+        EptsReportUtils.map(
+            getC(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    cdAbc.setCompositionString("((A OR B) AND NOT C)");
 
-    return sqlCohortDefinition;
+    return cdAbc;
   }
 
   /**
+   * Indicator E
+   *
+   * @return Number of patients who is in the 1st line treatment during the cohort month
+   */
+  public CohortDefinition getE() {
+    CohortDefinition preTarv = getA();
+    CohortDefinition transferredIn = getB();
+    CohortDefinition transferredOut = getC();
+    CohortDefinition suspended = getI();
+    CohortDefinition abandoned = getJ();
+    CohortDefinition dead = getL();
+    CohortDefinition inTheFirstLineOrNull =
+        getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull();
+
+    CompositionCohortDefinition wrapper = new CompositionCohortDefinition();
+    wrapper.setParameters(getParameters());
+    wrapper.addSearch("preTarv", mapStraightThrough(preTarv));
+    wrapper.addSearch("transferredIn", mapStraightThrough(transferredIn));
+    wrapper.addSearch("transferredOut", mapStraightThrough(transferredOut));
+    wrapper.addSearch("suspended", mapStraightThrough(suspended));
+    wrapper.addSearch("abandoned", mapStraightThrough(abandoned));
+    wrapper.addSearch("dead", mapStraightThrough(dead));
+    wrapper.addSearch("inTheFirstLineOrNull", mapStraightThrough(inTheFirstLineOrNull));
+
+    wrapper.setCompositionString(
+        "((preTarv OR transferredIn) NOT (transferredOut AND suspended AND abandoned AND dead)) AND inTheFirstLine ");
+    return wrapper;
+  }
+
+  /**
+   * Indicator F
+   *
    * @return Number of patients in Cohort who completed 12 months ARV treatment in the 1st line
    *     treatment who received one Viral load result
    */
@@ -126,7 +179,11 @@ public class ResumoTrimestralCohortQueries {
     return cd;
   }
 
-  /** @return Number of patients who is in the 2nd line treatment during the cohort month */
+  /**
+   * Indicator G
+   *
+   * @return Number of patients who is in the 2nd line treatment during the cohort month
+   */
   public CohortDefinition getG() {
     CohortDefinition indicatorA = getA();
     CohortDefinition indicatorB = getB();
@@ -147,23 +204,35 @@ public class ResumoTrimestralCohortQueries {
     comp.addSearch("L", mapStraightThrough(indicatorL));
     comp.addSearch(
         "lastSecondTherapeuticLine",
-        map(lastSecondTherapeuticLine, "onOrBefore=${onOrBefore}, locationList=${location}"));
+        map(lastSecondTherapeuticLine, "onOrBefore=${onOrBefore}, location=${location}"));
     comp.setCompositionString(
         "((A OR B) AND NOT (C OR I OR J OR L)) AND lastSecondTherapeuticLine");
     return comp;
   }
 
   /**
+   * Indicator H
+   *
    * @return Number of patients in Cohort who completed 12 months ARV treatment in the 2nd line
    *     treatment who received one Viral load result
    */
   public CohortDefinition getH() {
-    AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
+    CohortDefinition cohortG = getG();
+    CohortDefinition viralLoadResult = getNumberOfPatientsInFichaClinicaWithViralLoadResult();
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setParameters(getParameters());
+    cd.addSearch("cohortG", mapStraightThrough(cohortG));
+    cd.addSearch("viralLoadResult", mapStraightThrough(viralLoadResult));
+    cd.setCompositionString("cohortG AND viralLoadResult");
+
     return cd;
   }
 
-  /** @return Number of Suspended patients in the actual cohort */
+  /**
+   * Indicator I
+   *
+   * @return Number of Suspended patients in the actual cohort
+   */
   public CohortDefinition getI() {
     CohortDefinition indicatorA = getA();
     CohortDefinition indicatorB = getB();
@@ -198,14 +267,50 @@ public class ResumoTrimestralCohortQueries {
     return comp;
   }
 
-  /** @return Number of Abandoned Patients in the actual cohort */
+  /**
+   * Indicator J
+   *
+   * @return Number of Abandoned Patients in the actual cohort
+   */
   public CohortDefinition getJ() {
-    AllPatientsCohortDefinition cd = new AllPatientsCohortDefinition();
+    CohortDefinition abandoned =
+        resumoMensalCohortQueries.getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(true);
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setParameters(getParameters());
+    cd.addSearch("A", mapStraightThrough(getA()));
+    cd.addSearch("B", mapStraightThrough(getB()));
+    cd.addSearch("abandoned", map(abandoned, "date=${onOrBefore},location=${location}"));
+    cd.addSearch("C", mapStraightThrough(getC()));
+    cd.addSearch("I", mapStraightThrough(getI()));
+    cd.addSearch("L", mapStraightThrough(getL()));
+    cd.setCompositionString("(A OR B) AND abandoned NOT (C OR I OR L)");
     return cd;
   }
 
-  /** @return Number of Deceased patients in the actual cohort */
+  /**
+   * Fetches Patients with Last registered Line Treatment equals to (1st Line)
+   *
+   * @return SqlCohortDefinition
+   */
+  private CohortDefinition getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients in the first Line of treatment during a period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setQuery(
+        ResumoTrimestralQueries.getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getTherapeuticLineConcept().getConceptId(),
+            hivMetadata.getFirstLineConcept().getConceptId()));
+    return cd;
+  }
+
+  /**
+   * Indicator L
+   *
+   * @return Number of Deceased patients in the actual cohort
+   */
   public CohortDefinition getL() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     CohortDefinition cohortA = getA();
@@ -219,6 +324,27 @@ public class ResumoTrimestralCohortQueries {
     cd.addSearch("dead", mapStraightThrough(dead));
     cd.setCompositionString("((A OR B) AND NOT C) AND dead");
     return cd;
+  }
+
+  /**
+   * Number Of Patients In Ficha Clinica With Viral Load Result
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getNumberOfPatientsInFichaClinicaWithViralLoadResult() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Patients in the 1st line treatment who received one Viral load result");
+    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.setQuery(
+        ResumoTrimestralQueries.getPatientsWhoReceivedOneViralLoadResult(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getHivViralLoadQualitative().getConceptId()));
+
+    return sqlCohortDefinition;
   }
 
   /**
@@ -240,35 +366,31 @@ public class ResumoTrimestralCohortQueries {
     return cd;
   }
 
+  /**
+   * Number of patients transferred-in from another HFs during the current month
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition
+      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth() {
+
+    EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
+    cd.setProgramEnrolled(hivMetadata.getHIVCareProgram());
+    cd.setProgramEnrolled2(hivMetadata.getARTProgram());
+    cd.setPatientState(hivMetadata.getArtCareTransferredFromOtherHealthFacilityWorkflowState());
+    cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setB10Flag(new Boolean("false"));
+    return cd;
+  }
+
   private List<Parameter> getParameters() {
     return Arrays.asList(
         new Parameter("onOrAfter", "Start date", Date.class),
         new Parameter("onOrBefore", "End date", Date.class),
         new Parameter("location", "Location", Location.class));
-  }
-
-  /** @return ((A+B) - C) */
-  public CohortDefinition getD() {
-    CompositionCohortDefinition cdAbc = new CompositionCohortDefinition();
-    cdAbc.setName("Indicators A, B and C parameters");
-    cdAbc.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cdAbc.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cdAbc.addParameter(new Parameter("location", "location", Location.class));
-    cdAbc.addSearch(
-        "A",
-        EptsReportUtils.map(
-            getA(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdAbc.addSearch(
-        "B",
-        EptsReportUtils.map(
-            getB(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdAbc.addSearch(
-        "C",
-        EptsReportUtils.map(
-            getC(), "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    cdAbc.setCompositionString("((A OR B) AND NOT C)");
-
-    return cdAbc;
   }
 
   public EptsQuarterlyCohortDefinition getQuarterlyCohort(
