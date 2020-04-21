@@ -91,7 +91,7 @@ public class ResumoTrimestralCohortQueries {
    */
   public CohortDefinition getC() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
-    CohortDefinition transferredOut = getPatientsTransferredOutOrSuspended();
+    CohortDefinition transferredOut = getPatientsTransferredOut();
 
     CompositionCohortDefinition wrap = new CompositionCohortDefinition();
     wrap.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
@@ -106,30 +106,6 @@ public class ResumoTrimestralCohortQueries {
     wrap.setCompositionString("startedArt AND transferredOut");
 
     return wrap;
-  }
-
-  public CohortDefinition getPatientsTransferredOutOrSuspended() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("transferredOutPatients");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.setQuery(
-        ResumoTrimestralQueries.getTransferedOutPatients(
-            hivMetadata.getARTProgram().getProgramId(),
-            hivMetadata
-                .getTransferredOutToAnotherHealthFacilityWorkflowState()
-                .getProgramWorkflowStateId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
-            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
-            hivMetadata.getTransferredOutConcept().getConceptId(),
-            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-            hivMetadata.getArtDatePickupMasterCard().getConceptId()));
-    return cd;
   }
 
   /**
@@ -420,6 +396,30 @@ public class ResumoTrimestralCohortQueries {
         new Parameter("onOrAfter", "Start date", Date.class),
         new Parameter("onOrBefore", "End date", Date.class),
         new Parameter("location", "Location", Location.class));
+  }
+
+  private CohortDefinition getPatientsTransferredOut() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("transferredOutPatients");
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.setQuery(
+        ResumoTrimestralQueries.getTransferedOutPatients(
+            hivMetadata.getARTProgram().getProgramId(),
+            hivMetadata
+                .getTransferredOutToAnotherHealthFacilityWorkflowState()
+                .getProgramWorkflowStateId(),
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getTransferredOutConcept().getConceptId(),
+            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+            hivMetadata.getArtDatePickupMasterCard().getConceptId()));
+    return cd;
   }
 
   public EptsQuarterlyCohortDefinition getQuarterlyCohort(
