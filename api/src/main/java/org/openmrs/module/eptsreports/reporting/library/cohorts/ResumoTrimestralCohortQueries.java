@@ -398,6 +398,10 @@ public class ResumoTrimestralCohortQueries {
         new Parameter("location", "Location", Location.class));
   }
 
+  /**
+   * Number of transferred-out patients in TARV at this HF during the cohort month
+   * @return CohortDefinition
+   */
   private CohortDefinition getPatientsTransferredOut() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("transferredOutPatients");
