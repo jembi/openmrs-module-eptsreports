@@ -370,26 +370,6 @@ public class ResumoTrimestralCohortQueries {
     return cd;
   }
 
-  /**
-   * Number of patients transferred-in from another HFs during the current month
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition
-      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth() {
-
-    EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
-    cd.setProgramEnrolled(hivMetadata.getHIVCareProgram());
-    cd.setProgramEnrolled2(hivMetadata.getARTProgram());
-    cd.setPatientState(hivMetadata.getArtCareTransferredFromOtherHealthFacilityWorkflowState());
-    cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
-    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setB10Flag(new Boolean("false"));
-    return cd;
-  }
-
   private List<Parameter> getParameters() {
     return Arrays.asList(
         new Parameter("onOrAfter", "Start date", Date.class),
