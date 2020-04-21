@@ -42,26 +42,6 @@ public class ResumoTrimestralCohortQueries {
     this.hivMetadata = hivMetadata;
   }
 
-  /**
-   * Number of patients transferred-in from another HFs during the current month
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition
-      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth() {
-
-    EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
-    cd.setProgramEnrolled(hivMetadata.getHIVCareProgram());
-    cd.setProgramEnrolled2(hivMetadata.getARTProgram());
-    cd.setPatientState(hivMetadata.getArtCareTransferredFromOtherHealthFacilityWorkflowState());
-    cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
-    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setB10Flag(new Boolean("false"));
-    return cd;
-  }
-
   /** @return Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
   public CohortDefinition getA() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
@@ -359,6 +339,26 @@ public class ResumoTrimestralCohortQueries {
       EptsQuarterlyCohortDefinition.Month month) {
     EptsQuarterlyCohortDefinition cd = new EptsQuarterlyCohortDefinition(wrap, month);
     cd.addParameters(getParameters);
+    return cd;
+  }
+
+  /**
+   * Number of patients transferred-in from another HFs during the current month
+   *
+   * @return CohortDefinition
+   */
+  private CohortDefinition
+      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth() {
+
+    EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
+    cd.setProgramEnrolled(hivMetadata.getHIVCareProgram());
+    cd.setProgramEnrolled2(hivMetadata.getARTProgram());
+    cd.setPatientState(hivMetadata.getArtCareTransferredFromOtherHealthFacilityWorkflowState());
+    cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setB10Flag(new Boolean("false"));
     return cd;
   }
 }
