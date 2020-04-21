@@ -399,7 +399,13 @@ public class ResumoTrimestralCohortQueries {
   }
 
   /**
-   * Number of transferred-out patients in TARV at this HF during the cohort month
+   * Number of transferred-out patients in TARV at this HF during the cohort month.
+   *
+   * <p>This is the same as {@link HivCohortQueries#getPatientsTransferredOut()} except that it
+   * filters for both {@code onOrAfter} and {@code onOrBefore}.
+   *
+   * <p>It was duplicated here because the spec pointed to an incompatible query
+   *
    * @return CohortDefinition
    */
   private CohortDefinition getPatientsTransferredOut() {
