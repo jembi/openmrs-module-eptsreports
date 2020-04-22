@@ -504,8 +504,8 @@ public class TXTBCohortQueries {
     return cd;
   }
   /**
-   * all patients with at least one “POS” selected for “Resultado da Investigação para TB
-   * de BK e/ou RX?” (Ficha de Seguimento) during reporting period
+   * all patients with at least one “POS” selected for “Resultado da Investigação para TB de BK e/ou
+   * RX?” (Ficha de Seguimento) during reporting period
    *
    * @return
    */
@@ -555,9 +555,9 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * all patients with at least one “NEG” selected for “Resultado da Investigação para TB
-   * de BK e/ou RX?” (Ficha de Seguimento) AND “N” selected for TB Screening “Rastreio TB” 
-   * in same encounter occurred during reporting period during reporting period
+   * all patients with at least one “NEG” selected for “Resultado da Investigação para TB de BK e/ou
+   * RX?” (Ficha de Seguimento) AND “N” selected for TB Screening “Rastreio TB” in same encounter
+   * occurred during reporting period during reporting period
    *
    * @return
    */
@@ -581,7 +581,7 @@ public class TXTBCohortQueries {
     map.put("negativeConcept", tbMetadata.getNegativeConcept().getConceptId());
 
     String query =
-    "SELECT patient_id FROM ("
+        "SELECT patient_id FROM ("
             + "SELECT p.patient_id, e.encounter_id "
             + "FROM patient p "
             + "    INNER JOIN encounter e "
