@@ -461,48 +461,6 @@ public class TXTBCohortQueries {
     return cd;
   }
 
-  /** TB Treatment Start Date ( Ficha de Seguimento) within reporting period */
-  public CohortDefinition getPatientsStartTBTreatment() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-
-    cd.setName("Patients With At Least One Yes For TB Screening During the reporting  period");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<String, Integer>();
-    map.put(
-        "adultoSeguimentoEncounterType",
-        hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put(
-        "pediatriaSeguimentoEncounterType",
-        hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("tbDrugTreatmentStartDate", tbMetadata.getTBDrugTreatmentStartDate().getConceptId());
-
-    String query =
-        "SELECT p.patient_id "
-            + "FROM patient p "
-            + "    INNER JOIN encounter e "
-            + "        ON e.patient_id = p.patient_id "
-            + "    INNER JOIN obs o "
-            + "        ON o.encounter_id = e.encounter_id "
-            + "WHERE "
-            + "    p.voided = 0 AND "
-            + "    e.voided = 0 AND  "
-            + "    o.voided = 0 AND "
-            + "    e.encounter_type IN (${adultoSeguimentoEncounterType},${pediatriaSeguimentoEncounterType})  AND "
-            + "    o.concept_id = ${tbDrugTreatmentStartDate} AND "
-            + "    e.encounter_datetime BETWEEN :startDate AND :endDate AND "
-            + "    e.location_id  = :location "
-            + "GROUP BY p.patient_id";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    String replaceQuery = sb.replace(query);
-
-    cd.setQuery(replaceQuery);
-
-    return cd;
-  }
   /**
    * all patients with at least one “POS” selected for “Resultado da Investigação para TB de BK e/ou
    * RX?” (Ficha de Seguimento) during reporting period
