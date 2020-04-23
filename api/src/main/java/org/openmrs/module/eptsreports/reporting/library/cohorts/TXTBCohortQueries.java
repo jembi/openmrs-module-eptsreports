@@ -494,7 +494,7 @@ public class TXTBCohortQueries {
             + "    o.concept_id = ${tbDrugTreatmentStartDate} AND "
             + "    e.encounter_datetime BETWEEN :startDate AND :endDate AND "
             + "    e.location_id  = :location "
-            + "GROUP BY p.patient_id;";
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaceQuery = sb.replace(query);
@@ -544,7 +544,7 @@ public class TXTBCohortQueries {
             + "    o.value_coded = ${positiveConcept} AND "
             + "    e.encounter_datetime BETWEEN :startDate AND :endDate AND "
             + "    e.location_id  = :location "
-            + "GROUP BY p.patient_id;";
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaceQuery = sb.replace(query);
@@ -612,7 +612,7 @@ public class TXTBCohortQueries {
             + "    o.value_coded = ${negativeConcept} AND "
             + "    e.encounter_datetime BETWEEN :startDate AND :endDate AND "
             + "    e.location_id  = :location "
-            + "    GROUP BY p.patient_id) as list;";
+            + "    GROUP BY p.patient_id) as list";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaceQuery = sb.replace(query);
@@ -660,7 +660,7 @@ public class TXTBCohortQueries {
             + "    o.value_coded = ${getYesConcept} AND "
             + "    e.encounter_datetime BETWEEN :startDate AND :endDate AND "
             + "    e.location_id  = :location "
-            + "GROUP BY p.patient_id;";
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaceQuery = sb.replace(query);
