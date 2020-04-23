@@ -357,8 +357,8 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * at least one “POS” selected for “Resultado da Investigação para TB de BK e/ou RX?”
-   * during the reporting period consultations; ( response 703: POS for question: 6277)
+   * at least one “POS” selected for “Resultado da Investigação para TB de BK e/ou RX?” during the
+   * reporting period consultations; ( response 703: POS for question: 6277)
    */
   public CohortDefinition positiveInvestigationResultComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -537,11 +537,11 @@ public class TXTBCohortQueries {
             + "        ON o.encounter_id = e.encounter_id "
             + "WHERE "
             + "    p.voided = 0 AND "
-            + "    e.voided = 0 AND  "
+            + "    e.voided = 0 AND "
             + "    o.voided = 0 AND "
             + "    e.encounter_type IN (${adultoSeguimentoEncounterType},${pediatriaSeguimentoEncounterType})  AND "
             + "    o.concept_id = ${researchResultConcept} AND "
-            + "    o.value_coded = ${positiveConcept}AND "
+            + "    o.value_coded = ${positiveConcept} AND "
             + "    e.encounter_datetime BETWEEN :startDate AND :endDate AND "
             + "    e.location_id  = :location "
             + "GROUP BY p.patient_id;";
@@ -581,7 +581,7 @@ public class TXTBCohortQueries {
     map.put("negativeConcept", tbMetadata.getNegativeConcept().getConceptId());
 
     String query =
-        "SELECT patient_id FROM ("
+        "SELECT patient_id FROM ( "
             + "SELECT p.patient_id, e.encounter_id "
             + "FROM patient p "
             + "    INNER JOIN encounter e "
@@ -602,7 +602,7 @@ public class TXTBCohortQueries {
             + "    o.concept_id = ${tbScreening} AND "
             + "    o.value_coded = ${negativeConcept} "
             + ") as screening "
-            + "ON e.encounter_id = screening.encounter_id"
+            + "ON e.encounter_id = screening.encounter_id "
             + "WHERE "
             + "    p.voided = 0 AND "
             + "    e.voided = 0 AND "
