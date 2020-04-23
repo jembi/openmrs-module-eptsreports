@@ -831,7 +831,7 @@ public class ResumoMensalCohortQueries {
             + "                          INNER JOIN encounter enc ON minDate.patient_id = enc.patient_id  "
             + "                          WHERE minDate.min_date = enc.encounter_datetime) AS encounters "
             + "                         ON encounters.encounter_id = form.encounter_id "
-            + "                         WHERE form.patient_id is not null"
+            + "                         WHERE form.patient_id IS NOT NULL"
             + "                         GROUP BY form.patient_id;";
 
     StringSubstitutor sb = new StringSubstitutor(map);
