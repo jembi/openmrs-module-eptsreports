@@ -490,6 +490,33 @@ public class TXTBQueries {
     return cd;
   }
 
+  /**
+   * Gets patients with a coded obs between dates. This method though might seem like a duplicate of
+   * the above method, We are adding it because we faced a situation where a patient had an obs with
+   * a wrong obs date time format (0209-10-22 00:00:00) Using CodedObsCohortDefinition from the
+   * above method was counting this patient. We had to resort to using an SQL query to get around
+   * this issue.
+   *
+   * @param questionId the obs concept Id
+   * @param valueId the obs value coded Id
+   * @param encounterTypeIds the obs's encounter enounter-type
+   * @return the query to execute. TODO Investigate why CodedObsCohortDefinition was not able to
+   *     handle this wrong date time format (0209-10-22 00:00:00)
+   */
+  public static String getPatientsWithObsBetweenDates(
+      Integer questionId, Integer valueId, List<Integer> encounterTypeIds) {
+    return String.format(
+        "SELECT p.patient_id FROM patient p INNER JOIN encounter e "
+            + "ON p.patient_id = e.patient_id "
+            + "INNER JOIN obs o "
+            + "ON e.encounter_id = o.encounter_id "
+            + "WHERE e.location_id = :location AND e.encounter_type in (%s) "
+            + "AND o.concept_id = %s  AND o.value_coded = %s "
+            + "AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0",
+        StringUtils.join(encounterTypeIds, ","), questionId, valueId);
+  }
+
   public static class AbandonedWithoutNotificationParams {
     protected Integer programId;
     protected Integer returnVisitDateConceptId;
