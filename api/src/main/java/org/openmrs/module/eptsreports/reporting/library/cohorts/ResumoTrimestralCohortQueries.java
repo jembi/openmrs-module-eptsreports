@@ -323,7 +323,7 @@ public class ResumoTrimestralCohortQueries {
     CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
     cd.addParameter(new Parameter("onOrBefore", "End date", Date.class));
     cd.addParameter(new Parameter("locationList", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
+    cd.addEncounterType(hivMetadata.getMasterCardEncounterType());
     cd.setTimeModifier(TimeModifier.LAST);
     cd.setQuestion(hivMetadata.getTherapeuticLineConcept());
     cd.setOperator(SetComparator.IN);
