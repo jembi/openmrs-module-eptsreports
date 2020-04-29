@@ -505,16 +505,24 @@ public class TXTBQueries {
    */
   public static String getPatientsWithObsBetweenDates(
       Integer questionId, Integer valueId, List<Integer> encounterTypeIds) {
-    return String.format(
-        "SELECT p.patient_id FROM patient p INNER JOIN encounter e "
-            + "ON p.patient_id = e.patient_id "
-            + "INNER JOIN obs o "
-            + "ON e.encounter_id = o.encounter_id "
-            + "WHERE e.location_id = :location AND e.encounter_type in (%s) "
-            + "AND o.concept_id = %s  AND o.value_coded = %s "
-            + "AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate "
-            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0",
-        StringUtils.join(encounterTypeIds, ","), questionId, valueId);
+    StringBuilder s = new StringBuilder();
+    s.append("SELECT p.patient_id FROM patient p INNER JOIN encounter e ");
+    s.append("ON p.patient_id = e.patient_id ");
+    s.append("INNER JOIN obs o ");
+    s.append("ON e.encounter_id = o.encounter_id ");
+    s.append("WHERE e.location_id = :location AND e.encounter_type in (${encounterTypeIds}) ");
+    s.append("AND o.concept_id = ${questionId}  ");
+    s.append("AND o.value_coded = ${valueId} ");
+    s.append("AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate ");
+    s.append("AND p.voided = 0 AND e.voided = 0 AND o.voided = 0");
+
+    Map<String, String> values = new HashMap<>();
+    values.put("encounterTypeIds", StringUtils.join(encounterTypeIds, ","));
+    // Just convert the conceptId to String so it can be added to the map
+    values.put("questionId", String.valueOf(questionId));
+    values.put("valueId", String.valueOf(valueId));
+    StringSubstitutor sb = new StringSubstitutor(values);
+    return sb.replace(s.toString());
   }
 
   public static class AbandonedWithoutNotificationParams {
