@@ -1202,7 +1202,7 @@ public class TXTBCohortQueries {
 
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
     definition.setName("specimenSent()");
-    addCodedObsParameters(definition);
+    addGeneralParameters(definition);
 
     definition.addSearch(
         "basiloscopiaExamCohort",
