@@ -1061,7 +1061,7 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "denominator", EptsReportUtils.map(getDenominator(), generalParameterMapping));
     definition.addSearch(
-        "specimen-sent", EptsReportUtils.map(getSpecimenSent(), codedObsParameterMapping));
+        "specimen-sent", EptsReportUtils.map(getSpecimenSent(), generalParameterMapping));
     definition.addSearch(
         "positive-screening", EptsReportUtils.map(positiveScreening(), generalParameterMapping));
     addGeneralParameters(definition);
@@ -1164,22 +1164,41 @@ public class TXTBCohortQueries {
       Concept negative) {
 
     CohortDefinition basiloscopiaExamCohort =
-        getPatientsWithCodedObsBetweenDates(
-            laboratory, basiloscopiaExam, Arrays.asList(negative, positive));
+        genericCohortQueries.generalSql(
+            "patientsWhoInitiatedTbTreatment",
+            TXTBQueries.getPatientsWithObsBetweenDates(
+                laboratory, basiloscopiaExam, Arrays.asList(negative, positive)));
+    addGeneralParameters(basiloscopiaExamCohort);
+
     CohortDefinition genexpertTestCohort =
-        getPatientsWithCodedObsBetweenDates(
-            fichaClinica, genexpertTest, Arrays.asList(negative, positive));
+        genericCohortQueries.generalSql(
+            "patientsWhoInitiatedTbTreatment",
+            TXTBQueries.getPatientsWithObsBetweenDates(
+                fichaClinica, genexpertTest, Arrays.asList(negative, positive)));
+    addGeneralParameters(genexpertTestCohort);
+
     CohortDefinition tbLamTestCohort =
-        getPatientsWithCodedObsBetweenDates(
-            fichaClinica, tbLamTest, Arrays.asList(negative, positive));
+        genericCohortQueries.generalSql(
+            "patientsWhoInitiatedTbTreatment",
+            TXTBQueries.getPatientsWithObsBetweenDates(
+                fichaClinica, tbLamTest, Arrays.asList(negative, positive)));
+    addGeneralParameters(tbLamTestCohort);
+
     CohortDefinition cultureTestCohort =
-        getPatientsWithCodedObsBetweenDates(
-            fichaClinica, cultureTest, Arrays.asList(negative, positive));
+        genericCohortQueries.generalSql(
+            "patientsWhoInitiatedTbTreatment",
+            TXTBQueries.getPatientsWithObsBetweenDates(
+                fichaClinica, cultureTest, Arrays.asList(negative, positive)));
+    addGeneralParameters(cultureTestCohort);
+
     CohortDefinition applicationForLaboratoryResearchCohort =
-        getPatientsWithCodedObsBetweenDates(
-            fichaClinica,
-            applicationForLaboratoryResearch,
-            Arrays.asList(genexpertTest, cultureTest, tbLamTest));
+        genericCohortQueries.generalSql(
+            "patientsWhoInitiatedTbTreatment",
+            TXTBQueries.getPatientsWithObsBetweenDates(
+                fichaClinica,
+                applicationForLaboratoryResearch,
+                Arrays.asList(genexpertTest, cultureTest, tbLamTest)));
+    addGeneralParameters(applicationForLaboratoryResearchCohort);
 
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
     definition.setName("specimenSent()");
@@ -1187,16 +1206,16 @@ public class TXTBCohortQueries {
 
     definition.addSearch(
         "basiloscopiaExamCohort",
-        EptsReportUtils.map(basiloscopiaExamCohort, codedObsParameterMapping));
+        EptsReportUtils.map(basiloscopiaExamCohort, generalParameterMapping));
     definition.addSearch(
-        "genexpertTestCohort", EptsReportUtils.map(genexpertTestCohort, codedObsParameterMapping));
+        "genexpertTestCohort", EptsReportUtils.map(genexpertTestCohort, generalParameterMapping));
     definition.addSearch(
-        "tbLamTestCohort", EptsReportUtils.map(tbLamTestCohort, codedObsParameterMapping));
+        "tbLamTestCohort", EptsReportUtils.map(tbLamTestCohort, generalParameterMapping));
     definition.addSearch(
-        "cultureTestCohort", EptsReportUtils.map(cultureTestCohort, codedObsParameterMapping));
+        "cultureTestCohort", EptsReportUtils.map(cultureTestCohort, generalParameterMapping));
     definition.addSearch(
         "applicationForLaboratoryResearchCohort",
-        EptsReportUtils.map(applicationForLaboratoryResearchCohort, codedObsParameterMapping));
+        EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
 
     definition.setCompositionString(
         "basiloscopiaExamCohort OR genexpertTestCohort OR tbLamTestCohort OR cultureTestCohort OR applicationForLaboratoryResearchCohort");
