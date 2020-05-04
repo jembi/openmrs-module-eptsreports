@@ -69,7 +69,7 @@ public class EptsTransferredInCohortDefinitionEvaluator2 implements CohortDefini
 
     q.append("       AND type.voided = 0 ");
     q.append("       AND type.concept_id = :typeOfPatient ");
-    q.append("       AND type.value_coded = :programConcept ");
+    q.append("       AND type.value_coded in (:programConcept) ");
     q.append("       AND opening.voided = 0 ");
     q.append("       AND opening.concept_id = :dateOfMasterCardFileOpening ");
     if (cd.getOnOrAfter() == null) {
@@ -91,7 +91,7 @@ public class EptsTransferredInCohortDefinitionEvaluator2 implements CohortDefini
     q.append("    WHERE  pp.voided=0 ");
     q.append("    AND ps.voided=0 ");
     q.append("    AND p.voided=0 ");
-    q.append("    AND pp.program_id=:programsEnrolled ");
+    q.append("    AND pp.program_id in (:programsEnrolled)");
     q.append("    AND location_id= :location AND  ");
     if (cd.getOnOrAfter() == null) {
       q.append(" ps.start_date <= :onOrBefore ");
@@ -102,7 +102,7 @@ public class EptsTransferredInCohortDefinitionEvaluator2 implements CohortDefini
     q.append("  JOIN patient_state ps ");
     q.append("  ON ps.patient_program_id=pgEnrollment.patient_program_id ");
     q.append("  where ps.start_date=pgEnrollment.pgEnrollmentDate ");
-    q.append("  AND ps.state = :transferredInState ");
+    q.append("  AND ps.state in (:transferredInState) ");
     q.append("  AND ps.voided=0 ");
 
     q.addParameter("mastercard", hivMetadata.getMasterCardEncounterType());
