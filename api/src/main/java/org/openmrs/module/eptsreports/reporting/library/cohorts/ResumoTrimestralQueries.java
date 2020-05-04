@@ -278,7 +278,7 @@ public class ResumoTrimestralQueries {
             + "         FROM   encounter enc "
             + "         JOIN obs o "
             + "         ON o.encounter_id = enc.encounter_id "
-            + "         AND o.concept_id = ${therapeuticLineConcept} "
+            + "         WHERE o.concept_id = ${therapeuticLineConcept} "
             + "         AND enc.location_id = :location "
             + "         AND enc.voided = 0 "
             + "         AND o.location_id = :location "
