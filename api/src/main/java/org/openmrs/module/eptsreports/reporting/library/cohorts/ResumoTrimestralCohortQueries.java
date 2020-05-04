@@ -27,15 +27,18 @@ public class ResumoTrimestralCohortQueries {
   private GenericCohortQueries genericCohortQueries;
   private HivMetadata hivMetadata;
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private CommonCohortQueries commonCohortQueries;
 
   @Autowired
   public ResumoTrimestralCohortQueries(
       GenericCohortQueries genericCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
-      HivMetadata hivMetadata) {
+      HivMetadata hivMetadata,
+      CommonCohortQueries commonCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.hivMetadata = hivMetadata;
+    this.commonCohortQueries = commonCohortQueries;
   }
 
   /** Indicator A - Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
@@ -45,7 +48,7 @@ public class ResumoTrimestralCohortQueries {
         getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameters(getParameters());
-    
+
     String yearBefore =
         "onOrAfter=${onOrAfter-12m},onOrBefore=${onOrBefore-12m},location=${location}";
     cd.addSearch("startedArt", map(startedArt, yearBefore));
@@ -59,8 +62,7 @@ public class ResumoTrimestralCohortQueries {
   /** Indicator B - Nº de pacientes Transferidos de (+) outras US em TARV durante o mês */
   public CohortDefinition getB() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
-    CohortDefinition transferredIn =
-        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth();
+    CohortDefinition transferredIn = commonCohortQueries.getMohTransferredInPatients();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameters(getParameters());
 
