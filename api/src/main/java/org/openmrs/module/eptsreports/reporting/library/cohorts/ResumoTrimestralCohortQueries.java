@@ -169,7 +169,7 @@ public class ResumoTrimestralCohortQueries {
     CohortDefinition indicatorJ = getJ();
     CohortDefinition indicatorL = getL();
     CohortDefinition lastSecondTherapeuticLine =
-        getPatientsWithLastCodedObsInSecondTherapeuticLineInMasterCardBeforeMonthEndDate();
+    		getPatientsWithLastObsInSecondTherapeuticLineInMasterCardFichaClinicaBeforeMonthEndDate();
 
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
     comp.setParameters(getParameters());
@@ -314,20 +314,25 @@ public class ResumoTrimestralCohortQueries {
   }
 
   /**
-   * All patients with last observation registered in Second Therapeutic Line in Master Card before
-   * MonthEndDate
+   * All patients with last observation registered in Second Therapeutic Line in Master Card – Ficha
+   * Clinica before MonthEndDate encounter type id 6
+   *
+   * @return CohortDefinition
    */
   private CohortDefinition
-      getPatientsWithLastCodedObsInSecondTherapeuticLineInMasterCardBeforeMonthEndDate() {
-    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "End date", Date.class));
-    cd.addParameter(new Parameter("locationList", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getMasterCardEncounterType());
-    cd.setTimeModifier(TimeModifier.LAST);
-    cd.setQuestion(hivMetadata.getTherapeuticLineConcept());
-    cd.setOperator(SetComparator.IN);
-    cd.addValue(hivMetadata.getSecondLineConcept());
-    return cd;
+      getPatientsWithLastObsInSecondTherapeuticLineInMasterCardFichaClinicaBeforeMonthEndDate() {
+    SqlCohortDefinition sql = new SqlCohortDefinition();
+    sql.setName(
+        "All patients with last observation registered in Second Therapeutic Line in Master Card – Ficha Clinica 6");
+    sql.addParameter(new Parameter("endDate", "End date", Date.class));
+    sql.addParameter(new Parameter("location", "Location", Location.class));
+    sql.setQuery(
+        ResumoTrimestralQueries
+            .getPatientsWithLastObsInSecondTherapeuticLineInMasterCardFichaClinicaBeforeMonthEndDate(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getTherapeuticLineConcept().getConceptId(),
+                hivMetadata.getSecondLineConcept().getConceptId()));
+    return sql;
   }
 
   /** Number of patients transferred-in from another HFs during the current month */
