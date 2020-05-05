@@ -26,7 +26,6 @@ public class ResumoTrimestralCohortQueries {
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
   private CommonCohortQueries commonCohortQueries;
 
-
   @Autowired
   public ResumoTrimestralCohortQueries(
       GenericCohortQueries genericCohortQueries,
@@ -60,8 +59,7 @@ public class ResumoTrimestralCohortQueries {
   /** Indicator B - Nº de pacientes Transferidos de (+) outras US em TARV durante o mês */
   public CohortDefinition getB() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
-    CohortDefinition transferredIn =
-    		commonCohortQueries.getMohTransferredInPatients();
+    CohortDefinition transferredIn = commonCohortQueries.getMohTransferredInPatients();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameters(getParameters());
 
