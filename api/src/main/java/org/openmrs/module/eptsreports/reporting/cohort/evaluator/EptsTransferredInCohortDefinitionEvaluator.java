@@ -16,8 +16,6 @@ import org.openmrs.module.reporting.evaluation.querybuilder.SqlQueryBuilder;
 import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/** @deprecated Use {@link EptsTransferredInCohortDefinitionEvaluator2} instead. */
-@Deprecated
 @Handler(supports = EptsTransferredInCohortDefinition.class)
 public class EptsTransferredInCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
