@@ -11,9 +11,12 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
+import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,15 +27,18 @@ public class ResumoTrimestralCohortQueries {
   private GenericCohortQueries genericCohortQueries;
   private HivMetadata hivMetadata;
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private CommonCohortQueries commonCohortQueries;
 
   @Autowired
   public ResumoTrimestralCohortQueries(
       GenericCohortQueries genericCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
-      HivMetadata hivMetadata) {
+      HivMetadata hivMetadata,
+      CommonCohortQueries commonCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.hivMetadata = hivMetadata;
+    this.commonCohortQueries = commonCohortQueries;
   }
 
   /** Indicator A - Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
@@ -56,8 +62,7 @@ public class ResumoTrimestralCohortQueries {
   /** Indicator B - Nº de pacientes Transferidos de (+) outras US em TARV durante o mês */
   public CohortDefinition getB() {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
-    CohortDefinition transferredIn =
-        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth();
+    CohortDefinition transferredIn = commonCohortQueries.getMohTransferredInPatients();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameters(getParameters());
 
@@ -121,8 +126,9 @@ public class ResumoTrimestralCohortQueries {
     CohortDefinition suspended = getI();
     CohortDefinition abandoned = getJ();
     CohortDefinition dead = getL();
-    CohortDefinition lastFirstTherapeuticLine =
-        getPatientsWithLastTherapeuticLineEqualsToFirstLineOrWithoutInformation();
+    CohortDefinition inTheFirstLineOrNull =
+        getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull();
+
     CompositionCohortDefinition wrapper = new CompositionCohortDefinition();
     wrapper.setParameters(getParameters());
     wrapper.addSearch("preTarv", mapStraightThrough(preTarv));
@@ -131,10 +137,10 @@ public class ResumoTrimestralCohortQueries {
     wrapper.addSearch("suspended", mapStraightThrough(suspended));
     wrapper.addSearch("abandoned", mapStraightThrough(abandoned));
     wrapper.addSearch("dead", mapStraightThrough(dead));
-    wrapper.addSearch("lastFirstTherapeuticLine", mapStraightThrough(lastFirstTherapeuticLine));
+    wrapper.addSearch("inTheFirstLineOrNull", mapStraightThrough(inTheFirstLineOrNull));
 
     wrapper.setCompositionString(
-        "((preTarv OR transferredIn) NOT (transferredOut OR suspended OR abandoned OR dead)) AND lastFirstTherapeuticLine ");
+        "((preTarv OR transferredIn) NOT (transferredOut AND suspended AND abandoned AND dead)) AND inTheFirstLineOrNull ");
     return wrapper;
   }
 
@@ -163,7 +169,7 @@ public class ResumoTrimestralCohortQueries {
     CohortDefinition indicatorJ = getJ();
     CohortDefinition indicatorL = getL();
     CohortDefinition lastSecondTherapeuticLine =
-        getPatientsWithLastObsInSecondTherapeuticLineInMasterCardFichaClinicaBeforeMonthEndDate();
+        getPatientsWithLastCodedObsInSecondTherapeuticLineInMasterCardBeforeMonthEndDate();
 
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
     comp.setParameters(getParameters());
@@ -175,7 +181,7 @@ public class ResumoTrimestralCohortQueries {
     comp.addSearch("L", mapStraightThrough(indicatorL));
     comp.addSearch(
         "lastSecondTherapeuticLine",
-        map(lastSecondTherapeuticLine, "endDate=${onOrBefore},location=${location}"));
+        map(lastSecondTherapeuticLine, "onOrBefore=${onOrBefore},locationList=${location}"));
     comp.setCompositionString(
         "((A OR B) AND NOT (C OR I OR J OR L)) AND lastSecondTherapeuticLine");
     return comp;
@@ -249,22 +255,17 @@ public class ResumoTrimestralCohortQueries {
     return cd;
   }
 
-  /**
-   * Fetches Patients with Last registered Line Treatment equals to (1st Line) or without
-   * information regarding Therapeutic Line
-   */
-  private CohortDefinition
-      getPatientsWithLastTherapeuticLineEqualsToFirstLineOrWithoutInformation() {
+  /** Fetches Patients with Last registered Line Treatment equals to (1st Line) */
+  private CohortDefinition getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients in the first Line of treatment during a period");
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setQuery(
-        ResumoTrimestralQueries
-            .getPatientsWithLastTherapeuticLineEqualsToFirstLineOrWithoutInformation(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getTherapeuticLineConcept().getConceptId(),
-                hivMetadata.getFirstLineConcept().getConceptId()));
+        ResumoTrimestralQueries.getPatientsWithLastTherapeuticLineEqualsToFirstLineOrWithoutInformation(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getTherapeuticLineConcept().getConceptId(),
+            hivMetadata.getFirstLineConcept().getConceptId()));
     return cd;
   }
 
@@ -312,25 +313,20 @@ public class ResumoTrimestralCohortQueries {
   }
 
   /**
-   * All patients with last observation registered in Second Therapeutic Line in Master Card – Ficha
-   * Clinica before MonthEndDate encounter type id 6
-   *
-   * @return CohortDefinition
+   * All patients with last observation registered in Second Therapeutic Line in Master Card before
+   * MonthEndDate
    */
   private CohortDefinition
-      getPatientsWithLastObsInSecondTherapeuticLineInMasterCardFichaClinicaBeforeMonthEndDate() {
-    SqlCohortDefinition sql = new SqlCohortDefinition();
-    sql.setName(
-        "All patients with last observation registered in Second Therapeutic Line in Master Card – Ficha Clinica 6");
-    sql.addParameter(new Parameter("endDate", "End date", Date.class));
-    sql.addParameter(new Parameter("location", "Location", Location.class));
-    sql.setQuery(
-        ResumoTrimestralQueries
-            .getPatientsWithLastObsInSecondTherapeuticLineInMasterCardFichaClinicaBeforeMonthEndDate(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getTherapeuticLineConcept().getConceptId(),
-                hivMetadata.getSecondLineConcept().getConceptId()));
-    return sql;
+      getPatientsWithLastCodedObsInSecondTherapeuticLineInMasterCardBeforeMonthEndDate() {
+    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
+    cd.addParameter(new Parameter("onOrBefore", "End date", Date.class));
+    cd.addParameter(new Parameter("locationList", "Location", Location.class));
+    cd.addEncounterType(hivMetadata.getMasterCardEncounterType());
+    cd.setTimeModifier(TimeModifier.LAST);
+    cd.setQuestion(hivMetadata.getTherapeuticLineConcept());
+    cd.setOperator(SetComparator.IN);
+    cd.addValue(hivMetadata.getSecondLineConcept());
+    return cd;
   }
 
   /** Number of patients transferred-in from another HFs during the current month */
