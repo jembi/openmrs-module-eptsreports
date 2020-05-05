@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -488,6 +489,67 @@ public class TXTBQueries {
     cd.setTimeModifier(TimeModifier.ANY);
     cd.setEncounterTypeList(encounterTypesList);
     return cd;
+  }
+
+  /**
+   * Gets patients with a coded obs between dates. This method though might seem like a duplicate of
+   * the above method, We are adding it because we faced a situation where a patient had an obs with
+   * a wrong obs date time format (0209-10-22 00:00:00) Using CodedObsCohortDefinition from the
+   * above method was counting this patient. We had to resort to using an SQL query to get around
+   * this issue.
+   *
+   * @param questionId the obs concept Id
+   * @param valueId the obs value coded Id
+   * @param encounterTypeIds the obs's encounter enounter-type
+   * @return the query to execute. TODO Investigate why CodedObsCohortDefinition was not able to
+   *     handle this wrong date time format (0209-10-22 00:00:00)
+   */
+  public static String getPatientsWithObsBetweenDates(
+      Integer questionId, Integer valueId, List<Integer> encounterTypeIds) {
+    StringBuilder s = new StringBuilder();
+    s.append("SELECT p.patient_id FROM patient p INNER JOIN encounter e ");
+    s.append("ON p.patient_id = e.patient_id ");
+    s.append("INNER JOIN obs o ");
+    s.append("ON e.encounter_id = o.encounter_id ");
+    s.append("WHERE e.location_id = :location AND e.encounter_type in (${encounterTypeIds}) ");
+    s.append("AND o.concept_id = ${questionId}  ");
+    s.append("AND o.value_coded = ${valueId} ");
+    s.append("AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate ");
+    s.append("AND p.voided = 0 AND e.voided = 0 AND o.voided = 0");
+
+    Map<String, String> values = new HashMap<>();
+    values.put("encounterTypeIds", StringUtils.join(encounterTypeIds, ","));
+    // Just convert the conceptId to String so it can be added to the map
+    values.put("questionId", String.valueOf(questionId));
+    values.put("valueId", String.valueOf(valueId));
+    StringSubstitutor sb = new StringSubstitutor(values);
+    return sb.replace(s.toString());
+  }
+
+  public static String getPatientsWithObsBetweenDates(
+      EncounterType encounterType, Concept question, List<Concept> answers) {
+    List<Integer> answerIds = new ArrayList<Integer>();
+    for (Concept concept : answers) {
+      answerIds.add(concept.getConceptId());
+    }
+    StringBuilder s = new StringBuilder();
+    s.append("SELECT p.patient_id FROM patient p INNER JOIN encounter e ");
+    s.append("ON p.patient_id = e.patient_id ");
+    s.append("INNER JOIN obs o ");
+    s.append("ON e.encounter_id = o.encounter_id ");
+    s.append("WHERE e.location_id = :location AND e.encounter_type = ${encounterType} ");
+    s.append("AND o.concept_id = ${question}  ");
+    s.append("AND o.value_coded in (${answers}) ");
+    s.append("AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate ");
+    s.append("AND p.voided = 0 AND e.voided = 0 AND o.voided = 0");
+
+    Map<String, String> values = new HashMap<>();
+    values.put("encounterType", String.valueOf(encounterType.getEncounterTypeId()));
+    // Just convert the conceptId to String so it can be added to the map
+    values.put("question", String.valueOf(question.getConceptId()));
+    values.put("answers", StringUtils.join(answerIds, ","));
+    StringSubstitutor sb = new StringSubstitutor(values);
+    return sb.replace(s.toString());
   }
 
   public static class AbandonedWithoutNotificationParams {

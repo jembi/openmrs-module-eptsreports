@@ -16,9 +16,9 @@ public class ResumoTrimestralQueries {
             + "ON p.patient_id = e.patient_id JOIN obs o "
             + "ON o.encounter_id = e.encounter_id "
             + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND "
-            + "e.encounter_type = ${adultoSeguimentoEncounterType} AND (o.concept_id = ${viralLoadConcept} AND o.value_numeric IS NOT NULL) "
-            + "OR (o.concept_id = ${viralLoadQualitativeConcept} AND o.value_numeric IS NOT NULL) "
-            + "AND e.encounter_datetime <= :onOrBefore group by patient_id";
+            + "e.encounter_type = ${adultoSeguimentoEncounterType} AND ((o.concept_id = ${viralLoadConcept} AND o.value_numeric IS NOT NULL) "
+            + "OR (o.concept_id = ${viralLoadQualitativeConcept} AND o.value_coded IS NOT NULL)) "
+            + "AND e.encounter_datetime <= :onOrBefore ";
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
@@ -165,7 +165,8 @@ public class ResumoTrimestralQueries {
     sql.append("              AND ps.voided = 0 ");
     sql.append("              AND ps.state = ${suspendedState} ");
     sql.append("            AND ps.start_date BETWEEN :onOrAfter AND :onOrBefore ");
-    sql.append("              AND ps.end_date = NULL ");
+    sql.append("              AND ps.end_date IS NULL ");
+    sql.append("              GROUP BY p.patient_id ");
     sql.append("            UNION ");
     sql.append("            SELECT p.patient_id, ");
     sql.append("                   Max(e.encounter_datetime) suspended_date ");
@@ -182,6 +183,7 @@ public class ResumoTrimestralQueries {
     sql.append("              AND o.voided = 0 ");
     sql.append("              AND o.concept_id = ${artStateOfStay} ");
     sql.append("              AND o.value_coded = ${suspendedConcept} ");
+    sql.append("              GROUP BY p.patient_id ");
     sql.append("            UNION ");
     sql.append("            SELECT p.patient_id, ");
     sql.append("                   Max(o.obs_datetime) suspended_date ");
@@ -231,44 +233,62 @@ public class ResumoTrimestralQueries {
   }
 
   /**
-   * Fetches Patients with Last registered Line Treatment equals to (1st Line)
+   * Fetches Patients with Last registered Line Treatment equals to (1st Line) of without
+   * information regarding the therapeutic line
    *
    * @return SqlCohortDefinition
    */
-  public static String getPatientsWithLastTherapeuticLineEqualsToFirstLineOrNull(
+  public static String getPatientsWithLastTherapeuticLineEqualsToFirstLineOrWithoutInformation(
       int adultoSeguimentoEncounterType, int therapeuticLineConcept, int firstLineConcept) {
+
     String query =
-        " SELECT base_tbl.patient_id "
-            + "FROM   (SELECT p.patient_id, "
-            + "               (SELECT e.encounter_id "
-            + "                FROM   encounter e "
-            + "                       JOIN obs o "
-            + "                         ON o.encounter_id = e.encounter_id "
-            + "                            AND e.encounter_type = ${adultoSeguimentoEncounterType} "
-            + "                            AND o.concept_id = ${therapeuticLineConcept} "
-            + "                            AND o.location_id = :location "
-            + "                            AND o.voided = 0 "
-            + "                            AND e.encounter_datetime <= :onOrBefore "
-            + "                            AND e.voided = 0 "
-            + "                WHERE  e.patient_id = p.patient_id "
-            + "                ORDER  BY o.obs_id DESC "
-            + "                LIMIT  1) last_therapeutic_line_encounter "
-            + "        FROM   patient p "
-            + "        WHERE  p.voided = 0) base_tbl "
-            + "       JOIN (SELECT obs.encounter_id "
-            + "             FROM   obs "
-            + "             WHERE  obs.value_coded = ${firstLineConcept} "
-            + "                    AND obs.concept_id = ${therapeuticLineConcept} "
-            + "                    AND obs.location_id = :location "
-            + "                    AND obs.voided = 0 "
-            + "             UNION "
-            + "             SELECT encounter_id "
-            + "             FROM   obs "
-            + "             WHERE  Isnull (obs.value_coded) "
-            + "                    AND obs.concept_id = ${therapeuticLineConcept} "
-            + "                    AND obs.location_id = :location "
-            + "                    AND obs.voided = 0) inner_tbl "
-            + "         ON inner_tbl.encounter_id = base_tbl.last_therapeutic_line_encounter    ";
+        " SELECT patient_id "
+            + "FROM   (SELECT base_tbl.patient_id "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       (SELECT e.encounter_id "
+            + "                        FROM   encounter e "
+            + "                               JOIN obs o "
+            + "                                 ON o.encounter_id = e.encounter_id "
+            + "                                    AND e.encounter_type = ${adultoSeguimentoEncounterType} "
+            + "                                    AND o.concept_id = ${therapeuticLineConcept} "
+            + "                                    AND o.location_id = :location "
+            + "                                    AND o.voided = 0 "
+            + "                                    AND e.encounter_datetime <= :onOrBefore "
+            + "                                    AND e.voided = 0 "
+            + "                        WHERE  e.patient_id = p.patient_id "
+            + "                        ORDER  BY o.obs_id DESC "
+            + "                        LIMIT  1) last_therapeutic_line_encounter "
+            + "                FROM   patient p "
+            + "                WHERE  p.voided = 0) base_tbl "
+            + "               JOIN (SELECT obs.encounter_id "
+            + "                     FROM   obs "
+            + "                     WHERE  obs.value_coded = ${firstLineConcept} "
+            + "                            AND obs.concept_id = ${therapeuticLineConcept} "
+            + "                            AND obs.location_id = :location "
+            + "                            AND obs.voided = 0) inner_tbl "
+            + "                 ON inner_tbl.encounter_id = "
+            + "                    base_tbl.last_therapeutic_line_encounter) "
+            + "       last_1st_line_tbl "
+            + " UNION "
+            + "(SELECT enc.patient_id "
+            + " FROM   encounter enc "
+            + " JOIN patient p "
+            + " ON p.patient_id = enc.patient_id "
+            + " WHERE  enc.patient_id NOT IN (SELECT enc.patient_id "
+            + "         FROM   encounter enc "
+            + "         JOIN obs o "
+            + "         ON o.encounter_id = enc.encounter_id "
+            + "         WHERE o.concept_id = ${therapeuticLineConcept} "
+            + "         AND enc.location_id = :location "
+            + "         AND enc.voided = 0 "
+            + "         AND o.location_id = :location "
+            + "         AND o.voided = 0"
+            + "         AND enc.encounter_datetime <= :onOrBefore) "
+            + " AND enc.encounter_type = ${adultoSeguimentoEncounterType} "
+            + " AND enc.encounter_datetime <= :onOrBefore "
+            + " AND enc.voided = 0 "
+            + " AND enc.location_id = :location "
+            + " AND p.voided = 0 GROUP  BY patient_id  )";
 
     Map<String, Integer> map = new HashMap<>();
     map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
@@ -411,6 +431,36 @@ public class ResumoTrimestralQueries {
     map.put("pediatriaSeguimentoEncounterType", pediatriaSeguimentoEncounterType);
     map.put("arvFarmaciaEncounterType", arvFarmaciaEncounterType);
     map.put("artDatePickupMasterCardConcept", artDatePickupMasterCardConcept);
+    return sub.replace(sql);
+  }
+
+  /**
+   * all patients with last registered Line Treatment (PT: “Linha Terapeutica”) (Concept id 21151)
+   * equal to “Second Line” (PT: “Segunda Linha”) (Concept id 21148 ) and encounter date < =
+   * MonthEndDate in encounter “Master Card – Ficha Clinica” (encounter id 6)
+   *
+   * @return String
+   */
+  public static String
+      getPatientsWithLastObsInSecondTherapeuticLineInMasterCardFichaClinicaBeforeMonthEndDate(
+          int adultoSeguimentoEncounterType, int therapeuticLineConcept, int secondLineConcept) {
+    String sql =
+        "SELECT patient_id FROM( "
+            + " SELECT p.patient_id,MAX(o.obs_datetime) last_obs"
+            + " FROM patient p INNER JOIN encounter e ON p.patient_id=e.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${adultoSeguimentoEncounterType} "
+            + " AND  o.concept_id = ${therapeuticLineConcept} "
+            + " AND o.value_coded = ${secondLineConcept} "
+            + " AND e.encounter_datetime <= :endDate"
+            + " AND e.location_id= :location GROUP BY p.patient_id) tt ";
+
+    Map<String, Integer> map = new HashMap<>();
+
+    StringSubstitutor sub = new StringSubstitutor(map);
+    map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
+    map.put("therapeuticLineConcept", therapeuticLineConcept);
+    map.put("secondLineConcept", secondLineConcept);
     return sub.replace(sql);
   }
 }
