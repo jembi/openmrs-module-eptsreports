@@ -262,10 +262,11 @@ public class ResumoTrimestralCohortQueries {
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.setQuery(
-        ResumoTrimestralQueries.getPatientsWithLastTherapeuticLineEqualsToFirstLineOrWithoutInformation(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getTherapeuticLineConcept().getConceptId(),
-            hivMetadata.getFirstLineConcept().getConceptId()));
+        ResumoTrimestralQueries
+            .getPatientsWithLastTherapeuticLineEqualsToFirstLineOrWithoutInformation(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getTherapeuticLineConcept().getConceptId(),
+                hivMetadata.getFirstLineConcept().getConceptId()));
     return cd;
   }
 
