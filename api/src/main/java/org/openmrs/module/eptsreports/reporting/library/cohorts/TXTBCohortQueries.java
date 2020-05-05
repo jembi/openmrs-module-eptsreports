@@ -784,19 +784,18 @@ public class TXTBCohortQueries {
     return definition;
   }
 
-
   /**
-   * 
-   * Get patients who where Transferred Out (and had no registred drug pickup) 
-   * after the transferred out date within reporting period
-   * 
+   * Get patients who where Transferred Out (and had no registred drug pickup) after the transferred
+   * out date within reporting period
+   *
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsTransferredOut() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
-    sqlCohortDefinition.setName("Patient Transferred Out With No Drug Pick After The Transferred out Date ");
+    sqlCohortDefinition.setName(
+        "Patient Transferred Out With No Drug Pick After The Transferred out Date ");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
