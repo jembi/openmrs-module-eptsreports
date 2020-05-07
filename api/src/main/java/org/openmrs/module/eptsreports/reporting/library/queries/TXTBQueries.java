@@ -540,7 +540,7 @@ public class TXTBQueries {
     s.append("WHERE e.location_id = :location AND e.encounter_type = ${encounterType} ");
     s.append("AND o.concept_id = ${question}  ");
     s.append("AND o.value_coded in (${answers}) ");
-    s.append("AND o.obs_datetime >= :startDate AND o.obs_datetime <= :endDate ");
+    s.append("AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate ");
     s.append("AND p.voided = 0 AND e.voided = 0 AND o.voided = 0");
 
     Map<String, String> values = new HashMap<>();
