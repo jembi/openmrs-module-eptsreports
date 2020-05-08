@@ -40,9 +40,10 @@ public class ResumoTrimestralCohortQueries {
 
   /** Indicator A - Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
   public CohortDefinition getA() {
+    boolean tarvOnly = true;
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
     CohortDefinition transferredIn =
-        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth();
+        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth(tarvOnly);
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameters(getParameters());
 
@@ -337,7 +338,8 @@ public class ResumoTrimestralCohortQueries {
 
   /** Number of patients transferred-in from another HFs during the current month */
   private CohortDefinition
-      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth() {
+      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth(
+          boolean tarvOnly) {
 
     EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
     cd.setProgramEnrolled(hivMetadata.getHIVCareProgram());
@@ -345,7 +347,7 @@ public class ResumoTrimestralCohortQueries {
     cd.setPatientState(hivMetadata.getArtCareTransferredFromOtherHealthFacilityWorkflowState());
     cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
     cd.addParameters(getParameters());
-    cd.setB10Flag(false);
+    cd.setB10Flag(tarvOnly);
     return cd;
   }
 
