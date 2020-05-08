@@ -5,6 +5,7 @@ import java.util.Map;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.evaluator.CohortDefinitionEvaluator;
@@ -18,10 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
   private CohortDefinitionService cohortDefinitionService;
+  private GenericCohortQueries genericCohortQueries;
 
   @Autowired
-  public EptsQuarterlyCohortDefinitionEvaluator(CohortDefinitionService cohortDefinitionService) {
+  public EptsQuarterlyCohortDefinitionEvaluator(
+      CohortDefinitionService cohortDefinitionService, GenericCohortQueries genericCohortQueries) {
     this.cohortDefinitionService = cohortDefinitionService;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   @Override
@@ -34,9 +38,18 @@ public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionE
     EptsQuarterlyCohortDefinition.Month month = cd.getMonth();
     Map<String, Date> range = getRange(year, quarter, month);
     context.getParameterValues().putAll(range);
+    context.setBaseCohort(evaluateBaseCohort(context));
     Cohort c = cohortDefinitionService.evaluate(cd.getCohortDefinition(), context);
     ret.getMemberIds().addAll(c.getMemberIds());
     return ret;
+  }
+
+  private EvaluatedCohort evaluateBaseCohort(EvaluationContext context) throws EvaluationException {
+    EvaluationContext baseCohortContext = new EvaluationContext();
+    baseCohortContext.addParameterValue("endDate", context.getParameterValue("endDate"));
+    baseCohortContext.addParameterValue("location", context.getParameterValue("location"));
+    return cohortDefinitionService.evaluate(
+        genericCohortQueries.getBaseCohort(), baseCohortContext);
   }
 
   /**
