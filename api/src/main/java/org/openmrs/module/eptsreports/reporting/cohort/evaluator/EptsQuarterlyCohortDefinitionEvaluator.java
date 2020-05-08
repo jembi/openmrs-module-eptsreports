@@ -1,7 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.cohort.evaluator;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
@@ -40,24 +39,28 @@ public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionE
     return ret;
   }
 
+  /**
+   * If both quarter and month are given it returns a map containing the dates for the beginning and
+   * end of the month within the quarter. If no month is given returns da dates for the whole
+   * quarter.
+   */
   private Map<String, Date> getRange(
       Integer year,
       EptsQuarterlyCohortDefinition.Quarter quarter,
       EptsQuarterlyCohortDefinition.Month month) {
-    Map<String, Date> periodDates = DateUtil.getPeriodDates(year, quarter.ordinal() + 1, null);
-    int monthAdjustment = 0;
-    if (EptsQuarterlyCohortDefinition.Month.M2.equals(month)) {
-      monthAdjustment = 1;
-    } else if (EptsQuarterlyCohortDefinition.Month.M3.equals(month)) {
-      monthAdjustment = 2;
+    Integer q = quarter.ordinal() + 1;
+    Integer m = null;
+    if (month != null) {
+      q = null;
+      m = 3 * quarter.ordinal() + month.ordinal() + 1;
     }
-    HashMap<String, Date> range = new HashMap<>();
-    Date start = DateUtil.getStartOfMonth(periodDates.get("startDate"), monthAdjustment);
-    Date end = DateUtil.getEndOfMonth(start);
-    range.put("startDate", start);
-    range.put("onOrAfter", start);
-    range.put("endDate", end);
-    range.put("onOrBefore", end);
-    return range;
+    Map<String, Date> periodDates = DateUtil.getPeriodDates(year, q, m);
+    Date start = DateUtil.getStartOfDay(periodDates.get("startDate"));
+    Date end = DateUtil.getStartOfDay(periodDates.get("endDate"));
+    periodDates.put("startDate", start);
+    periodDates.put("onOrAfter", start);
+    periodDates.put("endDate", end);
+    periodDates.put("onOrBefore", end);
+    return periodDates;
   }
 }

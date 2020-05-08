@@ -22,14 +22,14 @@ public class EptsQuarterlyCohortDefinition extends BaseCohortDefinition {
     Q1,
     Q2,
     Q3,
-    Q4;
+    Q4
   }
 
   public enum Month {
     M1,
     M2,
     M3
-  };
+  }
 
   @ConfigurationProperty private Quarter quarter;
 
