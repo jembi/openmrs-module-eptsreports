@@ -54,8 +54,9 @@ public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionE
 
   /**
    * If both quarter and month are given it returns a map containing the dates for the beginning and
-   * end of the month within the quarter. If no month is given returns da dates for the whole
-   * quarter.
+   * end of the month within the quarter.
+   *
+   * <p>If no month is given returns the dates for the whole quarter.
    */
   private Map<String, Date> getRange(
       Integer year,
