@@ -342,8 +342,7 @@ public class ResumoTrimestralCohortQueries {
           boolean tarvOnly) {
 
     EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
-    cd.setProgramEnrolled(hivMetadata.getHIVCareProgram());
-    cd.setProgramEnrolled2(hivMetadata.getARTProgram());
+    cd.setProgramEnrolled(hivMetadata.getARTProgram());
     cd.setPatientState(hivMetadata.getArtCareTransferredFromOtherHealthFacilityWorkflowState());
     cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
     cd.addParameters(getParameters());
