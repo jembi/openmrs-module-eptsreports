@@ -9,7 +9,8 @@ import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition2;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition2.ARTProgram;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -40,10 +41,9 @@ public class ResumoTrimestralCohortQueries {
 
   /** Indicator A - Nº de pacientes que iniciou TARV nesta unidade sanitária durante o mês */
   public CohortDefinition getA() {
-    boolean tarvOnly = true;
     CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
     CohortDefinition transferredIn =
-        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth(tarvOnly);
+        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth();
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameters(getParameters());
 
@@ -338,15 +338,11 @@ public class ResumoTrimestralCohortQueries {
 
   /** Number of patients transferred-in from another HFs during the current month */
   private CohortDefinition
-      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth(
-          boolean tarvOnly) {
+      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth() {
 
-    EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
-    cd.setProgramEnrolled(hivMetadata.getARTProgram());
-    cd.setPatientState(hivMetadata.getArtCareTransferredFromOtherHealthFacilityWorkflowState());
-    cd.setPatientState2(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
+    EptsTransferredInCohortDefinition2 cd = new EptsTransferredInCohortDefinition2();
+    cd.addArtProgram(ARTProgram.TARV);
     cd.addParameters(getParameters());
-    cd.setB10Flag(tarvOnly);
     return cd;
   }
 
