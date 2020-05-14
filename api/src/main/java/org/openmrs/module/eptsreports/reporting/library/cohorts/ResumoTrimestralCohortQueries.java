@@ -76,7 +76,7 @@ public class ResumoTrimestralCohortQueries {
 
   /** Indicator C - Nº de pacientes Transferidos para (-) outras US em TARV durante o mês */
   public CohortDefinition getC() {
-    CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
+    CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(true, true);
     CohortDefinition transferredOut = getPatientsTransferredOut();
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -361,7 +361,7 @@ public class ResumoTrimestralCohortQueries {
    *
    * <p>It was duplicated here because the spec pointed to an incompatible query
    */
-  private CohortDefinition getPatientsTransferredOut() {
+  public CohortDefinition getPatientsTransferredOut() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("transferredOutPatients");
     cd.addParameters(getParameters());
