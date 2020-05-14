@@ -100,7 +100,7 @@ public class ResumoTrimestralQueries {
             + "                           AND e.encounter_type IN (${adultoSeguimentoEncounterType}, ${pediatriaSeguimentoEncounterType}, ${ARVPharmaciaEncounterType}) "
             + "                           AND e.location_id = :location "
             + "                           AND e.encounter_datetime > transferout_date "
-            + "                           AND e.encounter_datetime <= onOrBefore "
+            + "                           AND e.encounter_datetime <= :onOrBefore "
             + "                         UNION "
             + "                         SELECT p.patient_id "
             + "                         FROM patient p "
