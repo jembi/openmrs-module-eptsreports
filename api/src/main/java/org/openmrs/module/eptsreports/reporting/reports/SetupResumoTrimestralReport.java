@@ -20,9 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ResumoTrimestralDataSetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.ResumoTrimestralStartDateDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
@@ -73,11 +71,11 @@ public class SetupResumoTrimestralReport extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(resumoTrimestralDataSetDefinition.getParameters());
-    rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
+    // rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
     DataSetDefinition dataset =
         resumoTrimestralDataSetDefinition.constructResumoTrimestralDataset();
     rd.addDataSetDefinition("R", mapStraightThrough(dataset));
-    rd.addDataSetDefinition("D", mapStraightThrough(new ResumoTrimestralStartDateDataset()));
+    // rd.addDataSetDefinition("D", mapStraightThrough(new ResumoTrimestralStartDateDataset()));
     // base cohort is run on EptsQuarterlyCohortDefinitionEvaluator
     return rd;
   }

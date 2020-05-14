@@ -100,7 +100,7 @@ public class ResumoTrimestralQueries {
             + "                           AND e.encounter_type IN (${adultoSeguimentoEncounterType}, ${pediatriaSeguimentoEncounterType}, ${ARVPharmaciaEncounterType}) "
             + "                           AND e.location_id = :location "
             + "                           AND e.encounter_datetime > transferout_date "
-            + "                           AND e.encounter_datetime <= transferout_date "
+            + "                           AND e.encounter_datetime <= onOrBefore "
             + "                         UNION "
             + "                         SELECT p.patient_id "
             + "                         FROM patient p "
@@ -117,7 +117,7 @@ public class ResumoTrimestralQueries {
             + "                           AND o.value_datetime "
             + "                             > transferout_date "
             + "                           AND o.value_datetime "
-            + "                             <= transferout_date)) as list;";
+            + "                             <= :onOrBefore)) as list;";
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("artProgramConcept", artProgramConcept);
