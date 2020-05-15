@@ -361,7 +361,7 @@ public class ResumoTrimestralCohortQueries {
    *
    * <p>It was duplicated here because the spec pointed to an incompatible query
    */
-  public CohortDefinition getPatientsTransferredOut() {
+  private CohortDefinition getPatientsTransferredOut() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("transferredOutPatients");
     cd.addParameters(getParameters());
