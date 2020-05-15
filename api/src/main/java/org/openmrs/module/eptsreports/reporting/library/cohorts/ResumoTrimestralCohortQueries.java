@@ -76,7 +76,7 @@ public class ResumoTrimestralCohortQueries {
 
   /** Indicator C - Nº de pacientes Transferidos para (-) outras US em TARV durante o mês */
   public CohortDefinition getC() {
-    CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(true, true);
+    CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
     CohortDefinition transferredOut = getPatientsTransferredOut();
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
