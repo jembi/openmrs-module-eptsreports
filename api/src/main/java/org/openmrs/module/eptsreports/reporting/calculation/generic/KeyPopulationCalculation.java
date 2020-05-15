@@ -103,8 +103,14 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
     CalculationResultMap resultMap = new CalculationResultMap();
 
-    CalculationResultMap adultoSeguimento = getAdultoSeguimento(cohort, context);
-    CalculationResultMap apssPrevencaoPositiva = getApssPrevencaoPositiva(cohort, context);
+    Location location = (Location) context.getFromCache("location");
+    Date onOrAfter = (Date) context.getFromCache("onOrAfter");
+    Date onOrBefore = (Date) context.getFromCache("onOrBefore");
+
+    CalculationResultMap adultoSeguimento =
+        getAdultoSeguimento(cohort, context, location, onOrAfter, onOrBefore);
+    CalculationResultMap apssPrevencaoPositiva =
+        getApssPrevencaoPositiva(cohort, context, location, onOrAfter, onOrBefore);
     CalculationResultMap personAttribute = getPersonAttribute(cohort, context);
 
     KeyPop type = (KeyPop) parameterValues.get(TYPE);
@@ -173,32 +179,34 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
   }
 
   private CalculationResultMap getAdultoSeguimento(
-      Collection<Integer> cohort, PatientCalculationContext context) {
+      Collection<Integer> cohort,
+      PatientCalculationContext context,
+      Location location,
+      Date startDate,
+      Date endDate) {
     EPTSCalculationService eptsCalculationService =
         Context.getRegisteredComponents(EPTSCalculationService.class).get(0);
     HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
-    Location location = (Location) context.getFromCache("location");
-    Date onOrAfter = (Date) context.getFromCache("onOrAfter");
-    Date onOrBefore = (Date) context.getFromCache("onOrBefore");
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getAdultoSeguimentoEncounterType());
     Concept keyPop = hivMetadata.getKeyPopulationConcept();
     return eptsCalculationService.lastObs(
-        encounterTypes, keyPop, location, onOrAfter, onOrBefore, cohort, context);
+        encounterTypes, keyPop, location, startDate, endDate, cohort, context);
   }
 
   private CalculationResultMap getApssPrevencaoPositiva(
-      Collection<Integer> cohort, PatientCalculationContext context) {
+      Collection<Integer> cohort,
+      PatientCalculationContext context,
+      Location location,
+      Date startDate,
+      Date endDate) {
     EPTSCalculationService eptsCalculationService =
         Context.getRegisteredComponents(EPTSCalculationService.class).get(0);
     HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
-    Location location = (Location) context.getFromCache("location");
-    Date onOrAfter = (Date) context.getFromCache("onOrAfter");
-    Date onOrBefore = (Date) context.getFromCache("onOrBefore");
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getPrevencaoPositivaSeguimentoEncounterType());
     Concept keyPop = hivMetadata.getKeyPopulationConcept();
     return eptsCalculationService.lastObs(
-        encounterTypes, keyPop, location, onOrAfter, onOrBefore, cohort, context);
+        encounterTypes, keyPop, location, startDate, endDate, cohort, context);
   }
 }
