@@ -135,9 +135,16 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
     if (!adultoSeguimento.isEmpty(pId)) {
       Obs obs = adultoSeguimento.get(pId).asType(Obs.class);
-      Date date = obs.getEncounter().getEncounterDatetime();
-      KeyPop keypop = KeyPop.of(obs.getValueCoded());
-      keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.ADULTO_FORM));
+      Date date;
+      KeyPop keypop;
+      if (obs != null
+          && obs.getEncounter() != null
+          && obs.getEncounter().getEncounterDatetime() != null
+          && obs.getValueCoded() != null) {
+        date = obs.getEncounter().getEncounterDatetime();
+        keypop = KeyPop.of(obs.getValueCoded());
+        keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.ADULTO_FORM));
+      }
     }
 
     if (!personAttribute.isEmpty(pId)) {
@@ -153,9 +160,16 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
     if (!apssPrevencaoPositiva.isEmpty(pId)) {
       Obs obs = apssPrevencaoPositiva.get(pId).asType(Obs.class);
-      Date date = obs.getEncounter().getEncounterDatetime();
-      KeyPop keypop = KeyPop.of(obs.getValueCoded());
-      keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.APSS_FORM));
+      Date date;
+      KeyPop keypop;
+      if (obs != null
+          && obs.getEncounter() != null
+          && obs.getEncounter().getEncounterDatetime() != null
+          && obs.getValueCoded() != null) {
+        date = obs.getEncounter().getEncounterDatetime();
+        keypop = KeyPop.of(obs.getValueCoded());
+        keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.APSS_FORM));
+      }
     }
 
     KeyPop assignedKeyPop = null;
