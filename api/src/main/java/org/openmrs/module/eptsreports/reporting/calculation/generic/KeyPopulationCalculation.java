@@ -116,9 +116,14 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     KeyPop type = (KeyPop) parameterValues.get(TYPE);
 
     for (Integer pId : cohort) {
-      KeyPop patientKeyPop =
-          getAssignedKeyPop(pId, adultoSeguimento, apssPrevencaoPositiva, personAttribute);
-      boolean equals = type.equals(patientKeyPop);
+      boolean equals = false;
+      try {
+        equals =
+            type.equals(
+                getAssignedKeyPop(pId, adultoSeguimento, apssPrevencaoPositiva, personAttribute));
+      } catch (Exception e) {
+        // do nothing
+      }
       resultMap.put(pId, new BooleanResult(equals, this));
     }
 
