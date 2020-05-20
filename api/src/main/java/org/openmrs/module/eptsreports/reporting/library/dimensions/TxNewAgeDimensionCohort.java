@@ -25,7 +25,7 @@ public class TxNewAgeDimensionCohort implements AgeDimensionCohortInterface {
   public Mapped<CohortDefinition> createXtoYAgeCohort(String name, Integer minAge, Integer maxAge) {
     return EptsReportUtils.map(
         genericCohorts.getAgeOnArtStartDate(minAge, maxAge, true),
-        "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}");
+        "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}");
   }
 
   @Override
