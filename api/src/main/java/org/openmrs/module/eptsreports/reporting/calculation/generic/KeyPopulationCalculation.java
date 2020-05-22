@@ -53,7 +53,6 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       } else if (concept.equals(hivMetadata.getSexWorkerConcept())) {
         return SEX_WORKER;
       }
-      // throw new IllegalArgumentException();
       return null;
     }
 
@@ -71,7 +70,6 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
         case "TS":
           return SEX_WORKER;
         default:
-          // throw new IllegalArgumentException();
       }
       return null;
     }
