@@ -31,6 +31,8 @@ public class EriCohortQueries {
   @Autowired private GenericCohortQueries genericCohortQueries;
 
   @Autowired private HivCohortQueries hivCohortQueries;
+  
+  @Autowired private CommonCohortQueries commonCohortQueries;
 
   /**
    * Get all patients who initiated ART 2 months from ART initiation less transfer ins return the
@@ -47,7 +49,7 @@ public class EriCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition startedArtOnPeriod = genericCohortQueries.getStartedArtOnPeriod(false, true);
-    CohortDefinition transferIns = hivCohortQueries.getPatientsTransferredFromOtherHealthFacility();
+    CohortDefinition transferIns = commonCohortQueries.getMohTransferredInPatients();
 
     String mappings =
         "onOrAfter=${cohortStartDate},onOrBefore=${cohortEndDate},location=${location}";
