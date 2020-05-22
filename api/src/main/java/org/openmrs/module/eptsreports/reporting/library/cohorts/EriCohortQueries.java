@@ -29,8 +29,6 @@ public class EriCohortQueries {
   @Autowired private HivMetadata hivMetadata;
 
   @Autowired private GenericCohortQueries genericCohortQueries;
-
-  @Autowired private HivCohortQueries hivCohortQueries;
   
   @Autowired private CommonCohortQueries commonCohortQueries;
 
