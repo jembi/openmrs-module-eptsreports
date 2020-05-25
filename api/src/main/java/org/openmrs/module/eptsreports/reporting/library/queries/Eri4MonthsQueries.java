@@ -92,7 +92,7 @@ public class Eri4MonthsQueries {
             + "                        GROUP  BY p.patient_id "
             + "                        UNION "
             + "                        SELECT e.patient_id, "
-            + "                               Min(e.encounter_datetime) AS data_inicio"
+            + "                               Min(pickupdate.value_datetime) AS data_inicio"
             + "                        FROM   patient p "
             + "                               JOIN encounter e "
             + "                                 ON p.patient_id = e.patient_id "
