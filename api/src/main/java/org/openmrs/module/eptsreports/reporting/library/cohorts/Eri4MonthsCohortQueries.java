@@ -142,7 +142,7 @@ public class Eri4MonthsCohortQueries {
     cd.addSearch(
         "initiatedArt",
         EptsReportUtils.map(
-            eriCohortQueries.getAllPatientsWhoInitiatedArt(),
+            eriCohortQueries.getAllPatientsWhoInitiatedArtNOTTransferredInBeforeReportingEndDate(),
             "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},location=${location}"));
     cd.addSearch(
         "consultation",
@@ -182,7 +182,7 @@ public class Eri4MonthsCohortQueries {
     cd.addSearch(
         "initiatedArt",
         EptsReportUtils.map(
-            eriCohortQueries.getAllPatientsWhoInitiatedArt(),
+            eriCohortQueries.getAllPatientsWhoInitiatedArtNOTTransferredInBeforeReportingEndDate(),
             "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},location=${location}"));
     cd.addSearch(
         "missedVisit",
@@ -223,7 +223,7 @@ public class Eri4MonthsCohortQueries {
     cd.addSearch(
         "initiatedArt",
         EptsReportUtils.map(
-            eriCohortQueries.getAllPatientsWhoInitiatedArt(),
+            eriCohortQueries.getAllPatientsWhoInitiatedArtNOTTransferredInBeforeReportingEndDate(),
             "cohortStartDate=${cohortStartDate},cohortEndDate=${cohortEndDate},location=${location}"));
     cd.addSearch(
         "consultation",
