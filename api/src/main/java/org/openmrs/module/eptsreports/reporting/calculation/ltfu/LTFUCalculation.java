@@ -19,6 +19,7 @@ import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
+import org.openmrs.calculation.result.ListResult;
 import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -65,8 +66,14 @@ public class LTFUCalculation extends AbstractPatientCalculation {
 
 		EPTSCalculationService eptsCalculationService = Context.getRegisteredComponents(EPTSCalculationService.class)
 				.get(0);
+		
+		CalculationResultMap obs5096Map = eptsCalculationService.getObs(returnVisitDateForArvDrugConcept,
+				Arrays.asList(pharmacyEncounterType), cohort, Arrays.asList(location), null, TimeQualifier.ANY, null, onOrBefore, context);
+		
+		CalculationResultMap obs1410Map =eptsCalculationService.getObs(returnVisitDateConcept,
+				Arrays.asList(adultEncounterType,pediatricEncounterType), cohort, Arrays.asList(location), null, TimeQualifier.ANY, null, onOrBefore, context);
 
-		CalculationResultMap lastPharmacyEncounterMao = eptsCalculationService.getEncounter(
+		CalculationResultMap lastPharmacyEncounterMap = eptsCalculationService.getEncounter(
 				Arrays.asList(pharmacyEncounterType), TimeQualifier.LAST, cohort, location, onOrBefore, context);
 
 		CalculationResultMap lastPediatricAdultEncounterMao = eptsCalculationService.getEncounter(
@@ -79,27 +86,37 @@ public class LTFUCalculation extends AbstractPatientCalculation {
 		CalculationResultMap map = new CalculationResultMap();
 
 		for (Integer patientId : cohort) {
+			
+			ListResult obs5096ResultList  =  (ListResult) obs5096Map.get(patientId);
+			
+			ListResult obs1410ResultList  =  (ListResult) obs1410Map.get(patientId);
 
-			SimpleResult simpleResultPharmacy = (SimpleResult) lastPharmacyEncounterMao.get(patientId);
+
+			SimpleResult simpleResultPharmacy = (SimpleResult) lastPharmacyEncounterMap.get(patientId);
 			SimpleResult simpleResultPediatricAdult = (SimpleResult) lastPediatricAdultEncounterMao.get(patientId);
 			
 			Date maxPharmacyDate = null, maxAdultPediatricDate =null, maxMasterCardPickupDate = null;
 
-			if (simpleResultPharmacy != null) {
+			if (simpleResultPharmacy != null  && obs5096ResultList!=null) {
 
 				Encounter encounter = (Encounter) simpleResultPharmacy.getValue();
+				
+				List<Obs> obss  = EptsCalculationUtils.extractResultValues(obs5096ResultList);
 
-				if(hasTheEncounterHaveObs(encounter, returnVisitDateForArvDrugConcept)) {
+				if(hasTheEncounterHaveObs(encounter, returnVisitDateForArvDrugConcept,obss)) {
 					maxPharmacyDate = encounter.getEncounterDatetime();
 				}
 
 			}
 			
-			if(simpleResultPediatricAdult!=null) {
+			if(simpleResultPediatricAdult!=null && obs1410ResultList!=null) {
 				
 				Encounter encounter = (Encounter) simpleResultPediatricAdult.getValue();
 				
-				if(hasTheEncounterHaveObs(encounter, returnVisitDateConcept)) {
+				List<Obs> obss  = EptsCalculationUtils.extractResultValues(obs1410ResultList);
+
+				
+				if(hasTheEncounterHaveObs(encounter, returnVisitDateConcept,obss)) {
 					maxAdultPediatricDate = encounter.getEncounterDatetime();
 				}
 	
@@ -168,16 +185,16 @@ public class LTFUCalculation extends AbstractPatientCalculation {
 		return EptsCalculationUtils.evaluateWithReporting(patientDataDefinition, cohort, params, null, context);
 	}
 
-	private boolean hasTheEncounterHaveObs(Encounter encounter, Concept concept) {
-		Set<Obs> obss = encounter.getObs();
+	private boolean hasTheEncounterHaveObs(Encounter encounter, Concept concept, List<Obs> obss) {
+		
 		for (Obs o : obss) {
-			if (o.getConcept().equals(concept)) {
+			if (o.getConcept().equals(concept) && o.getEncounter().equals(encounter)) {
  				return true;
 			}
 		}
 		return  false;
 		
-	}
+ 	}
 	
 	private Date getTheMaxDate(List<Date> dates) {
 		
