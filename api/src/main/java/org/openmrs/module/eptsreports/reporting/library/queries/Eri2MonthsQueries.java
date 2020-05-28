@@ -132,7 +132,7 @@ public class Eri2MonthsQueries {
         + "                        GROUP  BY p.patient_id"
         + "                        UNION "
         + "                        SELECT e.patient_id, "
-        + "                               Min(e.encounter_datetime) AS data_inicio"
+        + "                               Min(pickupdate.value_datetime) AS data_inicio"
         + "                        FROM   patient p "
         + "                               JOIN encounter e "
         + "                                 ON p.patient_id = e.patient_id "
@@ -157,25 +157,33 @@ public class Eri2MonthsQueries {
         + mastercardDrugPickupEncounterType
         + " "
         + "                               AND e.voided = 0 "
-        + "                               AND e.location_id = :location) inicio "
+        + "                               AND e.location_id = :location " 
+        + "                          GROUP BY e.patient_id) inicio "
         + "                GROUP  BY patient_id)inicio1 "
         + "        WHERE  data_inicio BETWEEN :startDate AND :endDate) inicio_real "
         + "       INNER JOIN encounter e "
         + "               ON e.patient_id = inicio_real.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON o.encounter_id = e.encounter_id "
         + "WHERE  e.voided = 0 "
-        + "       AND e.encounter_type IN ( "
+        + "       AND o.voided = 0 "
+        + "       AND e.location_id = :location "
+        + "       AND ((e.encounter_type IN ( "
         + arvPharmaciaEncounter
         + ", "
         + arvAdultoSeguimentoEncounter
         + ", "
         + arvPediatriaSeguimentoEncounter
-        + ", "
-        + mastercardDrugPickupEncounterType
         + " ) "
-        + "       AND e.location_id = :location "
         + "       AND e.encounter_datetime BETWEEN inicio_real.data_inicio AND if (Date_add( "
         + "                                        inicio_real.data_inicio, INTERVAL "
-        + "                                        33 day) > :reportingEndDate, :reportingEndDate, Date_add(inicio_real.data_inicio, INTERVAL 33 day))  "
+        + "                                        33 day) > :reportingEndDate, :reportingEndDate, Date_add(inicio_real.data_inicio, INTERVAL 33 day)))  "
+        + "       OR (e.encounter_type IN = "
+        + mastercardDrugPickupEncounterType
+        + " "
+        + "       AND e.encounter_datetime BETWEEN inicio_real.data_inicio AND if (Date_add( "
+        + "                                        inicio_real.data_inicio, INTERVAL "
+        + "                                        33 day) > :reportingEndDate, :reportingEndDate, Date_add(inicio_real.data_inicio, INTERVAL 33 day))) ) "
         + "GROUP  BY inicio_real.patient_id "
         + "HAVING Min(e.encounter_datetime) < Max(e.encounter_datetime)";
   }
