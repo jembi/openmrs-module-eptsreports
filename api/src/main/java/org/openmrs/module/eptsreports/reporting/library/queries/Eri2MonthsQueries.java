@@ -40,7 +40,8 @@ public class Eri2MonthsQueries {
       int artPickupConcept,
       int yesConcept,
       int artPickupDateConcept,
-      int mastercardDrugPickupEncounterType) {
+      int mastercardDrugPickupEncounterType,
+      int masterCardEncounterType) {
     return "SELECT inicio_real.patient_id "
         + "FROM   (SELECT patient_id, "
         + "               data_inicio "
@@ -89,14 +90,10 @@ public class Eri2MonthsQueries {
         + arvAdultoSeguimentoEncounter
         + ", "
         + arvPediatriaSeguimentoEncounter
+        + ", "
+        + masterCardEncounterType
         + " ) "
-        + "                               AND o.concept_id = "
-        + arvPlanConcept
-        + " "
-        + "                               AND o.value_coded = "
-        + startDrugsConcept
-        + " "
-        + "                               AND o.concept_id = "
+        + "                              AND o.concept_id = "
         + historicalDrugsConcept
         + " "
         + "                               AND o.value_datetime IS NOT NULL "
