@@ -178,7 +178,7 @@ public class Eri2MonthsQueries {
         + "       AND e.encounter_datetime BETWEEN inicio_real.data_inicio AND if (Date_add( "
         + "                                        inicio_real.data_inicio, INTERVAL "
         + "                                        33 day) > :reportingEndDate, :reportingEndDate, Date_add(inicio_real.data_inicio, INTERVAL 33 day)))  "
-        + "       OR (e.encounter_type IN = "
+        + "       OR (e.encounter_type = "
         + mastercardDrugPickupEncounterType
         + " "
         + "       AND e.encounter_datetime BETWEEN inicio_real.data_inicio AND if (Date_add( "
