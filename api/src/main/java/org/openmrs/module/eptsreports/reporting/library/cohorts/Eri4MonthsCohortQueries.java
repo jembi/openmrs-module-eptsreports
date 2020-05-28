@@ -193,8 +193,12 @@ public class Eri4MonthsCohortQueries {
     cd.addSearch(
         "transfersOut",
         EptsReportUtils.map(
-            hivCohortQueries.getPatientsTransferredOut(),
-            "onOrBefore=${reportingEndDate},location=${location}"));
+            genericCohortQueries.getPatientsBasedOnPatientStates(
+                hivMetadata.getARTProgram().getProgramId(),
+                hivMetadata
+                    .getTransferredOutToAnotherHealthFacilityWorkflowState()
+                    .getProgramWorkflowStateId()),
+            "startDate=${cohortStartDate},endDate=${reportingEndDate},location=${location}"));
     cd.setCompositionString("initiatedArt AND missedVisit AND NOT (dead OR transfersOut)");
     return cd;
   }
