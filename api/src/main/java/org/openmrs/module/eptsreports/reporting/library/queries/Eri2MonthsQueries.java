@@ -157,7 +157,7 @@ public class Eri2MonthsQueries {
         + mastercardDrugPickupEncounterType
         + " "
         + "                               AND e.voided = 0 "
-        + "                               AND e.location_id = :location " 
+        + "                               AND e.location_id = :location "
         + "                          GROUP BY e.patient_id) inicio "
         + "                GROUP  BY patient_id)inicio1 "
         + "        WHERE  data_inicio BETWEEN :startDate AND :endDate) inicio_real "
@@ -184,7 +184,6 @@ public class Eri2MonthsQueries {
         + "       AND e.encounter_datetime BETWEEN inicio_real.data_inicio AND if (Date_add( "
         + "                                        inicio_real.data_inicio, INTERVAL "
         + "                                        33 day) > :reportingEndDate, :reportingEndDate, Date_add(inicio_real.data_inicio, INTERVAL 33 day))) ) "
-        + "GROUP  BY inicio_real.patient_id "
-        + "HAVING Min(e.encounter_datetime) < Max(e.encounter_datetime)";
+        + "GROUP  BY inicio_real.patient_id ";
   }
 }
