@@ -301,18 +301,17 @@ public class TXCurrQueries {
       int artDatePickup,
       int msterCardDrugPickupEncounterType,
       int numDays) {
-	  
-	  Map<String, Integer> map = new HashMap<>();
-	  map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
-	  map.put("ARVPharmaciaEncounterType",ARVPharmaciaEncounterType);
-	  map.put("returnVisitDateConcept",returnVisitDateConcept);
-	  map.put("adultoSeguimentoEncounterType",adultoSeguimentoEncounterType);
-	  map.put("aRVPediatriaSeguimentoEncounterType",aRVPediatriaSeguimentoEncounterType);
-	  map.put("artDatePickup",artDatePickup);
-	  map.put("msterCardDrugPickupEncounterType",msterCardDrugPickupEncounterType);
-	  map.put("numDays", numDays);
-	  
-	  
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
+    map.put("ARVPharmaciaEncounterType", ARVPharmaciaEncounterType);
+    map.put("returnVisitDateConcept", returnVisitDateConcept);
+    map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
+    map.put("aRVPediatriaSeguimentoEncounterType", aRVPediatriaSeguimentoEncounterType);
+    map.put("artDatePickup", artDatePickup);
+    map.put("msterCardDrugPickupEncounterType", msterCardDrugPickupEncounterType);
+    map.put("numDays", numDays);
+
     String query =
         "SELECT final.patient_id  "
             + " from(  "
@@ -395,12 +394,11 @@ public class TXCurrQueries {
             + "    HAVING final_encounter_date < :onOrBefore  "
             + " ) final  "
             + " GROUP BY final.patient_id;";
-    
+
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
 
-    return  replacedQuery;
-    
+    return replacedQuery;
   }
 
   public static String getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup(

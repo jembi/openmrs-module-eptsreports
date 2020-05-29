@@ -8,8 +8,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -35,185 +33,215 @@ import org.springframework.stereotype.Component;
 @Component
 public class LTFUCalculation extends AbstractPatientCalculation {
 
-	private static final String LOCATION = "location";
+  private static final String LOCATION = "location";
 
-	private static final String ON_OR_BEFORE = "onOrBefore";
-	
-	private static final String  NUM_DAYS = "numDays";
+  private static final String ON_OR_BEFORE = "onOrBefore";
 
-	@Override
-	public CalculationResultMap evaluate(Collection<Integer> cohort, Map<String, Object> parameterValues,
-			PatientCalculationContext context) {
+  private static final String NUM_DAYS = "numDays";
 
-		Location location = (Location) context.getFromCache(LOCATION);
+  @Override
+  public CalculationResultMap evaluate(
+      Collection<Integer> cohort,
+      Map<String, Object> parameterValues,
+      PatientCalculationContext context) {
 
-		Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
-		
-		Integer numDays = (Integer)  parameterValues.get(NUM_DAYS);
+    Location location = (Location) context.getFromCache(LOCATION);
 
-		HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
-		CommonMetadata commonMetadata = Context.getRegisteredComponents(CommonMetadata.class).get(0);
+    Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
 
-		EncounterType pharmacyEncounterType = hivMetadata.getARVPharmaciaEncounterType();
-		Concept returnVisitDateForArvDrugConcept = hivMetadata.getReturnVisitDateForArvDrugConcept();
+    Integer numDays = (Integer) parameterValues.get(NUM_DAYS);
 
-		EncounterType adultEncounterType = hivMetadata.getAdultoSeguimentoEncounterType();
-		EncounterType pediatricEncounterType = hivMetadata.getPediatriaSeguimentoEncounterType();
-		Concept returnVisitDateConcept = commonMetadata.getReturnVisitDateConcept();
+    HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
+    CommonMetadata commonMetadata = Context.getRegisteredComponents(CommonMetadata.class).get(0);
 
-		EncounterType masterCardDrugPickupEncounterType = hivMetadata.getMasterCardDrugPickupEncounterType();
-		Concept artDatePickupMasterCard = hivMetadata.getArtDatePickupMasterCard();
+    EncounterType pharmacyEncounterType = hivMetadata.getARVPharmaciaEncounterType();
+    Concept returnVisitDateForArvDrugConcept = hivMetadata.getReturnVisitDateForArvDrugConcept();
 
-		EPTSCalculationService eptsCalculationService = Context.getRegisteredComponents(EPTSCalculationService.class)
-				.get(0);
-		
-		CalculationResultMap obs5096Map = eptsCalculationService.getObs(returnVisitDateForArvDrugConcept,
-				Arrays.asList(pharmacyEncounterType), cohort, Arrays.asList(location), null, TimeQualifier.ANY, null, onOrBefore, context);
-		
-		CalculationResultMap obs1410Map =eptsCalculationService.getObs(returnVisitDateConcept,
-				Arrays.asList(adultEncounterType,pediatricEncounterType), cohort, Arrays.asList(location), null, TimeQualifier.ANY, null, onOrBefore, context);
+    EncounterType adultEncounterType = hivMetadata.getAdultoSeguimentoEncounterType();
+    EncounterType pediatricEncounterType = hivMetadata.getPediatriaSeguimentoEncounterType();
+    Concept returnVisitDateConcept = commonMetadata.getReturnVisitDateConcept();
 
-		CalculationResultMap lastPharmacyEncounterMap = eptsCalculationService.getEncounter(
-				Arrays.asList(pharmacyEncounterType), TimeQualifier.LAST, cohort, location, onOrBefore, context);
+    EncounterType masterCardDrugPickupEncounterType =
+        hivMetadata.getMasterCardDrugPickupEncounterType();
+    Concept artDatePickupMasterCard = hivMetadata.getArtDatePickupMasterCard();
 
-		CalculationResultMap lastPediatricAdultEncounterMao = eptsCalculationService.getEncounter(
-				Arrays.asList(adultEncounterType, pediatricEncounterType), TimeQualifier.LAST, cohort, location,
-				onOrBefore, context);
+    EPTSCalculationService eptsCalculationService =
+        Context.getRegisteredComponents(EPTSCalculationService.class).get(0);
 
-		CalculationResultMap getLastMasterCardPickUpMap = this
-				.getLastMasterCardPickUp(masterCardDrugPickupEncounterType, artDatePickupMasterCard, cohort, context);
+    CalculationResultMap obs5096Map =
+        eptsCalculationService.getObs(
+            returnVisitDateForArvDrugConcept,
+            Arrays.asList(pharmacyEncounterType),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.ANY,
+            null,
+            onOrBefore,
+            context);
 
-		CalculationResultMap map = new CalculationResultMap();
+    CalculationResultMap obs1410Map =
+        eptsCalculationService.getObs(
+            returnVisitDateConcept,
+            Arrays.asList(adultEncounterType, pediatricEncounterType),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.ANY,
+            null,
+            onOrBefore,
+            context);
 
-		for (Integer patientId : cohort) {
-			
-			ListResult obs5096ResultList  =  (ListResult) obs5096Map.get(patientId);
-			
-			ListResult obs1410ResultList  =  (ListResult) obs1410Map.get(patientId);
+    CalculationResultMap lastPharmacyEncounterMap =
+        eptsCalculationService.getEncounter(
+            Arrays.asList(pharmacyEncounterType),
+            TimeQualifier.LAST,
+            cohort,
+            location,
+            onOrBefore,
+            context);
 
+    CalculationResultMap lastPediatricAdultEncounterMao =
+        eptsCalculationService.getEncounter(
+            Arrays.asList(adultEncounterType, pediatricEncounterType),
+            TimeQualifier.LAST,
+            cohort,
+            location,
+            onOrBefore,
+            context);
 
-			SimpleResult simpleResultPharmacy = (SimpleResult) lastPharmacyEncounterMap.get(patientId);
-			SimpleResult simpleResultPediatricAdult = (SimpleResult) lastPediatricAdultEncounterMao.get(patientId);
-			
-			Date maxPharmacyDate = null, maxAdultPediatricDate =null, maxMasterCardPickupDate = null;
+    CalculationResultMap getLastMasterCardPickUpMap =
+        this.getLastMasterCardPickUp(
+            masterCardDrugPickupEncounterType, artDatePickupMasterCard, cohort, context);
 
-			if (simpleResultPharmacy != null  && obs5096ResultList!=null) {
+    CalculationResultMap map = new CalculationResultMap();
 
-				Encounter encounter = (Encounter) simpleResultPharmacy.getValue();
-				
-				List<Obs> obss  = EptsCalculationUtils.extractResultValues(obs5096ResultList);
+    for (Integer patientId : cohort) {
 
-				if(hasTheEncounterHaveObs(encounter, returnVisitDateForArvDrugConcept,obss)) {
-					maxPharmacyDate = encounter.getEncounterDatetime();
-				}
+      ListResult obs5096ResultList = (ListResult) obs5096Map.get(patientId);
 
-			}
-			
-			if(simpleResultPediatricAdult!=null && obs1410ResultList!=null) {
-				
-				Encounter encounter = (Encounter) simpleResultPediatricAdult.getValue();
-				
-				List<Obs> obss  = EptsCalculationUtils.extractResultValues(obs1410ResultList);
+      ListResult obs1410ResultList = (ListResult) obs1410Map.get(patientId);
 
-				
-				if(hasTheEncounterHaveObs(encounter, returnVisitDateConcept,obss)) {
-					maxAdultPediatricDate = encounter.getEncounterDatetime();
-				}
-	
-			}
+      SimpleResult simpleResultPharmacy = (SimpleResult) lastPharmacyEncounterMap.get(patientId);
+      SimpleResult simpleResultPediatricAdult =
+          (SimpleResult) lastPediatricAdultEncounterMao.get(patientId);
 
-			maxMasterCardPickupDate = EptsCalculationUtils.resultForPatient(getLastMasterCardPickUpMap, patientId);
-			
-			List<Date> dates = Arrays.asList (maxPharmacyDate,maxAdultPediatricDate,maxMasterCardPickupDate);
+      Date maxPharmacyDate = null, maxAdultPediatricDate = null, maxMasterCardPickupDate = null;
 
-			Date date  = this.getTheMaxDate(dates);
-			
-			if(date == null) {
-				continue;
-			}
-			
-			Calendar calendar  = Calendar.getInstance();
-			calendar.setTime(date);
-			calendar.add(Calendar.DATE, numDays);
-			Date maxDate  = calendar.getTime();
-			
-			if(maxDate.compareTo(onOrBefore)<=0) {
-				map.put(patientId, new BooleanResult(true, this));
-			}
+      if (simpleResultPharmacy != null && obs5096ResultList != null) {
 
-		}
-		
-		
+        Encounter encounter = (Encounter) simpleResultPharmacy.getValue();
 
-		return map;
-	}
+        List<Obs> obss = EptsCalculationUtils.extractResultValues(obs5096ResultList);
 
-	private CalculationResultMap getLastMasterCardPickUp(EncounterType encounterType, Concept concept,
-			Collection<Integer> cohort, PatientCalculationContext context) {
+        if (hasTheEncounterHaveObs(encounter, returnVisitDateForArvDrugConcept, obss)) {
+          maxPharmacyDate = encounter.getEncounterDatetime();
+        }
+      }
 
-		SqlPatientDataDefinition patientDataDefinition = new SqlPatientDataDefinition();
-		patientDataDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-		patientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-		String sql = "SELECT enc.patient_id,   "
-				+ "                             Date_add(Max(obs.value_datetime), interval 30 day) value_datetime  "
-				+ "                         FROM   patient pa   "
-				+ "                             inner join encounter enc   "
-				+ "                                 ON enc.patient_id = pa.patient_id   "
-				+ "                             inner join obs obs   "
-				+ "                                 ON obs.encounter_id = enc.encounter_id   "
-				+ "                         WHERE  pa.voided = 0   "
-				+ "                             AND enc.voided = 0   "
-				+ "                             AND obs.voided = 0   "
-				+ "                             AND obs.concept_id = ${concept}   "
-				+ "                             AND obs.value_datetime IS NOT NULL   "
-				+ "                             AND enc.encounter_type = ${encounterType}   "
-				+ "                             AND enc.location_id = :location   "
-				+ "                             AND obs.value_datetime <= :onOrBefore  "
-				+ "                        GROUP  BY pa.patient_id  ";
+      if (simpleResultPediatricAdult != null && obs1410ResultList != null) {
 
-		Map<String, Integer> map = new HashMap<>();
-		map.put("encounterType", encounterType.getEncounterTypeId());
-		map.put("concept", concept.getConceptId());
+        Encounter encounter = (Encounter) simpleResultPediatricAdult.getValue();
 
-		StringSubstitutor sb = new StringSubstitutor(map);
-		String mappedQuery = sb.replace(sql);
+        List<Obs> obss = EptsCalculationUtils.extractResultValues(obs1410ResultList);
 
-		patientDataDefinition.setQuery(mappedQuery);
-		Map<String, Object> params = new HashMap<>();
-		params.put("location", context.getFromCache("location"));
-		params.put("onOrBefore", context.getFromCache("onOrBefore"));
-		return EptsCalculationUtils.evaluateWithReporting(patientDataDefinition, cohort, params, null, context);
-	}
+        if (hasTheEncounterHaveObs(encounter, returnVisitDateConcept, obss)) {
+          maxAdultPediatricDate = encounter.getEncounterDatetime();
+        }
+      }
 
-	private boolean hasTheEncounterHaveObs(Encounter encounter, Concept concept, List<Obs> obss) {
-		
-		for (Obs o : obss) {
-			if (o.getConcept().equals(concept) && o.getEncounter().equals(encounter)) {
- 				return true;
-			}
-		}
-		return  false;
-		
- 	}
-	
-	private Date getTheMaxDate(List<Date> dates) {
-		
-		 
-		Date max  = new GregorianCalendar(1980,5,1).getTime();
-		for(Date current:dates) {
-			if(current!=null) {
-				if(current.compareTo(max)>0) {
-					max = current;
-				}
-			}
-		}
-		
-		if(max.equals(new GregorianCalendar(1980,5,1).getTime())) {
-			return null;
-		}
-		
-		return  max;
-		
-	}
+      maxMasterCardPickupDate =
+          EptsCalculationUtils.resultForPatient(getLastMasterCardPickUpMap, patientId);
 
+      List<Date> dates =
+          Arrays.asList(maxPharmacyDate, maxAdultPediatricDate, maxMasterCardPickupDate);
+
+      Date date = this.getTheMaxDate(dates);
+
+      if (date == null) {
+        continue;
+      }
+
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTime(date);
+      calendar.add(Calendar.DATE, numDays);
+      Date maxDate = calendar.getTime();
+
+      if (maxDate.compareTo(onOrBefore) <= 0) {
+        map.put(patientId, new BooleanResult(true, this));
+      }
+    }
+
+    return map;
+  }
+
+  private CalculationResultMap getLastMasterCardPickUp(
+      EncounterType encounterType,
+      Concept concept,
+      Collection<Integer> cohort,
+      PatientCalculationContext context) {
+
+    SqlPatientDataDefinition patientDataDefinition = new SqlPatientDataDefinition();
+    patientDataDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    patientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    String sql =
+        "SELECT enc.patient_id,   "
+            + "                             Date_add(Max(obs.value_datetime), interval 30 day) value_datetime  "
+            + "                         FROM   patient pa   "
+            + "                             inner join encounter enc   "
+            + "                                 ON enc.patient_id = pa.patient_id   "
+            + "                             inner join obs obs   "
+            + "                                 ON obs.encounter_id = enc.encounter_id   "
+            + "                         WHERE  pa.voided = 0   "
+            + "                             AND enc.voided = 0   "
+            + "                             AND obs.voided = 0   "
+            + "                             AND obs.concept_id = ${concept}   "
+            + "                             AND obs.value_datetime IS NOT NULL   "
+            + "                             AND enc.encounter_type = ${encounterType}   "
+            + "                             AND enc.location_id = :location   "
+            + "                             AND obs.value_datetime <= :onOrBefore  "
+            + "                        GROUP  BY pa.patient_id  ";
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("encounterType", encounterType.getEncounterTypeId());
+    map.put("concept", concept.getConceptId());
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    String mappedQuery = sb.replace(sql);
+
+    patientDataDefinition.setQuery(mappedQuery);
+    Map<String, Object> params = new HashMap<>();
+    params.put("location", context.getFromCache("location"));
+    params.put("onOrBefore", context.getFromCache("onOrBefore"));
+    return EptsCalculationUtils.evaluateWithReporting(
+        patientDataDefinition, cohort, params, null, context);
+  }
+
+  private boolean hasTheEncounterHaveObs(Encounter encounter, Concept concept, List<Obs> obss) {
+
+    for (Obs o : obss) {
+      if (o.getConcept().equals(concept) && o.getEncounter().equals(encounter)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private Date getTheMaxDate(List<Date> dates) {
+
+    Date max = new GregorianCalendar(1980, 5, 1).getTime();
+    for (Date current : dates) {
+      if (current != null) {
+        if (current.compareTo(max) > 0) {
+          max = current;
+        }
+      }
+    }
+
+    if (max.equals(new GregorianCalendar(1980, 5, 1).getTime())) {
+      return null;
+    }
+
+    return max;
+  }
 }
