@@ -1,11 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class Eri4MonthsQueries {
-
-  
 
   // TODO: harmonise with LTFU queries from TxCurr
   public static String getPatientsLostToFollowUpOnDrugPickup(
