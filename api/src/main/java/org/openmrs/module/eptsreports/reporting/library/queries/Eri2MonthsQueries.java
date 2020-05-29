@@ -42,7 +42,7 @@ public class Eri2MonthsQueries {
       int artPickupDateConcept,
       int mastercardDrugPickupEncounterType,
       int masterCardEncounterType) {
-    return "SELECT inicio_real.patient_id "
+    return "SELECT inicio_real.patient_id  "
         + "FROM   (SELECT patient_id, "
         + "               data_inicio "
         + "        FROM   (SELECT patient_id, "
@@ -158,31 +158,48 @@ public class Eri2MonthsQueries {
         + "                          GROUP BY p.patient_id) inicio "
         + "                GROUP  BY patient_id)inicio1 "
         + "        WHERE  data_inicio BETWEEN :startDate AND :endDate) inicio_real "
+        + "       INNER JOIN "
+        + "     (SELECT e.patient_id, "
+        + "                               Max(e.encounter_datetime) AS second_visit "
+        + "                        FROM   patient p "
         + "       INNER JOIN encounter e "
-        + "               ON e.patient_id = inicio_real.patient_id "
+        + "               ON e.patient_id = p.patient_id "
         + "       INNER JOIN obs o "
         + "               ON o.encounter_id = e.encounter_id "
         + "WHERE  e.voided = 0 "
         + "       AND o.voided = 0 "
         + "       AND e.location_id = :location "
-        + "       AND ((e.encounter_type IN ( "
+        + "       AND e.encounter_type IN ( "
         + arvPharmaciaEncounter
         + ", "
         + arvAdultoSeguimentoEncounter
         + ", "
         + arvPediatriaSeguimentoEncounter
         + " ) "
-        + "       AND e.encounter_datetime BETWEEN inicio_real.data_inicio AND if (Date_add( "
-        + "                                        inicio_real.data_inicio, INTERVAL "
-        + "                                        33 day) > :reportingEndDate, :reportingEndDate, Date_add(inicio_real.data_inicio, INTERVAL 33 day)))  "
-        + "       OR (e.encounter_type IN ( "
+        + "       AND e.encounter_datetime <= :endDate  "
+        + "GROUP  BY e.patient_id "
+        + "       UNION"
+        + "     SELECT e.patient_id, "
+        + "                               Max(o.value_datetime) AS second_visit "
+        + "                        FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON e.patient_id = p.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON o.encounter_id = e.encounter_id "
+        + "WHERE  e.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "       AND e.location_id = :location "
+        + "       AND e.encounter_type IN ( "
         + mastercardDrugPickupEncounterType
         + ","
         + masterCardEncounterType
         + " )"
-        + "       AND o.value_datetime BETWEEN inicio_real.data_inicio AND if (Date_add( "
-        + "                                        inicio_real.data_inicio, INTERVAL "
-        + "                                        33 day) > :reportingEndDate, :reportingEndDate, Date_add(inicio_real.data_inicio, INTERVAL 33 day))) ) "
+        + "            AND o.value_datetime <= :endDate  "
+        + "                 GROUP  BY e.patient_id ) AS second_real"
+        + "             ON inicio_real.patient_id = second_real.patient_id"
+        + "             WHERE "
+        + "             second_visit > inicio_real.data_inicio "
+        + "             second_visit <= Date_add(inicio_real.data_inicio, INTERVAL 33 day)) "
         + "GROUP  BY inicio_real.patient_id ";
   }
 }
