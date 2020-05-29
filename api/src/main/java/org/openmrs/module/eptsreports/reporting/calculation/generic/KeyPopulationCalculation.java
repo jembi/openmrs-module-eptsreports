@@ -65,9 +65,12 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
           return DRUG_USER;
         case "Prisoner":
         case "RC":
+        case "REC":
           return PRISONER;
         case "CSW":
         case "TS":
+        case "MTS":
+        case "FSW":
           return SEX_WORKER;
         default:
       }
