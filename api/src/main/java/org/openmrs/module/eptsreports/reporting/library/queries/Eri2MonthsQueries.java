@@ -70,7 +70,7 @@ public class Eri2MonthsQueries {
         + "                               AND o.value_coded = "
         + startDrugsConcept
         + " "
-        // + "                               AND e.encounter_datetime <= :endDate "
+        + "                               AND e.encounter_datetime <= :endDate "
         + "                               AND e.location_id = :location "
         + "                        GROUP  BY p.patient_id "
         + "                        UNION "
@@ -97,7 +97,7 @@ public class Eri2MonthsQueries {
         + historicalDrugsConcept
         + " "
         + "                               AND o.value_datetime IS NOT NULL "
-        // + "                               AND o.value_datetime <= :endDate "
+        + "                               AND o.value_datetime <= :endDate "
         + "                               AND e.location_id = :location "
         + "                        GROUP  BY p.patient_id "
         + "                        UNION "
@@ -111,7 +111,7 @@ public class Eri2MonthsQueries {
         + "                               AND program_id = "
         + artProgram
         + " "
-        // + "                               AND date_enrolled <= :endDate "
+        + "                               AND date_enrolled <= :endDate "
         + "                               AND location_id = :location "
         + "                        UNION "
         + "                        SELECT e.patient_id, "
@@ -124,7 +124,7 @@ public class Eri2MonthsQueries {
         + arvPharmaciaEncounter
         + " "
         + "                               AND e.voided = 0 "
-        // + "                               AND e.encounter_datetime <= :endDate "
+        + "                               AND e.encounter_datetime <= :endDate "
         + "                               AND e.location_id = :location "
         + "                        GROUP  BY p.patient_id"
         + "                        UNION "
@@ -149,7 +149,7 @@ public class Eri2MonthsQueries {
         + "                               AND pickupdate.concept_id = "
         + artPickupDateConcept
         + " "
-        // + "                               AND pickupdate.value_datetime <= :endDate "
+        + "                               AND pickupdate.value_datetime <= :endDate "
         + "                               AND e.encounter_type = "
         + mastercardDrugPickupEncounterType
         + " "

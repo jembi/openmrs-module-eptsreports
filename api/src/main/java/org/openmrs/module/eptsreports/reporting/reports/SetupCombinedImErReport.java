@@ -57,16 +57,16 @@ public class SetupCombinedImErReport extends EptsDataExportManager {
     rd.setDescription(getDescription());
     rd.setParameters(txNewDataset.getParameters());
 
-    rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
+    /*rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
 
     rd.addDataSetDefinition(
-        "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
+        "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));*/
 
     rd.addDataSetDefinition(
         "ERI2", Mapped.mapStraightThrough(eri2MonthsDataset.constructEri2MonthsDatset()));
 
-    rd.addDataSetDefinition(
-    "ERI4", Mapped.mapStraightThrough(eri4MonthsDataset.constructEri4MonthsDataset()));
+    /*rd.addDataSetDefinition(
+        "ERI4", Mapped.mapStraightThrough(eri4MonthsDataset.constructEri4MonthsDataset()));*/
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
