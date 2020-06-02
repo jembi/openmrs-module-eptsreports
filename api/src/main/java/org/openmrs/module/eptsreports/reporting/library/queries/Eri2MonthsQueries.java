@@ -160,7 +160,7 @@ public class Eri2MonthsQueries {
         + "        WHERE  data_inicio BETWEEN :startDate AND :endDate) inicio_real "
         + "   INNER JOIN   "
         + "   (SELECT      "
-        + "   e.patient_id,e.encounter_datetime AS first_visit    "
+        + "   e.patient_id, e.encounter_type, e.encounter_datetime AS first_visit    "
         + "   FROM    "
         + "   patient p   "
         + "   INNER JOIN encounter e ON e.patient_id = p.patient_id   "
@@ -177,7 +177,7 @@ public class Eri2MonthsQueries {
         + ")  "
         + "   AND e.encounter_datetime BETWEEN :startDate AND DATE_ADD(:endDate,INTERVAL 33 DAY)    "
         + "    UNION SELECT   "
-        + "    e.patient_id, pickupdate.value_datetime AS first_visit   "
+        + "    e.patient_id,  e.encounter_type, pickupdate.value_datetime AS first_visit   "
         + "   FROM    "
         + " patient p   "
         + "   INNER JOIN encounter e ON e.patient_id = p.patient_id   "
@@ -200,7 +200,7 @@ public class Eri2MonthsQueries {
         + "   ) AS first_real   "
         + "   INNER JOIN    "
         + "   (SELECT  "
-        + "   e.patient_id,e.encounter_datetime AS second_visit   "
+        + "   e.patient_id, e.encounter_type, e.encounter_datetime AS second_visit   "
         + "   FROM    "
         + "   patient p   "
         + "   INNER JOIN encounter e ON e.patient_id = p.patient_id   "
@@ -217,7 +217,7 @@ public class Eri2MonthsQueries {
         + ")    "
         + "   AND e.encounter_datetime BETWEEN :startDate AND DATE_ADD(:endDate,INTERVAL 33 DAY)    "
         + "   UNION SELECT  "
-        + "   e.patient_id, pickupdate.value_datetime AS second_visit   "
+        + "   e.patient_id, e.encounter_type, pickupdate.value_datetime AS second_visit   "
         + "   FROM    "
         + "   patient p   "
         + "   INNER JOIN encounter e ON e.patient_id = p.patient_id   "
@@ -244,6 +244,7 @@ public class Eri2MonthsQueries {
         + "   AND first_visit < second_visit  "
         + "   AND second_visit > inicio_real.data_inicio    "
         + "   AND second_visit <= DATE_ADD(inicio_real.data_inicio,INTERVAL 33 DAY)   "
+        + "   AND first_real.encounter_type = second_real.encounter_type   "
         + "   GROUP  BY inicio_real.patient_id ";
   }
 }
