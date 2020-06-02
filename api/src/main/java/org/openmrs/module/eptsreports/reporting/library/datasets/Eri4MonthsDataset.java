@@ -41,6 +41,8 @@ public class Eri4MonthsDataset extends BaseDataSet {
         cohortPeriodMappings + ",reportingStartDate=${startDate},reportingEndDate=${endDate}";
     String reportingPeriodMappings =
         "startDate=${startDate},endDate=${endDate},location=${location}";
+    String cohortAndReportingPeriodsMappings =
+        cohortPeriodMappings + ",reportingEndDate=${endDate}";
     dsd.setName("ERI-4months Data Set");
     dsd.addParameters(getParameters());
 
@@ -58,8 +60,7 @@ public class Eri4MonthsDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "all patients",
                 EptsReportUtils.map(
-                    eriCohortQueries.getAllPatientsWhoInitiatedArt(),
-                    "cohortStartDate=${endDate-5m+1d},cohortEndDate=${endDate-4m},reportingEndDate=${endDate},location=${location}")),
+                    eriCohortQueries.getAllPatientsWhoInitiatedArt(), cohortAndReportingPeriodsMappings)),
             reportingPeriodMappings),
         get4MonthsRetentionColumns());
     addRow(
@@ -102,8 +103,7 @@ public class Eri4MonthsDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "adults",
                 EptsReportUtils.map(
-                    eriCohortQueries.getAdultsRetained(),
-                    "cohortStartDate=${endDate-5m+1d},cohortEndDate=${endDate-4m},reportingEndDate=${endDate},location=${location}")),
+                    eriCohortQueries.getAdultsRetained(), cohortAndReportingPeriodsMappings)),
             reportingPeriodMappings),
         get4MonthsRetentionColumns());
     return dsd;
