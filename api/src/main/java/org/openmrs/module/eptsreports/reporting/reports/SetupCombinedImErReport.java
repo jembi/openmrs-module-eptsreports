@@ -65,6 +65,8 @@ public class SetupCombinedImErReport extends EptsDataExportManager {
     rd.addDataSetDefinition(
         "ERI2", Mapped.mapStraightThrough(eri2MonthsDataset.constructEri2MonthsDatset()));
 
+    /*rd.addDataSetDefinition(
+    "ERI4", Mapped.mapStraightThrough(eri4MonthsDataset.constructEri4MonthsDataset()));*/
     rd.addDataSetDefinition(
         "ERI4", Mapped.mapStraightThrough(eri4MonthsDataset.constructEri4MonthsDataset()));
     // add a base cohort here to help in calculations running

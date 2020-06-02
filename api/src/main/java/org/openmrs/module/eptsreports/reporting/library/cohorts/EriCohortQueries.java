@@ -111,7 +111,8 @@ public class EriCohortQueries {
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
             "startDate=${cohortStartDate},endDate=${cohortEndDate},location=${location}"));
-    cd.setCompositionString("initiatedART AND pregnant");
+    //cd.setCompositionString("initiatedART AND pregnant");
+    cd.setCompositionString("pregnant");
     return cd;
   }
 
