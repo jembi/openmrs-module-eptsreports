@@ -101,7 +101,9 @@ public class Eri4MonthsDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "adults",
-                EptsReportUtils.map(eriCohortQueries.getAdultsRetained(), cohortPeriodMappings)),
+                EptsReportUtils.map(
+                    eriCohortQueries.getAdultsRetained(),
+                    "cohortStartDate=${endDate-5m+1d},cohortEndDate=${endDate-4m},reportingEndDate=${endDate},location=${location}")),
             reportingPeriodMappings),
         get4MonthsRetentionColumns());
     return dsd;
