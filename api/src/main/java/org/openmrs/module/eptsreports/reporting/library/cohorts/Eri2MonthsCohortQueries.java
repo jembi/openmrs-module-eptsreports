@@ -77,7 +77,7 @@ public class Eri2MonthsCohortQueries {
         "initiatedArt",
         EptsReportUtils.map(
             eriCohortQueries.getAllPatientsWhoInitiatedArt(),
-            "cohortStartDate=${startDate},cohortEndDate=${endDate},reportingEndDate=${endDate},location=${location}"));
+            "cohortStartDate=${startDate},cohortEndDate=${endDate},reportingEndDate=${reportingEndDate},location=${location}"));
     cd.addSearch(
         "pickedDrugs",
         EptsReportUtils.map(

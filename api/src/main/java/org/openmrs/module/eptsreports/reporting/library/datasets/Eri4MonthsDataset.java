@@ -72,7 +72,8 @@ public class Eri4MonthsDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "pregnant women",
                 EptsReportUtils.map(
-                    eriCohortQueries.getPregnantWomenRetainedOnArt(), cohortPeriodMappings)),
+                    eriCohortQueries.getPregnantWomenRetainedOnArt(),
+                    cohortAndReportingPeriodsMappings)),
             reportingPeriodMappings),
         get4MonthsRetentionColumns());
     addRow(
@@ -83,7 +84,8 @@ public class Eri4MonthsDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "breastfeeding women",
                 EptsReportUtils.map(
-                    eriCohortQueries.getBreastfeedingWomenRetained(), cohortPeriodMappings)),
+                    eriCohortQueries.getBreastfeedingWomenRetained(),
+                    cohortAndReportingPeriodsMappings)),
             reportingPeriodMappings),
         get4MonthsRetentionColumns());
     addRow(
@@ -93,7 +95,8 @@ public class Eri4MonthsDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "children",
-                EptsReportUtils.map(eriCohortQueries.getChildrenRetained(), cohortPeriodMappings)),
+                EptsReportUtils.map(
+                    eriCohortQueries.getChildrenRetained(), cohortAndReportingPeriodsMappings)),
             reportingPeriodMappings),
         get4MonthsRetentionColumns());
     addRow(
