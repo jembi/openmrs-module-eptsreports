@@ -392,11 +392,7 @@ public class TXCurrQueries {
             + "    HAVING final_encounter_date < :onOrBefore  "
             + " ) final  "
             + " GROUP BY final.patient_id;";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    String replacedQuery = sb.replace(query);
-
-    return replacedQuery;
+    return new StringSubstitutor(map).replace(query);
   }
 
   public static String getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup(
