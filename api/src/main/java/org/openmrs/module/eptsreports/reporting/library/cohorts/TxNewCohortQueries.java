@@ -54,8 +54,6 @@ public class TxNewCohortQueries {
 
   @Autowired private CommonCohortQueries commonCohortQueries;
 
-  @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
-
   /**
    * PATIENTS WITH UPDATED DATE OF DEPARTURE IN THE ART SERVICE Are patients with date of delivery
    * updated in the tarv service. Note that the 'Start Date' and 'End Date' parameters refer to the
@@ -140,7 +138,24 @@ public class TxNewCohortQueries {
    */
   @DocumentedDefinition(value = "txNewBreastfeedingComposition")
   public CohortDefinition getTxNewBreastfeedingComposition() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("patientsBreastfeedingEnrolledOnART");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setQuery(
+        PregnantQueries.getBreastfeedingWhileOnArt(
+          commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            hivMetadata.getPriorDeliveryDateConcept().getConceptId(),
+            hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId(),
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getPtvEtvProgram().getProgramId(),
+            hivMetadata.getCriteriaForArtStart().getConceptId()));
+
+    /*CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setDescription("breastfeedingComposition");
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
@@ -185,7 +200,7 @@ public class TxNewCohortQueries {
     String compositionString =
         "(DATAPARTO OR INICIOLACTANTE OR LACTANTEPROGRAMA OR LACTANTE OR MASTERCARD) AND FEMININO";
 
-    cd.setCompositionString(compositionString);
+    cd.setCompositionString(compositionString);*/
     return cd;
   }
 
@@ -233,9 +248,7 @@ public class TxNewCohortQueries {
     txNewComposition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = genericCohorts.getStartedArtOnPeriod(false, true);
-    CohortDefinition transferredIn =
-        resumoMensalCohortQueries
-            .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
+    CohortDefinition transferredIn = commonCohortQueries.getMohTransferredInPatients();
 
     txNewComposition.getSearches().put("startedART", mapStraightThrough(startedART));
     txNewComposition.getSearches().put("transferredIn", mapStraightThrough(transferredIn));
