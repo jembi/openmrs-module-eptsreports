@@ -111,19 +111,35 @@ public class PregnantQueries {
       int eddConcept,
       int adultInitailEncounter,
       int adultSegEncounter,
+      int startARVCriteriaConcept,
       int fichaResumo,
       int etvProgram,
-      int startARVCriteriaConcept
+      int etvProgramState,
+      int historicalARTStartDate
       ) {
 
-    return "SELECT     p.patient_id"
+    return " SELECT p.patient_id"
         + " FROM patient p"
         + " INNER JOIN person pe ON p.patient_id=pe.person_id"
         + " INNER JOIN encounter e ON p.patient_id=e.patient_id"
         + " INNER JOIN obs o ON e.encounter_id=o.encounter_id"
         + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id="
+        + eddConcept
+        + " AND"
+        + " e.encounter_type in ("
+        + adultInitailEncounter
+        + ","
+        + adultSegEncounter
+        + ") AND o.value_datetime BETWEEN :startDate AND :endDate AND e.location_id=:location AND pe.gender='F' "
+        + " UNION"
+        + "SELECT     p.patient_id"
+        + " FROM patient p"
+        + " INNER JOIN person pe ON p.patient_id=pe.person_id"
+        + " INNER JOIN encounter e ON p.patient_id=e.patient_id"
+        + " INNER JOIN obs o ON e.encounter_id=o.encounter_id"
+        + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND o.concept_id="
         + breastFeedingConcept
-        + " AND value_coded="
+        + " AND o.value_coded="
         + yesConcept
         + " AND e.encounter_type in ("
         + adultInitailEncounter
@@ -146,26 +162,28 @@ public class PregnantQueries {
         + adultSegEncounter
         + ") AND e.encounter_datetime BETWEEN :startDate AND :endDate AND e.location_id=:location AND pe.gender='F' "
         + " UNION"
-        + " SELECT p.patient_id"
-        + " FROM patient p"
-        + " INNER JOIN person pe ON p.patient_id=pe.person_id"
-        + " INNER JOIN encounter e ON p.patient_id=e.patient_id"
-        + " INNER JOIN obs o ON e.encounter_id=o.encounter_id"
-        + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id="
-        + eddConcept
-        + " AND"
-        + " e.encounter_type in ("
-        + adultInitailEncounter
-        + ","
-        + adultSegEncounter
-        + ") AND e.encounter_datetime BETWEEN :startDate AND :endDate AND e.location_id=:location AND pe.gender='F' "
-        + " UNION"
         + " SELECT pp.patient_id FROM patient_program pp"
         + " INNER JOIN person pe ON pp.patient_id=pe.person_id"
+        + " INNER JOIN patient_state ps ON pp.patient_program_id=ps.patient_program_id"
         + " WHERE pp.program_id="
         + etvProgram
+        + " AND ps.state="
+        + etvProgramState
         + " AND pp.voided=0 AND pp.date_enrolled BETWEEN :startDate AND :endDate AND pp.location_id=:location AND pe.gender='F' "
-        + ") "
-        + " AND o.value_datetime BETWEEN :startDate AND :endDate ";
+        + "UNION "
+        + " SELECT p.patient_id FROM patient p "
+        + " INNER JOIN person pe ON p.patient_id=pe.person_id "
+        + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+        + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+        + " INNER JOIN obs hist ON e.encounter_id=hist.encounter_id "
+        + "  WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND o.concept_id= "
+        + breastFeedingConcept
+        + " AND value_coded="
+        + yesConcept
+        + " AND e.encounter_type ="
+        + fichaResumo
+        + " AND hist.concept_id="
+        + historicalARTStartDate
+        + " AND hist.value_datetime BETWEEN :startDate AND :endDate ";
   }
 }
