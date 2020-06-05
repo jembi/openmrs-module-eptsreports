@@ -115,8 +115,7 @@ public class PregnantQueries {
       int fichaResumo,
       int etvProgram,
       int etvProgramState,
-      int historicalARTStartDate
-      ) {
+      int historicalARTStartDate) {
 
     return " SELECT patient_id FROM ("
         + " SELECT p.patient_id, MAX(o.value_datetime) AS last_date"
@@ -155,9 +154,9 @@ public class PregnantQueries {
         + " INNER JOIN person pe ON p.patient_id=pe.person_id"
         + " INNER JOIN encounter e ON p.patient_id=e.patient_id"
         + " INNER JOIN obs o ON e.encounter_id=o.encounter_id"
-        + " WHERE p.voided=0 AND pe.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id="
+        + " WHERE p.voided=0 AND pe.voided=0 AND e.voided=0 AND o.voided=0 AND o.concept_id="
         + startARVCriteriaConcept
-        + " AND value_coded="
+        + " AND o.value_coded="
         + breastFeedingConcept
         + " AND e.encounter_type in ("
         + adultInitailEncounter
@@ -184,7 +183,7 @@ public class PregnantQueries {
         + " INNER JOIN obs hist ON e.encounter_id=hist.encounter_id "
         + "  WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND o.concept_id= "
         + breastFeedingConcept
-        + " AND value_coded="
+        + " AND o.value_coded="
         + yesConcept
         + " AND e.encounter_type ="
         + fichaResumo
@@ -192,6 +191,6 @@ public class PregnantQueries {
         + historicalARTStartDate
         + " AND hist.value_datetime BETWEEN :startDate AND :endDate "
         + " GROUP BY p.patient_id"
-        + " ) GROUP BY patient_id";
+        + " ) AS LIST GROUP BY patient_id";
   }
 }

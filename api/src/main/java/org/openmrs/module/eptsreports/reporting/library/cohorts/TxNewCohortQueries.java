@@ -16,7 +16,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.openmrs.EncounterType;
@@ -25,15 +24,12 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.BreastfeedingQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.PregnantQueries;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.DateObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.common.RangeComparator;
-import org.openmrs.module.reporting.common.SetComparator;
-import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -145,7 +141,7 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.setQuery(
         PregnantQueries.getBreastfeedingWhileOnArt(
-          commonMetadata.getBreastfeeding().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             hivMetadata.getPriorDeliveryDateConcept().getConceptId(),
             hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId(),
@@ -154,7 +150,7 @@ public class TxNewCohortQueries {
             hivMetadata.getPtvEtvProgram().getProgramId(),
             hivMetadata.getCriteriaForArtStart().getConceptId(),
             hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
-            HivMetadata.getPatientBreastfeedingWorkflowState().getProgramWorkflowStateId()));
+            hivMetadata.getPatientBreastfeedingWorkflowState().getProgramWorkflowStateId()));
 
     return cd;
   }
