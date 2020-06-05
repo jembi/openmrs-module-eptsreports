@@ -192,6 +192,6 @@ public class PregnantQueries {
         + historicalARTStartDate
         + " AND hist.value_datetime BETWEEN :startDate AND :endDate "
         + " GROUP BY p.patient_id"
-        + " ) GROUP BY patient_id";
+        + " ) as list GROUP BY patient_id";
   }
 }
