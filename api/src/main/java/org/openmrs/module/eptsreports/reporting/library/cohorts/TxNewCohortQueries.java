@@ -146,10 +146,10 @@ public class TxNewCohortQueries {
             hivMetadata.getPriorDeliveryDateConcept().getConceptId(),
             hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId(),
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getCriteriaForArtStart().getConceptId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getPtvEtvProgram().getProgramId(),
             hivMetadata.getPatientBreastfeedingWorkflowState().getProgramWorkflowStateId(),
-            hivMetadata.getCriteriaForArtStart().getConceptId(),
             hivMetadata.getHistoricalDrugStartDateConcept().getConceptId()));
 
     return cd;
