@@ -148,9 +148,9 @@ public class TxNewCohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getPtvEtvProgram().getProgramId(),
+            hivMetadata.getPatientBreastfeedingWorkflowState().getProgramWorkflowStateId(),
             hivMetadata.getCriteriaForArtStart().getConceptId(),
-            hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
-            hivMetadata.getPatientBreastfeedingWorkflowState().getProgramWorkflowStateId()));
+            hivMetadata.getHistoricalDrugStartDateConcept().getConceptId()));
 
     return cd;
   }
