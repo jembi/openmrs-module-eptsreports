@@ -164,7 +164,7 @@ public class TxNewCohortQueries {
    */
   public CohortDefinition getTxNewBreastfeedingPregnantOnPeriod() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("patientsBreastfeedingEnrolledOnART");
+    cd.setName("patientsBreastfeedingPregnantEnrolledOnART");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -201,13 +201,13 @@ public class TxNewCohortQueries {
     txNewBreastfeedingComposition.addParameter(
         new Parameter("location", "location", Location.class));
 
-    CohortDefinition breastfeedingOrPregnant = getTxNewBreastfeedingOnPeriod();
-    CohortDefinition pregnant = getTxNewBreastfeedingPregnantOnPeriod();
+    CohortDefinition breastfeedingCohort = getTxNewBreastfeedingOnPeriod();
+    CohortDefinition pregnantCohort = getTxNewBreastfeedingPregnantOnPeriod();
 
     txNewBreastfeedingComposition
         .getSearches()
-        .put("breastfeeding", mapStraightThrough(breastfeedingOrPregnant));
-    txNewBreastfeedingComposition.getSearches().put("pregnant", mapStraightThrough(pregnant));
+        .put("breastfeeding", mapStraightThrough(breastfeedingCohort));
+    txNewBreastfeedingComposition.getSearches().put("pregnant", mapStraightThrough(pregnantCohort));
 
     txNewBreastfeedingComposition.setCompositionString("breastfeeding NOT pregnant");
     return txNewBreastfeedingComposition;
