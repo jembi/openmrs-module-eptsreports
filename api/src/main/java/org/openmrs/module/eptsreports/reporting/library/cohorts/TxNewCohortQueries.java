@@ -209,7 +209,7 @@ public class TxNewCohortQueries {
         .put("breastfeeding", mapStraightThrough(breastfeedingOrPregnant));
     txNewBreastfeedingComposition.getSearches().put("pregnant", mapStraightThrough(pregnant));
 
-    txNewBreastfeedingComposition.setCompositionString("breastfeedingOrPregnant NOT pregnant");
+    txNewBreastfeedingComposition.setCompositionString("breastfeeding NOT pregnant");
     return txNewBreastfeedingComposition;
   }
 
