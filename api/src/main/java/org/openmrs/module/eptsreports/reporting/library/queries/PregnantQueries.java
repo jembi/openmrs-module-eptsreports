@@ -290,7 +290,7 @@ public class PregnantQueries {
         + " GROUP BY patient_id) AS pregnant_table "
         + " ON pregnant_table.patient_id = breastfeeding.patient_id "
         + " WHERE (breastfeeding.last_date > pregnant_table.pregnancy_date "
-        + " OR pregnant_table.pregnant_date IS NULL)"
+        + " OR pregnant_table.pregnancy_date IS NULL)"
         + " GROUP BY breastfeeding.patient_id) AS list ";
   }
 }
