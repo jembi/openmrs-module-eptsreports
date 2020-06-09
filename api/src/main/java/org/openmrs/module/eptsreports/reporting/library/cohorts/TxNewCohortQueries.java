@@ -128,11 +128,11 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * TxNew Breastfeeding query
+   * TxNew Breastfeeding Compisition Cohort
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getTxNewBreastfeedingOnPeriod() {
+  public CohortDefinition getTxNewBreastfeedingComposition() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("patientsBreastfeedingEnrolledOnART");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -155,62 +155,6 @@ public class TxNewCohortQueries {
             hivMetadata.getBPlusConcept().getConceptId(),
             hivMetadata.getDateOfLastMenstruationConcept().getConceptId()));
     return cd;
-  }
-
-  /**
-   * TxNew Breastfeeding and Pregnant query
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getTxNewBreastfeedingPregnantOnPeriod() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("patientsBreastfeedingPregnantEnrolledOnART");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        PregnantQueries.getBreastfeedingPregnantWhileOnArt(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            hivMetadata.getPriorDeliveryDateConcept().getConceptId(),
-            hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getCriteriaForArtStart().getConceptId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getPtvEtvProgram().getProgramId(),
-            hivMetadata.getPatientBreastfeedingWorkflowState().getProgramWorkflowStateId(),
-            hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getNumberOfWeeksPregnant().getConceptId(),
-            hivMetadata.getBPlusConcept().getConceptId(),
-            hivMetadata.getDateOfLastMenstruationConcept().getConceptId()));
-    return cd;
-  }
-
-  /**
-   * TxNew Breastfeeding Compisition Cohort
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getTxNewBreastfeedingComposition() {
-
-    CompositionCohortDefinition txNewBreastfeedingComposition = new CompositionCohortDefinition();
-    txNewBreastfeedingComposition.setName("breastfeedingComposition");
-    txNewBreastfeedingComposition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    txNewBreastfeedingComposition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    txNewBreastfeedingComposition.addParameter(
-        new Parameter("location", "location", Location.class));
-
-    CohortDefinition breastfeedingCohort = getTxNewBreastfeedingOnPeriod();
-    CohortDefinition pregnantCohort = getTxNewBreastfeedingPregnantOnPeriod();
-
-    txNewBreastfeedingComposition
-        .getSearches()
-        .put("breastfeeding", mapStraightThrough(breastfeedingCohort));
-    txNewBreastfeedingComposition.getSearches().put("pregnant", mapStraightThrough(pregnantCohort));
-
-    txNewBreastfeedingComposition.setCompositionString("breastfeeding NOT pregnant");
-    return txNewBreastfeedingComposition;
   }
 
   /**
