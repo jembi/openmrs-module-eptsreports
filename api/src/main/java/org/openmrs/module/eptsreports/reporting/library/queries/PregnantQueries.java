@@ -121,7 +121,7 @@ public class PregnantQueries {
       int lastMenstrualPeriod) {
 
     return "  SELECT list.patient_id FROM (  "
-        + " SELECT breastfeeding.patient_id, breastfeeding.last_date, pregnant_table.pregnant_date FROM ("
+        + " SELECT breastfeeding.patient_id, breastfeeding.last_date, pregnant_table.pregnancy_date FROM ("
         + " SELECT p.patient_id, MAX(o.value_datetime) AS last_date"
         + " FROM patient p"
         + " INNER JOIN person pe ON p.patient_id=pe.person_id"
