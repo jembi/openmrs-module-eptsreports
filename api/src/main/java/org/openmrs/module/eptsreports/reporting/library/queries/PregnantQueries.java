@@ -129,7 +129,7 @@ public class PregnantQueries {
         + " INNER JOIN obs o ON e.encounter_id=o.encounter_id"
         + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id="
         + eddConcept
-        + " AND"
+        + " AND "
         + " e.encounter_type in ("
         + adultInitailEncounter
         + ","
@@ -264,6 +264,7 @@ public class PregnantQueries {
         + startARVCriteriaConcept
         + " AND value_coded=  "
         + bPLusConcept
+        + " AND "
         + " e.encounter_type in ( "
         + adultInitailEncounter
         + ","
