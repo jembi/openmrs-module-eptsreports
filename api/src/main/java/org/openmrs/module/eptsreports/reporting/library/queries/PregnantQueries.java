@@ -114,7 +114,6 @@ public class PregnantQueries {
       int startARVCriteriaConcept,
       int fichaResumo,
       int etvProgram,
-      int etvProgramState,
       int historicalARTStartDate,
       int pregnantConcept,
       int weeksPregnantConcept,
@@ -176,8 +175,7 @@ public class PregnantQueries {
         + " INNER JOIN patient_state ps ON pp.patient_program_id=ps.patient_program_id"
         + " WHERE pp.program_id="
         + etvProgram
-        + " AND ps.state="
-        + etvProgramState
+        + " AND ps.state=27"
         + " AND pp.voided=0 AND pp.date_enrolled AND pp.date_enrolled BETWEEN :startDate AND :endDate AND pp.location_id=:location AND pe.gender='F' "
         + "UNION "
         + " SELECT p.patient_id, hist.value_datetime AS last_date"

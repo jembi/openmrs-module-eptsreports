@@ -1352,17 +1352,6 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflowState(ptvProgramUuid, "5", "PREGNANT");
   }
 
-  /**
-   * LACTATING STATE = 27
-   *
-   * @return
-   */
-  public ProgramWorkflowState getPatientBreastfeedingWorkflowState() {
-    String ptvProgramUuid =
-        Context.getAdministrationService().getGlobalProperty(gpPtvEtvProgramUuid);
-    return getProgramWorkflowState(ptvProgramUuid, "27", "LACTATING");
-  }
-
   public ProgramWorkflowState getPateintActiveOnHIVCareProgramtWorkflowState() {
     String hivCareProgramUuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.hivCareProgramUuid");

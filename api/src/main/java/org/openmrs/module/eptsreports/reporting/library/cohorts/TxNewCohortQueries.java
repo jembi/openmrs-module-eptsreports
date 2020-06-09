@@ -135,8 +135,8 @@ public class TxNewCohortQueries {
   public CohortDefinition getTxNewBreastfeedingComposition() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("patientsBreastfeedingEnrolledOnART");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.setQuery(
         PregnantQueries.getBreastfeedingWhileOnArt(
@@ -148,7 +148,6 @@ public class TxNewCohortQueries {
             hivMetadata.getCriteriaForArtStart().getConceptId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getPtvEtvProgram().getProgramId(),
-            hivMetadata.getPatientBreastfeedingWorkflowState().getProgramWorkflowStateId(),
             hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getNumberOfWeeksPregnant().getConceptId(),
