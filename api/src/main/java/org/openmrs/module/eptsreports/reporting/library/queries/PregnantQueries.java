@@ -136,8 +136,8 @@ public class PregnantQueries {
         + adultSegEncounter
         + ") AND o.value_datetime BETWEEN :onOrAfter AND :onOrBefore AND e.location_id=:location AND pe.gender='F' "
         + " GROUP BY p.patient_id"
-        + " UNION"
-        + "SELECT     p.patient_id, MAX(e.encounter_datetime) AS last_date"
+        + " UNION "
+        + " SELECT     p.patient_id, MAX(e.encounter_datetime) AS last_date"
         + " FROM patient p"
         + " INNER JOIN person pe ON p.patient_id=pe.person_id"
         + " INNER JOIN encounter e ON p.patient_id=e.patient_id"
@@ -152,7 +152,7 @@ public class PregnantQueries {
         + adultSegEncounter
         + ") AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore AND e.location_id=:location AND pe.gender='F' "
         + " GROUP BY p.patient_id"
-        + " UNION"
+        + " UNION "
         + " SELECT     p.patient_id, MAX(e.encounter_datetime) AS last_date"
         + " FROM patient p"
         + " INNER JOIN person pe ON p.patient_id=pe.person_id"
@@ -168,7 +168,7 @@ public class PregnantQueries {
         + adultSegEncounter
         + ") AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore AND e.location_id=:location AND pe.gender='F' "
         + " GROUP BY p.patient_id"
-        + " UNION"
+        + " UNION "
         + " SELECT pp.patient_id, pp.date_enrolled AS last_date "
         + " FROM patient_program pp"
         + " INNER JOIN person pe ON pp.patient_id=pe.person_id"
@@ -177,7 +177,7 @@ public class PregnantQueries {
         + etvProgram
         + " AND ps.state=27"
         + " AND pp.voided=0 AND pp.date_enrolled AND pp.date_enrolled BETWEEN :onOrAfter AND :onOrBefore AND pp.location_id=:location AND pe.gender='F' "
-        + "UNION "
+        + " UNION "
         + " SELECT p.patient_id, hist.value_datetime AS last_date"
         + " FROM patient p "
         + " INNER JOIN person pe ON p.patient_id=pe.person_id "
