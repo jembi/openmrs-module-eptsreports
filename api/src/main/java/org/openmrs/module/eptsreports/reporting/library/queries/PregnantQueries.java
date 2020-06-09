@@ -289,7 +289,7 @@ public class PregnantQueries {
         + " AND o.value_datetime BETWEEN :onOrAfter AND :onOrBefore GROUP BY p.patient_id) as pregnancy  "
         + " GROUP BY patient_id) AS pregnant_table "
         + " ON pregnant_table.patient_id = breastfeeding.patient_id "
-        + " WHERE (breastfeeding.last_date > pregnant_table.pregnant_date "
+        + " WHERE (breastfeeding.last_date > pregnant_table.pregnancy_date "
         + " OR pregnant_table.pregnant_date IS NULL)"
         + " GROUP BY breastfeeding.patient_id) AS list ";
   }
