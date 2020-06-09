@@ -122,7 +122,7 @@ public class PregnantQueries {
       int lastMenstrualPeriod) {
 
     return "  SELECT patient_id FROM (  "
-        + " SELECT breastfeeding.patient_id, max(last_date) as breastfeeding_date FROM ("
+        + " SELECT breastfeeding.patient_id, breastfeeding.last_date, pregnant_table.patient_id as pregnant_id, pregnant_table.pregnant_date FROM ("
         + " SELECT p.patient_id, MAX(o.value_datetime) AS last_date"
         + " FROM patient p"
         + " INNER JOIN person pe ON p.patient_id=pe.person_id"
@@ -288,10 +288,9 @@ public class PregnantQueries {
         + " AND e.encounter_type =  "
         + adultSegEncounter
         + " AND o.value_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id) as pregnancy  "
-        + " GROUP BY patient_id) AS pregnant "
-        + " ON pregnant.patient_id = breastfeeding.patient_id "
-        + " GROUP BY breastfeeding.patient_id) AS LIST "
-        + " GROUP BY patient_id ";
+        + " GROUP BY patient_id) AS pregnant_table "
+        + " ON pregnant_table.patient_id = breastfeeding.patient_id "
+        + " GROUP BY breastfeeding.patient_id) AS LIST ";
   }
 
   /** LACTANTES E GRAVIDAS NO SERVIÇO TARV */
