@@ -134,7 +134,7 @@ public class PregnantQueries {
         + adultInitailEncounter
         + ","
         + adultSegEncounter
-        + ") AND o.value_datetime BETWEEN :startDate AND :endDate AND e.location_id=:location AND pe.gender='F' "
+        + ") AND o.value_datetime BETWEEN :onOrAfter AND :onOrBefore AND e.location_id=:location AND pe.gender='F' "
         + " GROUP BY p.patient_id"
         + " UNION"
         + "SELECT     p.patient_id, MAX(e.encounter_datetime) AS last_date"
@@ -150,7 +150,7 @@ public class PregnantQueries {
         + adultInitailEncounter
         + ","
         + adultSegEncounter
-        + ") AND e.encounter_datetime BETWEEN :startDate AND :endDate AND e.location_id=:location AND pe.gender='F' "
+        + ") AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore AND e.location_id=:location AND pe.gender='F' "
         + " GROUP BY p.patient_id"
         + " UNION"
         + " SELECT     p.patient_id, MAX(e.encounter_datetime) AS last_date"
@@ -166,7 +166,7 @@ public class PregnantQueries {
         + adultInitailEncounter
         + ","
         + adultSegEncounter
-        + ") AND e.encounter_datetime BETWEEN :startDate AND :endDate AND e.location_id=:location AND pe.gender='F' "
+        + ") AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore AND e.location_id=:location AND pe.gender='F' "
         + " GROUP BY p.patient_id"
         + " UNION"
         + " SELECT pp.patient_id, pp.date_enrolled AS last_date "
@@ -176,7 +176,7 @@ public class PregnantQueries {
         + " WHERE pp.program_id="
         + etvProgram
         + " AND ps.state=27"
-        + " AND pp.voided=0 AND pp.date_enrolled AND pp.date_enrolled BETWEEN :startDate AND :endDate AND pp.location_id=:location AND pe.gender='F' "
+        + " AND pp.voided=0 AND pp.date_enrolled AND pp.date_enrolled BETWEEN :onOrAfter AND :onOrBefore AND pp.location_id=:location AND pe.gender='F' "
         + "UNION "
         + " SELECT p.patient_id, hist.value_datetime AS last_date"
         + " FROM patient p "
@@ -192,7 +192,7 @@ public class PregnantQueries {
         + fichaResumo
         + " AND hist.concept_id="
         + historicalARTStartDate
-        + " AND hist.value_datetime BETWEEN :startDate AND :endDate "
+        + " AND hist.value_datetime BETWEEN :onOrAfter AND :onOrBefore "
         + " GROUP BY p.patient_id"
         + " ) AS breastfeeding "
         + " LEFT JOIN "
@@ -210,7 +210,7 @@ public class PregnantQueries {
         + adultInitailEncounter
         + ","
         + adultSegEncounter
-        + " ) AND e.encounter_datetime between :startDate AND :endDate AND e.location_id= :location AND pe.gender='F' GROUP BY p.patient_id "
+        + " ) AND e.encounter_datetime between :onOrAfter AND :onOrBefore AND e.location_id= :location AND pe.gender='F' GROUP BY p.patient_id "
         + " UNION "
         + " select p.patient_id, MAX(historical_date.value_datetime) as pregnancy_date FROM patient p "
         + " INNER JOIN person pe ON p.patient_id=pe.person_id "
@@ -225,7 +225,7 @@ public class PregnantQueries {
         + historicalARTStartDate
         + " AND e.encounter_type = "
         + fichaResumo
-        + " AND historical_date.value_datetime between :startDate AND :endDate AND e.location_id= :location AND pe.gender='F' GROUP BY p.patient_id "
+        + " AND historical_date.value_datetime between :onOrAfter AND :onOrBefore AND e.location_id= :location AND pe.gender='F' GROUP BY p.patient_id "
         + " UNION "
         + " Select p.patient_id,  MAX(e.encounter_datetime) as pregnancy_date "
         + " FROM patient p "
@@ -239,7 +239,7 @@ public class PregnantQueries {
         + adultInitailEncounter
         + ","
         + adultSegEncounter
-        + " ) AND e.encounter_datetime between :startDate AND :endDate AND e.location_id= :location  AND pe.gender='F' GROUP BY p.patient_id "
+        + " ) AND e.encounter_datetime between :onOrAfter AND :onOrBefore AND e.location_id= :location  AND pe.gender='F' GROUP BY p.patient_id "
         + " UNION "
         + " Select p.patient_id,  e.encounter_datetime as pregnancy_date "
         + " FROM patient p "
@@ -253,7 +253,7 @@ public class PregnantQueries {
         + adultInitailEncounter
         + ","
         + adultSegEncounter
-        + " ) AND e.encounter_datetime between :startDate AND :endDate AND e.location_id= :location AND pe.gender='F' GROUP BY p.patient_id "
+        + " ) AND e.encounter_datetime between :onOrAfter AND :onOrBefore AND e.location_id= :location AND pe.gender='F' GROUP BY p.patient_id "
         + " UNION "
         + " Select p.patient_id, MAX(e.encounter_datetime) as pregnancy_date "
         + " FROM patient p "
@@ -268,14 +268,14 @@ public class PregnantQueries {
         + adultInitailEncounter
         + ","
         + adultSegEncounter
-        + " ) AND e.encounter_datetime BETWEEN :startDate AND :endDate AND e.location_id= :location AND pe.gender='F' GROUP BY p.patient_id "
+        + " ) AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore AND e.location_id= :location AND pe.gender='F' GROUP BY p.patient_id "
         + " UNION "
         + " SELECT pp.patient_id,  MAX(pp.date_enrolled) AS pregnancy_date "
         + " FROM patient_program pp "
         + " INNER JOIN person pe ON pp.patient_id=pe.person_id "
         + " WHERE pp.program_id=  "
         + etvProgram
-        + " AND pp.voided=0 AND pp.date_enrolled between  :startDate AND :endDate AND pp.location_id= :location AND pe.gender='F' GROUP BY pp.patient_id "
+        + " AND pp.voided=0 AND pp.date_enrolled between  :onOrAfter AND :onOrBefore AND pp.location_id= :location AND pe.gender='F' GROUP BY pp.patient_id "
         + " UNION "
         + " SELECT p.patient_id,  MAX(o.value_datetime) as pregnancy_date  FROM patient p "
         + " INNER JOIN person pe ON p.patient_id=pe.person_id "
@@ -285,7 +285,7 @@ public class PregnantQueries {
         + lastMenstrualPeriod
         + " AND e.encounter_type =  "
         + adultSegEncounter
-        + " AND o.value_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id) as pregnancy  "
+        + " AND o.value_datetime BETWEEN :onOrAfter AND :onOrBefore GROUP BY p.patient_id) as pregnancy  "
         + " GROUP BY patient_id) AS pregnant_table "
         + " ON pregnant_table.patient_id = breastfeeding.patient_id "
         + " WHERE (breastfeeding.last_date > pregnant_table.pregnant_date "
