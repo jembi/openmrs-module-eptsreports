@@ -361,7 +361,7 @@ public class TXCurrQueries {
             + "                            AND obs.value_datetime IS NOT NULL   "
             + "                            AND enc.encounter_type IN ( ${adultoSeguimentoEncounterType},${aRVPediatriaSeguimentoEncounterType} )   "
             + "                            AND enc.location_id =   :location    "
-            + "                            AND enc.encounter_datetime <= '2019-10-21'   "
+            + "                            AND enc.encounter_datetime <= :onOrBefore   "
             + "                        GROUP  BY pa.patient_id) ficha "
             + "                    INNER JOIN encounter e on "
             + "                        e.patient_id = ficha.patient_id "
