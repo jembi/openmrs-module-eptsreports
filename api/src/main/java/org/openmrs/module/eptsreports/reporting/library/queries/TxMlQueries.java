@@ -569,9 +569,9 @@ public class TxMlQueries {
             + "                  WHERE p.patient_id = e.patient_id "
             + "                    AND e.voided = 0 "
             + "                    AND o.voided = 0 "
-            + "                    AND e.encounter_type = %d "
+            + "                    AND e.encounter_type = ${pharmacyEncounterTypeId} "
             + "                    AND e.location_id = :location "
-            + "                    AND o.concept_id = %d "
+            + "                    AND o.concept_id = ${returnVisitDateForDrugsConcept} "
             + "                    AND e.encounter_datetime <= :endDate"
             + "                  ORDER BY e.encounter_datetime DESC "
             + "                  LIMIT 1) AS return_date "
@@ -585,9 +585,9 @@ public class TxMlQueries {
             + "                  WHERE p.patient_id = e.patient_id "
             + "                    AND e.voided = 0 "
             + "                    AND o.voided = 0 "
-            + "                    AND e.encounter_type IN (%d, %d) "
+            + "                    AND e.encounter_type IN (${adultoSequimentoEncounterTypeId}, ${arvPediatriaSeguimentoEncounterTypeId}) "
             + "                    AND e.location_id = :location "
-            + "                    AND o.concept_id = %d "
+            + "                    AND o.concept_id = ${returnVisitDateConcept} "
             + "                    AND e.encounter_datetime <= :endDate"
             + "                  ORDER BY e.encounter_datetime DESC "
             + "                  LIMIT 1) AS return_date "
@@ -601,9 +601,9 @@ public class TxMlQueries {
             + "                  WHERE p.patient_id = e.patient_id "
             + "                    AND e.voided = 0 "
             + "                    AND o.voided = 0 "
-            + "                    AND e.encounter_type = %d "
+            + "                    AND e.encounter_type = ${masterCardDrugPickupEncounterTypeId} "
             + "                    AND e.location_id = :location "
-            + "                    AND o.concept_id = %d "
+            + "                    AND o.concept_id = ${artDatePickupConceptId} "
             + "                    AND o.value_datetime <= :endDate"
             + "                  ORDER BY e.encounter_datetime DESC "
             + "                  LIMIT 1) AS return_date "
@@ -611,37 +611,40 @@ public class TxMlQueries {
             + "    GROUP BY e.patient_id)lp ON pa.patient_id=lp.patient_id "
             + "    INNER JOIN encounter e ON "
             + "        pa.patient_id=e.patient_id AND "
-            + "        e.encounter_type IN (%d,%d,%d) AND "
+            + "        e.encounter_type IN (${homeVisitCardEncounterTypeId}, ${apoioReintegracaoParteAEncounterTypeId}, ${apoioReintegracaoParteBEncounterTypeId}) AND "
             + "        e.location_id = :location AND "
             + "        e.encounter_datetime >= lp.return_date AND "
             + "        e.encounter_datetime <= :endDate "
             + "    INNER JOIN obs visitType ON "
             + "        pa.patient_id=visitType.person_id AND "
             + "        visitType.encounter_id=e.encounter_id AND "
-            + "        (visitType.concept_id=%d AND visitType.value_coded=%d) "
+            + "        (visitType.concept_id= ${typeOfVisitConcept} AND visitType.value_coded= ${buscaConcept}) "
             + "    LEFT JOIN obs patientNotFound ON "
             + "        pa.patient_id=patientNotFound.person_id AND "
             + "        patientNotFound.encounter_id=e.encounter_id AND "
-            + "        (patientNotFound.concept_id=%d AND patientNotFound.value_coded=%d) "
+            + "        (patientNotFound.concept_id= ${patientFoundConcept} AND patientNotFound.value_coded= ${patientFoundAnswerConcept}) "
             + " WHERE patientNotFound.obs_id IS NOT NULL "
             + " ORDER BY pa.patient_id ";
 
-    return String.format(
-        query,
-        pharmacyEncounterTypeId,
-        returnVisitDateForDrugsConcept,
-        adultoSequimentoEncounterTypeId,
-        arvPediatriaSeguimentoEncounterTypeId,
-        returnVisitDateConcept,
-        masterCardDrugPickupEncounterTypeId,
-        artDatePickupConceptId,
-        homeVisitCardEncounterTypeId,
-        apoioReintegracaoParteAEncounterTypeId,
-        apoioReintegracaoParteBEncounterTypeId,
-        typeOfVisitConcept,
-        buscaConcept,
-        patientFoundConcept,
-        patientFoundAnswerConcept);
+    Map<String, Integer> valuesMap = new HashMap<>();
+
+    valuesMap.put("pharmacyEncounterTypeId", pharmacyEncounterTypeId);
+    valuesMap.put("returnVisitDateForDrugsConcept", returnVisitDateForDrugsConcept);
+    valuesMap.put("adultoSequimentoEncounterTypeId", adultoSequimentoEncounterTypeId);
+    valuesMap.put("arvPediatriaSeguimentoEncounterTypeId", arvPediatriaSeguimentoEncounterTypeId);
+    valuesMap.put("returnVisitDateConcept", returnVisitDateConcept);
+    valuesMap.put("masterCardDrugPickupEncounterTypeId", masterCardDrugPickupEncounterTypeId);
+    valuesMap.put("artDatePickupConceptId", artDatePickupConceptId);
+    valuesMap.put("homeVisitCardEncounterTypeId", homeVisitCardEncounterTypeId);
+    valuesMap.put("apoioReintegracaoParteAEncounterTypeId", apoioReintegracaoParteAEncounterTypeId);
+    valuesMap.put("apoioReintegracaoParteBEncounterTypeId", apoioReintegracaoParteBEncounterTypeId);
+    valuesMap.put("typeOfVisitConcept", typeOfVisitConcept);
+    valuesMap.put("buscaConcept", buscaConcept);
+    valuesMap.put("patientFoundConcept", patientFoundConcept);
+    valuesMap.put("patientFoundAnswerConcept", patientFoundAnswerConcept);
+
+    StringSubstitutor sub = new StringSubstitutor(valuesMap);
+    return sub.replace(query);
   }
 
   public static String getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup(
