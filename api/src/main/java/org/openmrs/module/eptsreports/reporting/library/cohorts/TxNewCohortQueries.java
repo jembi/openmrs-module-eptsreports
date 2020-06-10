@@ -148,6 +148,7 @@ public class TxNewCohortQueries {
             hivMetadata.getCriteriaForArtStart().getConceptId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getPtvEtvProgram().getProgramId(),
+            hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId(),
             hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getNumberOfWeeksPregnant().getConceptId(),
