@@ -385,8 +385,7 @@ public class TXCurrQueries {
             + "                   ) most_recent "
             + "               GROUP BY most_recent.patient_id "
             + "               HAVING final_encounter_date < :onOrBefore "
-            + "            ) final "
-            + "            GROUP BY final.patient_id;";
+            + "            ) final ";
     return new StringSubstitutor(map).replace(query);
   }
 
