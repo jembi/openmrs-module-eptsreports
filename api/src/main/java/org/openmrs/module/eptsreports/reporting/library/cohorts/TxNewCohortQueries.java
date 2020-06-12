@@ -92,7 +92,7 @@ public class TxNewCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.setQuery(
         PregnantQueries.getPregnantWhileOnArt(
-            commonMetadata.getPregnantConcept().getConceptId(),
+            commonMetadata.getPregnantStatusConcept().getConceptId(),
             hivMetadata.getNumberOfWeeksPregnant().getConceptId(),
             hivMetadata.getPregnancyDueDate().getConceptId(),
             hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId(),

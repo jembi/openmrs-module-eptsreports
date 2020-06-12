@@ -202,7 +202,7 @@ public class PregnantQueries {
             + fichaResumo
             + "      AND hist.concept_id= "
             + historicalARTStartDate
-            + "      AND hist.value_datetime IS NOT NULL "
+            + "      AND pe.gender='F' AND hist.value_datetime IS NOT NULL "
             + "      AND hist.value_datetime BETWEEN :startDate AND :endDate "
             + "      GROUP BY p.patient_id "
             + "      ) AS breastfeeding "
@@ -406,6 +406,7 @@ public class PregnantQueries {
             + " WHERE (breastfeeding.last_date > pregnant_table.pregnancy_date "
             + " OR pregnant_table.pregnancy_date IS NULL)"
             + " GROUP BY breastfeeding.patient_id) AS list ";
+
     return query;
   }
 }

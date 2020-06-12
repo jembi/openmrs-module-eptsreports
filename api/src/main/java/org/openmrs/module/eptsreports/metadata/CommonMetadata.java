@@ -92,11 +92,11 @@ public class CommonMetadata extends Metadata {
     return getConcept(uuid);
   }
 
-  /** 
+  /**
    * concept_id=5282
-   * 
+   *
    * @return
-   * */ 
+   */
   public Concept getPregnantStatusConcept() {
     String uuid =
         Context.getAdministrationService()
