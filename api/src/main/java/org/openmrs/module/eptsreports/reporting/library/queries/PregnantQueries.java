@@ -187,6 +187,7 @@ public class PregnantQueries {
             + "      AND ps.state= "
             + gaveBirthPatientState
             + "      AND pp.voided=0 AND ps.start_date BETWEEN :startDate AND :endDate AND pp.location_id=:location AND pe.gender='F' "
+            + "      GROUP BY pp.patient_id "
             + "     UNION "
             + "      SELECT p.patient_id, MAX(hist.value_datetime) AS last_date "
             + "      FROM patient p "
