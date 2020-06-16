@@ -595,7 +595,7 @@ public class EriDSDDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "CAT",
                 EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWhoAreActiveAndParticipatingInAccessionClubs(),
+                    eriDSDCohortQueries.getN5(),
                     mappings)),
             mappings),
         "");
