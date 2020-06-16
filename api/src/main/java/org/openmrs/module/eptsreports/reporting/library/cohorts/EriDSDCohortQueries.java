@@ -1156,7 +1156,7 @@ public class EriDSDCohortQueries {
     String cohortName = "Active patients on ART  who are in AF";
 
     cd.setName(
-        "N5: Active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in AF");
+        "Active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in AF");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1434,9 +1434,15 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
+  /**
+   * N5: Filter all patients marked in last “Clubes de Adesão (CA)” as Iniciar (I) 
+   * or Continua (C) on Ficha Clinica – Master Card
+   *
+   * @return
+   */
   @DocumentedDefinition(
       "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA")
-  public CohortDefinition getPatientsWhoAreActiveAndParticipatingInAccessionClubs() {
+  public CohortDefinition getN5() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -1464,7 +1470,7 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition ca = getPatientsWhoAreActiveAndParticipatingInAccessionClubs();
+    CohortDefinition ca = getN5();
     CohortDefinition stable = getPatientsWhoAreStable();
 
     cd.addSearch("ca", mapStraightThrough(ca));
@@ -1483,7 +1489,7 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition ca = getPatientsWhoAreActiveAndParticipatingInAccessionClubs();
+    CohortDefinition ca = getN5();
     CohortDefinition stable = getPatientsWhoAreStable();
 
     cd.addSearch("ca", mapStraightThrough(ca));
