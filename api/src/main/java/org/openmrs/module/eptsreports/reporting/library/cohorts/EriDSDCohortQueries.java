@@ -1148,10 +1148,24 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment)
-   * who are in AF
+   * 1.Select all patients (adults and children) currently receiving treatment, included in Tx-Curr for selected Location and reporting period (Tx-Curr)
+
+   *2.Filter all patients marked in last “Abordagem Familiar (AF)” as Iniciar (I) or Continua (C) on Ficha Clinica – Master Card
+   * Encounter Type Id = 6
+   * Last Family Approach Concept (id=23725)
+   * Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
+	
+   * 3.Exclude patients who are registered as pregnant during the following period:
+   * a.startDate = reporting endDate – 9 months
+   * b.endDate = reporting endDate
+   * *4.Exclude patients who are registered as breastfeeding during the following period:
+   * a.startDate = reporting endDate – 18 months
+   * b.endDate = reporting endDate
+   * 5.Exclude patients who are on TB Treatment (see common queries for the specs on  9. Patients on TB Treatment)
+
+   * @return
    */
-  public CohortDefinition getActivePatientsOnARTAF() {
+  public CohortDefinition getN4() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String cohortName = "Active patients on ART  who are in AF";
 
@@ -1170,9 +1184,15 @@ public class EriDSDCohortQueries {
         "masterCardPatients",
         EptsReportUtils.map(
             getPatientsOnMasterCardAFQuery(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
+    
+    cd.addSearch(
+            "PregnantAndBreastfeedingAndOnTBTreatment",
+            EptsReportUtils.map(
+            	getPregnantAndBreastfeedingAndOnTBTreatment(),
+                "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("txCurr AND masterCardPatients");
+    cd.setCompositionString("(txCurr AND masterCardPatients) AND NOT  PregnantAndBreastfeedingAndOnTBTreatment");
 
     return cd;
   }
@@ -1221,7 +1241,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "masterCardAndTxCurrPatients",
         EptsReportUtils.map(
-            getActivePatientsOnARTAF(),
+            getN4(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("eligiblePatientsD1 AND masterCardAndTxCurrPatients");
@@ -1245,7 +1265,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "masterCardAndTxCurrPatients",
         EptsReportUtils.map(
-            getActivePatientsOnARTAF(),
+            getN4(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "patientsNotEligibleD2",
@@ -2118,4 +2138,30 @@ public class EriDSDCohortQueries {
 
     return cd;
   }
+  
+  public CohortDefinition getPregnantAndBreastfeedingAndOnTBTreatment() {
+	    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+	    cd.addParameter(new Parameter("endDate", "After Date", Date.class));
+	    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+	    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition();
+	    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
+	    CohortDefinition tb =hivCohortQueries.getPatientsOnTbTreatment();
+
+	    
+
+	    String pregnantMappings = "startDate=${endDate-9m},endDate=${endDate},location=${location}";
+	    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnantMappings));
+
+	    String breastfeedingMappings =
+	        "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}";
+	    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, breastfeedingMappings));
+	    
+	    String tbMappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+	    cd.addSearch("tb", EptsReportUtils.map(tb, tbMappings));
+
+	    cd.setCompositionString("pregnant OR breastfeeding OR tb");
+
+	    return cd;
+	  }
 }

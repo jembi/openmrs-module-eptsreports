@@ -361,14 +361,14 @@ public class EriDSDDataset extends BaseDataSet {
                     mappings)),
             mappings),
         getChildrenColumn());
-
+    //N4
     dsd.addColumn(
         "AFT",
         "AF: Total",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "AFT",
-                EptsReportUtils.map(eriDSDCohortQueries.getActivePatientsOnARTAF(), mappings)),
+                EptsReportUtils.map(eriDSDCohortQueries.getN4(), mappings)),
             mappings),
         "");
     dsd.addColumn(
