@@ -749,7 +749,7 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3 : Get the number of active patients on ART whose next clinical consultation is scheduled
+   * N2 : Get the number of active patients on ART whose next clinical consultation is scheduled
    * 175-190 days after the date of the last clinical consultation
    *
    * @return
@@ -757,7 +757,7 @@ public class EriDSDCohortQueries {
   public CohortDefinition getPatientsWithNextConsultationScheduled175To190Days() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String cohortName =
-        "N3: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation";
+        "N2: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation";
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -769,7 +769,7 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("TxCurr", EptsReportUtils.map(txCurr, mappings));
-    cd.addSearch("scheduledN3", EptsReportUtils.map(patientsScheduled, mappings));
+    cd.addSearch("scheduledN2", EptsReportUtils.map(patientsScheduled, mappings));
 
     String rapidFlowMappings =
         "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}";
@@ -777,7 +777,26 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "completed", EptsReportUtils.map(getPatientsWhoCompletedRapidFlow(), rapidFlowMappings));
 
-    cd.setCompositionString("TxCurr AND (scheduledN3 OR rapidFlow) NOT completed");
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
+            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            getBreastfeedingComposition(),
+            "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "tbPatient",
+        EptsReportUtils.map(
+            hivCohortQueries.getPatientsOnTbTreatment(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "TxCurr AND (scheduledN2 OR rapidFlow) NOT (completed OR pregnant OR breastfeeding OR tbPatient)");
 
     return cd;
   }
@@ -820,7 +839,7 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3 STABLE: Get number of active patients on ART whose next clinical consultation is scheduled
+   * N2 STABLE: Get number of active patients on ART whose next clinical consultation is scheduled
    * 175-190 days after the date of the last clinical consultation
    *
    * @return
@@ -829,7 +848,7 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
-        "N3 STABLE: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation");
+        "N2 STABLE: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -851,7 +870,7 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3 UNSTABLE: Get number of active patients on ART whose next clinical consultation is scheduled
+   * N2 UNSTABLE: Get number of active patients on ART whose next clinical consultation is scheduled
    * 175-190 days after the date of the last clinical consultation
    *
    * @return
@@ -860,7 +879,7 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
-        "N3 UNSTABLE: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation");
+        "N2 UNSTABLE: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -892,7 +911,7 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3: Unstable Patients who are Non-pregnant and Non-Breastfeeding
+   * N2: Unstable Patients who are Non-pregnant and Non-Breastfeeding
    *
    * @return
    */
@@ -932,7 +951,7 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3: Stable Patients who are Non-pregnant and Non-Breastfeeding
+   * N2: Stable Patients who are Non-pregnant and Non-Breastfeeding
    *
    * @return
    */
