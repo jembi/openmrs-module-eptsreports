@@ -1148,7 +1148,7 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment)
+   * Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment)
    * who are in AF
    */
   public CohortDefinition getActivePatientsOnARTAF() {
@@ -1178,7 +1178,7 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Active patients on ART MasterCard who are in AF Cohort Definition Query
+   * Active patients on ART MasterCard who are in AF Cohort Definition Query
    *
    * @return
    */
@@ -1201,14 +1201,14 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Active patients on ART who are in AF and Eligible
+   * Active patients on ART who are in AF and Eligible
    *
    * @return
    */
   public CohortDefinition getPatientsOnMasterCardAFWhoAreEligible() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("N5: Active patients on ART who are in AF and Eligible");
+    cd.setName("Active patients on ART who are in AF and Eligible");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1230,14 +1230,14 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Active patients on ART who are in AF and Not Eligible
+   * Active patients on ART who are in AF and Not Eligible
    *
    * @return
    */
   public CohortDefinition getPatientsOnMasterCardAFWhoAreNotEligible() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("N5: Active patients on ART who are in AF and Not Eligible");
+    cd.setName("Active patients on ART who are in AF and Not Eligible");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1435,7 +1435,7 @@ public class EriDSDCohortQueries {
   }
 
   @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA")
+      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA")
   public CohortDefinition getPatientsWhoAreActiveAndParticipatingInAccessionClubs() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1457,7 +1457,7 @@ public class EriDSDCohortQueries {
   }
 
   @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and stable")
+      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and stable")
   public CohortDefinition getPatientsWhoAreActiveParticipatingInAccessionClubsAndStable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1476,7 +1476,7 @@ public class EriDSDCohortQueries {
   }
 
   @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and unstable")
+      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and unstable")
   public CohortDefinition getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1495,7 +1495,7 @@ public class EriDSDCohortQueries {
   }
 
   @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and stable not pregnant or breastfeeding")
+      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and stable not pregnant or breastfeeding")
   public CohortDefinition getCAStableNonPregnantNonBreastfeeding() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1517,7 +1517,7 @@ public class EriDSDCohortQueries {
   }
 
   @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and unstable not pregnant or breastfeeding")
+      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and unstable not pregnant or breastfeeding")
   public CohortDefinition getCAUnstableNonPregnantNonBreastfeeding() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
