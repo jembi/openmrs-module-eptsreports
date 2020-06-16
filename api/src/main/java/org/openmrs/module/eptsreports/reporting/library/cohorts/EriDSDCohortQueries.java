@@ -1527,7 +1527,7 @@ public class EriDSDCohortQueries {
     CohortDefinition caUnstable = getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable();
     CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
     CohortDefinition breastfeeding =
-        txNewCohortQueries.getPatientsWhoGaveBirthWithinReportingPeriod();
+        txNewCohortQueries.getTxNewBreastfeedingComposition();
 
     cd.addSearch("caUnstable", mapStraightThrough(caUnstable));
     cd.addSearch("pregnant", mapStraightThrough(pregnant));
