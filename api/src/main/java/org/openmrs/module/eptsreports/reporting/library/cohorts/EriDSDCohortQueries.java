@@ -790,7 +790,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "tbPatient",
         EptsReportUtils.map(
-            hivCohortQueries.getPatientsOnTbTreatment(),
+            commonCohortQueries.getPatientsOnTbTreatment(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
