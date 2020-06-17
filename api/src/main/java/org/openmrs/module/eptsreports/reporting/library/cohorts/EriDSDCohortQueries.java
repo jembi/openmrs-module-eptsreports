@@ -608,26 +608,21 @@ public class EriDSDCohortQueries {
     CohortDefinition quarterly = getPatientsWithQuarterlyTypeOfDispensation();
     CohortDefinition startOrContinue = getPatientsWithStartOrContinueOnQuarterlyDispensation();
     CohortDefinition completed = getPatientsWithCompletedOnQuarterlyDispensation();
-    CohortDefinition pregnant =  txNewCohortQueries.getPatientsPregnantEnrolledOnART();
-    CohortDefinition breastFeeding =  txNewCohortQueries.getTxNewBreastfeedingComposition();
-    CohortDefinition patientsWithTB =  tbCohortQueries.getPatientsOnTbTreatment();
+    CohortDefinition pregnantOrBreastfeedingOrTBTreatment = getPregnantAndBreastfeedingAndOnTBTreatment();
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     String dispensationMappings =
         "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}";
-    String pregnantMappings = "startDate=${endDate-9m},endDate=${endDate},location=${location}";
-    String breastFeedingMappings = "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}";
-    String tbMappinggs = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String genericMappinggs = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     cd.addSearch("TxCurr", EptsReportUtils.map(txCurr, mappings));
     cd.addSearch("scheduled", EptsReportUtils.map(patientsScheduled, mappings));
     cd.addSearch("quarterly", EptsReportUtils.map(quarterly, dispensationMappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, dispensationMappings));
     cd.addSearch("completed", EptsReportUtils.map(completed, dispensationMappings));
-    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,pregnantMappings));
-    cd.addSearch("breastfeeding", EptsReportUtils.map(breastFeeding,breastFeedingMappings));
-    cd.addSearch("tbPatients", EptsReportUtils.map(patientsWithTB,tbMappinggs));
-    cd.setCompositionString("TxCurr AND (scheduled OR quarterly OR startOrContinue) NOT (completed OR pregnant OR breastfeeding OR tbPatients");
+    cd.addSearch("pregnantOrBreastfeedingOrTBTreatment",EptsReportUtils.map(pregnantOrBreastfeedingOrTBTreatment,genericMappinggs));
+
+    cd.setCompositionString("TxCurr AND (scheduled OR quarterly OR startOrContinue) NOT (completed OR pregnantOrBreastfeedingOrTBTreatment");
 
     return cd;
   }
