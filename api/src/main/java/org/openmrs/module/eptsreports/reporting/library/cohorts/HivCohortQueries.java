@@ -666,32 +666,5 @@ public class HivCohortQueries {
     return sqlCohortDefinition;
   }
 
-  /**
-   * Get All Patients On TB Treatment
-   *
-   * @return
-   */
-  public CohortDefinition getPatientsOnTbTreatment() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("patientsOnTbTreatment");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    cd.setQuery(
-        TbQueries.getPatientsOnTbTreatmentQuery(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getTBDrugStartDateConcept().getConceptId(),
-            hivMetadata.getTBDrugEndDateConcept().getConceptId(),
-            hivMetadata.getTBProgram().getProgramId(),
-            hivMetadata.getPatientActiveOnTBProgramWorkflowState().getProgramWorkflowStateId(),
-            hivMetadata.getActiveTBConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            hivMetadata.getTBTreatmentPlanConcept().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getContinueRegimenConcept().getConceptId()));
-
-    return cd;
-  }
+ 
 }
