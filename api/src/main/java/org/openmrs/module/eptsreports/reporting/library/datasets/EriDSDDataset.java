@@ -206,10 +206,7 @@ public class EriDSDDataset extends BaseDataSet {
         "DSD FR Total",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "FRT",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWithNextConsultationScheduled175To190Days(),
-                    mappings)),
+                "FRT", EptsReportUtils.map(eriDSDCohortQueries.getN2(), mappings)),
             mappings),
         "");
     dsd.addColumn(
@@ -251,11 +248,7 @@ public class EriDSDDataset extends BaseDataSet {
         "DSD FR Unstable subtotal",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "FRUST",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries
-                        .getPatientsWithNextConsultationScheduled175To190DaysUnstable(),
-                    mappings)),
+                "FRUST", EptsReportUtils.map(eriDSDCohortQueries.getN2(), mappings)),
             mappings),
         "");
     dsd.addColumn(
