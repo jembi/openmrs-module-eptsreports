@@ -1516,9 +1516,9 @@ public class EriDSDCohortQueries {
         tbCohortQueries.getPatientsOnTbTreatment();
 
     cd.addSearch("caStable", mapStraightThrough(caStable));
-    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m}, endDate=${endDate}, location=${location}"));
-    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding,"onOrAfter=${endDate-18m}, onOrBefore=${endDate}, location=${location}"));
-    cd.addSearch("tbTreatment", EptsReportUtils.map(tbTreatment,"startDate=${startDate}, endDate=${endDate}, location=${location}"));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding,"onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch("tbTreatment", EptsReportUtils.map(tbTreatment,"startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("caStable NOT (pregnant OR breastfeeding OR tbTreatment)");
 
@@ -1541,9 +1541,9 @@ public class EriDSDCohortQueries {
         tbCohortQueries.getPatientsOnTbTreatment();
 
     cd.addSearch("caUnstable", mapStraightThrough(caUnstable));
-    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m}, endDate=${endDate}, location=${location}"));
-    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding,"onOrAfter=${endDate-18m}, onOrBefore=${endDate}, location=${location}"));
-    cd.addSearch("tbTreatment", EptsReportUtils.map(tbTreatment,"startDate=${startDate}, endDate=${endDate}, location=${location}"));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding,"onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch("tbTreatment", EptsReportUtils.map(tbTreatment,"startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("caUnstable NOT (pregnant OR breastfeeding OR tbTreatment)");
 
