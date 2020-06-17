@@ -123,7 +123,7 @@ public class TbQueries {
         "        ON e.encounter_id = o.encounter_id " + 
         "JOIN " + 
         "  (SELECT p.patient_id, " + 
-        "          max(e.encounter_datetime) encounter_datetime " + 
+        "          max(o.obs_datetime) obs_datetime " + 
         "   FROM patient p " + 
         "   JOIN encounter e ON p.patient_id = e.patient_id " + 
         "   JOIN obs o ON e.encounter_id = o.encounter_id " + 
@@ -131,12 +131,12 @@ public class TbQueries {
         "     AND e.location_id =   :location  " + 
         "     AND e.encounter_type IN (${adultoSeguimentoEncounterTypeId}, " + 
         "                              ${arvPediatriaSeguimentoEncounterTypeId}) " + 
-        "     AND e.encounter_datetime BETWEEN   :startDate AND   :endDate " + 
+        "     AND o.obs_datetime <=  :endDate " + 
         "     AND p.voided=0 " + 
         "     AND e.voided=0 " + 
         "     AND o.voided=0 " + 
         "   GROUP BY p.patient_id) last ON p.patient_id = last.patient_id " + 
-        "AND e.encounter_datetime = last.encounter_datetime " + 
+        "AND o.obs_datetime = last.obs_datetime " + 
         "WHERE o.value_coded IN(${startDrugsConceptId},${continueRegimenConceptId}) " + 
         "  AND o.concept_id = ${tbTreatmentPlanConceptId} " + 
         "  AND e.encounter_type IN (${adultoSeguimentoEncounterTypeId},${arvPediatriaSeguimentoEncounterTypeId}) " + 
