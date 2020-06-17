@@ -1423,21 +1423,13 @@ public class EriDSDCohortQueries {
     String caMappings = "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}";
     cd.addSearch("startOrContinueCA", EptsReportUtils.map(startOrContinueCA, caMappings));
 
-    cd.addSearch(
-        "pregnant",
+   cd.addSearch(
+        "PregnantAndBreastfeedingAndOnTBTreatment",
         EptsReportUtils.map(
-            pregnant, "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "breastfeeding",
-        EptsReportUtils.map(
-            breastfeeding, "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch(
-        "tbTreatment",
-        EptsReportUtils.map(
-            tbTreatment, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
+            getPregnantAndBreastfeedingAndOnTBTreatment(),
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString(
-        "txCurr AND startOrContinueCA NOT (pregnant OR breastfeeding OR tbTreatment)");
+        "txCurr AND startOrContinueCA NOT PregnantAndBreastfeedingAndOnTBTreatment");
 
     return cd;
   }
