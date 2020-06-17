@@ -1511,7 +1511,7 @@ public class EriDSDCohortQueries {
     CohortDefinition breastfeeding =
         txNewCohortQueries.getTxNewBreastfeedingComposition();
     CohortDefinition tbTreatment =
-        tbCohortQueries.getPatientsOnTbTreatment();
+        commonCohortQueries.getPatientsOnTbTreatment();
 
     cd.addSearch("caStable", mapStraightThrough(caStable));
     cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m},endDate=${endDate},location=${location}"));
@@ -1536,7 +1536,7 @@ public class EriDSDCohortQueries {
     CohortDefinition breastfeeding =
         txNewCohortQueries.getTxNewBreastfeedingComposition();
     CohortDefinition tbTreatment =
-        tbCohortQueries.getPatientsOnTbTreatment();
+    commonCohortQueries.getPatientsOnTbTreatment();
 
     cd.addSearch("caUnstable", mapStraightThrough(caUnstable));
     cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m},endDate=${endDate},location=${location}"));
