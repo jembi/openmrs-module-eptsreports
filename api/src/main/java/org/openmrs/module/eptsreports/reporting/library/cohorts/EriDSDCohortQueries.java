@@ -1450,8 +1450,8 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Filter all patients marked in last “Clubes de Adesão (CA)” as Iniciar (I) 
-   * or Continua (C) on Ficha Clinica – Master Card
+   * N5: Filter all patients marked in last “Clubes de Adesão (CA)” as Iniciar (I) or Continua (C)
+   * on Ficha Clinica – Master Card
    *
    * @return
    */
@@ -1465,6 +1465,9 @@ public class EriDSDCohortQueries {
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort("TX_CURR", true);
     CohortDefinition startOrContinueCA = getPatientsWithStartOrContinueCA();
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
+    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition();
+    CohortDefinition tbTreatment = commonCohortQueries.getPatientsOnTbTreatment();
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("txCurr", EptsReportUtils.map(txCurr, mappings));
@@ -1472,7 +1475,21 @@ public class EriDSDCohortQueries {
     String caMappings = "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}";
     cd.addSearch("startOrContinueCA", EptsReportUtils.map(startOrContinueCA, caMappings));
 
-    cd.setCompositionString("txCurr AND startOrContinueCA");
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            pregnant, "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            breastfeeding, "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "tbTreatment",
+        EptsReportUtils.map(
+            tbTreatment, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "txCurr AND startOrContinueCA NOT (pregnant OR breastfeeding OR tbTreatment)");
 
     return cd;
   }
@@ -1511,56 +1528,6 @@ public class EriDSDCohortQueries {
     cd.addSearch("stable", mapStraightThrough(stable));
 
     cd.setCompositionString("ca NOT stable");
-
-    return cd;
-  }
-
-  @DocumentedDefinition(
-      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and stable not pregnant or breastfeeding")
-  public CohortDefinition getCAStableNonPregnantNonBreastfeeding() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition caStable = getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable();
-    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
-    CohortDefinition breastfeeding =
-        txNewCohortQueries.getTxNewBreastfeedingComposition();
-    CohortDefinition tbTreatment =
-        commonCohortQueries.getPatientsOnTbTreatment();
-
-    cd.addSearch("caStable", mapStraightThrough(caStable));
-    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding,"onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("tbTreatment", EptsReportUtils.map(tbTreatment,"startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("caStable NOT (pregnant OR breastfeeding OR tbTreatment)");
-
-    return cd;
-  }
-
-  @DocumentedDefinition(
-      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and unstable not pregnant or breastfeeding")
-  public CohortDefinition getCAUnstableNonPregnantNonBreastfeeding() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition caUnstable = getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable();
-    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
-    CohortDefinition breastfeeding =
-        txNewCohortQueries.getTxNewBreastfeedingComposition();
-    CohortDefinition tbTreatment =
-    commonCohortQueries.getPatientsOnTbTreatment();
-
-    cd.addSearch("caUnstable", mapStraightThrough(caUnstable));
-    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding,"onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("tbTreatment", EptsReportUtils.map(tbTreatment,"startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("caUnstable NOT (pregnant OR breastfeeding OR tbTreatment)");
 
     return cd;
   }
@@ -2142,30 +2109,6 @@ public class EriDSDCohortQueries {
     cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, breastfeedingMappings));
 
     cd.setCompositionString("NOT pregnant AND NOT breastfeeding");
-
-    return cd;
-  }
-
-  public CohortDefinition getPregnantAndBreastfeedingAndOnTBTreatment() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("endDate", "After Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition();
-    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
-    CohortDefinition tb = commonCohortQueries.getPatientsOnTbTreatment();
-
-    String pregnantMappings = "startDate=${endDate-9m},endDate=${endDate},location=${location}";
-    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnantMappings));
-
-    String breastfeedingMappings =
-        "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}";
-    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, breastfeedingMappings));
-
-    String tbMappings = "startDate=${startDate},endDate=${endDate},location=${location}";
-    cd.addSearch("tb", EptsReportUtils.map(tb, tbMappings));
-
-    cd.setCompositionString("pregnant OR breastfeeding OR tb");
 
     return cd;
   }
