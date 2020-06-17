@@ -2146,7 +2146,7 @@ public class EriDSDCohortQueries {
 
 	    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition();
 	    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
-	    CohortDefinition tb =hivCohortQueries.getPatientsOnTbTreatment();
+	    CohortDefinition tb =tbCohortQueries.getPatientsOnTbTreatment();
 
 	    
 
