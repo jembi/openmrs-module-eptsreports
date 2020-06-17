@@ -968,8 +968,6 @@ public class EriDSDCohortQueries {
   /**
    * N3: Get number of active patients on ART that are participating in GAAC at the end of the month
    * prior to month of results submission deadline.
-   *
-   * @return CohortDefinition
    */
   public CohortDefinition getN3() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
