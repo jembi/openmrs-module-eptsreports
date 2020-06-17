@@ -1636,7 +1636,8 @@ public class EriDSDCohortQueries {
             hivCohortQueries.getPatientsOnTbTreatment(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(1 AND 2 AND NOT (3 OR 4 OR 5 OR 6))");
+    // cd.setCompositionString("(1 AND 2 AND NOT (3 OR 4 OR 5 OR 6))");
+    cd.setCompositionString("1");
 
     return cd;
   }
