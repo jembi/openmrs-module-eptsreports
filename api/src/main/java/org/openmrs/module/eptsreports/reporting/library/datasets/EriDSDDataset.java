@@ -248,7 +248,7 @@ public class EriDSDDataset extends BaseDataSet {
         "DSD FR Unstable subtotal",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "FRUST", EptsReportUtils.map(eriDSDCohortQueries.getN2(), mappings)),
+                "FRUST", EptsReportUtils.map(eriDSDCohortQueries.getN2Unstable(), mappings)),
             mappings),
         "");
     dsd.addColumn(
