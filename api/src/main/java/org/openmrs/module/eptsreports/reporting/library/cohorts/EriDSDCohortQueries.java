@@ -1512,12 +1512,15 @@ public class EriDSDCohortQueries {
     CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
     CohortDefinition breastfeeding =
         txNewCohortQueries.getTxNewBreastfeedingComposition();
+    CohortDefinition tbTreatment =
+        tbCohortQueries.getPatientsOnTbTreatment();
 
     cd.addSearch("caStable", mapStraightThrough(caStable));
-    cd.addSearch("pregnant", mapStraightThrough(pregnant));
-    cd.addSearch("breastfeeding", mapStraightThrough(breastfeeding));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m}, endDate=${endDate}, location=${location}"));
+    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding,"onOrAfter=${endDate-18m}, onOrBefore=${endDate}, location=${location}"));
+    cd.addSearch("tbTreatment", EptsReportUtils.map(tbTreatment,"startDate=${startDate}, endDate=${endDate}, location=${location}"));
 
-    cd.setCompositionString("caStable NOT (pregnant OR breastfeeding)");
+    cd.setCompositionString("caStable NOT (pregnant OR breastfeeding OR tbTreatment)");
 
     return cd;
   }
@@ -1534,12 +1537,15 @@ public class EriDSDCohortQueries {
     CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
     CohortDefinition breastfeeding =
         txNewCohortQueries.getTxNewBreastfeedingComposition();
+    CohortDefinition tbTreatment =
+        tbCohortQueries.getPatientsOnTbTreatment();
 
     cd.addSearch("caUnstable", mapStraightThrough(caUnstable));
-    cd.addSearch("pregnant", mapStraightThrough(pregnant));
-    cd.addSearch("breastfeeding", mapStraightThrough(breastfeeding));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant,"startDate=${endDate-9m}, endDate=${endDate}, location=${location}"));
+    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding,"onOrAfter=${endDate-18m}, onOrBefore=${endDate}, location=${location}"));
+    cd.addSearch("tbTreatment", EptsReportUtils.map(tbTreatment,"startDate=${startDate}, endDate=${endDate}, location=${location}"));
 
-    cd.setCompositionString("caUnstable NOT (pregnant OR breastfeeding)");
+    cd.setCompositionString("caUnstable NOT (pregnant OR breastfeeding OR tbTreatment)");
 
     return cd;
   }
