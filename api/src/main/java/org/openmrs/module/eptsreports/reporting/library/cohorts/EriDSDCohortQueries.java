@@ -969,9 +969,9 @@ public class EriDSDCohortQueries {
    * N3: Get number of active patients on ART that are participating in GAAC at the end of the month
    * prior to month of results submission deadline.
    *
-   * @return
+   * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoAreActiveAndParticpatingInGaac() {
+  public CohortDefinition getN3() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String cohortName = "N3: Patients who are active and participating in GAAC";
 
@@ -1033,8 +1033,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "allPatientsN4Stable",
         EptsReportUtils.map(
-            getPatientsWhoAreActiveAndParticpatingInGaac(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getN3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "stablePatientsN4Stable",
         EptsReportUtils.map(
@@ -1064,8 +1063,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "allPatientsN4InGaac",
         EptsReportUtils.map(
-            getPatientsWhoAreActiveAndParticpatingInGaac(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getN3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "breastfeeding",
         EptsReportUtils.map(
@@ -1153,8 +1151,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "allPatientsN4InGaac",
         EptsReportUtils.map(
-            getPatientsWhoAreActiveAndParticpatingInGaac(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getN3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "allPatientsN4InGaac AND NOT stablePatients AND NOT pregnant AND NOT breastfeeding");
