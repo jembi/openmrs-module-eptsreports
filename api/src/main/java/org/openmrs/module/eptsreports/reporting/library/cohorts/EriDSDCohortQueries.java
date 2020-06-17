@@ -754,7 +754,7 @@ public class EriDSDCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPatientsWithNextConsultationScheduled175To190Days() {
+  public CohortDefinition getN2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String cohortName =
         "N2: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation";
@@ -844,7 +844,7 @@ public class EriDSDCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPatientsWithNextConsultationScheduled175To190DaysStable() {
+  public CohortDefinition getN2Stable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
@@ -856,7 +856,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "allPatients",
         EptsReportUtils.map(
-            getPatientsWithNextConsultationScheduled175To190Days(),
+            getN2(),
             "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "stablePatients",
@@ -875,7 +875,7 @@ public class EriDSDCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPatientsWithNextConsultationScheduled175To190DaysUnstable() {
+  public CohortDefinition getN2Unstable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
@@ -887,7 +887,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "allPatients",
         EptsReportUtils.map(
-            getPatientsWithNextConsultationScheduled175To190Days(),
+            getN2(),
             "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "breastfeeding",
@@ -936,7 +936,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "allPatients",
         EptsReportUtils.map(
-            getPatientsWithNextConsultationScheduled175To190Days(),
+            getN2(),
             "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "stablePatients",
@@ -976,7 +976,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "activeAndStableN2",
         EptsReportUtils.map(
-            getPatientsWithNextConsultationScheduled175To190DaysStable(),
+            getN2Stable(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("activeAndStableN2 AND NOT pregnant AND NOT breastfeeding");
