@@ -777,7 +777,7 @@ public class EriDSDCohortQueries {
 
     cd.addSearch(
         "nonPregnantNonBreastFeedingNonTb",
-        EptsReportUtils.map(getPatientsWhoCompletedRapidFlow(), rapidFlowMappings));
+        EptsReportUtils.map(getPregnantAndBreastfeedingAndOnTBTreatment(), rapidFlowMappings));
     cd.setCompositionString(
         "TxCurr AND (scheduledN2 OR rapidFlow) NOT (completed OR nonPregnantNonBreastFeedingNonTb)");
 
