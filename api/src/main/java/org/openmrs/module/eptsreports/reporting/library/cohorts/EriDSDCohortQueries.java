@@ -612,7 +612,7 @@ public class EriDSDCohortQueries {
     CohortDefinition completed = getPatientsWithCompletedOnQuarterlyDispensation();
     CohortDefinition pregnant =  txNewCohortQueries.getPatientsPregnantEnrolledOnART();
     CohortDefinition breastFeeding =  txNewCohortQueries.getTxNewBreastfeedingComposition();
-    CohortDefinition patientsWithTB =  hivCohortQueries.getPatientsOnTbTreatment();
+    CohortDefinition patientsWithTB =  tbCohortQueries.getPatientsOnTbTreatment();
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     String dispensationMappings =
