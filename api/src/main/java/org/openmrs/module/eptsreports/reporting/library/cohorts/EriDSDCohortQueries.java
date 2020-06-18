@@ -439,7 +439,6 @@ public class EriDSDCohortQueries {
   /**
    * D2: Number of active patients on ART Not Eligible for DSD D1
    *
-   * @return
    */
   public CohortDefinition getD2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
