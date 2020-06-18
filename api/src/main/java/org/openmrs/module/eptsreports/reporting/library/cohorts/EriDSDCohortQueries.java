@@ -144,7 +144,7 @@ public class EriDSDCohortQueries {
                     hivMetadata.getStevensJonhsonSyndromeConcept(),
                     hivMetadata.getHypersensitivityToAbcOrRailConcept(),
                     hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
-            "onOrAfter=${endDate - 6m},onOrBefore=${endDate},locationList=${location}"));
+            "onOrAfter=${endDate-6m},onOrBefore=${endDate},locationList=${location}"));
     cd.addSearch(
         "patientsWithViralLoad",
         EptsReportUtils.map(
