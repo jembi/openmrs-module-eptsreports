@@ -606,6 +606,59 @@ public class EriDSDDataset extends BaseDataSet {
                     eriDSDCohortQueries.getCAUnstableNonPregnantNonBreastfeeding(), mappings)),
             mappings),
         getChildrenColumn());
+    
+    dsd.addColumn(
+            "D9T",
+            "DSD D9 Total",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "DSD D9 Total",
+                    EptsReportUtils.map(
+                        eriDSDCohortQueries.getPatientsWhoAreActiveAndUnstable(), mappings)),
+                mappings),
+            "");
+        dsd.addColumn(
+            "D9NPNB",
+            "Non-pregnant and Non-Breastfeeding Adults (>=15)",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "D9NPNB",
+                    EptsReportUtils.map(
+                        eriDSDCohortQueries.getPatientsWhoAreNotPregnantAndNotBreastfeedingD2(),
+                        mappings)),
+                mappings),
+            "age=15+");
+        addRow(
+            dsd,
+            "D9NPNBC",
+            "Non-pregnant and Non-Breastfeeding Children  By age",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "D9NPNBC",
+                    EptsReportUtils.map(
+                        eriDSDCohortQueries.getPatientsWhoAreNotPregnantAndNotBreastfeedingD2(),
+                        mappings)),
+                mappings),
+            getChildrenColumn());
+        dsd.addColumn(
+            "D9BNP",
+            "Breastfeeding (exclude pregnant)",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "D9BNP",
+                    EptsReportUtils.map(
+                        eriDSDCohortQueries.getPatientsWhoAreBreastFeedingAndNotPregnant(), mappings)),
+                mappings),
+            "");
+        dsd.addColumn(
+            "D9PNB",
+            "Pregnant (exclude breastfeeding)",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "D9PNB",
+                    EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(), mappings)),
+                mappings),
+            "");
 
     return dsd;
   }
