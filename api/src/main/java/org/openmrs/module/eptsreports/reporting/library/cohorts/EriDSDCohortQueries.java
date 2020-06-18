@@ -507,68 +507,6 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * D2: Get patients who are breastfeeding and not pregnant
-   *
-   * @return
-   */
-  public CohortDefinition getPatientsWhoAreBreastFeedingAndNotPregnant() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    cd.setName(
-        "Patients who are breastfeeding: includes all breastfeeding patients excluding pregnant patients");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    cd.addSearch(
-        "breastfeeding",
-        EptsReportUtils.map(
-            getBreastfeedingComposition(),
-            "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch(
-        "pregnant",
-        EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
-            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "activeAndUnstable",
-        EptsReportUtils.map(
-            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("activeAndUnstable AND (breastfeeding AND NOT pregnant)");
-
-    return cd;
-  }
-
-  /**
-   * D2: Get Patients who are pregnant including those that are pregnant and breastfeeding
-   *
-   * @return
-   */
-  public CohortDefinition getPatientsWhoArePregnant() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    cd.setName("Pregnant: includes all pregnant patients");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    cd.addSearch(
-        "pregnant",
-        EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
-            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "activeAndUnstable",
-        EptsReportUtils.map(
-            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("activeAndUnstable AND pregnant");
-
-    return cd;
-  }
-
-  /**
    * N1: Number of active on ART whose next ART pick-up is schedule for 83-97 days after the date of
    * their last ART drug pick-up (Fluxo Rápido)
    *
