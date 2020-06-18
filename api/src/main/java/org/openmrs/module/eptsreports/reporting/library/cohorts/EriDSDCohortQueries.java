@@ -1608,11 +1608,11 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "N5",
         EptsReportUtils.map(
-            getN5(), "onOrBefore=${startDate},onOrAfter=${endDate},location=${location}"));
+            getN5(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "N7",
         EptsReportUtils.map(
-            getN7(), "onOrBefore=${startDate},onOrAfter=${endDate},location=${location}"));
+            getN7(), "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(N1 OR N2 OR N3 OR N4 OR N5 OR N7)");
 
