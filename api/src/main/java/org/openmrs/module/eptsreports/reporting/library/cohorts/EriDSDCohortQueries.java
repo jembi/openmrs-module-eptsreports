@@ -439,9 +439,8 @@ public class EriDSDCohortQueries {
   /**
    * D2: Number of active patients on ART Not Eligible for DSD D1
    *
-   * @return
    */
-  public CohortDefinition getPatientsWhoAreActiveAndUnstable() {
+  public CohortDefinition getD2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String cohortName =
         "All  patients  (adults  and  children)  currently  receiving  treatment (TxCurr)";
@@ -463,25 +462,13 @@ public class EriDSDCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "breastfeeding",
+        "pregnantOrBreastfeedingOrTBTreatment",
         EptsReportUtils.map(
-            txNewCohortQueries.getTxNewBreastfeedingComposition(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "pregnant",
-        EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "tbPatient",
-        EptsReportUtils.map(
-            commonCohortQueries.getPatientsOnTbTreatment(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getPregnantAndBreastfeedingAndOnTBTreatment(),
+            "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "allPatientsTxCurr AND NOT (activeAndStablePatients OR tbPatient OR breastfeeding OR pregnant)");
+        "allPatientsTxCurr AND NOT (activeAndStablePatients OR pregnantOrBreastfeedingOrTBTreatment)");
 
     return cd;
   }
@@ -512,8 +499,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "activeAndUnstable",
         EptsReportUtils.map(
-            getPatientsWhoAreActiveAndUnstable(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("activeAndUnstable AND NOT pregnant AND NOT breastfeeding");
 
@@ -521,78 +507,14 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * D2: Get patients who are breastfeeding and not pregnant
-   *
-   * @return
-   */
-  public CohortDefinition getPatientsWhoAreBreastFeedingAndNotPregnant() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    cd.setName(
-        "Patients who are breastfeeding: includes all breastfeeding patients excluding pregnant patients");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    cd.addSearch(
-        "breastfeeding",
-        EptsReportUtils.map(
-            getBreastfeedingComposition(),
-            "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch(
-        "pregnant",
-        EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
-            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "activeAndUnstable",
-        EptsReportUtils.map(
-            getPatientsWhoAreActiveAndUnstable(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("activeAndUnstable AND (breastfeeding AND NOT pregnant)");
-
-    return cd;
-  }
-
-  /**
-   * D2: Get Patients who are pregnant including those that are pregnant and breastfeeding
-   *
-   * @return
-   */
-  public CohortDefinition getPatientsWhoArePregnant() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    cd.setName("Pregnant: includes all pregnant patients");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    cd.addSearch(
-        "pregnant",
-        EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
-            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "activeAndUnstable",
-        EptsReportUtils.map(
-            getPatientsWhoAreActiveAndUnstable(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("activeAndUnstable AND pregnant");
-
-    return cd;
-  }
-
-  /**
-   * N2: Number of active on ART whose next ART pick-up is schedule for 83-97 days after the date of
+   * N1: Number of active on ART whose next ART pick-up is schedule for 83-97 days after the date of
    * their last ART drug pick-up (Fluxo Rápido)
    *
    * @return
    */
-  public CohortDefinition getPatientsWhoAreActiveWithNextPickupAs3Months() {
+  public CohortDefinition getN1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    String cohortName = "N2: Number of active, stable, patients on ART";
+    String cohortName = "N1: Number of active, stable, patients on ART";
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -602,7 +524,9 @@ public class EriDSDCohortQueries {
     CohortDefinition patientsScheduled =
         getPatientsScheduled(
             hivMetadata.getReturnVisitDateForArvDrugConcept(),
-            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()),
+            Arrays.asList(
+                hivMetadata.getARVPharmaciaEncounterType(),
+                hivMetadata.getMasterCardDrugPickupEncounterType()),
             97,
             83);
     CohortDefinition quarterly = getPatientsWithQuarterlyTypeOfDispensation();
@@ -612,20 +536,27 @@ public class EriDSDCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     String dispensationMappings =
         "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}";
+    String genericMappinggs = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     cd.addSearch("TxCurr", EptsReportUtils.map(txCurr, mappings));
     cd.addSearch("scheduled", EptsReportUtils.map(patientsScheduled, mappings));
     cd.addSearch("quarterly", EptsReportUtils.map(quarterly, dispensationMappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, dispensationMappings));
     cd.addSearch("completed", EptsReportUtils.map(completed, dispensationMappings));
+    cd.addSearch(
+        "pregnantOrBreastfeedingOrTBTreatment",
+        EptsReportUtils.map(
+            getPregnantAndBreastfeedingAndOnTBTreatment(),
+            "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("TxCurr AND (scheduled OR quarterly OR startOrContinue) NOT completed");
+    cd.setCompositionString(
+        "TxCurr AND (scheduled OR quarterly OR startOrContinue) NOT (completed OR pregnantOrBreastfeedingOrTBTreatment");
 
     return cd;
   }
 
   /**
-   * N2: Get all patients who are scheduled for the next pickup.
+   * N1: Get all patients who are scheduled for the next pickup.
    *
    * @return
    */
@@ -649,12 +580,12 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N2 STABLE: Get number of active on ART whose next ART pick-up is schedule for 83-97 days after
+   * N1 STABLE: Get number of active on ART whose next ART pick-up is schedule for 83-97 days after
    * the date of their last ART drug pick-up
    *
    * @return
    */
-  public CohortDefinition getPatientsWhoAreActiveWithNextPickupAs3MonthsAndStable() {
+  public CohortDefinition getN1AndStable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -663,9 +594,7 @@ public class EriDSDCohortQueries {
 
     cd.addSearch(
         "patientsWithNextPickupAs3Months",
-        EptsReportUtils.map(
-            getPatientsWhoAreActiveWithNextPickupAs3Months(),
-            "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getN1(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "patientsWhoAreStable",
         EptsReportUtils.map(
@@ -678,57 +607,53 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N2: Stable Patients who are Non-pregnant and Non-Breastfeeding
+   * N1: Stable Patients who are Non-pregnant and Non-Breastfeeding
    *
    * @return
    */
   public CohortDefinition getPatientsWhoAreNotPregnantAndNotBreastfeedingDTStable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("N2 Patients who are NOT pregnant and NOT breastfeeding");
+    cd.setName("N1 Patients who are NOT pregnant and NOT breastfeeding");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "activeAndStableN2",
+        "activeAndStableN1",
         EptsReportUtils.map(
-            getPatientsWhoAreActiveWithNextPickupAs3MonthsAndStable(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getN1AndStable(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "eligiblePatientsD1",
         EptsReportUtils.map(
             getAllPatientsWhoAreActiveAndStable(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("activeAndStableN2 AND eligiblePatientsD1");
+    cd.setCompositionString("activeAndStableN1 AND eligiblePatientsD1");
 
     return cd;
   }
 
   /**
-   * N2: Unstable Patients who are Non-pregnant and Non-Breastfeeding
+   * N1: Unstable Patients who are Non-pregnant and Non-Breastfeeding
    *
    * @return
    */
   public CohortDefinition getPatientsWhoAreNotPregnantAndNotBreastfeedingDTUnstable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("N2 Patients who are NOT pregnant and NOT breastfeeding");
+    cd.setName("N1 Patients who are NOT pregnant and NOT breastfeeding");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
         "patientsWithNextPickupDate",
-        EptsReportUtils.map(
-            getPatientsWhoAreActiveWithNextPickupAs3Months(),
-            "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getN1(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "patientsWhoAreStable",
         EptsReportUtils.map(
-            getPatientsWhoAreActiveWithNextPickupAs3MonthsAndStable(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getN1AndStable(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "pregnant",
         EptsReportUtils.map(
@@ -747,15 +672,15 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3 : Get the number of active patients on ART whose next clinical consultation is scheduled
+   * N2 : Get the number of active patients on ART whose next clinical consultation is scheduled
    * 175-190 days after the date of the last clinical consultation
    *
    * @return
    */
-  public CohortDefinition getPatientsWithNextConsultationScheduled175To190Days() {
+  public CohortDefinition getN2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String cohortName =
-        "N3: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation";
+        "N2: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation";
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -767,7 +692,7 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("TxCurr", EptsReportUtils.map(txCurr, mappings));
-    cd.addSearch("scheduledN3", EptsReportUtils.map(patientsScheduled, mappings));
+    cd.addSearch("scheduledN2", EptsReportUtils.map(patientsScheduled, mappings));
 
     String rapidFlowMappings =
         "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}";
@@ -775,7 +700,13 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "completed", EptsReportUtils.map(getPatientsWhoCompletedRapidFlow(), rapidFlowMappings));
 
-    cd.setCompositionString("TxCurr AND (scheduledN3 OR rapidFlow) NOT completed");
+    cd.addSearch(
+        "nonPregnantNonBreastFeedingNonTb",
+        EptsReportUtils.map(
+            getPregnantAndBreastfeedingAndOnTBTreatment(),
+            "endDate=${endDate},location=${location}"));
+    cd.setCompositionString(
+        "TxCurr AND (scheduledN2 OR rapidFlow) NOT (completed OR nonPregnantNonBreastFeedingNonTb)");
 
     return cd;
   }
@@ -818,25 +749,22 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3 STABLE: Get number of active patients on ART whose next clinical consultation is scheduled
+   * N2 STABLE: Get number of active patients on ART whose next clinical consultation is scheduled
    * 175-190 days after the date of the last clinical consultation
    *
    * @return
    */
-  public CohortDefinition getPatientsWithNextConsultationScheduled175To190DaysStable() {
+  public CohortDefinition getN2Stable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
-        "N3 STABLE: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation");
+        "N2 STABLE: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "allPatients",
-        EptsReportUtils.map(
-            getPatientsWithNextConsultationScheduled175To190Days(),
-            "endDate=${endDate},location=${location}"));
+        "allPatients", EptsReportUtils.map(getN2(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "stablePatients",
         EptsReportUtils.map(
@@ -849,25 +777,22 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3 UNSTABLE: Get number of active patients on ART whose next clinical consultation is scheduled
+   * N2 UNSTABLE: Get number of active patients on ART whose next clinical consultation is scheduled
    * 175-190 days after the date of the last clinical consultation
    *
    * @return
    */
-  public CohortDefinition getPatientsWithNextConsultationScheduled175To190DaysUnstable() {
+  public CohortDefinition getN2Unstable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
-        "N3 UNSTABLE: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation");
+        "N2 UNSTABLE: Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "allPatients",
-        EptsReportUtils.map(
-            getPatientsWithNextConsultationScheduled175To190Days(),
-            "endDate=${endDate},location=${location}"));
+        "allPatients", EptsReportUtils.map(getN2(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "breastfeeding",
         EptsReportUtils.map(
@@ -890,14 +815,14 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3: Unstable Patients who are Non-pregnant and Non-Breastfeeding
+   * N2: Unstable Patients who are Non-pregnant and Non-Breastfeeding
    *
    * @return
    */
   public CohortDefinition getPatientsWhoAreNotPregnantAndNotBreastfeedingFRUnstable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("N3 Patients who are NOT pregnant and NOT breastfeeding");
+    cd.setName("N2 Patients who are NOT pregnant and NOT breastfeeding");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -913,10 +838,7 @@ public class EriDSDCohortQueries {
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "allPatients",
-        EptsReportUtils.map(
-            getPatientsWithNextConsultationScheduled175To190Days(),
-            "endDate=${endDate},location=${location}"));
+        "allPatients", EptsReportUtils.map(getN2(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "stablePatients",
         EptsReportUtils.map(
@@ -930,14 +852,14 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N3: Stable Patients who are Non-pregnant and Non-Breastfeeding
+   * N2: Stable Patients who are Non-pregnant and Non-Breastfeeding
    *
    * @return
    */
   public CohortDefinition getPatientsWhoAreNotPregnantAndNotBreastfeedingFRStable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("N3 Patients who are NOT pregnant and NOT breastfeeding");
+    cd.setName("N2 Patients who are NOT pregnant and NOT breastfeeding");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -953,12 +875,11 @@ public class EriDSDCohortQueries {
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "activeAndStableN3",
+        "activeAndStableN2",
         EptsReportUtils.map(
-            getPatientsWithNextConsultationScheduled175To190DaysStable(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getN2Stable(), "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("activeAndStableN3 AND NOT pregnant AND NOT breastfeeding");
+    cd.setCompositionString("activeAndStableN2 AND NOT pregnant AND NOT breastfeeding");
 
     return cd;
   }
@@ -1176,7 +1097,7 @@ public class EriDSDCohortQueries {
     String cohortName = "Active patients on ART  who are in AF";
 
     cd.setName(
-        "N5: Active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in AF");
+        "Active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in AF");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1204,7 +1125,7 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Active patients on ART MasterCard who are in AF Cohort Definition Query
+   * Active patients on ART MasterCard who are in AF Cohort Definition Query
    *
    * @return
    */
@@ -1227,14 +1148,14 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Active patients on ART who are in AF and Eligible
+   * Active patients on ART who are in AF and Eligible
    *
    * @return
    */
   public CohortDefinition getPatientsOnMasterCardAFWhoAreEligible() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("N5: Active patients on ART who are in AF and Eligible");
+    cd.setName("Active patients on ART who are in AF and Eligible");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1255,14 +1176,14 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * N5: Active patients on ART who are in AF and Not Eligible
+   * Active patients on ART who are in AF and Not Eligible
    *
    * @return
    */
   public CohortDefinition getPatientsOnMasterCardAFWhoAreNotEligible() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("N5: Active patients on ART who are in AF and Not Eligible");
+    cd.setName("Active patients on ART who are in AF and Not Eligible");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1274,8 +1195,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "patientsNotEligibleD2",
         EptsReportUtils.map(
-            getPatientsWhoAreActiveAndUnstable(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("patientsNotEligibleD2 AND masterCardAndTxCurrPatients");
 
@@ -1402,9 +1322,15 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
+  /**
+   * N5: Filter all patients marked in last “Clubes de Adesão (CA)” as Iniciar (I) or Continua (C)
+   * on Ficha Clinica – Master Card
+   *
+   * @return
+   */
   @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA")
-  public CohortDefinition getPatientsWhoAreActiveAndParticipatingInAccessionClubs() {
+      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA")
+  public CohortDefinition getN5() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -1412,6 +1338,9 @@ public class EriDSDCohortQueries {
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort("TX_CURR", true);
     CohortDefinition startOrContinueCA = getPatientsWithStartOrContinueCA();
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
+    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition();
+    CohortDefinition tbTreatment = commonCohortQueries.getPatientsOnTbTreatment();
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("txCurr", EptsReportUtils.map(txCurr, mappings));
@@ -1419,20 +1348,26 @@ public class EriDSDCohortQueries {
     String caMappings = "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}";
     cd.addSearch("startOrContinueCA", EptsReportUtils.map(startOrContinueCA, caMappings));
 
-    cd.setCompositionString("txCurr AND startOrContinueCA");
+    cd.addSearch(
+        "PregnantAndBreastfeedingAndOnTBTreatment",
+        EptsReportUtils.map(
+            getPregnantAndBreastfeedingAndOnTBTreatment(),
+            "endDate=${endDate},location=${location}"));
+    cd.setCompositionString(
+        "txCurr AND startOrContinueCA NOT PregnantAndBreastfeedingAndOnTBTreatment");
 
     return cd;
   }
 
   @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and stable")
+      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and stable")
   public CohortDefinition getPatientsWhoAreActiveParticipatingInAccessionClubsAndStable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition ca = getPatientsWhoAreActiveAndParticipatingInAccessionClubs();
+    CohortDefinition ca = getN5();
     CohortDefinition stable = getPatientsWhoAreStable();
 
     cd.addSearch("ca", mapStraightThrough(ca));
@@ -1444,64 +1379,20 @@ public class EriDSDCohortQueries {
   }
 
   @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and unstable")
+      "N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and unstable")
   public CohortDefinition getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition ca = getPatientsWhoAreActiveAndParticipatingInAccessionClubs();
+    CohortDefinition ca = getN5();
     CohortDefinition stable = getPatientsWhoAreStable();
 
     cd.addSearch("ca", mapStraightThrough(ca));
     cd.addSearch("stable", mapStraightThrough(stable));
 
     cd.setCompositionString("ca NOT stable");
-
-    return cd;
-  }
-
-  @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and stable not pregnant or breastfeeding")
-  public CohortDefinition getCAStableNonPregnantNonBreastfeeding() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition caStable = getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable();
-    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
-    CohortDefinition breastfeeding =
-        txNewCohortQueries.getPatientsWhoGaveBirthWithinReportingPeriod();
-
-    cd.addSearch("caStable", mapStraightThrough(caStable));
-    cd.addSearch("pregnant", mapStraightThrough(pregnant));
-    cd.addSearch("breastfeeding", mapStraightThrough(breastfeeding));
-
-    cd.setCompositionString("caStable NOT (pregnant OR breastfeeding)");
-
-    return cd;
-  }
-
-  @DocumentedDefinition(
-      "Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in CA and unstable not pregnant or breastfeeding")
-  public CohortDefinition getCAUnstableNonPregnantNonBreastfeeding() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition caUnstable = getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable();
-    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART();
-    CohortDefinition breastfeeding =
-        txNewCohortQueries.getPatientsWhoGaveBirthWithinReportingPeriod();
-
-    cd.addSearch("caUnstable", mapStraightThrough(caUnstable));
-    cd.addSearch("pregnant", mapStraightThrough(pregnant));
-    cd.addSearch("breastfeeding", mapStraightThrough(breastfeeding));
-
-    cd.setCompositionString("caUnstable NOT (pregnant OR breastfeeding)");
 
     return cd;
   }
@@ -2091,7 +1982,7 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPregnantAndBreastfeedingAndOnTBTreatment() {
+  private CohortDefinition getPregnantAndBreastfeedingAndOnTBTreatment() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("endDate", "After Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));

@@ -84,9 +84,7 @@ public class EriDSDDataset extends BaseDataSet {
         "DSD D2 Total",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "DSD D2 Total",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWhoAreActiveAndUnstable(), mappings)),
+                "DSD D2 Total", EptsReportUtils.map(eriDSDCohortQueries.getD2(), mappings)),
             mappings),
         "");
     dsd.addColumn(
@@ -112,35 +110,13 @@ public class EriDSDDataset extends BaseDataSet {
                     mappings)),
             mappings),
         getChildrenColumn());
-    dsd.addColumn(
-        "D2BNP",
-        "Breastfeeding (exclude pregnant)",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "D2BNP",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWhoAreBreastFeedingAndNotPregnant(), mappings)),
-            mappings),
-        "");
-    dsd.addColumn(
-        "D2PNB",
-        "Pregnant (exclude breastfeeding)",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "D2PNB",
-                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(), mappings)),
-            mappings),
-        "");
 
     dsd.addColumn(
         "DTT",
         "DSD DT Total",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "DTT",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWhoAreActiveWithNextPickupAs3Months(),
-                    mappings)),
+                "DTT", EptsReportUtils.map(eriDSDCohortQueries.getN1(), mappings)),
             mappings),
         "");
     dsd.addColumn(
@@ -216,10 +192,7 @@ public class EriDSDDataset extends BaseDataSet {
         "DSD FR Total",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "FRT",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWithNextConsultationScheduled175To190Days(),
-                    mappings)),
+                "FRT", EptsReportUtils.map(eriDSDCohortQueries.getN2(), mappings)),
             mappings),
         "");
     dsd.addColumn(
@@ -261,11 +234,7 @@ public class EriDSDDataset extends BaseDataSet {
         "DSD FR Unstable subtotal",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "FRUST",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries
-                        .getPatientsWithNextConsultationScheduled175To190DaysUnstable(),
-                    mappings)),
+                "FRUST", EptsReportUtils.map(eriDSDCohortQueries.getN2Unstable(), mappings)),
             mappings),
         "");
     dsd.addColumn(
@@ -534,10 +503,7 @@ public class EriDSDDataset extends BaseDataSet {
         "DSD CA Total",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "CAT",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWhoAreActiveAndParticipatingInAccessionClubs(),
-                    mappings)),
+                "CAT", EptsReportUtils.map(eriDSDCohortQueries.getN5(), mappings)),
             mappings),
         "");
     dsd.addColumn(
@@ -559,7 +525,9 @@ public class EriDSDDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "CASNPNBA",
                 EptsReportUtils.map(
-                    eriDSDCohortQueries.getCAStableNonPregnantNonBreastfeeding(), mappings)),
+                    eriDSDCohortQueries
+                        .getPatientsWhoAreActiveParticipatingInAccessionClubsAndStable(),
+                    mappings)),
             mappings),
         "age=15+");
     addRow(
@@ -570,7 +538,9 @@ public class EriDSDDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "CASNPNBC",
                 EptsReportUtils.map(
-                    eriDSDCohortQueries.getCAStableNonPregnantNonBreastfeeding(), mappings)),
+                    eriDSDCohortQueries
+                        .getPatientsWhoAreActiveParticipatingInAccessionClubsAndStable(),
+                    mappings)),
             mappings),
         getChildrenColumn());
     dsd.addColumn(
@@ -592,7 +562,9 @@ public class EriDSDDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "CAUNPNBA",
                 EptsReportUtils.map(
-                    eriDSDCohortQueries.getCAUnstableNonPregnantNonBreastfeeding(), mappings)),
+                    eriDSDCohortQueries
+                        .getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable(),
+                    mappings)),
             mappings),
         "age=15+");
     addRow(
@@ -603,7 +575,9 @@ public class EriDSDDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "CAUNPNBC",
                 EptsReportUtils.map(
-                    eriDSDCohortQueries.getCAUnstableNonPregnantNonBreastfeeding(), mappings)),
+                    eriDSDCohortQueries
+                        .getPatientsWhoAreActiveParticipatingInAccessionClubsAndUnstable(),
+                    mappings)),
             mappings),
         getChildrenColumn());
     
