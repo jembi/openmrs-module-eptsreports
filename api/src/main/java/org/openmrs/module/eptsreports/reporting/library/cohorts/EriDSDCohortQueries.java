@@ -436,10 +436,7 @@ public class EriDSDCohortQueries {
     return sql;
   }
 
-  /**
-   * D2: Number of active patients on ART Not Eligible for DSD D1
-   *
-   */
+  /** D2: Number of active patients on ART Not Eligible for DSD D1 */
   public CohortDefinition getD2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String cohortName =
@@ -1553,10 +1550,10 @@ public class EriDSDCohortQueries {
 
   /*
    * Get number of active patients on ART who participate in at least one DSD model
-   *
+   *N8
    * @return CohortDefinition
    * */
-  public CohortDefinition getActivePatientsOnArtWhoParticipatedInAtLeastOneDsdModel() {
+  public CohortDefinition getN8() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -1592,8 +1589,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "1",
         EptsReportUtils.map(
-            getActivePatientsOnArtWhoParticipatedInAtLeastOneDsdModel(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getN8(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "2",
         EptsReportUtils.map(
@@ -1619,8 +1615,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "1",
         EptsReportUtils.map(
-            getActivePatientsOnArtWhoParticipatedInAtLeastOneDsdModel(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getN8(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "2",
         EptsReportUtils.map(

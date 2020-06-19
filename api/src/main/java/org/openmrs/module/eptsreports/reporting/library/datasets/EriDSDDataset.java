@@ -417,10 +417,7 @@ public class EriDSDDataset extends BaseDataSet {
         "Active patients on ART who participate in at least one measured DSD model N8)",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "AnyDSDModelT",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries.getActivePatientsOnArtWhoParticipatedInAtLeastOneDsdModel(),
-                    mappings)),
+                "AnyDSDModelT", EptsReportUtils.map(eriDSDCohortQueries.getN8(), mappings)),
             mappings),
         "");
     dsd.addColumn(
