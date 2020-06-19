@@ -776,9 +776,9 @@ public class TxCurrCohortQueries {
   @DocumentedDefinition(
       "Patients marked as DM on Ficha Clinica Mastercard on last Tipo de Levantamento")
   public SqlCohortDefinition getPatientsWithMonthlyTypeOfDispensation() {
-    SqlCohortDefinition patientsWithMonthlyTypeOfDispensation = new SqlCohortDefinition();
+    SqlCohortDefinition cd = new SqlCohortDefinition();
     String sqlQuery =
-        "select pp.patient_id from (select lst.patient_id, lst.encounter_datetime from (select last_encounter.patient_id, last_encounter.encounter_id, last_encounter.encounter_datetime from (select e.patient_id, e.encounter_datetime, e.encounter_id from encounter e where e.encounter_type in (${aRVPharmaciaEncounterType}, ${adultoSeguimentoEncounterType}) and e.encounter_datetime <= :onOrBefore and e.location_id = :location and e.voided=0 order by e.encounter_datetime desc, case when e.encounter_type = ${aRVPharmaciaEncounterType} then 1 else 2 end ) as last_encounter group by last_encounter.patient_id) as lst, obs o where lst.encounter_id=o.encounter_id and o.voided=0 and (( o.concept_id= ${returnVisitDateForArvDrugConcept} and timestampdiff(DAY, lst.encounter_datetime, o.value_datetime) < ${maxDays} ) or ( o.concept_id= ${typeOfDispensationConcept} and o.value_coded = ${monthlyConcept}))) as pp";
+        "select pp.patient_id from (select lst.patient_id, lst.encounter_datetime from (select last_encounter.patient_id, last_encounter.encounter_id, last_encounter.encounter_datetime from (select e.patient_id, e.encounter_datetime, e.encounter_id from encounter e where e.encounter_type in (${aRVPharmaciaEncounterType}, ${adultoSeguimentoEncounterType}) and e.encounter_datetime <= :onOrBefore and e.location_id = :location and e.voided=0 order by e.encounter_type desc, e.encounter_datetime desc ) as last_encounter group by last_encounter.patient_id) as lst, obs o where lst.encounter_id=o.encounter_id and o.voided=0 and (( o.concept_id= ${returnVisitDateForArvDrugConcept} and timestampdiff(DAY, lst.encounter_datetime, o.value_datetime) < ${maxDays} ) or ( o.concept_id= ${typeOfDispensationConcept} and o.value_coded = ${monthlyConcept}))) as pp";
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put(
@@ -796,14 +796,11 @@ public class TxCurrCohortQueries {
     valuesMap.put("monthlyConcept", hivMetadata.getMonthlyConcept().getConceptId());
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
-    patientsWithMonthlyTypeOfDispensation.setQuery(sub.replace(sqlQuery));
-    patientsWithMonthlyTypeOfDispensation.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
-    patientsWithMonthlyTypeOfDispensation.addParameter(
-        new Parameter("onOrAfter", "After Date", Date.class));
-    patientsWithMonthlyTypeOfDispensation.addParameter(
-        new Parameter("location", "Location", Location.class));
-    return patientsWithMonthlyTypeOfDispensation;
+    cd.setQuery(sub.replace(sqlQuery));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    return cd;
   }
 
   @DocumentedDefinition(
