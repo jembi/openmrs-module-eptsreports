@@ -1,9 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 public class CommonQueries {
@@ -144,43 +142,6 @@ public class CommonQueries {
             + "  AND p.voided=0 "
             + "  AND e.location_id =   :location ; "
             + "";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    String replaced = sb.replace(query);
-
-    return replaced;
-  }
-
-  /**
-   * Gets last obs with value coded before enDate
-   *
-   * @param encounterTypeId The Obs encounter Type
-   * @param question The Obs quetion concept
-   * @param answers The third value coded
-   * @return String
-   */
-  public static String getLastCodedObsBeforeDate(
-      List<Integer> encounterTypes, Integer question, List<Integer> answers) {
-
-    Map<String, String> map = new HashMap<>();
-
-    map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
-    map.put("question", String.valueOf(question));
-    map.put("answers", StringUtils.join(answers, ","));
-
-    String query =
-        "SELECT patient_id FROM ( "
-            + "  SELECT p.patient_id, max(e.encounter_datetime) datetime "
-            + "  FROM patient p "
-            + "  INNER JOIN encounter e "
-            + "  ON p.patient_id = e.patient_id "
-            + "  INNER JOIN obs o "
-            + "  ON e.encounter_id = o.encounter_id "
-            + "  WHERE e.location_id = :location AND e.encounter_type IN (${encounterTypes}) "
-            + "  AND o.concept_id = ${question} AND o.value_coded IN (${answers}) "
-            + "  AND e.encounter_datetime <= :onOrBefore  "
-            + "  AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "  GROUP BY p.patient_id ) AS last_encounter";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaced = sb.replace(query);
