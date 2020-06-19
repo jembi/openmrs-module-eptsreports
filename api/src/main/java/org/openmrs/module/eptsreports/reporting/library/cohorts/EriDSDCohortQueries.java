@@ -894,36 +894,29 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort(cohortName, true);
     CohortDefinition patientsEnrolledOnGaac = getAllPatientsEnrolledOnGaac();
     CohortDefinition startOrContinueGAAC = getPatientsWithStartOrContinueGAAC();
     CohortDefinition completedGAAC = getPatientsWhoCompletedGAAC();
 
     cd.addSearch(
-        "TxCurr", EptsReportUtils.map(txCurr, "onOrBefore=${endDate},location=${location}"));
+        "TxCurr",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTxCurrCompositionCohort(cohortName, true),
+            "onOrBefore=${endDate},location=${location}"));
+
     cd.addSearch("patientsEnrolledOnGaac", mapStraightThrough(patientsEnrolledOnGaac));
 
     String gaacMappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinueGAAC", EptsReportUtils.map(startOrContinueGAAC, gaacMappings));
+
     cd.addSearch("completedGAAC", EptsReportUtils.map(completedGAAC, gaacMappings));
     cd.addSearch(
-        "pregnant",
+        "PregnantAndBreastfeedingAndOnTBTreatment",
         EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
-            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "breastfeeding",
-        EptsReportUtils.map(
-            getBreastfeedingComposition(),
-            "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch(
-        "tbTreatment",
-        EptsReportUtils.map(
-            commonCohortQueries.getPatientsOnTbTreatment(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
+            getPregnantAndBreastfeedingAndOnTBTreatment(),
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString(
-        "TxCurr AND (patientsEnrolledOnGaac OR startOrContinueGAAC) NOT (completedGAAC OR pregnant OR breastfeeding OR tbTreatment)");
+        "TxCurr AND (patientsEnrolledOnGaac OR startOrContinueGAAC) NOT (completedGAAC OR PregnantAndBreastfeedingAndOnTBTreatment)");
 
     return cd;
   }
