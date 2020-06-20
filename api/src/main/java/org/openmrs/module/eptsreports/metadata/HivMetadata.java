@@ -990,6 +990,10 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
+  /**
+   * Concept_id 23888
+   * @return
+   */
   public Concept getSemiannualDispensation() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.semiannualConceptUuid");
