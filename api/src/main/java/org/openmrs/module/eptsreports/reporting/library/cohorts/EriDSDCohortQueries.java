@@ -436,10 +436,7 @@ public class EriDSDCohortQueries {
     return sql;
   }
 
-  /**
-   * D2: Number of active patients on ART Not Eligible for DSD D1
-   *
-   */
+  /** D2: Number of active patients on ART Not Eligible for DSD D1 */
   public CohortDefinition getD2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     String cohortName =
@@ -715,7 +712,7 @@ public class EriDSDCohortQueries {
     CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-    cd.addParameter(new Parameter("locationList", "Location", Location.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
     cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
     cd.setQuestion(hivMetadata.getRapidFlow());
@@ -1451,16 +1448,14 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-
- /**
+  /**
    * N9 : Number of active patients on ART who are on DS
    *
    * @return
    */
   public CohortDefinition getN9() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    String cohortName =
-        "N9: Number of active patients on ART who are on DS";
+    String cohortName = "N9: Number of active patients on ART who are on DS";
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -1468,7 +1463,8 @@ public class EriDSDCohortQueries {
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort(cohortName, true);
     CohortDefinition patientsScheduled = getPatientsScheduled175to190days();
-    CohortDefinition semestralDispensation = getPatientsWithStartOrContinueOnSemestralDispensation();
+    CohortDefinition semestralDispensation =
+        getPatientsWithStartOrContinueOnSemestralDispensation();
     CohortDefinition semestral = getPatientsWithSemestralTypeOfDispensation();
 
     String mappings = "onOrBefore=${endDate},location=${location}";
@@ -1477,8 +1473,7 @@ public class EriDSDCohortQueries {
     cd.addSearch("semestral", EptsReportUtils.map(semestral, mappings));
 
     cd.addSearch("semestralDispensation", EptsReportUtils.map(semestralDispensation, mappings));
-    cd.addSearch(
-        "completed", EptsReportUtils.map(getPatientsWhoCompletedRapidFlow(), mappings));
+    cd.addSearch("completed", EptsReportUtils.map(getPatientsWhoCompletedRapidFlow(), mappings));
 
     cd.addSearch(
         "nonPregnantNonBreastFeedingNonTb",
@@ -1504,7 +1499,7 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-   /**
+  /**
    * N9 STABLE: Number of active patients on ART who are on DS
    *
    * @return
@@ -1512,8 +1507,7 @@ public class EriDSDCohortQueries {
   public CohortDefinition getN9Stable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName(
-        "N9 STABLE: Number of active patients on ART who are on DS");
+    cd.setName("N9 STABLE: Number of active patients on ART who are on DS");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1539,8 +1533,7 @@ public class EriDSDCohortQueries {
   public CohortDefinition getN9Unstable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName(
-        "N9 UNSTABLE: Number of active patients on ART who are on DS");
+    cd.setName("N9 UNSTABLE: Number of active patients on ART who are on DS");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1649,7 +1642,6 @@ public class EriDSDCohortQueries {
     cd.addValue(hivMetadata.getSemiannualDispensation());
     return cd;
   }
-
 
   /**
    * Get Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment)
