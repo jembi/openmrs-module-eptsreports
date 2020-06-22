@@ -792,8 +792,9 @@ public class EriDSDCohortQueries {
 
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        CommonQueries.getLastCodedObsBeforeDate(
+    cd.setName("Patients who are completed for their rapid flow");
+    cd.setQuery(    
+        GenderCohortQueries.getLastCodedObsBeforeDate(
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
             hivMetadata.getRapidFlow().getConceptId(),
             Arrays.asList(hivMetadata.getCompletedConcept().getConceptId())));
@@ -805,8 +806,9 @@ public class EriDSDCohortQueries {
 
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setName("Patients who marked start or continue rapid flow");
     cd.setQuery(
-        CommonQueries.getLastCodedObsBeforeDate(
+        GenderCohortQueries.getLastCodedObsBeforeDate(
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
             hivMetadata.getRapidFlow().getConceptId(),
             Arrays.asList(
