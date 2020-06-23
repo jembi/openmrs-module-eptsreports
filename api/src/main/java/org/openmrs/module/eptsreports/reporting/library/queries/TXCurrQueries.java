@@ -443,7 +443,7 @@ public class TXCurrQueries {
             + "               left join obs o2 on o2.encounter_id=q1.encounter_id and "
             + "                   o2.concept_id = %s and o2.voided=0 "
             + "               where  o2.obs_id  is null) ficha "
-            + "           INNER JOIN ( "
+            + "           UNION ( "
             + "               SELECT q2.patient_id "
             + "               from ( "
             + "                   SELECT p.patient_id, "
