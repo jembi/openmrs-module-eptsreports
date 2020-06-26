@@ -241,6 +241,7 @@ public class Eri2MonthsQueries {
         + "   WHERE   "
         + "   first_visit >= inicio_real.data_inicio   "
         + "   AND first_visit <= DATE_ADD(inicio_real.data_inicio,INTERVAL 33 DAY)  "
+        + "   AND first_visit < second_visit  "
         + "   AND DATE_ADD(inicio_real.data_inicio,INTERVAL 5 DAY) <= second_visit  "
         + "   AND second_visit <= DATE_ADD(inicio_real.data_inicio,INTERVAL 33 DAY)   "
         + "   GROUP  BY inicio_real.patient_id ";
