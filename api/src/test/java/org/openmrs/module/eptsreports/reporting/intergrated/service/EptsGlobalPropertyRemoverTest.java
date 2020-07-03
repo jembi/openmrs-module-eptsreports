@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.intergrated.service;
 import static org.junit.Assert.*;
 
 import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.GlobalProperty;
@@ -13,34 +12,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class EptsGlobalPropertyRemoverTest extends DefinitionsTest {
 
-	@Autowired
-	private EptsGlobalProperty eptsGlobalPropertyRemover;
+  @Autowired private EptsGlobalProperty eptsGlobalPropertyRemover;
 
-	@Before
-	public void setup() throws Exception {
-		executeDataSet("epts-globalProperty-remover-dataset.xml");
-	}
+  @Before
+  public void setup() throws Exception {
+    executeDataSet("epts-globalProperty-remover-dataset.xml");
+  }
 
-	@Test
-	public void testRemoveEptsGlobalPropertiesEntries_shouldPass() {
+  @Test
+  public void testRemoveEptsGlobalPropertiesEntries_shouldPass() {
 
-		List<GlobalProperty> remvedGlobalProperties = this.eptsGlobalPropertyRemover
-				.removeEptsGlobalPropertiesEntries("eptsreports");
+    List<GlobalProperty> remvedGlobalProperties =
+        this.eptsGlobalPropertyRemover.removeEptsGlobalPropertiesEntries("eptsreports");
 
-		assertFalse(remvedGlobalProperties.isEmpty());
-		assertEquals(48, remvedGlobalProperties.size());
+    assertFalse(remvedGlobalProperties.isEmpty());
+    assertEquals(48, remvedGlobalProperties.size());
+  }
 
-	}
+  @Test
+  public void testRemoveEptsGlobalPropertiesEntries_shouldNotRemoveAnyEntry() {
 
-	@Test
-	public void testRemoveEptsGlobalPropertiesEntries_shouldNotRemoveAnyEntry() {
+    List<GlobalProperty> remvedGlobalProperties =
+        this.eptsGlobalPropertyRemover.removeEptsGlobalPropertiesEntries("unexistant_patter");
 
-		List<GlobalProperty> remvedGlobalProperties = this.eptsGlobalPropertyRemover
-				.removeEptsGlobalPropertiesEntries("unexistant_patter");
-
-		assertTrue(remvedGlobalProperties.isEmpty());
-		assertEquals(0, remvedGlobalProperties.size());
-
-	}
-
+    assertTrue(remvedGlobalProperties.isEmpty());
+    assertEquals(0, remvedGlobalProperties.size());
+  }
 }
