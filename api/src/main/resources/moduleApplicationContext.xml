@@ -58,14 +58,6 @@
 		</property>
 	</bean>
 	
-	<!-- Add global property listeners -->
-	<bean id="eptsModuleEventListeners" parent="openmrsEventListeners">
-		<property name="globalPropertyListeners">
-			<list value-type="org.openmrs.api.GlobalPropertyListener"
-				merge="true">
-				<bean
-					class="org.openmrs.module.eptsreports.EPTSGlobalPropertyListener" />
-			</list>
-		</property>
-	</bean>
+	
+	
 </beans>

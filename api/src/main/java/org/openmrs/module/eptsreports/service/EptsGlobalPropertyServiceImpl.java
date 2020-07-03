@@ -5,10 +5,12 @@ import java.util.List;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.impl.BaseOpenmrsService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EptsGlobalPropertyImpl implements EptsGlobalProperty {
+public class EptsGlobalPropertyServiceImpl extends BaseOpenmrsService
+    implements EptsGlobalPropertyService {
 
   @Override
   public List<GlobalProperty> removeEptsGlobalPropertiesEntries(String patternName) {

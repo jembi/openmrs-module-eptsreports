@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsReportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.eptsreports.service.EptsGlobalPropertyService;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.report.manager.ReportManager;
 import org.openmrs.module.reporting.report.util.ReportUtil;
@@ -29,6 +30,10 @@ public class EptsReportInitializer {
 
   /** Initializes all EPTS reports and remove deprocated reports from database. */
   public void initializeReports() {
+
+    EptsGlobalPropertyService eptsGlobalPropertyService =
+        Context.getRegisteredComponents(EptsGlobalPropertyService.class).get(0);
+    eptsGlobalPropertyService.removeEptsGlobalPropertiesEntries("eptsreports");
     for (ReportManager reportManager : Context.getRegisteredComponents(EptsReportManager.class)) {
       if (reportManager.getClass().getAnnotation(Deprecated.class) != null) {
         // remove depricated reports
