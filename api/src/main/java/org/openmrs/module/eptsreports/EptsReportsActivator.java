@@ -20,6 +20,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.eptsreports.metadata.ConfigurableMetadataLookupException;
 import org.openmrs.module.eptsreports.reporting.EptsReportInitializer;
+import org.openmrs.module.eptsreports.service.EptsGlobalPropertyService;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
@@ -38,6 +39,9 @@ public class EptsReportsActivator extends BaseModuleActivator {
   @Override
   public void willRefreshContext() {
     log.debug("Refreshing EPTS Reports Module");
+    EptsGlobalPropertyService eptsGlobalPropertyService =
+        Context.getRegisteredComponents(EptsGlobalPropertyService.class).get(0);
+    eptsGlobalPropertyService.removeEptsGlobalPropertiesEntries("eptsreports");
   }
 
   @Override

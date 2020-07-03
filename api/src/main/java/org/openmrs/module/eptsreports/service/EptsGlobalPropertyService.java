@@ -4,7 +4,7 @@ import java.util.List;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.OpenmrsService;
 
-/** The class is used to perform some operation in the {@link GlobalProperty} data. */
+/** The class is used to perform operations in the {@link GlobalProperty} data. */
 public interface EptsGlobalPropertyService extends OpenmrsService {
 
   /**
