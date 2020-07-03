@@ -10,7 +10,7 @@ import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTes
 import org.openmrs.module.eptsreports.service.EptsGlobalProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class EptsGlobalPropertyRemoverTest extends DefinitionsTest {
+public class EptsGlobalPropertyTest extends DefinitionsTest {
 
   @Autowired private EptsGlobalProperty eptsGlobalPropertyRemover;
 
