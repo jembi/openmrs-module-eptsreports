@@ -395,89 +395,18 @@ public class TXCurrQueries {
       int returnVisitDateConcept,
       int returnVisitDateForArvDrugConcept,
       int artDatePickup) {
-    String query =
-        " SELECT ps.patient_id "
-            + "   FROM (        "
-            + "       SELECT p.patient_id "
-            + "       FROM patient p "
-            + "       WHERE  p.voided = 0 "
-            + "           AND p.patient_id NOT IN "
-            + "               (SELECT patient_id "
-            + "                   FROM encounter "
-            + "                   WHERE  encounter_type IN (%s,%s,%s) "
-            + "						  AND encounter_datetime <= :onOrBefore"
-            + "                       AND location_id = :location "
-            + "                       AND voided = 0 "
-            + "				 UNION "
-            + "               SELECT patient_id "
-            + "                   FROM encounter e"
-            + "						INNER JOIN obs o ON o.encounter_id=e.encounter_id "
-            + "                   WHERE  e.encounter_type = %s  "
-            + "                       AND e.location_id = :location "
-            + "                       AND e.voided = 0"
-            + "						  AND o.voided = 0"
-            + "						  AND o.value_datetime <= :onOrBefore  "
-            + "						  AND o.concept_id = %s) "
-            + "       UNION "
-            + "       Select tabela.patient_id "
-            + "       from ( "
-            + "           SELECT q1.patient_id "
-            + "           from "
-            + "               ( "
-            + "               SELECT p.patient_id, "
-            + "                   Max(e.encounter_datetime) as max_enc_datetime, Max(e.encounter_id) AS encounter_id "
-            + "               FROM patient p "
-            + "                   INNER JOIN encounter e "
-            + "                   ON e.patient_id = p.patient_id "
-            + "                   INNER JOIN obs o "
-            + "                   ON o.encounter_id = e.encounter_id "
-            + "               WHERE  p.voided = 0 "
-            + "                   AND e.voided = 0 "
-            + "                   AND o.voided = 0 "
-            + "                   AND e.encounter_type IN (%s,%s) "
-            + "                   and e.encounter_datetime <= :onOrBefore "
-            + "                   AND e.location_id = :location "
-            + "               GROUP  BY p.patient_id ) q1 "
-            + "               left join obs o2 on o2.encounter_id=q1.encounter_id and "
-            + "                   o2.concept_id = %s and o2.voided=0 "
-            + "               where  o2.obs_id  is null "
-            + "           UNION  "
-            + "               SELECT q2.patient_id "
-            + "               from ( "
-            + "                   SELECT p.patient_id, "
-            + "                       Max(e.encounter_datetime) as max_enc_datetime, Max(e.encounter_id) AS encounter_id "
-            + "                   FROM patient p "
-            + "                       INNER JOIN encounter e "
-            + "                       ON e.patient_id = p.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                       ON o.encounter_id = e.encounter_id "
-            + "                   WHERE  p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND o.voided = 0 "
-            + "                       AND e.encounter_type IN (%s) "
-            + "                       and e.encounter_datetime <= :onOrBefore "
-            + "                       AND e.location_id = :location "
-            + "                   GROUP  BY p.patient_id  "
-            + "               )q2 "
-            + "               left join obs o1 on o1.encounter_id=q2.encounter_id and "
-            + "                       o1.concept_id = %s and o1.voided=0 "
-            + "               where  o1.obs_id is null "
-            + "           ) tabela "
-            + "       )ps "
-            + "       GROUP  BY ps.patient_id";
+    Map<String, Integer> map = new HashMap<>();
+    map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
+    map.put("ARVPediatriaSeguimentoEncounterType", ARVPediatriaSeguimentoEncounterType);
+    map.put("aRVPharmaciaEncounterType", aRVPharmaciaEncounterType);
+    map.put("masterCardDrugPickupEncounterType", masterCardDrugPickupEncounterType);
+    map.put("returnVisitDateConcept", returnVisitDateConcept);
+    map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
+    map.put("artDatePickup", artDatePickup);
+    String query = "";
 
-    return String.format(
-        query,
-        adultoSeguimentoEncounterType,
-        ARVPediatriaSeguimentoEncounterType,
-        aRVPharmaciaEncounterType,
-        masterCardDrugPickupEncounterType,
-        artDatePickup,
-        adultoSeguimentoEncounterType,
-        ARVPediatriaSeguimentoEncounterType,
-        returnVisitDateConcept,
-        aRVPharmaciaEncounterType,
-        returnVisitDateForArvDrugConcept);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    return stringSubstitutor.replace(query);
   }
 
   public static String getPatientWhoAfterMostRecentDateHaveDrusPickupOrConsultation(
