@@ -403,7 +403,51 @@ public class TXCurrQueries {
     map.put("returnVisitDateConcept", returnVisitDateConcept);
     map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
     map.put("artDatePickup", artDatePickup);
-    String query = "";
+    String query =
+        "SELECT pat.patient_id FROM patient pat WHERE pat.voided=0 AND pat.patient_id NOT IN( "
+            + " SELECT patient_id FROM( "
+            + " SELECT qa.patient_id FROM( "
+            + " SELECT pat.patient_id,MAX(e.encounter_datetime) AS encounter_datetime FROM patient pat "
+            + " INNER JOIN encounter e ON pat.patient_id=e.patient_id WHERE e.encounter_datetime<=:onOrBefore "
+            + " AND pat.voided=0 AND e.voided=0 AND e.location_id=:location_id AND e.encounter_type IN(${adultoSeguimentoEncounterType}) GROUP BY pat.patient_id)qa "
+            + " INNER JOIN encounter e1 ON qa.patient_id=e1.patient_id "
+            + " INNER JOIN obs o1 ON e1.encounter_id=o1.encounter_id "
+            + " WHERE qa.encounter_datetime=e1.encounter_datetime AND e1.encounter_datetime<=:onOrBefore "
+            + " AND e1.voided=0 AND e1.encounter_type IN(${adultoSeguimentoEncounterType}) AND e1.location_id=:location_id AND o1.value_datetime IS NOT NULL "
+            + " AND o1.voided=0 AND o1.concept_id IN(${returnVisitDateForArvDrugConcept}, ${returnVisitDateConcept}) AND o1.location_id = :location_id "
+            + " UNION "
+            + " SELECT qb.patient_id FROM( "
+            + " SELECT pat.patient_id,MAX(e.encounter_datetime) AS encounter_datetime FROM patient pat "
+            + " INNER JOIN encounter e ON pat.patient_id=e.patient_id WHERE e.encounter_datetime<=:onOrBefore "
+            + " AND pat.voided=0 AND e.voided=0 AND e.location_id=:location_id AND e.encounter_type IN(${ARVPediatriaSeguimentoEncounterType}) GROUP BY pat.patient_id)qb "
+            + " INNER JOIN encounter e1 ON qa.patient_id=e1.patient_id "
+            + " INNER JOIN obs o1 ON e1.encounter_id=o1.encounter_id "
+            + " WHERE qa.encounter_datetime=e1.encounter_datetime AND e1.encounter_datetime<=:onOrBefore "
+            + " AND e1.voided=0 AND e1.encounter_type IN(${${ARVPediatriaSeguimentoEncounterType}) AND e1.location_id=:location_id AND o1.value_datetime IS NOT NULL "
+            + " AND o1.voided=0 AND o1.concept_id IN(${returnVisitDateForArvDrugConcept}, ${returnVisitDateConcept}) AND o1.location_id = :location_id "
+            + " UNION "
+            + " SELECT qc.patient_id FROM( "
+            + " SELECT pat.patient_id,MAX(e.encounter_datetime) AS encounter_datetime FROM patient pat "
+            + " INNER JOIN encounter e ON pat.patient_id=e.patient_id WHERE e.encounter_datetime<=:onOrBefore "
+            + " AND pat.voided=0 AND e.voided=0 AND e.location_id=:location_id AND e.encounter_type IN(${aRVPharmaciaEncounterType}) GROUP BY pat.patient_id)qc "
+            + " INNER JOIN encounter e1 ON qa.patient_id=e1.patient_id "
+            + " INNER JOIN obs o1 ON e1.encounter_id=o1.encounter_id "
+            + " WHERE qa.encounter_datetime=e1.encounter_datetime AND e1.encounter_datetime<=:onOrBefore "
+            + " AND e1.voided=0 AND e1.encounter_type IN(${${aRVPharmaciaEncounterType}) AND e1.location_id=:location_id AND o1.value_datetime IS NOT NULL "
+            + " AND o1.voided=0 AND o1.concept_id IN(${returnVisitDateForArvDrugConcept}, ${returnVisitDateConcept}) AND o1.location_id = :location_id "
+            + " UNION "
+            + " SELECT pa.patient_id FROM patient pa "
+            + " INNER JOIN encounter en ON pa.patient_id=en.patient_id "
+            + " INNER JOIN obs ob ON en.encounter_id=ob.encounter_id "
+            + " WHERE pa.voided=0 AND en.voided=0 AND ob.voided=0 "
+            + " AND en.location_id=:location_id "
+            + " AND ob.location_id=:location_id "
+            + " AND en.encounter_type IN(${masterCardDrugPickupEncounterType}) "
+            + " AND ob.concept_id IN(${artDatePickup}) "
+            + " AND ob.value_datetime IS NOT NULL "
+            + " AND ob.value_datetime<=:onOrBefore "
+            + ")"
+            + "fn)";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     return stringSubstitutor.replace(query);
