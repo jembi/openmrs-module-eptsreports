@@ -32,6 +32,8 @@ public class Eri2MonthsCohortQueries {
 
   @Autowired private EriCohortQueries eriCohortQueries;
 
+  @Autowired private HivCohortQueries hivCohortQueries;
+
   /**
    * C
    *
@@ -118,12 +120,8 @@ public class Eri2MonthsCohortQueries {
     cd.addSearch(
         "transfers",
         EptsReportUtils.map(
-            genericCohortQueries.getPatientsBasedOnPatientStates(
-                hivMetadata.getARTProgram().getProgramId(),
-                hivMetadata
-                    .getTransferredOutToAnotherHealthFacilityWorkflowState()
-                    .getProgramWorkflowStateId()),
-            "startDate=${cohortStartDate},endDate=${reportingEndDate},location=${location}"));
+            hivCohortQueries.getPatientsTransferredOut(),
+            "onOrBefore=${reportingEndDate},location=${location}"));
     cd.setCompositionString("initiatedArt AND NOT (pickedDrugs OR dead OR transfers)");
     return cd;
   }
