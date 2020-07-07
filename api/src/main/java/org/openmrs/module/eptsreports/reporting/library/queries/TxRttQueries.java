@@ -43,8 +43,8 @@ public class TxRttQueries {
       int dateOfArtPickupConceptMasterCard) {
     String query =
         "SELECT  "
-            + "    patient_id, "
-            + "FROM "
+            + "    patient_id "
+            + " FROM "
             + "    (SELECT  "
             + "        e.encounter_id, "
             + "            p.patient_id, "
