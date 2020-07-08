@@ -1,7 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.intergrated.library;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +22,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.helper.TestsHelper;
 import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTest;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.common.DateUtil;
@@ -141,13 +144,13 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
   @Test
   public void generalSqlShouldMatchAGivenQuery() throws EvaluationException {
     assertEquals(
-        new HashSet<>(Arrays.asList(2, 6, 7, 8, 999, 432, 100, 101)),
+        new HashSet<>(Arrays.asList(2, 6, 7, 8, 999, 432, 100, 101, 372)),
         evaluateCohortDefinition(
                 genericCohortQueries.generalSql("allPatients", "select patient_id from patient"),
                 Collections.<Parameter, Object>emptyMap())
             .getMemberIds());
     assertEquals(
-        new HashSet<>(Arrays.asList(2, 6, 7, 8, 100, 101)),
+        new HashSet<>(Arrays.asList(2, 6, 7, 8, 100, 101, 372)),
         evaluateCohortDefinition(
                 genericCohortQueries.generalSql(
                     "nonVoidedPatients", "select patient_id from patient where voided = false"),
@@ -335,5 +338,17 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
                     Arrays.asList(encounterService.getEncounterType(1))),
                 parameters)
             .getMemberIds());
+  }
+
+  @Test
+  public void getStartedArtBeforeDateShouldReturnPatientsStartedArtBeforeDate()
+      throws EvaluationException {
+    Date date = DateUtil.getDateTime(2020, 7, 8);
+    CohortDefinition startedArtBeforeDate = genericCohortQueries.getStartedArtBeforeDate(false);
+    Map<Parameter, Object> params = new HashMap<>();
+    params.put(new Parameter("location", "location", Location.class), new Location(12345));
+    params.put(new Parameter("onOrBefore", "onOrBefore", Date.class), date);
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(startedArtBeforeDate, params);
+    assertThat(evaluatedCohort.getMemberIds(), contains(372));
   }
 }

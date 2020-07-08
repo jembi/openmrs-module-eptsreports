@@ -63,4 +63,20 @@
     <program_workflow program_workflow_id="2" program_id="11" concept_id="12" creator="1" date_created="2008-08-15 17:01:00.0" retired="false" changed_by="1" date_changed="2008-08-15 17:04:50.0" uuid="c67c8713-7df4-40de-96f6-dc4cce3432da"/>
     <program_workflow_state program_workflow_state_id="30" program_workflow_id="2" concept_id="777003" initial="false" terminal="true" creator="1" date_created="2019-04-30 17:04:02.0" retired="false" uuid="e938129e-248a-482a-acea-f85127251402"/>
     <patient_state patient_state_id="12" patient_program_id="13" state="30" start_date="2017-05-30" creator="1" date_created="2017-05-30 12:29:29.0" voided="false" uuid="ua89deaa-23cc-4840-92fe-63d199c37e6e"/>
+
+<!--    getStartedArtBeforeDateShouldReturnPatientsStartedArtBeforeDate-->
+    <person person_id="372" gender="M" birthdate="1980-03-18" birthdate_estimated="0" dead="0" creator="1"
+            date_created="2015-09-09 08:05:24" voided="0" uuid="a7c40965-fd2c-450f-80d1-6c5f295f9c40"
+            deathdate_estimated="0"/>
+
+    <patient patient_id="372" creator="1" date_created="2015-09-09 08:05:25" voided="0"/>
+
+    <location location_id="12345" name="Java" description="NA" address2="NA" state_province="NA" country="Ganymade"
+              creator="1" date_created="2015-08-20 18:03:30" county_district="NA" address6="NA"
+              address5="Bairro de Namicopo" retired="0" uuid="83be89c2-25b2-48b5-ae2e-f739922542e2"/>
+
+    <patient_program patient_program_id="17062" patient_id="372" program_id="11" date_enrolled="2015-02-19 00:00:00"
+                     creator="1" date_created="2017-07-17 12:06:09" voided="0"
+                     uuid="121b9c32-4164-4cd4-8d87-b69f916c6a12" location_id="12345"/>
+    <!--    -->
 </dataset>
