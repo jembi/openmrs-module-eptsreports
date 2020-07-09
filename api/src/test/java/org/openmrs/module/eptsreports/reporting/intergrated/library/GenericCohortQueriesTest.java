@@ -145,16 +145,18 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
   @Test
   public void generalSqlShouldMatchAGivenQuery() throws EvaluationException {
     assertEquals(
-        new HashSet<>(Arrays.asList(2, 6, 7, 8, 999, 432, 100, 101, 372, 11968)),
+        new HashSet<>(Arrays.asList(100, 101)),
         evaluateCohortDefinition(
-                genericCohortQueries.generalSql("allPatients", "select patient_id from patient"),
+                genericCohortQueries.generalSql(
+                    "allPatients", "select patient_id from patient where patient_id in(100, 101)"),
                 Collections.<Parameter, Object>emptyMap())
             .getMemberIds());
     assertEquals(
-        new HashSet<>(Arrays.asList(2, 6, 7, 8, 100, 101, 372, 11968)),
+        new HashSet<>(Arrays.asList(100, 101)),
         evaluateCohortDefinition(
                 genericCohortQueries.generalSql(
-                    "nonVoidedPatients", "select patient_id from patient where voided = false"),
+                    "nonVoidedPatients",
+                    "select patient_id from patient where voided = false and patient_id in(100, 101)"),
                 Collections.<Parameter, Object>emptyMap())
             .getMemberIds());
   }
