@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.intergrated.library;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -144,13 +145,13 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
   @Test
   public void generalSqlShouldMatchAGivenQuery() throws EvaluationException {
     assertEquals(
-        new HashSet<>(Arrays.asList(2, 6, 7, 8, 999, 432, 100, 101, 372)),
+        new HashSet<>(Arrays.asList(2, 6, 7, 8, 999, 432, 100, 101, 372, 11968)),
         evaluateCohortDefinition(
                 genericCohortQueries.generalSql("allPatients", "select patient_id from patient"),
                 Collections.<Parameter, Object>emptyMap())
             .getMemberIds());
     assertEquals(
-        new HashSet<>(Arrays.asList(2, 6, 7, 8, 100, 101, 372)),
+        new HashSet<>(Arrays.asList(2, 6, 7, 8, 100, 101, 372, 11968)),
         evaluateCohortDefinition(
                 genericCohortQueries.generalSql(
                     "nonVoidedPatients", "select patient_id from patient where voided = false"),
@@ -349,6 +350,22 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
     params.put(new Parameter("location", "location", Location.class), new Location(12345));
     params.put(new Parameter("onOrBefore", "onOrBefore", Date.class), date);
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(startedArtBeforeDate, params);
+    assertThat(evaluatedCohort.size(), is(1));
     assertThat(evaluatedCohort.getMemberIds(), contains(372));
+  }
+
+  @Test
+  public void getNewlyOrPreviouslyEnrolledOnARTShouldReturnNewlyEnrolledPatients()
+      throws EvaluationException {
+    Date onOrAfter = DateUtil.getDateTime(2019, 10, 21);
+    Date onOrBefore = DateUtil.getDateTime(2020, 1, 20);
+    CohortDefinition enrolledOnART = genericCohortQueries.getNewlyOrPreviouslyEnrolledOnART(true);
+    Map<Parameter, Object> params = new HashMap<>();
+    params.put(new Parameter("location", "location", Location.class), new Location(333));
+    params.put(new Parameter("onOrAfter", "onOrAfter", Date.class), onOrAfter);
+    params.put(new Parameter("onOrBefore", "onOrBefore", Date.class), onOrBefore);
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(enrolledOnART, params);
+    assertThat(evaluatedCohort.size(), is(1));
+    assertThat(evaluatedCohort.getMemberIds(), contains(11968));
   }
 }
