@@ -672,7 +672,7 @@ public class TXCurrQueries {
             + "    AND o.voided=0  "
             + " GROUP BY p.patient_id "
             + " UNION "
-            + " SELECT  p.patient_id,  e.encounter_datetime "
+            + " SELECT  p.patient_id,  o.obs_datetime "
             + " FROM patient p  "
             + "    INNER JOIN encounter e  "
             + "        ON e.patient_id=p.patient_id  "
