@@ -664,7 +664,7 @@ public class TXCurrQueries {
             + "        ON o.encounter_id=e.encounter_id  "
             + " WHERE e.encounter_type = ${adultoSeguimento} "
             + "    AND e.encounter_datetime <= :onOrBefore "
-            + "    ANe.encounter_datetimeD o.concept_id = ${stateOfStayOfArtPatient} "
+            + "    AND o.concept_id = ${stateOfStayOfArtPatient} "
             + "    AND o.value_coded=${patientHasDiedConcept}  "
             + "    AND e.location_id = :location  "
             + "    AND p.voided=0   "
