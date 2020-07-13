@@ -10,7 +10,7 @@ import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTes
 import org.openmrs.module.eptsreports.service.EptsGlobalPropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class EptsGlobalPropertyTest extends DefinitionsTest {
+public class EptsGlobalPropertyServiceTest extends DefinitionsTest {
 
   @Autowired private EptsGlobalPropertyService eptsGlobalPropertyRemover;
 
@@ -21,7 +21,7 @@ public class EptsGlobalPropertyTest extends DefinitionsTest {
   }
 
   @Test
-  public void testRemoveEptsGlobalPropertiesEntries_shouldPass() {
+  public void removeEptsGlobalPropertiesEntriesShouldRemoveGpByPrefix() {
 
     List<GlobalProperty> remvedGlobalProperties =
         this.eptsGlobalPropertyRemover.removeEptsGlobalPropertiesEntries("eptsreports");
@@ -31,7 +31,7 @@ public class EptsGlobalPropertyTest extends DefinitionsTest {
   }
 
   @Test
-  public void testRemoveEptsGlobalPropertiesEntries_shouldNotRemoveAnyEntry() {
+  public void removeEptsGlobalPropertiesEntriesShouldNotRemoveAnyEntry() {
 
     List<GlobalProperty> remvedGlobalProperties =
         this.eptsGlobalPropertyRemover.removeEptsGlobalPropertiesEntries("unexistant_patter");

@@ -1,4 +1,4 @@
-package org.openmrs.module.eptsreports.service;
+package org.openmrs.module.eptsreports.api;
 
 import java.util.List;
 import org.openmrs.GlobalProperty;
