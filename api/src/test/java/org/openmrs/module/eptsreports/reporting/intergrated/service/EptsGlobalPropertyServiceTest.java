@@ -6,8 +6,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.GlobalProperty;
+import org.openmrs.module.eptsreports.api.EptsGlobalPropertyService;
 import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTest;
-import org.openmrs.module.eptsreports.service.EptsGlobalPropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EptsGlobalPropertyServiceTest extends DefinitionsTest {

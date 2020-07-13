@@ -8,7 +8,7 @@ import org.openmrs.api.OpenmrsService;
 public interface EptsGlobalPropertyService extends OpenmrsService {
 
   /**
-   * Removes one or several {@link GlobalProperty}(s) with the has the given pattern name.
+   * Removes one or several {@link GlobalProperty}(s) with the given pattern name.
    *
    * @param patternName
    * @return removed global property(s)
