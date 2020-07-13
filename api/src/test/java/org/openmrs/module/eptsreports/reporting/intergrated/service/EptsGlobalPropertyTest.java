@@ -21,7 +21,7 @@ public class EptsGlobalPropertyTest extends DefinitionsTest {
   }
 
   @Test
-  public void testRemoveEptsGlobalPropertiesEntries_shouldPass() {
+  public void removeEptsGlobalPropertiesEntriesShouldRemoveGpByPrefix() {
 
     List<GlobalProperty> remvedGlobalProperties =
         this.eptsGlobalPropertyRemover.removeEptsGlobalPropertiesEntries("eptsreports");
