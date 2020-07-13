@@ -22,7 +22,7 @@ public class EptsGlobalPropertyServiceImpl extends BaseOpenmrsService
     List<GlobalProperty> remvedProperties = new ArrayList<>();
 
     AdministrationService administrationService = Context.getAdministrationService();
-    List<GlobalProperty> globalProperties = administrationService.getAllGlobalProperties();
+    List<GlobalProperty> globalProperties = administrationService.getGlobalPropertiesByPrefix(patternName);
 
     for (GlobalProperty gp : globalProperties) {
       if (gp.getProperty().contains(patternName)) {
