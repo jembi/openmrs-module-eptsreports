@@ -1,4 +1,4 @@
-package org.openmrs.module.eptsreports.service;
+package org.openmrs.module.eptsreports.api.impl;
 
 import java.util.ArrayList;
 import java.util.List;
