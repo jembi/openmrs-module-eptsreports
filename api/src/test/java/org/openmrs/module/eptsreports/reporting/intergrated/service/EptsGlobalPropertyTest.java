@@ -31,7 +31,7 @@ public class EptsGlobalPropertyTest extends DefinitionsTest {
   }
 
   @Test
-  public void testRemoveEptsGlobalPropertiesEntries_shouldNotRemoveAnyEntry() {
+  public void removeEptsGlobalPropertiesEntriesShouldNotRemoveAnyEntry() {
 
     List<GlobalProperty> remvedGlobalProperties =
         this.eptsGlobalPropertyRemover.removeEptsGlobalPropertiesEntries("unexistant_patter");
