@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.intergrated.library;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.api.ConceptService;
@@ -369,5 +371,21 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(enrolledOnART, params);
     assertThat(evaluatedCohort.size(), is(1));
     assertThat(evaluatedCohort.getMemberIds(), contains(11968));
+  }
+
+  @Test
+  @Ignore("Query using DATE_ADD not available in H2")
+  public void
+      getPatientsWhoToLostToFollowUpShouldReturnPatientsWithReturnVisitDateDaysBeforeEndDate()
+          throws EvaluationException {
+    int numDays = 60;
+    Date onOrBefore = DateUtil.getDateTime(2020, 1, 20);
+    CohortDefinition cd = genericCohortQueries.getPatientsWhoToLostToFollowUp(numDays);
+    Map<Parameter, Object> params = new HashMap<>();
+    params.put(new Parameter("location", "location", Location.class), new Location(456));
+    params.put(new Parameter("onOrBefore", "onOrBefore", Date.class), onOrBefore);
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, params);
+    assertThat(evaluatedCohort.getMemberIds(), hasSize(1));
+    assertThat(evaluatedCohort.getMemberIds(), contains(372));
   }
 }
