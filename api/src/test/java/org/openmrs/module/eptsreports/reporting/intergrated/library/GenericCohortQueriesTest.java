@@ -2,7 +2,6 @@ package org.openmrs.module.eptsreports.reporting.intergrated.library;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -354,7 +353,7 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
     params.put(new Parameter("location", "location", Location.class), new Location(12345));
     params.put(new Parameter("onOrBefore", "onOrBefore", Date.class), date);
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(startedArtBeforeDate, params);
-    assertThat(evaluatedCohort.size(), is(1));
+    assertThat(evaluatedCohort.getMemberIds(), hasSize(1));
     assertThat(evaluatedCohort.getMemberIds(), contains(372));
   }
 
@@ -369,7 +368,7 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
     params.put(new Parameter("onOrAfter", "onOrAfter", Date.class), onOrAfter);
     params.put(new Parameter("onOrBefore", "onOrBefore", Date.class), onOrBefore);
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(enrolledOnART, params);
-    assertThat(evaluatedCohort.size(), is(1));
+    assertThat(evaluatedCohort.getMemberIds(), hasSize(1));
     assertThat(evaluatedCohort.getMemberIds(), contains(11968));
   }
 
