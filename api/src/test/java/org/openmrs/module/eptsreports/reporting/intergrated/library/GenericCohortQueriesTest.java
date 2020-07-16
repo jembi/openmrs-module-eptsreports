@@ -345,6 +345,20 @@ public class GenericCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  public void getStartedArtOnPeriodShouldReturnPatientsStartedArtOnPeriod()
+      throws EvaluationException {
+    Date date = DateUtil.getDateTime(2020, 7, 8);
+    CohortDefinition startedArtBeforeDate = genericCohortQueries.getStartedArtOnPeriod(false,false);
+    Map<Parameter, Object> params = new HashMap<>();
+    params.put(new Parameter("location", "location", Location.class), new Location(12345));
+    params.put(new Parameter("onOrAfter", "onOrAfter", Date.class), date);
+    params.put(new Parameter("onOrBefore", "onOrBefore", Date.class), date);
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(startedArtBeforeDate, params);
+    assertThat(evaluatedCohort.getMemberIds(), hasSize(1));
+    assertThat(evaluatedCohort.getMemberIds(), contains(372));
+  }
+
+  @Test
   public void getStartedArtBeforeDateShouldReturnPatientsStartedArtBeforeDate()
       throws EvaluationException {
     Date date = DateUtil.getDateTime(2020, 7, 8);
