@@ -627,7 +627,7 @@ public class EriDSDDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "DSUNPNBA",
                 EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWhoAreNotPregnantAndNotBreastfeedingFRUnstable(),
+                    eriDSDCohortQueries.getPatientsWhoAreNotPregnantAndNotBreastfeedingDSUnstable(),
                     mappings)),
             mappings),
         "age=15+");
@@ -639,7 +639,7 @@ public class EriDSDDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "DSUNPNBC",
                 EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWhoAreNotPregnantAndNotBreastfeedingFRUnstable(),
+                    eriDSDCohortQueries.getPatientsWhoAreNotPregnantAndNotBreastfeedingDSUnstable(),
                     mappings)),
             mappings),
         getChildrenColumn());
