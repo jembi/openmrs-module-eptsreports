@@ -574,7 +574,7 @@ public class EriDSDDataset extends BaseDataSet {
         getChildrenColumn());
 
     dsd.addColumn(
-        "DS",
+        "DST",
         "DSD DS Total",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
