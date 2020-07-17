@@ -273,7 +273,7 @@ public class EriDSDCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getCD4CountAndCD4Percent2() {
+  private CohortDefinition getCD4CountAndCD4Percent2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
