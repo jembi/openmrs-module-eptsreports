@@ -306,6 +306,7 @@
 
 	<concept_name concept_id="1369" name="TRANSFERIDO DE" locale="pt" creator="1" date_created="2008-10-25 13:54:23" concept_name_id="3145" voided="0" uuid="e24e2ffa-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
+	<concept_name concept_id="1369" name="TRANSFER FROM OTHER FACILITY" locale="en" creator="1" date_created="2008-10-25 13:54:23" concept_name_id="2465" voided="0" uuid="e249fb4c-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
 <concept_name concept_id="1706" name="TRANSFERIDO PARA" locale="pt" creator="1" date_created="2008-10-25 13:54:23" concept_name_id="3140" voided="0" uuid="e24e2b72-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
@@ -325,7 +326,12 @@
 	<concept_name concept_id="1707" name="ABANDONED" locale="en" creator="1" date_created="2008-10-25 13:17:30" concept_name_id="5369" voided="0" uuid="e25e3a80-1d5f-11e0-b929-000c29ad1d07" locale_preferred="0" />
 
 	<concept_name concept_id="1366" name="PATIENT HAS DIED" locale="en" creator="1" date_created="2008-10-13 05:58:15" concept_name_id="2462" voided="0" uuid="e249f6c4-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
- 
+
+	<concept_name concept_id="16" name="FOLLOWING" locale="en" creator="1" date_created="2008-10-13 05:58:15" concept_name_id="2463" voided="0" uuid="e249f6c4-1d5f-11e0-b929-000c29ad1d08" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
+	<concept_name concept_id="14" name="NONE" locale="en" creator="1" date_created="2008-10-13 05:58:15" concept_name_id="2467" voided="0" uuid="e249f6c4-1d5f-11e0-b929-000c29ad1d09" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
+
  <concept_name concept_id="23866" name="Date of ART Pickup" locale="en" creator="1" date_created="2008-10-13 05:58:15"
                   concept_name_id="7185" voided="0" uuid="58316739-bdba-4f65-9661-ddd04e089f49"
                   concept_name_type="FULLY_SPECIFIED" locale_preferred="0"/>
@@ -343,9 +349,9 @@
 	 <program_workflow program_workflow_id="2" program_id="2" concept_id="6274" creator="1"
                       date_created="2012-02-29 10:17:25" retired="0" uuid="a59bd818-d2f0-4a9a-a2f2-0a54af4ce04e"/>
 
-	<program_workflow_state program_workflow_state_id="28" program_workflow_id="1" concept_id="1369" initial="1" terminal="0" creator="1" date_created="2013-07-24 11:45:26" retired="0" uuid="b227d4ff-2dc3-4c18-9a58-d4de8d077746" />
+	<program_workflow_state program_workflow_state_id="28" program_workflow_id="1" concept_id="1369" initial="0" terminal="0" creator="1" date_created="2013-07-24 11:45:26" retired="0" uuid="b227d4ff-2dc3-4c18-9a58-d4de8d077746" />
 
-	<program_workflow_state program_workflow_state_id="29" program_workflow_id="2" concept_id="1369" initial="1" terminal="0" creator="1" date_created="2013-07-24 11:45:49" retired="0" uuid="ef06e6df-6026-4d5a-88f9-b2c3e0495dc8" />
+	<program_workflow_state program_workflow_state_id="29" program_workflow_id="2" concept_id="1369" initial="0" terminal="0" creator="1" date_created="2013-07-24 11:45:49" retired="0" uuid="ef06e6df-6026-4d5a-88f9-b2c3e0495dc8" />
 
 	<program_workflow_state program_workflow_state_id="9" program_workflow_id="2" concept_id="1707" initial="0" terminal="0" creator="1" date_created="2012-02-29 10:20:45" retired="0" uuid="06124f77-4a49-49f8-8655-fa1fe5262936" />
 
