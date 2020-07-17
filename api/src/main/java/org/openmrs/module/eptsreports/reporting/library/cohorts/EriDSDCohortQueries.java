@@ -1200,7 +1200,6 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-
   /** Patients marked in last Dispensa Comunitaria as start or continue regimen query */
   private CohortDefinition getPatientsMarkedInLastCommunityDispense() {
     CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
@@ -1701,8 +1700,12 @@ public class EriDSDCohortQueries {
         "N7",
         EptsReportUtils.map(
             getN7(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "N9",
+        EptsReportUtils.map(
+            getN9(), "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(N1 OR N2 OR N3 OR N4 OR N5 OR N7)");
+    cd.setCompositionString("(N1 OR N2 OR N3 OR N4 OR N5 OR N7 OR N9)");
 
     return cd;
   }
@@ -1710,7 +1713,7 @@ public class EriDSDCohortQueries {
   /*
    * Get number of active patients on ART who participate in at least one DSD
    * model N8
-   * 
+   *
    * @return CohortDefinition
    */
   public CohortDefinition getN8() {
@@ -1788,8 +1791,8 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * Patients who are not pregnant 9 months before end date and not breastfeeding
-   * at 18 months before end date
+   * Patients who are not pregnant 9 months before end date and not breastfeeding at 18 months
+   * before end date
    */
   public CohortDefinition getNonPregnantAndNonBreastfeeding() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
