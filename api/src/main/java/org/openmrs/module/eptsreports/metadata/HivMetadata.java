@@ -945,6 +945,14 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
+  // Concept ID 23904
+  public Concept getLessThan839CopiesConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.lessThan839CopiesConceptUuid");
+    return getConcept(uuid);
+  }
+
   // Concept ID 23905
   public Concept getLessThan10CopiesConcept() {
     String uuid =
