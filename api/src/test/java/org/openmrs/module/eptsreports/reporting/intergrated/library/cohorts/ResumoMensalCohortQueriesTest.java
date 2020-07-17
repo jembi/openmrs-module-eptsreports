@@ -132,8 +132,7 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
     assertEquals(2, evaluatedCohort.getMemberIds().size());
-    System.out.println(evaluatedCohort.getMemberIds());
-    assertTrue(evaluatedCohort.getMemberIds().contains(41584));
+    assertTrue(evaluatedCohort.getMemberIds().contains(1003));
   }
   
   @Test
@@ -149,9 +148,8 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(3, evaluatedCohort.getMemberIds().size());
-    System.out.println(evaluatedCohort.getMemberIds());
-    assertTrue(evaluatedCohort.getMemberIds().contains(41584));
+    assertEquals(2, evaluatedCohort.getMemberIds().size());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1003));
   }
 
   @Test
@@ -169,6 +167,6 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
     assertEquals(1, evaluatedCohort.getMemberIds().size());
     System.out.println(evaluatedCohort.getMemberIds());
-    assertTrue(evaluatedCohort.getMemberIds().contains(41584));
+    assertTrue(evaluatedCohort.getMemberIds().contains(1003));
   }
 }
