@@ -763,7 +763,7 @@ public class EriDSDCohortQueries {
     cd.addSearch("completedGAAC", EptsReportUtils.map(completedGAAC, mappings));
 
     cd.setCompositionString(
-        "(patientsEnrolledOnGaac OR startOrContinueGAAC) NOT (completedGAAC OR PregnantAndBreastfeedingAndOnTBTreatment)");
+        "(patientsEnrolledOnGaac OR startOrContinueGAAC) NOT (completedGAAC)");
 
     return cd;
   }
