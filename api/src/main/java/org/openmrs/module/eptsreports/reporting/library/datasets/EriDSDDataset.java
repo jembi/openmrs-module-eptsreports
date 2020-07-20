@@ -28,9 +28,9 @@ public class EriDSDDataset extends BaseDataSet {
   private static final String N3 =
       "N3: Number of active patients on ART that are participating in GAAC at the end of the month prior to month of results submission deadline.";
 
-
-      "N8: Number of active patients on ART who participate in at least one DSD";
   private static final String N8 =
+      "N8: Number of active patients on ART who participate in at least one DSD";
+
   @Autowired private EriDSDCohortQueries eriDSDCohortQueries;
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
   @Autowired private EptsCommonDimension eptsCommonDimension;
