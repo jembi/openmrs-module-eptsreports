@@ -1646,7 +1646,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "2",
         EptsReportUtils.map(
-            getPatientsWhoAreStable(),
+            getD1(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(1 AND 2)");
@@ -1672,7 +1672,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "2",
         EptsReportUtils.map(
-            getPatientsWhoAreStable(),
+            getD1(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(1 AND NOT 2)");
