@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTest;
@@ -34,7 +35,7 @@ public class TxRttCohortQueriesTest extends DefinitionsTest {
     setLocation(new Location(1));
   }
 
-  @Test
+  @Ignore
   public void getPatientsPregnantEnrolledOnARTShouldReturnPregnantPatients()
       throws EvaluationException {
     CohortDefinition cd = txRttCohortQueries.getAllPatientsWhoMissedAppointmentBy28Or30DaysButLaterHadVisit();
