@@ -35,8 +35,9 @@ public class TxRttCohortQueriesTest extends DefinitionsTest {
     setLocation(new Location(1));
   }
 
-  @Ignore
-  public void getPatientsPregnantEnrolledOnARTShouldReturnPregnantPatients()
+  @Test
+  @Ignore("Query using IF function not available in H2")
+  public void getAllPatientsWhoMissedAppointmentBy28Or30DaysButHadVisitLater()
       throws EvaluationException {
     CohortDefinition cd = txRttCohortQueries.getAllPatientsWhoMissedAppointmentBy28Or30DaysButLaterHadVisit();
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd);
