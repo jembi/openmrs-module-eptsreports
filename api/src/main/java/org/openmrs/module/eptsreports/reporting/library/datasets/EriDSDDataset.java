@@ -345,7 +345,7 @@ public class EriDSDDataset extends BaseDataSet {
         new ColumnParameters(
             "Eligible 10-14",
             "Eligible 10-14",
-            "eligible=E|pregnantBreastfeedingTb=NPNBNTB|agegetDisagsgetDisags=10-14",
+            "eligible=E|pregnantBreastfeedingTb=NPNBNTB|age=10-14",
             "06"),
         new ColumnParameters(
             "Not Eligible Sub-Total", "Not Eligible Sub-Total", "eligible=NE", "07"),
