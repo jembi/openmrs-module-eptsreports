@@ -42,7 +42,11 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.basiloscopiaUuid");
     return getConcept(uuid);
   }
-  // Concepts Id = 856
+  /**
+   * Concepts Id = 856
+   *
+   * @return
+   */
   public Concept getHivViralLoadConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.hivViralLoadConceptUuid");
@@ -72,7 +76,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id=6123
+  /**
+   * concept_id=6123
+   *
+   * @return
+   */
   public Concept getDateOfHivDiagnosisConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.dateOfHIVDiagnosis");
@@ -93,14 +101,22 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id=1255
+  /**
+   * concept_id=1255
+   *
+   * @return
+   */
   public Concept getARVPlanConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.arvPlanConceptUuid");
     return getConcept(uuid);
   }
 
-  // concept_id=1088
+  /**
+   * concept_id=1088
+   *
+   * @return
+   */
   public Concept getRegimeConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.regimeUuid");
     return getConcept(uuid);
@@ -128,8 +144,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Second line ARV concepts
-  // 6328
+  /**
+   * 6328 Second line ARV concepts
+   *
+   * @return
+   */
   public Concept getAzt3tcAbcEfvConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -137,7 +156,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // 6327
+  /**
+   * concept 6327
+   *
+   * @return
+   */
   public Concept getD4t3tcAbcEfvConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -145,7 +168,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // 6326
+  /**
+   * 6326
+   *
+   * @return
+   */
   public Concept getAzt3tcAbcLpvConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -649,13 +676,21 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept 23732 Other Model
+  /**
+   * Concept 23732 Other Model
+   *
+   * @return
+   */
   public Concept getAnotherModel() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.anotherModel");
     return getConcept(uuid);
   }
 
-  // Concept 1256 Start Drugs
+  /**
+   * Concept 1256 Start Drugs
+   *
+   * @return
+   */
   public Concept getStartDrugs() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.startDrugsConceptUuid");
@@ -669,7 +704,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept 23808 Pre-ART Start Date
+  /**
+   * Concept 23808 Pre-ART Start Date
+   *
+   * @return
+   */
   public Concept getPreArtStartDate() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.preArtStartDate");
@@ -688,7 +727,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept 6300 Date of ART Pickup
+  /**
+   * Concept 6300 Date of ART Pickup
+   *
+   * @return
+   */
   public Concept getTypeOfPatientTransferredFrom() {
     String uuid =
         Context.getAdministrationService()
@@ -696,7 +739,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 6272
+  /**
+   * concept_id = 6272
+   *
+   * @return
+   */
   public Concept getStateOfStayOfPreArtPatient() {
     String uuid =
         Context.getAdministrationService()
@@ -704,21 +751,33 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept 6273 patient state
+  /**
+   * Concept 6273 patient state
+   *
+   * @return
+   */
   public Concept getStateOfStayOfArtPatient() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.stateOfStayArtPatient");
     return getConcept(uuid);
   }
 
-  // Concept 2031 REASON PATIENT NOT FOUND BY ACTIVIST
+  /**
+   * Concept 2031 REASON PATIENT NOT FOUND BY ACTIVIST
+   *
+   * @return
+   */
   public Concept getReasonPatientNotFound() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.reasonPatientNotFound");
     return getConcept(uuid);
   }
 
-  // Concept 1383 PATIENT IS DEAD - Incorrect
+  /**
+   * Concept 1383 PATIENT IS DEAD - Incorrect
+   *
+   * @return
+   */
   public Concept getPatientIsDead() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.patientIsdeadIncorrect");
@@ -809,14 +868,16 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 23865
+  /**
+   * concept_id = 23865
+   *
+   * @return
+   */
   public Concept getArtPickupConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.artPickupConceptUuid");
     return getConcept(uuid);
   }
-
-  // Concept  1465
 
   /**
    * Last Menstruation Date Concept_id = 1465
@@ -830,7 +891,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 23739
+  /**
+   * concept_id = 23739
+   *
+   * @return
+   */
   public Concept getTypeOfDispensationConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -838,28 +903,44 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 23720
+  /**
+   * concept_id = 23720
+   *
+   * @return
+   */
   public Concept getQuarterlyConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.quarterlyConceptUuid");
     return getConcept(uuid);
   }
 
-  // concept_id = 1267
+  /**
+   * concept_id = 1267
+   *
+   * @return
+   */
   public Concept getCompletedConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.completedConceptUuid");
     return getConcept(uuid);
   }
 
-  // Concept 23748
+  /**
+   * Concept 23748
+   *
+   * @return
+   */
   public Concept getCytopeniaConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.cytopeniaConceptUuid");
     return getConcept(uuid);
   }
 
-  // Concept 23749
+  /**
+   * Concept 23749
+   *
+   * @return
+   */
   public Concept getNephrotoxicityConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -867,14 +948,22 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept 29
+  /**
+   * Concept 29
+   *
+   * @return
+   */
   public Concept getHepatitisConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.hepatitisConceptUuid");
     return getConcept(uuid);
   }
 
-  // Concept 23750 STEVENS-JOHNSON SYNDROME
+  /**
+   * Concept 23750 STEVENS-JOHNSON SYNDROME
+   *
+   * @return
+   */
   public Concept getStevensJonhsonSyndromeConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -882,7 +971,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept 23751 HYPERSENSITIVITY TO ABC/RAL
+  /**
+   * Concept 23751 HYPERSENSITIVITY TO ABC/RAL
+   *
+   * @return
+   */
   public Concept getHypersensitivityToAbcOrRailConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -890,7 +983,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept 23752 HEPATIC STEATOSIS WITH HYPERLACTATAEMIA
+  /**
+   * Concept 23752 HEPATIC STEATOSIS WITH HYPERLACTATAEMIA
+   *
+   * @return
+   */
   public Concept getHepaticSteatosisWithHyperlactataemiaConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -898,7 +995,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept Id 1113
+  /**
+   * Concept Id 1113
+   *
+   * @return
+   */
   public Concept getTBDrugStartDateConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -906,7 +1007,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept 6120
+  /**
+   * Concept 6120
+   *
+   * @return
+   */
   public Concept getTBDrugEndDateConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -914,14 +1019,22 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept ID 23761
+  /**
+   * Concept ID 23761
+   *
+   * @return
+   */
   public Concept getActiveTBConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.activeTBConceptUuid");
     return getConcept(uuid);
   }
 
-  // Concept ID 1268
+  /**
+   * Concept ID 1268
+   *
+   * @return
+   */
   public Concept getTBTreatmentPlanConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -929,7 +1042,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept ID 1306
+  /**
+   * Concept ID 1306
+   *
+   * @return
+   */
   public Concept getBeyondDetectableLimitConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -937,7 +1054,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept ID 23814
+  /**
+   * Concept ID 23814
+   *
+   * @return
+   */
   public Concept getUndetectableViralLoadConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -945,7 +1066,23 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept ID 23905
+  /**
+   * Concept ID 23904
+   *
+   * @return
+   */
+  public Concept getLessThan839CopiesConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.lessThan839CopiesConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * Concept ID 23905
+   *
+   * @return
+   */
   public Concept getLessThan10CopiesConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -953,7 +1090,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept ID 23906
+  /**
+   * Concept ID 23906
+   *
+   * @return
+   */
   public Concept getLessThan20CopiesConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -961,7 +1102,11 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept ID 23907
+  /**
+   * Concept ID 23907
+   *
+   * @return
+   */
   public Concept getLessThan40CopiesConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -969,21 +1114,33 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // Concept ID 23908
+  /**
+   * Concept ID 23908
+   *
+   * @return
+   */
   public Concept getLessThan400CopiesConcept() {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.lessThan400CopiesConceptUuid");
     return getConcept(uuid);
   }
-  // Concept ID 1067
+  /**
+   * Concept ID 1067
+   *
+   * @return
+   */
   public Concept getUnkownConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.unknownConceptUuid");
     return getConcept(uuid);
   }
 
-  // concept_id = 23720
+  /**
+   * concept_id = 23720
+   *
+   * @return
+   */
   public Concept getMonthlyConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.monthlyConceptUuid");

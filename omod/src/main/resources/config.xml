@@ -1567,7 +1567,7 @@
 		</description>
 	</globalProperty>
 	
-	<!-- 51 -->
+	<!-- 51 - ENCOUNTER TYPE NOT YET IMPLEMENTED SO ENCOUNTER TYPE 13 - LABORATORY UUID BEING REUSED-->
 	<globalProperty>
 		<property>eptsreports.fsrEncounterType</property>
 		<defaultValue>e2790f68-1d5f-11e0-b929-000c29ad1d07</defaultValue>
@@ -1884,6 +1884,14 @@
 		<defaultValue>cc8ef88c-6ab6-4404-a036-d415bc42cc1c</defaultValue>
 		<description>
 			UUID for the UNDETECTABLE VIRAL LOAD concept
+		</description>
+	</globalProperty>
+		<!-- 23904 -->
+	<globalProperty>
+		<property>eptsreports.lessThan839CopiesConceptUuid</property>
+		<defaultValue>7c8e0a9b-3606-4a72-b8cc-89566521fac2</defaultValue>
+		<description>
+			UUID for the LESS THAN 839 COPIES/ML concept
 		</description>
 	</globalProperty>
 	<!-- 23905 -->
