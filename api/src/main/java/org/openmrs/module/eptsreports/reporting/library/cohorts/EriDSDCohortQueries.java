@@ -388,7 +388,7 @@ public class EriDSDCohortQueries {
   }
 
   /** Filter patients (from 4) who are considered stable according to criteria 5: a,b,c,d,e,f */
-  public CohortDefinition getPatientsWhoAreStable() {
+  private CohortDefinition getPatientsWhoAreStable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("Patients who are stable");
@@ -444,8 +444,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsViralLoadWithin12Months(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    // cd.setCompositionString("A AND (B OR (NOT patientsWithViralLoad AND C))  AND NOT F");
-    cd.setCompositionString("F");
+    cd.setCompositionString("A AND (B OR (NOT patientsWithViralLoad AND C))  AND NOT F");
 
     return cd;
   }
@@ -469,7 +468,7 @@ public class EriDSDCohortQueries {
    * 5C One CD4 Lab result > 750 cels/mm3 or > 15% in last ART year (if patients age >=2 and <=4) or
    * One CD4 result > 200 cels/mm3 in last ART year (if patients age >=5 and <=9) 5C (i) 5C (ii)
    */
-  public CohortDefinition getCD4CountAndCD4PercentCombined() {
+  private CohortDefinition getCD4CountAndCD4PercentCombined() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("Only if VL does not exist");
@@ -627,7 +626,7 @@ public class EriDSDCohortQueries {
   }
 
   /** Patients with LAST Viral Load Result < 1000 copies/ml in last ART year (only if VL exists) */
-  public CohortDefinition getPatientsWithViralLoadLessThan1000Within12Months() {
+  private CohortDefinition getPatientsWithViralLoadLessThan1000Within12Months() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
     cd.setName(
