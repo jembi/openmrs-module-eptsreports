@@ -46,6 +46,10 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
 
     for (Integer patientId : cohort) {
       Date artStartDate = InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
+
+      if (patientId == 328) {
+        int a = 328;
+      }
       Date lastClinicalContact =
           EptsCalculationUtils.resultForPatient(lastClinicalContactMap, patientId);
 
@@ -80,38 +84,87 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
     sqlPatientDataDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> valuesMap = new HashMap<>();
-    
-    String query =
-        "SELECT lcc.patient_id, MAX(lcc.value_datetime) FROM ( "
-            + "SELECT p.patient_id,MAX(o.value_datetime)value_datetime  FROM patient p "
-            + "INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + "INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + "WHERE p.voided =0 AND e.voided=0 AND o.voided=0 AND o.concept_id=${returnVisitDateForArvDrug} AND o.value_datetime IS NOT NULL AND e.encounter_type =${aRVPharmaciaEncounterType} AND e.location_id= :location "
-            + "AND e.encounter_datetime <= :onOrBefore GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id,MAX(o.value_datetime)value_datetime  FROM patient p "
-            + "INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + "INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + "WHERE p.voided =0 AND e.voided=0 AND o.voided=0 AND o.concept_id=${returnVisitDate} AND o.value_datetime IS NOT NULL AND e.encounter_type IN (${adultoSeguimentoEncounterType},${pediatriaSeguimentoEncounterType}) AND e.location_id= :location "
-            + "AND e.encounter_datetime <= :onOrBefore GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id,DATE_ADD(MAX(o.value_datetime), INTERVAL 30 day) value_datetime  FROM patient p "
-            + "INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + "INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + "WHERE p.voided =0 AND e.voided=0 AND o.voided=0 AND o.concept_id=${artDatePickupMasterCard} AND o.value_datetime IS NOT NULL AND e.encounter_type =${masterCardDrugPickupEncounterType} AND e.location_id= :location "
-            + "AND o.value_datetime <= :onOrBefore GROUP BY p.patient_id "
-            + ")lcc GROUP BY patient_id ";
-            StringSubstitutor sub = new StringSubstitutor(valuesMap);
-            valuesMap.put("returnVisitDateForArvDrug", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-            valuesMap.put("aRVPharmaciaEncounterType", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-            valuesMap.put("returnVisitDate", hivMetadata.getReturnVisitDateConcept().getConceptId());
-            valuesMap.put("adultoSeguimentoEncounterType", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-            valuesMap.put("pediatriaSeguimentoEncounterType", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-            valuesMap.put("artDatePickupMasterCard", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-            valuesMap.put("masterCardDrugPickupEncounterType", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
-    sqlPatientDataDefinition.setSql(
-      sub.replace(query));
+    String query =
+        "SELECT patient_id, "
+            + " DATE_ADD(GREATEST(COALESCE(return_date_fila,0),COALESCE(return_date_consulta,0),COALESCE(return_date_master,0)), INTERVAL 28 DAY) AS return_date "
+            + "                           FROM (SELECT p.patient_id, "
+            + "                                        (SELECT o.value_datetime"
+            + "                                        FROM encounter e JOIN obs o ON e.encounter_id=o.encounter_id"
+            + "                                        WHERE p.patient_id=e.patient_id "
+            + "                                         AND e.location_id=:location AND e.encounter_type=${aRVPharmaciaEncounterType}"
+            + "                                         AND o.concept_id = ${returnVisitDateForArvDrug} "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0"
+            + "                                         AND e.encounter_datetime = (SELECT e.encounter_datetime AS return_date "
+            + "                                         FROM encounter e "
+            + "                                                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                         WHERE p.patient_id = e.patient_id "
+            + "                                           AND e.voided = 0 "
+            + "                                           AND o.voided = 0 "
+            + "                                           AND e.encounter_type = ${aRVPharmaciaEncounterType} "
+            + "                                           AND e.location_id = :location "
+            + "                                           AND o.concept_id = ${returnVisitDateForArvDrug} "
+            + "                                           AND e.encounter_datetime <= :onOrBefore "
+            + "                                         ORDER BY e.encounter_datetime DESC "
+            + "                                         LIMIT 1) "
+            + "                                         ORDER BY o.value_datetime DESC LIMIT 1) AS return_date_fila,  "
+            + "                                        (SELECT o.value_datetime"
+            + "                                        FROM encounter e JOIN obs o ON e.encounter_id=o.encounter_id"
+            + "                                        WHERE p.patient_id=e.patient_id "
+            + "                                         AND e.location_id=:location AND e.encounter_type IN(${adultoSeguimentoEncounterType},${pediatriaSeguimentoEncounterType})"
+            + "                                         AND o.concept_id = ${returnVisitDate} "
+            + "                                         AND e.voided = 0 "
+            + "                                         AND o.voided = 0"
+            + "                                         AND e.encounter_datetime = (SELECT e.encounter_datetime AS return_date "
+            + "                                         FROM encounter e "
+            + "                                                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                         WHERE p.patient_id = e.patient_id "
+            + "                                           AND e.voided = 0 "
+            + "                                           AND o.voided = 0 "
+            + "                                           AND e.encounter_type IN (${adultoSeguimentoEncounterType},${pediatriaSeguimentoEncounterType}) "
+            + "                                           AND e.location_id = :location "
+            + "                                           AND o.concept_id = ${returnVisitDate} "
+            + "                                           AND e.encounter_datetime <= :onOrBefore "
+            + "                                         ORDER BY e.encounter_datetime DESC "
+            + "                                         LIMIT 1) ORDER BY o.value_datetime DESC LIMIT 1) AS return_date_consulta,"
+            + "                                         (SELECT DATE_ADD(o.value_datetime, INTERVAL 30 DAY) AS return_date "
+            + "                                         FROM encounter e "
+            + "                                                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                         WHERE p.patient_id = e.patient_id "
+            + "                                           AND e.voided = 0 "
+            + "                                           AND o.voided = 0 "
+            + "                                           AND e.encounter_type = ${artDatePickupMasterCard} "
+            + "                                           AND e.location_id = :location "
+            + "                                           AND o.concept_id = ${masterCardDrugPickupEncounterType} "
+            + "                                           AND o.value_datetime <= :onOrBefore "
+            + "                                         ORDER BY o.value_datetime DESC "
+            + "                                         LIMIT 1) AS return_date_master "
+            + "                                 FROM patient p"
+            + "                                 where p.voided=0) e "
+            + "                           GROUP BY e.patient_id";
+
+    StringSubstitutor sub = new StringSubstitutor(valuesMap);
+    valuesMap.put(
+        "returnVisitDateForArvDrug",
+        hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    valuesMap.put(
+        "aRVPharmaciaEncounterType",
+        hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("returnVisitDate", hivMetadata.getReturnVisitDateConcept().getConceptId());
+    valuesMap.put(
+        "adultoSeguimentoEncounterType",
+        hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put(
+        "pediatriaSeguimentoEncounterType",
+        hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put(
+        "artDatePickupMasterCard", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    valuesMap.put(
+        "masterCardDrugPickupEncounterType",
+        hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+
+    sqlPatientDataDefinition.setSql(sub.replace(query));
 
     Map<String, Object> params = new HashMap<>();
     params.put("onOrBefore", context.getFromCache("onOrBefore"));
