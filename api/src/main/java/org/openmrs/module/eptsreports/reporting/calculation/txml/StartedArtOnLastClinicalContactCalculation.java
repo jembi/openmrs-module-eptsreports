@@ -2,7 +2,6 @@ package org.openmrs.module.eptsreports.reporting.calculation.txml;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -46,15 +45,14 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
     for (Integer patientId : cohort) {
       Date artStartDate = InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
       Date lastClinicalContact = null;
-      String randomVal = EptsCalculationUtils.resultForPatient(lastClinicalContactMap, patientId).toString();
-      if( !randomVal.equals("0")){
-        try{
-        lastClinicalContact = new SimpleDateFormat("yyyy-MM-dd").parse(randomVal);
-        } catch (Exception ex){
+      String randomVal =
+          EptsCalculationUtils.resultForPatient(lastClinicalContactMap, patientId).toString();
+      if (!randomVal.equals("0")) {
+        try {
+          lastClinicalContact = new SimpleDateFormat("yyyy-MM-dd").parse(randomVal);
+        } catch (Exception ex) {
           ex.printStackTrace();
         }
-      }else{
-        lastClinicalContact = null;
       }
 
       if (artStartDate != null && lastClinicalContact != null) {
@@ -145,7 +143,6 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
             + "                                                                                    ${pediatriaSeguimentoEncounterType})"
             + "                                                    AND        e.location_id = :location"
             + "                                                    AND        o.concept_id = ${returnVisitDate}"
-            + "                                                    AND        o.value_datetime IS NOT NULL"
             + "                                                    AND        e.encounter_datetime <= :onOrBefore"
             + "                                                    ORDER BY   e.encounter_datetime DESC limit 1)"
             + "                                ORDER BY o.value_datetime DESC limit 1) AS return_date_consulta,"

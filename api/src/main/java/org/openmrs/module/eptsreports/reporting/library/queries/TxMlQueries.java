@@ -463,6 +463,18 @@ public class TxMlQueries {
           int apoioReintegracaoParteBEncounterTypeId,
           int masterCardDrugPickupEncounterTypeId,
           int artDatePickupConceptId) {
+    Map<String, Integer> valuesMap = new HashMap<>();
+    StringSubstitutor sub = new StringSubstitutor(valuesMap);
+    valuesMap.put("returnVisitDateForArvDrug", returnVisitDateForDrugsConcept);
+    valuesMap.put("aRVPharmaciaEncounterType", pharmacyEncounterTypeId);
+    valuesMap.put("returnVisitDate", returnVisitDateConcept);
+    valuesMap.put("adultoSeguimentoEncounterType", adultoSequimentoEncounterTypeId);
+    valuesMap.put("pediatriaSeguimentoEncounterType", arvPediatriaSeguimentoEncounterTypeId);
+    valuesMap.put("artDatePickupMasterCard", artDatePickupConceptId);
+    valuesMap.put("masterCardDrugPickupEncounterType", masterCardDrugPickupEncounterTypeId);
+    valuesMap.put("homeVisitCardEncounterTypeId", homeVisitCardEncounterTypeId);
+    valuesMap.put("apoioReintegracaoParteAEncounterTypeId", apoioReintegracaoParteAEncounterTypeId);
+    valuesMap.put("apoioReintegracaoParteBEncounterTypeId", apoioReintegracaoParteBEncounterTypeId);
 
     String query =
         " SELECT pa.patient_id FROM patient pa "
@@ -472,74 +484,88 @@ public class TxMlQueries {
             + "  INNER JOIN encounter e ON pa.patient_id=e.patient_id "
             + "  INNER JOIN obs o ON pa.patient_id=o.person_id "
             + "  INNER JOIN ("
-            + "                SELECT patient_id, MAX(return_date) AS return_date "
-            + "                FROM (SELECT p.patient_id, "
-            + "                             (SELECT o.value_datetime AS return_date "
-            + "                              FROM encounter e "
-            + "                                       INNER JOIN obs o "
-            + "                                                  ON e.encounter_id = o.encounter_id "
-            + "                              WHERE p.patient_id = e.patient_id "
-            + "                                AND e.voided = 0 "
-            + "                                AND o.voided = 0 "
-            + "                                AND e.encounter_type = %d "
-            + "                                AND e.location_id = :location "
-            + "                                AND o.concept_id = %d "
-            + "                                AND e.encounter_datetime <= :endDate "
-            + "                              ORDER BY e.encounter_datetime DESC "
-            + "                              LIMIT 1) AS return_date "
-            + "                      FROM patient p "
-            + "                      UNION "
-            + "                      SELECT p.patient_id, "
-            + "                             (SELECT o.value_datetime AS return_date "
-            + "                              FROM encounter e "
-            + "                                       INNER JOIN obs o "
-            + "                                                  ON e.encounter_id = o.encounter_id "
-            + "                              WHERE p.patient_id = e.patient_id "
-            + "                                AND e.voided = 0 "
-            + "                                AND o.voided = 0 "
-            + "                                AND e.encounter_type IN (%d, %d) "
-            + "                                AND e.location_id = :location "
-            + "                                AND o.concept_id = %d "
-            + "                                AND e.encounter_datetime <= :endDate "
-            + "                              ORDER BY e.encounter_datetime DESC "
-            + "                              LIMIT 1) AS return_date "
-            + "                      FROM patient p "
-            + "                      UNION "
-            + "                      SELECT p.patient_id, "
-            + "                             (SELECT DATE_ADD(o.value_datetime, INTERVAL 30 DAY) AS return_date "
-            + "                              FROM encounter e "
-            + "                                       INNER JOIN obs o "
-            + "                                                  ON e.encounter_id = o.encounter_id "
-            + "                              WHERE p.patient_id = e.patient_id "
-            + "                                AND e.voided = 0 "
-            + "                                AND o.voided = 0 "
-            + "                                AND e.encounter_type = %d "
-            + "                                AND e.location_id = :location "
-            + "                                AND o.concept_id = %d "
-            + "                                AND o.value_datetime <= :endDate "
-            + "                              ORDER BY o.value_datetime DESC "
-            + "                              LIMIT 1) AS return_date "
-            + "                      FROM patient p) e "
-            + "                GROUP BY e.patient_id)lp ON pa.patient_id=lp.patient_id "
+            + "                SELECT   patient_id,"
+            + "                     Greatest(COALESCE(return_date_fila,0),COALESCE(return_date_consulta,0),COALESCE(return_date_master,0)) AS return_date"
+            + "                FROM     ("
+            + "                         SELECT p.patient_id,"
+            + "                         ("
+            + "                                SELECT   o.value_datetime"
+            + "                                FROM     encounter e"
+            + "                                JOIN     obs o"
+            + "                                ON       e.encounter_id=o.encounter_id"
+            + "                                WHERE    p.patient_id=e.patient_id"
+            + "                                AND      e.location_id=:location"
+            + "                                AND      e.encounter_type=${aRVPharmaciaEncounterType}"
+            + "                                AND      o.concept_id = ${returnVisitDateForArvDrug}"
+            + "                                AND      e.voided = 0"
+            + "                                AND      o.voided = 0"
+            + "                                AND      e.encounter_datetime ="
+            + "                                         ("
+            + "                                                    SELECT     e.encounter_datetime AS return_date"
+            + "                                                    FROM       encounter e"
+            + "                                                    INNER JOIN obs o"
+            + "                                                    ON         e.encounter_id = o.encounter_id"
+            + "                                                    WHERE      p.patient_id = e.patient_id"
+            + "                                                    AND        e.voided = 0"
+            + "                                                    AND        o.voided = 0"
+            + "                                                    AND        e.encounter_type = ${aRVPharmaciaEncounterType}"
+            + "                                                    AND        e.location_id = :location"
+            + "                                                    AND        o.concept_id = ${returnVisitDateForArvDrug}"
+            + "                                                    AND        e.encounter_datetime <= :onOrBefore"
+            + "                                                    ORDER BY   e.encounter_datetime DESC limit 1)"
+            + "                                ORDER BY o.value_datetime DESC limit 1) AS return_date_fila,"
+            + "                                 ("
+            + "                                SELECT   o.value_datetime"
+            + "                                FROM     encounter e"
+            + "                                JOIN     obs o"
+            + "                                ON       e.encounter_id=o.encounter_id"
+            + "                                WHERE    p.patient_id=e.patient_id"
+            + "                                AND      e.location_id=:location"
+            + "                                AND      e.encounter_type IN(${adultoSeguimentoEncounterType},"
+            + "                                                             ${pediatriaSeguimentoEncounterType})"
+            + "                                AND      o.concept_id = ${returnVisitDate}"
+            + "                                AND      e.voided = 0"
+            + "                                AND      o.voided = 0"
+            + "                                AND      e.encounter_datetime ="
+            + "                                         ("
+            + "                                                    SELECT     e.encounter_datetime AS return_date"
+            + "                                                    FROM       encounter e"
+            + "                                                    INNER JOIN obs o"
+            + "                                                    ON         e.encounter_id = o.encounter_id"
+            + "                                                    WHERE      p.patient_id = e.patient_id"
+            + "                                                    AND        e.voided = 0"
+            + "                                                    AND        o.voided = 0"
+            + "                                                    AND        e.encounter_type IN (${adultoSeguimentoEncounterType},"
+            + "                                                                                    ${pediatriaSeguimentoEncounterType})"
+            + "                                                    AND        e.location_id = :location"
+            + "                                                    AND        o.concept_id = ${returnVisitDate}"
+            + "                                                    AND        e.encounter_datetime <= :onOrBefore"
+            + "                                                    ORDER BY   e.encounter_datetime DESC limit 1)"
+            + "                                ORDER BY o.value_datetime DESC limit 1) AS return_date_consulta,"
+            + "                                 ("
+            + "                                  SELECT     date_add(o.value_datetime, interval 30 day) AS return_date"
+            + "                                  FROM       encounter e"
+            + "                                  INNER JOIN obs o"
+            + "                                  ON         e.encounter_id = o.encounter_id"
+            + "                                  WHERE      p.patient_id = e.patient_id"
+            + "                                  AND        e.voided = 0"
+            + "                                  AND        o.voided = 0"
+            + "                                  AND        e.encounter_type = ${masterCardDrugPickupEncounterType} "
+            + "                                  AND        e.location_id = :location"
+            + "                                  AND        o.concept_id = ${artDatePickupMasterCard}"
+            + "                                  AND        o.value_datetime <= :onOrBefore"
+            + "                                  ORDER BY   o.value_datetime DESC limit 1) AS return_date_master"
+            + "                FROM   patient p"
+            + "                WHERE  p.voided=0) e"
+            + " GROUP BY e.patient_id)lp ON pa.patient_id=lp.patient_id "
             + "  WHERE e.encounter_datetime >= lp.return_date AND e.encounter_datetime<=:endDate"
-            + "  AND e.encounter_type IN (%d, %d, %d) "
+            + "  AND e.encounter_type IN (${homeVisitCardEncounterTypeId},${apoioReintegracaoParteAEncounterTypeId}, ${apoioReintegracaoParteBEncounterTypeId}) "
             + "  AND e.location_id=:location  "
             + "  GROUP BY pa.patient_id"
             + ") "
             + " GROUP BY pa.patient_id";
 
-    return String.format(
-        query,
-        pharmacyEncounterTypeId,
-        returnVisitDateForDrugsConcept,
-        adultoSequimentoEncounterTypeId,
-        arvPediatriaSeguimentoEncounterTypeId,
-        returnVisitDateConcept,
-        masterCardDrugPickupEncounterTypeId,
-        artDatePickupConceptId,
-        homeVisitCardEncounterTypeId,
-        apoioReintegracaoParteAEncounterTypeId,
-        apoioReintegracaoParteBEncounterTypeId);
+    return sub.replace(query);
   }
 
   // Traced Patients (Unable to locate)
