@@ -1,9 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.calculation.txml;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -46,8 +45,17 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
 
     for (Integer patientId : cohort) {
       Date artStartDate = InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
-      Date lastClinicalContact =
-          EptsCalculationUtils.resultForPatient(lastClinicalContactMap, patientId);
+      Date lastClinicalContact = null;
+      String randomVal = EptsCalculationUtils.resultForPatient(lastClinicalContactMap, patientId).toString();
+      if( !randomVal.equals("0")){
+        try{
+        lastClinicalContact = new SimpleDateFormat("yyyy-MM-dd").parse(randomVal);
+        } catch (Exception ex){
+          ex.printStackTrace();
+        }
+      }else{
+        lastClinicalContact = null;
+      }
 
       if (artStartDate != null && lastClinicalContact != null) {
         int days = EptsCalculationUtils.daysSince(artStartDate, lastClinicalContact);
@@ -137,6 +145,7 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
             + "                                                                                    ${pediatriaSeguimentoEncounterType})"
             + "                                                    AND        e.location_id = :location"
             + "                                                    AND        o.concept_id = ${returnVisitDate}"
+            + "                                                    AND        o.value_datetime IS NOT NULL"
             + "                                                    AND        e.encounter_datetime <= :onOrBefore"
             + "                                                    ORDER BY   e.encounter_datetime DESC limit 1)"
             + "                                ORDER BY o.value_datetime DESC limit 1) AS return_date_consulta,"
@@ -148,9 +157,9 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
             + "                                  WHERE      p.patient_id = e.patient_id"
             + "                                  AND        e.voided = 0"
             + "                                  AND        o.voided = 0"
-            + "                                  AND        e.encounter_type = ${artDatePickupMasterCard}"
+            + "                                  AND        e.encounter_type = ${masterCardDrugPickupEncounterType} "
             + "                                  AND        e.location_id = :location"
-            + "                                  AND        o.concept_id = ${masterCardDrugPickupEncounterType}"
+            + "                                  AND        o.concept_id = ${artDatePickupMasterCard}"
             + "                                  AND        o.value_datetime <= :onOrBefore"
             + "                                  ORDER BY   o.value_datetime DESC limit 1) AS return_date_master"
             + "                FROM   patient p"
