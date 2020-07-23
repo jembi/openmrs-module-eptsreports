@@ -450,7 +450,7 @@ public class EriDSDCohortQueries {
 
   /**
    * 5A Patients who are on ART for at least 12 months (if patients age >=2 and <=9) or On ART for
-   * at least 6 months (if patienpublicpublicts age >=10)
+   * at least 6 months (if patients age >=10)
    */
   private CohortDefinition getPatientsWhoAreStableA() {
     CalculationCohortDefinition cd =
