@@ -22,6 +22,7 @@ import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.MappedParametersCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.common.RangeComparator;
 import org.openmrs.module.reporting.common.SetComparator;
@@ -282,20 +283,18 @@ public class EriDSDCohortQueries {
 
   /** N7 - Number of active patients on ART who are in DC */
   public CohortDefinition getN7() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("N7 - Active patients in ART marked in last DC as start or continue regimen");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition communityDispense = getPatientsMarkedInLastCommunityDispense();
-
-    String dspMappings = "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}";
-    cd.addSearch("communityDispense", EptsReportUtils.map(communityDispense, dspMappings));
-
-    cd.setCompositionString("communityDispense");
-
-    return cd;
+    CodedObsCohortDefinition cd1 = new CodedObsCohortDefinition();
+    cd1.setName("N7 - Active patients in ART marked in last DC as start or continue regimen");
+    cd1.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd1.addParameter(new Parameter("locationList", "Location", Location.class));
+    cd1.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
+    cd1.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
+    cd1.setQuestion(hivMetadata.getCommunityDispensation());
+    cd1.setOperator(SetComparator.IN);
+    cd1.addValue(hivMetadata.getStartDrugs());
+    cd1.addValue(hivMetadata.getContinueRegimenConcept());
+    return new MappedParametersCohortDefinition(
+        cd1, "endDate", "onOrBefore", "location", "locationList");
   }
 
   /** N8 - Number of active patients on ART who participate in at least one DSD model */
@@ -361,7 +360,7 @@ public class EriDSDCohortQueries {
         "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}";
     cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, breastfeedingMappings));
 
-    String tbMappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String tbMappings = "endDate=${endDate},location=${location}";
     cd.addSearch("tb", EptsReportUtils.map(tb, tbMappings));
 
     cd.setCompositionString("pregnant OR breastfeeding OR tb");
@@ -656,8 +655,12 @@ public class EriDSDCohortQueries {
     map.put("lessThan839Copies", hivMetadata.getLessThan839CopiesConcept().getConceptId());
 
     String query =
-        "SELECT vl_max.patient_id from( "
-            + "    SELECT vl.patient_id, MAX(vl.latest_date) date FROM (  "
+        " SELECT vl_max.patient_id "
+            + "FROM "
+            + "( "
+            + "SELECT vl.patient_id, MAX(vl.latest_date) max_date "
+            + "FROM "
+            + "(  "
             + "        SELECT p.patient_id, MAX(e.encounter_datetime) latest_date  "
             + "        FROM patient p  "
             + "            INNER JOIN encounter e  "
@@ -688,9 +691,12 @@ public class EriDSDCohortQueries {
             + "            AND p.voided=0  "
             + "            AND e.voided=0  "
             + "            AND o.voided=0  "
-            + "        GROUP BY p.patient_id) vl "
+            + "        GROUP BY p.patient_id"
+            + "		) vl "
+            + " GROUP BY   vl.patient_id "
+            + ") vl_max"
             + "        INNER JOIN encounter e "
-            + "            ON e.patient_id = vl.patient_id "
+            + "            ON e.patient_id = vl_max.patient_id "
             + "        INNER JOIN obs o "
             + "            ON o.encounter_id = e.encounter_id "
             + "    WHERE  e.voided=0  "
@@ -705,15 +711,15 @@ public class EriDSDCohortQueries {
             + "                                       (e.encounter_type IN (${adultoSeguimento},${pediatriaSeguimento},${misauLaboratorio},${fsr})   "
             + "                                             AND e.encounter_datetime    "
             + "                        BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate  "
-            + "                                           AND e.encounter_datetime = vl.latest_date )  "
+            + "                                           AND e.encounter_datetime = vl_max.max_date )  "
             + "                           OR   "
             + "                                       (e.encounter_type =${masterCard}  "
             + "                                             AND o.obs_datetime      "
             + "                        BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate  "
-            + "                                             AND o.obs_datetime = vl.latest_date       )  "
+            + "                                             AND o.obs_datetime = vl_max.max_date       )  "
             + "                                 )  "
             + "        "
-            + "    GROUP BY   vl.patient_id) vl_max ";
+            + "   ORDER BY vl_max.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaceQuery = sb.replace(query);
@@ -807,21 +813,6 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.setQuery(DsdQueries.getPatientsEnrolledOnGAAC());
-    return cd;
-  }
-
-  /** Patients marked in last Dispensa Comunitaria as start or continue regimen query */
-  private CohortDefinition getPatientsMarkedInLastCommunityDispense() {
-    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-    cd.addParameter(new Parameter("locationList", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-    cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-    cd.setQuestion(hivMetadata.getCommunityDispensation());
-    cd.setOperator(SetComparator.IN);
-    cd.addValue(hivMetadata.getStartDrugs());
-    cd.addValue(hivMetadata.getContinueRegimenConcept());
     return cd;
   }
 
