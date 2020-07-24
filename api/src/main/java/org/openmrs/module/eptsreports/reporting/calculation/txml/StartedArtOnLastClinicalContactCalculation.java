@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.calculation.txml;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
@@ -50,7 +51,7 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
       if (!randomVal.equals("0")) {
         try {
           lastClinicalContact = new SimpleDateFormat("yyyy-MM-dd").parse(randomVal);
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
           ex.printStackTrace();
         }
       }
