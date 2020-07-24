@@ -1182,9 +1182,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-
   /** concept_id = 2007 */
-
   public Concept getDistanceOrMoneyForTransportIsTooMuchForPatientConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -1193,9 +1191,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-
   /** concept_id = 2010 */
-
   public Concept getPatientIsDissatisfiedWithDayHospitalServicesConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -1205,7 +1201,6 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /** concept_id = 2013 */
-
   public Concept getPatientIsTreatingHivWithTraditionalMedicineConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -1215,7 +1210,6 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /** concept_id = 2017 */
-
   public Concept getOtherReasonWhyPatientMissedVisitConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -1224,7 +1218,6 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /** concept_id = 23915 */
-
   public Concept getFearOfTheProviderConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -1232,9 +1225,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-
   /** concept_id = 23946 */
-
   public Concept getAbsenceOfHealthProviderInHealthUnitConcept() {
     String uuid =
         Context.getAdministrationService()
