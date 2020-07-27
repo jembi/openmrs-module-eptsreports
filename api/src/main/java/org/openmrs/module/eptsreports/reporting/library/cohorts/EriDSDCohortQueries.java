@@ -272,7 +272,6 @@ public class EriDSDCohortQueries {
     CodedObsCohortDefinition cd1 = new CodedObsCohortDefinition();
     cd1.setName("N5 - Number of active patients on ART who are in CA");
     cd1.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd1.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
     cd1.addParameter(new Parameter("locationList", "Location", Location.class));
     cd1.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
     cd1.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
@@ -281,7 +280,7 @@ public class EriDSDCohortQueries {
     cd1.addValue(hivMetadata.getStartDrugsConcept());
     cd1.addValue(hivMetadata.getContinueRegimenConcept());
     return new MappedParametersCohortDefinition(
-        cd1, "onOrAfter", "startDate", "onOrBefore", "endDate", "locationList", "location");
+        cd1, "onOrBefore", "endDate", "locationList", "location");
   }
 
   /** N7 - Number of active patients on ART who are in DC */
