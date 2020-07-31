@@ -113,10 +113,14 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
 
     List<Encounter> lastEncounters = EptsCalculationUtils.resultForPatient(encounterMap, patientId);
     if (lastEncounters.size() > 1) {
-      for (Encounter e : lastEncounters) {
-        if (e.getEncounterId() != encounter.getEncounterId()) {
-          anotherlastEncounters.add(e);
+      try {
+        for (Encounter e : lastEncounters) {
+          if (e.getEncounterId() != encounter.getEncounterId()) {
+            anotherlastEncounters.add(e);
+          }
         }
+      } catch (ClassCastException e) {
+        // in some case it raises null pointer exception
       }
     }
     return anotherlastEncounters;
