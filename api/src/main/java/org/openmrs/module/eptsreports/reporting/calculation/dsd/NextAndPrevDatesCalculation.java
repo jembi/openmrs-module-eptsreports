@@ -70,15 +70,13 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
                 pId,
                 context);
         List<Obs> copyOfReturnVisitList = new ArrayList<>(returnVisitList);
-        for(Encounter e: anotherLastEncounters){
+        for (Encounter e : anotherLastEncounters) {
 
-            Obs obs = getLastObs(copyOfReturnVisitList, e);
-            if (obs != null) {
-              scheduled = compareAgainstBoundaries(e, obs, lowerBound, upperBound);
-            }
-
+          Obs obs = getLastObs(copyOfReturnVisitList, e);
+          if (obs != null) {
+            scheduled = compareAgainstBoundaries(e, obs, lowerBound, upperBound);
+          }
         }
-
       }
 
       // Step 2.2: identify last return visit obs record
@@ -109,18 +107,17 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
     def.setName("another encounter of type=" + encounter.getEncounterType());
     List<Encounter> anotherlastEncounters = new ArrayList<>();
 
-
     CalculationResultMap encounterMap =
         EptsCalculationUtils.evaluateWithReporting(
             def, Arrays.asList(patientId), null, null, context);
 
     List<Encounter> lastEncounters = EptsCalculationUtils.resultForPatient(encounterMap, patientId);
     if (lastEncounters.size() > 1) {
-       for(Encounter e:lastEncounters) {
-         if (e.getEncounterId() != encounter.getEncounterId()) {
-           anotherlastEncounters.add(e);
-         }
-       }
+      for (Encounter e : lastEncounters) {
+        if (e.getEncounterId() != encounter.getEncounterId()) {
+          anotherlastEncounters.add(e);
+        }
+      }
     }
     return anotherlastEncounters;
   }
