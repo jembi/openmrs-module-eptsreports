@@ -61,7 +61,7 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
       /*for another last encounter that may occur in the same date*/
       if (lastEncounter != null) {
 
-        Encounter anotherLastEncounter =
+        List<Encounter> anotherLastEncounters =
             getAnotherLastEncounter(
                 lastEncounter.getEncounterDatetime(),
                 lastEncounter.getEncounterDatetime(),
@@ -69,13 +69,16 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
                 lastEncounter,
                 pId,
                 context);
-        if (anotherLastEncounter != null) {
-          List<Obs> copyOfReturnVisitList = new ArrayList<>(returnVisitList);
-          Obs obs = getLastObs(copyOfReturnVisitList, anotherLastEncounter);
-          if (obs != null) {
-            scheduled = compareAgainstBoundaries(anotherLastEncounter, obs, lowerBound, upperBound);
-          }
+        List<Obs> copyOfReturnVisitList = new ArrayList<>(returnVisitList);
+        for(Encounter e: anotherLastEncounters){
+
+            Obs obs = getLastObs(copyOfReturnVisitList, e);
+            if (obs != null) {
+              scheduled = compareAgainstBoundaries(e, obs, lowerBound, upperBound);
+            }
+
         }
+
       }
 
       // Step 2.2: identify last return visit obs record
@@ -90,7 +93,7 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
     return map;
   }
 
-  private Encounter getAnotherLastEncounter(
+  private List<Encounter> getAnotherLastEncounter(
       Date onOrAfter,
       Date onOrBefore,
       Location location,
@@ -104,25 +107,22 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
     def.setLocationList(Arrays.asList(location));
     def.setTypes(Arrays.asList(encounter.getEncounterType()));
     def.setName("another encounter of type=" + encounter.getEncounterType());
+    List<Encounter> anotherlastEncounters = new ArrayList<>();
+
 
     CalculationResultMap encounterMap =
         EptsCalculationUtils.evaluateWithReporting(
             def, Arrays.asList(patientId), null, null, context);
 
     List<Encounter> lastEncounters = EptsCalculationUtils.resultForPatient(encounterMap, patientId);
-    if (lastEncounters.size() > 0) {
-      Encounter otherLastEncounter = null;
-      try {
-        otherLastEncounter = (Encounter) lastEncounters.get(lastEncounters.size() - 1);
-      } catch (ClassCastException e) {
-        // otherLastEncounter remains NULL
-      }
-      if (otherLastEncounter != null
-          && otherLastEncounter.getEncounterId() != encounter.getEncounterId()) {
-        return otherLastEncounter;
-      }
+    if (lastEncounters.size() > 1) {
+       for(Encounter e:lastEncounters) {
+         if (e.getEncounterId() != encounter.getEncounterId()) {
+           anotherlastEncounters.add(e);
+         }
+       }
     }
-    return null;
+    return anotherlastEncounters;
   }
 
   private Obs getLastObs(List<Obs> returnVisitList, Encounter lastEncounter) {
