@@ -107,11 +107,12 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
     def.setName("another encounter of type=" + encounter.getEncounterType());
     List<Encounter> anotherlastEncounters = new ArrayList<>();
 
-    CalculationResultMap encounterMap =
+    CalculationResultMap encountersMap =
         EptsCalculationUtils.evaluateWithReporting(
             def, Arrays.asList(patientId), null, null, context);
 
-    List<Encounter> lastEncounters = EptsCalculationUtils.resultForPatient(encounterMap, patientId);
+    ListResult listResult = (ListResult) encountersMap.get(patientId);
+    List<Encounter> lastEncounters = EptsCalculationUtils.extractResultValues(listResult);
     if (lastEncounters.size() > 1) {
       try {
         for (Encounter e : lastEncounters) {
@@ -120,7 +121,7 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
           }
         }
       } catch (ClassCastException e) {
-        // in some case it raises null pointer exception
+        // in some cases it raises ClassCastException
       }
     }
     return anotherlastEncounters;
