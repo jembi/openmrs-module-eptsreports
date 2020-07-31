@@ -12,6 +12,8 @@ import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculati
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.patient.definition.EncountersForPatientDataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -75,10 +77,17 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
           Obs obs = getLastObs(copyOfReturnVisitList, e);
           if (obs != null) {
             scheduled = compareAgainstBoundaries(e, obs, lowerBound, upperBound);
+            if (scheduled) {
+              map.put(pId, new BooleanResult(scheduled, this));
+              break;
+            }
           }
         }
       }
 
+      if (scheduled) {
+        continue;
+      }
       // Step 2.2: identify last return visit obs record
       lastReturnVisitObs = getLastObs(returnVisitList, lastEncounter);
 
@@ -174,5 +183,35 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
       }
     }
     return false;
+  }
+  // TODO
+  private CalculationResultMap getAllEncounterFromPatientResultMap(
+      Integer patientId,
+      Integer encounterType,
+      Date encounterDatetime,
+      PatientCalculationContext context) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("encounter_datetime", "encounter_datetime", Date.class));
+
+    String query =
+        "SELECT e.patient_id  "
+            + " FROM encounter e"
+            + " WHERE e.patient_id= "
+            + patientId
+            + " AND e.encounter_type = "
+            + encounterType
+            + " AND e.encounter_datetime = :encounter_datetime"
+            + " AND e.voided = 0"
+            + " AND e.location_id= :location";
+
+    sqlPatientDataDefinition.setQuery(query);
+    Map<String, Object> params = new HashMap<>();
+    params.put("location", context.getFromCache("location"));
+    params.put("encounter_datetime", encounterDatetime);
+
+    return EptsCalculationUtils.evaluateWithReporting(
+        sqlPatientDataDefinition, Arrays.asList(patientId), params, null, context);
   }
 }
