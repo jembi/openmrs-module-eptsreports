@@ -11,9 +11,6 @@ import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
-import org.openmrs.module.reporting.data.patient.definition.EncountersForPatientDataDefinition;
-import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -65,10 +62,14 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
         List<Encounter> anotherLastEncounters = new ArrayList<>();
         List<Obs> copyOfReturnVisitList = new ArrayList<>(returnVisitList);
 
-        for(Obs obs:copyOfReturnVisitList){
-          if(obs.getEncounter().getEncounterDatetime().compareTo(lastEncounter.getEncounterDatetime())==0
-            && obs.getEncounter().getEncounterId() != lastEncounter.getEncounterId()
-                  && obs.getEncounter().getEncounterType().getEncounterTypeId() == lastEncounter.getEncounterType().getEncounterTypeId()){
+        for (Obs obs : copyOfReturnVisitList) {
+          if (obs.getEncounter()
+                      .getEncounterDatetime()
+                      .compareTo(lastEncounter.getEncounterDatetime())
+                  == 0
+              && obs.getEncounter().getEncounterId() != lastEncounter.getEncounterId()
+              && obs.getEncounter().getEncounterType().getEncounterTypeId()
+                  == lastEncounter.getEncounterType().getEncounterTypeId()) {
             anotherLastEncounters.add(obs.getEncounter());
           }
         }
@@ -100,8 +101,6 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
     }
     return map;
   }
-
-
 
   private Obs getLastObs(List<Obs> returnVisitList, Encounter lastEncounter) {
     Obs lastReturnVisitObs = null;
@@ -151,5 +150,4 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
     }
     return false;
   }
-
 }
