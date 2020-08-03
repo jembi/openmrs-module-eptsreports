@@ -63,14 +63,17 @@ public class NextAndPrevDatesCalculation extends AbstractPatientCalculation {
         List<Obs> copyOfReturnVisitList = new ArrayList<>(returnVisitList);
 
         for (Obs obs : copyOfReturnVisitList) {
-          if (obs.getEncounter()
-                      .getEncounterDatetime()
-                      .compareTo(lastEncounter.getEncounterDatetime())
-                  == 0
-              && obs.getEncounter().getEncounterId() != lastEncounter.getEncounterId()
-              && obs.getEncounter().getEncounterType().getEncounterTypeId()
-                  == lastEncounter.getEncounterType().getEncounterTypeId()) {
-            anotherLastEncounters.add(obs.getEncounter());
+          if(obs.getEncounter()!=null){
+            if (obs.getEncounter()
+                    .getEncounterDatetime()
+                    .compareTo(lastEncounter.getEncounterDatetime())
+                    == 0
+                    && obs.getEncounter().getEncounterId() != lastEncounter.getEncounterId()
+                    && obs.getEncounter().getEncounterType().getEncounterTypeId()
+                    == lastEncounter.getEncounterType().getEncounterTypeId()
+                    && !obs.getVoided()) {
+              anotherLastEncounters.add(obs.getEncounter());
+            }
           }
         }
 
