@@ -59,17 +59,6 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
             null,
             onOrBefore,
             context);
-    CalculationResultMap getLastTypeOfDispensationWithoutQuartelyAsValueCoded =
-        ePTSCalculationService.getObs(
-            typeOfDispensation,
-            Arrays.asList(ficha),
-            cohort,
-            Arrays.asList(location),
-            null,
-            TimeQualifier.LAST,
-            null,
-            onOrBefore,
-            context);
     CalculationResultMap getLastTypeOfDispensationWithQuartelyAsValueCoded =
         ePTSCalculationService.getObs(
             typeOfDispensation,
@@ -77,17 +66,6 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
             cohort,
             Arrays.asList(location),
             Arrays.asList(quaterlyDispensation),
-            TimeQualifier.LAST,
-            null,
-            onOrBefore,
-            context);
-    CalculationResultMap getLastQuartelyDispensationWithoutStartOrContinueRegimen =
-        ePTSCalculationService.getObs(
-            quaterlyDispensationDT,
-            Arrays.asList(ficha),
-            cohort,
-            Arrays.asList(location),
-            null,
             TimeQualifier.LAST,
             null,
             onOrBefore,
@@ -120,28 +98,6 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
             null,
             onOrBefore,
             context);
-    CalculationResultMap getLastTypeOfDispensationWithoutQuartelyValueCodedMap =
-        ePTSCalculationService.getObs(
-            typeOfDispensation,
-            Arrays.asList(ficha),
-            cohort,
-            Arrays.asList(location),
-            null,
-            TimeQualifier.LAST,
-            null,
-            onOrBefore,
-            context);
-    CalculationResultMap getLastQuartelyDispensationWithoutStartOrContinueValueCodedMap =
-        ePTSCalculationService.getObs(
-            quaterlyDispensationDT,
-            Arrays.asList(ficha),
-            cohort,
-            Arrays.asList(location),
-            null,
-            TimeQualifier.LAST,
-            null,
-            onOrBefore,
-            context);
     CalculationResultMap getLastEncounterWithDepositionAndMonthlyAsCodedValueMap =
         ePTSCalculationService.getObs(
             typeOfDispensation,
@@ -156,15 +112,9 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       boolean found = false;
 
       Obs lastFilaObs = EptsCalculationUtils.obsResultForPatient(getLastFila, pId);
-      Obs getLastTypeOfDispensationObsWithoutQuartelyValueCoded =
-          EptsCalculationUtils.obsResultForPatient(
-              getLastTypeOfDispensationWithoutQuartelyAsValueCoded, pId);
       Obs getLastTypeOfDispensationObsWithQuartelyValueCoded =
           EptsCalculationUtils.obsResultForPatient(
               getLastTypeOfDispensationWithQuartelyAsValueCoded, pId);
-      Obs getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs =
-          EptsCalculationUtils.obsResultForPatient(
-              getLastQuartelyDispensationWithoutStartOrContinueRegimen, pId);
       Obs getLastQuartelyDispensationObsWithStartOrContinueRegimenObs =
           EptsCalculationUtils.obsResultForPatient(
               getLastQuartelyDispensationWithStartOrContinueRegimen, pId);
@@ -175,44 +125,27 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       Encounter lastFilaEncounter =
           EptsCalculationUtils.resultForPatient(lastFilaEncounterMap, pId);
 
-      Obs getLastTypeOfDispensationWithoutQuartelyValueCodedObs =
-          EptsCalculationUtils.obsResultForPatient(
-              getLastTypeOfDispensationWithoutQuartelyValueCodedMap, pId);
-      Obs getLastQuartelyDispensationWithoutStartOrContinueValueCodedObs =
-          EptsCalculationUtils.obsResultForPatient(
-              getLastQuartelyDispensationWithoutStartOrContinueValueCodedMap, pId);
-
       Obs getObsWithDepositionAndMonthlyAsCodedValue =
           EptsCalculationUtils.obsResultForPatient(
               getLastEncounterWithDepositionAndMonthlyAsCodedValueMap, pId);
 
       // case 1: fila as last encounter and has return visit date for drugs filled
-      // this is compared to the date of Encounter Type Id = 6Last TYPE OF DISPENSATION
-      // (id=23739)Value.code = QUARTERLY (id=23720)
-      if (lastFilaEncounter != null
-          && lastFilaEncounter.getEncounterDatetime() != null
-          && lastFilaObs != null
+      // this is compared to ficha, if fila > ficha
+      if (lastFilaObs != null
           && lastFilaObs.getEncounter() != null
-          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && lastFichaEncounter != null
           && lastFichaEncounter.getEncounterDatetime() != null
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded
-              .getValueCoded()
-              .equals(quaterlyDispensation)
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter() != null
           && lastFilaObs.getValueDatetime() != null
-          && lastFichaEncounter.equals(
-              getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
-          && lastFilaEncounter
+          && lastFilaObs
+              .getEncounter()
               .getEncounterDatetime()
               .after(lastFichaEncounter.getEncounterDatetime())
           && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
+                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
               >= 83
           && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
+                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
               <= 173) {
         found = true;
       }
@@ -228,17 +161,17 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && lastFichaEncounter != null
           && lastFichaEncounter.getEncounterDatetime() != null
-          && getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs != null
+          && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs != null
           && lastFilaObs.getValueDatetime() != null
-          && (getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs
+          && (getLastQuartelyDispensationObsWithStartOrContinueRegimenObs
                   .getValueCoded()
                   .equals(startDrugs)
-              || getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs
+              || getLastQuartelyDispensationObsWithStartOrContinueRegimenObs
                   .getValueCoded()
                   .equals(continueRegimen))
-          && getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs.getEncounter() != null
+          && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter() != null
           && lastFichaEncounter.equals(
-              getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs.getEncounter())
+              getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter())
           && lastFilaEncounter
               .getEncounterDatetime()
               .after(lastFichaEncounter.getEncounterDatetime())
@@ -254,104 +187,58 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // case 3: ficha  as last encounter(ficha > fila) reverse of case1
       // this is compared to the date of Encounter Type Id = 6 Last TYPE OF DISPENSATION
       // (id=23739)Value.code = QUARTERLY (id=23720)
-      else if (lastFilaEncounter != null
-          && lastFilaEncounter.getEncounterDatetime() != null
-          && lastFilaObs != null
+      else if (lastFilaObs != null
           && lastFilaObs.getEncounter() != null
-          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
-          && lastFichaEncounter != null
-          && lastFichaEncounter.getEncounterDatetime() != null
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded
-              .getValueCoded()
-              .equals(quaterlyDispensation)
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter() != null
-          && lastFichaEncounter.equals(
-              getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
-          && lastFichaEncounter
+          && getLastTypeOfDispensationObsWithQuartelyValueCoded != null
+          && getLastTypeOfDispensationObsWithQuartelyValueCoded.getEncounter() != null
+          && getLastTypeOfDispensationObsWithQuartelyValueCoded
+              .getEncounter()
               .getEncounterDatetime()
-              .after(lastFilaEncounter.getEncounterDatetime())) {
+              .after(lastFilaObs.getEncounter().getEncounterDatetime())) {
         found = true;
       }
 
       // case 4: ficha as last encounter, ficha >fila opposite of 2
       // this is compared to the date of Encounter Type Id = 6 Last QUARTERLY DISPENSATION (DT)
       // (id=23730)Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
-      else if (lastFilaEncounter != null
-          && lastFilaEncounter.getEncounterDatetime() != null
-          && lastFilaObs != null
+      else if (lastFilaObs != null
           && lastFilaObs.getEncounter() != null
-          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
-          && lastFichaEncounter != null
-          && lastFichaEncounter.getEncounterDatetime() != null
-          && getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs != null
-          && (getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs
-                  .getValueCoded()
-                  .equals(startDrugs)
-              || getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs
-                  .getValueCoded()
-                  .equals(continueRegimen))
-          && getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs.getEncounter() != null
-          && lastFichaEncounter.equals(
-              getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs.getEncounter())
-          && lastFichaEncounter
+          && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs != null
+          && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter() != null
+          && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs
+              .getEncounter()
               .getEncounterDatetime()
-              .after(lastFilaEncounter.getEncounterDatetime())) {
+              .after(lastFilaObs.getEncounter().getEncounterDatetime())) {
         found = true;
       }
       // case 5: If the most recent have more than one source FILA and FICHA registered on the same
       // most recent date, then consider the information from FILA
       // get the first case for quartely
-      else if (lastFilaEncounter != null & lastFichaEncounter != null
+      else if (lastFichaEncounter != null
           && lastFilaObs != null
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
-          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
-          && lastFichaEncounter.equals(
-              getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
+          && lastFilaObs.getEncounter() != null
           && lastFilaObs.getValueDatetime() != null
-          && lastFilaEncounter
+          && lastFilaObs
+              .getEncounter()
               .getEncounterDatetime()
               .equals(lastFichaEncounter.getEncounterDatetime())
           && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
+                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
               >= 83
           && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
+                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
               <= 173) {
         found = true;
 
       }
-      // case 6: If the most recent have more than one source FILA and FICHA registered on the same
-      // most recent date, then consider the information from FILA
-      // get the first case for start and continue regimen
-      else if (lastFilaEncounter != null & lastFichaEncounter != null
-          && lastFilaObs != null
-          && getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs != null
-          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
-          && lastFichaEncounter.equals(
-              getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs.getEncounter())
-          && lastFilaObs.getValueDatetime() != null
-          && lastFilaEncounter
-              .getEncounterDatetime()
-              .equals(lastFichaEncounter.getEncounterDatetime())
-          && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
-              >= 83
-          && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
-              <= 173) {
-        found = true;
-      }
-      // case 7: here fila is the latest encounter with the values for the observations collected
+      // case 7: here fila is the latest/only  encounter with the values for the observations
+      // collected
       else if (lastFilaEncounter != null
           && lastFilaEncounter.getEncounterDatetime() != null
           && lastFilaObs != null
           && lastFilaObs.getEncounter() != null
-          && getLastTypeOfDispensationWithoutQuartelyValueCodedObs == null
-          && getLastQuartelyDispensationWithoutStartOrContinueValueCodedObs == null
-          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && lastFilaObs.getValueDatetime() != null
           && EptsCalculationUtils.daysSince(
@@ -363,63 +250,23 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
         found = true;
       }
 
-      // case 8: ficha has last encounter  Last TYPE OF DISPENSATION (id=23739) Value.code =
+      // case 8: ficha has last/only encounter  Last TYPE OF DISPENSATION (id=23739) Value.code =
       // QUARTERLY (id=23720)
-      else if (lastFichaEncounter != null
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
-          && lastFilaObs == null
-          && lastFichaEncounter.equals(
-              getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
-          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded
-              .getValueCoded()
-              .equals(quaterlyDispensation)) {
-        found = true;
-      }
-      // case 9: or Last QUARTERLY DISPENSATION (DT) (id=23730) with Value.coded= START DRUGS
-      // (id=1256) OR
-      // Value.coded= (CONTINUE REGIMEN id=1257)
-      else if (lastFichaEncounter != null
-          && getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs != null
-          && lastFilaObs == null
-          && lastFichaEncounter.equals(
-              getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs.getEncounter())
-          && (getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs
-                  .getValueCoded()
-                  .equals(startDrugs)
-              || getLastQuartelyDispensationObsWithoutStartOrContinueRegimenObs
-                  .getValueCoded()
-                  .equals(continueRegimen))) {
+      else if (getLastTypeOfDispensationObsWithQuartelyValueCoded != null
+          || getLastQuartelyDispensationObsWithStartOrContinueRegimenObs != null) {
+
         found = true;
       }
 
-      // case 10: here fila is the latest encounter with the values for the observations collected
-      // withiout qurately
+      // case 10: here fila is the latest/only encounter with the values for the observations
+      // collected
+      // withiout qurately, start or continue regimen
       else if (lastFilaEncounter != null
           && lastFilaEncounter.getEncounterDatetime() != null
           && lastFilaObs != null
           && lastFilaObs.getEncounter() != null
           && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
-          && getLastTypeOfDispensationObsWithQuartelyValueCoded == null
-          && lastFilaObs.getValueDatetime() != null
-          && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
-              >= 83
-          && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
-              <= 173) {
-        found = true;
-      }
-
-      // case 10: here fila is the latest encounter with the values for the observations collected
-      // withiout start or continue regimen
-      else if (lastFilaEncounter != null
-          && lastFilaEncounter.getEncounterDatetime() != null
-          && lastFilaObs != null
-          && lastFilaObs.getEncounter() != null
-          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
-          && lastFilaObs.getEncounter().getEncounterDatetime() != null
-          && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs == null
           && lastFilaObs.getValueDatetime() != null
           && EptsCalculationUtils.daysSince(
                   lastFilaEncounter.getEncounterDatetime(), lastFilaObs.getValueDatetime())
