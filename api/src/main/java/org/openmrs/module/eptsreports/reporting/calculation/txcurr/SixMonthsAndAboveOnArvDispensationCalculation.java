@@ -145,145 +145,92 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
               lastDispensaSemestraWithoutStartOrContinueDrugsMap, pId);
 
       // case 1 fila filled is after ficha filled with semestral concept id
-      if (lastFilaEncounter != null
-          && lastFilaEncounter.getEncounterDatetime() != null
-          && lastFichaEncounter != null
+      if (lastFichaEncounter != null
           && lastFichaEncounter.getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
-          && lastFichaObsWithSemestarlValueCoded != null
-          && lastFichaEncounter.equals(lastFichaObsWithSemestarlValueCoded.getEncounter())
+          && lastFilaWithReturnForDrugsObs.getEncounter() != null
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
-          && lastFilaEncounter
+          && lastFilaWithReturnForDrugsObs
+              .getEncounter()
               .getEncounterDatetime()
               .after(lastFichaEncounter.getEncounterDatetime())
           && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(),
+                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
                   lastFilaWithReturnForDrugsObs.getValueDatetime())
               > 173) {
         found = true;
 
       }
-      // case 2 fila filled is after ficha filled with start or continue regimen concept id
-      else if (lastFilaEncounter != null
-          && lastFilaEncounter.getEncounterDatetime() != null
-          && lastFichaEncounter != null
-          && lastFichaEncounter.getEncounterDatetime() != null
-          && lastFilaWithReturnForDrugsObs != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
-          && lastDispensaSemestraWithStartOrContinueDrugsObs != null
-          && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
-          && lastFichaEncounter.equals(
-              lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter())
-          && lastFilaEncounter
-              .getEncounterDatetime()
-              .after(lastFichaEncounter.getEncounterDatetime())
-          && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(),
-                  lastFilaWithReturnForDrugsObs.getValueDatetime())
-              > 173) {
-        found = true;
-
-      }
-      // case 3 ficha filled is after fila filled with semestral concept id reverse of 1
-      else if (lastFilaEncounter != null
-          && lastFichaEncounter != null
-          && lastFichaEncounter.getEncounterDatetime() != null
-          && lastFilaWithReturnForDrugsObs != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
+      // case 2 ficha filled is after fila filled with semestral concept id reverse of 1
+      else if (lastFilaWithReturnForDrugsObs != null
+          && lastFilaWithReturnForDrugsObs.getEncounter() != null
+          && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastFichaObsWithSemestarlValueCoded != null
-          && lastFichaEncounter.equals(lastFichaObsWithSemestarlValueCoded.getEncounter())
-          && lastFichaEncounter
+          && lastFichaObsWithSemestarlValueCoded.getEncounter() != null
+          && lastFichaObsWithSemestarlValueCoded.getEncounter().getEncounterDatetime() != null
+          && lastFichaObsWithSemestarlValueCoded
+              .getEncounter()
               .getEncounterDatetime()
-              .after(lastFilaEncounter.getEncounterDatetime())) {
+              .after(lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())) {
         found = true;
       }
-      // case 4 ficha filled is after fila filled with start or continue regimen concept id
-      else if (lastFilaEncounter != null
-          && lastFichaEncounter != null
-          && lastFichaEncounter.getEncounterDatetime() != null
-          && lastFilaWithReturnForDrugsObs != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
+      // case 3 ficha filled is after fila filled with start or continue regimen concept id
+      else if (lastFilaWithReturnForDrugsObs != null
+          && lastFilaWithReturnForDrugsObs.getEncounter() != null
+          && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastDispensaSemestraWithStartOrContinueDrugsObs != null
-          && lastFichaEncounter.equals(
-              lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter())
-          && lastFichaEncounter
+          && lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter() != null
+          && lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter().getEncounterDatetime()
+              != null
+          && lastDispensaSemestraWithStartOrContinueDrugsObs
+              .getEncounter()
               .getEncounterDatetime()
-              .after(lastFilaEncounter.getEncounterDatetime())) {
+              .after(lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())) {
         found = true;
 
       }
-      // case 5 if there are multiple fila filled for the same date, pick the latest that has
+      // case 4 if there are multiple fila filled/only fila available for the same date, pick the
+      // latest that has
       // information filled
-      else if (lastFilaEncounter != null
-          && lastFilaWithReturnForDrugsObs != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
+      else if (lastFilaWithReturnForDrugsObs != null
+          && lastFilaWithReturnForDrugsObs.getEncounter() != null
+          && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastDispensaTrimestralWithoutSemestralObs == null
           && lastDispensaSemestraWithoutStartOrContinueDrugsObs == null
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
           && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(),
+                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
                   lastFilaWithReturnForDrugsObs.getValueDatetime())
               > 173) {
 
         found = true;
       }
       // case 6 if ficha filled is after fila filled with semestral concept id
-      else if (lastFichaEncounter != null
-          && lastFichaObsWithSemestarlValueCoded != null
-          && lastFichaEncounter.equals(lastFichaObsWithSemestarlValueCoded.getEncounter())
+      else if ((lastFichaObsWithSemestarlValueCoded != null
+              || lastDispensaSemestraWithStartOrContinueDrugsObs != null)
           && lastFilaWithReturnForDrugsObs == null) {
         found = true;
       }
-      // case 7 if ficha filled is after fila filled with start and continue regimen concept id
-      else if (lastFichaEncounter != null
-          && lastDispensaSemestraWithStartOrContinueDrugsObs != null
-          && lastFichaEncounter.equals(
-              lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter())
-          && lastFilaWithReturnForDrugsObs == null) {
-        found = true;
-      }
-      // case 8 if there is a fila filled with ficha filled with semestral concept filled on the
+      // case 7 if there is a fila filled with ficha filled with semestral concept filled on the
       // same date
       // we will end up picking the fila
-      else if (lastFilaEncounter != null
-          && lastFichaEncounter != null
+      else if (lastFichaEncounter != null
           && lastFichaEncounter.getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
-          && lastFichaObsWithSemestarlValueCoded != null
-          && lastFichaEncounter.equals(lastFichaObsWithSemestarlValueCoded.getEncounter())
+          && lastFilaWithReturnForDrugsObs.getEncounter() != null
+          && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
           && lastFichaEncounter
               .getEncounterDatetime()
-              .equals(lastFilaEncounter.getEncounterDatetime())
+              .equals(lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
           && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(),
+                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
                   lastFilaWithReturnForDrugsObs.getValueDatetime())
               > 173) {
         found = true;
       }
-      // case 9: if there is fila filled and ficha filled with start and continue regimen concept id
-      // on the date date we consider fila
-      else if (lastFilaEncounter != null
-          && lastFichaEncounter != null
-          && lastFichaEncounter.getEncounterDatetime() != null
-          && lastFilaWithReturnForDrugsObs != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
-          && lastDispensaSemestraWithStartOrContinueDrugsObs != null
-          && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
-          && lastFichaEncounter.equals(
-              lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter())
-          && lastFichaEncounter
-              .getEncounterDatetime()
-              .equals(lastFilaEncounter.getEncounterDatetime())
-          && EptsCalculationUtils.daysSince(
-                  lastFilaEncounter.getEncounterDatetime(),
-                  lastFilaWithReturnForDrugsObs.getValueDatetime())
-              > 173) {
-        found = true;
-      }
-      // case 10:
+
+      // case 8:
       if (lastFichaEncounter != null
           && lastDispensaTrimestralWithCompltedObs != null
           && lastFichaEncounter.equals(lastDispensaTrimestralWithCompltedObs.getEncounter())) {

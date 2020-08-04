@@ -137,6 +137,7 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
 
       else if (getObsWithReturnVisitDateFilled != null
           && getObsWithReturnVisitDateFilled.getEncounter() != null
+          && getObsWithDepositionAndMonthlyAsCodedValue == null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled.getValueDatetime() != null
           && EptsCalculationUtils.daysSince(
@@ -148,7 +149,7 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       // case 5: if only ficha is available and has Last TYPE OF DISPENSATION and value coded as
       // monthly
       else if (getObsWithDepositionAndMonthlyAsCodedValue != null
-          && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded().equals(monthly)) {
+          && getObsWithReturnVisitDateFilled == null) {
         found = true;
       }
       resultMap.put(pId, new BooleanResult(found, this));
