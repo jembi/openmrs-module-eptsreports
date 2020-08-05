@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.calculation.txcurr;
 
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.getIfObsExists;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -169,11 +171,24 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
           && getObsWithReturnVisitDateFilled == null) {
         found = true;
       }
-      // check if there is date for drug pick up and there is a ficha without this concept 23739
+      // case 6 check if there is date for drug pick up and there is a ficha without this concept
+      // 23739
       // collected
       else if (getObsWithReturnVisitDateFilled != null
           && getObsWithReturnVisitDateFilled.getEncounter() != null
           && getObsWithoutDepositionAndMonthlyAsCodedValue == null
+          && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
+          && getObsWithReturnVisitDateFilled.getValueDatetime() != null
+          && EptsCalculationUtils.daysSince(
+                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime(),
+                  getObsWithReturnVisitDateFilled.getValueDatetime())
+              < 83) {
+        found = true;
+      }
+      // case 7 check if there is a last ficha that do not have observation collected
+      else if (!getIfObsExists(lastFichaEncounter, typeOfDispensation)
+          && getObsWithReturnVisitDateFilled != null
+          && getObsWithReturnVisitDateFilled.getEncounter() != null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled.getValueDatetime() != null
           && EptsCalculationUtils.daysSince(
