@@ -66,6 +66,17 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
             null,
             context);
 
+    CalculationResultMap getLastEncounterWithoutDepositionAndMonthlyAsCodedValueMap =
+        ePTSCalculationService.getObs(
+            typeOfDispensation,
+            Arrays.asList(ficha),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.LAST,
+            null,
+            context);
+
     for (Integer pId : cohort) {
       boolean found = false;
 
@@ -78,11 +89,17 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       Obs getObsWithDepositionAndMonthlyAsCodedValue =
           EptsCalculationUtils.obsResultForPatient(
               getLastEncounterWithDepositionAndMonthlyAsCodedValueMap, pId);
+      Obs getObsWithoutDepositionAndMonthlyAsCodedValue =
+          EptsCalculationUtils.obsResultForPatient(
+              getLastEncounterWithoutDepositionAndMonthlyAsCodedValueMap, pId);
 
       // case 1: fila as last encounter and has return visit date for drugs filled
       // Both 2 encounter are filled with relevant obseravtions
       // We consider the fila
-      if (lastFichaEncounter != null
+      if (getObsWithoutDepositionAndMonthlyAsCodedValue != null
+          && getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter() != null
+          && getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter().getEncounterDatetime()
+              != null
           && getObsWithReturnVisitDateFilled != null
           && getObsWithReturnVisitDateFilled.getEncounter() != null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
@@ -90,7 +107,10 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
           && getObsWithReturnVisitDateFilled
               .getEncounter()
               .getEncounterDatetime()
-              .after(lastFichaEncounter.getEncounterDatetime())
+              .after(
+                  getObsWithoutDepositionAndMonthlyAsCodedValue
+                      .getEncounter()
+                      .getEncounterDatetime())
           && EptsCalculationUtils.daysSince(
                   getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime(),
                   getObsWithReturnVisitDateFilled.getValueDatetime())
@@ -99,10 +119,7 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       }
       // case 2: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
       // monthly, make sure the last encounter has required obs collected on them
-      else if (
-
-      // lastFichaEncounter.getEncounterDatetime() != null
-      getObsWithReturnVisitDateFilled != null
+      else if (getObsWithReturnVisitDateFilled != null
           && getObsWithReturnVisitDateFilled.getEncounter() != null
           && getObsWithDepositionAndMonthlyAsCodedValue != null
           && getObsWithDepositionAndMonthlyAsCodedValue.getEncounter() != null
@@ -150,6 +167,19 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       // monthly
       else if (getObsWithDepositionAndMonthlyAsCodedValue != null
           && getObsWithReturnVisitDateFilled == null) {
+        found = true;
+      }
+      // check if there is date for drug pick up and there is a ficha without this concept 23739
+      // collected
+      else if (getObsWithReturnVisitDateFilled != null
+          && getObsWithReturnVisitDateFilled.getEncounter() != null
+          && getObsWithoutDepositionAndMonthlyAsCodedValue == null
+          && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
+          && getObsWithReturnVisitDateFilled.getValueDatetime() != null
+          && EptsCalculationUtils.daysSince(
+                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime(),
+                  getObsWithReturnVisitDateFilled.getValueDatetime())
+              < 83) {
         found = true;
       }
       resultMap.put(pId, new BooleanResult(found, this));
