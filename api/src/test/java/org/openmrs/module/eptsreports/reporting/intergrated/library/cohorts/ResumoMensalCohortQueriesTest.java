@@ -305,6 +305,56 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  public void getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndDiagnosedForActiveTBC3ShouldPass()
+      throws EvaluationException {
+
+    CohortDefinition cd =
+        resumoMensalCohortQueries
+            .getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndDiagnosedForActiveTBC3();
+    HashMap<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+
+    assertFalse(evaluatedCohort.getMemberIds().isEmpty());
+    assertTrue(evaluatedCohort.getMemberIds().contains(6000001));
+  }
+
+  @Test
+  public void getPatientsWhoStartedTPIShouldPass() throws EvaluationException {
+
+    CohortDefinition cd =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndStartedTpiC2();
+    HashMap<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+
+    assertFalse(evaluatedCohort.getMemberIds().isEmpty());
+    assertTrue(evaluatedCohort.getMemberIds().contains(6000002));
+  }
+
+  @Test
+  public void getPatientScreenedForTbShouldPass() throws EvaluationException {
+
+    CohortDefinition cd =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndScreenedTB();
+    HashMap<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+
+    assertFalse(evaluatedCohort.getMemberIds().isEmpty());
+    assertTrue(evaluatedCohort.getMemberIds().contains(6000003));
+  }
+
+  @Test
   public void getPatientsWhoHadAtLeastDrugPickUpShouldReturnPatientsWhoHadAtLeastDrugPickUp() throws EvaluationException {
     CohortDefinition cd = resumoMensalCohortQueries.getPatientsWhoHadAtLeastDrugPickUp();
 
