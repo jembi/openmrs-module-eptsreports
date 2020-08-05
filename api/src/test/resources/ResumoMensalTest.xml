@@ -609,7 +609,7 @@
 	 encounter_datetime="2019-10-10 00:00:00" creator="1" date_created="2019-10-10 00:00:00"
 	 voided="0" uuid="a34ba966-d1b1-11ea-ae83-0b6039bf3491" location_id="21" />
 
-	<obs obs_id="8000001" person_id="6000001" concept_id="9999" encounter_id="7000001" obs_datetime="2019-10-10 00:00:00"
+	<obs obs_id="8000001" person_id="6000001" concept_id="23808" encounter_id="7000001" obs_datetime="2019-10-10 00:00:00"
 	  creator="1" date_created="2013-06-19 12:55:48" voided="0"
 	uuid="a811c4c6-d1b1-11ea-a1e8-8755f07100b9" location_id="21" value_datetime="2019-10-10"/>
 
@@ -633,7 +633,7 @@
 	 encounter_datetime="2019-10-10 00:00:00" creator="1" date_created="2019-10-10 00:00:00"
 	 voided="0" uuid="c2120d80-d220-11ea-b59a-2fde0838d1e5" location_id="21" />
 
-	<obs obs_id="8000003" person_id="6000002" concept_id="9999" encounter_id="7000003" obs_datetime="2019-10-10 00:00:00"
+	<obs obs_id="8000003" person_id="6000002" concept_id="23808" encounter_id="7000003" obs_datetime="2019-10-10 00:00:00"
 	  creator="1" date_created="2013-06-19 12:55:48" voided="0"
 	uuid="ccf0677e-d220-11ea-b987-7faf5a26d881" location_id="21" value_datetime="2019-10-10"/>
 
@@ -657,7 +657,7 @@
 	 encounter_datetime="2019-10-10 00:00:00" creator="1" date_created="2019-10-10 00:00:00"
 	 voided="0" uuid="97bf2ade-d222-11ea-a46b-a350399183c3" location_id="21" />
 
-	<obs obs_id="8000005" person_id="6000003" concept_id="9999" encounter_id="7000005" obs_datetime="2019-10-10 00:00:00"
+	<obs obs_id="8000005" person_id="6000003" concept_id="23808" encounter_id="7000005" obs_datetime="2019-10-10 00:00:00"
 	  creator="1" date_created="2013-06-19 12:55:48" voided="0"
 	uuid="b5236ee6-d222-11ea-81ef-0b2a31540577" location_id="21" value_datetime="2019-10-10"/>
 
