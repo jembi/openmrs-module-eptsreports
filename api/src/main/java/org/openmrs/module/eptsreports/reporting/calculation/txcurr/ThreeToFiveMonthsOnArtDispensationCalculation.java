@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.calculation.txcurr;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -12,6 +13,7 @@ import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
+import org.openmrs.calculation.result.ListResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
@@ -47,7 +49,7 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
     Concept startDrugs = hivMetadata.getStartDrugs();
     Concept continueRegimen = hivMetadata.getContinueRegimenConcept();
     Concept monthly = hivMetadata.getMonthlyConcept();
-
+    // get the last fila with next drug pick up date captured, only the last one
     CalculationResultMap getLastFila =
         ePTSCalculationService.getObs(
             returnVisitDateForArvDrugs,
@@ -59,6 +61,19 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
             null,
             onOrBefore,
             context);
+    // get all the fila obs having next pickup concept collected
+    CalculationResultMap getAllFila =
+        ePTSCalculationService.getObs(
+            returnVisitDateForArvDrugs,
+            Arrays.asList(fila),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.ANY,
+            null,
+            onOrBefore,
+            context);
+    // get exactly last typeOfDispensation
     CalculationResultMap getLastTypeOfDispensationWithoutQuartelyAsValueCoded =
         ePTSCalculationService.getObs(
             typeOfDispensation,
@@ -70,6 +85,19 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
             null,
             onOrBefore,
             context);
+    // get all obs with typeOfDispensation and and quartely value coded
+    CalculationResultMap getAllLastTypeOfDispensationWithQuartelyAsValueCoded =
+        ePTSCalculationService.getObs(
+            typeOfDispensation,
+            Arrays.asList(ficha),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.ANY,
+            null,
+            onOrBefore,
+            context);
+    // get last DT
     CalculationResultMap getLastQuartelyDispensationWithStartOrContinueRegimen =
         ePTSCalculationService.getObs(
             quaterlyDispensationDT,
@@ -78,6 +106,18 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
             Arrays.asList(location),
             null,
             TimeQualifier.LAST,
+            null,
+            onOrBefore,
+            context);
+    // get DT with ANY list
+    CalculationResultMap getAllDtQuartelyDispensationWithStartOrContinueRegimen =
+        ePTSCalculationService.getObs(
+            quaterlyDispensationDT,
+            Arrays.asList(ficha),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.ANY,
             null,
             onOrBefore,
             context);
@@ -129,11 +169,26 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           EptsCalculationUtils.obsResultForPatient(
               getLastEncounterWithDepositionAndMonthlyAsCodedValueMap, pId);
 
+      // get all the list result for the fila
+      ListResult listResultForAllFila = (ListResult) getAllFila.get(pId);
+      List<Obs> obsListForAllFila = EptsCalculationUtils.extractResultValues(listResultForAllFila);
+      // get all the list results for ficha with quaterlyDispensation
+      ListResult listResultAddQuartelyDispensation =
+          (ListResult) getAllLastTypeOfDispensationWithQuartelyAsValueCoded.get(pId);
+      List<Obs> listObsForQuartely =
+          EptsCalculationUtils.extractResultValues(listResultAddQuartelyDispensation);
+      // get all the list with the patients DT and
+      ListResult listResultDtAll =
+          (ListResult) getAllDtQuartelyDispensationWithStartOrContinueRegimen.get(pId);
+      List<Obs> listresultsDtAll = EptsCalculationUtils.extractResultValues(listResultDtAll);
+
       // case 1: fila as last encounter and has return visit date for drugs filled
       // this is compared to ficha, if fila > ficha and the ficha filled should be the one with
       // typeOfDispensation(23739)
       if (lastFilaObs != null
+          && lastFilaEncounter != null
           && lastFilaObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter() != null
@@ -161,7 +216,9 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // this is compared to ficha, if fila > ficha and the ficha filled should be the one with
       // QUARTERLY DISPENSATION (DT) - 23730
       else if (lastFilaObs != null
+          && lastFilaEncounter != null
           && lastFilaObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs != null
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter() != null
@@ -183,6 +240,7 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           && EptsCalculationUtils.daysSince(
                   lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
               <= 173) {
+
         found = true;
       }
 
@@ -190,7 +248,9 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // this is compared to the date of Encounter Type Id = 6 Last QUARTERLY DISPENSATION (DT)
       // (id=23730)Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
       else if (lastFilaObs != null
+          && lastFilaEncounter != null
           && lastFilaObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs != null
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter() != null
@@ -225,7 +285,9 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // This is comapred to the 6 with 23739 concept collected and value coded of 23720
 
       else if (lastFilaObs != null
+          && lastFilaEncounter != null
           && lastFilaObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter() != null
@@ -257,10 +319,13 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // this is compared to the date of Encounter Type Id = 6 Last TYPE OF DISPENSATION
       // (id=23739)Value.code = QUARTERLY (id=23720)
       else if (lastFilaObs != null
+          && lastFichaEncounter != null
           && lastFilaObs.getEncounter() != null
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter() != null
+          && lastFichaEncounter.equals(
+              getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded
               .getValueCoded()
               .equals(quaterlyDispensation)
@@ -275,10 +340,13 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // this is compared to the date of Encounter Type Id = 6 Last QUARTERLY DISPENSATION (DT)
       // (id=23730)Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
       else if (lastFilaObs != null
+          && lastFichaEncounter != null
           && lastFilaObs.getEncounter() != null
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs != null
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter() != null
+          && lastFichaEncounter.equals(
+              getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter())
           && (getLastQuartelyDispensationObsWithStartOrContinueRegimenObs
                   .getValueCoded()
                   .equals(startDrugs)
@@ -294,8 +362,10 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // case 7: If the most recent have more than one source FILA and FICHA registered on the same
       // most recent date, then consider the information from FILA
       else if (lastFichaEncounter != null
+          && lastFilaEncounter != null
           && lastFilaObs != null
           && lastFilaObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getValueDatetime() != null
           && lastFilaObs
               .getEncounter()
@@ -314,7 +384,9 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // DT is null
       // collected getLastTypeOfDispensationObsWithoutQuartelyValueCoded
       else if (lastFilaObs != null
+          && lastFilaEncounter != null
           && lastFilaObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && lastFilaObs.getValueDatetime() != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded == null
@@ -331,7 +403,9 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // DT is null
       // collected getLastQuartelyDispensationObsWithStartOrContinueRegimenObs
       else if (lastFilaObs != null
+          && lastFilaEncounter != null
           && lastFilaObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaObs.getEncounter())
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && lastFilaObs.getValueDatetime() != null
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs == null
@@ -348,12 +422,15 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // QUARTERLY (id=23720)
       // included also is the start and continue regimen
       else if (getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
+          && lastFichaEncounter != null
           && lastFilaObs == null
+          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter() != null
+          && lastFichaEncounter.equals(
+              getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getValueCoded() != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded
               .getValueCoded()
               .equals(quaterlyDispensation)) {
-
         found = true;
       }
 
@@ -361,7 +438,11 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // QUARTERLY (id=23720)
       // included also is the start and continue regimen
       else if (getLastQuartelyDispensationObsWithStartOrContinueRegimenObs != null
+          && lastFichaEncounter != null
           && lastFilaObs == null
+          && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter() != null
+          && lastFichaEncounter.equals(
+              getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getEncounter())
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs.getValueCoded() != null
           && (getLastQuartelyDispensationObsWithStartOrContinueRegimenObs
                   .getValueCoded()
@@ -371,7 +452,48 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   .equals(continueRegimen))) {
         found = true;
       }
-      // case 12
+      // case 12, if a fila has value and a ficha is filled regardless of the obs collected
+      else if (lastFilaEncounter != null && obsListForAllFila.size() > 0) {
+        for (Obs obs : obsListForAllFila) {
+          if (lastFilaEncounter.equals(obs.getEncounter())
+              && obs.getValueDatetime() != null
+              && EptsCalculationUtils.daysSince(
+                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
+                  >= 83
+              && EptsCalculationUtils.daysSince(
+                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
+                  <= 173) {
+            found = true;
+            break;
+          }
+        }
+      }
+      // case 13, if a ficha has value and a fila is filled regardless of the obs collected with
+      // quartely ass answer
+      else if (lastFichaEncounter != null && listObsForQuartely.size() > 0) {
+        for (Obs obs : listObsForQuartely) {
+          if (lastFichaEncounter.equals(obs.getEncounter())
+              && obs.getValueCoded().equals(quaterlyDispensation)) {
+            found = true;
+            break;
+          }
+        }
+      }
+
+      // case 14, if a ficha has value and a fila is filled regardless of the obs collected with
+      // start and continue
+      else if (lastFichaEncounter != null && listresultsDtAll.size() > 0) {
+        for (Obs obs : listresultsDtAll) {
+          if (lastFichaEncounter.equals(obs.getEncounter())
+              && (obs.getValueCoded().equals(startDrugs)
+                  || obs.getValueCoded().equals(continueRegimen))) {
+            found = true;
+            break;
+          }
+        }
+      }
+
+      // case 15
       // exclude   patients   who   have   the   last   SEMESTRAL   QUARTERLY (concept   id=23730
       // with value_coded as value_coded=1267)
       if (lastQuartelyObsWithCompleted != null
@@ -380,7 +502,7 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
         found = false;
       }
 
-      // case 13: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
+      // case 16: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
       // monthly, make sure the last encounter has required obs collected on them
       // this section exclude patients already in <3 months on ARV dispensation
       else if (getObsWithDepositionAndMonthlyAsCodedValue != null

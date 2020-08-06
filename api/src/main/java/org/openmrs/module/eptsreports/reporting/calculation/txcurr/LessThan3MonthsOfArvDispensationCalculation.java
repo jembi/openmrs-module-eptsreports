@@ -1,10 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.calculation.txcurr;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.getIfObsExists;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -14,6 +14,7 @@ import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
+import org.openmrs.calculation.result.ListResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
@@ -47,6 +48,10 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
     CalculationResultMap getFichaEncounterMap =
         ePTSCalculationService.getEncounter(
             Arrays.asList(ficha), TimeQualifier.LAST, cohort, location, onOrBefore, context);
+    CalculationResultMap getFilaEncounterMap =
+        ePTSCalculationService.getEncounter(
+            Arrays.asList(fila), TimeQualifier.LAST, cohort, location, onOrBefore, context);
+    // get the last fila with date of next pick
     CalculationResultMap getLastEncounterWithReturnDateForArvMap =
         ePTSCalculationService.getObs(
             returnVisitDateForArvDrugs,
@@ -57,6 +62,18 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
             TimeQualifier.LAST,
             null,
             context);
+    // get all fila obs with drug pick up date
+    CalculationResultMap getAllEncounterWithReturnDateForArvMap =
+        ePTSCalculationService.getObs(
+            returnVisitDateForArvDrugs,
+            Arrays.asList(fila),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.ANY,
+            null,
+            context);
+
     CalculationResultMap getLastEncounterWithDepositionAndMonthlyAsCodedValueMap =
         ePTSCalculationService.getObs(
             typeOfDispensation,
@@ -78,12 +95,24 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
             TimeQualifier.LAST,
             null,
             context);
+    // get any all obs with typeOfDispensation and monthly
+    CalculationResultMap getAllEncounterWithoutDepositionAndMonthlyAsCodedValueMap =
+        ePTSCalculationService.getObs(
+            typeOfDispensation,
+            Arrays.asList(ficha),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.ANY,
+            null,
+            context);
 
     for (Integer pId : cohort) {
       boolean found = false;
 
       Encounter lastFichaEncounter =
           EptsCalculationUtils.resultForPatient(getFichaEncounterMap, pId);
+      Encounter lastFilaEncounter = EptsCalculationUtils.resultForPatient(getFilaEncounterMap, pId);
 
       Obs getObsWithReturnVisitDateFilled =
           EptsCalculationUtils.obsResultForPatient(getLastEncounterWithReturnDateForArvMap, pId);
@@ -95,14 +124,27 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
           EptsCalculationUtils.obsResultForPatient(
               getLastEncounterWithoutDepositionAndMonthlyAsCodedValueMap, pId);
 
+      // get all the drug pick up date
+      ListResult listResultNextDrugPickup =
+          (ListResult) getAllEncounterWithReturnDateForArvMap.get(pId);
+      List<Obs> obsListNextDrugPickup =
+          EptsCalculationUtils.extractResultValues(listResultNextDrugPickup);
+      // get all desposition and monthly
+      ListResult listResultDespositionMonthlyObs =
+          (ListResult) getAllEncounterWithoutDepositionAndMonthlyAsCodedValueMap.get(pId);
+      List<Obs> obsListDespositionMonthlyObs =
+          EptsCalculationUtils.extractResultValues(listResultDespositionMonthlyObs);
+
       // case 1: fila as last encounter and has return visit date for drugs filled
       // Both 2 encounter are filled with relevant obseravtions
       // We consider the fila
       if (getObsWithoutDepositionAndMonthlyAsCodedValue != null
+          && lastFilaEncounter != null
           && getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter() != null
           && getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter().getEncounterDatetime()
               != null
           && getObsWithReturnVisitDateFilled != null
+          && lastFilaEncounter.equals(getObsWithReturnVisitDateFilled.getEncounter())
           && getObsWithReturnVisitDateFilled.getEncounter() != null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled.getValueDatetime() != null
@@ -122,10 +164,13 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       // case 2: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
       // monthly, make sure the last encounter has required obs collected on them
       else if (getObsWithReturnVisitDateFilled != null
+          && lastFichaEncounter != null
           && getObsWithReturnVisitDateFilled.getEncounter() != null
-          && getObsWithDepositionAndMonthlyAsCodedValue != null
-          && getObsWithDepositionAndMonthlyAsCodedValue.getEncounter() != null
-          && getObsWithDepositionAndMonthlyAsCodedValue
+          && getObsWithoutDepositionAndMonthlyAsCodedValue != null
+          && lastFichaEncounter.equals(getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter())
+          && getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter() != null
+          && getObsWithoutDepositionAndMonthlyAsCodedValue.getValueCoded().equals(monthly)
+          && getObsWithoutDepositionAndMonthlyAsCodedValue
               .getEncounter()
               .getEncounterDatetime()
               .after(getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime())) {
@@ -136,8 +181,10 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       // otherwise we consider ficha if fila is null, but ficha has to contain the required obs to
       // pass
       else if (lastFichaEncounter != null
+          && lastFilaEncounter != null
           && lastFichaEncounter.getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled != null
+          && lastFilaEncounter.equals(getObsWithReturnVisitDateFilled.getEncounter())
           && getObsWithReturnVisitDateFilled.getEncounter() != null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled.getValueDatetime() != null
@@ -155,7 +202,9 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       // case 4: Only fila available and has value datetime collected for the next drug pick up
 
       else if (getObsWithReturnVisitDateFilled != null
+          && lastFilaEncounter != null
           && getObsWithReturnVisitDateFilled.getEncounter() != null
+          && lastFilaEncounter.equals(getObsWithReturnVisitDateFilled.getEncounter())
           && getObsWithDepositionAndMonthlyAsCodedValue == null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled.getValueDatetime() != null
@@ -175,7 +224,9 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       // 23739
       // collected
       else if (getObsWithReturnVisitDateFilled != null
+          && lastFilaEncounter != null
           && getObsWithReturnVisitDateFilled.getEncounter() != null
+          && lastFilaEncounter.equals(getObsWithReturnVisitDateFilled.getEncounter())
           && getObsWithoutDepositionAndMonthlyAsCodedValue == null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled.getValueDatetime() != null
@@ -185,17 +236,29 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
               < 83) {
         found = true;
       }
-      // case 7 check if there is a last ficha that do not have observation collected
-      else if (!getIfObsExists(lastFichaEncounter, typeOfDispensation)
-          && getObsWithReturnVisitDateFilled != null
-          && getObsWithReturnVisitDateFilled.getEncounter() != null
-          && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
-          && getObsWithReturnVisitDateFilled.getValueDatetime() != null
-          && EptsCalculationUtils.daysSince(
-                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime(),
-                  getObsWithReturnVisitDateFilled.getValueDatetime())
-              < 83) {
-        found = true;
+      // get all the fila obs collected and compare with last value date
+      else if (lastFilaEncounter != null && obsListNextDrugPickup.size() > 0) {
+        for (Obs obs : obsListNextDrugPickup) {
+          if (lastFilaEncounter.equals(obs.getEncounter())
+              && obs.getValueDatetime() != null
+              && EptsCalculationUtils.daysSince(
+                      lastFilaEncounter.getEncounterDatetime(), obs.getValueDatetime())
+                  < 83) {
+            found = true;
+            break;
+          }
+        }
+      }
+      // get all ficha with 1098 values and match last encounter
+      else if (lastFichaEncounter != null && obsListDespositionMonthlyObs.size() > 0) {
+        for (Obs obs : obsListDespositionMonthlyObs) {
+          if (lastFichaEncounter.equals(obs.getEncounter())
+              && obs.getValueCoded() != null
+              && obs.getValueCoded().equals(monthly)) {
+            found = true;
+            break;
+          }
+        }
       }
       resultMap.put(pId, new BooleanResult(found, this));
     }
