@@ -200,10 +200,13 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
 
       // case 1 fila filled is after ficha filled with semestral concept id
       if (lastDispensaTrimestralWithoutSemestralObs != null
+          && lastFilaEncounter != null
+          && lastFichaEncounter != null
           && lastDispensaTrimestralWithoutSemestralObs.getEncounter() != null
-          && lastDispensaTrimestralWithoutSemestralObs.getEncounter().getEncounterDatetime() != null
+          && lastFichaEncounter.equals(lastDispensaTrimestralWithoutSemestralObs.getEncounter())
           && lastFilaWithReturnForDrugsObs != null
           && lastFilaWithReturnForDrugsObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
           && lastFilaWithReturnForDrugsObs
               .getEncounter()
@@ -224,6 +227,7 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
           && lastFichaObsWithSemestarlValueCoded != null
           && lastFichaObsWithSemestarlValueCoded.getEncounter() != null
           && lastFichaEncounter.equals(lastFichaObsWithSemestarlValueCoded.getEncounter())
+          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
           && lastFichaObsWithSemestarlValueCoded.getValueCoded().equals(dispensaSemestra)
           && lastFichaEncounter
               .getEncounterDatetime()
@@ -254,7 +258,9 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
       // latest that has
       // information filled
       else if (lastFilaWithReturnForDrugsObs != null
+          && lastFilaEncounter != null
           && lastFilaWithReturnForDrugsObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
           && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastDispensaTrimestralWithoutSemestralObs == null
           && lastDispensaSemestraWithoutStartOrContinueDrugsObs == null
@@ -265,26 +271,36 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
               > 173) {
         found = true;
       }
-      // case 6 if ficha filled is after fila filled with semestral concept id
+      // case 5 if ficha filled
       else if ((lastFichaObsWithSemestarlValueCoded != null
+              && lastFichaEncounter != null
+              && lastFichaObsWithSemestarlValueCoded.getEncounter() != null
+              && lastFichaEncounter.equals(lastFichaObsWithSemestarlValueCoded.getEncounter())
               && lastFichaObsWithSemestarlValueCoded.getValueCoded().equals(dispensaSemestra)
+              && lastFilaWithReturnForDrugsObs == null)
           || (lastDispensaSemestraWithStartOrContinueDrugsObs != null
+                  && lastFichaEncounter != null
+                  && lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter() != null
+                  && lastFichaEncounter.equals(
+                      lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter())
                   && (lastDispensaSemestraWithStartOrContinueDrugsObs
                           .getValueCoded()
                           .equals(startDrugs)
                       || lastDispensaSemestraWithStartOrContinueDrugsObs
                           .getValueCoded()
                           .equals(continueRegimen)))
-              && lastFilaWithReturnForDrugsObs == null)) {
+              && lastFilaWithReturnForDrugsObs == null) {
         found = true;
       }
-      // case 7 if there is a fila filled with ficha filled with semestral concept filled on the
+      // case 6 if there is a fila filled with ficha filled with semestral concept filled on the
       // same date
       // we will end up picking the fila
       else if (lastFichaEncounter != null
+          && lastFilaEncounter != null
           && lastFichaEncounter.getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs != null
           && lastFilaWithReturnForDrugsObs.getEncounter() != null
+          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
           && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
           && lastFichaEncounter
@@ -337,16 +353,6 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
       if (lastDispensaTrimestralWithCompltedObs != null) {
         found = false;
       }
-
-      // case 9: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
-      // monthly, make sure the last encounter has required obs collected on them
-      // this section exclude patients already in <3 months on ARV dispensation
-      else if (lastFichaObsWithSemestarlValueCoded != null
-          && lastFichaObsWithSemestarlValueCoded.getValueCoded() != null
-          && lastFichaObsWithSemestarlValueCoded.getValueCoded().equals(monthly)) {
-        found = false;
-      }
-
       resultMap.put(pId, new BooleanResult(found, this));
     }
 
