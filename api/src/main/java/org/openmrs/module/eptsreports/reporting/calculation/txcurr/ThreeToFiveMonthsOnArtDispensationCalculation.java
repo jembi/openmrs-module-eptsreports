@@ -127,9 +127,9 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
     CalculationResultMap lastFilaEncounterMap =
         ePTSCalculationService.getEncounter(
             Arrays.asList(fila), TimeQualifier.LAST, cohort, location, onOrBefore, context);
-    CalculationResultMap quartelyMap =
+    CalculationResultMap semestaralquartelyMap =
         ePTSCalculationService.getObs(
-            quaterlyDispensation,
+            quaterlyDispensationDT,
             Arrays.asList(ficha),
             cohort,
             Arrays.asList(location),
@@ -160,7 +160,8 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
               getLastQuartelyDispensationWithStartOrContinueRegimen, pId);
       Encounter lastFichaEncounter =
           EptsCalculationUtils.resultForPatient(lastFichaEncounterMap, pId);
-      Obs lastQuartelyObsWithCompleted = EptsCalculationUtils.obsResultForPatient(quartelyMap, pId);
+      Obs lastQuartelyObsWithCompleted =
+          EptsCalculationUtils.obsResultForPatient(semestaralquartelyMap, pId);
 
       Encounter lastFilaEncounter =
           EptsCalculationUtils.resultForPatient(lastFilaEncounterMap, pId);
@@ -494,21 +495,12 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // case 15
       // exclude   patients   who   have   the   last   SEMESTRAL   QUARTERLY (concept   id=23730
       // with value_coded as value_coded=1267)
-      if (lastQuartelyObsWithCompleted != null
+      if (lastFichaEncounter != null
+          && lastQuartelyObsWithCompleted != null
+          && lastQuartelyObsWithCompleted.getEncounter() != null
           && lastQuartelyObsWithCompleted.getValueCoded() != null
+          && lastFichaEncounter.equals(lastQuartelyObsWithCompleted.getEncounter())
           && lastQuartelyObsWithCompleted.getValueCoded().equals(completedConcept)) {
-        found = false;
-      }
-
-      // case 16: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
-      // monthly, make sure the last encounter has required obs collected on them
-      // this section exclude patients already in <3 months on ARV dispensation
-      else if (lastFichaEncounter != null
-          && getObsWithDepositionAndMonthlyAsCodedValue != null
-          && getObsWithDepositionAndMonthlyAsCodedValue.getEncounter() != null
-          && lastFichaEncounter.equals(getObsWithDepositionAndMonthlyAsCodedValue.getEncounter())
-          && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded() != null
-          && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded().equals(monthly)) {
         found = false;
       }
       resultMap.put(pId, new BooleanResult(found, this));
