@@ -240,7 +240,6 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           && EptsCalculationUtils.daysSince(
                   lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
               <= 173) {
-
         found = true;
       }
 
@@ -321,7 +320,6 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       else if (lastFilaObs != null
           && lastFichaEncounter != null
           && lastFilaObs.getEncounter() != null
-          && lastFilaObs.getEncounter().getEncounterDatetime() != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter() != null
           && lastFichaEncounter.equals(
@@ -505,7 +503,10 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // case 16: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
       // monthly, make sure the last encounter has required obs collected on them
       // this section exclude patients already in <3 months on ARV dispensation
-      else if (getObsWithDepositionAndMonthlyAsCodedValue != null
+      else if (lastFichaEncounter != null
+          && getObsWithDepositionAndMonthlyAsCodedValue != null
+          && getObsWithDepositionAndMonthlyAsCodedValue.getEncounter() != null
+          && lastFichaEncounter.equals(getObsWithDepositionAndMonthlyAsCodedValue.getEncounter())
           && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded() != null
           && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded().equals(monthly)) {
         found = false;
