@@ -503,6 +503,30 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           && lastQuartelyObsWithCompleted.getValueCoded().equals(completedConcept)) {
         found = false;
       }
+
+      // exclude those in the <3 months
+      // should have their las encounter for ficha filled and should be after filla or fila be empty
+      if (lastFichaEncounter != null
+          && getObsWithDepositionAndMonthlyAsCodedValue != null
+          && lastFilaEncounter != null
+          && getObsWithDepositionAndMonthlyAsCodedValue.getEncounter() != null
+          && lastFichaEncounter.equals(getObsWithDepositionAndMonthlyAsCodedValue.getEncounter())
+          && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded() != null
+          && lastFichaEncounter
+              .getEncounterDatetime()
+              .after(lastFilaEncounter.getEncounterDatetime())
+          && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded().equals(monthly)) {
+        found = false;
+      }
+      if (lastFichaEncounter != null
+          && getObsWithDepositionAndMonthlyAsCodedValue != null
+          && lastFilaObs == null
+          && getObsWithDepositionAndMonthlyAsCodedValue.getEncounter() != null
+          && lastFichaEncounter.equals(getObsWithDepositionAndMonthlyAsCodedValue.getEncounter())
+          && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded() != null
+          && getObsWithDepositionAndMonthlyAsCodedValue.getValueCoded().equals(monthly)) {
+        found = false;
+      }
       resultMap.put(pId, new BooleanResult(found, this));
     }
     return resultMap;
