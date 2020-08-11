@@ -44,7 +44,7 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
     Concept returnVisitDateForArvDrugs = hivMetadata.getReturnVisitDateForArvDrugConcept();
     Concept typeOfDispensation = hivMetadata.getTypeOfDispensationConcept();
     Concept completedConcept = hivMetadata.getCompletedConcept();
-    Concept quaterly = hivMetadata.getQuarterlyDispensation();
+    Concept quaterly = hivMetadata.getQuarterlyConcept();
     Concept dispensaSemestra = hivMetadata.getSemiannualDispensation();
     Concept startDrugs = hivMetadata.getStartDrugs();
     Concept continueRegimen = hivMetadata.getContinueRegimenConcept();
@@ -153,6 +153,42 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
             null,
             onOrBefore,
             context);
+    // find map that has monthly as an obs for type of desposition
+    CalculationResultMap getLastFichaWithMonthlyObsMap =
+        ePTSCalculationService.getObs(
+            typeOfDispensation,
+            Arrays.asList(ficha),
+            cohort,
+            Arrays.asList(location),
+            Arrays.asList(monthly),
+            TimeQualifier.LAST,
+            null,
+            onOrBefore,
+            context);
+    // find map that has quartely response
+    CalculationResultMap getLastFichaWithQuartelyObsMap =
+        ePTSCalculationService.getObs(
+            typeOfDispensation,
+            Arrays.asList(ficha),
+            cohort,
+            Arrays.asList(location),
+            Arrays.asList(quaterly),
+            TimeQualifier.LAST,
+            null,
+            onOrBefore,
+            context);
+    // find map that has semestarl as last obs
+    CalculationResultMap getLastFichaWithSemestaralObsMap =
+        ePTSCalculationService.getObs(
+            typeOfDispensation,
+            Arrays.asList(ficha),
+            cohort,
+            Arrays.asList(location),
+            Arrays.asList(dispensaSemestra),
+            TimeQualifier.LAST,
+            null,
+            onOrBefore,
+            context);
     CalculationResultMap lastFichaEncounterMap =
         ePTSCalculationService.getEncounter(
             Arrays.asList(ficha), TimeQualifier.LAST, cohort, location, onOrBefore, context);
@@ -182,6 +218,15 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
       Obs lastDispensaSemestraWithoutStartOrContinueDrugsObs =
           EptsCalculationUtils.obsResultForPatient(
               lastDispensaSemestraWithoutStartOrContinueDrugsMap, pId);
+      // get latest ficha with monthly obs collected
+      Obs getLastFichaWithMonthlyObs =
+          EptsCalculationUtils.obsResultForPatient(getLastFichaWithMonthlyObsMap, pId);
+      // get lates ficha with quatertly collected
+      Obs getLastFichaWithQuartelyObs =
+          EptsCalculationUtils.obsResultForPatient(getLastFichaWithQuartelyObsMap, pId);
+      // get latest semestarl obs collected
+      Obs getLastFichaWithSemestaralObs =
+          EptsCalculationUtils.obsResultForPatient(getLastFichaWithSemestaralObsMap, pId);
 
       // get all fila list of date obs
       ListResult listResultAllNextDateOfAppointment =
@@ -243,7 +288,6 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
           && lastDispensaSemestraWithStartOrContinueDrugsObs != null
           && lastFichaEncounter.equals(
               lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter())
-          && lastDispensaSemestraWithStartOrContinueDrugsObs.getEncounter() != null
           && (lastDispensaSemestraWithStartOrContinueDrugsObs.getValueCoded().equals(startDrugs)
               || lastDispensaSemestraWithStartOrContinueDrugsObs
                   .getValueCoded()
@@ -347,6 +391,28 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
             break;
           }
         }
+      }
+      // what if there is 3 fichas on the same date that has a criteria for <3 months, 3-5 months
+      // and > 6 months
+      // we will have to pick that criteria here as well
+      else if (getLastFichaWithMonthlyObs != null
+          && getLastFichaWithSemestaralObs != null
+          && getLastFichaWithMonthlyObs.getObsDatetime() != null
+          && getLastFichaWithSemestaralObs.getObsDatetime() != null
+          && getLastFichaWithSemestaralObs
+                  .getObsDatetime()
+                  .compareTo(getLastFichaWithMonthlyObs.getObsDatetime())
+              >= 0) {
+        found = true;
+      } else if (getLastFichaWithQuartelyObs != null
+          && getLastFichaWithSemestaralObs != null
+          && getLastFichaWithQuartelyObs.getObsDatetime() != null
+          && getLastFichaWithSemestaralObs.getObsDatetime() != null
+          && getLastFichaWithSemestaralObs
+                  .getObsDatetime()
+                  .compareTo(getLastFichaWithQuartelyObs.getObsDatetime())
+              >= 0) {
+        found = true;
       }
 
       // case 8:
