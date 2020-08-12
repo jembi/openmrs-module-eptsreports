@@ -448,6 +448,23 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   .compareTo(lastFilaObs.getEncounter().getEncounterDatetime())
               > 0) {
         found = true;
+      } else if (lastFilaEncounter != null
+          && lastFichaEncounter == null
+          && obsListForAllFila.size() > 0) {
+        for (Obs obs : obsListForAllFila) {
+          if (lastFilaEncounter.equals(obs.getEncounter())
+              && EptsCalculationUtils.daysSince(
+                      lastFilaObs.getEncounter().getEncounterDatetime(),
+                      lastFilaObs.getValueDatetime())
+                  >= 83
+              && EptsCalculationUtils.daysSince(
+                      lastFilaObs.getEncounter().getEncounterDatetime(),
+                      lastFilaObs.getValueDatetime())
+                  <= 173) {
+            found = true;
+            break;
+          }
+        }
       }
 
       // exclude   patients   who   have   the   last   SEMESTRAL   QUARTERLY (concept   id=23730
