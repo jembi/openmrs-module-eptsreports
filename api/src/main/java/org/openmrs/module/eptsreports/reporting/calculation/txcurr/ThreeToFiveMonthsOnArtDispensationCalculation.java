@@ -415,6 +415,7 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   .equals(continueRegimen))) {
         found = true;
       } else if (getLastTypeOfDispensationWithQuartelyAsValueCodedAddedObs != null
+          && lastFilaObs == null
           && getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs != null
           && getLastTypeOfDispensationWithQuartelyAsValueCodedAddedObs
                   .getObsDatetime()
@@ -423,13 +424,13 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
               >= 0) {
         found = true;
       } else if (getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs != null
+          && lastFilaObs == null
           && getLastQuartelyDispensationWithStartOrContinueRegimenValueCodedObs != null
           && getLastQuartelyDispensationWithStartOrContinueRegimenValueCodedObs
                   .getObsDatetime()
                   .compareTo(
                       getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs.getObsDatetime())
               >= 0) {
-        System.out.println("start/continue >= monthly " + pId);
         found = true;
       }
 
