@@ -454,12 +454,10 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
         for (Obs obs : obsListForAllFila) {
           if (lastFilaEncounter.equals(obs.getEncounter())
               && EptsCalculationUtils.daysSince(
-                      lastFilaObs.getEncounter().getEncounterDatetime(),
-                      lastFilaObs.getValueDatetime())
+                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
                   >= 83
               && EptsCalculationUtils.daysSince(
-                      lastFilaObs.getEncounter().getEncounterDatetime(),
-                      lastFilaObs.getValueDatetime())
+                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
                   <= 173) {
             found = true;
             break;
@@ -475,6 +473,40 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           && lastQuartelyObsWithCompleted.getValueCoded() != null
           && lastFichaEncounter.equals(lastQuartelyObsWithCompleted.getEncounter())
           && lastQuartelyObsWithCompleted.getValueCoded().equals(completedConcept)) {
+        found = false;
+      }
+      // exclude all patients who have ficha with 1098 which is after recent fila and ficha of
+      // start/continue regimen
+      if (getLastTypeOfDispensationWithQuartelyAsValueCodedAddedObs != null
+          && lastFilaObs != null
+          && lastFilaObs.getEncounter() != null
+          && getLastTypeOfDispensationWithQuartelyAsValueCodedAddedObs.getEncounter() != null
+          && getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs != null
+          && getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs.getEncounter() != null
+          && getLastQuartelyDispensationWithStartOrContinueRegimenValueCodedObs != null
+          && getLastQuartelyDispensationWithStartOrContinueRegimenValueCodedObs.getEncounter()
+              != null
+          && getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs
+                  .getEncounter()
+                  .getEncounterDatetime()
+                  .compareTo(lastFilaObs.getEncounter().getEncounterDatetime())
+              > 0
+          && getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs
+                  .getEncounter()
+                  .getEncounterDatetime()
+                  .compareTo(
+                      getLastTypeOfDispensationWithQuartelyAsValueCodedAddedObs
+                          .getEncounter()
+                          .getEncounterDatetime())
+              > 0
+          && getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs
+                  .getEncounter()
+                  .getEncounterDatetime()
+                  .compareTo(
+                      getLastQuartelyDispensationWithStartOrContinueRegimenValueCodedObs
+                          .getEncounter()
+                          .getEncounterDatetime())
+              > 0) {
         found = false;
       }
 
