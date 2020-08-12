@@ -298,8 +298,8 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       else if (lastFilaObs != null
           && lastFilaObs.getEncounter() != null
           && lastFilaObs.getEncounter().getEncounterDatetime() != null
-          && (getLastTypeOfDispensationObsWithoutQuartelyValueCoded == null
-              && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs == null)
+          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded == null
+          && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs == null
           && lastFilaObs.getValueDatetime() != null
           && EptsCalculationUtils.daysSince(
                   lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
@@ -307,7 +307,6 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           && EptsCalculationUtils.daysSince(
                   lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
               <= 173) {
-
         found = true;
       }
       // case 4: ficha  as last encounter(ficha > fila) reverse of case1
@@ -451,6 +450,27 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       } else if (lastFilaEncounter != null
           && lastFichaEncounter == null
           && obsListForAllFila.size() > 0) {
+        for (Obs obs : obsListForAllFila) {
+          if (lastFilaEncounter.equals(obs.getEncounter())
+              && EptsCalculationUtils.daysSince(
+                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
+                  >= 83
+              && EptsCalculationUtils.daysSince(
+                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
+                  <= 173) {
+            found = true;
+            break;
+          }
+        }
+      }
+      // fila and ficha available, but fila> fila
+      else if (lastFilaEncounter != null
+          && lastFichaEncounter != null
+          && obsListForAllFila.size() > 0
+          && lastFilaEncounter
+                  .getEncounterDatetime()
+                  .compareTo(lastFichaEncounter.getEncounterDatetime())
+              > 0) {
         for (Obs obs : obsListForAllFila) {
           if (lastFilaEncounter.equals(obs.getEncounter())
               && EptsCalculationUtils.daysSince(
