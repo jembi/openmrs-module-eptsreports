@@ -2,6 +2,8 @@ package org.openmrs.module.eptsreports.reporting.calculation.txcurr;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +155,9 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
     CalculationResultMap lastFilaEncounterMap =
         ePTSCalculationService.getEncounter(
             Arrays.asList(fila), TimeQualifier.LAST, cohort, location, onOrBefore, context);
+    CalculationResultMap allFilaEncountersMap =
+        ePTSCalculationService.getEncounter(
+            Arrays.asList(fila), TimeQualifier.ANY, cohort, location, onOrBefore, context);
     CalculationResultMap semestaralquartelyMap =
         ePTSCalculationService.getObs(
             quaterlyDispensationDT,
@@ -232,6 +237,15 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       ListResult listResultDtAll =
           (ListResult) getAllDtQuartelyDispensationWithStartOrContinueRegimen.get(pId);
       List<Obs> listresultsDtAll = EptsCalculationUtils.extractResultValues(listResultDtAll);
+
+      ListResult listResultAllFilaEncounters = (ListResult) allFilaEncountersMap.get(pId);
+      List<Encounter> allFilaEncounters =
+          EptsCalculationUtils.extractResultValues(listResultAllFilaEncounters);
+      Encounter lastFilaPicked = null;
+      if (allFilaEncounters.size() > 0) {
+        sortEncountersByEncounterId(allFilaEncounters);
+        lastFilaPicked = allFilaEncounters.get(allFilaEncounters.size() - 1);
+      }
 
       // case 1: fila as last encounter and has return visit date for drugs filled
       // this is compared to ficha, if fila > ficha and the ficha filled should be the one with
@@ -464,15 +478,15 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
         }
       }
       // fila and ficha available, but fila> fila
-      else if (lastFilaEncounter != null
-          && lastFichaEncounter != null
+      else if (lastFilaPicked != null
           && obsListForAllFila.size() > 0
-          && lastFilaEncounter
+          && lastFichaEncounter != null
+          && lastFilaPicked
                   .getEncounterDatetime()
                   .compareTo(lastFichaEncounter.getEncounterDatetime())
-              > 0) {
+              >= 0) {
         for (Obs obs : obsListForAllFila) {
-          if (lastFilaEncounter.equals(obs.getEncounter())
+          if (lastFilaPicked.equals(obs.getEncounter())
               && EptsCalculationUtils.daysSince(
                       obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
                   >= 83
@@ -533,5 +547,16 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       resultMap.put(pId, new BooleanResult(found, this));
     }
     return resultMap;
+  }
+
+  private void sortEncountersByEncounterId(List<Encounter> encounters) {
+    Collections.sort(
+        encounters,
+        new Comparator<Encounter>() {
+          @Override
+          public int compare(Encounter a, Encounter b) {
+            return a.getEncounterId().compareTo(b.getEncounterId());
+          }
+        });
   }
 }
