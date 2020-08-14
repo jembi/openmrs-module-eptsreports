@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.calculation.txcurr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -241,10 +242,13 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       ListResult listResultAllFilaEncounters = (ListResult) allFilaEncountersMap.get(pId);
       List<Encounter> allFilaEncounters =
           EptsCalculationUtils.extractResultValues(listResultAllFilaEncounters);
-      Encounter lastFilaPicked = null;
-      if (allFilaEncounters.size() > 0) {
+      Encounter lastFilaPickedEncounter = null;
+      Encounter secondLastEncounter = null;
+      List<Obs> filaObsOnTheSameEncounterDate = new ArrayList<Obs>();
+      if (allFilaEncounters.size() >= 2) {
         sortEncountersByEncounterId(allFilaEncounters);
-        lastFilaPicked = allFilaEncounters.get(allFilaEncounters.size() - 1);
+        lastFilaPickedEncounter = allFilaEncounters.get(allFilaEncounters.size() - 1);
+        secondLastEncounter = allFilaEncounters.get(allFilaEncounters.size() - 2);
       }
 
       // case 1: fila as last encounter and has return visit date for drugs filled
@@ -478,23 +482,38 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
         }
       }
       // fila and ficha available, but fila> fila
-      else if (lastFilaPicked != null
-          && obsListForAllFila.size() > 0
-          && lastFichaEncounter != null
-          && lastFilaPicked
-                  .getEncounterDatetime()
-                  .compareTo(lastFichaEncounter.getEncounterDatetime())
-              >= 0) {
-        for (Obs obs : obsListForAllFila) {
-          if (lastFilaPicked.equals(obs.getEncounter())
+      else if (lastFilaPickedEncounter != null
+          && secondLastEncounter != null
+          && obsListForAllFila.size() > 0) {
+        if (lastFilaPickedEncounter
+            .getEncounterDatetime()
+            .equals(secondLastEncounter.getEncounterDatetime())) {
+          // loop through the obs and pick those that match those 2 encounter
+          for (Obs obs : obsListForAllFila) {
+            if (obs.getValueDatetime() != null
+                && (lastFilaPickedEncounter.equals(obs.getEncounter())
+                    || secondLastEncounter.equals(obs.getEncounter()))) {
+              filaObsOnTheSameEncounterDate.add(obs);
+            }
+          }
+          Date requiredDate = null;
+          if (filaObsOnTheSameEncounterDate.size() == 2) {
+            requiredDate = filaObsOnTheSameEncounterDate.get(0).getValueDatetime();
+            if (filaObsOnTheSameEncounterDate.get(1).getValueDatetime().compareTo(requiredDate)
+                > 0) {
+              requiredDate = filaObsOnTheSameEncounterDate.get(1).getValueDatetime();
+            }
+          }
+          // no that you have the right value datetime and the encounter date, do the logic for >=83
+          // days and <=173 days
+          if (requiredDate != null
               && EptsCalculationUtils.daysSince(
-                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
+                      lastFilaPickedEncounter.getEncounterDatetime(), requiredDate)
                   >= 83
               && EptsCalculationUtils.daysSince(
-                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
+                      lastFilaPickedEncounter.getEncounterDatetime(), requiredDate)
                   <= 173) {
             found = true;
-            break;
           }
         }
       }
@@ -555,7 +574,7 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
         new Comparator<Encounter>() {
           @Override
           public int compare(Encounter a, Encounter b) {
-            return a.getEncounterId().compareTo(b.getEncounterId());
+            return a.getEncounterDatetime().compareTo(b.getEncounterDatetime());
           }
         });
   }
