@@ -162,17 +162,18 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       }
       // case 2: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
       // monthly, make sure the last encounter has required obs collected on them
-      else if (getObsWithReturnVisitDateFilled != null
+      else if (lastFilaEncounter != null
+          && getObsWithReturnVisitDateFilled != null
           && lastFichaEncounter != null
           && getObsWithReturnVisitDateFilled.getEncounter() != null
+          && lastFilaEncounter.equals(getObsWithReturnVisitDateFilled.getEncounter())
           && getObsWithoutDepositionAndMonthlyAsCodedValue != null
           && lastFichaEncounter.equals(getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter())
-          && getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter() != null
           && getObsWithoutDepositionAndMonthlyAsCodedValue.getValueCoded().equals(monthly)
-          && getObsWithoutDepositionAndMonthlyAsCodedValue
-              .getEncounter()
-              .getEncounterDatetime()
-              .after(getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime())) {
+          && lastFichaEncounter
+                  .getEncounterDatetime()
+                  .compareTo(lastFilaEncounter.getEncounterDatetime())
+              > 0) {
         found = true;
       }
       // case 3: if both fila and ficha are available taken on the same date, we pick fila first if
