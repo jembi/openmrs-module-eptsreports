@@ -502,7 +502,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsViralLoadWithin12Months(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("A AND (B OR (NOT patientsWithViralLoad AND C))  AND NOT F");
+    cd.setCompositionString("A AND (B OR (C AND NOT patientsWithViralLoad)) AND NOT F");
 
     return cd;
   }
@@ -575,7 +575,8 @@ public class EriDSDCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMisauLaboratorioEncounterType(),
-                    hivMetadata.getFsrEncounterType())),
+                    hivMetadata.getFsrEncounterType(),
+                    hivMetadata.getMasterCardEncounterType())),
             "onOrAfter=${endDate-12m},onOrBefore=${endDate},locationList=${location}"));
     cd.addSearch(
         "Cd4Lab",
@@ -591,7 +592,8 @@ public class EriDSDCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMisauLaboratorioEncounterType(),
-                    hivMetadata.getFsrEncounterType())),
+                    hivMetadata.getFsrEncounterType(),
+                    hivMetadata.getMasterCardEncounterType())),
             "onOrAfter=${endDate-12m},onOrBefore=${endDate},locationList=${location}"));
     cd.addSearch(
         "Cd4Percent",
@@ -607,7 +609,8 @@ public class EriDSDCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMisauLaboratorioEncounterType(),
-                    hivMetadata.getFsrEncounterType())),
+                    hivMetadata.getFsrEncounterType(),
+                    hivMetadata.getMasterCardEncounterType())),
             "onOrAfter=${endDate-12m},onOrBefore=${endDate},locationList=${location}"));
     cd.addSearch(
         "Age",
