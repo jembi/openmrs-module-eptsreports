@@ -30,7 +30,8 @@ public class PregnantQueries {
       int deliveryDateConcept,
       int yesConcept,
       int breastFeedingConcept,
-      int gaveBirthPatientState) {
+      int gaveBirthPatientState,
+      boolean dsd) {
 
     String query =
         "Select max_pregnant.patient_id from "
@@ -140,8 +141,15 @@ public class PregnantQueries {
             + adultInitialEncounter
             + ","
             + adultSegEncounter
-            + ") "
-            + "     AND o.value_datetime BETWEEN :startDate AND :endDate AND e.location_id=:location AND pe.gender='F' "
+            + ") ";
+            if (dsd == true) {
+              query = query + "   AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate ";
+              
+            } 
+            else {
+              query = query + "     AND o.value_datetime BETWEEN :startDate AND :endDate ";
+            }
+            query = query + "       AND e.location_id=:location AND pe.gender='F' "
             + "      GROUP BY p.patient_id "
             + "      UNION "
             + "     SELECT     p.patient_id, MAX(e.encounter_datetime) AS last_date "
