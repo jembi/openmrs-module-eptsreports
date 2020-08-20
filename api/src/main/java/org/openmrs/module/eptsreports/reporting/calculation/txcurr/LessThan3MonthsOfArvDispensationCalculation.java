@@ -154,9 +154,9 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
                   getObsWithoutDepositionAndMonthlyAsCodedValue
                       .getEncounter()
                       .getEncounterDatetime())
-          && EptsCalculationUtils.daysSince(
-                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime(),
-                  getObsWithReturnVisitDateFilled.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  getObsWithReturnVisitDateFilled.getValueDatetime(),
+                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime())
               < 83) {
         found = true;
       }
@@ -188,9 +188,9 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
               .getEncounter()
               .getEncounterDatetime()
               .equals(lastFichaEncounter.getEncounterDatetime())
-          && EptsCalculationUtils.daysSince(
-                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime(),
-                  getObsWithReturnVisitDateFilled.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  getObsWithReturnVisitDateFilled.getValueDatetime(),
+                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime())
               < 83) {
         found = true;
       }
@@ -204,9 +204,9 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
           && getObsWithDepositionAndMonthlyAsCodedValue == null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled.getValueDatetime() != null
-          && EptsCalculationUtils.daysSince(
-                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime(),
-                  getObsWithReturnVisitDateFilled.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  getObsWithReturnVisitDateFilled.getValueDatetime(),
+                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime())
               < 83) {
         found = true;
       }
@@ -226,9 +226,9 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
           && getObsWithoutDepositionAndMonthlyAsCodedValue == null
           && getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime() != null
           && getObsWithReturnVisitDateFilled.getValueDatetime() != null
-          && EptsCalculationUtils.daysSince(
-                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime(),
-                  getObsWithReturnVisitDateFilled.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  getObsWithReturnVisitDateFilled.getValueDatetime(),
+                  getObsWithReturnVisitDateFilled.getEncounter().getEncounterDatetime())
               < 83) {
         found = true;
       }
@@ -237,8 +237,8 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
         for (Obs obs : obsListNextDrugPickup) {
           if (lastFilaEncounter.equals(obs.getEncounter())
               && obs.getValueDatetime() != null
-              && EptsCalculationUtils.daysSince(
-                      lastFilaEncounter.getEncounterDatetime(), obs.getValueDatetime())
+              && EptsCalculationUtils.exactDaysSince(
+                      obs.getValueDatetime(), lastFilaEncounter.getEncounterDatetime())
                   < 83) {
             found = true;
             break;
