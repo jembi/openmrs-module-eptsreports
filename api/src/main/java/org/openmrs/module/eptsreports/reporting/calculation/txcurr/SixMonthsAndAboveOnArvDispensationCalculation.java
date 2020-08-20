@@ -252,9 +252,9 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
                   .getEncounterDatetime()
                   .compareTo(lastFichaEncounter.getEncounterDatetime())
               > 0
-          && EptsCalculationUtils.daysSince(
-                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
-                  lastFilaWithReturnForDrugsObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaWithReturnForDrugsObs.getValueDatetime(),
+                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
               > 173) {
         found = true;
 
@@ -300,11 +300,12 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
           && lastDispensaTrimestralWithoutSemestralObs == null
           && lastDispensaSemestraWithoutStartOrContinueDrugsObs == null
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
-          && EptsCalculationUtils.daysSince(
-                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
-                  lastFilaWithReturnForDrugsObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaWithReturnForDrugsObs.getValueDatetime(),
+                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
               > 173) {
         found = true;
+
       }
       // case 5 if ficha filled
       else if ((lastFichaObsWithSemestarlValueCoded != null
@@ -341,9 +342,9 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
           && lastFichaEncounter
               .getEncounterDatetime()
               .equals(lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
-          && EptsCalculationUtils.daysSince(
-                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
-                  lastFilaWithReturnForDrugsObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaWithReturnForDrugsObs.getValueDatetime(),
+                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
               > 173) {
         found = true;
       }
@@ -353,11 +354,11 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
           && lastFichaEncounter == null
           && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
-          && EptsCalculationUtils.daysSince(
-                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
-                  lastFilaWithReturnForDrugsObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaWithReturnForDrugsObs.getValueDatetime(),
+                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
               > 173) {
-
+        found = true;
       }
       // find all obs compared per the encounter based on
       else if (lastFilaEncounter == null

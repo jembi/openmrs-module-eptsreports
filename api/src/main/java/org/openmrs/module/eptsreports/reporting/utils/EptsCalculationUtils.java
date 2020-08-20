@@ -286,6 +286,19 @@ public class EptsCalculationUtils {
   }
 
   /**
+   * Calculates the days since the given date Consider true values as required
+   *
+   * @param date1 the date
+   * @param date2 the date2
+   * @return the number of days true values
+   */
+  public static int exactDaysSince(Date date1, Date date2) {
+    DateTime d1 = new DateTime(date1.getTime());
+    DateTime d2 = new DateTime(date2.getTime());
+    return Days.daysBetween(d2, d1).getDays();
+  }
+
+  /**
    * Calculates the days since the given date
    *
    * @param date1 the date
