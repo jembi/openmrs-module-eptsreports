@@ -163,12 +163,8 @@ public class LessThan3MonthsOfArvDispensationCalculation extends AbstractPatient
       // case 2: ficha as the last encounter and has Last TYPE OF DISPENSATION and value coded as
       // monthly, make sure the last encounter has required obs collected on them
       else if (lastFilaEncounter != null
-          && getObsWithReturnVisitDateFilled != null
           && lastFichaEncounter != null
-          && getObsWithReturnVisitDateFilled.getEncounter() != null
-          && lastFilaEncounter.equals(getObsWithReturnVisitDateFilled.getEncounter())
           && getObsWithoutDepositionAndMonthlyAsCodedValue != null
-          && lastFichaEncounter.equals(getObsWithoutDepositionAndMonthlyAsCodedValue.getEncounter())
           && getObsWithoutDepositionAndMonthlyAsCodedValue.getValueCoded().equals(monthly)
           && lastFichaEncounter
                   .getEncounterDatetime()

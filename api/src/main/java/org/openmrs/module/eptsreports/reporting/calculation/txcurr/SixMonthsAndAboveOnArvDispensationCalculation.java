@@ -244,20 +244,14 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
           EptsCalculationUtils.extractResultValues(allListResultDispensaSemestry);
 
       // case 1 fila filled is after ficha filled with semestral concept id
-      if (lastDispensaTrimestralWithoutSemestralObs != null
-          && lastFilaEncounter != null
+      if (lastFilaEncounter != null
           && lastFichaEncounter != null
-          && lastDispensaTrimestralWithoutSemestralObs.getEncounter() != null
-          && lastFichaEncounter.equals(lastDispensaTrimestralWithoutSemestralObs.getEncounter())
           && lastFilaWithReturnForDrugsObs != null
-          && lastFilaWithReturnForDrugsObs.getEncounter() != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
-          && lastFilaWithReturnForDrugsObs
-              .getEncounter()
-              .getEncounterDatetime()
-              .after(
-                  lastDispensaTrimestralWithoutSemestralObs.getEncounter().getEncounterDatetime())
+          && lastFilaEncounter
+                  .getEncounterDatetime()
+                  .compareTo(lastFichaEncounter.getEncounterDatetime())
+              > 0
           && EptsCalculationUtils.daysSince(
                   lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
                   lastFilaWithReturnForDrugsObs.getValueDatetime())
@@ -267,16 +261,13 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
       }
       // case 2 ficha filled is after fila filled with semestral concept id reverse of 1
       else if (lastFilaEncounter != null
-          && lastFilaWithReturnForDrugsObs != null
           && lastFichaEncounter != null
           && lastFichaObsWithSemestarlValueCoded != null
-          && lastFichaObsWithSemestarlValueCoded.getEncounter() != null
-          && lastFichaEncounter.equals(lastFichaObsWithSemestarlValueCoded.getEncounter())
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
           && lastFichaObsWithSemestarlValueCoded.getValueCoded().equals(dispensaSemestra)
           && lastFichaEncounter
-              .getEncounterDatetime()
-              .after(lastFilaEncounter.getEncounterDatetime())) {
+                  .getEncounterDatetime()
+                  .compareTo(lastFilaEncounter.getEncounterDatetime())
+              > 0) {
         found = true;
       }
       // case 3 ficha filled is after fila filled with start or continue regimen concept id
@@ -357,46 +348,39 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
         found = true;
       }
       // find all the fila, compare with the last encounter, if it has >173 days, pick it here
-      else if (lastFilaEncounter != null && allFilaObsList.size() > 0) {
-        for (Obs obs : allFilaObsList) {
-          if (lastFilaEncounter.equals(obs.getEncounter())
-              && obs.getValueDatetime() != null
-              && EptsCalculationUtils.daysSince(
-                      lastFilaEncounter.getEncounterDatetime(), obs.getValueDatetime())
-                  > 173) {
-            found = true;
-            break;
-          }
-        }
+      else if (lastFilaWithReturnForDrugsObs != null
+          && lastFilaWithReturnForDrugsObs.getEncounter() != null
+          && lastFichaEncounter == null
+          && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
+          && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
+          && EptsCalculationUtils.daysSince(
+                  lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime(),
+                  lastFilaWithReturnForDrugsObs.getValueDatetime())
+              > 173) {
+
       }
       // find all obs compared per the encounter based on
-      else if (lastFichaEncounter != null && listResultDispositionObs.size() > 0) {
-        for (Obs obs : listResultDispositionObs) {
-          if (lastFichaEncounter.equals(obs.getEncounter())
-              && obs.getValueCoded() != null
-              && obs.getValueCoded().equals(dispensaSemestra)) {
-            found = true;
-            break;
-          }
-        }
+      else if (lastFilaEncounter == null
+          && lastFichaObsWithSemestarlValueCoded != null
+          && lastFichaObsWithSemestarlValueCoded.getValueCoded().equals(dispensaSemestra)) {
+        found = true;
       }
       // find all obs compared with last encounter with start and continue regimen
-      else if (lastFichaEncounter != null && allListResultDispensaSemestryObs.size() > 0) {
-        for (Obs obs : allListResultDispensaSemestryObs) {
-          if (lastFichaEncounter.equals(obs.getEncounter())
-              && obs.getValueCoded() != null
-              && (obs.getValueCoded().equals(startDrugs)
-                  || obs.getValueCoded().equals(continueRegimen))) {
-            found = true;
-            break;
-          }
-        }
+      else if (lastFilaEncounter == null
+          && lastDispensaSemestraWithStartOrContinueDrugsObs != null
+          && lastDispensaSemestraWithStartOrContinueDrugsObs.getValueCoded() != null
+          && (lastDispensaSemestraWithStartOrContinueDrugsObs.getValueCoded().equals(startDrugs)
+              || lastDispensaSemestraWithStartOrContinueDrugsObs
+                  .getValueCoded()
+                  .equals(continueRegimen))) {
+        found = true;
       }
       // what if there is 3 fichas on the same date that has a criteria for <3 months, 3-5 months
       // and > 6 months
       // we will have to pick that criteria here as well
       else if (getLastFichaWithMonthlyObs != null
           && getLastFichaWithSemestaralObs != null
+          && lastFilaEncounter == null
           && getLastFichaWithMonthlyObs.getObsDatetime() != null
           && getLastFichaWithSemestaralObs.getObsDatetime() != null
           && getLastFichaWithSemestaralObs
@@ -405,6 +389,7 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
               >= 0) {
         found = true;
       } else if (getLastFichaWithQuartelyObs != null
+          && lastFilaEncounter == null
           && getLastFichaWithSemestaralObs != null
           && getLastFichaWithQuartelyObs.getObsDatetime() != null
           && getLastFichaWithSemestaralObs.getObsDatetime() != null
@@ -416,7 +401,13 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
       }
 
       // case 8:
-      if (lastDispensaTrimestralWithCompltedObs != null) {
+      if (lastDispensaTrimestralWithCompltedObs != null
+          && lastFichaEncounter != null
+          && lastFilaEncounter != null
+          && lastFichaEncounter
+                  .getEncounterDatetime()
+                  .compareTo(lastFilaEncounter.getEncounterDatetime())
+              > 0) {
         found = false;
       }
       resultMap.put(pId, new BooleanResult(found, this));
