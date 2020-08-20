@@ -33,9 +33,14 @@ public class HivMetadata extends ProgramsMetadata {
   private String getTBProgramUuid = "eptsreports.tbProgramUuid";
 
   /**
-   * concept_id = 307
-   *
-   * @return
+   *  <b>concept_id = 307</b>
+   *<p>
+   *  <b>Name:</b> ESPUTO PARA BACILOS RÁPIDOS DE ÁCIDO
+   *</p>
+   *<p>
+   *  <b>Description:</b> Mancha para a tuberculose, realizado em uma amostra profunda muco do trato respiratório.
+   *</p>
+   * @return {@link Concept}
    */
   public Concept getResultForBasiloscopia() {
     String uuid =
@@ -43,9 +48,14 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
   /**
-   * Concepts Id = 856
-   *
-   * @return
+   *  <b>concept_id = 856</b>
+   *<p>
+   *  <b>Name:</b> CARGA VIRAL DE HIV
+   *</p>
+   *<p>
+   *  <b>Description:</b> Medição de numero de copias/ml de ADN/RNA em  pacientes com HIV.
+   *</p>
+   * @return {@link Concept}
    */
   public Concept getHivViralLoadConcept() {
     String uuid =
@@ -54,9 +64,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * Criterio para inicio de tarv Concept Id = 6334
-   *
-   * @return
+   *  <b>concept_id = 6334</b>
+   *<p>
+   *  <b>Name:</b> CRITERIO PARA INICIO DE TARV 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Critérios que faz com que um paciente inicie o TARV
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getCriteriaForArtStart() {
     String uuid =
@@ -65,9 +80,15 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * Fila Next pick up concept concept_id=5096
-   *
-   * @return
+   *  <b>concept_id = 5096</b>
+   *<p>
+   *  <b>Name:</b> DATA DO PROXIMO LEVANTAMENTO DE ARV 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Data marcada para o paciente voltar a levantar medicamentos ARV. 
+   *                     Se o paciente não aparece nesta data começa a contagem de dias para se marcar ABANDONO após 60 dias
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getReturnVisitDateForArvDrugConcept() {
     String uuid =
@@ -77,9 +98,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * concept_id=6123
-   *
-   * @return
+   *  <b>concept_id = 6123</b>
+   *<p>
+   *  <b>Name:</b> DATA DO DIAGNÓSTICO DE HIV 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Data marcada para o teste diagnóstico de HIV
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getDateOfHivDiagnosisConcept() {
     String uuid =
@@ -87,12 +113,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
   /**
-   * concept_id=1190
-   *
-   * <p>Information gathered on encounter forms which describes the date of a particular drug's
-   * institution. Most often "globbed" with another concept which describes the drug.
-   *
-   * @return
+   *  <b>concept_id = 1190</b>
+   *<p>
+   *  <b>Name:</b> DATA DE INICIO DA MEDICACAO 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Informação adquirida no formulario de encontro que descreve a data de inicio de um medicamento em particular. 
+   *                     Na maioria das vezes "globbed" com um outro conceito que descreve o medicamento
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getARVStartDateConcept() {
     String uuid =
@@ -102,9 +131,15 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * concept_id=1255
-   *
-   * @return
+   *  <b>concept_id = 1255</b>
+   *<p>
+   *  <b>Name:</b> GESTÃO DE TARV 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Pergunta em formulario de encontro: "O paciente tem, ou o paciente já teve, qualquer uma das seguintes condições?". 
+   *                     Esta questão registra de 1 a n todas as condições listadas como respostas a este conceito
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getARVPlanConcept() {
     String uuid =
@@ -113,18 +148,30 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * concept_id=1088
-   *
-   * @return
+   *  <b>concept_id = 1088</b>
+   *<p>
+   *  <b>Name:</b> MEDICAMENTOS ANTIRRETROVIRAIS ATUAIS USADOS PARA TRATAMENTO 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Pergunta no formulario de consulta: O paciente est&amp;aacute; a tomar, j&amp;aacute; tomou, qualquer um dos seguintes medicamentos retrovirais? Raz&amp;atilde;o Para usar?. 
+   *                      Este especial conceito fornece uma hist&amp;oacute;ria de uso pr&amp;eacute;vio de medicamentos anti-retrovirais associados para o tratamento do HIV
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getRegimeConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.regimeUuid");
     return getConcept(uuid);
   }
+
   /**
-   * Concept id = 1705 Reinicio de terapia ou tratamento apos abandono ou recaida
-   *
-   * @return
+   *  <b>concept_id = 1705</b>
+   *<p>
+   *  <b>Name:</b> REINICIAR 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Reinicio de terapia ou tratamento apos abandono ou recaida
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getRestartConcept() {
     String uuid =
@@ -133,10 +180,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * concept_id = 1707 DROPPED FROM TREATMENT Sinónimos DROPPED FROM ANTI-RETROVIRAL THERAPY DROPPED
-   * FROM TUBERCULOSIS TREATMENT ABANDONED
-   *
-   * @return
+   *  <b>concept_id = 1707</b>
+   *<p>
+   *  <b>Name:</b> ABANDONO 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Abandono do tratammento de terapia ou tratamento
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getAbandonedConcept() {
     String uuid =
@@ -145,9 +196,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * 6328 Second line ARV concepts
-   *
-   * @return
+   *  <b>concept_id = 6328</b>
+   *<p>
+   *  <b>Name:</b> CONCEITOS DE ARV DE SEGUNDA LINHA
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getAzt3tcAbcEfvConcept() {
     String uuid =
@@ -157,9 +213,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * concept 6327
-   *
-   * @return
+   *  <b>concept_id = 6327</b>
+   *<p>
+   *  <b>Name:</b> D4T+3TC+ABC+EFV (SEGUNDA LINHA) 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getD4t3tcAbcEfvConcept() {
     String uuid =
@@ -169,9 +230,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * 6326
-   *
-   * @return
+   *  <b>concept_id = 6326</b>
+   *<p>
+   *  <b>Name:</b> AZT+3TC+ABC+LPV (SEGUNDA LINHA DE REGIME)  
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
    */
   public Concept getAzt3tcAbcLpvConcept() {
     String uuid =
@@ -180,7 +246,16 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // 6325
+  /**
+   *  <b>concept_id = 6325</b>
+   *<p>
+   *  <b>Name:</b> D4T+3TC+ABC+LPV (SEGUNDA LINHA DE REGIME) 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getD4t3tcAbcLpvConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -188,56 +263,129 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // 6109
+  /**
+   *  <b>concept_id = 6109</b>
+   *<p>
+   *  <b>Name:</b> AZT_DDI_LPV (SEGUNDA LINHA DE REGIME) 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getAztDdiLpvConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.AZT_DDI_LPV_ConceptUuid");
     return getConcept(uuid);
   }
 
-  // 1315
+  /**
+   *  <b>concept_id = 1315</b>
+   *<p>
+   *  <b>Name:</b> TDF_3TC_EFV (SEGUNDA LINHA DE REGIME) 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getTdf3tcEfvConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.TDF_3TC_EFV_ConceptUuid");
     return getConcept(uuid);
   }
 
-  // 1314
+  /**
+   *  <b>concept_id = 1314</b>
+   *<p>
+   *  <b>Name:</b> AZT_3TC_LPV (SEGUNDA LINHA DE REGIME) 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getAzt3tcLpvConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.AZT_3TC_LPV_ConceptUuid");
     return getConcept(uuid);
   }
 
-  // 1313
+  /**
+   *  <b>concept_id = 1313</b>
+   *<p>
+   *  <b>Name:</b> ABC_3TC_EFV (SEGUNDA LINHA DE REGIME) 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getAbc3tcEfvConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.ABC_3TC_EFV_ConceptUuid");
     return getConcept(uuid);
   }
 
-  // 1312
+  /**
+   *  <b>concept_id = 1312</b>
+   *<p>
+   *  <b>Name:</b> ABC_3TC_NVP (SEGUNDA LINHA DE REGIME) 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
+
   public Concept getAbc3tcNvpConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.ABC_3TC_NVP_ConceptUuid");
     return getConcept(uuid);
   }
 
-  // 1311
+  /**
+   *  <b>concept_id = 1311</b>
+   *<p>
+   *  <b>Name:</b> ABC_3TC_LPV (SEGUNDA LINHA DE REGIME) 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getAbc3tcLpvConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.ABC_3TC_LPV_ConceptUuid");
     return getConcept(uuid);
   }
 
-  //
+  /**
+   *  <b>concept_id = 1310</b>
+   *<p>
+   *  <b>Name:</b> TDF_3TC_LPV  
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */ 
   public Concept getTdf3tcLpvConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.TDF_3TC_LPV_ConceptUuid");
     return getConcept(uuid);
   }
 
-  // concept id 6306
+  /**
+   *  <b>concept_id = 6306</b>
+   *<p>
+   *  <b>Name:</b> ACEITAR CONTACTO 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Pode ser contactado com a unidade sanitária em caso de necessidade 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getAcceptContactConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -245,7 +393,16 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** concept id 1066 Generic Answer for a question */
+  /**
+   *  <b>concept_id = 1066</b>
+   *<p>
+   *  <b>Name:</b> NÃO
+   *</p>
+   *<p>
+   *  <b>Description:</b> Resposta genérica a uma pergunta
+   *</p> 
+   * @return {@link Concept}
+   */
   @Override
   public Concept getNoConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.noConceptUuid");
@@ -266,21 +423,48 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** concept_id=6122 */
+  /**
+   *  <b>concept_id = 6122</b>
+   *<p>
+   *  <b>Name:</b> USO DE ISONIAZIDA 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getIsoniazidUsageConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.isoniazidUseConceptUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=1695 */
+  /**
+   *  <b>concept_id = 1695</b>
+   *<p>
+   *  <b>Name:</b> CD4 ABSOLUTO OBS  
+   *</p>
+   *<p>
+   *  <b>Description:</b> Se não estiver sob terapia de profilaxia ARV, elegibilidade a partir desta visita
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getCD4AbsoluteOBSConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.cd4AbsoluteOBSUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=6314 */
+  /**
+   *  <b>concept_id = 6314</b>
+   *<p>
+   *  <b>Name:</b> TIPO DE ATIVIDADE DE ACONSELHAMENTO 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getCoucelingActivityConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -288,42 +472,97 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** concept_id=21150 */
+  /**
+   *  <b>concept_id = 21150</b>
+   *<p>
+   *  <b>Name:</b> CONCEITO DE PRIMEIRA LINHA 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getFirstLineConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.firstLineConceptUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=5356 */
+  /**
+   *  <b>concept_id = 5356</b>
+   *<p>
+   *  <b>Name:</b> ESTADIO OMS ACTUAL  
+   *</p>
+   *<p>
+   *  <b>Description:</b> Pergunta feita no formulário de encontro. 
+   *                       Espera uma resposta numérica definindo o estágio do HIV em uma visita específica.
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getcurrentWhoHivStageConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.currentWhoHivStageUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=1205 */
+  /**
+   *  <b>concept_id = 1205</b>
+   *<p>
+   *  <b>Name:</b> ESTADIO II OMS, ADULTO  
+   *</p>
+   *<p>
+   *  <b>Description:</b> Conjunto de conveniência.
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getWho2AdultStageConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.who2AdultStageUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=1206 */
+  /**
+   *  <b>concept_id = 1206</b>
+   *<p>
+   *  <b>Name:</b> ESTADIO III OMS, ADULTO  
+   *</p>
+   *<p>
+   *  <b>Description:</b> Conjunto de conveniência.
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getWho3AdultStageConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.who3AdultStageUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=1207 */
+  /**
+   *  <b>concept_id = 1207</b>
+   *<p>
+   *  <b>Name:</b> ESTADIO VI OMS, ADULTO  
+   *</p>
+   *<p>
+   *  <b>Description:</b> Conjunto de conveniência.
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getWho4AdultStageConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.who4AdultStageUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id = 1366 patient is dead */
+  /**
+   *  <b>concept_id = 1366</b>
+   *<p>
+   *  <b>Name:</b> PACIENTE MORREU 
+   *</p>
+   *<p>
+   *  <b>Description:</b>
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getPatientHasDiedConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -331,51 +570,123 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** concept_id = 1981 */
+  /**
+   *  <b>concept_id = 1981</b>
+   *<p>
+   *  <b>Name:</b> TIPO DE VISITA 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getTypeOfVisitConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.typeOfVisit");
     return getConcept(uuid);
   }
 
-  /** concept_id = 2003 */
+  /**
+   *  <b>concept_id = 2003</b>
+   *<p>
+   *  <b>Name:</b> ACTIVISTA ENCONTROU A PESSOA  
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getPatientFoundConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.patientFound");
     return getConcept(uuid);
   }
 
-  /** concept_id = 1065 */
+  /**
+   *  <b>concept_id = 1065</b>
+   *<p>
+   *  <b>Name:</b> SIM 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Resposta generica de uma pergunta
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getPatientFoundYesConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.yesConceptUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id = 2160 */
+  /**
+   *  <b>concept_id = 2160</b>
+   *<p>
+   *  <b>Name:</b> VISITA DE BUSCA 
+   *</p>
+   *<p>
+   *  <b>Description:</b> 
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getBuscaConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.busca");
     return getConcept(uuid);
   }
 
-  /** concept_id = 6254 */
+  /**
+   *  <b>concept_id = 6254</b>
+   *<p>
+   *  <b>Name:</b> SEGUNDA TENTATIVA 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Data em que pela segunda vez o activista tentou efectuar a busca activa ao paciente
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getSecondAttemptConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.secondAttempt");
     return getConcept(uuid);
   }
 
-  /** concept_id = 6255 */
+  /**
+   *  <b>concept_id = 6255</b>
+   *<p>
+   *  <b>Name:</b> TERCEIRA TENTATIVA 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Data em que pela terceira vez o activista tentou efectuar a busca activa ao paciente
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getThirdAttemptConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.thirdAttempt");
     return getConcept(uuid);
   }
 
-  /** Concept_id = 2016 */
+  /**
+   *  <b>concept_id = 2016</b>
+   *<p>
+   *  <b>Name:</b> MOTIVO DE FALTA 
+   *</p>
+   *<p>
+   *  <b>Description:</b> O PACIENTE APRESENTOU DIFICULDADES
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getDefaultingMotiveConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.defaultingMotive");
     return getConcept(uuid);
   }
 
-  // concept_id = 6201
+  /**
+   *  <b>concept_id = 6201</b>
+   *<p>
+   *  <b>Name:</b> RAZÃO ANTIRRETROVIRAIS PARADOS
+   *</p>
+   *<p>
+   *  <b>Description:</b> Razão para parar de tomar medicamentos ARV nos últimos 7 Dias
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getReasonForStoppedTakingArvDrugsDuringLast7DaysConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -383,7 +694,16 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** Concept_id = 6202 */
+  /**
+   *  <b>concept_id = 6202</b>
+   *<p>
+   *  <b>Name:</b> RAZÃO ANTIRRETROVIRAIS PARADOS
+   *</p>
+   *<p>
+   *  <b>Description:</b> Razão para parar de tomar medicamentos ARV durante o mês passado
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getReasonForStoppedTakingArvDrugsDuringLastMonthConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -391,7 +711,16 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** Concept_id = 6217 */
+  /**
+   *  <b>concept_id = 6217</b>
+   *<p>
+   *  <b>Name:</b> PRINCIPAL RAZAO ATRASO TOMADA DE ARV 
+   *</p>
+   *<p>
+   *  <b>Description:</b>
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getMainReasonForDelayInTakingArvConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -399,8 +728,16 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 2024
-  /** Concept_id = 2024 */
+  /**
+   *  <b>concept_id = 2024</b>
+   *<p>
+   *  <b>Name:</b> PACIENTE COM ENDEREÇO ERRADO 
+   *</p>
+   *<p>
+   *  <b>Description:</b>
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getPatientRecordHasWrongAddressConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -408,24 +745,48 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 2026
-  /** Concept_id = 2026 */
+  /**
+   *  <b>concept_id = 2026</b>
+   *<p>
+   *  <b>Name:</b> PACIENTE MUDOU DE CASA 
+   *</p>
+   *<p>
+   *  <b>Description:</b>
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getPatientMovedHousesConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.patientMovedHouses");
     return getConcept(uuid);
   }
 
-  // concept_id = 2011
-  /** Concept_id = 2011 */
+  /**
+   *  <b>concept_id = 2011</b>
+   *<p>
+   *  <b>Name:</b> PACIENTE VIAJOU 
+   *</p>
+   *<p>
+   *  <b>Description:</b>
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getPatientTookATripConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.patientTookATrip");
     return getConcept(uuid);
   }
 
-  // concept_id = 2032
-  /** Concept_id = 2032 */
+  /**
+   *  <b>concept_id = 2032</b>
+   *<p>
+   *  <b>Name:</b> OUTROS MOTIVOS DE PACIENTE NÂO TER SIDO LOCALIZADO 
+   *</p>
+   *<p>
+   *  <b>Description:</b>
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getOtherReasonsWhyPatientWasNotLocatedByActivistConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -433,16 +794,32 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 2032
-  /** Concept_id = 2032 */
+  /**
+   *  <b>concept_id = 2158</b>
+   *<p>
+   *  <b>Name:</b> RELATÓRIO DA VISITA APOIO 
+   *</p>
+   *<p>
+   *  <b>Description:</b>
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getReportOfVisitSupportConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.reportOfVisitSupport");
     return getConcept(uuid);
   }
 
-  // concept_id = 2157
-  /** Concept_id = 2157 */
+  /**
+   *  <b>concept_id = 2157</b>
+   *<p>
+   *  <b>Name:</b> PACIENTE APRESENTOU DIFICULDADES 
+   *</p>
+   *<p>
+   *  <b>Description:</b>
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getPatientHadDifficultyConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.patientHadDifficulty");
