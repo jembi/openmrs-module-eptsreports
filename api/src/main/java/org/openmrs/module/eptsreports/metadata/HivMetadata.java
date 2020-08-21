@@ -33,13 +33,13 @@ public class HivMetadata extends ProgramsMetadata {
   private String getTBProgramUuid = "eptsreports.tbProgramUuid";
 
   /**
-   *  <b>concept_id = 307</b>
-   *<p>
-   *  <b>Name:</b> SPUTUM FOR ACID FAST BACILLI
-   *</p>
-   *<p>
-   *  <b>Description:</b> Ziehl Nielsen stain for tuberculosis, performed on a deep sputum sample from the respiratory tract.
-   *</p>
+   * <b>concept_id = 307</b>
+   *
+   * <p><b>Name:</b> SPUTUM FOR ACID FAST BACILLI
+   *
+   * <p><b>Description:</b> Ziehl Nielsen stain for tuberculosis, performed on a deep sputum sample
+   * from the respiratory tract.
+   *
    * @return {@link Concept}
    */
   public Concept getResultForBasiloscopia() {
@@ -48,13 +48,13 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
   /**
-   *  <b>concept_id = 856</b>
-   *<p>
-   *  <b>Name:</b> CARGA VIRAL DE HIV
-   *</p>
-   *<p>
-   *  <b>Description:</b> This is a measure of the number of copies/ml of DNA/RNA in patients with HIV.
-   *</p>
+   * <b>concept_id = 856</b>
+   *
+   * <p><b>Name:</b> CARGA VIRAL DE HIV
+   *
+   * <p><b>Description:</b> This is a measure of the number of copies/ml of DNA/RNA in patients with
+   * HIV.
+   *
    * @return {@link Concept}
    */
   public Concept getHivViralLoadConcept() {
@@ -64,13 +64,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6334</b>
-   *<p>
-   *  <b>Name:</b> CRITERIA FOR ART START 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Are criteria that makes a patient starts antiretroviral treatment
-   *</p> 
+   * <b>concept_id = 6334</b>
+   *
+   * <p><b>Name:</b> CRITERIA FOR ART START
+   *
+   * <p><b>Description:</b> Are criteria that makes a patient starts antiretroviral treatment
+   *
    * @return {@link Concept}
    */
   public Concept getCriteriaForArtStart() {
@@ -80,14 +79,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 5096</b>
-   *<p>
-   *  <b>Name:</b> RETURN VISIT DATE FOR ARV DRUG 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Date set for patient re-raise ARV drugs. 
-   *                      If the patient does not appear on this date begins the countdown of days to mark Abandoned after 60 days.
-   *</p> 
+   * <b>concept_id = 5096</b>
+   *
+   * <p><b>Name:</b> RETURN VISIT DATE FOR ARV DRUG
+   *
+   * <p><b>Description:</b> Date set for patient re-raise ARV drugs. If the patient does not appear
+   * on this date begins the countdown of days to mark Abandoned after 60 days.
+   *
    * @return {@link Concept}
    */
   public Concept getReturnVisitDateForArvDrugConcept() {
@@ -98,13 +96,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6123</b>
-   *<p>
-   *  <b>Name:</b> DATE OF HIV DIAGNOSIS
-   *</p>
-   *<p>
-   *  <b>Description:</b> DATE OF HIV+ DIAGNOSIS concept
-   *</p> 
+   * <b>concept_id = 6123</b>
+   *
+   * <p><b>Name:</b> DATE OF HIV DIAGNOSIS
+   *
+   * <p><b>Description:</b> DATE OF HIV+ DIAGNOSIS concept
+   *
    * @return {@link Concept}
    */
   public Concept getDateOfHivDiagnosisConcept() {
@@ -113,14 +110,14 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
   /**
-   *  <b>concept_id = 1190</b>
-   *<p>
-   *  <b>Name:</b> HISTORICAL DRUG START DATE 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Information gathered on encounter forms which describes the date of a particular drug's institution.  
-   *                      Most often "globbed" with another concept which describes the drug.
-   *</p> 
+   * <b>concept_id = 1190</b>
+   *
+   * <p><b>Name:</b> HISTORICAL DRUG START DATE
+   *
+   * <p><b>Description:</b> Information gathered on encounter forms which describes the date of a
+   * particular drug's institution. Most often "globbed" with another concept which describes the
+   * drug.
+   *
    * @return {@link Concept}
    */
   public Concept getARVStartDateConcept() {
@@ -131,14 +128,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1255</b>
-   *<p>
-   *  <b>Name:</b> ANTIRETROVIRAL PLAN 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Question on encounter form.  
-   *                      Collects information related to antiretroviral drug therapy plans.
-   *</p> 
+   * <b>concept_id = 1255</b>
+   *
+   * <p><b>Name:</b> ANTIRETROVIRAL PLAN
+   *
+   * <p><b>Description:</b> Question on encounter form. Collects information related to
+   * antiretroviral drug therapy plans.
+   *
    * @return {@link Concept}
    */
   public Concept getARVPlanConcept() {
@@ -148,13 +144,15 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1088</b>
-   *<p>
-   *  <b>Name:</b> CURRENT ANTIRETROVIRAL DRUGS USED FOR TREATMENT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Question on encounter forms: Is the patient currently taking, or has the patient ever taken, any of the following retroviral medications? or Current HIV Medications:. This particular concept stores a history of active use of the associated antiretroviral medications for treatment.
-   *</p> 
+   * <b>concept_id = 1088</b>
+   *
+   * <p><b>Name:</b> CURRENT ANTIRETROVIRAL DRUGS USED FOR TREATMENT
+   *
+   * <p><b>Description:</b> Question on encounter forms: Is the patient currently taking, or has the
+   * patient ever taken, any of the following retroviral medications? or Current HIV Medications:.
+   * This particular concept stores a history of active use of the associated antiretroviral
+   * medications for treatment.
+   *
    * @return {@link Concept}
    */
   public Concept getRegimeConcept() {
@@ -163,13 +161,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1705</b>
-   *<p>
-   *  <b>Name:</b> RESTART 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Resumption of therapy or treatment or relapse after discontinuation
-   *</p> 
+   * <b>concept_id = 1705</b>
+   *
+   * <p><b>Name:</b> RESTART
+   *
+   * <p><b>Description:</b> Resumption of therapy or treatment or relapse after discontinuation
+   *
    * @return {@link Concept}
    */
   public Concept getRestartConcept() {
@@ -179,13 +176,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1707</b>
-   *<p>
-   *  <b>Name:</b> DROPPED FROM TREATMENT 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 1707</b>
+   *
+   * <p><b>Name:</b> DROPPED FROM TREATMENT
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getAbandonedConcept() {
@@ -195,13 +191,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6328</b>
-   *<p>
-   *  <b>Name:</b> AZT_3TC_ABC_EFV SECOND REGIMEN
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 6328</b>
+   *
+   * <p><b>Name:</b> AZT_3TC_ABC_EFV SECOND REGIMEN
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getAzt3tcAbcEfvConcept() {
@@ -212,13 +207,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6327</b>
-   *<p>
-   *  <b>Name:</b> D4T+3TC+ABC+EFV (SECOND REGIMEN) 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 6327</b>
+   *
+   * <p><b>Name:</b> D4T+3TC+ABC+EFV (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getD4t3tcAbcEfvConcept() {
@@ -229,13 +223,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6326</b>
-   *<p>
-   *  <b>Name:</b> AZT+3TC+ABC+LPV (SECOND REGIMEN)  
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 6326</b>
+   *
+   * <p><b>Name:</b> AZT+3TC+ABC+LPV (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getAzt3tcAbcLpvConcept() {
@@ -246,13 +239,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6325</b>
-   *<p>
-   *  <b>Name:</b> D4T+3TC+ABC+LPV (SECOND REGIMEN) 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 6325</b>
+   *
+   * <p><b>Name:</b> D4T+3TC+ABC+LPV (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getD4t3tcAbcLpvConcept() {
@@ -263,13 +255,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6109</b>
-   *<p>
-   *  <b>Name:</b> AZT_DDI_LPV (SECOND REGIMEN) 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 6109</b>
+   *
+   * <p><b>Name:</b> AZT_DDI_LPV (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getAztDdiLpvConcept() {
@@ -279,13 +270,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1315</b>
-   *<p>
-   *  <b>Name:</b> TDF_3TC_EFV (SECOND REGIMEN) 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 1315</b>
+   *
+   * <p><b>Name:</b> TDF_3TC_EFV (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getTdf3tcEfvConcept() {
@@ -295,13 +285,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1314</b>
-   *<p>
-   *  <b>Name:</b> AZT_3TC_LPV (SECOND REGIMEN) 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 1314</b>
+   *
+   * <p><b>Name:</b> AZT_3TC_LPV (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getAzt3tcLpvConcept() {
@@ -311,13 +300,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1313</b>
-   *<p>
-   *  <b>Name:</b> ABC_3TC_EFV (SECOND REGIMEN) 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 1313</b>
+   *
+   * <p><b>Name:</b> ABC_3TC_EFV (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getAbc3tcEfvConcept() {
@@ -327,16 +315,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1312</b>
-   *<p>
-   *  <b>Name:</b> ABC_3TC_NVP (SECOND REGIMEN) 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 1312</b>
+   *
+   * <p><b>Name:</b> ABC_3TC_NVP (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
-
   public Concept getAbc3tcNvpConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.ABC_3TC_NVP_ConceptUuid");
@@ -344,13 +330,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1311</b>
-   *<p>
-   *  <b>Name:</b> ABC_3TC_LPV (SECOND REGIMEN) 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 1311</b>
+   *
+   * <p><b>Name:</b> ABC_3TC_LPV (SECOND REGIMEN)
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getAbc3tcLpvConcept() {
@@ -360,15 +345,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1310</b>
-   *<p>
-   *  <b>Name:</b> TDF_3TC_LPV  
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 1310</b>
+   *
+   * <p><b>Name:</b> TDF_3TC_LPV
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
-   */ 
+   */
   public Concept getTdf3tcLpvConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.TDF_3TC_LPV_ConceptUuid");
@@ -376,13 +360,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6306</b>
-   *<p>
-   *  <b>Name:</b> ACEPT CONTACT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> A question in a form that determines if the patient agrees to be contact by the health unit in case of need 
-   *</p> 
+   * <b>concept_id = 6306</b>
+   *
+   * <p><b>Name:</b> ACEPT CONTACT
+   *
+   * <p><b>Description:</b> A question in a form that determines if the patient agrees to be contact
+   * by the health unit in case of need
+   *
    * @return {@link Concept}
    */
   public Concept getAcceptContactConcept() {
@@ -393,13 +377,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1066</b>
-   *<p>
-   *  <b>Name:</b> NO CONCEPT
-   *</p>
-   *<p>
-   *  <b>Description:</b> Generic answer to a question.
-   *</p> 
+   * <b>concept_id = 1066</b>
+   *
+   * <p><b>Name:</b> NO CONCEPT
+   *
+   * <p><b>Description:</b> Generic answer to a question.
+   *
    * @return {@link Concept}
    */
   @Override
@@ -423,13 +406,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6122</b>
-   *<p>
-   *  <b>Name:</b> ISONIAZID USE CONCEPT
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 6122</b>
+   *
+   * <p><b>Name:</b> ISONIAZID USE CONCEPT
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getIsoniazidUsageConcept() {
@@ -439,13 +421,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1695</b>
-   *<p>
-   *  <b>Name:</b> CD4 ABSOLUTE OBS  
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 1695</b>
+   *
+   * <p><b>Name:</b> CD4 ABSOLUTE OBS
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getCD4AbsoluteOBSConcept() {
@@ -455,13 +436,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6314</b>
-   *<p>
-   *  <b>Name:</b> COUNCELING ACTIVITY TYPE 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 6314</b>
+   *
+   * <p><b>Name:</b> COUNCELING ACTIVITY TYPE
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getCoucelingActivityConcept() {
@@ -472,13 +452,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 21150</b>
-   *<p>
-   *  <b>Name:</b> FIRST LINE CONCEPT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 21150</b>
+   *
+   * <p><b>Name:</b> FIRST LINE CONCEPT
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getFirstLineConcept() {
@@ -488,14 +467,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 5356</b>
-   *<p>
-   *  <b>Name:</b> CURRENT WHO HIV STAGE   
-   *</p>
-   *<p>
-   *  <b>Description:</b> Question asked on encounter form.  
-   *                      Expects a numeric answer defining the HIV stage at a particular visit.
-   *</p> 
+   * <b>concept_id = 5356</b>
+   *
+   * <p><b>Name:</b> CURRENT WHO HIV STAGE
+   *
+   * <p><b>Description:</b> Question asked on encounter form. Expects a numeric answer defining the
+   * HIV stage at a particular visit.
+   *
    * @return {@link Concept}
    */
   public Concept getcurrentWhoHivStageConcept() {
@@ -505,13 +483,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1205</b>
-   *<p>
-   *  <b>Name:</b> WHO STAGE 2 ADULT  
-   *</p>
-   *<p>
-   *  <b>Description:</b> Convenience set.
-   *</p> 
+   * <b>concept_id = 1205</b>
+   *
+   * <p><b>Name:</b> WHO STAGE 2 ADULT
+   *
+   * <p><b>Description:</b> Convenience set.
+   *
    * @return {@link Concept}
    */
   public Concept getWho2AdultStageConcept() {
@@ -521,13 +498,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1206</b>
-   *<p>
-   *  <b>Name:</b> WHO STAGE 3 ADULT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Convenience set.
-   *</p> 
+   * <b>concept_id = 1206</b>
+   *
+   * <p><b>Name:</b> WHO STAGE 3 ADULT
+   *
+   * <p><b>Description:</b> Convenience set.
+   *
    * @return {@link Concept}
    */
   public Concept getWho3AdultStageConcept() {
@@ -537,13 +513,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1207</b>
-   *<p>
-   *  <b>Name:</b> WHO STAGE 4 ADULT  
-   *</p>
-   *<p>
-   *  <b>Description:</b> Convenience set.
-   *</p> 
+   * <b>concept_id = 1207</b>
+   *
+   * <p><b>Name:</b> WHO STAGE 4 ADULT
+   *
+   * <p><b>Description:</b> Convenience set.
+   *
    * @return {@link Concept}
    */
   public Concept getWho4AdultStageConcept() {
@@ -553,13 +528,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1366</b>
-   *<p>
-   *  <b>Name:</b> PATIENT HAS DIED 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 1366</b>
+   *
+   * <p><b>Name:</b> PATIENT HAS DIED
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getPatientHasDiedConcept() {
@@ -570,13 +544,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1981</b>
-   *<p>
-   *  <b>Name:</b> TYPE OF VISIT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 1981</b>
+   *
+   * <p><b>Name:</b> TYPE OF VISIT
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getTypeOfVisitConcept() {
@@ -585,13 +558,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2003</b>
-   *<p>
-   *  <b>Name:</b> ACTIVIST LOCATED MISSING PATIENT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 2003</b>
+   *
+   * <p><b>Name:</b> ACTIVIST LOCATED MISSING PATIENT
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getPatientFoundConcept() {
@@ -600,13 +572,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1065</b>
-   *<p>
-   *  <b>Name:</b> YES CONCEPT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Generic answer to a question.
-   *</p> 
+   * <b>concept_id = 1065</b>
+   *
+   * <p><b>Name:</b> YES CONCEPT
+   *
+   * <p><b>Description:</b> Generic answer to a question.
+   *
    * @return {@link Concept}
    */
   public Concept getPatientFoundYesConcept() {
@@ -616,13 +587,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2160</b>
-   *<p>
-   *  <b>Name:</b> MISSED VISIT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> 
-   *</p> 
+   * <b>concept_id = 2160</b>
+   *
+   * <p><b>Name:</b> MISSED VISIT
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getBuscaConcept() {
@@ -631,13 +601,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6254</b>
-   *<p>
-   *  <b>Name:</b> SECOND ATTEMPT
-   *</p>
-   *<p>
-   *  <b>Description:</b> Date for the second time the activist tried to make the active search for patients
-   *</p> 
+   * <b>concept_id = 6254</b>
+   *
+   * <p><b>Name:</b> SECOND ATTEMPT
+   *
+   * <p><b>Description:</b> Date for the second time the activist tried to make the active search
+   * for patients
+   *
    * @return {@link Concept}
    */
   public Concept getSecondAttemptConcept() {
@@ -646,13 +616,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6255</b>
-   *<p>
-   *  <b>Name:</b> THIRD ATTEMPT 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Date for the third time the activist tried to make the active search for patients
-   *</p> 
+   * <b>concept_id = 6255</b>
+   *
+   * <p><b>Name:</b> THIRD ATTEMPT
+   *
+   * <p><b>Description:</b> Date for the third time the activist tried to make the active search for
+   * patients
+   *
    * @return {@link Concept}
    */
   public Concept getThirdAttemptConcept() {
@@ -661,13 +631,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2016</b>
-   *<p>
-   *  <b>Name:</b> REASON PATIENT MISSED VISIT 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 2016</b>
+   *
+   * <p><b>Name:</b> REASON PATIENT MISSED VISIT
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getDefaultingMotiveConcept() {
@@ -677,13 +646,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6201</b>
-   *<p>
-   *  <b>Name:</b> REASON ARV STOPPED
-   *</p>
-   *<p>
-   *  <b>Description:</b> Reason for stopped taking ARV drugs during last 7 Days
-   *</p> 
+   * <b>concept_id = 6201</b>
+   *
+   * <p><b>Name:</b> REASON ARV STOPPED
+   *
+   * <p><b>Description:</b> Reason for stopped taking ARV drugs during last 7 Days
+   *
    * @return {@link Concept}
    */
   public Concept getReasonForStoppedTakingArvDrugsDuringLast7DaysConcept() {
@@ -694,13 +662,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6202</b>
-   *<p>
-   *  <b>Name:</b> RREASON ARV STOPPED
-   *</p>
-   *<p>
-   *  <b>Description:</b> Reason for stopped taking ARV drugs during last month
-   *</p> 
+   * <b>concept_id = 6202</b>
+   *
+   * <p><b>Name:</b> RREASON ARV STOPPED
+   *
+   * <p><b>Description:</b> Reason for stopped taking ARV drugs during last month
+   *
    * @return {@link Concept}
    */
   public Concept getReasonForStoppedTakingArvDrugsDuringLastMonthConcept() {
@@ -711,13 +678,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 6217</b>
-   *<p>
-   *  <b>Name:</b> MAIN REASON FOR DELAY IN TAKING ARV 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 6217</b>
+   *
+   * <p><b>Name:</b> MAIN REASON FOR DELAY IN TAKING ARV
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getMainReasonForDelayInTakingArvConcept() {
@@ -728,13 +694,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2024</b>
-   *<p>
-   *  <b>Name:</b> PATIENT RECORD HAS WRONG ADDRESS 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 2024</b>
+   *
+   * <p><b>Name:</b> PATIENT RECORD HAS WRONG ADDRESS
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getPatientRecordHasWrongAddressConcept() {
@@ -745,13 +710,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2026</b>
-   *<p>
-   *  <b>Name:</b> PATIENT MOVED HOUSES 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 2026</b>
+   *
+   * <p><b>Name:</b> PATIENT MOVED HOUSES
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getPatientMovedHousesConcept() {
@@ -761,13 +725,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2011</b>
-   *<p>
-   *  <b>Name:</b> PACIENTE TOOK A TRIP 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 2011</b>
+   *
+   * <p><b>Name:</b> PACIENTE TOOK A TRIP
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getPatientTookATripConcept() {
@@ -777,13 +740,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2032</b>
-   *<p>
-   *  <b>Name:</b> OTHER REASONS WHY PATIENT WAS NOT LOCATED BY ACTIVIST 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 2032</b>
+   *
+   * <p><b>Name:</b> OTHER REASONS WHY PATIENT WAS NOT LOCATED BY ACTIVIST
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getOtherReasonsWhyPatientWasNotLocatedByActivistConcept() {
@@ -794,13 +756,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2158</b>
-   *<p>
-   *  <b>Name:</b> REPORT OF VISIT SUPPORT 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 2158</b>
+   *
+   * <p><b>Name:</b> REPORT OF VISIT SUPPORT
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getReportOfVisitSupportConcept() {
@@ -810,13 +771,12 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 2157</b>
-   *<p>
-   *  <b>Name:</b> PATIENT HAD DIFICULTY 
-   *</p>
-   *<p>
-   *  <b>Description:</b>
-   *</p> 
+   * <b>concept_id = 2157</b>
+   *
+   * <p><b>Name:</b> PATIENT HAD DIFICULTY
+   *
+   * <p><b>Description:</b>
+   *
    * @return {@link Concept}
    */
   public Concept getPatientHadDifficultyConcept() {
@@ -826,13 +786,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   *  <b>concept_id = 1272</b>
-   *<p>
-   *  <b>Name:</b> REFERRALS ORDERED 
-   *</p>
-   *<p>
-   *  <b>Description:</b> Question on encounter form.  Answers are referrals made during a particular patient visit.
-   *</p> 
+   * <b>concept_id = 1272</b>
+   *
+   * <p><b>Name:</b> REFERRALS ORDERED
+   *
+   * <p><b>Description:</b> Question on encounter form. Answers are referrals made during a
+   * particular patient visit.
+   *
    * @return {@link Concept}
    */
   public Concept getPatientFoundForwardedConcept() {
@@ -841,21 +801,45 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 2037
+  /**
+   * <b>concept_id = 2037</b>
+   *
+   * <p><b>Name:</b> REASON PATIENT NOT FOUND PROVIDED BY
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getWhoGaveInformationConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.whoGaveInformation");
     return getConcept(uuid);
   }
 
-  // concept_id = 2180
+  /**
+   * <b>concept_id = 2180</b>
+   *
+   * <p><b>Name:</b> DELIVERY DATE OF THE CARD HOME VISIT THE HEALTH UNIT
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getCardDeliveryDateConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.cardDeliveryDate");
     return getConcept(uuid);
   }
 
-  // concept_id = 1709
+  /**
+   * <b>concept_id = 1709</b>
+   *
+   * <p><b>Name:</b> SUSPEND TREATMENT
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getSuspendedTreatmentConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -863,14 +847,30 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 6269
+  /**
+   * <b>concept_id = 6269</b>
+   *
+   * <p><b>Name:</b> ACTIVE ON PROGRAM CONCEPT
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getActiveOnProgramConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.activeOnProgramConcept");
     return getConcept(uuid);
   }
 
-  // concept_id = 1126
+  /**
+   * <b>concept_id = 1126</b>
+   *
+   * <p><b>Name:</b> UROGENITAL EXAM FINDINGS
+   *
+   * <p><b>Description:</b> Findings noted on examination of the urogenital region.
+   *
+   * @return {@link Concept}
+   */
   public Concept getUrogenitalExamFindingsConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -878,185 +878,419 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 1115
+  /**
+   * <b>concept_id = 1115</b>
+   *
+   * <p><b>Name:</b> NORMAL
+   *
+   * <p><b>Description:</b> General descriptive answer.
+   *
+   * @return {@link Concept}
+   */
   public Concept getNormalConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.normalConcept");
     return getConcept(uuid);
   }
 
-  // concept_id = 1116
+  /**
+   * <b>concept_id = 1116</b>
+   *
+   * <p><b>Name:</b> ABNORMAL
+   *
+   * <p><b>Description:</b> General descriptive answer
+   *
+   * @return {@link Concept}
+   */
   public Concept getAbnormalConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.abnormalConcept");
     return getConcept(uuid);
   }
 
-  // concept_id = 1399
+  /**
+   * <b>concept_id = 1399</b>
+   *
+   * <p><b>Name:</b> SECRETIONS
+   *
+   * <p><b>Description:</b> SECRETIONS [Q HDD PROCESSO ADULTO: Genital examination]
+   *
+   * @return {@link Concept}
+   */
   public Concept getSecretionsConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.secretionsConcept");
     return getConcept(uuid);
   }
 
-  // concept_id = 1400
+  /**
+   * <b>concept_id = 1400</b>
+   *
+   * <p><b>Name:</b> CONDYLOMAS
+   *
+   * <p><b>Description:</b> [Q HDD PROCESSO ADULTO: Genital examination]
+   *
+   * @return {@link Concept}
+   */
   public Concept getCondylomasConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.condylomasConcept");
     return getConcept(uuid);
   }
 
-  // concept_id = 1602
+  /**
+   * <b>concept_id = 1602</b>
+   *
+   * <p><b>Name:</b> ULCERS
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getUlcersConcept() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.ulcersConcept");
     return getConcept(uuid);
   }
 
-  // concept_id=5488
+  /**
+   * <b>concept_id = 5488</b>
+   *
+   * <p><b>Name:</b> ADHERENCE COUNSELING
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getAdherenceCoucelingConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.adherenceCounselingUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=5497 */
+  /**
+   * <b>concept_id = 5497</b>
+   *
+   * <p><b>Name:</b> CD4 COUNT
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getCD4AbsoluteConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.cd4AbsolutoUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=730 */
+  /**
+   * <b>concept_id = 730</b>
+   *
+   * <p><b>Name:</b> CD4 %
+   *
+   * <p><b>Description:</b> Percentage of T-helper lymphocytes.
+   *
+   * @return {@link Concept}
+   */
   public Concept getCD4PercentConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.cd4PercentUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=1714 */
+  /**
+   * <b>concept_id = 1714</b>
+   *
+   * <p><b>Name:</b> ADHERENCE
+   *
+   * <p><b>Description:</b> Generic inquiry about treatment adherance since last farmacy visit
+   *
+   * @return {@link Concept}
+   */
   public Concept getAdherence() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.poorAdherenceUuid");
     return getConcept(uuid);
   }
 
-  /** concept_id=2015 */
+  /**
+   * <b>concept_id = 2015</b>
+   *
+   * <p><b>Name:</b> PATIENT DOES NOT LIKE ARV TREATMENT SIDE EFFECTS
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getAdverseReaction() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.adverseReactionUuid");
     return getConcept(uuid);
   }
 
-  /** Concept 6292 */
+  /**
+   * <b>concept_id = 6292</b>
+   *
+   * <p><b>Name:</b> NEUTROPENIA
+   *
+   * <p><b>Description:</b> Neutropenia e uma doenca hematologica caracterizada por um numero
+   * anormalmente baixo de neutrofilos, o mais importante tipo de célula branca do sangue, no sangue
+   *
+   * @return {@link Concept}
+   */
   public Concept getNeutropenia() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.neutropenia");
     return getConcept(uuid);
   }
 
-  /** Concept 6293 */
+  /**
+   * <b>concept_id = 6293</b>
+   *
+   * <p><b>Name:</b> PANCREATITIS
+   *
+   * <p><b>Description:</b> Pancreatite e a inflamacao do pancreas. O pancreas e um orgao situado na
+   * parte superior do abdomen, aproximadamente atras do estomago
+   *
+   * @return {@link Concept}
+   */
   public Concept getPancreatitis() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.pancreatitis");
     return getConcept(uuid);
   }
 
-  /** Concept 6294 */
+  /**
+   * <b>concept_id = 6294</b>
+   *
+   * <p><b>Name:</b> HEPATOTOXICITY
+   *
+   * <p><b>Description:</b> Hepatotoxicity (liver toxicity) is a liver damage caused by chemicals
+   * called hepatotoxins. It may be a side effect of certain medications
+   *
+   * @return {@link Concept}
+   */
   public Concept getHepatotoxicity() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.hepatotoxicity");
     return getConcept(uuid);
   }
 
-  /** Concept 6295 */
+  /**
+   * <b>concept_id = 6295</b>
+   *
+   * <p><b>Name:</b> PSYCHOLOGICAL CHANGES
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getPsychologicalChanges() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.psychologicalChanges");
     return getConcept(uuid);
   }
 
-  /** Concept 6296 */
+  /**
+   * <b>concept_id = 6296</b>
+   *
+   * <p><b>Name:</b> MYOPATHY
+   *
+   * <p><b>Description:</b> Myopathy is the generic name of diseases and muscle diseases in which
+   * muscle fibers do not work many times, resulting in muscle weakness.
+   *
+   * @return {@link Concept}
+   */
   public Concept getMyopathy() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.myopathy");
     return getConcept(uuid);
   }
 
-  /** Concept 6297 */
+  /**
+   * <b>concept_id = 6927</b>
+   *
+   * <p><b>Name:</b> SKIN ALLERGY
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getSkinAllergy() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.skinAllergy");
     return getConcept(uuid);
   }
 
-  /** Concept 6298 */
+  /**
+   * <b>concept_id = 6298</b>
+   *
+   * <p><b>Name:</b> LIPODYSTROPHY
+   *
+   * <p><b>Description:</b> Lipodystrophy is the designation of a set of bodily changes, related to
+   * fat distribution, which are more frequently observed in people being treated with
+   * antiretrovirals.
+   *
+   * @return {@link Concept}
+   */
   public Concept getLipodystrophy() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.lipodystrophy");
     return getConcept(uuid);
   }
 
-  /** Concept 6299 */
+  /**
+   * <b>concept_id = 6299</b>
+   *
+   * <p><b>Name:</b> LACTIC ACIDOSIS
+   *
+   * <p><b>Description:</b> It is an acute metabolic disease caused by eating sudden grain and other
+   * food highly fermentable in bulk, which is characterized by loss of appetite, depression and
+   * death
+   *
+   * @return {@link Concept}
+   */
   public Concept getLacticAcidosis() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.lacticAcidosis");
     return getConcept(uuid);
   }
 
-  /** Concept 821 */
+  /**
+   * <b>concept_id = 821</b>
+   *
+   * <p><b>Name:</b> PERIPHERAL NEUROPATHY
+   *
+   * <p><b>Description:</b> A disease or degenerative state (as polyneuropathy) of the peripheral
+   * nerves in which motor, sensory, or vasomotor nerve fibers may be affected and which is marked
+   * by muscle weakness and atrophy, pain, and numbness.
+   *
+   * @return {@link Concept}
+   */
   public Concept getPeripheralNeuropathy() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.peripheralNeuropathy");
     return getConcept(uuid);
   }
 
-  /** Concept 16 */
+  /**
+   * <b>concept_id = 16</b>
+   *
+   * <p><b>Name:</b> DIARRHEA
+   *
+   * <p><b>Description:</b> Diarrhea due to an unspecified cause.
+   *
+   * @return {@link Concept}
+   */
   public Concept getDiarrhea() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.diarrhea");
     return getConcept(uuid);
   }
 
-  /** Concept 1406 */
+  /**
+   * <b>concept_id = 1406</b>
+   *
+   * <p><b>Name:</b> OTHER DIAGNOSIS
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getOtherDiagnosis() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.otherDiagnosis");
     return getConcept(uuid);
   }
 
-  /** Concept 23724 GAAC */
+  /**
+   * <b>concept_id = 23724</b>
+   *
+   * <p><b>Name:</b> GAAC
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getGaac() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.gaac");
     return getConcept(uuid);
   }
 
-  /** Concept 23725 AF */
+  /**
+   * <b>concept_id = 23725</b>
+   *
+   * <p><b>Name:</b> AF
+   *
+   * <p><b>Description:</b> Family Approach
+   *
+   * @return {@link Concept}
+   */
   public Concept getFamilyApproach() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.familyApproach");
     return getConcept(uuid);
   }
 
-  /** Concept 23726 CA */
+  /**
+   * <b>concept_id = 23726</b>
+   *
+   * <p><b>Name:</b> CA
+   *
+   * <p><b>Description:</b> Accession Clubs
+   *
+   * @return {@link Concept}
+   */
   public Concept getAccessionClubs() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.accessionClubs");
     return getConcept(uuid);
   }
 
-  /** Concept 23727 PU */
+  /**
+   * <b>concept_id = 23727</b>
+   *
+   * <p><b>Name:</b> PU
+   *
+   * <p><b>Description:</b> Single Stop
+   *
+   * @return {@link Concept}
+   */
   public Concept getSingleStop() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.singleStop");
     return getConcept(uuid);
   }
 
-  /** Concept 23729 FR */
+  /**
+   * <b>concept_id = 23729</b>
+   *
+   * <p><b>Name:</b> FR
+   *
+   * <p><b>Description:</b> Rapid Flow
+   *
+   * @return {@link Concept}
+   */
   public Concept getRapidFlow() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.rapidFlow");
     return getConcept(uuid);
   }
 
-  /** Concept 23730 DT */
+  /**
+   * <b>concept_id = 23730</b>
+   *
+   * <p><b>Name:</b> DT
+   *
+   * <p><b>Description:</b> Quartely Dispensation
+   *
+   * @return {@link Concept}
+   */
   public Concept getQuarterlyDispensation() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.quarterlyDispensation");
     return getConcept(uuid);
   }
 
-  /** Concept 23731 DC */
+  /**
+   * <b>concept_id = 23731</b>
+   *
+   * <p><b>Name:</b> DC
+   *
+   * <p><b>Description:</b> Community Dispensation
+   *
+   * @return {@link Concept}
+   */
   public Concept getCommunityDispensation() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.communityDispensation");
@@ -1064,9 +1298,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * Concept 23732 Other Model
+   * <b>concept_id = 23732</b>
    *
-   * @return
+   * <p><b>Name:</b> Another Model
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
    */
   public Concept getAnotherModel() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.anotherModel");
@@ -1074,9 +1312,14 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * Concept 1256 Start Drugs
+   * <b>concept_id = 1256</b>
    *
-   * @return
+   * <p><b>Name:</b> START DRUGS
+   *
+   * <p><b>Description:</b> Answer on encounter form. Implies that a patient will be started on
+   * drugs for that particular encounter.
+   *
+   * @return {@link Concept}
    */
   public Concept getStartDrugs() {
     String uuid =
@@ -1084,29 +1327,61 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** Concept 1257 Continue Regimen */
+  /**
+   * <b>concept_id = 1257</b>
+   *
+   * <p><b>Name:</b> CONTINUE REGIMEN
+   *
+   * <p><b>Description:</b> Answer on encounter form. Implies that a patient will continue on the
+   * same drug regimen as previously described.
+   *
+   * @return {@link Concept}
+   */
   public Concept getContinueRegimenConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.continueRegimen");
     return getConcept(uuid);
   }
 
-  /** Concept 23808 Pre-ART Start Date */
+  /**
+   * <b>concept_id = 23808</b>
+   *
+   * <p><b>Name:</b> PRE ART Start Date
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getPreArtStartDate() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.preArtStartDate");
     return getConcept(uuid);
   }
 
-  //
-  /** Concept 23866 Date of ART Pickup Return date for ART pick up Master Card */
+  /**
+   * <b>concept_id = 23866</b>
+   *
+   * <p><b>Name:</b> PRE ART PICKUP DATE
+   *
+   * <p><b>Description:</b> Date of PRE ART Pickup
+   *
+   * @return {@link Concept}
+   */
   public Concept getArtDatePickupMasterCard() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.preArtPickupDate");
     return getConcept(uuid);
   }
 
-  /** Concept 6300 Date of ART Pickup */
+  /**
+   * <b>concept_id = 23866</b>
+   *
+   * <p><b>Name:</b> TYPE OF PATIENT TRANSFERRED FROM
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getTypeOfPatientTransferredFrom() {
     String uuid =
         Context.getAdministrationService()
@@ -1114,7 +1389,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** concept_id = 6272 */
+  /**
+   * <b>concept_id = 6272</b>
+   *
+   * <p><b>Name:</b> STATED OF STAY PRE ART PATIENT
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getStateOfStayOfPreArtPatient() {
     String uuid =
         Context.getAdministrationService()
@@ -1122,40 +1405,88 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  /** Concept 6273 patient state */
+  /**
+   * <b>concept_id = 6273</b>
+   *
+   * <p><b>Name:</b> STATED OF STAY ART PATIENT
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getStateOfStayOfArtPatient() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.stateOfStayArtPatient");
     return getConcept(uuid);
   }
 
-  /** Concept 2031 REASON PATIENT NOT FOUND BY ACTIVIST */
+  /**
+   * <b>concept_id = 2031</b>
+   *
+   * <p><b>Name:</b> REASON PATIENT NOT FOUND BY ACTIVIST
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getReasonPatientNotFound() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.reasonPatientNotFound");
     return getConcept(uuid);
   }
 
-  /** Concept 1383 PATIENT IS DEAD - Incorrect */
+  /**
+   * <b>concept_id = 1383</b>
+   *
+   * <p><b>Name:</b> PATIENT IS DEAD - Incorrect
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getPatientIsDead() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.patientIsdeadIncorrect");
     return getConcept(uuid);
   }
 
-  /** Concept 2027 PATIENT IS DEAD */
+  /**
+   * <b>concept_id = 2027</b>
+   *
+   * <p><b>Name:</b> PATIENT IS DEAD
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getPatientIsDeadCorrect() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.patientIsdead");
     return getConcept(uuid);
   }
 
-  /** Concept 6276 Date of ART Pickup */
+  /**
+   * <b>concept_id = 6276</b>
+   *
+   * <p><b>Name:</b> Date of ART Pickup
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getArtStatus() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.art");
     return getConcept(uuid);
   }
 
-  /** Concept 1706 TRANSFERRED OUT TO ANOTHER FACILITY */
+  /**
+   * <b>concept_id = 1706</b>
+   *
+   * <p><b>Name:</b> TRANSFERRED OUT TO ANOTHER FACILITY
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getTransferredOutConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -1164,19 +1495,28 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * Concept 23863 AUTO TRANSFER
+   * <b>concept_id = 23863</b>
    *
-   * @return
+   * <p><b>Name:</b> AUTO TRANSFER
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
    */
   public Concept getAutoTransferConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.autoTransferConceptUuid");
     return getConcept(uuid);
   }
+
   /**
-   * Concept 6272 STATE OF STAY PRIOR ART PATIENT
+   * <b>concept_id = 6272</b>
    *
-   * @return
+   * <p><b>Name:</b> STATE OF STAY PRIOR ART PATIENT
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
    */
   public Concept getStateOfStayPriorArtPatientConcept() {
     String uuid =
@@ -1186,9 +1526,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * Concept 23722 APPLICATION FOR LABORATORY RESEARCH
+   * <b>concept_id = 23722</b>
    *
-   * @return
+   * <p><b>Name:</b> APPLICATION FOR LABORATORY RESEARCH
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
    */
   public Concept getApplicationForLaboratoryResearch() {
     String uuid =
@@ -1196,7 +1540,16 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.applicationForLaboratoryResearch");
     return getConcept(uuid);
   }
-  /** Concept 1305 HIV VIRAL LOAD, QUALITATIVE */
+
+  /**
+   * <b>concept_id = 1305</b>
+   *
+   * <p><b>Name:</b> HIV VIRAL LOAD, QUALITATIVE
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getHivViralLoadQualitative() {
     String uuid =
         Context.getAdministrationService()
@@ -1204,6 +1557,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
+  /**
+   * <b>concept_id = 23703</b>
+   *
+   * <p><b>Name:</b> KEY POPULATION
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getKeyPopulationConcept() {
     String uuid =
         Context.getAdministrationService()
@@ -1211,12 +1573,30 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
+  /**
+   * <b>concept_id = 1377</b>
+   *
+   * <p><b>Name:</b> HOMOSEXUAL
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getHomosexualConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.homosexualConceptUuid");
     return getConcept(uuid);
   }
 
+  /**
+   * <b>concept_id = 20454</b>
+   *
+   * <p><b>Name:</b> DRUG USE
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getDrugUseConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.drugUseConceptUuid");
@@ -1229,6 +1609,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
+  /**
+   * <b>concept_id = 1901</b>
+   *
+   * <p><b>Name:</b> SEX WORKER
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
   public Concept getSexWorkerConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.sexWorkerConceptUuid");
@@ -1236,9 +1625,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * concept_id = 23865
+   * <b>concept_id = 23865</b>
    *
-   * @return
+   * <p><b>Name:</b> ART PICKUP
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
    */
   public Concept getArtPickupConcept() {
     String uuid =
@@ -1247,9 +1640,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * Last Menstruation Date Concept_id = 1465
+   * <b>concept_id = 1465</b>
    *
-   * @return
+   * <p><b>Name:</b> DATE OF LAST MENSTRUATION
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
    */
   public Concept getDateOfLastMenstruationConcept() {
     String uuid =
@@ -1262,6 +1659,15 @@ public class HivMetadata extends ProgramsMetadata {
    * concept_id = 23739
    *
    * @return
+   */
+  /**
+   * <b>concept_id = 1465</b>
+   *
+   * <p><b>Name:</b> DATE OF LAST MENSTRUATION
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
    */
   public Concept getTypeOfDispensationConcept() {
     String uuid =
