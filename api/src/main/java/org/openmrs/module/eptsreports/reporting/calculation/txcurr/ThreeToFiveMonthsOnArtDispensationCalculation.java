@@ -483,8 +483,54 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
         }
       }
       // 2 filas on the same encounter date, but with different value datetime
-      //pick the obs with the highest value datetime
+      // pick the obs with the highest value datetime
+      // fila should be greater than fila
       else if (lastFilaPickedEncounter != null
+          && lastFichaEncounter != null
+          && secondLastEncounter != null
+          && obsListForAllFila.size() > 0) {
+        if (lastFilaPickedEncounter
+                .getEncounterDatetime()
+                .equals(secondLastEncounter.getEncounterDatetime())
+            && lastFilaPickedEncounter
+                    .getEncounterDatetime()
+                    .compareTo(lastFichaEncounter.getEncounterDatetime())
+                > 0) {
+          // loop through the obs and pick those that match those 2 encounter
+          for (Obs obs : obsListForAllFila) {
+            if (obs.getValueDatetime() != null
+                && (lastFilaPickedEncounter.equals(obs.getEncounter())
+                    || secondLastEncounter.equals(obs.getEncounter()))) {
+              filaObsOnTheSameEncounterDate.add(obs);
+            }
+          }
+          Date requiredDate = null;
+          if (filaObsOnTheSameEncounterDate.size() == 2) {
+            requiredDate = filaObsOnTheSameEncounterDate.get(0).getValueDatetime();
+            if (filaObsOnTheSameEncounterDate.get(1).getValueDatetime().compareTo(requiredDate)
+                > 0) {
+              requiredDate = filaObsOnTheSameEncounterDate.get(1).getValueDatetime();
+            }
+          }
+          // no that you have the right value datetime and the encounter date, do the logic for >=83
+          // days and <=173 days
+          if (requiredDate != null
+              && EptsCalculationUtils.exactDaysSince(
+                      requiredDate, lastFilaPickedEncounter.getEncounterDatetime())
+                  >= 83
+              && EptsCalculationUtils.exactDaysSince(
+                      requiredDate, lastFilaPickedEncounter.getEncounterDatetime())
+                  <= 173) {
+            found = true;
+          }
+        }
+      }
+
+      // 2 filas on the same encounter date, but with different value datetime
+      // pick the obs with the highest value datetime
+      // ficha is null for this case
+      else if (lastFilaPickedEncounter != null
+          && lastFichaEncounter == null
           && secondLastEncounter != null
           && obsListForAllFila.size() > 0) {
         if (lastFilaPickedEncounter

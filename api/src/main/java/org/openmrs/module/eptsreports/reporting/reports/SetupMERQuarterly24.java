@@ -108,7 +108,7 @@ public class SetupMERQuarterly24 extends EptsDataExportManager {
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+            genericCohortQueries.getBaseCohortTest(), "endDate=${endDate},location=${location}"));
 
     return rd;
   }

@@ -152,7 +152,8 @@ public class GenericCohortQueries {
   }
 
   public CohortDefinition getBaseCohortTest() {
-    return generalSql("baseCohort", "SELECT patient_id FROM patient WHERE patient_id IN(17696)");
+    return generalSql(
+        "baseCohort", "SELECT patient_id FROM patient WHERE patient_id IN(21827, 19649, 34484)");
   }
 
   /**
