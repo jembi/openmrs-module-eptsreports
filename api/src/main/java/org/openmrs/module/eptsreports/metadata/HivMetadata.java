@@ -35,10 +35,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 307</b>
    *<p>
-   *  <b>Name:</b> ESPUTO PARA BACILOS RÁPIDOS DE ÁCIDO
+   *  <b>Name:</b> SPUTUM FOR ACID FAST BACILLI
    *</p>
    *<p>
-   *  <b>Description:</b> Mancha para a tuberculose, realizado em uma amostra profunda muco do trato respiratório.
+   *  <b>Description:</b> Ziehl Nielsen stain for tuberculosis, performed on a deep sputum sample from the respiratory tract.
    *</p>
    * @return {@link Concept}
    */
@@ -53,7 +53,7 @@ public class HivMetadata extends ProgramsMetadata {
    *  <b>Name:</b> CARGA VIRAL DE HIV
    *</p>
    *<p>
-   *  <b>Description:</b> Medição de numero de copias/ml de ADN/RNA em  pacientes com HIV.
+   *  <b>Description:</b> This is a measure of the number of copies/ml of DNA/RNA in patients with HIV.
    *</p>
    * @return {@link Concept}
    */
@@ -66,10 +66,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6334</b>
    *<p>
-   *  <b>Name:</b> CRITERIO PARA INICIO DE TARV 
+   *  <b>Name:</b> CRITERIA FOR ART START 
    *</p>
    *<p>
-   *  <b>Description:</b> Critérios que faz com que um paciente inicie o TARV
+   *  <b>Description:</b> Are criteria that makes a patient starts antiretroviral treatment
    *</p> 
    * @return {@link Concept}
    */
@@ -82,11 +82,11 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 5096</b>
    *<p>
-   *  <b>Name:</b> DATA DO PROXIMO LEVANTAMENTO DE ARV 
+   *  <b>Name:</b> RETURN VISIT DATE FOR ARV DRUG 
    *</p>
    *<p>
-   *  <b>Description:</b> Data marcada para o paciente voltar a levantar medicamentos ARV. 
-   *                     Se o paciente não aparece nesta data começa a contagem de dias para se marcar ABANDONO após 60 dias
+   *  <b>Description:</b> Date set for patient re-raise ARV drugs. 
+   *                      If the patient does not appear on this date begins the countdown of days to mark Abandoned after 60 days.
    *</p> 
    * @return {@link Concept}
    */
@@ -100,10 +100,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6123</b>
    *<p>
-   *  <b>Name:</b> DATA DO DIAGNÓSTICO DE HIV 
+   *  <b>Name:</b> DATE OF HIV DIAGNOSIS
    *</p>
    *<p>
-   *  <b>Description:</b> Data marcada para o teste diagnóstico de HIV
+   *  <b>Description:</b> DATE OF HIV+ DIAGNOSIS concept
    *</p> 
    * @return {@link Concept}
    */
@@ -115,11 +115,11 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1190</b>
    *<p>
-   *  <b>Name:</b> DATA DE INICIO DA MEDICACAO 
+   *  <b>Name:</b> HISTORICAL DRUG START DATE 
    *</p>
    *<p>
-   *  <b>Description:</b> Informação adquirida no formulario de encontro que descreve a data de inicio de um medicamento em particular. 
-   *                     Na maioria das vezes "globbed" com um outro conceito que descreve o medicamento
+   *  <b>Description:</b> Information gathered on encounter forms which describes the date of a particular drug's institution.  
+   *                      Most often "globbed" with another concept which describes the drug.
    *</p> 
    * @return {@link Concept}
    */
@@ -133,11 +133,11 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1255</b>
    *<p>
-   *  <b>Name:</b> GESTÃO DE TARV 
+   *  <b>Name:</b> ANTIRETROVIRAL PLAN 
    *</p>
    *<p>
-   *  <b>Description:</b> Pergunta em formulario de encontro: "O paciente tem, ou o paciente já teve, qualquer uma das seguintes condições?". 
-   *                     Esta questão registra de 1 a n todas as condições listadas como respostas a este conceito
+   *  <b>Description:</b> Question on encounter form.  
+   *                      Collects information related to antiretroviral drug therapy plans.
    *</p> 
    * @return {@link Concept}
    */
@@ -150,11 +150,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1088</b>
    *<p>
-   *  <b>Name:</b> MEDICAMENTOS ANTIRRETROVIRAIS ATUAIS USADOS PARA TRATAMENTO 
+   *  <b>Name:</b> CURRENT ANTIRETROVIRAL DRUGS USED FOR TREATMENT 
    *</p>
    *<p>
-   *  <b>Description:</b> Pergunta no formulario de consulta: O paciente est&amp;aacute; a tomar, j&amp;aacute; tomou, qualquer um dos seguintes medicamentos retrovirais? Raz&amp;atilde;o Para usar?. 
-   *                      Este especial conceito fornece uma hist&amp;oacute;ria de uso pr&amp;eacute;vio de medicamentos anti-retrovirais associados para o tratamento do HIV
+   *  <b>Description:</b> Question on encounter forms: Is the patient currently taking, or has the patient ever taken, any of the following retroviral medications? or Current HIV Medications:. This particular concept stores a history of active use of the associated antiretroviral medications for treatment.
    *</p> 
    * @return {@link Concept}
    */
@@ -166,10 +165,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1705</b>
    *<p>
-   *  <b>Name:</b> REINICIAR 
+   *  <b>Name:</b> RESTART 
    *</p>
    *<p>
-   *  <b>Description:</b> Reinicio de terapia ou tratamento apos abandono ou recaida
+   *  <b>Description:</b> Resumption of therapy or treatment or relapse after discontinuation
    *</p> 
    * @return {@link Concept}
    */
@@ -182,10 +181,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1707</b>
    *<p>
-   *  <b>Name:</b> ABANDONO 
+   *  <b>Name:</b> DROPPED FROM TREATMENT 
    *</p>
    *<p>
-   *  <b>Description:</b> Abandono do tratammento de terapia ou tratamento
+   *  <b>Description:</b>
    *</p> 
    * @return {@link Concept}
    */
@@ -198,7 +197,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6328</b>
    *<p>
-   *  <b>Name:</b> CONCEITOS DE ARV DE SEGUNDA LINHA
+   *  <b>Name:</b> AZT_3TC_ABC_EFV SECOND REGIMEN
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -215,7 +214,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6327</b>
    *<p>
-   *  <b>Name:</b> D4T+3TC+ABC+EFV (SEGUNDA LINHA) 
+   *  <b>Name:</b> D4T+3TC+ABC+EFV (SECOND REGIMEN) 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -232,7 +231,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6326</b>
    *<p>
-   *  <b>Name:</b> AZT+3TC+ABC+LPV (SEGUNDA LINHA DE REGIME)  
+   *  <b>Name:</b> AZT+3TC+ABC+LPV (SECOND REGIMEN)  
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -249,7 +248,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6325</b>
    *<p>
-   *  <b>Name:</b> D4T+3TC+ABC+LPV (SEGUNDA LINHA DE REGIME) 
+   *  <b>Name:</b> D4T+3TC+ABC+LPV (SECOND REGIMEN) 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -266,7 +265,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6109</b>
    *<p>
-   *  <b>Name:</b> AZT_DDI_LPV (SEGUNDA LINHA DE REGIME) 
+   *  <b>Name:</b> AZT_DDI_LPV (SECOND REGIMEN) 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -282,7 +281,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1315</b>
    *<p>
-   *  <b>Name:</b> TDF_3TC_EFV (SEGUNDA LINHA DE REGIME) 
+   *  <b>Name:</b> TDF_3TC_EFV (SECOND REGIMEN) 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -298,7 +297,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1314</b>
    *<p>
-   *  <b>Name:</b> AZT_3TC_LPV (SEGUNDA LINHA DE REGIME) 
+   *  <b>Name:</b> AZT_3TC_LPV (SECOND REGIMEN) 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -314,7 +313,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1313</b>
    *<p>
-   *  <b>Name:</b> ABC_3TC_EFV (SEGUNDA LINHA DE REGIME) 
+   *  <b>Name:</b> ABC_3TC_EFV (SECOND REGIMEN) 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -330,7 +329,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1312</b>
    *<p>
-   *  <b>Name:</b> ABC_3TC_NVP (SEGUNDA LINHA DE REGIME) 
+   *  <b>Name:</b> ABC_3TC_NVP (SECOND REGIMEN) 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -347,7 +346,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1311</b>
    *<p>
-   *  <b>Name:</b> ABC_3TC_LPV (SEGUNDA LINHA DE REGIME) 
+   *  <b>Name:</b> ABC_3TC_LPV (SECOND REGIMEN) 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -379,10 +378,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6306</b>
    *<p>
-   *  <b>Name:</b> ACEITAR CONTACTO 
+   *  <b>Name:</b> ACEPT CONTACT 
    *</p>
    *<p>
-   *  <b>Description:</b> Pode ser contactado com a unidade sanitária em caso de necessidade 
+   *  <b>Description:</b> A question in a form that determines if the patient agrees to be contact by the health unit in case of need 
    *</p> 
    * @return {@link Concept}
    */
@@ -396,10 +395,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1066</b>
    *<p>
-   *  <b>Name:</b> NÃO
+   *  <b>Name:</b> NO CONCEPT
    *</p>
    *<p>
-   *  <b>Description:</b> Resposta genérica a uma pergunta
+   *  <b>Description:</b> Generic answer to a question.
    *</p> 
    * @return {@link Concept}
    */
@@ -426,7 +425,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6122</b>
    *<p>
-   *  <b>Name:</b> USO DE ISONIAZIDA 
+   *  <b>Name:</b> ISONIAZID USE CONCEPT
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -442,10 +441,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1695</b>
    *<p>
-   *  <b>Name:</b> CD4 ABSOLUTO OBS  
+   *  <b>Name:</b> CD4 ABSOLUTE OBS  
    *</p>
    *<p>
-   *  <b>Description:</b> Se não estiver sob terapia de profilaxia ARV, elegibilidade a partir desta visita
+   *  <b>Description:</b>
    *</p> 
    * @return {@link Concept}
    */
@@ -458,7 +457,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6314</b>
    *<p>
-   *  <b>Name:</b> TIPO DE ATIVIDADE DE ACONSELHAMENTO 
+   *  <b>Name:</b> COUNCELING ACTIVITY TYPE 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -475,7 +474,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 21150</b>
    *<p>
-   *  <b>Name:</b> CONCEITO DE PRIMEIRA LINHA 
+   *  <b>Name:</b> FIRST LINE CONCEPT 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -491,11 +490,11 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 5356</b>
    *<p>
-   *  <b>Name:</b> ESTADIO OMS ACTUAL  
+   *  <b>Name:</b> CURRENT WHO HIV STAGE   
    *</p>
    *<p>
-   *  <b>Description:</b> Pergunta feita no formulário de encontro. 
-   *                       Espera uma resposta numérica definindo o estágio do HIV em uma visita específica.
+   *  <b>Description:</b> Question asked on encounter form.  
+   *                      Expects a numeric answer defining the HIV stage at a particular visit.
    *</p> 
    * @return {@link Concept}
    */
@@ -508,10 +507,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1205</b>
    *<p>
-   *  <b>Name:</b> ESTADIO II OMS, ADULTO  
+   *  <b>Name:</b> WHO STAGE 2 ADULT  
    *</p>
    *<p>
-   *  <b>Description:</b> Conjunto de conveniência.
+   *  <b>Description:</b> Convenience set.
    *</p> 
    * @return {@link Concept}
    */
@@ -524,10 +523,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1206</b>
    *<p>
-   *  <b>Name:</b> ESTADIO III OMS, ADULTO  
+   *  <b>Name:</b> WHO STAGE 3 ADULT 
    *</p>
    *<p>
-   *  <b>Description:</b> Conjunto de conveniência.
+   *  <b>Description:</b> Convenience set.
    *</p> 
    * @return {@link Concept}
    */
@@ -540,10 +539,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1207</b>
    *<p>
-   *  <b>Name:</b> ESTADIO VI OMS, ADULTO  
+   *  <b>Name:</b> WHO STAGE 4 ADULT  
    *</p>
    *<p>
-   *  <b>Description:</b> Conjunto de conveniência.
+   *  <b>Description:</b> Convenience set.
    *</p> 
    * @return {@link Concept}
    */
@@ -556,7 +555,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1366</b>
    *<p>
-   *  <b>Name:</b> PACIENTE MORREU 
+   *  <b>Name:</b> PATIENT HAS DIED 
    *</p>
    *<p>
    *  <b>Description:</b>
@@ -573,7 +572,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1981</b>
    *<p>
-   *  <b>Name:</b> TIPO DE VISITA 
+   *  <b>Name:</b> TYPE OF VISIT 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -588,7 +587,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2003</b>
    *<p>
-   *  <b>Name:</b> ACTIVISTA ENCONTROU A PESSOA  
+   *  <b>Name:</b> ACTIVIST LOCATED MISSING PATIENT 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -603,10 +602,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 1065</b>
    *<p>
-   *  <b>Name:</b> SIM 
+   *  <b>Name:</b> YES CONCEPT 
    *</p>
    *<p>
-   *  <b>Description:</b> Resposta generica de uma pergunta
+   *  <b>Description:</b> Generic answer to a question.
    *</p> 
    * @return {@link Concept}
    */
@@ -619,7 +618,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2160</b>
    *<p>
-   *  <b>Name:</b> VISITA DE BUSCA 
+   *  <b>Name:</b> MISSED VISIT 
    *</p>
    *<p>
    *  <b>Description:</b> 
@@ -634,10 +633,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6254</b>
    *<p>
-   *  <b>Name:</b> SEGUNDA TENTATIVA 
+   *  <b>Name:</b> SECOND ATTEMPT
    *</p>
    *<p>
-   *  <b>Description:</b> Data em que pela segunda vez o activista tentou efectuar a busca activa ao paciente
+   *  <b>Description:</b> Date for the second time the activist tried to make the active search for patients
    *</p> 
    * @return {@link Concept}
    */
@@ -649,10 +648,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6255</b>
    *<p>
-   *  <b>Name:</b> TERCEIRA TENTATIVA 
+   *  <b>Name:</b> THIRD ATTEMPT 
    *</p>
    *<p>
-   *  <b>Description:</b> Data em que pela terceira vez o activista tentou efectuar a busca activa ao paciente
+   *  <b>Description:</b> Date for the third time the activist tried to make the active search for patients
    *</p> 
    * @return {@link Concept}
    */
@@ -664,10 +663,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2016</b>
    *<p>
-   *  <b>Name:</b> MOTIVO DE FALTA 
+   *  <b>Name:</b> REASON PATIENT MISSED VISIT 
    *</p>
    *<p>
-   *  <b>Description:</b> O PACIENTE APRESENTOU DIFICULDADES
+   *  <b>Description:</b>
    *</p> 
    * @return {@link Concept}
    */
@@ -680,10 +679,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6201</b>
    *<p>
-   *  <b>Name:</b> RAZÃO ANTIRRETROVIRAIS PARADOS
+   *  <b>Name:</b> REASON ARV STOPPED
    *</p>
    *<p>
-   *  <b>Description:</b> Razão para parar de tomar medicamentos ARV nos últimos 7 Dias
+   *  <b>Description:</b> Reason for stopped taking ARV drugs during last 7 Days
    *</p> 
    * @return {@link Concept}
    */
@@ -697,10 +696,10 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6202</b>
    *<p>
-   *  <b>Name:</b> RAZÃO ANTIRRETROVIRAIS PARADOS
+   *  <b>Name:</b> RREASON ARV STOPPED
    *</p>
    *<p>
-   *  <b>Description:</b> Razão para parar de tomar medicamentos ARV durante o mês passado
+   *  <b>Description:</b> Reason for stopped taking ARV drugs during last month
    *</p> 
    * @return {@link Concept}
    */
@@ -714,7 +713,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 6217</b>
    *<p>
-   *  <b>Name:</b> PRINCIPAL RAZAO ATRASO TOMADA DE ARV 
+   *  <b>Name:</b> MAIN REASON FOR DELAY IN TAKING ARV 
    *</p>
    *<p>
    *  <b>Description:</b>
@@ -731,7 +730,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2024</b>
    *<p>
-   *  <b>Name:</b> PACIENTE COM ENDEREÇO ERRADO 
+   *  <b>Name:</b> PATIENT RECORD HAS WRONG ADDRESS 
    *</p>
    *<p>
    *  <b>Description:</b>
@@ -748,7 +747,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2026</b>
    *<p>
-   *  <b>Name:</b> PACIENTE MUDOU DE CASA 
+   *  <b>Name:</b> PATIENT MOVED HOUSES 
    *</p>
    *<p>
    *  <b>Description:</b>
@@ -764,7 +763,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2011</b>
    *<p>
-   *  <b>Name:</b> PACIENTE VIAJOU 
+   *  <b>Name:</b> PACIENTE TOOK A TRIP 
    *</p>
    *<p>
    *  <b>Description:</b>
@@ -780,7 +779,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2032</b>
    *<p>
-   *  <b>Name:</b> OUTROS MOTIVOS DE PACIENTE NÂO TER SIDO LOCALIZADO 
+   *  <b>Name:</b> OTHER REASONS WHY PATIENT WAS NOT LOCATED BY ACTIVIST 
    *</p>
    *<p>
    *  <b>Description:</b>
@@ -797,7 +796,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2158</b>
    *<p>
-   *  <b>Name:</b> RELATÓRIO DA VISITA APOIO 
+   *  <b>Name:</b> REPORT OF VISIT SUPPORT 
    *</p>
    *<p>
    *  <b>Description:</b>
@@ -813,7 +812,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    *  <b>concept_id = 2157</b>
    *<p>
-   *  <b>Name:</b> PACIENTE APRESENTOU DIFICULDADES 
+   *  <b>Name:</b> PATIENT HAD DIFICULTY 
    *</p>
    *<p>
    *  <b>Description:</b>
@@ -826,8 +825,16 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-  // concept_id = 1272
-  /** Concept_id = 1272 */
+  /**
+   *  <b>concept_id = 1272</b>
+   *<p>
+   *  <b>Name:</b> REFERRALS ORDERED 
+   *</p>
+   *<p>
+   *  <b>Description:</b> Question on encounter form.  Answers are referrals made during a particular patient visit.
+   *</p> 
+   * @return {@link Concept}
+   */
   public Concept getPatientFoundForwardedConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.patientFoundForwarded");
