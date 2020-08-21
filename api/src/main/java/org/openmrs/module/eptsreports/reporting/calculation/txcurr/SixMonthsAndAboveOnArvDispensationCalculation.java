@@ -293,9 +293,7 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
       // latest that has
       // information filled
       else if (lastFilaWithReturnForDrugsObs != null
-          && lastFilaEncounter != null
           && lastFilaWithReturnForDrugsObs.getEncounter() != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
           && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastDispensaTrimestralWithoutSemestralObs == null
           && lastDispensaSemestraWithoutStartOrContinueDrugsObs == null
@@ -332,11 +330,8 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
       // same date
       // we will end up picking the fila
       else if (lastFichaEncounter != null
-          && lastFilaEncounter != null
-          && lastFichaEncounter.getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs != null
           && lastFilaWithReturnForDrugsObs.getEncounter() != null
-          && lastFilaEncounter.equals(lastFilaWithReturnForDrugsObs.getEncounter())
           && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
           && lastFichaEncounter
