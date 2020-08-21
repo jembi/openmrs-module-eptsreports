@@ -272,11 +272,11 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                           .getEncounter()
                           .getEncounterDatetime())
               > 0
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               >= 83
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               <= 173) {
         found = true;
       }
@@ -302,11 +302,11 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                           .getEncounter()
                           .getEncounterDatetime())
               > 0
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               >= 83
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               <= 173) {
         found = true;
       }
@@ -320,10 +320,10 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           && getLastQuartelyDispensationObsWithStartOrContinueRegimenObs == null
           && lastFilaObs.getValueDatetime() != null
           && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               >= 83
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               <= 173) {
         found = true;
       }
@@ -375,11 +375,11 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   getLastTypeOfDispensationObsWithoutQuartelyValueCoded
                       .getEncounter()
                       .getEncounterDatetime())
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               >= 83
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               <= 173) {
         found = true;
       }
@@ -399,11 +399,11 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   getLastQuartelyDispensationObsWithStartOrContinueRegimenObs
                       .getEncounter()
                       .getEncounterDatetime())
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               >= 83
-          && EptsCalculationUtils.daysSince(
-                  lastFilaObs.getEncounter().getEncounterDatetime(), lastFilaObs.getValueDatetime())
+          && EptsCalculationUtils.exactDaysSince(
+                  lastFilaObs.getValueDatetime(), lastFilaObs.getEncounter().getEncounterDatetime())
               <= 173) {
         found = true;
       }
@@ -471,18 +471,19 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
         for (Obs obs : obsListForAllFila) {
           if (lastFilaEncounter.equals(obs.getEncounter())
               && obs.getValueDatetime() != null
-              && EptsCalculationUtils.daysSince(
-                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
+              && EptsCalculationUtils.exactDaysSince(
+                      obs.getValueDatetime(), obs.getEncounter().getEncounterDatetime())
                   >= 83
-              && EptsCalculationUtils.daysSince(
-                      obs.getEncounter().getEncounterDatetime(), obs.getValueDatetime())
+              && EptsCalculationUtils.exactDaysSince(
+                      obs.getValueDatetime(), obs.getEncounter().getEncounterDatetime())
                   <= 173) {
             found = true;
             break;
           }
         }
       }
-      // fila and ficha available, but fila> fila
+      // 2 filas on the same encounter date, but with different value datetime
+      //pick the obs with the highest value datetime
       else if (lastFilaPickedEncounter != null
           && secondLastEncounter != null
           && obsListForAllFila.size() > 0) {
@@ -508,11 +509,11 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
           // no that you have the right value datetime and the encounter date, do the logic for >=83
           // days and <=173 days
           if (requiredDate != null
-              && EptsCalculationUtils.daysSince(
-                      lastFilaPickedEncounter.getEncounterDatetime(), requiredDate)
+              && EptsCalculationUtils.exactDaysSince(
+                      requiredDate, lastFilaPickedEncounter.getEncounterDatetime())
                   >= 83
-              && EptsCalculationUtils.daysSince(
-                      lastFilaPickedEncounter.getEncounterDatetime(), requiredDate)
+              && EptsCalculationUtils.exactDaysSince(
+                      requiredDate, lastFilaPickedEncounter.getEncounterDatetime())
                   <= 173) {
             found = true;
           }
