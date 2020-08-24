@@ -2220,7 +2220,16 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.reasonPatientNotFoundByActivist3rdVisitConceptUuid");
     return getConcept(uuid);
   }
-  /** encounterType_id = 6 */
+
+  /**
+   * <b>encounterType_id = 6</b>
+   *
+   * <p><b>Name:</b> S.TARV: ADULTO SEGUIMENTO 
+   *
+   * <p><b>Description:</b> Seguimento visita do paciente adulto
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getAdultoSeguimentoEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2228,14 +2237,31 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  /** encounterType_id = 9 */
+  /**
+   * <b>encounterType_id = 9</b>
+   *
+   * <p><b>Name:</b> S.TARV: PEDIATRIA SEGUIMENTO 
+   *
+   * <p><b>Description:</b> Seguimento visita do paciente pediatria
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getPediatriaSeguimentoEncounterType() {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.sTarvPediatriaSeguimentoEncounterTypeUuid");
     return getEncounterType(uuid);
   }
-  /** encounterType_id= 21 */
+
+  /**
+   * <b>encounterType_id = 21</b>
+   *
+   * <p><b>Name:</b> S.TARV: BUSCA ACTIVA 
+   *
+   * <p><b>Description:</b> Busca Activa
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getBuscaActivaEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2243,7 +2269,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  /** encounterType_id = 5 */
+  /**
+   * <b>encounterType_id = 5</b>
+   *
+   * <p><b>Name:</b> S.TARV: ADULTO INICIAL A
+   *
+   * <p><b>Description:</b> Primeira visita do paciente adulto
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getARVAdultInitialEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2251,7 +2285,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  /** encounterType_id = 7 */
+  /**
+   * <b>encounterType_id = 7</b>
+   *
+   * <p><b>Name:</b> S.TARV: PEDIATRIA INICIAL A
+   *
+   * <p><b>Description:</b> Primeira visita do paciente pediatria
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getARVPediatriaInitialEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2259,14 +2301,30 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  /** encounterType_id = 18 */
+  /**
+   * <b>encounterType_id = 18</b>
+   *
+   * <p><b>Name:</b> S.TARV: FARMACIA
+   *
+   * <p><b>Description:</b> Farmacia
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getARVPharmaciaEncounterType() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty(gpSTarvFarmaciaEncounterTypeUuid);
     return getEncounterType(uuid);
   }
 
-  /** encounter_type_id = 29 */
+  /**
+   * <b>encounterType_id = 29</b>
+   *
+   * <p><b>Name:</b> S.TARV: AVALIACAO E PREPARACAO DO CANDIDATO TARV
+   *
+   * <p><b>Description:</b> Avalicao e preparacao psicologica do candidato ao TARV
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getEvaluationAndPrepForARTEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2275,9 +2333,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * encounter_type 13
+   * <b>encounterType_id = 13</b>
    *
-   * @return
+   * <p><b>Name:</b> MISAU: LABORATORIO
+   *
+   * <p><b>Description:</b> Laboratorio
+   *
+   * @return {@link EncounterType}
    */
   public EncounterType getMisauLaboratorioEncounterType() {
     String uuid =
@@ -2286,7 +2348,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // encounter type 34
+  /**
+   * <b>encounterType_id = 34</b>
+   *
+   * <p><b>Name:</b> APSS: PREVENÇÃO POSITIVA - INICIAL
+   *
+   * <p><b>Description:</b> Avaliação Psico-Social e Prevenção Positiva
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getPrevencaoPositivaInicialEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2294,7 +2364,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // encounter type 35
+  /**
+   * <b>encounterType_id = 35</b>
+   *
+   * <p><b>Name:</b> APSS: PREVENÇÃO POSITIVA - SEGUIMENTO
+   *
+   * <p><b>Description:</b> Ficha de apoio psicossocial e prevenção positiva - Seguimento
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getPrevencaoPositivaSeguimentoEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2303,9 +2381,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * encounter type 36 Coming from ICAP
+   * <b>encounterType_id = 36 </b> Coming from ICAP
    *
-   * @return encounter type
+   * <p><b>Name:</b> S.TARV: VISITA DE APOIO E REINTEGRACAO - PARTE A
+   *
+   * <p><b>Description:</b> Consulta de dados de visita ao domicilio para apoio e reintegração do paciente
+   *
+   * @return {@link EncounterType}
    */
   public EncounterType getVisitaApoioReintegracaoParteAEncounterType() {
     String uuid =
@@ -2315,9 +2397,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * encounter type 37 Coming from ICAP
+   * <b>encounterType_id = 37 </b> Coming from ICAP
    *
-   * @return encounter type
+   * <p><b>Name:</b> S.TARV: VISITA DE APOIO E REINTEGRACAO - PARTE B
+   *
+   * <p><b>Description:</b> Consulta de dados de visita ao domicilio para apoio e reintegração do paciente
+   *
+   * @return {@link EncounterType}
    */
   public EncounterType getVisitaApoioReintegracaoParteBEncounterType() {
     String uuid =
@@ -2326,7 +2412,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // encounter_type_id = 1
+  /**
+   * <b>encounterType_id = 1</b>
+   *
+   * <p><b>Name:</b> S.TARV: ADULTO INICIAL B
+   *
+   * <p><b>Description:</b> Outpatient Adult Initial Visit part 2
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getARVAdultInitialBEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2334,7 +2428,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // encounter_type_id = 3
+  /**
+   * <b>encounterType_id = 3</b>
+   *
+   * <p><b>Name:</b> S.TARV: PEDIATRIA INICIAL B
+   *
+   * <p><b>Description:</b> Primeira visita de paciente pediatrico, parte B. As duas ultimas paginas
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getARVPediatriaInitialBEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2342,7 +2444,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // encounter_type_id = 19
+  /**
+   * <b>encounterType_id = 19</b>
+   *
+   * <p><b>Name:</b> S.TARV: ACONSELHAMENTO
+   *
+   * <p><b>Description:</b> MISAU/HDD TARV Aconselhamento
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getArtAconselhamentoEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2350,7 +2460,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // encounter_type_id = 24
+  /**
+   * <b>encounterType_id = 24</b>
+   *
+   * <p><b>Name:</b> S.TARV: ACONSELHAMENTO SEGUIMENTO
+   *
+   * <p><b>Description:</b> Seguimento Aconselhamento
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getArtAconselhamentoSeguimentoEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2358,7 +2476,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // encounter_type = 52
+  /**
+   * <b>encounterType_id = 52</b>
+   *
+   * <p><b>Name:</b> Levantamento de ARV Master Card
+   *
+   * <p><b>Description:</b> Registo de levantamento de ARV no Master Card
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getMasterCardDrugPickupEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -2366,14 +2492,30 @@ public class HivMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  /** encounter_type = 53 */
+  /**
+   * <b>encounterType_id = 53</b>
+   *
+   * <p><b>Name:</b> Master Card - Ficha Resumo
+   *
+   * <p><b>Description:</b> Ficha resumo no master card
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getMasterCardEncounterType() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.masterCardEncounterType");
     return getEncounterType(uuid);
   }
 
-  /** encounter_type = 51 */
+  /**
+   * <b>encounterType_id = 51</b>
+   *
+   * <p><b>Name:</b> FSR
+   *
+   * <p><b>Description:</b> Carga Viral
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getFsrEncounterType() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.fsrEncounterType");
