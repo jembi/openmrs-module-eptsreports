@@ -2525,9 +2525,13 @@ public class HivMetadata extends ProgramsMetadata {
   // Programs
 
   /**
-   * program_id=2
+   * <b>program_id = 2</b>
    *
-   * @return
+   * <p><b>Name:</b> SERVICO TARV - TRATAMENTO
+   *
+   * <p><b>Description:</b> Programa de seguimento e tratamento aos pacientes HIV+
+   *
+   * @return {@link Program}
    */
   public Program getARTProgram() {
     String uuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
@@ -2535,9 +2539,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * ETV ProgramId = 8
+   * <b>program_id = 8</b>
    *
-   * @return
+   * <p><b>Name:</b> PTV/ETV
+   *
+   * <p><b>Description:</b> Programa de representa o estado de gravidez de uma mulher
+   *
+   * @return {@link Program}
    */
   public Program getPtvEtvProgram() {
     String uuid = Context.getAdministrationService().getGlobalProperty(gpPtvEtvProgramUuid);
@@ -2545,9 +2553,13 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * program_id=1
+   * <b>program_id = 1 </b>
    *
-   * @return
+   * <p><b>Name:</b> SERVICO TARV - CUIDADO
+   *
+   * <p><b>Description:</b> Programa de seguimento e cuidado aos pacientes HIV+
+   *
+   * @return {@link Program}
    */
   public Program getHIVCareProgram() {
     String uuid =
@@ -2555,13 +2567,30 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgram(uuid);
   }
 
-  // Program Id 5 TB
+  /**
+   * <b>program_id = 5 </b>
+   *
+   * <p><b>Name:</b> TUBERCULOSE
+   *
+   * <p><b>Description:</b> Programa de Combate a Tuberculose
+   *
+   * @return {@link Program}
+   */
   public Program getTBProgram() {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.tbProgramUuid");
     return getProgram(uuid);
   }
 
   // Identifier types
+  /**
+   * <b>program_id = 2 </b>
+   *
+   * <p><b>Name:</b> NID (SERVICO TARV)
+   *
+   * <p><b>Description:</b> Numero de Identificaçao de Doente, serviço TARV
+   *
+   * @return {@link PatientIdentifierType}
+   */
   public PatientIdentifierType getNidServiceTarvIdentifierType() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.nidServicoTarvUuid");
@@ -2569,11 +2598,30 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   // Program Workflow States
+
+  /**
+   * <b>program_workflow_state_id = 7 </b>
+   *
+   * <p><b>Name:</b> TRANSFERRED OUT TO ANOTHER FACILITY
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */  
   public ProgramWorkflowState getTransferredOutToAnotherHealthFacilityWorkflowState() {
     String artProgramUuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
     return getProgramWorkflowState(artProgramUuid, "2", "TRANSFERRED OUT TO ANOTHER FACILITY");
   }
 
+  /**
+   * <b>program_workflow_state_id = 29 </b>
+   *
+   * <p><b>Name:</b> ART CARE TRANSFERRED FROM OTHER FACILITY
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getTransferredFromOtherHealthFacilityWorkflowState() {
     // TODO Refactor this method, use
     // #getTransferredFromOtherHealthFacilityWorkflowState(Program,
@@ -2585,6 +2633,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflowState(artProgramUuid, "2", transferFromOtherUuid);
   }
 
+  /**
+   * <b>program_workflow_state_id = 28 </b>
+   *
+   * <p><b>Name:</b> HIV CARE TRANSFERRED FROM OTHER FACILITY
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getArtCareTransferredFromOtherHealthFacilityWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
@@ -2593,6 +2650,15 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  /**
+   * <b>program_workflow_state_id = 29 </b>
+   *
+   * <p><b>Name:</b> ART CARE TRANSFERRED FROM OTHER FACILITY
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getArtTransferredFromOtherHealthFacilityWorkflowState() {
     Program hivCareProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
@@ -2601,6 +2667,15 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  /**
+   * <b>program_workflow_state_id = 3 </b>
+   *
+   * <p><b>Name:</b> HIV CARE TRANSFERRED OUT TO ANOTHER FACILITY
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getArtCareTransferredOutToAnotherHealthFacilityWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
@@ -2609,6 +2684,15 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  /**
+   * <b>program_workflow_state_id = 1 </b>
+   *
+   * <p><b>Name:</b> HIV CARE ACTIVE ON PROGRAM
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getArtCareActiveOnProgramWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
@@ -2616,6 +2700,15 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  /**
+   * <b>program_workflow_state_id = 6 </b>
+   *
+   * <p><b>Name:</b> ART CARE ACTIVE ON PROGRAM
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getArtActiveOnProgramWorkflowState() {
     Program hivCareProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
@@ -2623,6 +2716,15 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  /**
+   * <b>program_workflow_state_id = 2 </b>
+   *
+   * <p><b>Name:</b> HIV CARE ABANDONED
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getArtCareAbandonedWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
@@ -2630,16 +2732,43 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  /**
+   * <b>program_workflow_state_id = 8 </b>
+   *
+   * <p><b>Name:</b> ART CARE SUSPEND TREATMENT
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getSuspendedTreatmentWorkflowState() {
     String artProgramUuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
     return getProgramWorkflowState(artProgramUuid, "2", "SUSPEND TREATMENT");
   }
 
+  /**
+   * <b>program_workflow_state_id = 9 </b>
+   *
+   * <p><b>Name:</b> ART CARE ABANDONED
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getAbandonedWorkflowState() {
     String artProgramUuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
     return getProgramWorkflowState(artProgramUuid, "2", "ABANDONED");
   }
 
+  /**
+   * <b>program_workflow_state_id = 10 </b>
+   *
+   * <p><b>Name:</b> ART CARE PATIENT HAS DIED
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getPatientHasDiedWorkflowState() {
     String artProgramUuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
     return getProgramWorkflowState(artProgramUuid, "2", "PATIENT HAS DIED");
@@ -2651,17 +2780,44 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflowState(ptvProgramUuid, "5", "GAVE BIRTH");
   }
 
+  /**
+   * <b>program_workflow_state_id = 5 </b>
+   *
+   * <p><b>Name:</b> HIV CARE PATIENT HAS DIED
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getArtCareDeadWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
     return getDeadWorkflowState(hivCareProgram, workflow);
   }
 
+  /**
+   * <b>program_workflow_state_id = 6 </b>
+   *
+   * <p><b>Name:</b> ART CARE ACTIVE ON PROGRAM
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getPateintActiveArtWorkflowState() {
     String artProgramUuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
     return getProgramWorkflowState(artProgramUuid, "2", "c50d6bdc-8a79-43ae-ab45-abbaa6b45e7d");
   }
 
+  /**
+   * <b>program_workflow_state_id = 29 </b>
+   *
+   * <p><b>Name:</b> ART CARE TRANSFERRED FROM OTHER FACILITY
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getPateintTransferedFromOtherFacilityWorkflowState() {
     String artProgramUuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
     return getProgramWorkflowState(artProgramUuid, "2", "TRANSFER FROM OTHER FACILITY");
@@ -2673,18 +2829,45 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflowState(ptvProgramUuid, "5", "PREGNANT");
   }
 
+  /**
+   * <b>program_workflow_state_id = 1 </b>
+   *
+   * <p><b>Name:</b> HIV CARE ACTIVE ON PROGRAM
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getPateintActiveOnHIVCareProgramtWorkflowState() {
     String hivCareProgramUuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.hivCareProgramUuid");
     return getProgramWorkflowState(hivCareProgramUuid, "1", "ACTIVE ON PROGRAM");
   }
 
+  /**
+   * <b>program_workflow_state_id = 28 </b>
+   *
+   * <p><b>Name:</b> HIV CARE TRANSFERRED FROM OTHER FACILITY
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getPateintTransferedFromOtherFacilityHIVCareWorkflowState() {
     String hivCareProgramUuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.hivCareProgramUuid");
     return getProgramWorkflowState(hivCareProgramUuid, "1", "TRANSFER FROM OTHER FACILITY");
   }
 
+  /**
+   * <b>program_workflow_state_id = 16 </b>
+   *
+   * <p><b>Name:</b> TUBERCULOSE ACTIVE ON PROGRAM
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getPatientActiveOnTBProgramWorkflowState() {
     String tbProgramUuid = Context.getAdministrationService().getGlobalProperty(getTBProgramUuid);
     return getProgramWorkflowState(tbProgramUuid, "4", "ACTIVE ON PROGRAM");
@@ -2787,6 +2970,15 @@ public class HivMetadata extends ProgramsMetadata {
         program.getUuid(), programWorkflow.getUuid(), transferFromOtherFacility.getUuid());
   }
 
+  /**
+   * <b>program_workflow_state_id = 4 </b>
+   *
+   * <p><b>Name:</b> HIV CARE START DRUGS
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getArtCareInitiatedWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
@@ -2795,6 +2987,15 @@ public class HivMetadata extends ProgramsMetadata {
         hivCareProgram.getUuid(), workflow.getUuid(), startDrugs.getUuid());
   }
 
+  /**
+   * <b>program_workflow_state_id = 8 </b>
+   *
+   * <p><b>Name:</b> ART CARE SUSPEND TREATMENT
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getArtSuspendedTreatmentWorkflowState() {
     Program artProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
@@ -2807,6 +3008,15 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflow(getARTProgram().getUuid(), "2");
   }
 
+  /**
+   * <b>program_workflow_state_id = 29 </b>
+   *
+   * <p><b>Name:</b> ART CARE TRANSFERRED FROM OTHER FACILITY
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */ 
   public ProgramWorkflowState getArtTransferredOutToAnotherHealthFacilityWorkflowState() {
     Program artProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
@@ -2815,12 +3025,30 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  /**
+   * <b>program_workflow_state_id = 10 </b>
+   *
+   * <p><b>Name:</b> ART CARE PATIENT HAS DIED
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getArtDeadWorkflowState() {
     Program artProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
     return getDeadWorkflowState(artProgram, workflow);
   }
 
+  /**
+   * <b>program_workflow_state_id = 9 </b>
+   *
+   * <p><b>Name:</b> ART CARE ABANDONED
+   *
+   * <p><b>Description:</b> 
+   *
+   * @return {@link ProgramWorkflowState}
+   */
   public ProgramWorkflowState getArtAbandonedWorkflowState() {
     Program artProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
