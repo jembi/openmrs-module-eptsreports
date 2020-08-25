@@ -2650,6 +2650,7 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  // TODO: Duplicated method 
   /**
    * <b>program_workflow_state_id = 29 </b>
    *
@@ -2684,6 +2685,7 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  
   /**
    * <b>program_workflow_state_id = 1 </b>
    *
@@ -2774,6 +2776,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflowState(artProgramUuid, "2", "PATIENT HAS DIED");
   }
 
+  // TODO: Missing program_workflow_state_id
   public ProgramWorkflowState getPatientGaveBirthWorkflowState() {
     String ptvProgramUuid =
         Context.getAdministrationService().getGlobalProperty(gpPtvEtvProgramUuid);
@@ -2795,6 +2798,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getDeadWorkflowState(hivCareProgram, workflow);
   }
 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 6 </b>
    *
@@ -2809,6 +2813,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflowState(artProgramUuid, "2", "c50d6bdc-8a79-43ae-ab45-abbaa6b45e7d");
   }
 
+  // TODO: Duplicated method 
   /**
    * <b>program_workflow_state_id = 29 </b>
    *
@@ -2823,12 +2828,14 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflowState(artProgramUuid, "2", "TRANSFER FROM OTHER FACILITY");
   }
 
+  // TODO: Duplicated and Missing program_workflow_id
   public ProgramWorkflowState getPateintPregnantWorkflowState() {
     String ptvProgramUuid =
         Context.getAdministrationService().getGlobalProperty(gpPtvEtvProgramUuid);
     return getProgramWorkflowState(ptvProgramUuid, "5", "PREGNANT");
   }
 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 1 </b>
    *
@@ -2844,6 +2851,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflowState(hivCareProgramUuid, "1", "ACTIVE ON PROGRAM");
   }
 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 28 </b>
    *
@@ -2987,6 +2995,7 @@ public class HivMetadata extends ProgramsMetadata {
         hivCareProgram.getUuid(), workflow.getUuid(), startDrugs.getUuid());
   }
 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 8 </b>
    *
@@ -3008,6 +3017,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflow(getARTProgram().getUuid(), "2");
   }
 
+  // TODO: Duplicated method 
   /**
    * <b>program_workflow_state_id = 29 </b>
    *
@@ -3025,6 +3035,7 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 10 </b>
    *
@@ -3040,6 +3051,7 @@ public class HivMetadata extends ProgramsMetadata {
     return getDeadWorkflowState(artProgram, workflow);
   }
 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 9 </b>
    *
