@@ -885,39 +885,98 @@ public class TxCurrCohortQueries {
   public SqlCohortDefinition getPatientsWithQuarterlyTypeOfDispensation() {
     SqlCohortDefinition patientsWithQuarterlyTypeOfDispensation = new SqlCohortDefinition();
     String sqlQuery =
-        "SELECT pp.patient_id "
-            + "FROM   ( "
-            + "              SELECT lst.patient_id, "
-            + "                     lst.encounter_datetime "
-            + "              FROM   ( "
-            + "                              SELECT   last_encounter.patient_id, "
-            + "                                       last_encounter.encounter_id, "
-            + "                                       last_encounter.encounter_datetime "
-            + "                              FROM     ( "
-            + "                                                SELECT   e.patient_id, "
-            + "                                                         e.encounter_datetime, "
-            + "                                                         e.encounter_id "
-            + "                                                FROM     encounter e "
-            + "                                                WHERE    e.encounter_type IN(${aRVPharmaciaEncounterType},"
-            + "                                                                             ${adultoSeguimentoEncounterType})"
-            + "                                                AND      e.encounter_datetime <= :onOrBefore "
-            + "                                                AND      e.location_id = :location "
-            + "                                                AND      e.voided=0 "
-            + "                                                ORDER BY e.encounter_type DESC, e.encounter_datetime DESC ) AS last_encounter "
-            + "                              GROUP BY last_encounter.patient_id) AS lst, "
-            + "                     obs o "
-            + "              WHERE  lst.encounter_id=o.encounter_id "
-            + "              AND    o.voided=0 "
-            + "              AND    (( "
-            + "                                   o.concept_id= ${returnVisitDateForArvDrugConcept} "
-            + "                            AND    timestampdiff(day, lst.encounter_datetime, o.value_datetime) BETWEEN ${minDays} AND    ${maxDays} )"
-            + "                     OR     ( "
-            + "                                   o.concept_id= ${typeOfDispensationConcept} "
-            + "                            AND    o.value_coded = ${quarterlyConcept}) "
-            + "                     OR     ( "
-            + "                                   o.concept_id= ${quarterlyConcept} "
-            + "                            AND    o.value_coded IN (${startDrugsConcept}, "
-            + "                                                     ${continueRegimen})))) AS pp";
+        "SELECT en.patient_id    "                     
+
+       + "FROM     "
+       + "(SELECT e.patient_id, max(e.encounter_datetime) encounter_date    "
+       + "FROM patient p    "
+       + "INNER JOIN encounter e ON p.patient_id = e.patient_id    "
+       + "WHERE e.encounter_type IN (18,6)    "
+       + "AND p.voided = 0    "
+       + "AND e.voided = 0    "
+       + "AND e.location_id = 271    "
+       + "AND e.encounter_datetime <= '2020-01-20'    "
+       + "GROUP by p.patient_id) as last_encounter     "
+       
+       + "INNER JOIN  encounter en  ON en.patient_id = last_encounter.patient_id     "
+       + "AND en.encounter_datetime = last_encounter.encounter_date    "
+       
+       + "INNER JOIN obs ob on ob.encounter_id = en.encounter_id     "
+       
+       + "WHERE en.voided = 0    "
+       + "AND ob.voided = 0    "
+       + "AND en.location_id = 271    "
+       
+       + "AND ((en.encounter_type = 18 AND ob.concept_id = 5096     "
+       + "AND ob.value_datetime IS NOT NULL     "
+       + "AND timestampdiff(day,last_encounter.encounter_date,ob.value_datetime) BETWEEN 83 AND 173)    "
+      
+       
+       + "OR (en.encounter_type = 6 AND     "
+       + "((ob.concept_id = 23739 AND ob.value_coded = 23720)     "
+       + "OR (ob.concept_id = 23730 AND ob.value_coded in (1256,1257))    "
+       
+       + "OR (en.patient_id in (    "
+       + "select e.patient_id    "
+       + "FROM encounter e    "
+       + "INNER JOIN obs o ON o.encounter_id = e.encounter_id    "
+       + "WHERE e.voided = 0 AND o.voided = 0    "
+       + "AND e.patient_id = en.patient_id    "
+       + "AND o.value_coded = 23720    "
+       + "AND e.encounter_type = 6    "
+       + "AND e.location_id = 271    "
+       + "AND e.encounter_datetime = last_encounter.encounter_date    "
+       + "group by e.patient_id)))    "
+       + ")    "
+      
+       + "OR ((en.encounter_type = 18 AND ob.concept_id = 5096     "
+       + "AND ob.value_datetime IS NOT NULL     "
+       + "AND timestampdiff(day,last_encounter.encounter_date,    "
+       + "(SELECT  max(o.value_datetime)     "
+       + "FROM encounter e    "
+       + "INNER JOIN obs o ON o.encounter_id = e.encounter_id    "
+       + "WHERE e.voided = 0 AND o.voided = 0    "
+       + "AND e.patient_id = en.patient_id    "
+       + "AND o.concept_id = 5096    "
+       + "AND o.value_datetime IS NOT NULL    "
+       + "AND e.encounter_type = 18    "
+       + "AND e.location_id = 271    "
+       + "AND e.encounter_datetime = last_encounter.encounter_date    "
+       + "group by e.patient_id)) BETWEEN 83 AND 173))    "
+       + ")    "
+    
+       + "AND IF(en.patient_id in    "
+       + "(SELECT  e.patient_id as patient_id    "
+       + "FROM encounter e    "
+       + "INNER JOIN    "
+       + "(SELECT  e.patient_id as patient_id, e.encounter_datetime    "
+       + "FROM encounter e    "
+       + "WHERE e.voided = 0     "
+       + "AND e.encounter_type = 6    "
+       + "AND e.location_id = 271    "
+       + "GROUP BY e.patient_id) as b on e.patient_id = b.patient_id     "
+       + "AND e.encounter_datetime = b.encounter_datetime    "
+       + "WHERE e.voided = 0    "
+       + "AND e.patient_id = en.patient_id    "
+       + "AND e.encounter_datetime = last_encounter.encounter_date    "
+       + "AND e.encounter_type = 18    "
+       + "AND e.location_id = 271    "
+       + "GROUP BY e.patient_id    "
+       + "),18,en.encounter_type) = en.encounter_type    "
+      
+       + "AND en.patient_id NOT IN     "
+       + "(select e.patient_id    "
+       + "FROM encounter e    "
+       + "INNER JOIN obs o ON o.encounter_id = e.encounter_id    "
+       + "WHERE e.voided = 0 AND o.voided = 0    "
+       + "AND o.concept_id = 23730    "
+       + "AND o.value_coded = 1267    "
+       + "AND e.encounter_type = 6    "
+       + "AND e.location_id = 271    "
+       + "AND e.encounter_datetime <= '2020-01-20'    "
+       + "group by e.patient_id)    "
+       
+       + "group by en.patient_id;";
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put(
@@ -948,6 +1007,31 @@ public class TxCurrCohortQueries {
         new Parameter("location", "Location", Location.class));
     return patientsWithQuarterlyTypeOfDispensation;
   }
+
+ /**
+   * Dispensation Compositions
+   *
+   * @return
+   */
+  public CohortDefinition
+      quarterlyDispensationComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Get patients with Quarterly ARV Dispensation");
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition quarterlyDispensation = getPatientsWithQuarterlyTypeOfDispensation();
+    CohortDefinition monthlyDispensation = getPatientsWithLessThan3MonthlyTypeOfDispensation();
+    CohortDefinition semiAnnualDispensation = getPatientsWithSemiAnnualTypeOfDispensation();
+
+    cd.addSearch("quarterly", Mapped.mapStraightThrough(quarterlyDispensation));
+    cd.addSearch("monthly", Mapped.mapStraightThrough(monthlyDispensation));
+    cd.addSearch("semiAnnual", Mapped.mapStraightThrough(semiAnnualDispensation));
+
+    cd.setCompositionString("quarterly AND NOT semiAnnual");
+    return cd;
+  } 
 
   @DocumentedDefinition(
       "Patients marked as DS on Ficha Clinica Mastercard on last Tipo de Levantamento")
