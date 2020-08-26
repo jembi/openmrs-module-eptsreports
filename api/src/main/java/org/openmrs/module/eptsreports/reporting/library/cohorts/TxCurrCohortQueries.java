@@ -775,13 +775,7 @@ public class TxCurrCohortQueries {
                 .get(0));
     cd1.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
     cd1.addParameter(new Parameter("location", "Location", Location.class));
-    CalculationCohortDefinition cd2 =
-        new CalculationCohortDefinition(
-            "3-5 months of ARVs dispensed",
-            Context.getRegisteredComponents(ThreeToFiveMonthsOnArtDispensationCalculation.class)
-                .get(0));
-    cd2.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
-    cd2.addParameter(new Parameter("location", "Location", Location.class));
+
     CalculationCohortDefinition cd3 =
         new CalculationCohortDefinition(
             "6 or more months of ARV dispensed",
@@ -791,7 +785,11 @@ public class TxCurrCohortQueries {
     cd3.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch("1", EptsReportUtils.map(cd1, "onOrBefore=${onOrBefore},location=${location}"));
-    cd.addSearch("2", EptsReportUtils.map(cd2, "onOrBefore=${onOrBefore},location=${location}"));
+    cd.addSearch(
+        "2",
+        EptsReportUtils.map(
+            getPatientsWhoAreOn3To5MonthsArvCombined(),
+            "onOrBefore=${onOrBefore},location=${location}"));
     cd.addSearch("3", EptsReportUtils.map(cd3, "onOrBefore=${onOrBefore},location=${location}"));
     if (range.equals("<3")) {
       cd.setCompositionString("1 AND NOT (2 OR 3)");
@@ -1164,5 +1162,24 @@ public class TxCurrCohortQueries {
     definition.addParameter(new Parameter("location", "location", Location.class));
 
     return definition;
+  }
+
+  private CohortDefinition getPatientsWhoAreOn3To5MonthsArvCombined() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Get combined patients for the 3 to 5 months on ARV");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CalculationCohortDefinition cd2 =
+        new CalculationCohortDefinition(
+            "3-5 months of ARVs dispensed",
+            Context.getRegisteredComponents(ThreeToFiveMonthsOnArtDispensationCalculation.class)
+                .get(0));
+    cd2.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
+    cd2.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch("cd2", EptsReportUtils.map(cd2, "onOrBefore=${onOrBefore},location=${location}"));
+    cd.setCompositionString("cd2");
+    return cd;
   }
 }

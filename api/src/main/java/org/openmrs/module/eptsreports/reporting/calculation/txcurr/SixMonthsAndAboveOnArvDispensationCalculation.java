@@ -260,13 +260,15 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
 
       }
       // case 2 ficha filled is after fila filled with semestral concept id reverse of 1
-      else if (lastFilaEncounter != null
-          && lastFichaEncounter != null
+      else if (lastFilaWithReturnForDrugsObs != null
+          && lastFilaWithReturnForDrugsObs.getEncounter() != null
           && lastFichaObsWithSemestarlValueCoded != null
+          && lastFichaObsWithSemestarlValueCoded.getEncounter() != null
           && lastFichaObsWithSemestarlValueCoded.getValueCoded().equals(dispensaSemestra)
-          && lastFichaEncounter
+          && lastFichaObsWithSemestarlValueCoded
+                  .getEncounter()
                   .getEncounterDatetime()
-                  .compareTo(lastFilaEncounter.getEncounterDatetime())
+                  .compareTo(lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
               > 0) {
         found = true;
       }

@@ -151,6 +151,11 @@ public class GenericCohortQueries {
             hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId()));
   }
 
+  public CohortDefinition getBaseCohortTest() {
+    return generalSql(
+        "baseCohortTest", "SELECT patient_id FROM patient WHERE patient_id IN(38813)");
+  }
+
   /**
    * Get patients states based on program, state and end of reporting period
    *
@@ -506,7 +511,7 @@ public class GenericCohortQueries {
   /**
    * Gets last obs with value coded before enDate
    *
-   * @param encounterTypeId The Obs encounter Type
+   * @param encounterTypes The Obs encounter Type
    * @param question The Obs quetion concept
    * @param answers The third value coded
    * @return String
@@ -543,7 +548,7 @@ public class GenericCohortQueries {
   /**
    * Gets last obs with value coded before enDate
    *
-   * @param encounterTypeId The Obs encounter Type
+   * @param encounterTypes The Obs encounter Type
    * @param question The Obs quetion concept
    * @param answers The third value coded
    * @return String
