@@ -1764,7 +1764,8 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> HEPATITIS
    *
-   * <p><b>Description:</b> Liver infection with an unknown organism or unspecified non-infectious liver inflammation.
+   * <p><b>Description:</b> Liver infection with an unknown organism or unspecified non-infectious
+   * liver inflammation.
    *
    * @return {@link Concept}
    */
@@ -2017,7 +2018,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> MONTHLY
    *
-   * <p><b>Description:</b> Records whether the patient is receiving ARVs by quarterly dispensation 
+   * <p><b>Description:</b> Records whether the patient is receiving ARVs by quarterly dispensation
    *
    * @return {@link Concept}
    */
@@ -2224,7 +2225,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    * <b>encounterType_id = 6</b>
    *
-   * <p><b>Name:</b> S.TARV: ADULTO SEGUIMENTO 
+   * <p><b>Name:</b> S.TARV: ADULTO SEGUIMENTO
    *
    * <p><b>Description:</b> Seguimento visita do paciente adulto
    *
@@ -2240,7 +2241,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    * <b>encounterType_id = 9</b>
    *
-   * <p><b>Name:</b> S.TARV: PEDIATRIA SEGUIMENTO 
+   * <p><b>Name:</b> S.TARV: PEDIATRIA SEGUIMENTO
    *
    * <p><b>Description:</b> Seguimento visita do paciente pediatria
    *
@@ -2256,7 +2257,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    * <b>encounterType_id = 21</b>
    *
-   * <p><b>Name:</b> S.TARV: BUSCA ACTIVA 
+   * <p><b>Name:</b> S.TARV: BUSCA ACTIVA
    *
    * <p><b>Description:</b> Busca Activa
    *
@@ -2385,7 +2386,8 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> S.TARV: VISITA DE APOIO E REINTEGRACAO - PARTE A
    *
-   * <p><b>Description:</b> Consulta de dados de visita ao domicilio para apoio e reintegração do paciente
+   * <p><b>Description:</b> Consulta de dados de visita ao domicilio para apoio e reintegração do
+   * paciente
    *
    * @return {@link EncounterType}
    */
@@ -2401,7 +2403,8 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> S.TARV: VISITA DE APOIO E REINTEGRACAO - PARTE B
    *
-   * <p><b>Description:</b> Consulta de dados de visita ao domicilio para apoio e reintegração do paciente
+   * <p><b>Description:</b> Consulta de dados de visita ao domicilio para apoio e reintegração do
+   * paciente
    *
    * @return {@link EncounterType}
    */
@@ -2604,10 +2607,10 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> TRANSFERRED OUT TO ANOTHER FACILITY
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */  
+   */
   public ProgramWorkflowState getTransferredOutToAnotherHealthFacilityWorkflowState() {
     String artProgramUuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
     return getProgramWorkflowState(artProgramUuid, "2", "TRANSFERRED OUT TO ANOTHER FACILITY");
@@ -2621,7 +2624,7 @@ public class HivMetadata extends ProgramsMetadata {
    * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getTransferredFromOtherHealthFacilityWorkflowState() {
     // TODO Refactor this method, use
     // #getTransferredFromOtherHealthFacilityWorkflowState(Program,
@@ -2638,10 +2641,10 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> HIV CARE TRANSFERRED FROM OTHER FACILITY
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getArtCareTransferredFromOtherHealthFacilityWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
@@ -2650,16 +2653,16 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
-  // TODO: Duplicated method 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 29 </b>
    *
    * <p><b>Name:</b> ART CARE TRANSFERRED FROM OTHER FACILITY
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getArtTransferredFromOtherHealthFacilityWorkflowState() {
     Program hivCareProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
@@ -2676,7 +2679,7 @@ public class HivMetadata extends ProgramsMetadata {
    * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getArtCareTransferredOutToAnotherHealthFacilityWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
@@ -2685,16 +2688,15 @@ public class HivMetadata extends ProgramsMetadata {
     return state;
   }
 
-  
   /**
    * <b>program_workflow_state_id = 1 </b>
    *
    * <p><b>Name:</b> HIV CARE ACTIVE ON PROGRAM
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getArtCareActiveOnProgramWorkflowState() {
     Program hivCareProgram = getHIVCareProgram();
     ProgramWorkflow workflow = getPreArtWorkflow();
@@ -2707,10 +2709,10 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> ART CARE ACTIVE ON PROGRAM
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getArtActiveOnProgramWorkflowState() {
     Program hivCareProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
@@ -2723,7 +2725,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> HIV CARE ABANDONED
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -2739,7 +2741,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> ART CARE SUSPEND TREATMENT
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -2753,7 +2755,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> ART CARE ABANDONED
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -2767,7 +2769,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> ART CARE PATIENT HAS DIED
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -2788,7 +2790,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> HIV CARE PATIENT HAS DIED
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -2804,22 +2806,22 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> ART CARE ACTIVE ON PROGRAM
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getPateintActiveArtWorkflowState() {
     String artProgramUuid = Context.getAdministrationService().getGlobalProperty(gpArtProgramUuid);
     return getProgramWorkflowState(artProgramUuid, "2", "c50d6bdc-8a79-43ae-ab45-abbaa6b45e7d");
   }
 
-  // TODO: Duplicated method 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 29 </b>
    *
    * <p><b>Name:</b> ART CARE TRANSFERRED FROM OTHER FACILITY
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -2841,7 +2843,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> HIV CARE ACTIVE ON PROGRAM
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -2857,10 +2859,10 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> HIV CARE TRANSFERRED FROM OTHER FACILITY
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getPateintTransferedFromOtherFacilityHIVCareWorkflowState() {
     String hivCareProgramUuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.hivCareProgramUuid");
@@ -2872,7 +2874,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> TUBERCULOSE ACTIVE ON PROGRAM
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -3043,7 +3045,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> HIV CARE START DRUGS
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -3061,7 +3063,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> ART CARE SUSPEND TREATMENT
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -3077,16 +3079,16 @@ public class HivMetadata extends ProgramsMetadata {
     return getProgramWorkflow(getARTProgram().getUuid(), "2");
   }
 
-  // TODO: Duplicated method 
+  // TODO: Duplicated method
   /**
    * <b>program_workflow_state_id = 29 </b>
    *
    * <p><b>Name:</b> ART CARE TRANSFERRED FROM OTHER FACILITY
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
-   */ 
+   */
   public ProgramWorkflowState getArtTransferredOutToAnotherHealthFacilityWorkflowState() {
     Program artProgram = getARTProgram();
     ProgramWorkflow workflow = getArtWorkflow();
@@ -3101,7 +3103,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> ART CARE PATIENT HAS DIED
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -3117,7 +3119,7 @@ public class HivMetadata extends ProgramsMetadata {
    *
    * <p><b>Name:</b> ART CARE ABANDONED
    *
-   * <p><b>Description:</b> 
+   * <p><b>Description:</b>
    *
    * @return {@link ProgramWorkflowState}
    */
