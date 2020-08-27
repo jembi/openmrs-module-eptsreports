@@ -839,14 +839,14 @@ public class TxCurrCohortQueries {
     + "     INNER JOIN encounter e ON p.patient_id = e.patient_id       "
     + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id       "
     + "     WHERE       "
-    + "         e.encounter_type = 18       "
+    + "         e.encounter_type = ${18}       "
     + "             AND o.value_datetime IS NOT NULL       "
-    + "             AND o.concept_id = 5096       "
+    + "             AND o.concept_id = ${5096}       "
     + "             AND p.voided = 0       "
     + "             AND o.voided = 0       "
     + "             AND e.voided = 0       "
-    + "             AND e.location_id = 244       "
-    + "             AND e.encounter_datetime <= '2020-01-20'       "
+    + "             AND e.location_id = :location       "
+    + "             AND e.encounter_datetime <= :onOrBefore       "
     + "     GROUP BY p.patient_id        "
     + "UNION        "
     + "SELECT        "
@@ -856,13 +856,13 @@ public class TxCurrCohortQueries {
     + "     INNER JOIN encounter e ON p.patient_id = e.patient_id       "
     + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id       "
     + "     WHERE       "
-    + "         e.encounter_type = 6       "
-    + "             AND o.concept_id = 23739       "
+    + "         e.encounter_type = ${6}      "
+    + "             AND o.concept_id = ${23739}        "
     + "             AND p.voided = 0       "
     + "             AND o.voided = 0       "
     + "             AND e.voided = 0       "
-    + "             AND e.location_id = 244       "
-    + "             AND e.encounter_datetime <= '2020-01-20'       "
+    + "             AND e.location_id = :location       "
+    + "             AND e.encounter_datetime <= :onOrBefore       "
     + "     GROUP BY p.patient_id) AS true_last       "
     + "     GROUP BY patient_id) AS last_encounter       "
     + "         INNER JOIN       "
@@ -872,18 +872,18 @@ public class TxCurrCohortQueries {
     + "     obs ob ON ob.encounter_id = en.encounter_id       "
     + " WHERE       "
     + "     en.voided = 0 AND ob.voided = 0       "
-    + "         AND en.location_id = 244       "
+    + "         AND en.location_id = :location       "
 
-    + "         AND ((en.encounter_type = 18       "
-    + "         AND ob.concept_id = 5096       "
+    + "         AND ((en.encounter_type = ${18}       "
+    + "         AND ob.concept_id = ${5096}       "
     + "         AND ob.value_datetime IS NOT NULL       "
     + "         AND TIMESTAMPDIFF(DAY,       "
     + "         last_encounter.encounter_date,       "
     + "         ob.value_datetime) < 83 )       "
   
-    + "         OR (en.encounter_type = 6       "
-    + "         AND (ob.concept_id = 23739       "
-    + "         AND ob.value_coded = 1098)       "
+    + "         OR (en.encounter_type = ${6}      "
+    + "         AND (ob.concept_id = ${23739}        "
+    + "         AND ob.value_coded = ${1098} )       "
     + "         OR (en.patient_id IN (SELECT        "
     + "             e.patient_id       "
     + "         FROM       "
@@ -893,14 +893,14 @@ public class TxCurrCohortQueries {
     + "         WHERE       "
     + "             e.voided = 0 AND o.voided = 0       "
     + "                 AND e.patient_id = en.patient_id       "
-    + "                 AND o.value_coded = 1098       "
-    + "                 AND e.encounter_type = 6       "
-    + "                 AND e.location_id = 244       "
+    + "                 AND o.value_coded = ${1098}        "
+    + "                 AND e.encounter_type = ${6}      "
+    + "                 AND e.location_id = :location       "
     + "                 AND e.encounter_datetime = last_encounter.encounter_date       "
     + "         GROUP BY e.patient_id)))       "
     
-    + "         OR ((en.encounter_type = 18       "
-    + "         AND ob.concept_id = 5096       "
+    + "         OR ((en.encounter_type = ${18}       "
+    + "         AND ob.concept_id = ${5096}       "
     + "         AND ob.value_datetime IS NOT NULL       "
     + "         AND TIMESTAMPDIFF(DAY,       "
     + "         last_encounter.encounter_date,       "
@@ -913,10 +913,10 @@ public class TxCurrCohortQueries {
     + "             WHERE       "
     + "                 e.voided = 0 AND o.voided = 0       "
     + "                     AND e.patient_id = en.patient_id       "
-    + "                     AND o.concept_id = 5096       "
+    + "                     AND o.concept_id = ${5096}       "
     + "                     AND o.value_datetime IS NOT NULL       "
-    + "                     AND e.encounter_type = 18       "
-    + "                     AND e.location_id = 244       "
+    + "                     AND e.encounter_type = ${18}       "
+    + "                     AND e.location_id = :location       "
     + "                     AND e.encounter_datetime = last_encounter.encounter_date       "
     + "             GROUP BY e.patient_id)) < 83 )))       "
     
@@ -929,21 +929,21 @@ public class TxCurrCohortQueries {
     + "INNER JOIN obs o on e.encounter_id = o.encounter_id       "
     + "WHERE e.voided = 0        "
     + "AND o.voided = 0       "
-    + "AND e.encounter_type = 6       "
-    + "AND o.concept_id = 23739       "
-    + "AND o.value_coded = 1098       "
-    + "AND e.encounter_datetime <= '2020-01-20'       "
-    + "AND e.location_id = 244) as b       "
+    + "AND e.encounter_type = ${6}      "
+    + "AND o.concept_id = ${23739}        "
+    + "AND o.value_coded = ${1098}        "
+    + "AND e.encounter_datetime <= :onOrBefore       "
+    + "AND e.location_id = :location) as b       "
     + "LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND ex.encounter_datetime = b.encounter_datetime       "
     + "INNER JOIN obs o on ex.encounter_id = o.encounter_id       "
     + "WHERE ex.voided = 0       "
     + "AND o.voided = 0        "
-    + "AND ex.encounter_type = 18       "
-    + "AND o.concept_id = 5096        "
-    + "AND ex.encounter_datetime <= '2020-01-20'       "
-    + "AND ex.location_id = 244       "
+    + "AND ex.encounter_type = ${18}       "
+    + "AND o.concept_id = ${5096}        "
+    + "AND ex.encounter_datetime <= :onOrBefore       "
+    + "AND ex.location_id = :location       "
     + ") as same_day       "
-    + "WHERE same_day.encounter_type = 6        "
+    + "WHERE same_day.encounter_type = ${6}       "
     + "AND same_day.patient_id = en.patient_id        "
     + "AND same_day.encounter_datetime = last_encounter.encounter_date)       "
     
@@ -957,10 +957,10 @@ public class TxCurrCohortQueries {
     + "INNER JOIN obs o ON o.encounter_id = e.encounter_id       "
     + "WHERE e.voided = 0 AND o.voided = 0       "
     + "AND e.patient_id = list.patient_id       "
-    + "AND o.concept_id = 5096       "
+    + "AND o.concept_id = ${5096}       "
     + "AND o.value_datetime IS NOT NULL       "
-    + "AND e.encounter_type = 18       "
-    + "AND e.location_id = 244       "
+    + "AND e.encounter_type = ${18}       "
+    + "AND e.location_id = :location       "
     + "AND e.encounter_datetime = list.encounter_datetime       "
     + "group by e.patient_id)       "
     + ") > 83)       "
@@ -968,18 +968,17 @@ public class TxCurrCohortQueries {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put(
-        "aRVPharmaciaEncounterType",
+        "18",
         hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put(
-        "adultoSeguimentoEncounterType",
+        "6",
         hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put(
-        "returnVisitDateForArvDrugConcept",
+        "5096",
         hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-    valuesMap.put("maxDays", 83);
     valuesMap.put(
-        "typeOfDispensationConcept", hivMetadata.getTypeOfDispensationConcept().getConceptId());
-    valuesMap.put("monthlyConcept", hivMetadata.getMonthlyConcept().getConceptId());
+        "23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
+    valuesMap.put("1098", hivMetadata.getMonthlyConcept().getConceptId());
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     cd.setQuery(sub.replace(sqlQuery));
@@ -1004,14 +1003,14 @@ public class TxCurrCohortQueries {
        + "    INNER JOIN encounter e ON p.patient_id = e.patient_id           "
        + "    INNER JOIN obs o on e.encounter_id = o.encounter_id           "
        + "    WHERE           "
-       + "        e.encounter_type = 18           "
+       + "        e.encounter_type = ${18}           "
        + "            AND o.value_datetime IS NOT NULL           "
-       + "            AND o.concept_id = 5096           "
+       + "            AND o.concept_id = ${5096}           "
        + "            AND p.voided = 0           "
        + "            AND o.voided = 0           "
        + "            AND e.voided = 0           "
-       + "            AND e.location_id = 244           "
-       + "            AND e.encounter_datetime <= '2020-01-20'           "
+       + "            AND e.location_id = :location           "
+       + "            AND e.encounter_datetime <= :onOrBefore           "
        + "    GROUP BY p.patient_id           "
        + "    UNION            "
        + "    SELECT            "
@@ -1021,13 +1020,13 @@ public class TxCurrCohortQueries {
        + "    INNER JOIN encounter e ON p.patient_id = e.patient_id           "
        + "    INNER JOIN obs o on e.encounter_id = o.encounter_id           "
        + "    WHERE           "
-       + "        e.encounter_type = 6           "           
-       + "        AND o.concept_id IN (23739,23730)           "
+       + "        e.encounter_type = ${6}          "           
+       + "        AND o.concept_id IN (${23739} ,${23730})           "
        + "            AND p.voided = 0           "
        + "            AND o.voided = 0           "
        + "            AND e.voided = 0           "
-       + "            AND e.location_id = 244           "
-       + "            AND e.encounter_datetime <= '2020-01-20'           "
+       + "            AND e.location_id = :location           "
+       + "            AND e.encounter_datetime <= :onOrBefore           "
        + "    GROUP BY p.patient_id) as  true_last            "
        + "    GROUP BY patient_id) as last_encounter             "
        + "INNER JOIN  encounter en  ON en.patient_id = last_encounter.patient_id AND en.encounter_datetime = last_encounter.encounter_date           "
@@ -1035,26 +1034,26 @@ public class TxCurrCohortQueries {
        + "WHERE            "
        + "en.voided = 0           "
        + "AND ob.voided = 0           "
-       + "AND en.location_id = 244           "
-       + "AND ((en.encounter_type = 18 AND ob.concept_id = 5096            "
+       + "AND en.location_id = :location           "
+       + "AND ((en.encounter_type = ${18} AND ob.concept_id = ${5096}            "
        + "AND ob.value_datetime IS NOT NULL            "
        + "AND timestampdiff(day,last_encounter.encounter_date,ob.value_datetime) BETWEEN 83 AND 173)           "
-       + "OR (en.encounter_type = 6 AND            "
-       + "((ob.concept_id = 23739 AND ob.value_coded = 23720)            "
-       + "OR (ob.concept_id = 23730 AND ob.value_coded in (1256,1257))           "
+       + "OR (en.encounter_type = ${6} AND            "
+       + "((ob.concept_id = ${23739}  AND ob.value_coded = ${23720})            "
+       + "OR (ob.concept_id = ${23730} AND ob.value_coded in (${1256},${1257}))           "
        + "OR (en.patient_id in (           "
        + "select e.patient_id           "
        + "FROM encounter e           "
        + "INNER JOIN obs o ON o.encounter_id = e.encounter_id           "
        + "WHERE e.voided = 0 AND o.voided = 0           "
        + "AND e.patient_id = en.patient_id           "
-       + "AND o.value_coded = 23720           "
-       + "AND e.encounter_type = 6           "
-       + "AND e.location_id = 244           "
+       + "AND o.value_coded = ${23720}           "
+       + "AND e.encounter_type = ${6}           "
+       + "AND e.location_id = :location           "
        + "AND e.encounter_datetime = last_encounter.encounter_date           "
        + "group by e.patient_id)))           "
        + ")           "
-       + "OR ((en.encounter_type = 18 AND ob.concept_id = 5096            "
+       + "OR ((en.encounter_type = ${18} AND ob.concept_id = ${5096}            "
        + "AND ob.value_datetime IS NOT NULL            "
        + "AND timestampdiff(day,last_encounter.encounter_date,           "
        + "(SELECT  max(o.value_datetime)            "
@@ -1062,10 +1061,10 @@ public class TxCurrCohortQueries {
        + "INNER JOIN obs o ON o.encounter_id = e.encounter_id           "
        + "WHERE e.voided = 0 AND o.voided = 0           "
        + "AND e.patient_id = en.patient_id           "
-       + "AND o.concept_id = 5096           "
+       + "AND o.concept_id = ${5096}           "
        + "AND o.value_datetime IS NOT NULL           "
-       + "AND e.encounter_type = 18           "
-       + "AND e.location_id = 244           "
+       + "AND e.encounter_type = ${18}           "
+       + "AND e.location_id = :location           "
        + "AND e.encounter_datetime = last_encounter.encounter_date           "
        + "group by e.patient_id)) BETWEEN 83 AND 173))           "
        + ")           "
@@ -1078,20 +1077,20 @@ public class TxCurrCohortQueries {
        + "INNER JOIN obs o on e.encounter_id = o.encounter_id           "
        + "WHERE e.voided = 0           "
        + "AND o.voided = 0           "
-       + "AND e.encounter_type = 6           "
-       + "AND o.concept_id IN (23739,23730)           "
-       + "AND e.encounter_datetime <= '2020-01-20'           "
-       + "AND e.location_id = 244) as b           "
+       + "AND e.encounter_type = ${6}           "
+       + "AND o.concept_id IN (${23739} ,${23730})           "
+       + "AND e.encounter_datetime <= :onOrBefore           "
+       + "AND e.location_id = :location) as b           "
        + " LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND ex.encounter_datetime = b.encounter_datetime           "
        + "INNER JOIN obs o on ex.encounter_id = o.encounter_id           "
        + "WHERE ex.voided = 0           "
        + "AND o.voided = 0           "
-       + "AND ex.encounter_type = 18           "
-       + "AND o.concept_id = 5096           " 
-       + "AND ex.encounter_datetime <= '2020-01-20'           "
-       + "AND ex.location_id = 244           "
+       + "AND ex.encounter_type = ${18}           "
+       + "AND o.concept_id = ${5096}           " 
+       + "AND ex.encounter_datetime <= :onOrBefore           "
+       + "AND ex.location_id = :location           "
        + ") as same_day           "
-       + "WHERE same_day.encounter_type = 6           " 
+       + "WHERE same_day.encounter_type = ${6}           " 
        + "AND same_day.patient_id = en.patient_id           " 
        + "AND same_day.encounter_datetime = last_encounter.encounter_date)           "
        + "AND en.patient_id NOT IN           " 
@@ -1104,10 +1103,10 @@ public class TxCurrCohortQueries {
        + "INNER JOIN obs o ON o.encounter_id = e.encounter_id           "
        + "WHERE e.voided = 0 AND o.voided = 0           "
        + "AND e.patient_id = list.patient_id           "
-       + "AND o.concept_id = 5096           "
+       + "AND o.concept_id = ${5096}           "
        + "AND o.value_datetime IS NOT NULL           "
-       + "AND e.encounter_type = 18           "
-       + "AND e.location_id = 244           "
+       + "AND e.encounter_type = ${18}           "
+       + "AND e.location_id = :location           "
        + "AND e.encounter_datetime = list.encounter_datetime           "
        + "group by e.patient_id) ) > 173)           "
        + "AND en.encounter_id NOT IN            "
@@ -1119,41 +1118,43 @@ public class TxCurrCohortQueries {
        + "INNER JOIN obs o on e.encounter_id = o.encounter_id           "
        + "WHERE e.voided = 0            "
        + "AND o.voided = 0           "
-       + "AND e.encounter_type = 6           "
-       + "AND o.concept_id = 23730           "
-       + "AND e.encounter_datetime <= '2020-01-20'           "
-       + "AND e.location_id = 244) as b           "
+       + "AND e.encounter_type = ${6}           "
+       + "AND o.concept_id = ${23730}           "
+       + "AND e.encounter_datetime <= :onOrBefore           "
+       + "AND e.location_id = :location) as b           "
        + "LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND ex.encounter_datetime = b.encounter_datetime           "
        + "INNER JOIN obs o on ex.encounter_id = o.encounter_id           "
        + "WHERE ex.voided = 0           "
        + "AND o.voided = 0            "
-       + "AND ex.encounter_type = 6           "
-       + "AND o.concept_id = 23739            "
-       + "AND ex.encounter_datetime <= '2020-01-20'           "
-       + "AND ex.location_id = 244           "
+       + "AND ex.encounter_type = ${6}           "
+       + "AND o.concept_id = ${23739}             "
+       + "AND ex.encounter_datetime <= :onOrBefore           "
+       + "AND ex.location_id = :location           "
        + ") as same_day           "
-       + "WHERE same_day.concept_id = 23730            "
+       + "WHERE same_day.concept_id = ${23730}            "
        + "AND same_day.patient_id = en.patient_id            "
        + "AND same_day.encounter_datetime = last_encounter.encounter_date)           "
        + "group by en.patient_id;";
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put(
-        "aRVPharmaciaEncounterType",
+        "18",
         hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put(
-        "adultoSeguimentoEncounterType",
+        "6",
         hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put(
-        "returnVisitDateForArvDrugConcept",
+        "5096",
         hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     valuesMap.put("minDays", 83);
     valuesMap.put("maxDays", 173);
     valuesMap.put(
-        "typeOfDispensationConcept", hivMetadata.getTypeOfDispensationConcept().getConceptId());
-    valuesMap.put("quarterlyConcept", hivMetadata.getQuarterlyConcept().getConceptId());
-    valuesMap.put("startDrugsConcept", hivMetadata.getStartDrugsConcept().getConceptId());
-    valuesMap.put("continueRegimen", hivMetadata.getContinueRegimenConcept().getConceptId());
+        "23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
+        valuesMap.put(
+        "23730", hivMetadata.getQuarterlyDispensation().getConceptId());
+    valuesMap.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
+    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     patientsWithQuarterlyTypeOfDispensation.setQuery(sub.replace(sqlQuery));
@@ -1167,7 +1168,196 @@ public class TxCurrCohortQueries {
     return patientsWithQuarterlyTypeOfDispensation;
   }
 
- /**
+  @DocumentedDefinition(
+      "Patients marked as DS on Ficha Clinica Mastercard on last Tipo de Levantamento")
+  public SqlCohortDefinition getPatientsWithSemiAnnualTypeOfDispensation() {
+    SqlCohortDefinition patientsWithSemiAnnualTypeOfDispensation = new SqlCohortDefinition();
+    String sqlQuery =
+        "SELECT en.patient_id          "
+    + " FROM           "
+    + " (SELECT patient_id, MAX(encounter_date) as encounter_date FROM           "
+    + " (SELECT           "
+    + "         e.patient_id, MAX(e.encounter_datetime) as encounter_date          "
+    + "     FROM          "
+    + "         patient p          "
+    + "     INNER JOIN encounter e ON p.patient_id = e.patient_id          "
+    + "     INNER JOIN obs o on e.encounter_id = o.encounter_id          "
+    + "     WHERE          "
+    + "         e.encounter_type = ${18}          "
+    + "             AND o.value_datetime IS NOT NULL          "
+    + "             AND o.concept_id = ${5096}          "
+    + "             AND p.voided = 0          "
+    + "             AND o.voided = 0          "
+    + "             AND e.voided = 0          "
+    + "             AND e.location_id = :location          "
+    + "             AND e.encounter_datetime <= :onOrBefore          "
+    + "     GROUP BY p.patient_id          "
+    + "     UNION           "
+    + "     SELECT           "
+    + "         e.patient_id, MAX(e.encounter_datetime) encounter_date          "
+    + "     FROM          "
+    + "         patient p          "
+    + "     INNER JOIN encounter e ON p.patient_id = e.patient_id          "
+    + "     INNER JOIN obs o on e.encounter_id = o.encounter_id          "
+    + "     WHERE          "
+    + "         e.encounter_type = ${6}          "
+    + "         AND o.concept_id IN (${23739} ,${23730},${23888})          "
+    + "             AND p.voided = 0          "
+    + "             AND o.voided = 0          "
+    + "             AND e.voided = 0          "
+    + "             AND e.location_id = :location          "
+    + "             AND e.encounter_datetime <= :onOrBefore          "
+    + "     GROUP BY p.patient_id) as  true_last           "
+    + "     GROUP BY patient_id) as last_encounter          "
+    
+    + " INNER JOIN  encounter en  ON en.patient_id = last_encounter.patient_id AND en.encounter_datetime = last_encounter.encounter_date          "
+    + " INNER JOIN obs ob on ob.encounter_id = en.encounter_id          "
+    + "           "
+    + " WHERE           "
+    + " en.voided = 0          "
+    + " AND ob.voided = 0          "
+    + " AND en.location_id = :location          "
+    
+    + " AND ((en.encounter_type = ${18} AND ob.concept_id = ${5096}           "
+    + " AND ob.value_datetime IS NOT NULL           "
+    + " AND timestampdiff(day,last_encounter.encounter_date,ob.value_datetime) > 173)          "
+    
+    + " OR (en.encounter_type = ${6} AND           "
+    + " ((ob.concept_id = ${23739}  AND ob.value_coded = ${23888})           "
+    + " OR (ob.concept_id = ${23888} AND ob.value_coded in (${1256},${1257}))          "
+    
+    + " OR (en.patient_id in (          "
+    + " select e.patient_id          "
+    + " FROM encounter e          "
+    + " INNER JOIN obs o ON o.encounter_id = e.encounter_id          "
+    + " WHERE e.voided = 0 AND o.voided = 0          "
+    + " AND e.patient_id = en.patient_id          "
+    + " AND e.encounter_type = ${6}          "
+    + " AND ((ob.concept_id = ${23739}  AND ob.value_coded = ${23888})           "
+    + " OR (ob.concept_id = ${23888} AND ob.value_coded in (${1256},${1257})))          "
+    + " AND e.location_id = :location          "
+    + " AND e.encounter_datetime = last_encounter.encounter_date          "
+    + " group by e.patient_id)))          "
+    + " )          "
+    
+    + " OR ((en.encounter_type = ${18} AND ob.concept_id = ${5096}           "
+    + " AND ob.value_datetime IS NOT NULL           "
+    + " AND timestampdiff(day,last_encounter.encounter_date,          "
+    + " (SELECT  max(o.value_datetime)           "
+    + " FROM encounter e          "
+    + " INNER JOIN obs o ON o.encounter_id = e.encounter_id          "
+    + " WHERE e.voided = 0 AND o.voided = 0          "
+    + " AND e.patient_id = en.patient_id          "
+    + " AND o.concept_id = ${5096}          "
+    + " AND o.value_datetime IS NOT NULL          "
+    + " AND e.encounter_type = ${18}          "
+    + " AND e.location_id = :location          "
+    + " AND e.encounter_datetime = last_encounter.encounter_date          "
+    + " group by e.patient_id)) > 173))          "
+    + " )          "
+
+    + "    AND en.encounter_id NOT IN          "           
+    + "(SELECT same_day.encounter_id FROM          "          
+    + "(SELECT b.encounter_id,b.patient_id,b.encounter_datetime,b.encounter_type          "
+    + "FROM           "
+    + "(SELECT  e.patient_id, e.encounter_datetime, e.encounter_id, e.encounter_type          "
+    + "FROM encounter e          "
+    + "INNER JOIN obs o on e.encounter_id = o.encounter_id          "
+    + "WHERE e.voided = 0           "
+    + "AND o.voided = 0          "
+    + "AND e.encounter_type = ${6}          "
+    + "AND ((o.concept_id = ${23739}  AND o.value_coded = ${23888})           "
+    + "OR (o.concept_id = ${23888} AND o.value_coded in (${1256},${1257})))          "
+    + "AND e.encounter_datetime <= :onOrBefore          "
+    + "AND e.location_id = :location) as b          "
+    + "LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND ex.encounter_datetime = b.encounter_datetime          "
+    + "INNER JOIN obs o on ex.encounter_id = o.encounter_id          "
+    + "WHERE ex.voided = 0          "
+    + "AND o.voided = 0           "
+    + "AND ex.encounter_type = ${18}          "
+    + "AND o.concept_id = ${5096}           "
+    + "AND ex.encounter_datetime <= :onOrBefore          "
+    + "AND ex.location_id = :location          "
+    + ") as same_day          "
+    + "WHERE same_day.encounter_type = ${6}           "
+    + "AND same_day.patient_id = en.patient_id           "
+    + "AND same_day.encounter_datetime = last_encounter.encounter_date)          "
+    + "AND en.patient_id NOT IN           "
+    + "(SELECT list.patient_id FROM encounter list           "
+    + "WHERE list.patient_id = en.patient_id          "
+    + "AND list.encounter_datetime = last_encounter.encounter_date          "
+    + "AND timestampdiff(day,last_encounter.encounter_date,          "
+    + "(SELECT  max(o.value_datetime)           "
+    + "FROM encounter e          "
+    + "INNER JOIN obs o ON o.encounter_id = e.encounter_id          "
+    + "WHERE e.voided = 0 AND o.voided = 0          "
+    + "AND e.patient_id = list.patient_id          "
+    + "AND o.concept_id = ${5096}          "
+    + "AND o.value_datetime IS NOT NULL          "
+    + "AND e.encounter_type = ${18}          "
+    + "AND e.location_id = :location          "
+    + "AND e.encounter_datetime = list.encounter_datetime          "
+    + "group by e.patient_id)          "
+    + ") < 173)          "
+    + "AND en.encounter_id NOT IN           "
+    + "(SELECT same_day.encounter_id FROM          "
+    + "(SELECT b.patient_id,b.encounter_id,b.concept_id,b.encounter_datetime          "
+    + "FROM          "
+    + "(SELECT  e.patient_id, e.encounter_datetime, e.encounter_id, o.concept_id          "
+    + "FROM encounter e          "
+    + "INNER JOIN obs o on e.encounter_id = o.encounter_id          "
+    + "WHERE e.voided = 0           "
+    + "AND o.voided = 0          "
+    + "AND e.encounter_type = ${6}          "
+    + "AND o.concept_id = ${23888}          "
+    + "AND e.encounter_datetime <= :onOrBefore          "
+    + "AND e.location_id = :location) as b          "
+    + "LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND ex.encounter_datetime = b.encounter_datetime          "
+    + "INNER JOIN obs o on ex.encounter_id = o.encounter_id          "
+    + "WHERE ex.voided = 0          "
+    + "AND o.voided = 0           "
+    + "AND ex.encounter_type = ${6}          "
+    + "AND o.concept_id = ${23739}           "
+    + "AND ex.encounter_datetime <= :onOrBefore          "
+    + "AND ex.location_id = :location          "
+    + ") as same_day          "
+    + "WHERE same_day.concept_id = ${23888}           "
+    + "AND same_day.patient_id = en.patient_id           "
+    + "AND same_day.encounter_datetime = last_encounter.encounter_date)          "
+    + " group by en.patient_id;";
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put(
+        "18",
+        hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put(
+        "6",
+        hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put(
+        "5096",
+        hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    valuesMap.put("minDays", 173);
+    valuesMap.put(
+        "23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
+        valuesMap.put(
+        "23730", hivMetadata.getQuarterlyDispensation().getConceptId());
+    valuesMap.put("23888", hivMetadata.getSemiannualDispensation().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
+    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+
+    StringSubstitutor sub = new StringSubstitutor(valuesMap);
+    patientsWithSemiAnnualTypeOfDispensation.setQuery(sub.replace(sqlQuery));
+
+    patientsWithSemiAnnualTypeOfDispensation.addParameter(
+        new Parameter("onOrBefore", "Before Date", Date.class));
+    patientsWithSemiAnnualTypeOfDispensation.addParameter(
+        new Parameter("onOrAfter", "After Date", Date.class));
+    patientsWithSemiAnnualTypeOfDispensation.addParameter(
+        new Parameter("location", "Location", Location.class));
+    return patientsWithSemiAnnualTypeOfDispensation;
+  }
+
+  /**
    * Dispensation Compositions
    *
    * @return
@@ -1231,193 +1421,6 @@ public class TxCurrCohortQueries {
     cd.setCompositionString("semiAnnual");
     return cd;
   } 
-
-  @DocumentedDefinition(
-      "Patients marked as DS on Ficha Clinica Mastercard on last Tipo de Levantamento")
-  public SqlCohortDefinition getPatientsWithSemiAnnualTypeOfDispensation() {
-    SqlCohortDefinition patientsWithSemiAnnualTypeOfDispensation = new SqlCohortDefinition();
-    String sqlQuery =
-        "SELECT en.patient_id          "
-    + " FROM           "
-    + " (SELECT patient_id, MAX(encounter_date) as encounter_date FROM           "
-    + " (SELECT           "
-    + "         e.patient_id, MAX(e.encounter_datetime) as encounter_date          "
-    + "     FROM          "
-    + "         patient p          "
-    + "     INNER JOIN encounter e ON p.patient_id = e.patient_id          "
-    + "     INNER JOIN obs o on e.encounter_id = o.encounter_id          "
-    + "     WHERE          "
-    + "         e.encounter_type = 18          "
-    + "             AND o.value_datetime IS NOT NULL          "
-    + "             AND o.concept_id = 5096          "
-    + "             AND p.voided = 0          "
-    + "             AND o.voided = 0          "
-    + "             AND e.voided = 0          "
-    + "             AND e.location_id = 244          "
-    + "             AND e.encounter_datetime <= '2020-01-20'          "
-    + "     GROUP BY p.patient_id          "
-    + "     UNION           "
-    + "     SELECT           "
-    + "         e.patient_id, MAX(e.encounter_datetime) encounter_date          "
-    + "     FROM          "
-    + "         patient p          "
-    + "     INNER JOIN encounter e ON p.patient_id = e.patient_id          "
-    + "     INNER JOIN obs o on e.encounter_id = o.encounter_id          "
-    + "     WHERE          "
-    + "         e.encounter_type = 6          "
-    + "         AND o.concept_id IN (23739,23730,23888)          "
-    + "             AND p.voided = 0          "
-    + "             AND o.voided = 0          "
-    + "             AND e.voided = 0          "
-    + "             AND e.location_id = 244          "
-    + "             AND e.encounter_datetime <= '2020-01-20'          "
-    + "     GROUP BY p.patient_id) as  true_last           "
-    + "     GROUP BY patient_id) as last_encounter          "
-    
-    + " INNER JOIN  encounter en  ON en.patient_id = last_encounter.patient_id AND en.encounter_datetime = last_encounter.encounter_date          "
-    + " INNER JOIN obs ob on ob.encounter_id = en.encounter_id          "
-    + "           "
-    + " WHERE           "
-    + " en.voided = 0          "
-    + " AND ob.voided = 0          "
-    + " AND en.location_id = 244          "
-    
-    + " AND ((en.encounter_type = 18 AND ob.concept_id = 5096           "
-    + " AND ob.value_datetime IS NOT NULL           "
-    + " AND timestampdiff(day,last_encounter.encounter_date,ob.value_datetime) > 173)          "
-    
-    + " OR (en.encounter_type = 6 AND           "
-    + " ((ob.concept_id = 23739 AND ob.value_coded = 23888)           "
-    + " OR (ob.concept_id = 23888 AND ob.value_coded in (1256,1257))          "
-    
-    + " OR (en.patient_id in (          "
-    + " select e.patient_id          "
-    + " FROM encounter e          "
-    + " INNER JOIN obs o ON o.encounter_id = e.encounter_id          "
-    + " WHERE e.voided = 0 AND o.voided = 0          "
-    + " AND e.patient_id = en.patient_id          "
-    + " AND e.encounter_type = 6          "
-    + " AND ((ob.concept_id = 23739 AND ob.value_coded = 23888)           "
-    + " OR (ob.concept_id = 23888 AND ob.value_coded in (1256,1257)))          "
-    + " AND e.location_id = 244          "
-    + " AND e.encounter_datetime = last_encounter.encounter_date          "
-    + " group by e.patient_id)))          "
-    + " )          "
-    
-    + " OR ((en.encounter_type = 18 AND ob.concept_id = 5096           "
-    + " AND ob.value_datetime IS NOT NULL           "
-    + " AND timestampdiff(day,last_encounter.encounter_date,          "
-    + " (SELECT  max(o.value_datetime)           "
-    + " FROM encounter e          "
-    + " INNER JOIN obs o ON o.encounter_id = e.encounter_id          "
-    + " WHERE e.voided = 0 AND o.voided = 0          "
-    + " AND e.patient_id = en.patient_id          "
-    + " AND o.concept_id = 5096          "
-    + " AND o.value_datetime IS NOT NULL          "
-    + " AND e.encounter_type = 18          "
-    + " AND e.location_id = 244          "
-    + " AND e.encounter_datetime = last_encounter.encounter_date          "
-    + " group by e.patient_id)) > 173))          "
-    + " )          "
-
-    + "    AND en.encounter_id NOT IN          "           
-    + "(SELECT same_day.encounter_id FROM          "          
-    + "(SELECT b.encounter_id,b.patient_id,b.encounter_datetime,b.encounter_type          "
-    + "FROM           "
-    + "(SELECT  e.patient_id, e.encounter_datetime, e.encounter_id, e.encounter_type          "
-    + "FROM encounter e          "
-    + "INNER JOIN obs o on e.encounter_id = o.encounter_id          "
-    + "WHERE e.voided = 0           "
-    + "AND o.voided = 0          "
-    + "AND e.encounter_type = 6          "
-    + "AND ((o.concept_id = 23739 AND o.value_coded = 23888)           "
-    + "OR (o.concept_id = 23888 AND o.value_coded in (1256,1257)))          "
-    + "AND e.encounter_datetime <= '2020-01-20'          "
-    + "AND e.location_id = 244) as b          "
-    + "LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND ex.encounter_datetime = b.encounter_datetime          "
-    + "INNER JOIN obs o on ex.encounter_id = o.encounter_id          "
-    + "WHERE ex.voided = 0          "
-    + "AND o.voided = 0           "
-    + "AND ex.encounter_type = 18          "
-    + "AND o.concept_id = 5096           "
-    + "AND ex.encounter_datetime <= '2020-01-20'          "
-    + "AND ex.location_id = 244          "
-    + ") as same_day          "
-    + "WHERE same_day.encounter_type = 6           "
-    + "AND same_day.patient_id = en.patient_id           "
-    + "AND same_day.encounter_datetime = last_encounter.encounter_date)          "
-    + "AND en.patient_id NOT IN           "
-    + "(SELECT list.patient_id FROM encounter list           "
-    + "WHERE list.patient_id = en.patient_id          "
-    + "AND list.encounter_datetime = last_encounter.encounter_date          "
-    + "AND timestampdiff(day,last_encounter.encounter_date,          "
-    + "(SELECT  max(o.value_datetime)           "
-    + "FROM encounter e          "
-    + "INNER JOIN obs o ON o.encounter_id = e.encounter_id          "
-    + "WHERE e.voided = 0 AND o.voided = 0          "
-    + "AND e.patient_id = list.patient_id          "
-    + "AND o.concept_id = 5096          "
-    + "AND o.value_datetime IS NOT NULL          "
-    + "AND e.encounter_type = 18          "
-    + "AND e.location_id = 244          "
-    + "AND e.encounter_datetime = list.encounter_datetime          "
-    + "group by e.patient_id)          "
-    + ") < 173)          "
-    + "AND en.encounter_id NOT IN           "
-    + "(SELECT same_day.encounter_id FROM          "
-    + "(SELECT b.patient_id,b.encounter_id,b.concept_id,b.encounter_datetime          "
-    + "FROM          "
-    + "(SELECT  e.patient_id, e.encounter_datetime, e.encounter_id, o.concept_id          "
-    + "FROM encounter e          "
-    + "INNER JOIN obs o on e.encounter_id = o.encounter_id          "
-    + "WHERE e.voided = 0           "
-    + "AND o.voided = 0          "
-    + "AND e.encounter_type = 6          "
-    + "AND o.concept_id = 23888          "
-    + "AND e.encounter_datetime <= '2020-01-20'          "
-    + "AND e.location_id = 244) as b          "
-    + "LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND ex.encounter_datetime = b.encounter_datetime          "
-    + "INNER JOIN obs o on ex.encounter_id = o.encounter_id          "
-    + "WHERE ex.voided = 0          "
-    + "AND o.voided = 0           "
-    + "AND ex.encounter_type = 6          "
-    + "AND o.concept_id = 23739          "
-    + "AND ex.encounter_datetime <= '2020-01-20'          "
-    + "AND ex.location_id = 244          "
-    + ") as same_day          "
-    + "WHERE same_day.concept_id = 23888           "
-    + "AND same_day.patient_id = en.patient_id           "
-    + "AND same_day.encounter_datetime = last_encounter.encounter_date)          "
-    + " group by en.patient_id;";
-
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put(
-        "aRVPharmaciaEncounterType",
-        hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    valuesMap.put(
-        "adultoSeguimentoEncounterType",
-        hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put(
-        "returnVisitDateForArvDrugConcept",
-        hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-    valuesMap.put("minDays", 173);
-    valuesMap.put(
-        "typeOfDispensationConcept", hivMetadata.getTypeOfDispensationConcept().getConceptId());
-    valuesMap.put("semiannualDispensation", hivMetadata.getSemiannualDispensation().getConceptId());
-    valuesMap.put("startDrugsConcept", hivMetadata.getStartDrugsConcept().getConceptId());
-    valuesMap.put("continueRegimen", hivMetadata.getContinueRegimenConcept().getConceptId());
-
-    StringSubstitutor sub = new StringSubstitutor(valuesMap);
-    patientsWithSemiAnnualTypeOfDispensation.setQuery(sub.replace(sqlQuery));
-
-    patientsWithSemiAnnualTypeOfDispensation.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
-    patientsWithSemiAnnualTypeOfDispensation.addParameter(
-        new Parameter("onOrAfter", "After Date", Date.class));
-    patientsWithSemiAnnualTypeOfDispensation.addParameter(
-        new Parameter("location", "Location", Location.class));
-    return patientsWithSemiAnnualTypeOfDispensation;
-  }
 
   @DocumentedDefinition(
       "Patients with last “Dispensa Trimestral (DT)” as Iniciar (I) or Manter (C)")
