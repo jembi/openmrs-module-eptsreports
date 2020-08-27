@@ -1128,8 +1128,6 @@ public class TxCurrCohortQueries {
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-    valuesMap.put("minDays", 83);
-    valuesMap.put("maxDays", 173);
     valuesMap.put("23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
     valuesMap.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId());
     valuesMap.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
@@ -1304,7 +1302,6 @@ public class TxCurrCohortQueries {
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-    valuesMap.put("minDays", 173);
     valuesMap.put("23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
     valuesMap.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId());
     valuesMap.put("23888", hivMetadata.getSemiannualDispensation().getConceptId());
@@ -1355,11 +1352,9 @@ public class TxCurrCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition quarterlyDispensation = getPatientsWithQuarterlyTypeOfDispensation();
-    CohortDefinition monthlyDispensation = getPatientsWithLessThan3MonthlyTypeOfDispensation();
     CohortDefinition semiAnnualDispensation = getPatientsWithSemiAnnualTypeOfDispensation();
 
     cd.addSearch("quarterly", Mapped.mapStraightThrough(quarterlyDispensation));
-    cd.addSearch("monthly", Mapped.mapStraightThrough(monthlyDispensation));
     cd.addSearch("semiAnnual", Mapped.mapStraightThrough(semiAnnualDispensation));
 
     cd.setCompositionString("quarterly AND NOT semiAnnual");
@@ -1373,12 +1368,8 @@ public class TxCurrCohortQueries {
     cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition quarterlyDispensation = getPatientsWithQuarterlyTypeOfDispensation();
-    CohortDefinition monthlyDispensation = getPatientsWithLessThan3MonthlyTypeOfDispensation();
     CohortDefinition semiAnnualDispensation = getPatientsWithSemiAnnualTypeOfDispensation();
 
-    cd.addSearch("quarterly", Mapped.mapStraightThrough(quarterlyDispensation));
-    cd.addSearch("monthly", Mapped.mapStraightThrough(monthlyDispensation));
     cd.addSearch("semiAnnual", Mapped.mapStraightThrough(semiAnnualDispensation));
 
     cd.setCompositionString("semiAnnual");
