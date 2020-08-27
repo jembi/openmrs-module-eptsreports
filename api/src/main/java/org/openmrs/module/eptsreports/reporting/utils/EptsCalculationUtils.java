@@ -16,6 +16,8 @@ package org.openmrs.module.eptsreports.reporting.utils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +27,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Months;
 import org.openmrs.Cohort;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
@@ -426,5 +429,16 @@ public class EptsCalculationUtils {
       }
     }
     return false;
+  }
+
+  public static void sortEncountersByEncounterId(List<Encounter> encounters) {
+    Collections.sort(
+        encounters,
+        new Comparator<Encounter>() {
+          @Override
+          public int compare(Encounter a, Encounter b) {
+            return a.getEncounterDatetime().compareTo(b.getEncounterDatetime());
+          }
+        });
   }
 }

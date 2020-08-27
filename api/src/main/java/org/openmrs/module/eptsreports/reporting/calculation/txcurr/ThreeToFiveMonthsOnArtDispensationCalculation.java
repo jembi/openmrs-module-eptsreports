@@ -3,8 +3,6 @@ package org.openmrs.module.eptsreports.reporting.calculation.txcurr;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -246,7 +244,7 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       Encounter secondLastEncounter = null;
       List<Obs> filaObsOnTheSameEncounterDate = new ArrayList<Obs>();
       if (allFilaEncounters.size() > 1) {
-        sortEncountersByEncounterId(allFilaEncounters);
+        EptsCalculationUtils.sortEncountersByEncounterId(allFilaEncounters);
         lastFilaPickedEncounter = allFilaEncounters.get(allFilaEncounters.size() - 1);
         secondLastEncounter = allFilaEncounters.get(allFilaEncounters.size() - 2);
       }
@@ -526,7 +524,6 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                       requiredDate, lastFilaPickedEncounter.getEncounterDatetime())
                   <= 173) {
             found = true;
-            // System.out.println("The patient appears here " + pId);
           }
         }
       }
@@ -624,16 +621,5 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       resultMap.put(pId, new BooleanResult(found, this));
     }
     return resultMap;
-  }
-
-  private void sortEncountersByEncounterId(List<Encounter> encounters) {
-    Collections.sort(
-        encounters,
-        new Comparator<Encounter>() {
-          @Override
-          public int compare(Encounter a, Encounter b) {
-            return a.getEncounterDatetime().compareTo(b.getEncounterDatetime());
-          }
-        });
   }
 }

@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.calculation.txcurr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -195,6 +196,9 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
     CalculationResultMap lastFilaEncounterMap =
         ePTSCalculationService.getEncounter(
             Arrays.asList(fila), TimeQualifier.LAST, cohort, location, onOrBefore, context);
+    CalculationResultMap allFilaEncountersMap =
+        ePTSCalculationService.getEncounter(
+            Arrays.asList(fila), TimeQualifier.ANY, cohort, location, onOrBefore, context);
     for (Integer pId : cohort) {
       boolean found = false;
       // get last encounters
@@ -243,6 +247,18 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
       List<Obs> allListResultDispensaSemestryObs =
           EptsCalculationUtils.extractResultValues(allListResultDispensaSemestry);
 
+      ListResult listResultAllFilaEncounters = (ListResult) allFilaEncountersMap.get(pId);
+      List<Encounter> allFilaEncounters =
+          EptsCalculationUtils.extractResultValues(listResultAllFilaEncounters);
+
+      Encounter lastFilaPickedEncounter = null;
+      Encounter secondLastEncounter = null;
+      List<Obs> filaObsOnTheSameEncounterDate = new ArrayList<Obs>();
+      if (allFilaEncounters.size() > 1) {
+        EptsCalculationUtils.sortEncountersByEncounterId(allFilaEncounters);
+        lastFilaPickedEncounter = allFilaEncounters.get(allFilaEncounters.size() - 1);
+        secondLastEncounter = allFilaEncounters.get(allFilaEncounters.size() - 2);
+      }
       // case 1 fila filled is after ficha filled with semestral concept id
       if (lastFilaEncounter != null
           && lastFichaEncounter != null
@@ -337,8 +353,9 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
           && lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime() != null
           && lastFilaWithReturnForDrugsObs.getValueDatetime() != null
           && lastFichaEncounter
-              .getEncounterDatetime()
-              .equals(lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
+                  .getEncounterDatetime()
+                  .compareTo(lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
+              == 0
           && EptsCalculationUtils.exactDaysSince(
                   lastFilaWithReturnForDrugsObs.getValueDatetime(),
                   lastFilaWithReturnForDrugsObs.getEncounter().getEncounterDatetime())
@@ -396,6 +413,77 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
                   .compareTo(getLastFichaWithQuartelyObs.getObsDatetime())
               >= 0) {
         found = true;
+      }
+      // check if there is multiple filas taken on the same date, pick the one with the highest
+      // value datetime and >= last ficha
+      else if (lastFilaPickedEncounter != null
+          && lastFichaEncounter != null
+          && secondLastEncounter != null
+          && allFilaObsList.size() > 0) {
+        if (lastFilaPickedEncounter
+            .getEncounterDatetime()
+            .equals(secondLastEncounter.getEncounterDatetime())) {
+          // loop through the obs and pick those that match those 2 encounter
+          for (Obs obs : allFilaObsList) {
+            if (obs.getValueDatetime() != null
+                && (lastFilaPickedEncounter.equals(obs.getEncounter())
+                    || secondLastEncounter.equals(obs.getEncounter()))) {
+              filaObsOnTheSameEncounterDate.add(obs);
+            }
+          }
+          Date requiredDate = null;
+          if (filaObsOnTheSameEncounterDate.size() == 2) {
+            requiredDate = filaObsOnTheSameEncounterDate.get(0).getValueDatetime();
+            if (filaObsOnTheSameEncounterDate.get(1).getValueDatetime().compareTo(requiredDate)
+                > 0) {
+              requiredDate = filaObsOnTheSameEncounterDate.get(1).getValueDatetime();
+            }
+          }
+          // no that you have the right value datetime and the encounter date, do the logic for
+          // days and <=173 days
+          if (requiredDate != null
+              && EptsCalculationUtils.exactDaysSince(
+                      requiredDate, lastFilaPickedEncounter.getEncounterDatetime())
+                  > 173) {
+            found = true;
+          }
+        }
+      }
+
+      // check if there is multiple filas taken on the same date, pick the one with the highest
+      // value datetime and ficha is null, just to check agianst fila only
+      else if (lastFilaPickedEncounter != null
+          && lastFichaEncounter == null
+          && secondLastEncounter != null
+          && allFilaObsList.size() > 0) {
+        if (lastFilaPickedEncounter
+            .getEncounterDatetime()
+            .equals(secondLastEncounter.getEncounterDatetime())) {
+          // loop through the obs and pick those that match those 2 encounter
+          for (Obs obs : allFilaObsList) {
+            if (obs.getValueDatetime() != null
+                && (lastFilaPickedEncounter.equals(obs.getEncounter())
+                    || secondLastEncounter.equals(obs.getEncounter()))) {
+              filaObsOnTheSameEncounterDate.add(obs);
+            }
+          }
+          Date requiredDate = null;
+          if (filaObsOnTheSameEncounterDate.size() == 2) {
+            requiredDate = filaObsOnTheSameEncounterDate.get(0).getValueDatetime();
+            if (filaObsOnTheSameEncounterDate.get(1).getValueDatetime().compareTo(requiredDate)
+                > 0) {
+              requiredDate = filaObsOnTheSameEncounterDate.get(1).getValueDatetime();
+            }
+          }
+          // no that you have the right value datetime and the encounter date, do the logic
+          // days and <=173 days
+          if (requiredDate != null
+              && EptsCalculationUtils.exactDaysSince(
+                      requiredDate, lastFilaPickedEncounter.getEncounterDatetime())
+                  > 173) {
+            found = true;
+          }
+        }
       }
 
       // case 8:
