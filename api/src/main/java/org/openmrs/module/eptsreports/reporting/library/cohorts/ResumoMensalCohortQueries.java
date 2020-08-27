@@ -63,7 +63,13 @@ public class ResumoMensalCohortQueries {
     this.genericCohortQueries = genericCohortQueries;
   }
 
-  /** A1 Number of patients who initiated Pre-TARV at this HF by end of previous month */
+  /**
+  *<b>Name: A1</b> 
+  *</p>
+  *<b>Descrption:</b> Number of patients who initiated Pre-TARV at this HF by end of previous month
+  *</p>
+  * @return {@link CohortDefinition}
+  */
   public CohortDefinition getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -98,6 +104,13 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+  *<b>Name: A1I</b> 
+  *</p>
+  *<b>Descrption:</b> Number of patients in Master Card with ART less than Start Date
+  *</p>
+  * @return {@link CohortDefinition}
+  */
   public CohortDefinition getNumberOfPatientsInMasterCardWithArtLessThanStartDateA1() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("A1I");
@@ -112,10 +125,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * A2 Number of patients who initiated Pre-TARV at this HF during the current month
-   *
-   * @return CohortDefinition
-   */
+  *<b>Name: A2</b> 
+  *</p>
+  *<b>Descrption:</b> Number of patients who initiated Pre-TARV at this HF during the current month
+  *</p>
+  * @return {@link CohortDefinition}
+  */
   public CohortDefinition getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Number of patients who initiated Pre-TARV at this HF during the current month");
@@ -139,6 +154,13 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+  *<b>Name: A2I</b> 
+  *</p>
+  *<b>Descrption:</b> Number of patients who initiated Pre-ART during current month
+  *</p>
+  * @return {@link CohortDefinition}
+  */
   public CohortDefinition getNumberOfPatientInitiedPreArtDuringCurrentMothA2() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("A2i");
@@ -181,11 +203,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * A.2: Number of patients transferred-in from another HFs during the current month
-   *
-   * @return Cohort
-   * @return CohortDefinition
-   */
+  *<b>Name: A2II</b> 
+  *</p>
+  *<b>Descrption:</b> Number of patients transferred-in from another HFs during the current month
+  *</p>
+  * @return {@link CohortDefinition}
+  */
   public CohortDefinition
       getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthA2() {
 
@@ -203,10 +226,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * A3 = A.1 + A.2
-   *
-   * @return CohortDefinition
-   */
+  *<b>Name:  A3 = A1 + A2</b>
+  *</p>
+  *<b>Descrption:</b> Number of patients who initiated Pre-TARV at this HF until the end of reporting period 
+  *</p>
+  * @return {@link CohortDefinition}
+  */
   public CohortDefinition getSumOfA1AndA2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Sum of A1 and A2");
@@ -1716,9 +1741,11 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * Get all patients enrolled in PRE-ART program id 1, with date enrolled less than startDate
-   *
-   * @return CohortDefinition
+   *<b>Name: A1III</b>
+   *</p>
+   *<b>Descrption:</b> Get all patients enrolled in PRE-ART program id 1, with date enrolled less than startDate
+   *</p>
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getAllPatientsEnrolledInPreArtProgramWithDateEnrolledLessThanStartDateA1() {
@@ -1734,10 +1761,12 @@ public class ResumoMensalCohortQueries {
     return sqlPatientsEnrolledInPreART;
   }
 
-  /**
-   * Get all patients registered in encounterType 5 or 7, with date enrolled less than startDate
-   *
-   * @return CohortDefinition
+  /** 
+   *<b>Name: A1IV</b> 
+   *</p>
+   *<b>Descrption:</b> Get all patients registered in encounterType 5 or 7, with date enrolled less than startDate
+   *</p>
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getAllPatientsRegisteredInEncounterType5or7WithEncounterDatetimeLessThanStartDateA1() {
@@ -1750,9 +1779,11 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * Number of patients transferred-in from another HF during a period less than startDate
-   *
-   * @return CohortDefinition
+   *<b>Name: A1II</b>
+   *</p>
+   *<b>Descrption:</b> Number of patients transferred-in from another HFs during a period less than startDate
+   *</p>
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthA1() {

@@ -20,9 +20,10 @@ import org.apache.commons.text.StringSubstitutor;
 public class ResumoMensalQueries {
 
   /**
-   * All patients with encounter type 53, and Pre-ART Start Date that is less than startDate
-   *
-   * @return String
+   *<p> 
+   *<b>Description:</b> All patients who have Pre-ART Start Date that is less than startDate
+   *</p>
+   * @return {@link String}
    */
   public static String getAllPatientsWithPreArtStartDateLessThanReportingStartDate(
       int encounterType, int conceptId) {
@@ -31,6 +32,12 @@ public class ResumoMensalQueries {
     return String.format(query, encounterType, conceptId);
   }
 
+  /**
+   *<p>
+   * <b>Description:</b> Patients who initiated Pre-ART during current Month with conditions
+   *</p>
+   * @return {@link String}
+   */
   public static String getPatientsWhoInitiatedPreArtDuringCurrentMonthWithConditions(
       int masterCardEncounterType,
       int preArtStartDateConceptId,
@@ -591,9 +598,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * Get all patients enrolled in PRE-ART program id 1, with date enrolled less than startDate
+   * <b>Description:</b> Get all patients enrolled in PRE-ART program id 1, with date enrolled less than startDate
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getAllPatientsEnrolledInPreArtProgramWithDateEnrolledLessThanStartDate(
       int programId) {
