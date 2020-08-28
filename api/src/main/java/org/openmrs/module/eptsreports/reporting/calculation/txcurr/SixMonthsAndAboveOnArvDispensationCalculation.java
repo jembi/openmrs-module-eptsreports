@@ -50,6 +50,7 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
     Concept startDrugs = hivMetadata.getStartDrugs();
     Concept continueRegimen = hivMetadata.getContinueRegimenConcept();
     Concept monthly = hivMetadata.getMonthlyConcept();
+    Concept trisemsstra = hivMetadata.getQuarterlyDispensation();
 
     CalculationResultMap getLastFilaWithReturnVisitForDrugFilledMap =
         ePTSCalculationService.getObs(
@@ -305,6 +306,12 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
               .getEncounterDatetime()
               .after(lastFilaEncounter.getEncounterDatetime())) {
         found = true;
+        if (lastDispensaTrimestralWithoutSemestralObs != null
+            && lastFichaEncounter.equals(lastDispensaTrimestralWithoutSemestralObs.getEncounter())
+            && (lastDispensaTrimestralWithoutSemestralObs.getValueCoded().equals(monthly)
+                || lastDispensaTrimestralWithoutSemestralObs.getValueCoded().equals(trisemsstra))) {
+          found = false;
+        }
 
       }
       // case 4 if there are multiple fila filled/only fila available for the same date, pick the
@@ -343,6 +350,12 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
                           .equals(continueRegimen)))
               && lastFilaWithReturnForDrugsObs == null) {
         found = true;
+        if (lastDispensaTrimestralWithoutSemestralObs != null
+            && lastFichaEncounter.equals(lastDispensaTrimestralWithoutSemestralObs.getEncounter())
+            && (lastDispensaTrimestralWithoutSemestralObs.getValueCoded().equals(monthly)
+                || lastDispensaTrimestralWithoutSemestralObs.getValueCoded().equals(trisemsstra))) {
+          found = false;
+        }
       }
       // case 6 if there is a fila filled with ficha filled with semestral concept filled on the
       // same date
@@ -389,6 +402,12 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
                   .getValueCoded()
                   .equals(continueRegimen))) {
         found = true;
+        if (lastDispensaTrimestralWithoutSemestralObs != null
+            && lastFichaEncounter.equals(lastDispensaTrimestralWithoutSemestralObs.getEncounter())
+            && (lastDispensaTrimestralWithoutSemestralObs.getValueCoded().equals(monthly)
+                || lastDispensaTrimestralWithoutSemestralObs.getValueCoded().equals(trisemsstra))) {
+          found = false;
+        }
       }
       // what if there is 3 fichas on the same date that has a criteria for <3 months, 3-5 months
       // and > 6 months

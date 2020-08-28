@@ -50,6 +50,7 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
     Concept startDrugs = hivMetadata.getStartDrugs();
     Concept continueRegimen = hivMetadata.getContinueRegimenConcept();
     Concept monthly = hivMetadata.getMonthlyConcept();
+    Concept dispensaSemestra = hivMetadata.getSemiannualDispensation();
     // get the last fila with next drug pick up date captured, only the last one
     CalculationResultMap getLastFila =
         ePTSCalculationService.getObs(
@@ -358,6 +359,17 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   .compareTo(lastFilaObs.getEncounter().getEncounterDatetime())
               > 0) {
         found = true;
+        if (getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
+            && lastFichaEncounter.equals(
+                getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
+            && (getLastTypeOfDispensationObsWithoutQuartelyValueCoded
+                    .getValueCoded()
+                    .equals(monthly)
+                || getLastTypeOfDispensationObsWithoutQuartelyValueCoded
+                    .getValueCoded()
+                    .equals(dispensaSemestra))) {
+          found = false;
+        }
       }
       // case 6: If the most recent have more than one source FILA and FICHA registered on the same
       // most recent date, then consider the information from FILA compare with quartely 23739
@@ -408,13 +420,24 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
       // case 10: ficha has last/only encounter  Last TYPE OF DISPENSATION (id=23739) Value.code =
       // QUARTERLY (id=23720)
       // included also is the start and continue regimen
-      else if (getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
+      else if (lastFichaEncounter != null
+          && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
           && lastFilaObs == null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getValueCoded() != null
           && getLastTypeOfDispensationObsWithoutQuartelyValueCoded
               .getValueCoded()
               .equals(quaterlyDispensation)) {
         found = true;
+        if (lastFichaEncounter.equals(
+                getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
+            && (getLastTypeOfDispensationObsWithoutQuartelyValueCoded
+                    .getValueCoded()
+                    .equals(monthly)
+                || getLastTypeOfDispensationObsWithoutQuartelyValueCoded
+                    .getValueCoded()
+                    .equals(dispensaSemestra))) {
+          found = false;
+        }
       }
 
       // case 11: ficha has last/only encounter
@@ -429,6 +452,17 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   .getValueCoded()
                   .equals(continueRegimen))) {
         found = true;
+        if (lastFichaEncounter != null
+            && lastFichaEncounter.equals(
+                getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
+            && (getLastTypeOfDispensationObsWithoutQuartelyValueCoded
+                    .getValueCoded()
+                    .equals(monthly)
+                || getLastTypeOfDispensationObsWithoutQuartelyValueCoded
+                    .getValueCoded()
+                    .equals(dispensaSemestra))) {
+          found = false;
+        }
       } else if (getLastTypeOfDispensationWithQuartelyAsValueCodedAddedObs != null
           && lastFilaObs == null
           && getLastEncounterWithDepositionAndMonthlyAsCodedValueAddedObs != null
@@ -463,6 +497,18 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   .compareTo(lastFilaObs.getEncounter().getEncounterDatetime())
               > 0) {
         found = true;
+        if (lastFichaEncounter != null
+            && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
+            && lastFichaEncounter.equals(
+                getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
+            && (getLastTypeOfDispensationObsWithoutQuartelyValueCoded
+                    .getValueCoded()
+                    .equals(monthly)
+                || getLastTypeOfDispensationObsWithoutQuartelyValueCoded
+                    .getValueCoded()
+                    .equals(dispensaSemestra))) {
+          found = false;
+        }
       } else if (lastFilaEncounter != null
           && lastFichaEncounter == null
           && obsListForAllFila.size() > 0) {
@@ -617,7 +663,6 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
               > 0) {
         found = false;
       }
-
       resultMap.put(pId, new BooleanResult(found, this));
     }
     return resultMap;
