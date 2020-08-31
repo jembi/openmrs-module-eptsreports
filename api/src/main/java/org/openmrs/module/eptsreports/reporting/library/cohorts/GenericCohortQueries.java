@@ -150,13 +150,6 @@ public class GenericCohortQueries {
             hivMetadata.getARTProgram().getProgramId(),
             hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId()));
   }
-
-  public CohortDefinition getBaseCohortTest() {
-    return generalSql(
-        "baseCohortTest",
-        "SELECT patient_id FROM patient WHERE patient_id IN(21447,4582,25311,27502,28573,28810)");
-  }
-
   /**
    * Get patients states based on program, state and end of reporting period
    *
