@@ -20,9 +20,8 @@ import org.apache.commons.text.StringSubstitutor;
 public class ResumoMensalQueries {
 
   /**
-   *<p> 
-   *<b>Description:</b> All patients who have Pre-ART Start Date that is less than startDate
-   *</p>
+   * <b>Description:</b> All patients who have Pre-ART Start Date that is less than startDate
+   *
    * @return {@link String}
    */
   public static String getAllPatientsWithPreArtStartDateLessThanReportingStartDate(
@@ -33,9 +32,8 @@ public class ResumoMensalQueries {
   }
 
   /**
-   *<p>
    * <b>Description:</b> Patients who initiated Pre-ART during current Month with conditions
-   *</p>
+   *
    * @return {@link String}
    */
   public static String getPatientsWhoInitiatedPreArtDuringCurrentMonthWithConditions(
@@ -149,9 +147,8 @@ public class ResumoMensalQueries {
   }
 
   /**
-   *<p> 
-   *<b>Description:</b> Get transferred-in patients as specified in Resumo Mensal 
-   *</p>
+   * <b>Description:</b> Get transferred-in patients as specified in Resumo Mensal
+   *
    * @return {@link String}
    */
   public static String getTransferredIn(
@@ -510,7 +507,7 @@ public class ResumoMensalQueries {
   }
 
   /**
-   *<b>Description:</b> Number of patients who abandoned ART by specified date 
+   * <b>Description:</b> Number of patients who abandoned ART by specified date
    *
    * @return String
    */
@@ -599,7 +596,8 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * <b>Description:</b> Get all patients enrolled in PRE-ART program id 1, with date enrolled less than startDate
+   * <b>Description:</b> Get all patients enrolled in PRE-ART program id 1, with date enrolled less
+   * than startDate
    *
    * @return {@link String}
    */

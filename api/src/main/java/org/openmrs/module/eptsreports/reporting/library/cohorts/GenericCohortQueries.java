@@ -152,7 +152,7 @@ public class GenericCohortQueries {
   }
 
   /**
-   *<b>Description:</b> Get patients states based on program, state and end of reporting period
+   * <b>Description:</b> Get patients states based on program, state and end of reporting period
    *
    * @param
    * @return {@link CohortDefinition}
@@ -457,7 +457,7 @@ public class GenericCohortQueries {
   }
 
   /**
-   *<b>Description:</b> Get patients with any coded obs before end date
+   * <b>Description:</b> Get patients with any coded obs before end date
    *
    * @return {@link String}
    */
