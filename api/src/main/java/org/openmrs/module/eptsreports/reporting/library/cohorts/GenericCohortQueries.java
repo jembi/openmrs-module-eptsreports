@@ -152,11 +152,10 @@ public class GenericCohortQueries {
   }
 
   /**
-   * Get patients states based on program, state and end of reporting period
+   *<b>Description:</b> Get patients states based on program, state and end of reporting period
    *
-   * @param program
-   * @param state
-   * @return
+   * @param
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsBasedOnPatientStates(int program, int state) {
     SqlCohortDefinition cd = new SqlCohortDefinition();

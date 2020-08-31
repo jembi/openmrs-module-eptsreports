@@ -178,6 +178,15 @@ public class ResumoMensalCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   *<b>Name: C1</b> 
+   *</p>
+   *<b>Description:</b> Number of patients who initiated Pre-TARV during the current month
+   *                <p><b>NOTE:</b> The composition returns patients with pre-TARV,
+   *                                excluding patients transferred form other HFs  
+   *</p>
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthC1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("C1");
@@ -196,7 +205,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "exclusion",
         map(
-            getAdditionalExclusionCriteriaForC1andC2(
+            getAdditionalExclusionCriteriaForC1(
                 transferBasedOnDateMappings, inProgramStatesMappings),
             "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
     cd.setCompositionString("population AND NOT exclusion");
@@ -816,7 +825,18 @@ public class ResumoMensalCohortQueries {
     return transferredIn;
   }
 
-  /** @return Patients who initiated Pre-TARV during the current month and was screened for TB. */
+  /**
+   *<b>Name: C1</b> 
+   *</p>
+   *<b>Description:</b> Number of patients who initiated Pre-TARV during the current month and was screened for TB
+   *                <p><b>NOTE:</b> The composition returns patients with pre-TARV,
+   *                                filtering patients who were screened for TB
+   *</p>
+   * @return {@link CohortDefinition}
+   */
+
+  // TODO: Method is only being used for tests
+  // TODO: Method is duplicated in ResumoMensalCohortQueriesTest
   public CohortDefinition getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndScreenedTB() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients who initiated Pre-TARV during the current month and was screened for TB.");
@@ -837,10 +857,13 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * C1: Number of patients who initiated Pre-TARV during the current month and was screened for TB
-   * C1
-   *
-   * @return
+   *<b>Name: C1</b> 
+   *</p>
+   *<b>Description:</b> Number of patients who initiated Pre-TARV during the current month and was screened for TB
+   *                <p><b>NOTE:</b> The composition returns patients with pre-TARV,
+   *                                filtering patients who were screened for TB
+   *</p>
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndScreenedTbC1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -860,6 +883,12 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   *<b>Description:</b> Number of patients screened for TB in first encounter
+   *
+   *</p>
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getNumberOfPatientTbScreenedInFirstEncounter() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -915,7 +944,13 @@ public class ResumoMensalCohortQueries {
     return definition;
   }
 
-  /** @return Patients who initiated Pre-TARV during the current month and started TPI. */
+  /** 
+   *<b>Name: C2</b>
+   *<p>
+   *<b>Description:</b> Number of patients who initiated Pre-TARV during the current month and started TPI
+   *  
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndStartedTpiC2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients who initiated Pre-TARV during the current month and started TPI");
@@ -937,7 +972,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "exclusions",
         map(
-            getAdditionalExclusionCriteriaForC1andC2(
+            getAdditionalExclusionCriteriaForC1(
                 transferBasedOnDateMappings, inProgramStatesMappings),
             "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
     cd.setCompositionString("(A2 AND TPI) AND NOT exclusions");
@@ -946,11 +981,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * C3: Number of patients who initiated Pre-TARV during the current month and was diagnosed for
-   * active TB. (PT: Dos inícios Pré-TARV durante o mês (A.2), subgrupo que foi diagnosticado como
-   * TB activa)
-   *
-   * @return CohortDefinition
+   *<b>Name: C3</b>
+   *<p>
+   *<b>Description:</b> Number of patients who initiated Pre-TARV during the current month
+   *                    and was diagnosed for active TB 
+   * 
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndDiagnosedForActiveTBC3() {
@@ -974,6 +1010,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   *<b>Description:</b> Number of patients diagnosed for active TB in first or second encounter
+   * 
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getNumberOfPatientActiveTBInFirstAndSecondEncounter() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1077,8 +1118,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * @return Patients that have ISONIAZID USE = START DRUGS in their FIRST or SECOND S.TARV – Adulto
-   *     Seguimento encounter
+   *<b>Description:</b> Patients that have ISONIAZID USE = START DRUGS in their FIRST or SECOND S.TARV – Adulto
+   *                    Seguimento
+   *  
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getPatientsWhoStartedTPI() {
     CodedObsOnFirstOrSecondEncounterCalculation calculation =
@@ -1094,8 +1137,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * @return Patients that have TB Symptoms = Yes in their FIRST S.TARV – Adulto Seguimento
-   *     encounter
+   *<b>Description:</b> Patients that have TB Symptoms = Yes in their FIRST S.TARV – Adulto 
+   *                    Seguimento
+   * 
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getPatientScreenedForTb() {
     CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
@@ -1110,7 +1155,7 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * Get number of patients transferred from other health facility marked in master card
+   *<b>Description:</b> Number of patients transferred from other HF marked in master-card
    *
    * @return CohortDefinition
    */
@@ -1124,7 +1169,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** @return CohortDefinition Patients with transfer from other HF = YES */
+  /**
+   *<b>Description:</b> Number of Patients transferred from other HF = YES 
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getPatientsWithTransferFromOtherHF() {
     EncounterWithCodedObsCohortDefinition cd = new EncounterWithCodedObsCohortDefinition();
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
@@ -1136,7 +1185,15 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getAdditionalExclusionCriteriaForC1andC2(
+  /**
+   *<b>Description:</b> Additional exclusion criteria for <b>C1</b>
+   *                <p> The <b>parameters</b> return mappings for 
+   *                     <b>transferBasedOnObsDate</b> and <b>programState</b>
+   * 
+   * @param
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getAdditionalExclusionCriteriaForC1(
       String transferBasedOnDateMappings, String inProgramStatesMappings) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("All patients to be excluded for the C1 definition");
@@ -1165,6 +1222,12 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   *<b>Description:</b> Additional exclusion criteria for <b>C2</b>
+   * 
+   * @param
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getAdditionalExclusionCriteriaForC2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("All patients to be excluded for the C2 definition");
@@ -1195,6 +1258,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   *<b>Description:</b> Number of patients transfer based on obs date
+   * 
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getPatientsTransferBasedOnObsDate() {
     CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
     cd.setName("Get patients with obs date based on a concept");
@@ -1209,6 +1277,7 @@ public class ResumoMensalCohortQueries {
   }
 
   /** @return CohortDefinition Patients with Type of Patient Transferred From = 'Pre-TARV' */
+  // TODO: method is never used
   private CohortDefinition getPatientsWithTransferFrom() {
     EncounterWithCodedObsCohortDefinition cd = new EncounterWithCodedObsCohortDefinition();
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
@@ -1220,6 +1289,7 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  // TODO: method is never used
   private CohortDefinition getPatientsWhoInitiatedTarvAtAfacility() {
     DateObsCohortDefinition cd = new DateObsCohortDefinition();
     cd.addParameter(new Parameter("value1", "Value 1", Date.class));
