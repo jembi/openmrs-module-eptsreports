@@ -32,6 +32,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.CodedObsOnFirstOrSec
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.ResumoMensalTransferredOutCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.cohort.evaluator.ResumoMensalTransferredOutCohortDefinitionEvaluator;
 import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -226,7 +227,7 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-  *<b>Name:  A3 = A1 + A2</b>
+  *<b>Name: A3 = A1 + A2</b>
   *</p>
   *<b>Descrption:</b> Number of patients who initiated Pre-TARV at this HF until the end of reporting period 
   *</p>
@@ -254,9 +255,11 @@ public class ResumoMensalCohortQueries {
 
   // Start of the B queries
   /**
-   * B1 Number of patientes who initiated TARV at this HF during the current month
+   *<b>Name: B1</b>
+   *</p>
+   *<b>Description:</b> Number of patients who initiated TARV at this HF during the current month
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -281,10 +284,11 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * B.2: Number of patients transferred-in from another HFs during the current month
+   *<b>Name: B2</b>
+   *</p>
+   *<b>Description:</b> Number of patients transferred-in from another HFs during the current month
    *
-   * @return Cohort
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E() {
@@ -305,11 +309,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * B.2 Composition to exclude B5 (Patients Transferred Out): Number of patients transferred-in
-   * from another HFs during the current month
+   *<b>Name: B2</b> 
+   *</p> 
+   *<b>Description:</b> Number of patients transferred-in from another HFs during the current month.
+   *                    Composition to exclude <b>B5 ({@link #getPatientsTransferredOutB5})</b>
    *
-   * @return Cohort
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2() {
@@ -340,9 +345,11 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * B.3 Number of patients who restarted the treatment during the current month
+   *<b>Name: B3</b>
+   *</p>
+   *<b>Description:</b> Number of patients who restarted the treatment during the current month
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithStartDrugs() {
     EncounterWithCodedObsCohortDefinition cd = getStateOfStayCohort();
@@ -352,9 +359,15 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * See {@link HivCohortQueries#getPatientsTransferredOut}
-   *
-   * @return B.5 Number of patients transferred out during the current month
+   *<b>Name: B5</b>
+   *</p>
+   *<b>Description:</b> Number of patients transferred out during the current month. 
+   *                <p> The <b>parameter</b> below checks patients in last date as transfered out
+   *</p>
+   * See <b>{@link ResumoMensalTransferredOutCohortDefinitionEvaluator}</b>
+   * 
+   * @param 
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsTransferredOutB5(boolean maxDates) {
 
@@ -368,7 +381,15 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** @return B6: Number of patients with ART suspension during the current month */
+  /**
+   *<b>Name: B6</b>
+   *</p>
+   *<b>Description:</b> Number of patients with ART suspension during the current month.
+   *                <p> The <b>parameter</b> below checks the patient's state between the start and end date   
+   *
+   * @param
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoSuspendedTreatmentB6(boolean useBothDates) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patients with ART suspension during the current month");
@@ -486,7 +507,15 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** @return B8: Number of dead patients during the current month */
+  /**
+   *<b>Name: B8</b>
+   *</p>
+   *<b>Description:</b> Number of dead patients during the current month.
+   *                <p> The <b>parameter</b> below checks the patient's state between the start and end date   
+   * 
+   * @param
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoDied(Boolean hasStartDate) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -616,7 +645,13 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** @return Number of cumulative patients who started ART by end of previous month */
+  /**
+   *<b>Name: B10</b>
+   *</p>
+   *<b>Description:</b> Number of cumulative patients who started ART by end of previous month
+   *  
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoStartedArtByEndOfPreviousMonthB10() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Number of cumulative patients who started ART by end of previous month");
@@ -638,6 +673,13 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   *<b>Name:</b> Transferred-in for <b>B10</b> 
+   *</p> 
+   *<b>Description:</b> Number of patients transferred-in from another HF during a period less than startDate
+   * 
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getTransferredInForB10() {
     EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
     cd.setName(
@@ -651,7 +693,13 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** B12 @return Number of active patients in ART by end of previous month */
+  /**
+   *<b>Name: B12</b>
+   *</p>
+   *<b>Description:</b> Number of active patients in ART by end of previous month 
+   *
+   * @return {@link CohortDefinition}     
+   */
   public CohortDefinition getPatientsWhoWereActiveByEndOfPreviousMonthB12() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Number of active patients in ART by end of previous month");
@@ -691,14 +739,14 @@ public class ResumoMensalCohortQueries {
             getPatientsWhoHadAtLeastDrugPickUp(),
             "startDate=${startDate-1d},location=${location}"));
     cd.setCompositionString("((B10 OR B2A) AND drugPick) AND NOT (B5A OR B6A OR B7A OR B8A)");
-    // cd.setCompositionString("drugPick");
 
     return cd;
   }
+
   /**
-   * Patients who had a drug pick up as Levantamento de ARV Master Card and FILA
+   *<b>Descritpion:</b> Patients who had a drug pick up as Levantamento de ARV Master Card and FILA
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoHadAtLeastDrugPickUp() {
 
@@ -1215,11 +1263,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * All patients who have picked up drugs (Recepção Levantou ARV) – Master Card by end of reporting
-   * period Encounter Type Ids = 52 The earliest “Data de Levantamento” (Concept Id 23866
-   * value_datetime) <= endDate
+   *<b>Description:</b> All patients who have picked up drugs (Recepção Levantou ARV) – Master Card by end of reporting
+   * period The earliest “Data de Levantamento”
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod")
   public CohortDefinition getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod() {
@@ -1255,10 +1302,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * Patients with Drug pickup - Encounter Type 18 (FILA) and Next Scheduled Pickup Date - Concept
-   * ID 5096 - value_datetime not null
+   *<b>Description:</b> Patients with Drug pickup and Next Scheduled Pickup Date
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithFILAEncounterAndNextPickupDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1687,9 +1733,11 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * B7A: Number of active patients in ART by end of previous/current month
+   *<b>Name: B7</b> 
+   *</p>
+   *<b>Description:</b> Number of active patients in ART by end of previous/current month 
    *
-   * @retrun CohortDefinition
+   * @return {@link CohortDefinition}  
    */
   public CohortDefinition getNumberOfPatientsWhoAbandonedArtDuringCurrentMonthForB7() {
 
@@ -1725,6 +1773,12 @@ public class ResumoMensalCohortQueries {
     return ccd;
   }
 
+  /**
+   *<b>Name: B7</b> 
+   *</p>
+   *<b>Description:</b> Number of patients who abandoned ART during previous month  
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patients who Abandoned the ART during the current month");
@@ -1764,7 +1818,7 @@ public class ResumoMensalCohortQueries {
   /** 
    *<b>Name: A1IV</b> 
    *</p>
-   *<b>Descrption:</b> Get all patients registered in encounterType 5 or 7, with date enrolled less than startDate
+   *<b>Descrption:</b> Get all patients registered in {@link HivMetadata#getARVAdultInitialEncounterType} unterType 5 or 7, with date enrolled less than startDate
    *</p>
    * @return {@link CohortDefinition}
    */
@@ -1802,10 +1856,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * B13 B.13: Number of active patients in ART by end of current month (PT: Nº activo em TARV no
+   *<b>Name: B13</b> 
+   *</p>
+   *<b>Description:</b> Number of active patients in ART by end of current month (PT: Nº activo em TARV no
    * fim do mês automaticamente calculado através da seguinte formula)
    *
-   * @retrun CompositionCohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getActivePatientsInARTByEndOfCurrentMonth() {
 
@@ -1848,7 +1904,12 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** Get transferred-in patients */
+  /**
+   * <b>Description:</b> Get transferred-In patients
+   * 
+   * @param
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getTransferredInPatients(boolean isExclusion) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Transferred-in patients");

@@ -148,7 +148,12 @@ public class ResumoMensalQueries {
     return sub.replace(query);
   }
 
-  /** Get transferred-in patients as specified in Resumo Mensal */
+  /**
+   *<p> 
+   *<b>Description:</b> Get transferred-in patients as specified in Resumo Mensal 
+   *</p>
+   * @return {@link String}
+   */
   public static String getTransferredIn(
       int mastercard,
       int transferFromOther,
@@ -505,12 +510,8 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * B7
+   *<b>Description:</b> Number of patients who abandoned ART by specified date 
    *
-   * @param returnVisitDateForArvDrugConcept
-   * @param arvPharmaciaEncounterType
-   * @param artDatePickup
-   * @param masterCardDrugPickupEncounterType
    * @return String
    */
   public static String getNumberOfPatientsWhoAbandonedArtBySpecifiedDateB7(
