@@ -65,8 +65,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A1</b> <b>Descrption:</b> Number of patients who initiated Pre-TARV at this HF by end
-   * of previous month
+   * <b>Name: A1</b>
+   *
+   * <p><b>Description:</b> Number of patients who initiated Pre-TARV at this HF by end of previous
+   * month
    *
    * @return {@link CohortDefinition}
    */
@@ -105,8 +107,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A1I</b> <b>Descrption:</b> Number of patients in Master Card with ART less than Start
-   * Date
+   * <b>Name: A1I</b>
+   *
+   * <p><b>Description:</b> Number of patients in Master Card with ART less than Start Date
    *
    * @return {@link CohortDefinition}
    */
@@ -124,8 +127,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A2</b> <b>Descrption:</b> Number of patients who initiated Pre-TARV at this HF during
-   * the current month
+   * <b>Name: A2</b>
+   *
+   * <p><b>Description:</b> Number of patients who initiated Pre-TARV at this HF during the current
+   * month
    *
    * @return {@link CohortDefinition}
    */
@@ -153,8 +158,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A2I</b> <b>Descrption:</b> Number of patients who initiated Pre-ART during current
-   * month
+   * <b>Name: A2I</b>
+   *
+   * <p><b>Description:</b> Number of patients who initiated Pre-ART during current month
    *
    * @return {@link CohortDefinition}
    */
@@ -175,8 +181,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: C1</b> <b>Description:</b> Number of patients who initiated Pre-TARV during the
-   * current month
+   * <b>Name: C1</b>
+   *
+   * <p><b>Description:</b> Number of patients who initiated Pre-TARV during the current month
    *
    * <p><b>NOTE:</b> The composition returns patients with pre-TARV, excluding patients transferred
    * form other HFs
@@ -209,8 +216,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A2II</b> <b>Descrption:</b> Number of patients transferred-in from another HFs during
-   * the current month
+   * <b>Name: A2II</b>
+   *
+   * <p><b>Description:</b> Number of patients transferred-in from another HFs during the current
+   * month
    *
    * @return {@link CohortDefinition}
    */
@@ -231,8 +240,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A3 = A1 + A2</b> <b>Descrption:</b> Number of patients who initiated Pre-TARV at this
-   * HF until the end of reporting period
+   * <b>Name: A3 = A1 + A2</b>
+   *
+   * <p><b>Descrption:</b> Number of patients who initiated Pre-TARV at this HF until the end of
+   * reporting period
    *
    * @return {@link CohortDefinition}
    */
@@ -258,8 +269,10 @@ public class ResumoMensalCohortQueries {
 
   // Start of the B queries
   /**
-   * <b>Name: B1</b> <b>Description:</b> Number of patients who initiated TARV at this HF during the
-   * current month
+   * <b>Name: B1</b>
+   *
+   * <p><b>Description:</b> Number of patients who initiated TARV at this HF during the current
+   * month
    *
    * @return {@link CohortDefinition}
    */
@@ -286,8 +299,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B2</b> <b>Description:</b> Number of patients transferred-in from another HFs during
-   * the current month
+   * <b>Name: B2</b>
+   *
+   * <p><b>Description:</b> Number of patients transferred-in from another HFs during the current
+   * month
    *
    * @return {@link CohortDefinition}
    */
@@ -310,8 +325,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B2</b> <b>Description:</b> Number of patients transferred-in from another HFs during
-   * the current month. Composition to exclude <b>B5 ({@link #getPatientsTransferredOutB5})</b>
+   * <b>Name: B2</b>
+   *
+   * <p><b>Description:</b> Number of patients transferred-in from another HFs during the current
+   * month. Composition to exclude <b>B5 ({@link #getPatientsTransferredOutB5})</b>
    *
    * @return {@link CohortDefinition}
    */
@@ -344,8 +361,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B3</b> <b>Description:</b> Number of patients who restarted the treatment during the
-   * current month
+   * <b>Name: B3</b>
+   *
+   * <p><b>Description:</b> Number of patients who restarted the treatment during the current month
    *
    * @return {@link CohortDefinition}
    */
@@ -357,8 +375,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B5</b> <b>Description:</b> Number of patients transferred out during the current
-   * month.
+   * <b>Name: B5</b>
+   *
+   * <p><b>Description:</b> Number of patients transferred out during the current month.
    *
    * <p>The <b>parameter</b> below checks patients in last date as transfered out See <b>{@link
    * ResumoMensalTransferredOutCohortDefinitionEvaluator}</b>
@@ -379,8 +398,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B6</b> <b>Description:</b> Number of patients with ART suspension during the current
-   * month.
+   * <b>Name: B6</b>
+   *
+   * <p><b>Description:</b> Number of patients with ART suspension during the current month.
    *
    * <p>The <b>parameter</b> below checks the patient's state between the start and end date
    *
@@ -505,7 +525,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B8</b> <b>Description:</b> Number of dead patients during the current month.
+   * <b>Name: B8</b>
+   *
+   * <p><b>Description:</b> Number of dead patients during the current month.
    *
    * <p>The <b>parameter</b> below checks the patient's state between the start and end date
    *
@@ -642,8 +664,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B10</b> <b>Description:</b> Number of cumulative patients who started ART by end of
-   * previous month
+   * <b>Name: B10</b>
+   *
+   * <p><b>Description:</b> Number of cumulative patients who started ART by end of previous month
    *
    * @return {@link CohortDefinition}
    */
@@ -669,8 +692,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name:</b> Transferred-in for <b>B10</b> <b>Description:</b> Number of patients
-   * transferred-in from another HF during a period less than startDate
+   * <b>Name:</b> Transferred-in for <b>B10</b>
+   *
+   * <p><b>Description:</b> Number of patients transferred-in from another HF during a period less
+   * than startDate
    *
    * @return {@link CohortDefinition}
    */
@@ -688,7 +713,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B12</b> <b>Description:</b> Number of active patients in ART by end of previous month
+   * <b>Name: B12</b>
+   *
+   * <p><b>Description:</b> Number of active patients in ART by end of previous month
    *
    * @return {@link CohortDefinition}
    */
@@ -736,7 +763,7 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Descritpion:</b> Patients who had a drug pick up as Levantamento de ARV Master Card and FILA
+   * <b>Description:</b> Patients who had a drug pick up as Levantamento de ARV Master Card and FILA
    *
    * @return {@link CohortDefinition}
    */
@@ -809,8 +836,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: C1</b> <b>Description:</b> Number of patients who initiated Pre-TARV during the
-   * current month and was screened for TB
+   * <b>Name: C1</b>
+   *
+   * <p><b>Description:</b> Number of patients who initiated Pre-TARV during the current month and
+   * was screened for TB
    *
    * <p><b>NOTE:</b> The composition returns patients with pre-TARV, filtering patients who were
    * screened for TB
@@ -840,8 +869,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: C1</b> <b>Description:</b> Number of patients who initiated Pre-TARV during the
-   * current month and was screened for TB
+   * <b>Name: C1</b>
+   *
+   * <p><b>Description:</b> Number of patients who initiated Pre-TARV during the current month and
+   * was screened for TB
    *
    * <p><b>NOTE:</b> The composition returns patients with pre-TARV, filtering patients who were
    * screened for TB
@@ -1085,8 +1116,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * @return Patients that have ACTIVE TB = YES in their FIRST or SECOND S.TARV – Adulto *
-   *     Seguimento encounter
+   * <b>Description:<b> Number of patients that have ACTIVE TB = YES in their FIRST or SECOND S.TARV
+   * – Adulto Seguimento encounter
+   *
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getPatientsDiagnosedForActiveTB() {
     CodedObsOnFirstOrSecondEncounterCalculation calculation =
@@ -1140,7 +1173,7 @@ public class ResumoMensalCohortQueries {
   /**
    * <b>Description:</b> Number of patients transferred from other HF marked in master-card
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getTypeOfPatientTransferredFrom() {
     EncounterWithCodedObsCohortDefinition cd = new EncounterWithCodedObsCohortDefinition();
@@ -1209,7 +1242,6 @@ public class ResumoMensalCohortQueries {
   /**
    * <b>Description:</b> Additional exclusion criteria for <b>C2</b>
    *
-   * @param
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getAdditionalExclusionCriteriaForC2() {
@@ -1260,7 +1292,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** @return CohortDefinition Patients with Type of Patient Transferred From = 'Pre-TARV' */
+  /**
+   * <b>Description:</b> Number of patients with Type of Patient Transferred From = 'Pre-TARV'
+   *
+   * @return {@link CohortDefinition}
+   */
   // TODO: method is never used
   private CohortDefinition getPatientsWithTransferFrom() {
     EncounterWithCodedObsCohortDefinition cd = new EncounterWithCodedObsCohortDefinition();
@@ -1273,6 +1309,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:<b> Number of patients who initiated TARV at a facility
+   *
+   * @return {@link CohortDefinition}
+   */
   // TODO: method is never used
   private CohortDefinition getPatientsWhoInitiatedTarvAtAfacility() {
     DateObsCohortDefinition cd = new DateObsCohortDefinition();
@@ -1287,7 +1328,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** @return Patients with Adulto Seguimento encounter with State of Stay question */
+  /**
+   * <b>Description:</b> Patients with Adulto Seguimento encounter with State of Stay question
+   *
+   * @return {@link CohortDefinition}
+   */
   private EncounterWithCodedObsCohortDefinition getStateOfStayCohort() {
     EncounterWithCodedObsCohortDefinition cd = new EncounterWithCodedObsCohortDefinition();
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
@@ -1299,9 +1344,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * Patients with master card drug pickup date
+   * <b>Description:<> Number of patients with master card drug pickup date
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   private DateObsCohortDefinition getPatientsWithMasterCardDrugPickUpDate() {
     DateObsCohortDefinition cd = new DateObsCohortDefinition();
@@ -1348,7 +1393,11 @@ public class ResumoMensalCohortQueries {
     return definition;
   }
 
-  /** @return Patients with last Drug Pickup Date between boundaries */
+  /**
+   * <b>Description:</b> Patients with last Drug Pickup Date between boundaries
+   *
+   * @return {@link CohortDefinition}
+   */
   private DateObsCohortDefinition getLastArvPickupDateCohort() {
     DateObsCohortDefinition cd = getPatientsWithMasterCardDrugPickUpDate();
     cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
@@ -1807,9 +1856,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * Get number of patients who have a consultation on the same date as that of pre art
+   * <b>Description:<b> Number of patients who have a consultation on the same date as that of
+   * pre-ART
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition
       getPatientsWithFirstClinicalConsultationOnTheSameDateAsPreArtStartDate() {
@@ -1827,8 +1877,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B7</b> <b>Description:</b> Number of active patients in ART by end of previous/current
-   * month
+   * <b>Name: B7</b>
+   *
+   * <p><b>Description:</b> Number of active patients in ART by end of previous/current month
    *
    * @return {@link CohortDefinition}
    */
@@ -1867,7 +1918,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B7</b> <b>Description:</b> Number of patients who abandoned ART during previous month
+   * <b>Name: B7</b>
+   *
+   * <p><b>Description:</b> Number of patients who abandoned ART during previous month
    *
    * @return {@link CohortDefinition}
    */
@@ -1887,8 +1940,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A1III</b> <b>Descrption:</b> Get all patients enrolled in PRE-ART program id 1, with
-   * date enrolled less than startDate
+   * <b>Name: A1III</b>
+   *
+   * <p><b>Descrption:</b> Number of patients enrolled in PRE-ART program id 1, with date enrolled
+   * less than startDate
    *
    * @return {@link CohortDefinition}
    */
@@ -1907,9 +1962,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A1IV</b> <b>Descrption:</b> Get all patients registered in {@link
-   * HivMetadata#getARVAdultInitialEncounterType} unterType 5 or 7, with date enrolled less than
-   * startDate
+   * <b>Name: A1IV</b>
+   *
+   * <p><b>Descrption:</b> Number of patients registered in <b>encounterType 5 or 7</b>, with date
+   * enrolled less than startDate
    *
    * @return {@link CohortDefinition}
    */
@@ -1924,8 +1980,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A1II</b> <b>Descrption:</b> Number of patients transferred-in from another HFs during
-   * a period less than startDate
+   * <b>Name: A1II</b>
+   *
+   * <p><b>Descrption:</b> Number of patients transferred-in from another HFs during a period less
+   * than startDate
    *
    * @return {@link CohortDefinition}
    */
@@ -1946,8 +2004,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B13</b> <b>Description:</b> Number of active patients in ART by end of current month
-   * (PT: Nº activo em TARV no fim do mês automaticamente calculado através da seguinte formula)
+   * <b>Name: B13</b>
+   *
+   * <p><b>Description:</b> Number of active patients in ART by end of current month (PT: Nº activo
+   * em TARV no fim do mês automaticamente calculado através da seguinte formula)
    *
    * @return {@link CohortDefinition}
    */
@@ -1993,7 +2053,7 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Get transferred-In patients
+   * <b>Description:</b> Number of patients transferred-In
    *
    * @param
    * @return {@link CohortDefinition}

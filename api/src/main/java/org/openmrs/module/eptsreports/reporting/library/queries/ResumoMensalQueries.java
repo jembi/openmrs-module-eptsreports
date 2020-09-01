@@ -95,6 +95,12 @@ public class ResumoMensalQueries {
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * <b>Description:</b> Number of patients transferred from another health facility by end of
+   * previous month
+   *
+   * @return {@link String}
+   */
   public static String getPatientsTransferredFromAnotherHealthFacilityByEndOfPreviousMonth(
       int masterCardEncounter,
       int transferFromConcept,
@@ -222,14 +228,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * Patient screened for TB
+   * <b>Description:</b>Number of Patients screened for TB
    *
-   * @param encounterType
-   * @param tbScreening
-   * @param yesConcept
-   * @param noConcept
-   * @param tbTreatment
-   * @return
+   * @return {@link String}
    */
   public static String getPatientsWithTBScreening(
       int adultoSeguimentoEncounterType,
@@ -465,10 +466,10 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * F3 exclusions
+   * <b>Description: F3</b> exclusion criteria
    *
    * @param encounterType
-   * @return
+   * @return {@link String}
    */
   public static String getF3Exclusion(int encounterType) {
     String query =
@@ -482,9 +483,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * Patients with first clinical consultation 6 on the same Pre-ART Start date() Concept ID 23808
+   * <b>Description:</b> Patients with first clinical consultation 6 on the same Pre-ART Start date
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getPatientsWithFirstClinicalConsultationOnTheSameDateAsPreArtStartDate(
       int mastercardEncounterType, int consultationEncounterType, int preArtStarConceptId) {
@@ -502,7 +503,7 @@ public class ResumoMensalQueries {
   /**
    * <b>Description:</b> Number of patients who abandoned ART by specified date
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getNumberOfPatientsWhoAbandonedArtBySpecifiedDateB7(
       int returnVisitDateForArvDrugConcept,
@@ -614,9 +615,10 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * Get all patients registered in encounterType 5 or 7, with date enrolled less than startDate
+   * <b>Description:</b> Number of patients registered in <b>encounterType 5 or 7</b>, with date
+   * enrolled less than startDate
    *
-   * @return String
+   * @return {@link String}
    */
   public static String
       getAllPatientsRegisteredInEncounterType5or7WithEncounterDatetimeLessThanStartDate(
