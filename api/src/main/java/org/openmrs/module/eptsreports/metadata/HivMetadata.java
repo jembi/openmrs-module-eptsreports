@@ -3043,9 +3043,9 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    * <b>program_workflow_state_id = 4 </b>
    *
-   * <p><b>Name:</b> HIV CARE START DRUGS
+   * <p><b>Name:</b> HIV CARE START DRUGS</p>
    *
-   * <p><b>Description:</b>
+   * <p><b>Description:</b></p>
    *
    * @return {@link ProgramWorkflowState}
    */
@@ -3129,6 +3129,14 @@ public class HivMetadata extends ProgramsMetadata {
     ProgramWorkflowState state = getAbandonedWorkflowState(artProgram, workflow);
     return state;
   }
+
+  /**
+   *  <b>person_attribute_type_id = 24 </b>
+   *
+   *  <p><b>Name:</b>  Identificador definido localmente 01</p>
+   *
+   * @return {@link PersonAttributeType}
+   */
 
   public PersonAttributeType getIdentificadorDefinidoLocalmente01() {
     String uuid =
