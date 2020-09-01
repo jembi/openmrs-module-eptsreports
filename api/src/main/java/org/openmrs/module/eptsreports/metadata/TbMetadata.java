@@ -263,7 +263,15 @@ public class TbMetadata extends ProgramsMetadata {
 
   // encounter types
 
-  // TODO: missing encounterType_id
+  /**
+   * <b>encounterType_id = 25</b>
+   *
+   * <p><b>Name:</b> TUBERCULOSE: LIVRO
+   *
+   * <p><b>Description:</b> Livro de registo de doentes com Tuberculose
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getTBLivroEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -271,7 +279,15 @@ public class TbMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // TODO: missing encounterType_id
+  /**
+   * <b>encounterType_id = 26</b>
+   *
+   * <p><b>Name:</b> TUBERCULOSE: PROCESSO
+   *
+   * <p><b>Description:</b> Tratamento de Tuberculose
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getTBProcessoEncounterType() {
     String uuid =
         Context.getAdministrationService()
@@ -279,7 +295,15 @@ public class TbMetadata extends ProgramsMetadata {
     return getEncounterType(uuid);
   }
 
-  // TODO: missing encounterType_id
+  /**
+   * <b>encounterType_id = 20</b>
+   *
+   * <p><b>Name:</b> TUBERCULOSE: RASTREIO
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link EncounterType}
+   */
   public EncounterType getTBRastreioEncounterType() {
     String uuid =
         Context.getAdministrationService()

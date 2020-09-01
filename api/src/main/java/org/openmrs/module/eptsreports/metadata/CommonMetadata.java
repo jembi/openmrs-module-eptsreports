@@ -85,8 +85,8 @@ public class CommonMetadata extends Metadata {
    *
    * <p><b>Name:</b> START DRUGS
    *
-   * <p><b>Description:</b> Answer on encounter form.  
-   *                        Implies that a patient will be started on drugs for that particular encounter.
+   * <p><b>Description:</b> Answer on encounter form. Implies that a patient will be started on
+   * drugs for that particular encounter.
    *
    * @return {@link Concept}
    */
@@ -191,12 +191,13 @@ public class CommonMetadata extends Metadata {
     return getConcept(uuid);
   }
 
-   /**
+  /**
    * <b>concept_id = 6332</b>
    *
    * <p><b>Name:</b> BREASTFEEDING
    *
-   * <p><b>Description:</b> Describes the secretion of milk from the mammary glands and the period of time that a mother lactates to feed her young
+   * <p><b>Description:</b> Describes the secretion of milk from the mammary glands and the period
+   * of time that a mother lactates to feed her young
    *
    * @return {@link Concept}
    */
@@ -348,7 +349,7 @@ public class CommonMetadata extends Metadata {
     return getConcept(uuid);
   }
 
-   /**
+  /**
    * <b>concept_id = 6336</b>
    *
    * <p><b>Name:</b> CLASSIFICATION OF MALNUTRITION
@@ -383,7 +384,8 @@ public class CommonMetadata extends Metadata {
    *
    * <p><b>Name:</b> MALNUTRITION
    *
-   * <p><b>Description:</b> Inadequate oral intake of unspecified nutrients (eg, calories, protein, vitamins, etc.)
+   * <p><b>Description:</b> Inadequate oral intake of unspecified nutrients (eg, calories, protein,
+   * vitamins, etc.)
    *
    * @return {@link Concept}
    */
