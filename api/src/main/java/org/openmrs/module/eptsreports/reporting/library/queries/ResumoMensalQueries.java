@@ -286,10 +286,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * Get patients with encounters within start and end date F1: Number of patients who had clinical
-   * appointment during the reporting month
+   * <b>Description:</b> Number of patients with encounters within start and end date F1
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getPatientsWithGivenEncounterType(int encounterType) {
     String query =
@@ -307,9 +306,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * Get patients with viral load suppression
+   * <b>Description:</b> Number of patients with viral load suppression
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getPatientsHavingViralLoadSuppression(
       int viralLoadConcept, int encounterType) {
@@ -325,9 +324,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * getPatientsWithCodedObsAndAnswers
+   * <b>Description:</b> Number of Patients With Coded Obs And Answers
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getPatientsWithCodedObsAndAnswers(
       int encounterType, int questionConceptId, int answerConceptId) {
@@ -340,9 +339,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * Get patients with viral load suppression
+   * <b>Description:</b> Number of patients with viral load suppression
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getPatientsHavingViralLoadResults(int viralLoadConcept, int encounterType) {
     String query =
@@ -356,9 +355,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * Get patients with any coded obs value
+   * <b>Description</b> Number of patients with any coded obs value
    *
-   * @return String
+   * @return {@link String}
    */
   public static String gePatientsWithCodedObs(int encounterType, int conceptId) {
     String query =
@@ -370,9 +369,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * E1 exclusions
+   * <b>Description: E1</b> exclusion criteria
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getE1ExclusionCriteria(
       int encounterType, int questionConceptId, int answerConceptId) {
@@ -400,12 +399,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * E2 exclusions
+   * <b>Description: E2</b> exclusion criteria
    *
-   * @param viralLoadConcept
-   * @param encounterType
-   * @param qualitativeConcept
-   * @return String
+   * @return {@link String}
    */
   public static String getE2ExclusionCriteria(
       int viralLoadConcept, int encounterType, int qualitativeConcept) {
@@ -434,12 +430,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * E3 exclusion
+   * <b>Description: E3</b> exclusion criteria
    *
-   * @param viralLoadConcept
-   * @param encounterType
-   * @param qualitativeConcept
-   * @return
+   * @return {@link String}
    */
   public static String getE3ExclusionCriteria(
       int viralLoadConcept, int adultoSeguimentoEncounterType, int qualitativeConcept) {
@@ -646,6 +639,11 @@ public class ResumoMensalQueries {
     return sub.replace(query);
   }
 
+  /**
+   * <b>Description:</b> Number of patients registered as transferred in during the statistical year
+   *
+   * @return {@link String}
+   */
   public static String getPatientsRegisteredAsTransferredInDuringTheStatisticalYear(
       int mastercard,
       int transferFromOther,

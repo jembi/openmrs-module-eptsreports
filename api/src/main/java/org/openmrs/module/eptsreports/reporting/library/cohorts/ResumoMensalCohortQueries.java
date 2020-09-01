@@ -1373,10 +1373,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * E1: Number of active patients in ART at the end of current month who performed Viral Load Test
-   * (Annual Notification) B12 AND NOT (B5 OR B6 OR B7 OR B8)
+   * <b>Name: E1</b>
    *
-   * @return CohortDefinition
+   * <p><b>Description:</b> Number of active patients in ART at the end of current month who
+   * performed Viral Load Test (Annual Notification) B12 AND NOT (B5 OR B6 OR B7 OR B8)
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getNumberOfActivePatientsInArtAtEndOfCurrentMonthWithVlPerformed() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1415,10 +1417,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * B12 = B13 AND NOT (B4 OR B9), this common for the 3 E columns B4 = B1+B2+B3 B9 = B5+B6+B7+B8
-   * This just implementation of B12
+   * <b>Description:</b> Standard columns for <b>E1, E2 and E3</b> implementation
    *
-   * @return
+   * <p><b>NOTE:</b> B12 = B13 AND NOT (B4 OR B9), this common for the 3 E columns B4 = B1+B2+B3 B9
+   * = B5+B6+B7+B8 This just implementation of <b>B12</b>
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getStandardDefinitionForEcolumns() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1471,7 +1475,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  /** Filter only those patients */
+  /**
+   * <b>Description:</b> Number of patients with lab requests
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getPatientsWithCodedObsAndAnswers(Concept question, Concept answer) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName(
@@ -1487,6 +1495,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Number of patients with TB Screening
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWithTBScreening() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients with TB Screening");
@@ -1504,9 +1517,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * get patients who have viral load test done
+   * <b>Description:</b> Number of patients who have viral load test done
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getViralLoadTestDone() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1522,10 +1535,10 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * Get patients with coded observation
+   * <b>Description:</b> Number of patients with coded observation
    *
-   * @param question
-   * @return
+   * @param
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition gePatientsWithCodedObs(Concept question) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1541,9 +1554,9 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * Combine the viral load and viral load qualitative
+   * <b>Description:</b> Combined viral load and viral load qualitative
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getViralLoadOrQualitative() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1566,16 +1579,18 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * E2 Get the combinations together E2: Number of active patients in ART at the end of current
-   * month who received a Viral Load Test Result (Annual Notification
+   * <b>Name: E2</b>
    *
-   * @return CohortDefinition
+   * <p><b>Description:</b> Number of active patients in ART at the end of current month who
+   * received a Viral Load Test Result (Annual Notification)
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getNumberOfActivePatientsInArtAtTheEndOfTheCurrentMonthHavingVlTestResults() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName(
-        "E2: Number of active patients in ART at the end of current month who received a Viral Load Test Result (Annual Notification");
+        "E2: Number of active patients in ART at the end of current month who received a Viral Load Test Result (Annual Notification)");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -1605,10 +1620,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * E3: Number of active patients in ART at the end of current month who received supressed Viral
-   * Load Result (Annual Notification)
+   * <b>Name: E3</b>
    *
-   * @return CohortDefinition
+   * <p><b>Description:</b> Number of active patients in ART at the end of current month who
+   * received supressed Viral Load Result (Annual Notification)
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getActivePatientsOnArtWhoReceivedVldSuppressionResults() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1648,6 +1665,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Viral load suprresion
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getViralLoadSuppression() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Viral load suppression");
@@ -1662,9 +1684,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * F1: Number of patients who had clinical appointment during the reporting month
+   * <b>Name: F1</b>
    *
-   * @return CohortDefinition
+   * <p><b>Description:</b> Number of patients who had clinical appointment during the reporting
+   * month
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getNumberOfPatientsWhoHadClinicalAppointmentDuringTheReportingMonthF1() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1679,10 +1704,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * F2: Number of patients who had clinical appointment during the reporting month and were
-   * screened for TB
+   * <b>Name: F2</b>
    *
-   * @return CohortDefinition
+   * <p><b>Description:</b> Number of patients who had clinical appointment during the reporting
+   * month and were screened for TB
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getNumberOfPatientsWhoHadClinicalAppointmentDuringTheReportingMonthAndScreenedForTbF2() {
@@ -1702,9 +1729,12 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * F3: Number of patients who had at least one clinical appointment during the year
+   * <b>Name: F3</b>
    *
-   * @return CohortDefinition
+   * <p><b>Description:</b> Number of patients who had at least one clinical appointment during the
+   * year
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getNumberOfPatientsWithAtLeastOneClinicalAppointmentDuringTheYearF3() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1730,6 +1760,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Number of patients registered as transferred in during the statistical year
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsRegisteredAsTransferredInDuringTheStatisticalYear() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1754,6 +1789,11 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description: F3</b> exclusion criteria
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getExclusionForF3() {
     SqlCohortDefinition sql = new SqlCohortDefinition();
     sql.setName("Exclusions");
