@@ -926,7 +926,7 @@ public class TxCurrCohortQueries {
             + "AND o.value_coded = ${1098}        "
             + "AND e.encounter_datetime <= :onOrBefore       "
             + "AND e.location_id = :location) as b       "
-            + "LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND ex.encounter_datetime = b.encounter_datetime       "
+            + "LEFT JOIN encounter ex on ex.patient_id = b.patient_id AND DATE(ex.encounter_datetime) = DATE(b.encounter_datetime)       "
             + "INNER JOIN obs o on ex.encounter_id = o.encounter_id       "
             + "WHERE ex.voided = 0       "
             + "AND o.voided = 0        "
@@ -1089,9 +1089,9 @@ public class TxCurrCohortQueries {
             + "WHERE same_day.concept_id = ${23730}            "
             + "AND same_day.patient_id = en.patient_id            "
             + "AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date))           "
-            + "            AND (en.encounter_id NOT IN            "
+            + "            AND en.encounter_id NOT IN            "
             + "(SELECT same_day.encounter_id FROM           "
-            + "(SELECT ex.encounter_id,ex.patient_id, ex.encounter_type           "
+            + "(SELECT ex.encounter_id,ex.patient_id, ex.encounter_type,ex.encounter_datetime           "
             + "FROM            "
             + "(SELECT  e.patient_id, e.encounter_datetime, e.encounter_id, e.encounter_type, o.concept_id           "
             + "FROM encounter e           "
@@ -1119,7 +1119,7 @@ public class TxCurrCohortQueries {
             + "AND e.location_id = :location) "
             + "AND same_day.patient_id = en.patient_id            "
             + "AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date))           "
-            + "OR en.encounter_id NOT IN           "
+            + "AND en.encounter_id NOT IN           "
             + "(SELECT same_day.encounter_id FROM           "
             + "(SELECT b.patient_id, b.encounter_id,b.encounter_datetime,b.encounter_type           "
             + "FROM           "
@@ -1144,7 +1144,6 @@ public class TxCurrCohortQueries {
             + "WHERE same_day.encounter_type = ${6}           "
             + "AND same_day.patient_id = en.patient_id           "
             + "AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date))           "
-            + " )"
             + "group by en.patient_id;";
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -1291,7 +1290,7 @@ public class TxCurrCohortQueries {
             + "AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date))          "
             + "            AND en.encounter_id NOT IN            "
             + "(SELECT same_day.encounter_id FROM           "
-            + "(SELECT ex.encounter_id, ex.encounter_type ,ex.patient_id           "
+            + "(SELECT ex.encounter_id, ex.encounter_type ,ex.patient_id,ex.encounter_datetime           "
             + "FROM           "
             + "(SELECT  e.patient_id, e.encounter_datetime, e.encounter_id, e.encounter_type, o.concept_id           "
             + "FROM encounter e           "
@@ -1345,7 +1344,6 @@ public class TxCurrCohortQueries {
             + "WHERE same_day.encounter_type = ${6}           "
             + "AND same_day.patient_id = en.patient_id           "
             + "AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date))          "
-            + " )"
             + " group by en.patient_id;";
 
     Map<String, Integer> valuesMap = new HashMap<>();
