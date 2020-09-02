@@ -453,6 +453,7 @@ public class ThreeToFiveMonthsOnArtDispensationCalculation extends AbstractPatie
                   .equals(continueRegimen))) {
         found = true;
         if (lastFichaEncounter != null
+            && getLastTypeOfDispensationObsWithoutQuartelyValueCoded != null
             && lastFichaEncounter.equals(
                 getLastTypeOfDispensationObsWithoutQuartelyValueCoded.getEncounter())
             && (getLastTypeOfDispensationObsWithoutQuartelyValueCoded

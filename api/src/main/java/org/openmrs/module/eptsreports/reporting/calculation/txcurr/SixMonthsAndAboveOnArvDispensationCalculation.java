@@ -402,7 +402,8 @@ public class SixMonthsAndAboveOnArvDispensationCalculation extends AbstractPatie
                   .getValueCoded()
                   .equals(continueRegimen))) {
         found = true;
-        if (lastDispensaTrimestralWithoutSemestralObs != null
+        if (lastFichaEncounter != null
+            && lastDispensaTrimestralWithoutSemestralObs != null
             && lastFichaEncounter.equals(lastDispensaTrimestralWithoutSemestralObs.getEncounter())
             && (lastDispensaTrimestralWithoutSemestralObs.getValueCoded().equals(monthly)
                 || lastDispensaTrimestralWithoutSemestralObs.getValueCoded().equals(trisemsstra))) {
