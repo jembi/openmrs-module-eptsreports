@@ -1121,7 +1121,7 @@ public class TxCurrCohortQueries {
             + "AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date))           "
             + "OR en.encounter_id NOT IN           "
             + "(SELECT same_day.encounter_id FROM           "
-            + "(SELECT b.patient_id, b.encounter_id,b.encounter_datetime,b.encounter_type,b.concept_id           "
+            + "(SELECT b.patient_id, b.encounter_id,b.encounter_datetime,b.encounter_type           "
             + "FROM           "
             + "(SELECT  e.patient_id, e.encounter_datetime, e.encounter_id, e.encounter_type           "
             + "FROM encounter e           "
