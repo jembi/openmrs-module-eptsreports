@@ -494,7 +494,7 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
 
     @Test
-    public void getPatientsWithFILAEncounterAndNextPickupDate() throws EvaluationException {
+    public void getPatientsWithFILAEncounterAndNextPickupDateShouldPass() throws EvaluationException {
         CohortDefinition cd = resumoMensalCohortQueries.getPatientsWithFILAEncounterAndNextPickupDate();
         HashMap<Parameter, Object> parameters = new HashMap<>();
         parameters.put(new Parameter("onOrBefore", "onOrBefore", Date.class), this.getEndDate());
@@ -505,7 +505,22 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
         assertEquals(1, evaluatedCohort.getMemberIds().size());
         assertTrue(evaluatedCohort.getMemberIds().contains(5642));
 
+    }
 
+
+    @Test
+  public void getAdditionalExclusionCriteriaForC1andC2ShouldPass() throws  EvaluationException {
+      String transferBasedOnDateMappings =
+              "onOrAfter=${onOrAfter-1m},onOrBefore=${onOrBefore},locationList=${location}";
+      String inProgramStatesMappings =
+              "startDate=${onOrAfter-1m},endDate=${onOrBefore},location=${location}";
+      CohortDefinition cd = resumoMensalCohortQueries.getAdditionalExclusionCriteriaForC1andC2(transferBasedOnDateMappings,inProgramStatesMappings);
+      HashMap<Parameter, Object> parameters = new HashMap<>();
+      parameters.put(new Parameter("onOrBefore", "onOrBefore", Date.class), this.getEndDate());
+      parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+      EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+      assertEquals(3, evaluatedCohort.getMemberIds().size());
+      assertTrue(evaluatedCohort.getMemberIds().contains(1563));
     }
 
 }
