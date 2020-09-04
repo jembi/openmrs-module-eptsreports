@@ -1326,7 +1326,6 @@ public class TxCurrCohortQueries {
             + "            AND list.voided = 0                                "
             + "            AND list.location_id = 208                                "
             + "            AND list.patient_id = en.patient_id                                "
-            + "            AND list.encounter_datetime = en.encounter_datetime                      "
             + "            UNION                               "
             + "            SELECT list.encounter_id                                "
             + "            FROM encounter list                                "
