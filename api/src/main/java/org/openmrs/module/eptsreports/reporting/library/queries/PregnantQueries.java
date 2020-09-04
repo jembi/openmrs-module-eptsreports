@@ -14,7 +14,11 @@ package org.openmrs.module.eptsreports.reporting.library.queries;
 /** Re usable queries that can be used for finding patients who are pregnant */
 public class PregnantQueries {
 
-  /** GRAVIDAS INSCRITAS NO SERVIÇO TARV */
+  /**
+   * <b>Description:</b> Pregnant patients enrolled on ART
+   *
+   * @return {@link String}
+   */
   public static String getPregnantWhileOnArt(
       int pregnantConcept,
       int weeksPregnantConcept,
@@ -214,7 +218,11 @@ public class PregnantQueries {
     return query;
   }
 
-  /** LACTANTES INSCRITAS NO SERVIÇO TARV */
+  /**
+   * <b>Description:</b> Breastfeeding patients enrolled on ART
+   *
+   * @return {@link String}
+   */
   public static String getBreastfeedingWhileOnArt(
       int breastFeedingConcept,
       int yesConcept,
@@ -413,7 +421,11 @@ public class PregnantQueries {
 
   // TODO Rewrite the pregnant method at the top to
   // add parameter for breastfeeding query startDate to consider 18 months
-  /** GRAVIDAS INSCRITAS NO SERVIÇO TARV */
+  /**
+   * <b>Description:</b> Pregnant patients enrolled on ART DSD
+   *
+   * @return {@link String}
+   */
   public static String getPregnantWhileOnArtDSD(
       int pregnantConcept,
       int weeksPregnantConcept,
@@ -615,7 +627,11 @@ public class PregnantQueries {
 
   // TODO Rewrite the breastFeeding method at the top to
   // add parameter for pregnant query startDate to consider 9 months
-  /** LACTANTES INSCRITAS NO SERVIÇO TARV */
+  /**
+   * <b>Description:</b> Breastfeeding patients enrolled on ART DSD
+   *
+   * @return {@link String}
+   */
   public static String getBreastfeedingWhileOnArtDSD(
       int breastFeedingConcept,
       int yesConcept,

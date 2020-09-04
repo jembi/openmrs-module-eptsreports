@@ -30,7 +30,11 @@ public class CommonCohortQueries {
     this.tbMetadata = tbMetadata;
   }
 
-  /** 9. Patients on TB Treatment */
+  /**
+   * <b>Description:</b> Number of patients who are on TB treatment
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsOnTbTreatment() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("patientsOnTbTreatment");

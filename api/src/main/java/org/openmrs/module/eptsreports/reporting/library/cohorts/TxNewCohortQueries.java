@@ -78,11 +78,12 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * PREGNANCY ENROLLED IN THE ART SERVICE These are patients who are pregnant during the initiation
-   * of the process or during ART follow-up and who were notified as a new pregnancy during
-   * follow-up.
+   * <b>Description:</b> PREGNANCY ENROLLED IN THE ART SERVICE
    *
-   * @return CohortDefinition
+   * <p><b>NOTE:</b> These are patients who are pregnant during the initiation of the process or
+   * during ART follow-up and who were notified as a new pregnancy during follow-up.
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsPregnantEnrolledOnART() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -130,9 +131,9 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * TxNew Breastfeeding Compisition Cohort
+   * <b>Description:</b> TxNew Breastfeeding enrolled on ART
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getTxNewBreastfeedingComposition() {
     SqlCohortDefinition cd = new SqlCohortDefinition();

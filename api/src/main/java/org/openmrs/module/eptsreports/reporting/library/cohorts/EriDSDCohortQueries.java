@@ -44,11 +44,17 @@ public class EriDSDCohortQueries {
   @Autowired private HivMetadata hivMetadata;
   @Autowired private CommonMetadata commonMetadata;
 
-  /** D1 - Number of active, stable, patients on ART. Combinantion of Criteria 1,2,3,4,5 */
+  /**
+   * <b>Name: D1</b>
+   *
+   * <p><b>Description:</b> Number of active, stable, patients on ART. Combination of Criteria
+   * 1,2,3,4,5
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getD1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName(
-        "D1 - Number of active, stable, patients on ART. Combinantion of Criteria 1,2,3,4,5");
+    cd.setName("D1 - Number of active, stable, patients on ART. Combination of Criteria 1,2,3,4,5");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -82,7 +88,11 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  /** D1 - Patients who are Non-pregnant and Non-Breastfeeding */
+  /**
+   * <b>Description:</b> Patients who are Non-Pregnant and Non-Breastfeeding for <b>D1</b>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoAreNotPregnantAndNotBreastfeedingD1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -111,7 +121,13 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  /** D2 - Number of active patients on ART Not Eligible for DSD D1 */
+  /**
+   * <b>Name: D2</b>
+   *
+   * <p><b>Description:</b> Number of active patients on ART Not Eligible for <b>D1</b>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getD2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -137,12 +153,10 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  /** D2 - Patients who are Non-pregnant and Non-Breastfeeding */
-
   /**
-   * DSD Breastfeeding Compisition Cohort
+   * <b>Description:</b> Number of patients who are registered as <b>breastfeeding</b>
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getTxNewBreastfeedingCompositionDSD() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -171,9 +185,9 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * DSD Pregnant Compisition Cohort
+   * <b>Description:</b> Number of patients who are registered as <b>pregnant</b>
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsPregnantEnrolledOnArtDSD() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -201,6 +215,11 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Patients who are Non-Pregnant and Non-Breastfeeding for <b>D2</b>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoAreNotPregnantAndNotBreastfeedingD2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -412,6 +431,12 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Patients who are registered as pregnant, as breastfeeding or who are on TB
+   * treatment
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPregnantAndBreastfeedingAndOnTBTreatment() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("endDate", "After Date", Date.class));
@@ -436,7 +461,11 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  /** Patients who are on Sarcoma Karposi */
+  /**
+   * <b>Description:</b> Number of patients who are on Sarcoma Karposi
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getAllPatientsOnSarcomaKarposi() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("sarcomaKarposiPatients");
@@ -454,7 +483,12 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  /** Filter patients (from 4) who are considered stable according to criteria 5: a,b,c,d,e,f */
+  /**
+   * <b>Description:</b> Filter patients (from 4) who are considered stable according to criteria 5:
+   * <b>a, b, c, d, e, f</b>
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getPatientsWhoAreStable() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -508,8 +542,12 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * 5A Patients who are on ART for at least 12 months (if patients age >=2 and <=9) or On ART for
-   * at least 6 months (if patients age >=10)
+   * <b>Name: 5A</b>
+   *
+   * <p><b>Description:</b> Patients on ART for at least 12 months <b>(if patients age >=2 and
+   * <=9)</b> or On ART for at least 6 months <b>(if patients age >=10)</b>
+   *
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getPatientsWhoAreStableA() {
     CalculationCohortDefinition cd =
@@ -523,8 +561,13 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * 5C One CD4 Lab result > 750 cels/mm3 or > 15% in last ART year (if patients age >=2 and <=4) or
-   * One CD4 result > 200 cels/mm3 in last ART year (if patients age >=5 and <=9) 5C (i) 5C (ii)
+   * <b>Name: 5C</b>
+   *
+   * <p><b>Description:</b> One CD4 Lab result > 750 cels/mm3 or > 15% in last ART year <b>(if
+   * patients age >=2 and <=4)</b> or One CD4 result > 200 cels/mm3 in last ART year <b>(if patients
+   * age >=5 and <=9)</b> 5C (i) 5C (ii)
+   *
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getCD4CountAndCD4PercentCombined() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -551,8 +594,12 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * 5C (i) One CD4 Lab result > 750 cels/mm3 or > 15% in last ART year (if patients age >=2 and
-   * <=4)
+   * <b>Name: 5C (i)</b>
+   *
+   * <p><b>Description:</b> One CD4 Lab result > 750 cels/mm3 or > 15% in last ART year (if patients
+   * age >=2 and <=4)
+   *
+   * @return {@link CohortDefinition}
    */
   private CohortDefinition getCD4CountAndCD4Percent1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -619,7 +666,14 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  /** 5C (ii) One CD4 result > 200 cels/mm3 in last ART year (if patients age >=5 years) */
+  /**
+   * <b>Name: 5C (ii)</b>
+   *
+   * <p><b>Description:</b> One CD4 result > 200 cels/mm3 in last ART year (if patients age >=5
+   * years)
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getCD4CountAndCD4Percent2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName(
@@ -643,7 +697,11 @@ public class EriDSDCohortQueries {
 
     return cd;
   }
-  /** LAST CD4 result > 200 cels/mm3 in last ART year (if patients age >=5 */
+  /**
+   * <b>Description:</b> LAST CD4 result > 200 cels/mm3 in last ART year (if patients age >=5)
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getCD4CountAndCD4Percent2Part1() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("LAST CD4 result > 200 cels/mm3 in last ART year (if patients age >=5");
@@ -740,7 +798,14 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  /** Patients with LAST Viral Load Result < 1000 copies/ml in last ART year (only if VL exists) */
+  /**
+   * <b>Name: 5B </b>
+   *
+   * <p><b>Description:</b> Patients with LAST Viral Load Result < 1000 copies/ml in last ART year
+   * (only if VL exists)
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getPatientsWithViralLoadLessThan1000Within12Months() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
