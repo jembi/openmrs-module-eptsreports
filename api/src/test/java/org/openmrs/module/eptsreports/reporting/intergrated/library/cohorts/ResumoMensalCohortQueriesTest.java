@@ -463,23 +463,6 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
 
     @Test
-    public void getPatientsWithMasterCardDrugPickUpDateShouldPass() throws EvaluationException {
-        CohortDefinition cd =  resumoMensalCohortQueries.getPatientsWithMasterCardDrugPickUpDate();
-
-        HashMap<Parameter, Object> parameters = new HashMap<>();
-        parameters.put(new Parameter("value1", "Value 1", Date.class), this.getStartDate());
-        parameters.put(new Parameter("value2", "Value 2", Date.class), this.getEndDate());
-        parameters.put(new Parameter("onOrBefore", "onOrBefore", Date.class), this.getEndDate());
-        parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
-
-        EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
-
-        assertEquals(1, evaluatedCohort.getMemberIds().size());
-        assertTrue(evaluatedCohort.getMemberIds().contains(1004));
-    }
-
-
-    @Test
     public void getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriodShouldPass() throws EvaluationException {
         CohortDefinition cd = resumoMensalCohortQueries.getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod();
 

@@ -1176,7 +1176,7 @@ public class ResumoMensalCohortQueries {
    *
    * @return CohortDefinition
    */
-  public DateObsCohortDefinition getPatientsWithMasterCardDrugPickUpDate() {
+  private DateObsCohortDefinition getPatientsWithMasterCardDrugPickUpDate() {
     DateObsCohortDefinition cd = new DateObsCohortDefinition();
     cd.addParameter(new Parameter("value1", "Value 1", Date.class));
     cd.addParameter(new Parameter("value2", "Value 1", Date.class));
