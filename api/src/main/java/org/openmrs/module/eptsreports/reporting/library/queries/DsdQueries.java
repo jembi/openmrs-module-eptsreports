@@ -255,14 +255,14 @@ public class DsdQueries {
         continueRegimenConceptId);
   }
   /**
-   * N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment)
-   * who are in AF
+   * <b>Description:</b> Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on
+   * TB treatment) who are in <b>AF</b>
    *
    * @param adultSeguimentoEncounterTypeId
    * @param lastFamilyApproachConceptId
    * @param startDrugsConceptId
    * @param continueRegimenConceptId
-   * @return
+   * @return {@link String}
    */
   public static String getPatientsOnMasterCardAF(
       int adultSeguimentoEncounterTypeId,
