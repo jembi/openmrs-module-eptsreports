@@ -18,7 +18,6 @@ import org.openmrs.module.eptsreports.reporting.calculation.dsd.NextAndPrevDates
 import org.openmrs.module.eptsreports.reporting.calculation.dsd.OnArtForAtleastXmonthsCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.DsdQueries;
-import org.openmrs.module.eptsreports.reporting.library.queries.PregnantQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -104,12 +103,12 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "breastfeeding",
         EptsReportUtils.map(
-            txNewCohortQueries.getTxNewBreastfeedingComposition(),
+            txNewCohortQueries.getTxNewBreastfeedingComposition(false),
             "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "pregnant",
         EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "activeAndStable",
@@ -154,68 +153,6 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Number of patients who are registered as <b>breastfeeding</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getTxNewBreastfeedingCompositionDSD() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("patientsBreastfeedingEnrolledOnART");
-    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        PregnantQueries.getBreastfeedingWhileOnArtDSD(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            hivMetadata.getPriorDeliveryDateConcept().getConceptId(),
-            hivMetadata.getPregnancyDueDate().getConceptId(),
-            hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getCriteriaForArtStart().getConceptId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getPtvEtvProgram().getProgramId(),
-            hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId(),
-            hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getNumberOfWeeksPregnant().getConceptId(),
-            hivMetadata.getBPlusConcept().getConceptId(),
-            hivMetadata.getDateOfLastMenstruationConcept().getConceptId()));
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Number of patients who are registered as <b>pregnant</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsPregnantEnrolledOnArtDSD() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("patientsPregnantEnrolledOnART");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        PregnantQueries.getPregnantWhileOnArtDSD(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getNumberOfWeeksPregnant().getConceptId(),
-            hivMetadata.getPregnancyDueDate().getConceptId(),
-            hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getDateOfLastMenstruationConcept().getConceptId(),
-            hivMetadata.getPtvEtvProgram().getProgramId(),
-            hivMetadata.getCriteriaForArtStart().getConceptId(),
-            hivMetadata.getBPlusConcept().getConceptId(),
-            hivMetadata.getARVStartDateConcept().getConceptId(),
-            commonMetadata.getPriorDeliveryDateConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            hivMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId()));
-    return cd;
-  }
-
-  /**
    * <b>Description:</b> Patients who are Non-Pregnant and Non-Breastfeeding for <b>D2</b>
    *
    * @return {@link CohortDefinition}
@@ -231,12 +168,12 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "breastfeeding",
         EptsReportUtils.map(
-            getTxNewBreastfeedingCompositionDSD(),
+            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
             "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "pregnant",
         EptsReportUtils.map(
-            getPatientsPregnantEnrolledOnArtDSD(),
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "activeAndUnstable",
@@ -488,8 +425,8 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("endDate", "After Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.setName("Pregnant, Breastfeeding or on TB Treatment");
-    CohortDefinition breastfeeding = getTxNewBreastfeedingCompositionDSD();
-    CohortDefinition pregnant = getPatientsPregnantEnrolledOnArtDSD();
+    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition(true);
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(true);
     CohortDefinition tb = commonCohortQueries.getPatientsOnTbTreatment();
 
     String pregnantMappings = "startDate=${endDate-9m},endDate=${endDate},location=${location}";
@@ -582,7 +519,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsViralLoadWithin12Months(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("A AND (B OR (NOT patientsWithViralLoad AND C))  AND NOT F");
+    cd.setCompositionString("A AND (B OR (C AND NOT patientsWithViralLoad)) AND NOT F");
 
     return cd;
   }
@@ -668,7 +605,8 @@ public class EriDSDCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMisauLaboratorioEncounterType(),
-                    hivMetadata.getFsrEncounterType())),
+                    hivMetadata.getFsrEncounterType(),
+                    hivMetadata.getMasterCardEncounterType())),
             "onOrAfter=${endDate-12m},onOrBefore=${endDate},locationList=${location}"));
     cd.addSearch(
         "Cd4Lab",
@@ -684,7 +622,8 @@ public class EriDSDCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMisauLaboratorioEncounterType(),
-                    hivMetadata.getFsrEncounterType())),
+                    hivMetadata.getFsrEncounterType(),
+                    hivMetadata.getMasterCardEncounterType())),
             "onOrAfter=${endDate-12m},onOrBefore=${endDate},locationList=${location}"));
     cd.addSearch(
         "Cd4Percent",
@@ -700,7 +639,8 @@ public class EriDSDCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMisauLaboratorioEncounterType(),
-                    hivMetadata.getFsrEncounterType())),
+                    hivMetadata.getFsrEncounterType(),
+                    hivMetadata.getMasterCardEncounterType())),
             "onOrAfter=${endDate-12m},onOrBefore=${endDate},locationList=${location}"));
     cd.addSearch(
         "Age",

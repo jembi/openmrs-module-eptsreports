@@ -85,7 +85,7 @@ public class TxNewCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsPregnantEnrolledOnART() {
+  public CohortDefinition getPatientsPregnantEnrolledOnART(boolean dsd) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("patientsPregnantEnrolledOnART");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -107,7 +107,8 @@ public class TxNewCohortQueries {
             commonMetadata.getPriorDeliveryDateConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             hivMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId()));
+            hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId(),
+            dsd));
     return cd;
   }
 
@@ -135,7 +136,7 @@ public class TxNewCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getTxNewBreastfeedingComposition() {
+  public CohortDefinition getTxNewBreastfeedingComposition(boolean dsd) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("patientsBreastfeedingEnrolledOnART");
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
@@ -157,7 +158,8 @@ public class TxNewCohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getNumberOfWeeksPregnant().getConceptId(),
             hivMetadata.getBPlusConcept().getConceptId(),
-            hivMetadata.getDateOfLastMenstruationConcept().getConceptId()));
+            hivMetadata.getDateOfLastMenstruationConcept().getConceptId(),
+            dsd));
     return cd;
   }
 

@@ -154,12 +154,12 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "breastfeeding",
         EptsReportUtils.map(
-            txNewCohortQueries.getTxNewBreastfeedingComposition(),
+            txNewCohortQueries.getTxNewBreastfeedingComposition(false),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     dim.addCohortDefinition(
         "pregnant",
         EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(),
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
@@ -322,12 +322,9 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     dim.addParameter(new Parameter("onOrBefore", "orOrBefore", Date.class));
     dim.addParameter(new Parameter("locationList", "Location", Location.class));
-    CohortDefinition less3m =
-        txCurrCohortQueries.getPatientsWithMonthsRangeOfArvDispensationQuantity("<3");
-    CohortDefinition threeTo5m =
-        txCurrCohortQueries.getPatientsWithMonthsRangeOfArvDispensationQuantity("3-5");
-    CohortDefinition more6m =
-        txCurrCohortQueries.getPatientsWithMonthsRangeOfArvDispensationQuantity(">6");
+    CohortDefinition less3m = txCurrCohortQueries.monthlyDispensationComposition();
+    CohortDefinition threeTo5m = txCurrCohortQueries.quarterlyDispensationComposition();
+    CohortDefinition more6m = txCurrCohortQueries.semiAnnualDispensationComposition();
     dim.addCohortDefinition(
         "<3m", EptsReportUtils.map(less3m, "onOrBefore=${onOrBefore},location=${locationList}"));
     dim.addCohortDefinition(
