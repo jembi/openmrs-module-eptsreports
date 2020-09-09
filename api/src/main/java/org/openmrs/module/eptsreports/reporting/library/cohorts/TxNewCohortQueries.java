@@ -49,11 +49,13 @@ public class TxNewCohortQueries {
   @Autowired private CommonCohortQueries commonCohortQueries;
 
   /**
-   * PATIENTS WITH UPDATED DATE OF DEPARTURE IN THE ART SERVICE Are patients with date of delivery
-   * updated in the tarv service. Note that the 'Start Date' and 'End Date' parameters refer to the
-   * date of delivery and not the date of registration (update)
+   * <b>Description:</b> Patients with updated date of departure in the ART Service
    *
-   * @return CohortDefinition
+   * <p><b>NOTE:</b> Are patients with date of delivery updated in the tarv service. Note that the
+   * 'Start Date' and 'End Date' parameters refer to the date of delivery and not the date of
+   * registration (update)
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithUpdatedDepartureInART() {
     DateObsCohortDefinition cd = new DateObsCohortDefinition();
@@ -78,11 +80,13 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * PREGNANCY ENROLLED IN THE ART SERVICE These are patients who are pregnant during the initiation
-   * of the process or during ART follow-up and who were notified as a new pregnancy during
-   * follow-up.
+   * <b>Description:</b> Prengancy enrolled in the ART Service
    *
-   * @return CohortDefinition
+   * <p><b>NOTE:</b> These are patients who are pregnant during the initiation of the process or
+   * during ART follow-up and who were notified as a new pregnancy during follow-up.
+   *
+   * @param dsd If it's true, subtract the 'End Date' by an interval of 18 months
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsPregnantEnrolledOnART(boolean dsd) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -112,10 +116,10 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * Women who gave birth 2 years ago These patients are enrolled in the PMTCT program and have been
-   * updated as a childbirth within 2 years of the reference date
+   * <b>Description:</b> Women who gave birth 2 years ago These patients are enrolled in the PMTCT
+   * program and have been updated as a childbirth within 2 years of the reference date
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoGaveBirthWithinReportingPeriod() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -131,9 +135,10 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * TxNew Breastfeeding Compisition Cohort
+   * <b>Description:</b> Breastfeeding enrolled on ART Service
    *
-   * @return CohortDefinition
+   * @param dsd If it's true, subtract the 'End Date' by an interval of 9 months
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getTxNewBreastfeedingComposition(boolean dsd) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -163,10 +168,10 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * Build TxNew composition cohort definition
+   * <b>Description:</b> Patients who started ART on Period
    *
-   * @param cohortName Cohort name
-   * @return CompositionQuery
+   * @param
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getTxNewCompositionCohort(String cohortName) {
     CompositionCohortDefinition txNewComposition = new CompositionCohortDefinition();
