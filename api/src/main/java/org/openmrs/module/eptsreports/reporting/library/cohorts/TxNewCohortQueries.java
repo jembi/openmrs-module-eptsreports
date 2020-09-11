@@ -51,9 +51,13 @@ public class TxNewCohortQueries {
   /**
    * <b>Description:</b> Patients with updated date of departure in the ART Service
    *
-   * <p><b>NOTE:</b> Are patients with date of delivery updated in the tarv service. Note that the
-   * 'Start Date' and 'End Date' parameters refer to the date of delivery and not the date of
-   * registration (update)
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * Have date of delivery <b>(obs conceppt_id = 5599)</b> updated in the ART <b>(encounterType_id =
+   * 5 and 6)</b>. Note that the 'Start Date' and 'End Date' parameters refer to the date of
+   * delivery and not the date of registration (update)
    *
    * @return {@link CohortDefinition}
    */
@@ -80,12 +84,26 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Prengancy enrolled in the ART Service
+   * <b>Description:</b> Prengancy Patients enrolled in the ART Service
    *
-   * <p><b>NOTE:</b> These are patients who are pregnant during the initiation of the process or
-   * during ART follow-up and who were notified as a new pregnancy during follow-up.
+   * <p><b>Technical Specs</b>
    *
-   * @param dsd If it's true, subtract the 'End Date' by an interval of 18 months
+   * <blockquote>
+   *
+   * Marked pregnant <b>(obs concept_id = 1982)</b> int the initial <b>(encounterType_id = 5)</b> or
+   * follow-up <b>(encounterType_id = 6)</b> in Ficha resumo <b>(encounterType = 53)</b>
+   * consultation.
+   *
+   * <p>Have “Number of weeks Pregnant <b>(obs concept_id = 1279)</b>” and have "Pregnancy Due Date
+   * <b>(obs concept_id = 1600)</b>" in the initial or follow-up between start and end date
+   * <b>(encounter_datetime)</b>.
+   *
+   * <p>Enrolled in PTV(ETV) program <b>(program_id = 8)</b> between start and end date
+   * <b>(patient_program date_enrolled)</b>.
+   *
+   * </blockquote>
+   *
+   * @param dsd If it's true, subtract the 'End Date' by an interval of 9 months
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsPregnantEnrolledOnART(boolean dsd) {
@@ -116,8 +134,16 @@ public class TxNewCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Women who gave birth 2 years ago These patients are enrolled in the PMTCT
-   * program and have been updated as a childbirth within 2 years of the reference date
+   * <b>Description:</b> Women who gave birth 2 years ago
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * enrolled in the PTV(ETV) program <b>(program_id = 8)</b> and have been updated as a childbirth
+   * within 2 years of the reference date <b>(program_workflow_state_id = 27)</b>.
+   *
+   * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
@@ -137,7 +163,27 @@ public class TxNewCohortQueries {
   /**
    * <b>Description:</b> Breastfeeding enrolled on ART Service
    *
-   * @param dsd If it's true, subtract the 'End Date' by an interval of 9 months
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * Have the “Delivery date <b>(obs concept_id = 5599)</b>” registered in the initial
+   * <b>(encounterType_id = 5)</b> or follow-up <b>(encounterType_id = 6)</b> consultation and where
+   * the delivery date is <b>( obs value_datetime )&gt;=startDate and &lt;=endDate</b>.
+   *
+   * <p>Have started ART for being breastfeeding <b>(concept_id = 6332)</b> as specified in
+   * “CRITÉRIO PARA INÍCIO DE TARV <b>(concept_id = 6634)</b>” in the initial or follow-up
+   * consultations between start and end date <b>(encounter_datetime)</b>.
+   *
+   * <p>Enrolled in PTV(ETV) program <b>(program_id = 8)</b> between start and end date <b>( patient
+   * state id= 27 and start_date)</b>.
+   *
+   * <p>Have registered as breastfeeding in Ficha Resumo – Master Card <b>(encounterType_id =
+   * 58)</b> between start and end date <b>(encounter_datetime)</b>.</b>
+   *
+   * </blockquote>
+   *
+   * @param dsd If it's true, subtract the 'End Date' by an interval of 18 months
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getTxNewBreastfeedingComposition(boolean dsd) {
