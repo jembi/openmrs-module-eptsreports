@@ -46,8 +46,10 @@ public class EriDSDCohortQueries {
   /**
    * <b>Name: D1</b>
    *
-   * <p><b>Description:</b> Number of active, stable, patients on ART. Combination of Criteria
-   * 1,2,3,4,5
+   * <p><b>Description:</b> Number of active patients on ART Eligible for DSD”
+   *
+   * <p><b>NOTE:</b> Excluding patients registered as pregnant, breastfeeding, in TB Treatment and
+   * were ever on Sarcoma Karposi
    *
    * @return {@link CohortDefinition}
    */
@@ -88,7 +90,8 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Patients who are Non-Pregnant and Non-Breastfeeding for <b>D1</b>
+   * <b>Description:</b> Active and stable Patients who are Non-Pregnant and Non-Breastfeeding for
+   * <b>D1</b>
    *
    * @return {@link CohortDefinition}
    */
@@ -447,6 +450,18 @@ public class EriDSDCohortQueries {
   /**
    * <b>Description:</b> Number of patients who are on Sarcoma Karposi
    *
+   * <p><b>Techinal Specs</b>
+   *
+   * <blockquote>
+   *
+   * <pre>
+   * <p>Include patients who have Sarcoma Kaposi <b>(concept_id = 507)</b> registered
+   * in the follow-up (Adults <b>(encounterType = 6)</b> and Children <b>(encounterType = 9)</b>))
+   * consultation and <b>encounter_datetime <= reporting_end_date</b>
+   * </pre>
+   *
+   * </blockquote>
+   *
    * @return {@link CohortDefinition}
    */
   private CohortDefinition getAllPatientsOnSarcomaKarposi() {
@@ -530,6 +545,13 @@ public class EriDSDCohortQueries {
    * <p><b>Description:</b> Patients on ART for at least 12 months <b>(if patients age >=2 and
    * <=9)</b> or On ART for at least 6 months <b>(if patients age >=10)</b>
    *
+   * <p><b>Technical Specs</b>
+   * <blockquote>
+   * <pre>
+   * <p>On ART for at least x months means: <b>(patient_art_initiation date–
+   * reporting end date) >= x months</b>
+   * </blockquote>
+   *
    * @return {@link CohortDefinition}
    */
   private CohortDefinition getPatientsWhoAreStableA() {
@@ -581,6 +603,30 @@ public class EriDSDCohortQueries {
    *
    * <p><b>Description:</b> One CD4 Lab result > 750 cels/mm3 or > 15% in last ART year (if patients
    * age >=2 and <=4)
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <ol>
+   *   <li>Get the most recent encounter between A and B: <div>A. The last Encounter of type 6,9,13
+   *       or 51 occurred (Encounter_date) between reporting end date and (reporting end date – 12
+   *       months) which contains one of the following concept:
+   *       <p>
+   *       <ul>
+   *         <li>CD4 Abs Result <b>(Concept id 1695 or Concept id 5497)</b> or
+   *         <li>CD4 % Result <b>(Concept id 730)</b>
+   *       </ul>
+   *       <div>B. The last obs.datetime of obs concept id 1695 occurred between reporting end date
+   *       and (reporting end date – 12 months) recorded in Encounter of type 53.
+   *   <li>Check If the most recent encounter between A and B contains:
+   *       <ul>
+   *         <li>CD4 Abs Result <b>(Concept id 1695 or Concept id 5497) >750</b> or
+   *         <li>CD4 % Result <b>(Concept id 730) >15%</b>
+   *       </ul>
+   * </ol>
+   *
+   * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
@@ -686,6 +732,31 @@ public class EriDSDCohortQueries {
   /**
    * <b>Description:</b> LAST CD4 result > 200 cels/mm3 in last ART year (if patients age >=5)
    *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <ol>
+   *   <li>Get the most recent encounter between A and B: <div>A. The last Encounter of type 6,9,13
+   *       or 51 occurred (Encounter_date) between reporting end date and (reporting end date–12
+   *       months) which contains one of the following concept:
+   *       <p>
+   *       <ul>
+   *         <li>CD4 Abs Result <b>(Concept id 1695 or Concept id 5497)</b>
+   *       </ul>
+   *       <div>B. The last obs.datetime of obs concept id 1695 occurred between reporting end date
+   *       and (reporting end date – 12 months) recorded in Encounter of type 53.
+   *   <li>Check If the most recent encounter between A and B contains:
+   *       <ul>
+   *         <li>CD4 Abs Result <b>(Concept id 1695 or Concept id 5497) >200</b> or
+   *             <ul>
+   *               <li>No active clinical condition of WHO stage III or IV in last clinical
+   *                   appointment and
+   *               <li>No adverse reactions to medications in last six months that require regular
+   *                   monitoring
+   *             </ol>
+   *             </blockquote>
+   *
    * @return {@link CohortDefinition}
    */
   private CohortDefinition getCD4CountAndCD4Percent2Part1() {
@@ -789,6 +860,30 @@ public class EriDSDCohortQueries {
    *
    * <p><b>Description:</b> Patients with LAST Viral Load Result < 1000 copies/ml in last ART year
    * (only if VL exists)
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <ol>
+   *   <li>Get the most recent encounter between A and B: <div>A. The last Encounter of type 6,9,13
+   *       or 51 occurred (Encounter_date) between reporting end date and (reporting end date – 12
+   *       months) which contains one of the following concept:
+   *       <p>
+   *       <ul>
+   *         <li>HIV VIRAL LOAD OBS Concept id = 856</b>or
+   *         <li>HIV VIRAL LOAD OBS Concept id = 1305</b>
+   *       </ul>
+   *       <div>B. The last obs.datetime of obs concept id 1695 occurred between reporting end date
+   *       and (reporting end date – 12 months) recorded in Encounter of type 53.
+   *   <li>Check If the most recent encounter between A and B contains:
+   *       <ul>
+   *         <li><b>Concept id 856 and OBS VALUE_NUMERIC is > 1000</b> or
+   *         <li><b>Concept id 1305 and value_coded in</b> { See in Specs DSD D1 Indicator}
+   *       </ul>
+   * </ol>
+   *
+   * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
@@ -941,8 +1036,8 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Patients marked in last <b>Rapid Flow</b> as <b>Start or Continue</b> on
-   * (ficha clinica - Master Card)
+   * <b>Description:</b> Patients marked in last <b>Rapid Flow</b> as <b>Start Drugs or Continue
+   * Regimen</b> on (ficha clinica - Master Card)
    *
    * @return {@link CohortDefinition}
    */
@@ -1014,8 +1109,8 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Patients marked in last <b>GAAC</b> as <b>Start or Continue</b> on (ficha
-   * clinica - Master Card)
+   * <b>Description:</b> Patients marked in last <b>GAAC</b> as <b>Start Drugs or Continue
+   * Regimen</b> on (ficha clinica - Master Card)
    *
    * @return {@link CohortDefinition}
    */
@@ -1072,8 +1167,8 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Patients marked in last <b>Quartely Dispensation</b> as <b>Start or
-   * Continue</b> on (ficha clinica - Master Card)
+   * <b>Description:</b> Patients marked in last <b>Quartely Dispensation</b> as <b>Start Drugs or
+   * Continue Regimen</b> on (ficha clinica - Master Card)
    *
    * @return {@link CohortDefinition}
    */
@@ -1113,8 +1208,8 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Patients marked in last <b>Semestral Dispensation</b> as <b>Start or
-   * Continue</b> on (ficha clinica - Master Card)
+   * <b>Description:</b> Patients marked in last <b>Semestral Dispensation</b> as <b>Start Drugs</b>
+   * or <b>Continue Regimen</b> on (ficha clinica - Master Card)
    *
    * @return {@link CohortDefinition}
    */
