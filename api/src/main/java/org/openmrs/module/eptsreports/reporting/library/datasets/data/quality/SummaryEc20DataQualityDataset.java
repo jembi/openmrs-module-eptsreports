@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SummaryEc20DataQualityDataset extends BaseDataSet {
-  private EptsGeneralIndicator eptsGeneralIndicator;
-  private SummaryEc20DataQualityCohorts summaryEc20DataQualityCohorts;
-  private HivMetadata hivMetadata;
+  private final EptsGeneralIndicator eptsGeneralIndicator;
+  private final SummaryEc20DataQualityCohorts summaryEc20DataQualityCohorts;
+  private final HivMetadata hivMetadata;
 
   @Autowired
   public SummaryEc20DataQualityDataset(

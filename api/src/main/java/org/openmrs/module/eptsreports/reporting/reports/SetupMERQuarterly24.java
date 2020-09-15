@@ -35,17 +35,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupMERQuarterly24 extends EptsDataExportManager {
 
-  private TxPvlsDataset txPvlsDataset;
+  private final TxPvlsDataset txPvlsDataset;
 
-  private TxNewDataset txNewDataset;
+  private final TxNewDataset txNewDataset;
 
-  private TxCurrDataset txCurrDataset;
+  private final TxCurrDataset txCurrDataset;
 
-  private TxMlDataset txMlDataset;
+  private final TxMlDataset txMlDataset;
 
-  private TxRttDataset txRttDataset;
+  private final TxRttDataset txRttDataset;
 
-  private GenericCohortQueries genericCohortQueries;
+  private final GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public SetupMERQuarterly24(

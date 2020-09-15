@@ -81,54 +81,6 @@ public class TXTBQueries {
         artProgramId, StringUtils.join(stateIds, ","));
   }
 
-  /** ABANDONO NÃO NOTIFICADO - TARV SqlCohortDefinition#a1145104-132f-460b-b85e-ea265916625b */
-  public static String abandonedWithNoNotification(AbandonedWithoutNotificationParams params) {
-    String stateIds =
-        StringUtils.join(
-            Arrays.asList(
-                params.transferOutStateId,
-                params.treatmentSuspensionStateId,
-                params.treatmentAbandonedStateId,
-                params.deathStateId),
-            ",");
-    return String.format(
-        "SELECT patient_id FROM (SELECT p.patient_id, Max(encounter_datetime) encounter_datetime FROM patient p "
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id WHERE p.voided = 0 AND e.voided = 0 "
-            + "AND e.encounter_type = %s AND e.location_id = :location AND e.encounter_datetime <= :endDate GROUP BY p.patient_id) max_frida "
-            + "INNER JOIN obs o ON o.person_id = max_frida.patient_id WHERE max_frida.encounter_datetime = o.obs_datetime AND o.voided = 0 "
-            + "AND o.concept_id = %s AND o.location_id = :location AND patient_id "
-            + "NOT IN (SELECT pg.patient_id FROM patient p INNER JOIN patient_program pg ON p.patient_id = pg.patient_id "
-            + "INNER JOIN patient_state ps ON pg.patient_program_id = ps.patient_program_id WHERE pg.voided = 0 AND ps.voided = 0 "
-            + "AND p.voided = 0 AND pg.program_id = %s AND ps.state IN ( %s ) AND ps.end_date IS NULL AND ps.start_date <= :endDate "
-            + "AND location_id = :location) AND patient_id NOT IN(SELECT patient_id FROM "
-            + "(SELECT p.patient_id, Max(encounter_datetime) encounter_datetime FROM patient p "
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id WHERE p.voided = 0 AND e.voided = 0 "
-            + "AND e.encounter_type IN ( %s, %s ) AND e.location_id = :location AND e.encounter_datetime <= :endDate GROUP BY p.patient_id) max_mov "
-            + "INNER JOIN obs o ON o.person_id = max_mov.patient_id WHERE max_mov.encounter_datetime = o.obs_datetime AND o.voided = 0 "
-            + "AND o.concept_id = %s AND o.location_id = :location AND Datediff(:endDate, o.value_datetime) <= 60) AND patient_id "
-            + "NOT IN(SELECT abandono.patient_id FROM (SELECT pg.patient_id FROM patient p INNER JOIN patient_program pg ON p.patient_id = pg.patient_id "
-            + "INNER JOIN patient_state ps ON pg.patient_program_id = ps.patient_program_id WHERE pg.voided = 0 AND ps.voided = 0 AND p.voided = 0 AND pg.program_id = %s "
-            + "AND ps.state = %s AND ps.end_date IS NULL AND ps.start_date <= :endDate AND location_id = :location)abandono "
-            + "INNER JOIN (SELECT max_frida.patient_id, max_frida.encounter_datetime, o.value_datetime FROM "
-            + "(SELECT p.patient_id, Max(encounter_datetime) encounter_datetime FROM patient p "
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id WHERE p.voided = 0 AND e.voided = 0 AND e.encounter_type = %s"
-            + " AND e.location_id = :location "
-            + "AND e.encounter_datetime <= :endDate GROUP BY p.patient_id) max_frida INNER JOIN obs o ON o.person_id = max_frida.patient_id "
-            + "WHERE max_frida.encounter_datetime = o.obs_datetime AND o.voided = 0 AND o.concept_id = %s AND o.location_id = :location) ultimo_fila "
-            + "ON abandono.patient_id = ultimo_fila.patient_id WHERE Datediff(:endDate, ultimo_fila.value_datetime) < 60) AND Datediff(:endDate, o.value_datetime) >= 60;",
-        params.pharmacyEncounterTypeId,
-        params.returnVisitDateForARVDrugConceptId,
-        params.programId,
-        stateIds,
-        params.artAdultFollowupEncounterTypeId,
-        params.artPedInicioEncounterTypeId,
-        params.returnVisitDateConceptId,
-        params.programId,
-        params.treatmentAbandonedStateId,
-        params.pharmacyEncounterTypeId,
-        params.returnVisitDateForARVDrugConceptId);
-  }
-
   public static String inTBProgramWithinReportingPeriodAtLocation(Integer tbProgramId) {
     return String.format(
         "select pg.patient_id from patient p inner join "
@@ -144,7 +96,7 @@ public class TXTBQueries {
    * @param encounterTypeId
    * @param pulmonaryTBConcept
    * @param yesConcept
-   * @return
+   * @return String
    */
   public static String pulmonaryTB(
       Integer encounterTypeId, Integer pulmonaryTBConcept, Integer yesConcept) {
@@ -164,7 +116,7 @@ public class TXTBQueries {
    * @param encounterTypeId
    * @param tbTreatmentPlan
    * @param startDrugs
-   * @return
+   * @return String
    */
   public static String tbTreatmentStart(
       Integer encounterTypeId, Integer tbTreatmentPlan, Integer startDrugs) {
@@ -185,7 +137,7 @@ public class TXTBQueries {
    * @param tbSymptomsId
    * @param yesConcept
    * @param noConcept
-   * @return
+   * @return String
    */
   public static String tuberculosisSymptoms(
       Integer encounterTypeId, Integer tbSymptomsId, Integer yesConcept, Integer noConcept) {
@@ -220,7 +172,7 @@ public class TXTBQueries {
    * @param encounterTypeId
    * @param activeTuberculosis
    * @param yesConcept
-   * @return
+   * @return String
    */
   public static String activeTuberculosis(
       Integer encounterTypeId, Integer activeTuberculosis, Integer yesConcept) {
@@ -316,7 +268,7 @@ public class TXTBQueries {
    * @param tbGenexpertTest
    * @param positive
    * @param negative
-   * @return
+   * @return String
    */
   public static String tbGenexpertTest(
       Integer encounterTypeId, Integer tbGenexpertTest, Integer positive, Integer negative) {
@@ -350,9 +302,8 @@ public class TXTBQueries {
     query.append("		AND p.voided = 0 AND e.voided = 0 AND o.voided = 0");
 
     StringSubstitutor sb = new StringSubstitutor(map);
-    String replacedQuery = sb.replace(query.toString());
 
-    return replacedQuery;
+    return sb.replace(query.toString());
   }
 
   /**
@@ -362,7 +313,7 @@ public class TXTBQueries {
    * @param cultureTest
    * @param positive
    * @param negative
-   * @return
+   * @return String
    */
   public static String cultureTest(
       Integer encounterTypeId, Integer cultureTest, Integer positive, Integer negative) {
@@ -385,7 +336,7 @@ public class TXTBQueries {
    * @param testTBLAM
    * @param positive
    * @param negative
-   * @return
+   * @return String
    */
   public static String testTBLAM(
       Integer encounterTypeId, Integer testTBLAM, Integer positive, Integer negative) {
@@ -431,35 +382,6 @@ public class TXTBQueries {
       sql += "value_datetime <= :endDate and voided=0";
     }
     return sql;
-  }
-
-  public static String dateObsWithinXMonthsBeforeStartDate(
-      Integer questionId, List<Integer> encounterTypeIds, Integer xMonths) {
-    return String.format(
-        "select person_id from obs "
-            + "where concept_id = %s and encounter_id in"
-            + "( select distinct encounter_id from encounter "
-            + "where encounter_type in(%s)) and location_id = :location "
-            + "and value_datetime >= DATE_SUB(:startDate, INTERVAL "
-            + "%s MONTH) "
-            + "and value_datetime < :startDate and voided=0",
-        questionId, StringUtils.join(encounterTypeIds, ","), xMonths);
-  }
-
-  public static String encounterObs(Integer encounterTypeId) {
-    return String.format(
-        "select distinct patient_id from encounter where encounter_type =%s and location_id = :location and encounter_datetime <= :endDate and voided=0;",
-        encounterTypeId);
-  }
-
-  public static String patientWithFirstDrugPickupEncounterInReportingPeriod(
-      Integer encounterTypeId) {
-    return String.format(
-        "SELECT p.patient_id "
-            + "FROM patient p "
-            + "INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + "WHERE p.voided=0 AND e.encounter_type=%s AND e.voided=0 AND e.encounter_datetime>=:startDate AND e.encounter_datetime<=:endDate AND e.location_id=:location GROUP BY p.patient_id",
-        encounterTypeId);
   }
 
   /**
@@ -548,21 +470,9 @@ public class TXTBQueries {
       return this;
     }
 
-    public AbandonedWithoutNotificationParams returnVisitDateForARVDrugConceptId(
-        Integer returnVisitDateForARVDrugConceptId) {
-      this.returnVisitDateForARVDrugConceptId = returnVisitDateForARVDrugConceptId;
-      return this;
-    }
-
     public AbandonedWithoutNotificationParams pharmacyEncounterTypeId(
         Integer pharmacyEncounterTypeId) {
       this.pharmacyEncounterTypeId = pharmacyEncounterTypeId;
-      return this;
-    }
-
-    public AbandonedWithoutNotificationParams artAdultFollowupEncounterTypeId(
-        Integer artAdultFollowupEncounterTypeId) {
-      this.artAdultFollowupEncounterTypeId = artAdultFollowupEncounterTypeId;
       return this;
     }
 

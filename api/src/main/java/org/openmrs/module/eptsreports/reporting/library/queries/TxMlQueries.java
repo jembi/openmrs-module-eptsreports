@@ -945,9 +945,9 @@ public class TxMlQueries {
    * Get the patient list based on the program and state in the program. by reporting end date
    * ps.start_date<=:onOrBefore
    *
-   * @param program
-   * @param stateOfProgram
-   * @return
+   * @param program - program id
+   * @param stateOfProgram - state
+   * @return String
    */
   public static String getPatientsListBasedOnProgramAndStateByReportingEndDate(
       int program, int stateOfProgram) {

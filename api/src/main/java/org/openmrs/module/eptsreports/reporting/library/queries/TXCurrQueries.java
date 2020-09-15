@@ -77,14 +77,11 @@ public class TXCurrQueries {
 
   public static String getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate() {
 
-    String query =
-        "SELECT p.person_id patient_id "
-            + "   FROM person p "
-            + "    WHERE p.dead=1 "
-            + "     AND p.death_date <= :onOrBefore "
-            + "     AND p.voided=0";
-
-    return query;
+    return "SELECT p.person_id patient_id "
+        + "   FROM person p "
+        + "    WHERE p.dead=1 "
+        + "     AND p.death_date <= :onOrBefore "
+        + "     AND p.voided=0";
   }
 
   public static String getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate(
@@ -512,41 +509,6 @@ public class TXCurrQueries {
     return stringSubstitutor.replace(query);
   }
 
-  public static String getPatientWhoAfterMostRecentDateHaveDrusPickupOrConsultation(
-      int adultoSeguimentoEncounterType,
-      int aRVPediatriaSeguimentoEncounterType,
-      int aRVPharmaciaEncounterType,
-      int masterCardDrugPickupEncounterType,
-      int artDatePickup) {
-    String query =
-        " select p.patient_id "
-            + " from patient p "
-            + " inner join encounter e on  e.patient_id = p.patient_id "
-            + " where  p.voided=0  and e.voided=0 "
-            + " and e.encounter_type in (%s,%s,%s)  "
-            + " and e.encounter_datetime > (select  max(encounter_datetime) from encounter where  patient_id= p.patient_id "
-            + " and encounter_type = e.encounter_type ) "
-            + " and e.location_id= :location group by p.patient_id "
-            + " union "
-            + " select p.patient_id "
-            + " from patient p "
-            + " inner join encounter e on e.patient_id=p.patient_id "
-            + " inner join obs obss on obss.encounter_id=e.encounter_id "
-            + " where e.encounter_type = %s and p.voided=0  and e.voided=0 and obss.voided=0 "
-            + " and obss.concept_id=%s  "
-            + " and obss.value_datetime > (select  max(value_datetime) from obs where  encounter_id= e.encounter_id  "
-            + " and concept_id = obss.concept_id) "
-            + " and e.location_id= :location group by p.patient_id ";
-
-    return String.format(
-        query,
-        adultoSeguimentoEncounterType,
-        aRVPediatriaSeguimentoEncounterType,
-        aRVPharmaciaEncounterType,
-        masterCardDrugPickupEncounterType,
-        artDatePickup);
-  }
-
   public static String getPatientWhoAfterMostRecentDateHaveDrusPickupOrConsultationComposition(
       int adultoSeguimento,
       int aRVPediatriaSeguimento,
@@ -859,24 +821,6 @@ public class TXCurrQueries {
     map.put("transferredOutConcept", transferredOutConcept);
     map.put("autoTransferConcept", autoTransferConcept);
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-    return stringSubstitutor.replace(query);
-  }
-
-  /**
-   * For <3 months of ARVs dispense to active patient’s on ART
-   *
-   * @return String
-   */
-  public static String getLessThan3MonthsOfArvDispensation(
-      int pharmacyEncounterType,
-      int fichaClinicaEncounterType,
-      int drugPickupDateConcept,
-      int returnVisitDateConcept) {
-    String query =
-        "SELECT pa.patient_id, MAX(e1.encounter_datetime) FROM patient pa INNER JOIN encounter e1 WHERE pa.voided=0 AND e1.voided=0 AND e1.encounter_datetime<=:endDate AND e1.encounter_type IN (${pharmacyEncounterType})";
-    Map<String, Integer> map = new HashMap<>();
-    map.put("pharmacyEncounterType", pharmacyEncounterType);
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     return stringSubstitutor.replace(query);
   }

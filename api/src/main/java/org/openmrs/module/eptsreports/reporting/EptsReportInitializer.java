@@ -25,7 +25,7 @@ import org.openmrs.module.reporting.report.util.ReportUtil;
 
 public class EptsReportInitializer {
 
-  private Log log = LogFactory.getLog(this.getClass());
+  private final Log log = LogFactory.getLog(this.getClass());
 
   /** Initializes all EPTS reports and remove deprocated reports from database. */
   public void initializeReports() {

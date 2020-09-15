@@ -33,7 +33,7 @@ public class TxMlCohortQueries {
   /**
    * a and b
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition
       getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation() {
@@ -62,7 +62,7 @@ public class TxMlCohortQueries {
    * consultation date (Ficha de Seguimento or Ficha Clinica – Master Card) and ART Pickup date
    * (Recepção – Levantou ARV).
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
@@ -88,7 +88,7 @@ public class TxMlCohortQueries {
   /**
    * a and b and died
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -123,7 +123,7 @@ public class TxMlCohortQueries {
    * (from a and b) Refused/Stopped treatment Except patients identified in Dead Disaggregation
    * Except patients identified in Transferred –out Disaggregation
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndRefusedOrStoppedTreatment() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -164,7 +164,7 @@ public class TxMlCohortQueries {
    * criterias, have a drugs pick up or consultation: Except patients identified in Dead
    * Disaggregation
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndTransferredOut() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -526,7 +526,7 @@ public class TxMlCohortQueries {
   /**
    * Get all patients who after most recent Date have drug pickup or consultation
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientWhoAfterMostRecentDateHaveDrugPickupOrConsultation() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -557,7 +557,7 @@ public class TxMlCohortQueries {
    * <p>d. All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end
    * date
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getDeadPatientsComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -683,7 +683,7 @@ public class TxMlCohortQueries {
    * the “data da visita” when the patient reason was marked on the home visit card as the reference
    * date
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithMissedVisit() {
     SqlCohortDefinition sql = new SqlCohortDefinition();
@@ -705,7 +705,7 @@ public class TxMlCohortQueries {
   /**
    * Patients Who have refused or Stopped Treatment Query
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getRefusedOrStoppedTreatmentQuery() {
     SqlCohortDefinition sql = new SqlCohortDefinition();
@@ -809,8 +809,8 @@ public class TxMlCohortQueries {
    * appointment or last drugs pick up-FILA or 30 days after last drugs pick-up-MasterCard (the most
    * recent one from 3 sources) by reporting end date)
    *
-   * @param lessThan90Days
-   * @return
+   * @param lessThan90Days - less than 90 days
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsOnARTForLessOrMoreThan90Days(Boolean lessThan90Days) {
     CalculationCohortDefinition cd =

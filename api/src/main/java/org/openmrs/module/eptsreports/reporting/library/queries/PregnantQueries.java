@@ -142,7 +142,7 @@ public class PregnantQueries {
             + ","
             + adultSegEncounter
             + ") ";
-    if (dsd == true) {
+    if (dsd) {
       query +=
           "   AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate ";
 
@@ -167,7 +167,7 @@ public class PregnantQueries {
             + ","
             + adultSegEncounter
             + ") ";
-    if (dsd == true) {
+    if (dsd) {
       query +=
           "           AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate";
     } else {
@@ -191,7 +191,7 @@ public class PregnantQueries {
             + ","
             + adultSegEncounter
             + ")";
-    if (dsd == true) {
+    if (dsd) {
       query +=
           "      AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate ";
     } else {
@@ -209,7 +209,7 @@ public class PregnantQueries {
             + "      AND ps.state= "
             + gaveBirthPatientState
             + "      AND pp.voided=0 AND ";
-    if (dsd == true) {
+    if (dsd) {
       query += " ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate ";
     } else {
       query += " ps.start_date BETWEEN :startDate AND :endDate ";
@@ -233,7 +233,7 @@ public class PregnantQueries {
             + "      AND hist.concept_id= "
             + historicalARTStartDate
             + "      AND pe.gender='F' AND hist.value_datetime IS NOT NULL ";
-    if (dsd == true) {
+    if (dsd) {
       query +=
           "      AND hist.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate ";
     } else {
@@ -361,7 +361,7 @@ public class PregnantQueries {
             + adultInitailEncounter
             + ","
             + adultSegEncounter;
-    if (dsd == true) {
+    if (dsd) {
       query +=
           ") AND e.encounter_datetime between DATE_SUB(:onOrBefore, INTERVAL 9 MONTH) AND :onOrBefore";
     } else {
@@ -383,7 +383,7 @@ public class PregnantQueries {
             + historicalARTStartDate
             + " AND e.encounter_type = "
             + fichaResumo;
-    if (dsd == true) {
+    if (dsd) {
       query +=
           "      AND historical_date.value_datetime between DATE_SUB(:onOrBefore, INTERVAL 9 MONTH) AND :onOrBefore";
     } else {
@@ -404,7 +404,7 @@ public class PregnantQueries {
             + adultInitailEncounter
             + ","
             + adultSegEncounter;
-    if (dsd == true) {
+    if (dsd) {
       query +=
           " ) AND e.encounter_datetime between DATE_SUB(:onOrBefore, INTERVAL 9 MONTH) AND :onOrBefore ";
     } else {
@@ -425,7 +425,7 @@ public class PregnantQueries {
             + adultInitailEncounter
             + ","
             + adultSegEncounter;
-    if (dsd == true) {
+    if (dsd) {
       query +=
           " ) AND e.encounter_datetime between DATE_SUB(:onOrBefore, INTERVAL 9 MONTH) AND :onOrBefore ";
     } else {
@@ -448,7 +448,7 @@ public class PregnantQueries {
             + adultInitailEncounter
             + ","
             + adultSegEncounter;
-    if (dsd == true) {
+    if (dsd) {
       query +=
           " ) AND e.encounter_datetime BETWEEN DATE_SUB(:onOrBefore, INTERVAL 9 MONTH) AND :onOrBefore ";
     } else {
@@ -462,7 +462,7 @@ public class PregnantQueries {
             + " INNER JOIN person pe ON pp.patient_id=pe.person_id "
             + " WHERE pp.program_id=  "
             + etvProgram;
-    if (dsd == true) {
+    if (dsd) {
       query +=
           " AND pp.voided=0 AND pp.date_enrolled between  DATE_SUB(:onOrBefore, INTERVAL 9 MONTH) AND :onOrBefore ";
     } else {
@@ -479,7 +479,7 @@ public class PregnantQueries {
             + lastMenstrualPeriod
             + " AND e.encounter_type =  "
             + adultSegEncounter;
-    if (dsd == true) {
+    if (dsd) {
       query +=
           " AND o.value_datetime BETWEEN DATE_SUB(:onOrBefore, INTERVAL 9 MONTH) AND :onOrBefore ";
     } else {

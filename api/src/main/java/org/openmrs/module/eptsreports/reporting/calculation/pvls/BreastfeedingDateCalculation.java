@@ -24,11 +24,7 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.springframework.stereotype.Component;
 
-/**
- * Calculates for patient eligibility to be breastfeeding
- *
- * @return CalculationResultMap
- */
+/** Calculates for patient eligibility to be breastfeeding */
 @Component
 public class BreastfeedingDateCalculation extends AbstractPatientCalculation {
 

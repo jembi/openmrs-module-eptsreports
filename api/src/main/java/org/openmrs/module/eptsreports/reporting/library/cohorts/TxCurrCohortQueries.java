@@ -18,22 +18,13 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.txcurr.LessThan3MonthsOfArvDispensationCalculation;
-import org.openmrs.module.eptsreports.reporting.calculation.txcurr.SixMonthsAndAboveOnArvDispensationCalculation;
-import org.openmrs.module.eptsreports.reporting.calculation.txcurr.ThreeToFiveMonthsOnArtDispensationCalculation;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.TXCurrQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.EncounterCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -43,12 +34,6 @@ import org.springframework.stereotype.Component;
 /** Defines all of the TxCurrCohortQueries we want to expose for EPTS */
 @Component
 public class TxCurrCohortQueries {
-
-  private static final String HAS_NEXT_APPOINTMENT_QUERY =
-      "select distinct obs.person_id from obs "
-          + " where obs.obs_datetime <= :onOrBefore and obs.location_id = :location and obs.concept_id = %s and obs.voided = false and obs.value_datetime is not null "
-          + " and obs.obs_datetime = (select max(encounter.encounter_datetime) from encounter "
-          + " where encounter.encounter_type in (%s) and encounter.patient_id = obs.person_id and encounter.location_id = obs.location_id and encounter.voided = false and encounter.encounter_datetime <= :onOrBefore) ";
 
   private static final int OLD_SPEC_ABANDONMENT_DAYS = 60;
 
@@ -64,7 +49,7 @@ public class TxCurrCohortQueries {
 
   /**
    * @param cohortName Cohort name
-   * @param currentSpec
+   * @param currentSpec - true for is current and false the opposit
    * @return TxCurr composition cohort definition
    */
   @DocumentedDefinition(value = "getTxCurrCompositionCohort")
@@ -332,7 +317,7 @@ public class TxCurrCohortQueries {
    * reporting period Encounter Type Ids = 52 The earliest “Data de Levantamento” (Concept Id 23866
    * value_datetime) <= endDate
    *
-   * @return
+   * @return CohortDefinition
    */
   @DocumentedDefinition(value = "patientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod")
   public CohortDefinition getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod() {
@@ -410,7 +395,7 @@ public class TxCurrCohortQueries {
    * (Encounter Type 21, 36, 37) Patient not found (Concept ID 2003) = NO (Concept ID 1066) Reason
    * of Not Finding (Concept ID 2031) = Died (COncpet Id 1383) Last Encounter_datetime <= endDate
    *
-   * @return
+   * @return CohortDefinition
    */
   @DocumentedDefinition(value = "patientDeathRegisteredInLastHomeVisitCardByReportingEndDate")
   public CohortDefinition getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate() {
@@ -514,7 +499,8 @@ public class TxCurrCohortQueries {
    * pickup date (Recepção – Levantou ARV) and adding {@code numDays} days and this date being less
    * than reporting end Date. (For more clarifications refer to scenario Table 1)
    *
-   * @param numDays
+   * @param numDays - number of days
+   * @return CohortDefinition
    */
   @DocumentedDefinition(value = "patientHavingLastScheduledDrugPickupDate")
   public CohortDefinition getPatientHavingLastScheduledDrugPickupDateDaysBeforeEndDate(
@@ -545,7 +531,7 @@ public class TxCurrCohortQueries {
    * consultation date (Ficha de Seguimento or Ficha Clinica – Master Card) and ART Pickup date
    * (Recepção – Levantou ARV).
    *
-   * @return
+   * @return CohortDefinition
    */
   @DocumentedDefinition(value = "patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup")
   public CohortDefinition getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup() {
@@ -694,25 +680,6 @@ public class TxCurrCohortQueries {
     return definition;
   }
 
-  @DocumentedDefinition(value = "patientWhoAfterMostRecentDateHaveDrusPickupOrConsultation")
-  public CohortDefinition getPatientWhoAfterMostRecentDateHaveDrusPickupOrConsultation() {
-    SqlCohortDefinition definition = new SqlCohortDefinition();
-
-    definition.setName("patientWhoAfterMostRecentDateHaveDrusPickupOrConsultation");
-
-    definition.setQuery(
-        TXCurrQueries.getPatientWhoAfterMostRecentDateHaveDrusPickupOrConsultation(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-            hivMetadata.getArtDatePickupMasterCard().getConceptId()));
-
-    definition.addParameter(new Parameter("location", "location", Location.class));
-
-    return definition;
-  }
-
   /**
    * 12. Except all patients who after the most recent date from 2.1 to 2.6, have a drugs pick up or
    * consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most recent date or
@@ -759,66 +726,6 @@ public class TxCurrCohortQueries {
     defintion.addParameter(new Parameter("location", "location", Location.class));
 
     return defintion;
-  }
-
-  @DocumentedDefinition("<3, 3-5, >6 months of ARVs Dispensed")
-  public CohortDefinition getPatientsWithMonthsRangeOfArvDispensationQuantity(String range) {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("<3, 3-5, >6 months of ARVs Dispensed");
-    cd.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CalculationCohortDefinition cd1 =
-        new CalculationCohortDefinition(
-            "<3 months on ART",
-            Context.getRegisteredComponents(LessThan3MonthsOfArvDispensationCalculation.class)
-                .get(0));
-    cd1.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
-    cd1.addParameter(new Parameter("location", "Location", Location.class));
-    CalculationCohortDefinition cd2 =
-        new CalculationCohortDefinition(
-            "3-5 months of ARVs dispensed",
-            Context.getRegisteredComponents(ThreeToFiveMonthsOnArtDispensationCalculation.class)
-                .get(0));
-    cd2.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
-    cd2.addParameter(new Parameter("location", "Location", Location.class));
-    CalculationCohortDefinition cd3 =
-        new CalculationCohortDefinition(
-            "6 or more months of ARV dispensed",
-            Context.getRegisteredComponents(SixMonthsAndAboveOnArvDispensationCalculation.class)
-                .get(0));
-    cd3.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
-    cd3.addParameter(new Parameter("location", "Location", Location.class));
-
-    cd.addSearch("1", EptsReportUtils.map(cd1, "onOrBefore=${onOrBefore},location=${location}"));
-    cd.addSearch("2", EptsReportUtils.map(cd2, "onOrBefore=${onOrBefore},location=${location}"));
-    cd.addSearch("3", EptsReportUtils.map(cd3, "onOrBefore=${onOrBefore},location=${location}"));
-    if (range.equals("<3")) {
-      cd.setCompositionString("1 AND NOT (2 OR 3)");
-    } else if (range.equals("3-5")) {
-      cd.setCompositionString("2 AND NOT 3");
-    } else if (range.equals(">6")) {
-      cd.setCompositionString("3");
-    }
-    return cd;
-  }
-
-  @DocumentedDefinition(
-      "patients whose next ART pick-up is scheduled for >173 days after the date of their last ART drug pick-up")
-  private CohortDefinition getPatientsWithNextPickupMoreThan173Days() {
-    return getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(173, null);
-  }
-
-  @DocumentedDefinition(
-      "Patients whose next ART pick-up is scheduled for 83-173 days after the date of their last ART drug pick-up")
-  private CohortDefinition getPatientsWithNextPickup83to173Days() {
-    return getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(83, 173);
-  }
-
-  @DocumentedDefinition(
-      "Patients whose next ART pick-up is scheduled for <83 days after the date of their last ART drug pick-up")
-  private CohortDefinition getPatientsWithNextPickupLessThan83days() {
-    return getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(null, 83);
   }
 
   @DocumentedDefinition("For <3 months of ARVs dispense to active patient’s on ART ")
@@ -1802,7 +1709,7 @@ public class TxCurrCohortQueries {
   /**
    * Dispensation Compositions
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition monthlyDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1852,136 +1759,6 @@ public class TxCurrCohortQueries {
     cd.addSearch("semiAnnual", Mapped.mapStraightThrough(semiAnnualDispensation));
 
     cd.setCompositionString("semiAnnual");
-    return cd;
-  }
-
-  @DocumentedDefinition(
-      "Patients with last “Dispensa Trimestral (DT)” as Iniciar (I) or Manter (C)")
-  private CohortDefinition getPatientsWithStartOrContinueOnQuarterlyDispensation() {
-    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-    cd.addParameter(new Parameter("locationList", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-    cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-    cd.setQuestion(hivMetadata.getQuarterlyDispensation());
-    cd.setOperator(SetComparator.IN);
-    cd.addValue(hivMetadata.getStartDrugsConcept());
-    cd.addValue(hivMetadata.getContinueRegimenConcept());
-    return cd;
-  }
-
-  @DocumentedDefinition("Patients with last “Dispensa Semestral (DS)” as Iniciar (I) or Manter (C)")
-  private CohortDefinition getPatientsWithStartOrContinueOnSemiannualDispensation() {
-    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-    cd.addParameter(new Parameter("locationList", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-    cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-    cd.setQuestion(hivMetadata.getSemiannualDispensation());
-    cd.setOperator(SetComparator.IN);
-    cd.addValue(hivMetadata.getStartDrugsConcept());
-    cd.addValue(hivMetadata.getContinueRegimenConcept());
-    return cd;
-  }
-
-  @DocumentedDefinition(
-      "Patients who are marked Completed for their last “Dispensa Trimestral (DT)")
-  private CohortDefinition getPatientsWithCompletedOnQuarterlyDispensation() {
-    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-    cd.addParameter(new Parameter("locationList", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-    cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-    cd.setQuestion(hivMetadata.getQuarterlyDispensation());
-    cd.setOperator(SetComparator.IN);
-    cd.addValue(hivMetadata.getCompletedConcept());
-    return cd;
-  }
-
-  @DocumentedDefinition("Patients who are marked Completed for their last “Dispensa Semestral (DS)")
-  private CohortDefinition getPatientsWithCompletedOnSemiannualDispensation() {
-    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-    cd.addParameter(new Parameter("locationList", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-    cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-    cd.setQuestion(hivMetadata.getSemiannualDispensation());
-    cd.setOperator(SetComparator.IN);
-    cd.addValue(hivMetadata.getCompletedConcept());
-    return cd;
-  }
-
-  private CohortDefinition getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(
-      Integer minDays, Integer maxDays) {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    StringBuilder sb =
-        new StringBuilder()
-            .append("select p.patient_id ")
-            .append("from patient p ")
-            .append(
-                "         join (select e.patient_id, e.encounter_datetime, max(o.value_datetime) value_datetime ")
-            .append("               from encounter e ")
-            .append(
-                "                        join (select patient_id, max(encounter_datetime) encounter_datetime ")
-            .append("                              from encounter e ")
-            .append("                              where e.voided = 0 ")
-            .append("                                and e.encounter_type = %d ")
-            .append("                                and e.encounter_datetime <= :onOrBefore ")
-            .append("                                and e.location_id = :location ")
-            .append("                              group by patient_id) last ")
-            .append("                             on e.patient_id = last.patient_id ")
-            .append(
-                "                                 and e.encounter_datetime = last.encounter_datetime ")
-            .append("                        join obs o on e.encounter_id = o.encounter_id ")
-            .append("               where e.voided = 0 ")
-            .append("                 and o.voided = 0 ")
-            .append("                 and o.concept_id = %d ")
-            .append("                 and e.location_id = :location ")
-            .append("                 and e.encounter_type = %d ")
-            .append("               group by e.patient_id, e.encounter_datetime) last_obs ")
-            .append("              on p.patient_id = last_obs.patient_id ");
-
-    if (minDays != null && maxDays != null) {
-      sb.append(
-              "  where timestampdiff(DAY, last_obs.encounter_datetime, last_obs.value_datetime) BETWEEN ")
-          .append(minDays)
-          .append(" AND ")
-          .append(maxDays);
-    } else if (minDays == null) {
-      sb.append(
-              "  where timestampdiff(DAY, last_obs.encounter_datetime, last_obs.value_datetime) < ")
-          .append(maxDays);
-    } else {
-      sb.append(
-              "  where timestampdiff(DAY, last_obs.encounter_datetime, last_obs.value_datetime) > ")
-          .append(minDays);
-    }
-    sb.append(" and p.voided = 0");
-
-    cd.setQuery(
-        String.format(
-            sb.toString(),
-            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
-            hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
-            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId()));
-
-    return cd;
-  }
-
-  @DocumentedDefinition("Patients with S.TARV FARMACIA encounter type")
-  private CohortDefinition getPatientsWithArvFarmaciaEncounterType() {
-    EncounterCohortDefinition cd = new EncounterCohortDefinition();
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("locationList", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getARVPharmaciaEncounterType());
     return cd;
   }
 

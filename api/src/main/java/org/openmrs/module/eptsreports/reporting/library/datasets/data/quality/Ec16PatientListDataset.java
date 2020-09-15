@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Ec16PatientListDataset extends BaseDataSet {
-  private HivMetadata hivMetadata;
+  private final HivMetadata hivMetadata;
 
   @Autowired
   public Ec16PatientListDataset(HivMetadata hivMetadata) {
@@ -22,8 +22,8 @@ public class Ec16PatientListDataset extends BaseDataSet {
   /**
    * EC16 Patient Listing Dataset Definition
    *
-   * @param parameterList
-   * @return
+   * @param parameterList - list of params
+   * @return DataSetDefinition
    */
   public DataSetDefinition ec16PatientListDataset(List<Parameter> parameterList) {
     SqlDataSetDefinition sqlDataSetDefinition = new SqlDataSetDefinition();

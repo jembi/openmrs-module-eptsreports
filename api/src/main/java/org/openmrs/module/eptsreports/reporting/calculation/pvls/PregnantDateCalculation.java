@@ -25,11 +25,7 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.springframework.stereotype.Component;
 
-/**
- * Calculates for patient eligibility to be pregnant
- *
- * @return CalculationResultMap
- */
+/** Calculates for patient eligibility to be pregnant */
 @Component
 public class PregnantDateCalculation extends AbstractPatientCalculation {
 

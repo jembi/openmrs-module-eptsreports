@@ -16,11 +16,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SummaryDataQualityDataset extends BaseDataSet {
 
-  private EptsGeneralIndicator eptsGeneralIndicator;
+  private final EptsGeneralIndicator eptsGeneralIndicator;
 
-  private SummaryDataQualityCohorts summaryDataQualityCohorts;
+  private final SummaryDataQualityCohorts summaryDataQualityCohorts;
 
-  private HivMetadata hivMetadata;
+  private final HivMetadata hivMetadata;
 
   @Autowired
   public SummaryDataQualityDataset(

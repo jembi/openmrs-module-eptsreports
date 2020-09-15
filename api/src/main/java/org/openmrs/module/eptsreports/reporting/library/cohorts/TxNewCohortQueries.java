@@ -46,8 +46,6 @@ public class TxNewCohortQueries {
 
   @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
-  @Autowired private CommonCohortQueries commonCohortQueries;
-
   /**
    * PATIENTS WITH UPDATED DATE OF DEPARTURE IN THE ART SERVICE Are patients with date of delivery
    * updated in the tarv service. Note that the 'Start Date' and 'End Date' parameters refer to the
@@ -61,7 +59,7 @@ public class TxNewCohortQueries {
     cd.setQuestion(commonMetadata.getPriorDeliveryDateConcept());
     cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.ANY);
 
-    List<EncounterType> encounterTypes = new ArrayList<EncounterType>();
+    List<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getAdultoSeguimentoEncounterType());
     encounterTypes.add(hivMetadata.getARVAdultInitialEncounterType());
     cd.setEncounterTypeList(encounterTypes);

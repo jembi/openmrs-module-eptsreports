@@ -9,8 +9,6 @@ import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition2;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition2.ARTProgram;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -21,10 +19,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResumoTrimestralCohortQueries {
 
-  private GenericCohortQueries genericCohortQueries;
-  private HivMetadata hivMetadata;
-  private ResumoMensalCohortQueries resumoMensalCohortQueries;
-  private CommonCohortQueries commonCohortQueries;
+  private final GenericCohortQueries genericCohortQueries;
+  private final HivMetadata hivMetadata;
+  private final ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private final CommonCohortQueries commonCohortQueries;
 
   @Autowired
   public ResumoTrimestralCohortQueries(
@@ -346,16 +344,6 @@ public class ResumoTrimestralCohortQueries {
                 hivMetadata.getTherapeuticLineConcept().getConceptId(),
                 hivMetadata.getSecondLineConcept().getConceptId()));
     return sql;
-  }
-
-  /** Number of patients transferred-in from another HFs during the current month */
-  private CohortDefinition
-      getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonth() {
-
-    EptsTransferredInCohortDefinition2 cd = new EptsTransferredInCohortDefinition2();
-    cd.addArtProgram(ARTProgram.TARV);
-    cd.addParameters(getParameters());
-    return cd;
   }
 
   private List<Parameter> getParameters() {

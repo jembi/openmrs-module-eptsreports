@@ -3,23 +3,25 @@ package org.openmrs.module.eptsreports.reporting.library.queries;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 
 public class CommonQueries {
 
   /**
    * Patients on TB Treatment
    *
-   * @param adultoSeguimentoEncounterTypeId
-   * @param arvPediatriaSeguimentoEncounterTypeId
-   * @param tbStartDateConceptId
-   * @param tbEndDateConceptId
-   * @param tbProgramId
-   * @param patientStateId
-   * @param activeTBConceptId
-   * @param yesConceptId
-   * @param tbTreatmentPlanConceptId
-   * @param startDrugsConceptId
-   * @param continueRegimenConceptId
+   * @param adultoSeguimentoEncounterTypeId {@link HivMetadata#getAdultoSeguimentoEncounterType()}
+   * @param arvPediatriaSeguimentoEncounterTypeId {@link
+   *     HivMetadata#getPediatriaSeguimentoEncounterType()} ()}
+   * @param tbStartDateConceptId - TB start date Concept ID
+   * @param tbEndDateConceptId - TB end date Concept ID
+   * @param tbProgramId - TB program ID
+   * @param patientStateId - patient state
+   * @param activeTBConceptId -
+   * @param yesConceptId - ues concept
+   * @param tbTreatmentPlanConceptId - TB Treatment Plan Concept
+   * @param startDrugsConceptId - start Drugs Concept
+   * @param continueRegimenConceptId - Continue Regime Concept
    */
   public static String getPatientsOnTbTreatmentQuery(
       int adultoSeguimentoEncounterTypeId,
@@ -163,8 +165,6 @@ public class CommonQueries {
             + "       AND o.value_coded = ${yesConceptId}";
 
     StringSubstitutor sb = new StringSubstitutor(map);
-    String replaced = sb.replace(query);
-
-    return replaced;
+    return sb.replace(query);
   }
 }

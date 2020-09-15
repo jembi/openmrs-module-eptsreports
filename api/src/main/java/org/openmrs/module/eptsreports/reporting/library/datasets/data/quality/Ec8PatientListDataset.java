@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Ec8PatientListDataset extends BaseDataSet {
 
-  private HivMetadata hivMetadata;
+  private final HivMetadata hivMetadata;
 
   @Autowired
   public Ec8PatientListDataset(HivMetadata hivMetadata) {

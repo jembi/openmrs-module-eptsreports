@@ -33,9 +33,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxPvlsCohortQueries {
 
-  private HivCohortQueries hivCohortQueries;
+  private final HivCohortQueries hivCohortQueries;
 
-  private HivMetadata hivMetadata;
+  private final HivMetadata hivMetadata;
 
   @Autowired
   public TxPvlsCohortQueries(HivCohortQueries hivCohortQueries, HivMetadata hivMetadata) {
@@ -269,7 +269,7 @@ public class TxPvlsCohortQueries {
   /**
    * Get patients having viral load suppression and routine for adults and children - Numerator
    *
-   * @retrun CohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientWithViralSuppressionAndOnRoutine() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -290,7 +290,7 @@ public class TxPvlsCohortQueries {
   /**
    * Get patients having viral load suppression and target for adults and children - Numerator
    *
-   * @retrun CohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientWithViralSuppressionAndOnTarget() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();

@@ -31,8 +31,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupRTTQuarterlyReport extends EptsDataExportManager {
 
-  private TxRttDataset txRttDataset;
-  private GenericCohortQueries genericCohortQueries;
+  private final TxRttDataset txRttDataset;
+  private final GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public SetupRTTQuarterlyReport(

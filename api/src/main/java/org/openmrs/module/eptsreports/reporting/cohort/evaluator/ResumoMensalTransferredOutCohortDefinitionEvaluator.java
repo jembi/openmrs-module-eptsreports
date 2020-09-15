@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ResumoMensalTransferredOutCohortDefinitionEvaluator
     implements CohortDefinitionEvaluator {
 
-  private HivMetadata hivMetadata;
+  private final HivMetadata hivMetadata;
 
-  private EvaluationService evaluationService;
+  private final EvaluationService evaluationService;
 
   @Autowired
   public ResumoMensalTransferredOutCohortDefinitionEvaluator(

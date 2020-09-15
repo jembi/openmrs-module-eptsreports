@@ -47,7 +47,7 @@ public abstract class BaseDataSet {
   }
 
   public List<Parameter> getParameters() {
-    List<Parameter> parameters = new ArrayList<Parameter>();
+    List<Parameter> parameters = new ArrayList<>();
     parameters.add(ReportingConstants.START_DATE_PARAMETER);
     parameters.add(ReportingConstants.END_DATE_PARAMETER);
     parameters.add(ReportingConstants.LOCATION_PARAMETER);
@@ -56,13 +56,13 @@ public abstract class BaseDataSet {
 
   public static class ColumnParameters {
 
-    private String name;
+    private final String name;
 
-    private String label;
+    private final String label;
 
-    private String dimensions;
+    private final String dimensions;
 
-    private String column;
+    private final String column;
 
     /**
      * Default constructor
