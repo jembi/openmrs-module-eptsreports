@@ -636,4 +636,20 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
     assertEquals(4, evaluatedCohort.getMemberIds().size());
     assertTrue(evaluatedCohort.getMemberIds().contains(25000));
   }
+
+  @Ignore("Query using IF function not supported in H2 database")
+  public void getActivePatientsOnArtWhoReceivedVldSuppressionResults() throws EvaluationException {
+    CohortDefinition cd =
+        resumoMensalCohortQueries.getActivePatientsOnArtWhoReceivedVldSuppressionResults();
+
+    HashMap<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+
+    assertEquals(3, evaluatedCohort.getMemberIds().size());
+    assertTrue(evaluatedCohort.getMemberIds().contains(25000));
+  }
 }
