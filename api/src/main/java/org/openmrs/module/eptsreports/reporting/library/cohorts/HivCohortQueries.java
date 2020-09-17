@@ -134,18 +134,17 @@ public class HivCohortQueries {
 
   /**
    * <b>Description: 2.</b> Number of Patients with historical drug start Date Obs
-   * 
+   *
    * <p><b>Technical Specs</b>
-   * 
+   *
    * <blockquote>
-   * 
-   * Cohort of patients with START DATE <b>(concept_id = 1190)</b> filled in
-   * drug pickup <b>(encounterType_id 18)</b> or follow up consultation 
-   * for adults and children <b>(encounterType_ids = 6 and 5)</b> 
-   * and obs startDate <= endDate
-   * 
+   *
+   * Cohort of patients with START DATE <b>(concept_id = 1190)</b> filled in drug pickup
+   * <b>(encounterType_id 18)</b> or follow up consultation for adults and children
+   * <b>(encounterType_ids = 6 and 5)</b> and obs startDate <= endDate
+   *
    * </blockquote>
-   * 
+   *
    * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientWithHistoricalDrugStartDateObs")
