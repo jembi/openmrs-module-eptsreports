@@ -31,9 +31,10 @@ public class TxMlCohortQueries {
   @Autowired private TxCurrCohortQueries txCurrCohortQueries;
 
   /**
-   * a and b
+   * <b>Description:</b> Patients Started Art and missed Next Appointment or Next Drug Pickup
+   * (a and b)
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation() {
@@ -62,7 +63,7 @@ public class TxMlCohortQueries {
    * consultation date (Ficha de Seguimento or Ficha Clinica – Master Card) and ART Pickup date
    * (Recepção – Levantou ARV).
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
@@ -86,9 +87,10 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * a and b and died
+   * <b>Description:</b> Patients Started Art and missed Next Appointment or Next Drug Pickup and Died
+   * (a and b) and Died
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -123,7 +125,7 @@ public class TxMlCohortQueries {
    * (from a and b) Refused/Stopped treatment Except patients identified in Dead Disaggregation
    * Except patients identified in Transferred –out Disaggregation
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndRefusedOrStoppedTreatment() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -164,7 +166,7 @@ public class TxMlCohortQueries {
    * criterias, have a drugs pick up or consultation: Except patients identified in Dead
    * Disaggregation
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndTransferredOut() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -199,7 +201,12 @@ public class TxMlCohortQueries {
     return cd;
   }
 
-  // a and b and Traced (Unable to locate)
+  /**
+   * <b>Description:</b> a and b and Traced (Unable to locate)
+   *
+   * @return {@link CohortDefinition}
+   */
+
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndNotTransferredOutAndTraced() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -225,8 +232,9 @@ public class TxMlCohortQueries {
     return cd;
   }
 
-  /*
-   * a and b and Untraced Patients
+  /**
+   * <b>Description</b> A and B and Untraced Patients
+   *
    */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndNotTransferredOutAndUntraced() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -593,8 +601,24 @@ public class TxMlCohortQueries {
     return cd;
   }
 
-  /*
-   * Untraced Patients Criteria 2 Patients with a visit card of type busca with certain set of observations
+  /**
+   * * <b>Description:</b> A- “Untraced” patients as following (Part II):
+   *    *
+   *    * <p><b>Technical Specs:</b>
+   *
+   * All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37) registered between most recent scheduled date (as below) and the reporting end date with the following observations:
+   * a. Type of Visit: concept id=1981 value = concept id 2160 (Busca) and
+   * b. Second Attempt: concept id=6254 any value or
+   * c. Third Attempt: concept id=6255 any value or
+   * d. Patient Found: concept id = 2003 any value or
+   * e. Defaulting Motive: concept id=2016 any value or
+   * f. Report Visit: concept ids = 2158, 2157 any value or
+   * g. Patient Found Forwarded: concept id =1272 any value or
+   * h. REason of not finding: concept id = 2031 any value or
+   * i. Who gave the information: concept id = 2037 any value or
+   * l. Card Delivery Date: concept id =2180 any value)
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithVisitCardAndWithObs() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -632,10 +656,14 @@ public class TxMlCohortQueries {
     return sqlCohortDefinition;
   }
 
-  /*
-   * Untraced Patients Criteria 2 All Patients without “Patient Visit Card”
-   * registered between the last scheduled appointment or drugs pick up by
-   * reporting end date and the reporting end date
+  /**
+   * <b>Description:</b> A- “Untraced” patients as following (Part I):
+   *
+   * <p><b>Technical Specs:</b>
+   *
+   * 1. All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37)
+   * registered between the most recent scheduled date (as below) and the reporting end date
+
    */
   public CohortDefinition
       getPatientsWithoutVisitCardRegisteredBtwnLastAppointmentOrDrugPickupAndEnddate() {
@@ -663,6 +691,8 @@ public class TxMlCohortQueries {
     return sqlCohortDefinition;
   }
 
+
+
   // a
   public CohortDefinition getAllPatientsWhoMissedNextAppointment() {
     return genericCohortQueries.generalSql(
@@ -683,7 +713,7 @@ public class TxMlCohortQueries {
    * the “data da visita” when the patient reason was marked on the home visit card as the reference
    * date
    *
-   * @return
+   * @return {@link SqlCohortDefinition}
    */
   public CohortDefinition getPatientsWithMissedVisit() {
     SqlCohortDefinition sql = new SqlCohortDefinition();
@@ -705,7 +735,7 @@ public class TxMlCohortQueries {
   /**
    * Patients Who have refused or Stopped Treatment Query
    *
-   * @return
+   * @return {@link SqlCohortDefinition}
    */
   public CohortDefinition getRefusedOrStoppedTreatmentQuery() {
     SqlCohortDefinition sql = new SqlCohortDefinition();
@@ -738,7 +768,15 @@ public class TxMlCohortQueries {
     return sql;
   }
 
-  // Patients Traced Not Found
+  /**
+   * <b>Description</b> TRACED PATIENTS AND NOT FOUND
+   * All Patients with  “Patient Visit Card” (Encounter type 21 or 36 or 37)
+   * registered between the most recent scheduled date (as below)
+   * and the reporting end date with the following information
+   * With Answer (id = 2024 or id=2026 or id =2011 or id = 2032) For Reason Not Found Concept (id=2031 or id=23944 or id = 23945)
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsTracedAndNotFound() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
@@ -774,7 +812,13 @@ public class TxMlCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // Patients Traced and Found.
+  /**
+   * <b>Description</b> TRACED PATIENTS AND FOUND
+   * All Patients with  “Patient Visit Card” (Encounter type 21 or 36 or 37)
+   * registered between the most recent scheduled date (as below)
+   * and the reporting end date with the following information and with YES answer (Concept ID 1067) for Patient Found (ConceptId =2003)
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getPatientTracedAndFound() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
@@ -810,7 +854,7 @@ public class TxMlCohortQueries {
    * recent one from 3 sources) by reporting end date)
    *
    * @param lessThan90Days
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsOnARTForLessOrMoreThan90Days(Boolean lessThan90Days) {
     CalculationCohortDefinition cd =
@@ -825,6 +869,7 @@ public class TxMlCohortQueries {
 
     return cd;
   }
+
   /**
    * <b>All patients who after the most recent date from below criterias:</b>
    *
@@ -996,6 +1041,7 @@ public class TxMlCohortQueries {
 
     return definition;
   }
+
   /**
    * @return Cohort of patients who left ART program before or on end date(4). Includes: transferred
    *     to, (patient state 7)

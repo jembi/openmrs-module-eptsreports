@@ -6,6 +6,18 @@ import org.apache.commons.text.StringSubstitutor;
 
 public class TxMlQueries {
 
+  /**
+   * <b>Description:</b> all patients who missed (by 28 days) the last scheduled clinical appointment
+   * or last drugs pick up-FILA or 30 days
+   * @param returnVisitDateForDrugsConcept
+   * @param returnVisitDateConcept
+   * @param pharmacyEncounterType
+   * @param adultoSequimentoEncounterType
+   * @param pediatriaSeguimentoEncounterType
+   * @param masterCardDrugPickupEncounterType
+   * @param artPickupDateMasterCardConcept
+   * @return
+   */
   public static String getPatientsWhoMissedAppointment(
       int returnVisitDateForDrugsConcept,
       int returnVisitDateConcept,
@@ -107,57 +119,20 @@ public class TxMlQueries {
     return sub.replace(query);
   }
 
-  public static String getNonConsentedPatients(
-      int prevencaoPositivaInicial,
-      int prevencaoPositivaSeguimento,
-      int acceptContactConcept,
-      int noConcept) {
-    String query =
-        "SELECT distinct(pp.patient_id) FROM patient pp "
-            + "INNER JOIN encounter e ON e.patient_id=pp.patient_id "
-            + "INNER JOIN obs o ON o.person_id = pp.patient_id "
-            + "INNER JOIN person p ON o.person_id = p.person_id "
-            + "WHERE pp.voided=0 AND e.voided=0 AND e.encounter_type IN(%d, %d) AND e.location_id=:location AND o.obs_datetime<=:endDate AND o.voided=0 AND o.concept_id=%d AND o.value_coded=%d AND o.location_id=:location "
-            + "AND o.obs_id = (SELECT obs_id FROM obs WHERE concept_id = %d AND pp.patient_id = person_id GROUP BY obs_datetime DESC LIMIT 1)";
 
-    return String.format(
-        query,
-        prevencaoPositivaInicial,
-        prevencaoPositivaSeguimento,
-        acceptContactConcept,
-        noConcept,
-        acceptContactConcept);
-  }
-
-  // All Patients marked as Dead in the patient home visit card
-  public static String getPatientsMarkedDeadInHomeVisitCard(
-      int homeVisitCardEncounterTypeId,
-      int apoioReintegracaoParteAEncounterTypeId,
-      int apoioReintegracaoParteBEncounterTypeId,
-      int busca,
-      int dead) {
-    String query =
-        " SELECT     pa.patient_id "
-            + "FROM       patient pa "
-            + "INNER JOIN encounter e "
-            + "ON         pa.patient_id=e.patient_id "
-            + "INNER JOIN obs o "
-            + "ON         pa.patient_id=o.person_id "
-            + "WHERE      e.encounter_type IN (%d, %d, %d) "
-            + "AND        o.concept_id= %d "
-            + "AND        o.value_coded = %d "
-            + "AND        e.location_id=:location "
-            + "AND        o.obs_datetime <=:endDate";
-
-    return String.format(
-        query,
-        homeVisitCardEncounterTypeId,
-        apoioReintegracaoParteAEncounterTypeId,
-        apoioReintegracaoParteBEncounterTypeId,
-        busca,
-        dead);
-  }
-
+  /**
+   * <b>Description:</b>
+   * Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as “Transferido para outra US”
+   * or “Auto-transferencia” marked last Home Visit Card occurred during the reporting period. Use
+   * the “data da visita” when the patient reason was marked on the home visit card as the reference
+   * date
+   *
+   * @param homeVisitCardEncounterTypeId
+   * @param reasonPatientMissedVisitConceptId
+   * @param transferredOutToAnotherFacilityConceptId
+   * @param autoTransferConceptId
+   * @return
+   */
   public static String getPatientsWithMissedVisit(
       int homeVisitCardEncounterTypeId,
       int reasonPatientMissedVisitConceptId,
@@ -187,6 +162,29 @@ public class TxMlQueries {
         autoTransferConceptId);
   }
 
+
+  /**
+   * <b>Description:</b> Patients who Refused or stopped treatment
+   * @param homeVisitCardEncounterTypeId
+   * @param reasonPatientMissedVisitConceptId
+   * @param patientForgotVisitDateConceptId
+   * @param patientIsBedriddenAtHomeConceptId
+   * @param distanceOrMoneyForTransportIsToMuchForPatientConceptId
+   * @param patientIsDissatifiedWithDayHospitalServicesConceptId
+   * @param fearOfTheProviderConceptId
+   * @param absenceOfHealthProviderInHealthUnitConceptId
+   * @param patientDoesNotLikeArvTreatmentSideEffectsConceptId
+   * @param patientIsTreatingHivWithTraditionalMedicineConceptId
+   * @param otherReasonWhyPatientMissedVisitConceptId
+   * @param pharmacyEncounterTypeId
+   * @param returnVisitDateForDrugsConcept
+   * @param adultoSequimentoEncounterTypeId
+   * @param arvPediatriaSeguimentoEncounterTypeId
+   * @param returnVisitDateConcept
+   * @param masterCardDrugPickupEncounterTypeId
+   * @param artDatePickupConceptId
+   * @return String
+   */
   public static String getRefusedOrStoppedTreatment(
       int homeVisitCardEncounterTypeId,
       int reasonPatientMissedVisitConceptId,
@@ -313,9 +311,38 @@ public class TxMlQueries {
   }
 
   /*
-   Untraced Patients Criteria 2
-   Patients without Patient Visit Card of type busca and with a set of observations
+
   */
+
+  /**
+   * <b>Description:</b>
+   * Untraced Patients Criteria 2
+   * Patients without Patient Visit Card of type busca and with a set of observations
+   *
+   * @param pharmacyEncounterTypeId
+   * @param adultoSequimentoEncounterTypeId
+   * @param arvPediatriaSeguimentoEncounterTypeId
+   * @param returnVisitDateForDrugsConcept
+   * @param returnVisitDateConcept
+   * @param homeVisitCardEncounterTypeId
+   * @param apoioReintegracaoParteAEncounterTypeId
+   * @param apoioReintegracaoParteBEncounterTypeId
+   * @param typeOfVisitConcept
+   * @param buscaConcept
+   * @param secondAttemptConcept
+   * @param thirdAttemptConcept
+   * @param patientFoundConcept
+   * @param defaultingMotiveConcept
+   * @param reportVisitConcept1
+   * @param reportVisitConcept2
+   * @param patientFoundForwardedConcept
+   * @param reasonForNotFindingConcept
+   * @param whoGaveInformationConcept
+   * @param cardDeliveryDate
+   * @param masterCardDrugPickupEncounterTypeId
+   * @param artDatePickupConceptId
+   * @return
+   */
   public static String getPatientsWithVisitCardAndWithObs(
       int pharmacyEncounterTypeId,
       int adultoSequimentoEncounterTypeId,
