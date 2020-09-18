@@ -996,9 +996,10 @@ public class TxCurrCohortQueries {
 
   /**
    * <b>Technical Specs</b>
-   * 
-   * Number of patients with less than 3 Monthly Type of Dispensation <b>(concept_id = 23739)</b> 
-   * 
+   *
+   * <p>Number of patients with less than 3 Monthly Type of Dispensation <b>(concept_id = 23739)</b>
+   * on ART
+   *
    * @return {@link SqlCohortDefinition}
    */
   @DocumentedDefinition("For <3 months of ARVs dispense to active patient’s on ART ")
@@ -1240,15 +1241,14 @@ public class TxCurrCohortQueries {
 
   /**
    * <b>Technical Specs</b>
-   * 
+   *
    * <blockquote>
-   * 
-   * Patients marked as (DT) Quartely Dispensation <b>(concept_id = 23730)</b> on Ficha
-   * Clinica Mastercard on last drug pickup <b>(concept_id = 
-   * 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
-   * 
+   *
+   * Patients marked as (DT) Quartely Dispensation <b>(concept_id = 23730)</b> on Ficha Clinica
+   * Mastercard on last drug pickup <b>(concept_id = 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
+   *
    * </blockquote>
-   * 
+   *
    * @return {@link SqlCohortDefinition}
    */
   @DocumentedDefinition(
@@ -1617,15 +1617,14 @@ public class TxCurrCohortQueries {
 
   /**
    * <b>Technical Specs</b>
-   * 
+   *
    * <blockquote>
-   * 
-   * Patients marked as (DS) Semi-annual Dispensation <b>(concept_id = 23888)</b> on Ficha
-   * Clinica Mastercard on last drug pickup <b>(concept_id = 
-   * 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
-   * 
+   *
+   * Patients marked as (DS) Semi-annual Dispensation <b>(concept_id = 23888)</b> on Ficha Clinica
+   * Mastercard on last drug pickup <b>(concept_id = 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
+   *
    * </blockquote>
-   * 
+   *
    * @return {@link SqlCohortDefinition}
    */
   @DocumentedDefinition(
