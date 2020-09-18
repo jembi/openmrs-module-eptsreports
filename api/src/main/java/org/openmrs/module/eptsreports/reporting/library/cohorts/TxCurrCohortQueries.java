@@ -994,6 +994,13 @@ public class TxCurrCohortQueries {
     return getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(null, 83);
   }
 
+  /**
+   * <b>Technical Specs</b>
+   * 
+   * Number of patients with less than 3 Monthly Type of Dispensation <b>(concept_id = 23739)</b> 
+   * 
+   * @return {@link SqlCohortDefinition}
+   */
   @DocumentedDefinition("For <3 months of ARVs dispense to active patient’s on ART ")
   public CohortDefinition getPatientsWithLessThan3MonthlyTypeOfDispensation() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1231,6 +1238,19 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   * 
+   * <blockquote>
+   * 
+   * Patients marked as (DT) Quartely Dispensation <b>(concept_id = 23730)</b> on Ficha
+   * Clinica Mastercard on last drug pickup <b>(concept_id = 
+   * 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
+   * 
+   * </blockquote>
+   * 
+   * @return {@link SqlCohortDefinition}
+   */
   @DocumentedDefinition(
       "Patients marked as DT on Ficha Clinica Mastercard on last Tipo de Levantamento")
   public SqlCohortDefinition getPatientsWithQuarterlyTypeOfDispensation() {
@@ -1595,6 +1615,19 @@ public class TxCurrCohortQueries {
     return patientsWithQuarterlyTypeOfDispensation;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   * 
+   * <blockquote>
+   * 
+   * Patients marked as (DS) Semi-annual Dispensation <b>(concept_id = 23888)</b> on Ficha
+   * Clinica Mastercard on last drug pickup <b>(concept_id = 
+   * 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
+   * 
+   * </blockquote>
+   * 
+   * @return {@link SqlCohortDefinition}
+   */
   @DocumentedDefinition(
       "Patients marked as DS on Ficha Clinica Mastercard on last Tipo de Levantamento")
   public SqlCohortDefinition getPatientsWithSemiAnnualTypeOfDispensation() {
@@ -1973,9 +2006,9 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * Dispensation Compositions
+   * <b>Description:</b> Dispensation Compositions, Monthly, Quartely and Semi-annual Dispensations
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition monthlyDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1996,6 +2029,11 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Number of patients with Quartely Dispensation (excluding Semi-annual)
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition quarterlyDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Get patients with Quarterly ARV Dispensation");
@@ -2013,6 +2051,11 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Number of patients with Semi-annual Dispensation
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition semiAnnualDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Get patients with Quarterly ARV Dispensation");
@@ -2028,6 +2071,12 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Patients marked in last <b>Quartely Dispensation</b> as <b>Start Drugs</b>
+   * or <b>Continue Regimen</b>
+   *
+   * @return {@link CohortDefinition}
+   */
   @DocumentedDefinition(
       "Patients with last “Dispensa Trimestral (DT)” as Iniciar (I) or Manter (C)")
   private CohortDefinition getPatientsWithStartOrContinueOnQuarterlyDispensation() {
@@ -2044,6 +2093,12 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Patients marked in last <b>Semi-annual Dispensation</b> as <b>Start
+   * Drugs</b> or <b>Continue Regimen</b>
+   *
+   * @return {@link CohortDefinition}
+   */
   @DocumentedDefinition("Patients with last “Dispensa Semestral (DS)” as Iniciar (I) or Manter (C)")
   private CohortDefinition getPatientsWithStartOrContinueOnSemiannualDispensation() {
     CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
@@ -2059,6 +2114,12 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Patients who are marked <b>Completed</b> for their last <b>Quartely
+   * Dispensation</b>
+   *
+   * @return {@link CohortDefinition}
+   */
   @DocumentedDefinition(
       "Patients who are marked Completed for their last “Dispensa Trimestral (DT)")
   private CohortDefinition getPatientsWithCompletedOnQuarterlyDispensation() {
@@ -2074,6 +2135,12 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Patients who are marked <b>Completed</b> for their last <b>Semi-annual
+   * Dispensation</b>
+   *
+   * @return {@link CohortDefinition}
+   */
   @DocumentedDefinition("Patients who are marked Completed for their last “Dispensa Semestral (DS)")
   private CohortDefinition getPatientsWithCompletedOnSemiannualDispensation() {
     CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
@@ -2088,6 +2155,18 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * All Patients with next pickup <b>(concept_id = 5096 RETURN VISIT DATE FOR ARV DRUG)</b> between
+   * days after last drug pickup <b>(encounterType_id = 18)</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(
       Integer minDays, Integer maxDays) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -2158,7 +2237,20 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
-  /** 15. 2.7 = 15 since version 4 . All transferred-outs registered in Last Home Visit Card */
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>15 - 2.7 = 15 since version 4</b>
+   *
+   * <p>All Patients transferred-outs <b>(concept_id = 1706)</b> registered in Last Home Visit Card
+   * <b>(encounterType_id = 21)</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   @DocumentedDefinition(value = "Patients Transfered Out In Last Home Visit Card")
   public CohortDefinition getPatientsTransferedOutInLastHomeVisitCard() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
