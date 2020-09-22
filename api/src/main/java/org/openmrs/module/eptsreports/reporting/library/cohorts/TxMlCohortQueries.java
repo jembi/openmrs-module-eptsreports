@@ -31,8 +31,8 @@ public class TxMlCohortQueries {
   @Autowired private TxCurrCohortQueries txCurrCohortQueries;
 
   /**
-   * <b>Description:</b> Patients Started Art and missed Next Appointment or Next Drug Pickup
-   * (a and b)
+   * <b>Description:</b> Patients started ART and missed Next Appointment or Next Drug Pickup (a and
+   * b)
    *
    * @return {@link CohortDefinition}
    */
@@ -59,9 +59,28 @@ public class TxMlCohortQueries {
     return cd;
   }
   /**
-   * 14. All patients who do not have the next scheduled drug pick up date (Fila) and next scheduled
-   * consultation date (Ficha de Seguimento or Ficha Clinica – Master Card) and ART Pickup date
-   * (Recepção – Levantou ARV).
+   * <b>Description:</b> All patients who do not have the next scheduled drug pick up date (Fila)
+   * and next scheduled consultation date (Ficha de Seguimento or Ficha Clinica – Master Card) and
+   * ART Pickup date (Recepção – Levantou ARV).
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>a.</b> the most recent Encounters of Type 6, 9 and 18 during the reporting period without
+   * the following observations or itscontents is null:
+   *
+   * <ul>
+   *   <li><b>i.</b> Next Clinical Appointment <b>(concept_id = 1410) -><b>encountersType_id = 6, or
+   *       9</b>
+   *   <li><b>ii.</b> Next Drugs Pick Up Appointment <b>(concept_id = 5096)</b> ->
+   *       <b>encounterType_id = 18</b>
+   * </ul>
+   *
+   * <p><b>b.</b> And none ART Pickup MasterCard date <b>(concept_id = 23866)</b> within reporting
+   * period from <b>encounterType_id = 52</b>.
+   *
+   * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
@@ -87,8 +106,8 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Patients Started Art and missed Next Appointment or Next Drug Pickup and Died
-   * (a and b) and Died
+   * <b>Description:</b> Patients Started Art and missed Next Appointment or Next Drug Pickup (a and
+   * b) and Died during reporting period
    *
    * @return {@link CohortDefinition}
    */
@@ -122,8 +141,9 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * (from a and b) Refused/Stopped treatment Except patients identified in Dead Disaggregation
-   * Except patients identified in Transferred –out Disaggregation
+   * <b>Description:</b> (from a and b) Refused/Stopped treatment
+   *
+   * <p>Except patients identified in Dead or Transferred–out Disaggregation
    *
    * @return {@link CohortDefinition}
    */
@@ -162,8 +182,8 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * a, b AND Transferred Out Except all patients who after the most recent date from above
-   * criterias, have a drugs pick up or consultation: Except patients identified in Dead
+   * <b>Description:</b> A, B AND Transferred Out Except all patients who after the most recent date
+   * from above criterias, have a drugs pick up or consultation: Except patients identified in Dead
    * Disaggregation
    *
    * @return {@link CohortDefinition}
@@ -206,7 +226,6 @@ public class TxMlCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndNotTransferredOutAndTraced() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -232,10 +251,10 @@ public class TxMlCohortQueries {
     return cd;
   }
 
-  /**
-   * <b>Description</b> A and B and Untraced Patients
-   *
-   */
+  /** <b>Description: </b> A and B and Untraced Patients 
+   * 
+   * @return {@link CohortDefinition}
+  */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndNotTransferredOutAndUntraced() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -315,9 +334,14 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * @return Disaggregation “Lost to Follow-Up After being on Treatment for >3 months” will have the
-   *     following combination: ((A OR B) AND C2) AND NOT DEAD AND NOT TRANSFERRED OUT AND NOT
-   *     REFUSED
+   * <b>Description:</b> “Lost to Follow-Up After being on Treatment for >3 months” will have the
+   * following combination:
+   *
+   * <ul>
+   *   <li>((A OR B) AND C2) AND NOT Dead AND NOT Transferred-Out AND NOT Refused
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsLTFUMoreThan90DaysComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -369,10 +393,25 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * Get patients who where Transferred Out (and had no registred drug pickup) after the transferred
-   * out date within reporting period
+   * <b>Technical Specs</b>
    *
-   * @return CohortDefinition
+   * <blockquote>
+   *
+   * <b>10 –</b> All transferred-outs <b>(Patient_State.state = 7)</b> in ART Program <b>(program_id
+   * =2)</b>
+   *
+   * <p>with Estado de Permanencia <b>(concept_id = 6272)</b> = Transferred-out <b>(concept_id =
+   * 1706)</b>
+   *
+   * <p>with Busca activa <b>(encounterType_id = 21)</b> = Transferred-out <b>(concept_id =
+   * 1706)</b> and Auto Transfer <b>(concept_id = 23863)</b>
+   *
+   * <p>And had no registered in Drug pickup <b>(encounterType_id = 53)</b> after The
+   * Transferred-out Date within reporting period
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getTransferredOutPatientsComposition() {
 
@@ -532,9 +571,10 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * Get all patients who after most recent Date have drug pickup or consultation
+   * <b>Description:</b> Get all patients who after most recent Date have drug pickup or
+   * consultation
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientWhoAfterMostRecentDateHaveDrugPickupOrConsultation() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -556,16 +596,28 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * a. All deaths registered in Patient Program State by reporting end date
+   * <b>Technical Specs</b>
    *
-   * <p>b. All deaths registered in Patient Demographics by reporting end date
+   * <blockquote>
    *
-   * <p>c. All deaths registered in Last Home Visit Card by reporting end date
+   * <b>a.</b> All deaths registered in Patient Program State by reporting end date
    *
-   * <p>d. All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end
-   * date
+   * <p><b>
    *
-   * @return
+   * <p>b.</b> All deaths registered in Patient Demographics by reporting end date
+   *
+   * <p><b>
+   *
+   * <p>c.</b> All deaths registered in Last Home Visit Card by reporting end date
+   *
+   * <p><b>
+   *
+   * <p>d.</b> All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting
+   * end date
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getDeadPatientsComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -602,21 +654,30 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * * <b>Description:</b> A- “Untraced” patients as following (Part II):
-   *    *
-   *    * <p><b>Technical Specs:</b>
+   * * <b>Description: A -</b> “Untraced” patients as following (Part II): * *
    *
-   * All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37) registered between most recent scheduled date (as below) and the reporting end date with the following observations:
-   * a. Type of Visit: concept id=1981 value = concept id 2160 (Busca) and
-   * b. Second Attempt: concept id=6254 any value or
-   * c. Third Attempt: concept id=6255 any value or
-   * d. Patient Found: concept id = 2003 any value or
-   * e. Defaulting Motive: concept id=2016 any value or
-   * f. Report Visit: concept ids = 2158, 2157 any value or
-   * g. Patient Found Forwarded: concept id =1272 any value or
-   * h. REason of not finding: concept id = 2031 any value or
-   * i. Who gave the information: concept id = 2037 any value or
-   * l. Card Delivery Date: concept id =2180 any value)
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>All Patients without “Patient Visit Card” <b>(encounterType_id 21 or 36 or 37)</b>
+   * registered between most recent scheduled date (as below) and the reporting end date with the
+   * following observations:
+   *
+   * <ul>
+   *   <li>Type of Visit: <b>concept id= 1981 value = concept_id = 2160</b> (Busca) AND
+   *   <li>Second Attempt: <b>concept_id = 6254</b> any value OR
+   *   <li>Third Attempt: <b>concept_id = 6255</b> any value OR
+   *   <li>Patient Found: <b>concept_id = 2003</b> any value OR
+   *   <li>Defaulting Motive: <b>concept_id = 2016</b> any value OR
+   *   <li>Report Visit: <b>concept_ids =  2158, 2157</b> any value OR
+   *   <li>Patient Found Forwarded: <b>concept_id = 1272</b> any value OR
+   *   <li>Reason of not finding: <b>concept_id =  2031</b> any value OR
+   *   <li>Who gave the information: <b>concept_id = 2037</b> any value OR
+   *   <li>Card Delivery Date: <b>concept_id = 2180</b> any value)
+   * </ul>
+   *
+   * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
@@ -657,13 +718,14 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> A- “Untraced” patients as following (Part I):
+   * * <b>Description: A-</b> “Untraced” patients as following (Part I): * *
    *
    * <p><b>Technical Specs:</b>
    *
-   * 1. All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37)
-   * registered between the most recent scheduled date (as below) and the reporting end date
-
+   * <p>1. All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37) registered
+   * between the most recent scheduled date (as below) and the reporting end date
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition
       getPatientsWithoutVisitCardRegisteredBtwnLastAppointmentOrDrugPickupAndEnddate() {
@@ -691,9 +753,32 @@ public class TxMlCohortQueries {
     return sqlCohortDefinition;
   }
 
-
-
-  // a
+  /**
+   * <b><b>Description:</b> All patients who missed (by 28 days) the last scheduled clinical
+   * appointment or last drugs pick up-FILA or 30 days
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * All patients with the most recent date between the
+   *
+   * <p><b>(1)</b> last scheduled Drug pick up <b>(concept_id = 5096)</b> date from last Fila form
+   * <b>(EncounterType_id = 18)</b> and the
+   *
+   * <p><b>(2)</b> last scheduled consultation date (concept_id = 1410) from last Ficha Seguimento
+   * or Ficha Clinica Form <b>(encounterType_id = 6 or 9)</b> and
+   *
+   * <p><b>(3)</b> 30 days after the last ART pickup date <b>(concept_id = 23866)</b> from last
+   * Recepcao – Levantou ARV Form <b>(encounterType_id = 52)</b>
+   *
+   * <p>Adding 28 days and this date is less than the reporting end Date and greater and equal than
+   * start date minus 1 day
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getAllPatientsWhoMissedNextAppointment() {
     return genericCohortQueries.generalSql(
         "Missed Next appointment",
@@ -708,10 +793,21 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as “Transferido para outra US”
-   * or “Auto-transferencia” marked last Home Visit Card occurred during the reporting period. Use
-   * the “data da visita” when the patient reason was marked on the home visit card as the reference
-   * date
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * Patients who have Reason Patient Missed Visit <b>(obs concept_id = 2016)</b>
+   *
+   * <ul>
+   *   <li>As “Transferido para outra US <b>(concept_id = 1706)</b>” or “Auto-transferencia
+   *       <b>(concept_id = 2363)</b>” marked last Home Visit Card <b>(EncounterType_id =21)</b>
+   *       occurred during the reporting period.
+   *       <p>Use the “data da visita” when the patient reason was marked on the home visit card as
+   *       the relference date
+   * </ul>
+   *
+   * </blockquote>
    *
    * @return {@link SqlCohortDefinition}
    */
@@ -733,9 +829,29 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * Patients Who have refused or Stopped Treatment Query
+   * <b>Description:</b> Patients Who have refused or Stopped Treatment Query
    *
-   * @return {@link SqlCohortDefinition}
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * Patients where Home Visit Card <b>(EncounterType_id =21)</b> where Reason Patient Missed Visit
+   * <b>(obs concept_id = 2016)</b> in answers =
+   *
+   * <ul>
+   *   <li>Patient Forgot Visit Date <b>(2005)</b>
+   *   <li>Patient Is Bedridden At Home <b>(2006)</b>
+   *   <li>Distance Or Money For Transport Is To Much For Patient <b>(2007)</b>
+   *   <li>Patient Is Dissatisfied With Day Hospital Services <b>(2010)</b>
+   *   <li>Fear Of The Provider (23915)absence Of Health Provider In Health Unit <b>(23946)</b>
+   *   <li>Patient Does Not Like Arv Treatment Side Effects <b>(2015)</b>
+   *   <li>Patient Is Treating Hiv With Traditional Medicine <b>(2013)</b>
+   *   <li>Other Reason Why Patient Missed Visit <b>(2017)</b>
+   * </ul>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getRefusedOrStoppedTreatmentQuery() {
     SqlCohortDefinition sql = new SqlCohortDefinition();
@@ -769,11 +885,22 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description</b> TRACED PATIENTS AND NOT FOUND
-   * All Patients with  “Patient Visit Card” (Encounter type 21 or 36 or 37)
-   * registered between the most recent scheduled date (as below)
-   * and the reporting end date with the following information
-   * With Answer (id = 2024 or id=2026 or id =2011 or id = 2032) For Reason Not Found Concept (id=2031 or id=23944 or id = 23945)
+   * <b>Description:</b> TRACED PATIENTS AND NOT FOUND
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * All Patients with “Patient Visit Card” <b>(encounterType 21 or 36 or 37)</b> with "NO" answer
+   * <b>(concept_id 1067)</b> for Patient Found <b>(concept_id = 2003)</b>
+   *
+   * <p>Registered between the most recent scheduled date (as below) and the reporting end date with
+   * the following information
+   *
+   * <p>With For Reason Not Found <b>(obs concept (id = 2031 or id = 23944 or id = 23945))</b> and
+   * Answer <b>(id = 2024 or id = 2026 or id = 2011 or id = 2032)</b>
+   *
+   * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
@@ -813,10 +940,20 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description</b> TRACED PATIENTS AND FOUND
-   * All Patients with  “Patient Visit Card” (Encounter type 21 or 36 or 37)
-   * registered between the most recent scheduled date (as below)
-   * and the reporting end date with the following information and with YES answer (Concept ID 1067) for Patient Found (ConceptId =2003)
+   * <b>Description:</b> TRACED PATIENTS AND FOUND
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * All Patients with “Patient Visit Card” <b>(encounterType_id 21 or 36 or 37)</b> registered
+   * between the most recent scheduled date (as below) and the reporting end date with the following
+   * information
+   *
+   * <p>With "YES" answer <b>(concept_id = 1067)</b> for Patient Found <b>(concept_id = 2003)</b>
+   *
+   * </blockquote>
+   *
    * @return {@link CohortDefinition}
    */
   private CohortDefinition getPatientTracedAndFound() {
@@ -848,12 +985,17 @@ public class TxMlCohortQueries {
   }
 
   /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
    * All patients who have been on treatment for less than 90 days since the date initiated ARV
    * treatment to the date of their last scheduled clinical contact (the last scheduled clinical
    * appointment or last drugs pick up-FILA or 30 days after last drugs pick-up-MasterCard (the most
    * recent one from 3 sources) by reporting end date)
    *
-   * @param lessThan90Days
+   * </blockquote>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsOnARTForLessOrMoreThan90Days(Boolean lessThan90Days) {
@@ -871,20 +1013,27 @@ public class TxMlCohortQueries {
   }
 
   /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
    * <b>All patients who after the most recent date from below criterias:</b>
    *
-   * <p>Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 7
-   * (Transferred-out) or  Patient_State.start_date <= endDate Patient_state.end_date is null and
+   * <p><b>(Patient_program.program_id = 2)</b> = (SERVICO TARV-TRATAMENTO) and Patient_State.state
+   * = 7 (Transferred-out) or Patient_State.start_date <= endDate Patient_state.end_date is null And
    *
-   * <p>Encounter Type ID= 53 Estado de Permanencia (Concept Id 6272) = Transferred-out (Concept ID
-   * 1706) obs_datetime <= endDate OR Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) =
-   * Transferred-out (Concept ID 1706) Encounter_datetime <= endDate and
+   * <p><b>encounterType_id = 53</b>, Estado de Permanencia <b>(concept Id 6272)</b> =
+   * Transferred-out <b>(concept_id = 1706)</b> obs_datetime <= endDate OR Encounter Type ID= 6
+   * Estado de Permanencia <b>(concept_id 6273)</b> = Transferred-out <b>(concept_id 1706)</b>
+   * Encounter_datetime <= endDate And
    *
-   * <p>Encounter Type ID= 21, Last Encounter_datetime <=endDate REASON PATIENT MISSED VISIT (Obs
-   * concept id = 2016) Answers = TRANSFERRED OUT TO ANOTHER FACILITY (id=1706) OR AUTO TRANSFER
-   * (id=23863) <b>have a drugs pick up or consultation</b>
+   * <p><b>EncounterType_id = 21</b>, Last Encounter_datetime <=endDate Reason Patient Missed Visit
+   * <b>(obs concept id = 2016)</b> Answers = "Transferred Out To Another Facility" <b>(id =
+   * 1706)</b> OR "Auto Transfer" <b>(id = 23863)</b> have a drugs pick up or consultation
    *
-   * @return CohortDefinition
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientWithFilaOrConsultationAfterTrasnferDiedMissed() {
 
@@ -1020,10 +1169,19 @@ public class TxMlCohortQueries {
 
     return sqlCohortDefinition;
   }
+
   /**
-   * All deaths registered in Patient Program State by reporting end date Patient_program.program_id
-   * =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 10 (Died) and Patient_State.start_date
-   * <= endDate Patient_state.end_date is null
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * All deaths <b>(Patient_State.state = 10)</b> in ART Service Program
+   * <b>(Patient_program.program_id = 2)</b> registered in Patient Program State by reporting end
+   * date
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientsDeadInProgramStateByReportingEndDate")
   public CohortDefinition getPatientsDeadInProgramStateByReportingEndDate() {
@@ -1043,8 +1201,17 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * @return Cohort of patients who left ART program before or on end date(4). Includes: transferred
-   *     to, (patient state 7)
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * All Transferred-out <b>(Patient_State.state = 7)</b> in ART Service Program
+   * <b>(Patient_program.program_id = 2)</b> registered in Patient Program State by reporting end
+   * date
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "leftARTProgramBeforeOrOnEndDate")
   public CohortDefinition getPatientsTransferedOutInProgramBeforeOrOnEndDate() {

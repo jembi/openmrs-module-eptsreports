@@ -28,6 +28,7 @@ public class TxMlDataset extends BaseDataSet {
 
   /**
    * <b>Description:</b> Constructs TXML Dataset
+   *
    * @return
    */
   public DataSetDefinition constructtxMlDataset() {
@@ -138,9 +139,9 @@ public class TxMlDataset extends BaseDataSet {
     return dsd;
   }
 
-
   /**
    * <b>Description:</b> Creates Desagregation based on Age and Gender
+   *
    * @return
    */
   private List<ColumnParameters> getColumnsForAgeAndGender() {

@@ -7,16 +7,9 @@ import org.apache.commons.text.StringSubstitutor;
 public class TxMlQueries {
 
   /**
-   * <b>Description:</b> all patients who missed (by 28 days) the last scheduled clinical appointment
-   * or last drugs pick up-FILA or 30 days
-   * @param returnVisitDateForDrugsConcept
-   * @param returnVisitDateConcept
-   * @param pharmacyEncounterType
-   * @param adultoSequimentoEncounterType
-   * @param pediatriaSeguimentoEncounterType
-   * @param masterCardDrugPickupEncounterType
-   * @param artPickupDateMasterCardConcept
-   * @return
+   * <b>Description:</b> Number of patients who missed Appointment
+   *
+   * @return {@link String}
    */
   public static String getPatientsWhoMissedAppointment(
       int returnVisitDateForDrugsConcept,
@@ -119,13 +112,11 @@ public class TxMlQueries {
     return sub.replace(query);
   }
 
-
   /**
-   * <b>Description:</b>
-   * Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as “Transferido para outra US”
-   * or “Auto-transferencia” marked last Home Visit Card occurred during the reporting period. Use
-   * the “data da visita” when the patient reason was marked on the home visit card as the reference
-   * date
+   * <b>Description:</b> Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as
+   * “Transferido para outra US” or “Auto-transferencia” marked last Home Visit Card occurred during
+   * the reporting period. Use the “data da visita” when the patient reason was marked on the home
+   * visit card as the reference date
    *
    * @param homeVisitCardEncounterTypeId
    * @param reasonPatientMissedVisitConceptId
@@ -162,28 +153,10 @@ public class TxMlQueries {
         autoTransferConceptId);
   }
 
-
   /**
    * <b>Description:</b> Patients who Refused or stopped treatment
-   * @param homeVisitCardEncounterTypeId
-   * @param reasonPatientMissedVisitConceptId
-   * @param patientForgotVisitDateConceptId
-   * @param patientIsBedriddenAtHomeConceptId
-   * @param distanceOrMoneyForTransportIsToMuchForPatientConceptId
-   * @param patientIsDissatifiedWithDayHospitalServicesConceptId
-   * @param fearOfTheProviderConceptId
-   * @param absenceOfHealthProviderInHealthUnitConceptId
-   * @param patientDoesNotLikeArvTreatmentSideEffectsConceptId
-   * @param patientIsTreatingHivWithTraditionalMedicineConceptId
-   * @param otherReasonWhyPatientMissedVisitConceptId
-   * @param pharmacyEncounterTypeId
-   * @param returnVisitDateForDrugsConcept
-   * @param adultoSequimentoEncounterTypeId
-   * @param arvPediatriaSeguimentoEncounterTypeId
-   * @param returnVisitDateConcept
-   * @param masterCardDrugPickupEncounterTypeId
-   * @param artDatePickupConceptId
-   * @return String
+   *
+   * @return {@link String}
    */
   public static String getRefusedOrStoppedTreatment(
       int homeVisitCardEncounterTypeId,
@@ -315,9 +288,8 @@ public class TxMlQueries {
   */
 
   /**
-   * <b>Description:</b>
-   * Untraced Patients Criteria 2
-   * Patients without Patient Visit Card of type busca and with a set of observations
+   * <b>Description:</b> Untraced Patients Criteria 2 Patients without Patient Visit Card of type
+   * busca and with a set of observations
    *
    * @param pharmacyEncounterTypeId
    * @param adultoSequimentoEncounterTypeId
@@ -497,11 +469,13 @@ public class TxMlQueries {
     return sub.replace(query);
   }
 
-  /*
-       All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37) registered between
-       ◦ the last scheduled appointment or drugs pick up (the most recent one) by reporting end date and
-       ◦ the reporting end date
-  */
+  /**
+   * All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37) registered between ◦
+   * the last scheduled appointment or drugs pick up (the most recent one) by reporting end date and
+   * ◦ the reporting end date
+   *
+   * @return {@link String}
+   */
   public static String
       getPatientsWithoutVisitCardRegisteredBtwnLastAppointmentOrDrugPickupAndEnddate(
           int pharmacyEncounterTypeId,
@@ -617,7 +591,11 @@ public class TxMlQueries {
     return sub.replace(query);
   }
 
-  // Traced Patients (Unable to locate)
+  /**
+   * <b>Description:</b> Get patients traced (Unable to locate) and Not Found
+   *
+   * @return {@link String}
+   */
   public static String getPatientsTracedWithReasonNotFound(
       int pharmacyEncounterTypeId,
       int adultoSequimentoEncounterTypeId,
@@ -766,7 +744,11 @@ public class TxMlQueries {
     return sub.replace(query);
   }
 
-  // Traced Patients (Unable to locate)
+  /**
+   * <b>Description:</b> Get patients traced (Unable to locate) and Found
+   *
+   * @return {@link String}
+   */
   public static String getPatientsTracedWithVisitCard(
       int pharmacyEncounterTypeId,
       int adultoSequimentoEncounterTypeId,
@@ -878,6 +860,11 @@ public class TxMlQueries {
     return sub.replace(query);
   }
 
+  /**
+   * <b>Description:</b> Number of patients without scheduled Drug pickup date and ART Pickup
+   *
+   * @return {@link String}
+   */
   public static String getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup(
       int adultoSeguimentoEncounterType,
       int ARVPediatriaSeguimentoEncounterType,
@@ -969,12 +956,10 @@ public class TxMlQueries {
   }
 
   /**
-   * Get the patient list based on the program and state in the program. by reporting end date
-   * ps.start_date<=:onOrBefore
+   * <b>Description:</b> Number of patients based on the program and state in the program. by
+   * reporting end date <b>ps.start_date <=: onOrBefore</b>
    *
-   * @param program
-   * @param stateOfProgram
-   * @return
+   * @return {@link String}
    */
   public static String getPatientsListBasedOnProgramAndStateByReportingEndDate(
       int program, int stateOfProgram) {
