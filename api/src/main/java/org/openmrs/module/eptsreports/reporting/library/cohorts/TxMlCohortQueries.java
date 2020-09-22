@@ -31,8 +31,8 @@ public class TxMlCohortQueries {
   @Autowired private TxCurrCohortQueries txCurrCohortQueries;
 
   /**
-   * <b>Description:</b> Patients started ART and missed Next Appointment or Next Drug Pickup (a and
-   * b)
+   * <b>Description:</b> Patients started ART and missed Next Appointment or Next Drug Pickup (A and
+   * B)
    *
    * @return {@link CohortDefinition}
    */
@@ -141,7 +141,7 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> (from a and b) Refused/Stopped treatment
+   * <b>Description:</b> (from A and B) Refused/Stopped treatment
    *
    * <p>Except patients identified in Dead or Transferred–out Disaggregation
    *
@@ -222,7 +222,7 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * <b>Description:</b> a and b and Traced (Unable to locate)
+   * <b>Description:</b> A and B and Traced (Unable to locate)
    *
    * @return {@link CohortDefinition}
    */
@@ -251,10 +251,11 @@ public class TxMlCohortQueries {
     return cd;
   }
 
-  /** <b>Description: </b> A and B and Untraced Patients 
-   * 
+  /**
+   * <b>Description: </b> A and B and Untraced Patients
+   *
    * @return {@link CohortDefinition}
-  */
+   */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndNotTransferredOutAndUntraced() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
@@ -279,9 +280,11 @@ public class TxMlCohortQueries {
   }
 
   /**
-   * @return Disaggregation “Lost to Follow-Up After being on Treatment for <3 months” will have the
-   *     following combination: ((A OR B) AND C1) AND NOT DEAD AND NOT TRANSFERRED OUT AND NOT
-   *     REFUSED Lost to Follow-Up After being on Treatment for <3 months
+   * <b>Description:</b> “Lost to Follow-Up After being on Treatment for <3 months” will have the
+   * following combination: ((A OR B) AND C1) AND NOT DEAD AND NOT TRANSFERRED OUT AND NOT REFUSED
+   * Lost to Follow-Up After being on Treatment for <3 months
+   *
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsLTFULessThan90DaysComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -722,8 +725,8 @@ public class TxMlCohortQueries {
    *
    * <p><b>Technical Specs:</b>
    *
-   * <p>1. All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37) registered
-   * between the most recent scheduled date (as below) and the reporting end date
+   * <p><b>1 -</b> All Patients without “Patient Visit Card” (Encounter type 21 or 36 or 37)
+   * registered between the most recent scheduled date (as below) and the reporting end date
    *
    * @return {@link CohortDefinition}
    */
@@ -892,7 +895,7 @@ public class TxMlCohortQueries {
    * <blockquote>
    *
    * All Patients with “Patient Visit Card” <b>(encounterType 21 or 36 or 37)</b> with "NO" answer
-   * <b>(concept_id 1067)</b> for Patient Found <b>(concept_id = 2003)</b>
+   * <b>(concept_id 1066)</b> for Patient Found <b>(concept_id = 2003)</b>
    *
    * <p>Registered between the most recent scheduled date (as below) and the reporting end date with
    * the following information
