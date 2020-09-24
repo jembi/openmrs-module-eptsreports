@@ -70,6 +70,39 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of patients who initiated Pre-TARV at this HF by end of previous
    * month
    *
+   * <h4>PT: Nº cumulativo de pacientes que iniciou Pré-TARV (Cuidados de HIV) nesta US até ao fim
+   * do mês anterior</h4>
+   *
+   * <ul>
+   *   <li>Select all patients:
+   *       <ol>
+   *         <li>registered in encounter “Master Card – Ficha Resumo” <b>(encounter id 53)</b> who
+   *             have Pre-ART Start Date (PT”: “Data do Inicio Pre-TARV”) <b>Concept ID 23808</b>
+   *             <code> < startDate </code>
+   *         <li>enrolled in PRE-ART Program <b>program_id=1</b>, from patient program table) with
+   *             enrollement date <code>date_enrolled < startDate</code> )
+   *         <li>registered in “Abertura de Processo Clínico” <b>(encounter type id 5 or 7)</b> with
+   *             “Data de Registo” <code>date_enrolled < startDate</code>
+   *       </ol>
+   *   <li>Exclude all patients registered in encounter “Master Card – Ficha Resumo” <b>(encounter
+   *       id 53)</b> who have the following conditions:
+   *       <ol>
+   *         <li>Transfer from other HF” (PT:“Transferido de outra US”) <b>(Concept ID 1369)</b> is
+   *             equal to <i>“YES”</i> <b>(Concept ID 1065)</b>
+   *         <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) <b>(Concept
+   *             ID 6300)</b> = “Pre-TARV” (Concept ID ????)
+   *         <li>Date of Transferred In From (PT”: “Data de Transferência”) <b>(Concept ID 1369
+   *             obs_datetime)</b> <code> < startDate</code>
+   *       </ol>
+   *   <li>Exclude all patients registered as “Transferred-in” in Program Enrollment:
+   *       <ol>
+   *         Technical Specs:
+   *         <li>
+   *             <p>Table: patient_program <b>Criterias:</b> <code>
+   *             program_id=1, patient_state_id=29 and start_date < startDate </code>
+   *       </ol>
+   * </ul>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1() {
@@ -129,14 +162,47 @@ public class ResumoMensalCohortQueries {
   /**
    * <b>Name: A2</b>
    *
-   * <p><b>Description:</b> Number of patients who initiated Pre-TARV at this HF during the current
-   * month
+   * <p><b>Description:</b>Number of patients who initiated Pre-TARV at this HF during the current
+   * month month
+   *
+   * <h4>PT: Nº de pacientes que iniciou Pré-TARV (Cuidados de HIV) nesta US durante o mês</h4>
+   *
+   * <ul>
+   *   <li>Select all patients registered in encounter <i>Master Card – Ficha Resumo</i>
+   *       <b>encounter id 53</b> who have the following conditions:
+   *       <ol>
+   *         <li>Pre-ART Start Date (PT: Data do Inicio Pre-TARV”) <b>Concept ID 23808</b>
+   *         <li>enrolled in PRE-ART Program <b>program_id=1</b>, from patient program table) with
+   *             enrollement date
+   *         <li>registered in “Abertura de Processo Clínico” <b>(encounter type id 5 or 7)</b> with
+   *             “Data de Registo” encounter_datetime
+   *         <li>with the most earliest date from above criterias in the reporting period <code>
+   *              >=startDate and <=endDate</code>
+   *       </ol>
+   *   <li>Exclude all patients registered in encounter “Master Card – Ficha Resumo” <b>(encounter
+   *       id 53)</b> who have the following conditions:
+   *       <ol>
+   *         <li>Transfer from other HF” (PT:“Transferido de outra US”) <b>(Concept ID 1369)</b> is
+   *             equal to <i>“YES”</i> <b>(Concept ID 1065)</b>
+   *         <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) <b>(Concept
+   *             ID 6300)</b> = “Pre-TARV” (Concept ID ????)
+   *         <li>Date of Transferred In From (PT”: “Data de Transferência”) <b>(Concept ID 1369
+   *             obs_datetime)</b> <code> >=startDate and <=endDate </code>
+   *       </ol>
+   *   <li>Exclude all patients registered as “Transferred-in” in Program Enrollment:
+   *       <ol>
+   *         Technical Specs:
+   *         <li>
+   *             <p>Table: patient_program <b>Criterias:</b> <code>
+   *             program_id=1, patient_state_id=29 and start_date >= startDate and <= endDate</code>
+   *       </ol>
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Number of patients who initiated Pre-TARV at this HF during the current month");
+    cd.setName("Number of patients who initiated Pre-TARV at this HF d  uring the current month");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -240,10 +306,15 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: A3 = A1 + A2</b>
+   * <b>Name: A3 </b>
    *
    * <p><b>Descrption:</b> Number of patients who initiated Pre-TARV at this HF until the end of
    * reporting period
+   *
+   * <p>PT: Nº cumulativo de pacientes que iniciou Pré-TARV (Cuidados de HIV) nesta unidade
+   * sanitária até ao fim do mês;
+   *
+   * <p><b>Formula: </b><code>A3 = A1 + A2<</code>
    *
    * @return {@link CohortDefinition}
    */
@@ -273,6 +344,63 @@ public class ResumoMensalCohortQueries {
    *
    * <p><b>Description:</b> Number of patients who initiated TARV at this HF during the current
    * month
+   *
+   * <p>Excludes All transfered In
+   *
+   * <ul>
+   *   <li>Select all patients with the earliest ART Start Date from the following criterias:
+   *       <ol>
+   *         <li>All patients who have their first drugs pick-up date (first encounter_datetime) by
+   *             reporting end date in Pharmacy form FILA (Encounter Type ID 18): <code>
+   * first occurrence of encounter datetime
+   *                 Encounter Type Ids = 18
+   * *</code> *
+   *         <li>All patients who have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) = START
+   *             DRUGS (Concept ID 1256) at the pharmacy or clinical visits (Encounter Type IDs
+   *             6,9,18) <code>
+   * first occurrence of encounter datetime
+   *                     Encounter Type Ids = 6,9,18
+   *                     ARV PLAN (Concept Id 1255) = START DRUGS (Concept ID 1256)
+   * </code>
+   *         <li>All patients who have the first historical start drugs date (earliest concept ID
+   *             1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
+   *             earliest “historical start date” <code>Encounter Type Ids = 6,9,18,53
+   *             The earliest “Historical Start Date” (Concept Id 1190)
+   * </code>
+   *         <li>
+   *             <p>All patients enrolled in ART Program (date_enrolled in program_id 2, from
+   *             patient program table)
+   *             <p><code>
+   * program_enrollment date
+   * program_id=2, patient_state_id=29 and date_enrolled
+   * </code>
+   *         <li>
+   *             <p>All patients with first drugs pick up date (earliest concept ID 23866
+   *             value_datetime) set in mastercard pharmacy form “Recepção/Levantou ARV” (Encounter
+   *             Type ID 52) with Levantou ARV (concept id 23865) = Yes (concept id 1065)
+   *             <p><code>
+   * earliest “Date of Pick up”
+   *                        Encounter Type Ids = 52
+   *                        The earliest “Data de Levantamento” (Concept Id 23866 value_datetime) <= endDate
+   *                        Levantou ARV (concept id 23865) = SIm (1065)
+   *
+   * </code>
+   *       </ol>
+   *   <li>and check if the selected ART Start Date falls in the reporting period (>= startDate and
+   *       <= endDate)
+   *   <li>Exclude all patients transferred-in
+   *       <ol>
+   *         <li>Registered in encounter “Master Card – Ficha Resumo” (encounter id 53) with
+   *             “Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) equal to
+   *             “YES” (Concept ID 1065) AND Type of Patient Transferred From (PT”: “Tipo de
+   *             Paciente Transferido”) (Concept ID 6300) = “TARV” (Concept ID 6276)
+   *         <li>AND Date of MasterCard File Opening (PT”: “Data de Abertura da Ficha na US”)
+   *             (Concept ID 23891 value_datetime) <= endDate
+   *         <li>Registered as Transferred-in in Program Enrollment (1st State) Technical Specs:
+   *             Table: patient_program Criterias: program_id=2, patient_state_id=29 and
+   *             min(start_date)<=endDate
+   *       </ol>
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */
@@ -330,6 +458,29 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of patients transferred-in from another HFs during the current
    * month. Composition to exclude <b>B5 ({@link #getPatientsTransferredOutB5})</b>
    *
+   * <ul>
+   *   <li>B2i - Select all patients registered in encounter “Master Card – Ficha Resumo” (encounter
+   *       id 53) who have the following conditions:
+   *       <ol>
+   *         <li>Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is equal
+   *             to “YES” (Concept ID 1065); AND
+   *         <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID
+   *             6300) = “TARV” (Concept ID 6276) AND
+   *         <li>Date of MasterCard File Opening (PT”: “Data de Abertura da Ficha na US”) (Concept
+   *             ID 23891 value_datetime) >=startDate and <= endDate
+   *       </ol>
+   *       OR
+   *   <li>B2ii - Select all patients registered as transferred-in in Program Enrollment
+   *       <p>Technical Specs: <i>Table: patient_program</i> <b>Criterias:</b> <code>
+   *       program_id=2, patient_state_id=29 and start_date >=startDate and <=endDate
+   * </code>
+   *   <li>Exclude all Transferred-in registered by end of previous month (B2i [< startDate] OR B2ii
+   *       [>startDate]) except transferred-out patients by end of previous month (B5 inclusion
+   *       criterias for < startDate) according to 13 MOH Transferred-out patients by end of the
+   *       period (Any State) defined in the common queries <a
+   *       href="https://docs.google.com/document/d/1EtpeIn-6seD5skZJteCdANhxkKXQye9RckGV2eoYj6c/edit?pli=1#">link</a>
+   * </ul>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition
@@ -364,6 +515,11 @@ public class ResumoMensalCohortQueries {
    * <b>Name: B3</b>
    *
    * <p><b>Description:</b> Number of patients who restarted the treatment during the current month
+   * <br>
+   *
+   * <p>PT: Nº de reinícios TARV durante o mês <br>
+   *
+   * <p><code>B3 = B13 + B9 - B12 - B1 - B2</code>
    *
    * @return {@link CohortDefinition}
    */
