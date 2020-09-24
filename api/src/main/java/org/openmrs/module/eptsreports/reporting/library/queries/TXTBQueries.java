@@ -24,7 +24,7 @@ public class TXTBQueries {
    * TRANSFERIDOS DE COM DATA DE INICIO CONHECIDA (SQL)
    * SqlCohortDefinition#91787a86-0362-4820-a4ee-025d5501198b in backup
    *
-   * @return sql
+   * @return {@link String}
    */
   public static String arvTreatmentIncludesTransfersFromWithKnownStartData(
       Integer arvPlanConceptId,
@@ -72,10 +72,8 @@ public class TXTBQueries {
   /**
    * <b>Description:</b> exited by either transfer out, treatment suspension, treatment abandoned or
    * death of patient
-   *
-   * @param artProgramId
-   * @param stateIds
-   * @return
+   * 
+   * @return {@link CohortDefinition}
    */
   public static String patientsAtProgramStates(Integer artProgramId, List<Integer> stateIds) {
     return String.format(
@@ -92,8 +90,7 @@ public class TXTBQueries {
    * <b>Description:</b> ABANDONO NÃO NOTIFICADO - TARV
    * SqlCohortDefinition#a1145104-132f-460b-b85e-ea265916625b
    *
-   * @param params
-   * @return
+   * @return {@link String}
    */
   public static String abandonedWithNoNotification(AbandonedWithoutNotificationParams params) {
     String stateIds =
@@ -145,8 +142,7 @@ public class TXTBQueries {
   /**
    * <b>Description:</b> Patients in TB Program Within Reporting Period At Location
    *
-   * @param params
-   * @return
+   * @return {@link String}
    */
   public static String inTBProgramWithinReportingPeriodAtLocation(Integer tbProgramId) {
     return String.format(
@@ -159,11 +155,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Patients with Pulmonary TB Date in Patient Clinical Record of ART date TB
-   *
-   * @param encounterTypeId
-   * @param pulmonaryTBConcept
-   * @param yesConcept
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String pulmonaryTB(
       Integer encounterTypeId, Integer pulmonaryTBConcept, Integer yesConcept) {
@@ -180,11 +173,8 @@ public class TXTBQueries {
   /**
    * <b>Description:</b> Patients marked as “Tratamento TB= Inicio (I) ” in Ficha Clinica Master
    * Card
-   *
-   * @param encounterTypeId
-   * @param tbTreatmentPlan
-   * @param startDrugs
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String tbTreatmentStart(
       Integer encounterTypeId, Integer tbTreatmentPlan, Integer startDrugs) {
@@ -200,12 +190,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> TUBERCULOSIS SYMPTOMS
-   *
-   * @param encounterTypeId
-   * @param tbSymptomsId
-   * @param yesConcept
-   * @param noConcept
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String tuberculosisSymptoms(
       Integer encounterTypeId, Integer tbSymptomsId, Integer yesConcept, Integer noConcept) {
@@ -236,11 +222,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> ACTIVE TUBERCULOSIS
-   *
-   * @param encounterTypeId
-   * @param activeTuberculosis
-   * @param yesConcept
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String activeTuberculosis(
       Integer encounterTypeId, Integer activeTuberculosis, Integer yesConcept) {
@@ -258,17 +241,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> TB OBSERVATIONS
-   *
-   * @param encounterTypeId
-   * @param tbObservation
-   * @param fever
-   * @param weight
-   * @param nightweats
-   * @param cough
-   * @param asthenia
-   * @param cohabitant
-   * @param lymphadenopathy
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String tbObservation(
       Integer encounterTypeId,
@@ -303,13 +277,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> APPLICATION FOR LABORATORY RESEARCH
-   *
-   * @param encounterTypeId
-   * @param applicationForLaboratory
-   * @param tbGenexpertTest
-   * @param cultureTest
-   * @param testTBLAM
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String applicationForLaboratoryResearch(
       Integer encounterTypeId,
@@ -331,12 +300,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> TB GENEXPERT TEST
-   *
-   * @param encounterTypeId
-   * @param tbGenexpertTest
-   * @param positive
-   * @param negative
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String tbGenexpertTest(
       Integer encounterTypeId, Integer tbGenexpertTest, Integer positive, Integer negative) {
@@ -378,11 +343,7 @@ public class TXTBQueries {
   /**
    * <b>Description:</b> CULTURE TEST
    *
-   * @param encounterTypeId
-   * @param cultureTest
-   * @param positive
-   * @param negative
-   * @return
+   * @return {@link String}
    */
   public static String cultureTest(
       Integer encounterTypeId, Integer cultureTest, Integer positive, Integer negative) {
@@ -400,12 +361,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Test TB LAM
-   *
-   * @param encounterTypeId
-   * @param testTBLAM
-   * @param positive
-   * @param negative
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String testTBLAM(
       Integer encounterTypeId, Integer testTBLAM, Integer positive, Integer negative) {
@@ -423,12 +380,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Result For Basiloscopia
-   *
-   * @param encounterTypeId
-   * @param basiloscopia
-   * @param positive
-   * @param negative
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String resultForBasiloscopia(
       Integer encounterTypeId, Integer basiloscopia, Integer positive, Integer negative) {
@@ -446,11 +399,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Date Obs
-   *
-   * @param questionId
-   * @param encounterTypeIds
-   * @param startDate
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String dateObs(
       Integer questionId, List<Integer> encounterTypeIds, boolean startDate) {
@@ -472,11 +422,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Date Obs Within Months Before Start Date
-   *
-   * @param questionId
-   * @param encounterTypeIds
-   * @param xMonths
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String dateObsWithinXMonthsBeforeStartDate(
       Integer questionId, List<Integer> encounterTypeIds, Integer xMonths) {
@@ -494,8 +441,7 @@ public class TXTBQueries {
   /**
    * <b>Description:</b> Encounter Obs
    *
-   * @param encounterTypeId
-   * @return
+   * @return {@link String}
    */
   public static String encounterObs(Integer encounterTypeId) {
     return String.format(
@@ -505,9 +451,8 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Patients With First Drug Pickup Encounter In Reporting Period
-   *
-   * @param encounterTypeId
-   * @return
+   * 
+   * @return {@link String}
    */
   public static String patientWithFirstDrugPickupEncounterInReportingPeriod(
       Integer encounterTypeId) {
@@ -527,7 +472,8 @@ public class TXTBQueries {
    * @param questionConcept The question concept
    * @param valueCodedConcept The valueCoded concept
    * @param encounterTypesList The encounter types to consider
-   * @return The cohort definition
+   * 
+   * @return {@link CohortDefinition}
    */
   public static CohortDefinition getPatientsWithObsBetweenDates(
       String cohortDefinitionName,
