@@ -64,14 +64,14 @@ public class TXTBCohortQueries {
 
   /**
    * <b>Technical Specs</b>
-   * 
+   *
    * <blockquote>
-   * 
-   * Data Inicio De Tratamento De Tuberculose <b>(concept_id = 1113)</b> 
-   * 
-   * Data notificada nas fichas de:
-   * Seguimento <b>(encounterType_id = 6 or 9)</b>, Rastreio E Livro Tb.
-   * 
+   *
+   * Data Inicio De Tratamento De Tuberculose <b>(concept_id = 1113)</b>
+   *
+   * <p>Data notificada nas fichas de: Seguimento <b>(encounterType_id = 6 or 9)</b>, Rastreio E
+   * Livro Tb.
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -107,16 +107,15 @@ public class TXTBCohortQueries {
 
   /**
    * <b>Technical Specs</b>
-   * 
+   *
    * <blockquote>
-   * 
-   * Patients with Pulmonary TB Date  <b>(concept_id = 41)</b>  and 
-   * Positive Screening "YES" <b>(concept_id = 1065)</b> in Patient 
-   * Clinical Record of ART date TB
-   * 
-   * <p>Registered Ficha Resumo Mastercard <b>(encounterType_id = 53)</b>
-   * during the reporting period
-   * 
+   *
+   * Patients with Pulmonary TB Date <b>(concept_id = 41)</b> and Positive Screening "YES"
+   * <b>(concept_id = 1065)</b> in Patient Clinical Record of ART date TB
+   *
+   * <p>Registered Ficha Resumo Mastercard <b>(encounterType_id = 53)</b> during the reporting
+   * period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -134,9 +133,8 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Patients marked as “Tratamento TB = Inicio (I) - <b>Start Drugs</b>" 
-   * in (Ficha Clinica - Mastercard)
-   * Card
+   * <b>Description:</b> Patients marked as “Tratamento TB = Inicio (I) - <b>Start Drugs</b>" in
+   * (Ficha Clinica - Mastercard) Card
    *
    * @return {@link CohortDefinition}
    */
@@ -153,20 +151,20 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <p><b>Technical Specs</b>
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   *  Patients with Tuberculosis Symptoms <b>(concept_id = 23758)</b> registered in 
-   * the Adult follow-up <b>(encounter_id = 6)</b> with Answers:
+   *
+   * Patients with Tuberculosis Symptoms <b>(concept_id = 23758)</b> registered in the Adult
+   * follow-up <b>(encounter_id = 6)</b> with Answers:
+   *
    * <ul>
-   *    <li>YES <b>(concept_id = 1065)</b></li>
-   *    <li>NO <b>(concept_id = 1066)</b></li>
+   *   <li>YES <b>(concept_id = 1065)</b>
+   *   <li>NO <b>(concept_id = 1066)</b>
    * </ul>
-   * 
-   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b>
-   * during the reporting period
-   * 
+   *
+   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b> during the reporting period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -185,16 +183,15 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <p><b>Technical Specs</b>
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * Patients with Tuberculosis Symptoms <b>(concept_id = 23758)</b>  and 
-   * Positive Screening "YES" <b>(concept_id = 1065)</b>
-   * 
-   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b>
-   * during the reporting period
-   * 
+   *
+   * Patients with Tuberculosis Symptoms <b>(concept_id = 23758)</b> and Positive Screening "YES"
+   * <b>(concept_id = 1065)</b>
+   *
+   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b> during the reporting period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -213,16 +210,15 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <p><b>Technical Specs</b>
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * Patients with Active Tuberculosis <b>(concept_id = 23761)</b> with 
-   * Answer "YES" <b>(concept_id = 1065)</b>
-   * 
-   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b>
-   * during the reporting period
-   * 
+   *
+   * Patients with Active Tuberculosis <b>(concept_id = 23761)</b> with Answer "YES" <b>(concept_id
+   * = 1065)</b>
+   *
+   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b> during the reporting period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -240,21 +236,22 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <p><b>Technical Specs</b>
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * Patients with TB Observations <b>(concept_id = 1766)</b> in Answers = 
+   *
+   * Patients with TB Observations <b>(concept_id = 1766)</b> in Answers =
+   *
    * <ul>
-   *    <li>Fever Lasting More Than 3 Weeks <b>(id = 1763)</b> OR</li>
-   *    <li>Weight Loss Of More Than 3 Kg In Last Month <b>(id = 1764)</b> OR</li>
-   *    <li>Nightsweats Lasting More Than 3 Weeks <b>(id = 1762)</b> OR</li>
-   *    <li>Cough Lasting More Than 3 Weeks <b>( id = 1760)</b> OR</li>
-   *    <li>Asthenia <b>(id = 23760)</b> OR</li>
-   *   <li>Cohabitant Being Treated For Tb <b>(id = 1765)</b> OR</li>
-   *    <li>Lymphadenopathy <b>(id = 161)</b></li>
+   *   <li>Fever Lasting More Than 3 Weeks <b>(id = 1763)</b> OR
+   *   <li>Weight Loss Of More Than 3 Kg In Last Month <b>(id = 1764)</b> OR
+   *   <li>Nightsweats Lasting More Than 3 Weeks <b>(id = 1762)</b> OR
+   *   <li>Cough Lasting More Than 3 Weeks <b>( id = 1760)</b> OR
+   *   <li>Asthenia <b>(id = 23760)</b> OR
+   *   <li>Cohabitant Being Treated For Tb <b>(id = 1765)</b> OR
+   *   <li>Lymphadenopathy <b>(id = 161)</b>
    * </ul>
-   * 
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -278,21 +275,20 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <p><b>Technical Specs</b>
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * Application for Laboratory Research <b>(concept_id = 23722)</b>
-   * with Answers:
+   *
+   * Application for Laboratory Research <b>(concept_id = 23722)</b> with Answers:
+   *
    * <ul>
-   *    <li>TB Genexpert Test <b>(concept_id = 23723)</b></li>
-   *    <li>Culture Test <b>(concept_id = 23774)</b></li>
-   *    <li>Test TB LAM <b>(concept_id = 23951)</b></li>
+   *   <li>TB Genexpert Test <b>(concept_id = 23723)</b>
+   *   <li>Culture Test <b>(concept_id = 23774)</b>
+   *   <li>Test TB LAM <b>(concept_id = 23951)</b>
    * </ul>
-   * 
-   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b>
-   * during the reporting period
-   * 
+   *
+   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b> during the reporting period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -312,16 +308,15 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b> 
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * TB GeneExpertTest <b>(concept_id = 23723)</b> with Answer Positive 
-   * <b>(concept_id = 703)</b> or Negative <b>(id = 664)</b>
-   * 
-   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b>
-   * during the reporting period
-   * 
+   *
+   * TB GeneExpertTest <b>(concept_id = 23723)</b> with Answer Positive <b>(concept_id = 703)</b> or
+   * Negative <b>(id = 664)</b>
+   *
+   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b> during the reporting period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -340,16 +335,15 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b> 
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * Culture Test <b>(concept_id = 23774)</b> with Answer Positive 
-   * <b>(concept_id = 703)</b> or Negative <b>(id = 664)</b>
-   * 
-   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b>
-   * during the reporting period
-   * 
+   *
+   * Culture Test <b>(concept_id = 23774)</b> with Answer Positive <b>(concept_id = 703)</b> or
+   * Negative <b>(id = 664)</b>
+   *
+   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b> during the reporting period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -368,16 +362,15 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b> 
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * Test TB LAM <b>(concept_id = 237951)</b> with Answer Positive 
-   * <b>(concept_id = 703)</b> or Negative <b>(id = 664)</b>
-   * 
-   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b>
-   * during the reporting period
-   * 
+   *
+   * Test TB LAM <b>(concept_id = 237951)</b> with Answer Positive <b>(concept_id = 703)</b> or
+   * Negative <b>(id = 664)</b>
+   *
+   * <p>Registered in the Adult follow-up <b>(encounterType_id = 6)</b> during the reporting period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -396,16 +389,15 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b> 
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * Result For Basiloscopia <b>(concept_id = 307)</b> with Answer Positive 
-   * <b>(concept_id = 703)</b> or Negative <b>(id = 664)</b>
-   * 
-   * <p>Registered in Misau Laboratorio <b>(encounterType_id = 13)</b>
-   * during the reporting period
-   * 
+   *
+   * Result For Basiloscopia <b>(concept_id = 307)</b> with Answer Positive <b>(concept_id =
+   * 703)</b> or Negative <b>(id = 664)</b>
+   *
+   * <p>Registered in Misau Laboratorio <b>(encounterType_id = 13)</b> during the reporting period
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -424,9 +416,8 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Pacientes Com Rastreio De Tuberculose <b>(concept_id = 6257)</b>
-   * Negativo <b>(concept_id = 1066)</b> in the follow-up (Adult and Children) 
-   * codes: RASTREIOTBNEG
+   * <b>Description:</b> Pacientes Com Rastreio De Tuberculose <b>(concept_id = 6257)</b> Negativo
+   * <b>(concept_id = 1066)</b> in the follow-up (Adult and Children) codes: RASTREIOTBNEG
    *
    * @return {@link CohortDefinition}
    */
@@ -445,9 +436,8 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Pacientes Com Rastreio De Tuberculose <b>(concept_id = 6257)</b>
-   * Positivo <b>(concept_id = 1065)</b> in the follow-up (Adult and Children) 
-   * codes: RASTREIOTBNEG
+   * <b>Description:</b> Pacientes Com Rastreio De Tuberculose <b>(concept_id = 6257)</b> Positivo
+   * <b>(concept_id = 1065)</b> in the follow-up (Adult and Children) codes: RASTREIOTBNEG
    *
    * @return {@link CohortDefinition}
    */
@@ -467,10 +457,10 @@ public class TXTBCohortQueries {
 
   /**
    * <b>Description:</b> Patients who started art <b>on</b> period considering the transferred in
-   * for that same period 
-   * 
-   * <p>And patients who started art <b>before</b> period also considering the transferred in 
    * for that same period
+   *
+   * <p>And patients who started art <b>before</b> period also considering the transferred in for
+   * that same period
    *
    * @return {@link CohortDefinition}
    */
@@ -496,8 +486,8 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Positive Investigation Research result <b>(concept_id = 6277)</b>
-   * Positivo <b>(concept_id = 1065)</b> in the follow-up (Adult and Children) 
+   * <b>Description:</b> Positive Investigation Research result <b>(concept_id = 6277)</b> Positivo
+   * <b>(concept_id = 1065)</b> in the follow-up (Adult and Children)
    *
    * @return {@link CohortDefinition}
    */
@@ -550,7 +540,7 @@ public class TXTBCohortQueries {
    *
    * </blockquote>
    *
-   * @return cd
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition yesOrNoInvestigationResult() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -567,8 +557,9 @@ public class TXTBCohortQueries {
    * <b>Description:</b> TX_TB Numerator A
    *
    * <p><b>Technical Specs</b>
-   * <p>Number of patients on TB Treatment, with Pulmonary TB Date, who initiated TB
-   * Treatment in ART
+   *
+   * <p>Number of patients on TB Treatment, with Pulmonary TB Date, who initiated TB Treatment in
+   * ART
    *
    * @return {@link CohortDefinition}
    */
@@ -624,8 +615,7 @@ public class TXTBCohortQueries {
   /**
    * <b>Description:</b> TX_TB Numerator
    *
-   * <p><b>Technical Specs</b>
-   * Exclusion for patients who started TB Treatment on previous period
+   * <p><b>Technical Specs</b> Exclusion for patients who started TB Treatment on previous period
    *
    * @return {@link CohortDefinition}
    */
@@ -646,7 +636,7 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Positive Screening
+   * <b>Description: BR-6</b> Positive Screening
    *
    * <p><b>Technical Specs</b>
    *
@@ -792,16 +782,16 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b> 
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * All patients with at least one “S” (Yes) <b>(concept_id =1065)</b> 
-   * selected for TB Screening “Rastreio TB <b>(concept_id = 6257)</b>” 
-   * (Ficha de Seguimento Adult or Pediatric) during the reporting period
+   *
+   * All patients with at least one “S” (Yes) <b>(concept_id =1065)</b> selected for TB Screening
+   * “Rastreio TB <b>(concept_id = 6257)</b>” (Ficha de Seguimento Adult or Pediatric) during the
+   * reporting period
    *
    * </blockquote>
-   * 
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithAtLeastOneYesForTBScreening() {
@@ -1054,15 +1044,14 @@ public class TXTBCohortQueries {
 
   /**
    * <b>Technical Specs</b>
-   * 
+   *
    * <blockquote>
-   * 
+   *
    * All Transferred-out <b>(Patient_State.state = 7)</b> in ART Service Program
    * <b>(Patient_program.program_id = 2)</b>
-   * 
-   * <p>(and had no registred drug pickup Mastercard Date<b>(concept_id = 23866)</b> 
-   * From <b>(EncounterType_id = 52)</b>) after the transferred Out
-   * date within reporting period
+   *
+   * <p>(and had no registred drug pickup Mastercard Date<b>(concept_id = 23866)</b> From
+   * <b>(EncounterType_id = 52)</b>) after the transferred Out date within reporting period
    *
    * </blockquote>
    *
@@ -1312,7 +1301,7 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Get patients specimen sent
+   * <b>Description:</b> Get patients who have specimen sent
    *
    * <p><b>Technical Specs</b>
    *
@@ -1334,11 +1323,16 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Get patients who have a GeneXpert Positivo or Negativo registered in the
-   * investigations - Ficha Clinica - Mastercard OR 
-   * have a GeneXpert request registered in the investigations - Ficha Clinica - Mastercard
+   * <b>Technical Specs</b>
    *
-   * <p><b>Technical Specs</b>
+   * <blockquote>
+   *
+   * Get patients who have a GeneXpert Positivo or Negativo registered in the investigations - Ficha
+   * Clinica - Mastercard OR
+   *
+   * <p>Have a GeneXpert request registered in the investigations - Ficha Clinica - Mastercard
+   *
+   * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
@@ -1391,22 +1385,22 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <p><b>Technical Specs</b>
-   * 
+   * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * 
-   * Get patients from denominator who have positive 
-   * results returned registered during the period Have a ‘GeneXpert Positivo’ 
-   * registered in the 
+   *
+   * Get patients from denominator who have positive results returned registered during the period
+   * Have a ‘GeneXpert Positivo’ registered in the
+   *
    * <ul>
-   *    <li>investigacoes – resultados laboratoriais - ficha clinica – mastercard OR</li> 
-   *    <li>Have a ‘resultado baciloscopia positive’ registered in the laboratory form OR</li> 
-   *    <li>Have a TB LAM positivo registered in the investigacoes –
-   *    resultados laboratoriais ficha clinica – mastercard OR </li>
-   *    <li>Have a cultura positiva registered in the investigacoes – resultados laboratoriais 
-   * ficha clinica – mastercard</li>
+   *   <li>investigacoes – resultados laboratoriais - ficha clinica – mastercard OR
+   *   <li>Have a ‘resultado baciloscopia positive’ registered in the laboratory form OR
+   *   <li>Have a TB LAM positivo registered in the investigacoes – resultados laboratoriais ficha
+   *       clinica – mastercard OR
+   *   <li>Have a cultura positiva registered in the investigacoes – resultados laboratoriais ficha
+   *       clinica – mastercard
    * </ul>
-   * 
+   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -1446,8 +1440,8 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> BR-9 GenExpert MTB/RIF - Get patients from denominator 
-   * AND tb_screened AND genexpert
+   * <b>Description:</b> BR-9 GenExpert MTB/RIF - Get patients from denominator AND
+   * positive_screened AND genexpert
    *
    * @return {@link CohortDefinition}
    */
@@ -1465,7 +1459,7 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> BR-10 Get patients who have a Basiloscopia Positivo or Negativo registered
+   * <b>Description: BR-10 </b> Get patients who have a Basiloscopia Positivo or Negativo registered
    * in the laboratory form encounter type 13 Except patients identified in GeneXpert
    *
    * @return {@link CohortDefinition}
@@ -1486,10 +1480,10 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> BR-11 Additional Test - Denominator AND Screened AND Additional AND NOT
+   * <b>Description: BR-11</b> Additional Test - Denominator AND Screened AND Additional AND NOT
    * Genexpert AND NOT Microscopy
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition otherAdditionalTest() {
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
@@ -1506,10 +1500,10 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> BR-12 Positive Results Returned All patients from denominator who have the
+   * <b>Description: BR-12</b> Positive Results Returned All patients from denominator who have the
    * following requests/results registered during the period:
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition positiveResultsReturned() {
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
@@ -1527,7 +1521,7 @@ public class TXTBCohortQueries {
   /**
    * <b>Description:</b> Get patients who sent specimen within date boundaries
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoHaveSentSpecimen(
       EncounterType laboratory,
@@ -1604,7 +1598,7 @@ public class TXTBCohortQueries {
    * investigations - lab results - ficha clinica - mastercard OR Get patients who have a GeneXpert
    * request registered in the investigations - lab results - ficha clinica - mastercard
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoHaveGeneXpert(
       Concept applicationForLaboratoryResearch,
@@ -1647,7 +1641,7 @@ public class TXTBCohortQueries {
    * Negativo registered in the laboratory form encounter type 13 Except patients identified in
    * GeneXpert
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getSmearMicroscopyOnly(
       EncounterType laboratory, Concept basiloscopiaExam, Concept positive, Concept negative) {
@@ -1676,7 +1670,7 @@ public class TXTBCohortQueries {
    * <b>Description:</b> Get patients who have a Additional Test AND Not GeneXpert AND Not Smear
    * Microscopy Only
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getAdditionalTest(
       EncounterType fichaClinica,
@@ -1734,7 +1728,7 @@ public class TXTBCohortQueries {
   /**
    * <b>Description:</b> Get patients who have positive results returned
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getPositiveResultsReturned(
       EncounterType laboratory,
