@@ -1240,6 +1240,23 @@ public class ResumoMensalCohortQueries {
    * <p><b>NOTE:</b> The composition returns patients with pre-TARV, filtering patients who were
    * screened for TB
    *
+   * <ul>
+   *     <li>A2: {@link ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}</li>
+   *     <b>AND</b>
+   *     <li>
+   *         <p>Filter all patients with following information in their FIRST visit “S.TARV – Adulto Seguimento or Ficha Clinica Master Card” (encounter id 6)</p>
+   *         <ol>
+   *             <li>
+   *                 “Has TB Symptoms” (PT”: “Tem Sintomas TB?”) (Concept ID 23758) = (Concept ID 1065) OR (Concept ID 1066)
+   *             </li>
+   *             <b>AND</b>
+   *             <li>
+   *                 Encounter Date >=startDate and <=endDate (ONLY CONSIDER THE FIRST OCCURRENCE EVER)
+   *             </li>
+   *         </ol>
+   *     </li>
+   * </ul>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndScreenedTbC1() {
@@ -1326,6 +1343,36 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of patients who initiated Pre-TARV during the current month and
    * started TPI
    *
+   * <ul>
+   *     <li>A2:{@link ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}</li>
+   *     <b>AND</b>
+   *     <li>
+   *          <b>Profilaxia com Isoniazida (TPI)</b> {@link ResumoMensalCohortQueries#getPatientsWhoStartedTPI()}
+   *     </li>
+   *     <h4>Exclusions</h4>
+   *
+   *     <ul>
+   *         <li>
+   *             <p>Exclude all patients registered in encounter “Master Card – Ficha Resumo” (encounter id 53) who have the following conditions:</p>
+   *             <ul>
+   *                 <li>“Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is equal to “YES” (Concept ID 1065);</li>
+   *                 <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID 6300) = “Pre-TARV” (Concept ID 6275) </li>
+   *                 <li>Date of Transferred In From (PT”: “Data de Transferência”) (Concept ID 1369 obs_datetime) >=startDate – 1month and <=endDate</li>
+   *             </ul>
+   *         </li>
+   *         <li>
+   *             <p>Exclude all patients registered as “Transferred-in” in Program Enrollment:</p>
+   *                <i>Technical Specs:</i>
+   *                <br>
+   *                 <code>
+   *                     Table: patient_program<br />
+   *                     Criterias: program_id=1, patient_state_id=29 and start_date >= startDate-1month and <= endDate
+   *                 </code>
+   *         </li>
+   *     </ul>
+   *
+   * </ul>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndStartedTpiC2() {
@@ -1363,6 +1410,14 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of patients who initiated Pre-TARV during the current month and
    * was diagnosed for active TB
    *
+   * <ul>
+   *     <li>
+   *         <li>A2:{@link ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}</li>
+   *         <b>AND</b>
+   *         <li> TB: {@link ResumoMensalCohortQueries#getNumberOfPatientActiveTBInFirstAndSecondEncounter()}</li>
+   *     </li>
+   * </ul>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition
@@ -1389,6 +1444,14 @@ public class ResumoMensalCohortQueries {
 
   /**
    * <b>Description:</b> Number of patients diagnosed for active TB in first or second encounter
+   *
+   * <ul>
+   *     <li>Filter all patients with following information in their FIRST OR SECOND visits “S.TARV – Adulto Seguimento” (encounter id 6)</li>
+   *     <ul>
+   *         <li>“Active TB Diagnosis” (PT”: “Diagnóstico TB Activa”) (Concept ID 23761) = (Concept ID 1065) </li>
+   *         <li>Encounter Date >=startDate and <= endDate (ONLY CONSIDER THE FIRST AND SECOND OCCURRENCE EVER)</li>
+   *     </ul>
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */
@@ -1498,7 +1561,17 @@ public class ResumoMensalCohortQueries {
 
   /**
    * <b>Description:</b> Patients that have ISONIAZID USE = START DRUGS in their FIRST or SECOND
-   * S.TARV – Adulto Seguimento
+   * S.TARV – Adulto Seguimento (encounter id 6)
+   * <ul>
+   *     <li>
+   *         “ISONIAZID PROPYLAXIS” (PT”: “Profilaxia com Isoniazida”) (Concept ID 6122) = (Concept ID 1256)
+   *     </li>
+   *     <b>AND</b>
+   *     <li>
+   *         Encounter Date >=startDate and <= endDate (ONLY CONSIDER THE FIRST OR SECOND OCCURRENCE EVER)
+   *     </li>
+   * </ul>
+   *
    *
    * @return {@link CohortDefinition}
    */
@@ -1791,6 +1864,34 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of active patients in ART at the end of current month who
    * performed Viral Load Test (Annual Notification) B12 AND NOT (B5 OR B6 OR B7 OR B8)
    *
+   * <ul>
+   *     <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}</li>
+   *     <b>AND</b>
+   *     <li>
+   *         Filter all patients registered in encounter “S.TARV – Adulto Seguimento”
+   *         (encounter id 6) with the following information:
+   *         <ul>
+   *             <li>
+   *                 Lab Requests (PT”: “Pedido Exames Laboratoriais”) (Concept ID 23722) = Viral Load (PT:”Carga Viral”) (Concept ID 856)
+   *             </li>
+   *             <li>
+   *                 Encounter Date >=startDate and <= endDate as “LAB REQUEST DATE”
+   *             </li>
+   *         </ul>
+   *     </li>
+   *     <b>AND NOT</b>
+   *     <li>oExclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6) with the following information:
+   *         <ul>
+   *             <li>
+   *                Lab Requests (PT”: “Pedido Exames Laboratoriais”) (Concept ID 23722) =  (Concept ID 856)
+   *             </li>
+   *             <li>
+   *                 Encounter  Date >=newStartDate and <= (startDate-1d)
+   *             </li>
+   *         </ul>
+   *     </li>
+   * </ul>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getNumberOfActivePatientsInArtAtEndOfCurrentMonthWithVlPerformed() {
@@ -1992,10 +2093,41 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: E2</b>
+   * <h4>Name: E2</h4>
+   * <p>Number of active patients in ART at the end of current month who received a Viral Load Test Result (Annual Notification)
+   * (PT: Dos activos em TARV no fim do mês (B.13), subgrupo que recebeu um resultado de Carga Viral (CV) durante o mês (Notificação anual) B13=B12+B4-B9)</p>
    *
-   * <p><b>Description:</b> Number of active patients in ART at the end of current month who
-   * received a Viral Load Test Result (Annual Notification)
+   *
+   *  <ul>
+   *         <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}</li>
+   *         <b>AND</b>
+   *         <li>
+   *             Filter all patients registered in encounter “S.TARV – Adulto Seguimento”
+   *             (encounter id 6) with the following information:
+   *             <ul>
+   *                 <li>
+   *                     Viral Load (PT”: “Carga Viral”) (Concept ID 856) = any value Or Viral load Qual (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value
+   *                 </li>
+   *                 <b>AND</b>
+   *                 <li>Encounter Date >=startDate and <= endDate as “LAB RESULT DATE”</li>
+   *             </ul>
+   *         </li>
+   *         <b>AND NOT</b>
+   *         <li>
+   *             Exclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6) with the following information:
+   *              <ul>
+   *                  <li>
+   *                      Viral Load (PT”: “Carga Viral”) (Concept ID 856) = any value Or Viral load Qual (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value
+   *                  </li>
+   *                  <li>
+   *                      Encounter  Date >=newStartDate and <= (startDate-1d)
+   *                  </li>
+   *              </ul>
+   *         </li>
+   *  </ul>
+   *
+   *  <p><b><Note:/b>If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate = startDate
+   *       Else newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate</p>
    *
    * @return {@link CohortDefinition}
    */
@@ -2038,6 +2170,32 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of active patients in ART at the end of current month who
    * received supressed Viral Load Result (Annual Notification)
    *
+   * <p> Number of active patients in ART at the end of current month who received supressed Viral Load Result (Annual Notification)
+   * (PT: Dos activos em TARV no fim do mês (B.13), subgrupo que recebeu resultado de CV com supressão virológica durante o mês (<1000 cópias/mL) (Notificação anual!) B13=B12+B4-B9)</p>
+   *
+   * <ul>
+   *     <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}</li>
+   *     <b>AND</b>
+   *     <li>
+   *         Filter all patients registered in encounter “S.TARV – Adulto Seguimento”
+   *         (encounter id 6) with the following information:
+   *         <ul>
+   *             <li>Viral Load (PT”: “Carga Viral”) (Concept ID 856) < 1000 Or Viral load Qual (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value</li>
+   *             <li>Encounter Date >=startDate and <= endDate as “LAB RESULT DATE”</li>
+   *         </ul>
+   *     </li>
+   *     <b>AND NOT</b>
+   *     <li>
+   *         Exclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6) with the following information:
+   *         <ul>
+   *             <li>Viral Load (PT”: “Carga Viral”) (Concept ID 856) < 1000 Or Viral load Qual (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value </li>
+   *             <li>Encounter  Date >=newStartDate and <= (startDate-1d)</li>
+   *         </ul>
+   *     </li>
+   * </ul>
+   *
+   * <p>If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate = startDate
+   * Else newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate</p>
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getActivePatientsOnArtWhoReceivedVldSuppressionResults() {
