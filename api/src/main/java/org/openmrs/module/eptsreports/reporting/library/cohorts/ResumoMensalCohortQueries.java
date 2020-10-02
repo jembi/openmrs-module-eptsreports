@@ -2430,6 +2430,87 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of active patients in ART by end of current month (PT: Nº activo
    * em TARV no fim do mês automaticamente calculado através da seguinte formula)
    *
+   * <ol>
+   *     <li>
+   *         Select all patients with the earliest ART Start Date from the following criterias
+   *         <ul>
+   *             <li>
+   *                 <p>All patients who have their first drugs pick-up date (first encounter_datetime) by reporting end date in Pharmacy form FILA (Encounter Type ID 18):</p>
+   *                  <code>
+   *                      first occurrence of encounter datetime
+   *                      Encounter Type Ids = 18
+   *                   </code>
+   *             </li>
+   *             <li>
+   *                 <p>All patients who have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) = START DRUGS (Concept ID 1256) at the pharmacy or clinical visits (Encounter Type IDs 6,9,18)</p>
+   *                  <code>first occurrence of encounter datetime
+   *                     Encounter Type Ids = 6,9,18
+   *                      ARV PLAN (Concept Id 1255) = START DRUGS (Concept ID 1256)
+   *                      </code>
+   *            </li>
+   *            <li>
+   *                <p>All patients who have the first historical start drugs date (earliest concept ID 1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
+   *                    earliest “historical start date”</p>
+   *                    <code>
+   *                          Encounter Type Ids = 6,9,18,53
+   *                          The earliest “Historical Start Date” (Concept Id 1190)
+   *                    </code>
+   *            </li>
+   *            <li>
+   *                <p>All patients enrolled in ART Program (date_enrolled in program_id 2, from patient program table)</p>
+   *                <code>
+   *                    program_enrollment date
+   *                      program_id=2, patient_state_id=29 and date_enrolled
+   *                </code>
+   *            </li>
+   *            <li>
+   *                <p>f.All patients with first drugs pick up date (earliest concept ID 23866 value_datetime) set in mastercard pharmacy form “Recepção/Levantou ARV” (Encounter Type ID 52) with Levantou ARV (concept id 23865) = Yes (concept id 1065)</p>
+   *                <code>
+   *                      earliest “Date of Pick up”
+   *                      Encounter Type Ids = 52
+   *                      The earliest “Data de Levantamento” (Concept Id 23866 value_datetime) <= endDate
+   *                      Levantou ARV (concept id 23865) = SIm (1065)
+   *                </code>
+   *            </li>
+   *         </ul>
+   *     </li>
+   *     <li>
+   *         And check if the selected ART Start Date  is <= endDate
+   *     </li>
+   *     <li>
+   *         <p>Filter patients who had a drug pick up as</p>
+   *         <code>
+   *             At least one encounter “Levantamento de ARV Master Card” (encounter id 52) with the following information:
+   *              PickUp Date (PT: “Data de Levantamento”) (Concept ID 23866) <=endDate
+   *         </code>
+   *         <code>
+   *             Patient had a drug pick in FILA (encounter id 18) by reporting end date (encounter_datetime <=endDate) and have next
+   *             scheduled pick up SET (Concept ID 5096 value_datetime – not empty/null)
+   *         </code>
+   *
+   *     </li>
+   *
+   * </ol>
+   *
+   * <p>EXCEPT (NOT)</p>
+   * <ol>
+   *     <li>
+   *       B5: {@link ResumoMensalCohortQueries#getPatientsTransferredOutB5(boolean)}  
+   *     </li>
+   *     <li>
+   *         B6: {@link ResumoMensalCohortQueries#getPatientsWhoSuspendedTreatmentB6(boolean)}
+   *     </li>
+   *     <li>
+   *         B7: {@link ResumoMensalCohortQueries#getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7()}
+   *     </li>
+   *     <li>
+   *         B8: {@link ResumoMensalCohortQueries#getPatientsWhoDied(Boolean)}
+   *     </li>
+   *     
+   * </ol>
+   *
+   *
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getActivePatientsInARTByEndOfCurrentMonth() {
