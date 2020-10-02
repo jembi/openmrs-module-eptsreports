@@ -531,39 +531,31 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <p><b>Name: B5: Number of patientes transferred out during the current month.
-   * (PT: Nº de transferidos para outras US em TARV durante o mês)</b></p>
+   * <b>Name: B5: Number of patientes transferred out during the current month. (PT: Nº de
+   * transferidos para outras US em TARV durante o mês)</b>
    *
    * <p><b>Description:</b> Number of patients transferred out during the current month.
    *
    * <ol>
-   *     <li>
-   *       Select all patients registered in encounter “Ficha Clinica-MasterCard” (encounter id 6) with LAST
-   *       “Patient State” (PT:“Estado de Permanência”) (Concept ID 6273) equal to “Transferred Out” (PT: “Transferido Para”)
-   *       (Concept ID 1706); AND encounter Date >=startDate and <=endDate
-   *     </li>
-   *
-   *     <li>
-   *        Select all patients registered in encounter “Ficha Resumo-MasterCard” (encounter id 53) with LAST
-   *        “Patient State” (PT:“Estado de Permanência”) (Concept ID 6272) equal to “Transferred Out” (PT: “Transferido Para”)
-   *        (Concept ID 1706) AND obs_datetime >=startDate and <=endDate
-   *     </li>
-   *
-   *    <li>
-   *          Select all patients registered as transferred-out in LAST Patient Program State during the reporting period
-   *          <code>Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and
-   *          Patient_State.state = 7 (Transferred-out) or 
+   *   <li>Select all patients registered in encounter “Ficha Clinica-MasterCard” (encounter id 6)
+   *       with LAST “Patient State” (PT:“Estado de Permanência”) (Concept ID 6273) equal to
+   *       “Transferred Out” (PT: “Transferido Para”) (Concept ID 1706); AND encounter Date
+   *       >=startDate and <=endDate
+   *   <li>Select all patients registered in encounter “Ficha Resumo-MasterCard” (encounter id 53)
+   *       with LAST “Patient State” (PT:“Estado de Permanência”) (Concept ID 6272) equal to
+   *       “Transferred Out” (PT: “Transferido Para”) (Concept ID 1706) AND obs_datetime >=startDate
+   *       and <=endDate
+   *   <li>Select all patients registered as transferred-out in LAST Patient Program State during
+   *       the reporting period <code>Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and
+   *          Patient_State.state = 7 (Transferred-out) or
    *          Patient_State.start_date >= startDate and <= endDate
    *          Patient_State.end_date = null -> deve se selecionar a max (start_date)</code>
-   *     </li>
-   *
-   *     <li>
-   *          Except all patients who after the most recent date from 1 to 3 have a drugs pick up or consultation by reporting endDate:
-   *          <code>Encounter Type ID= 6, 9, 18 and
+   *   <li>Except all patients who after the most recent date from 1 to 3 have a drugs pick up or
+   *       consultation by reporting endDate: <code>Encounter Type ID= 6, 9, 18 and
    *          encounter_datetime> the most recent date and <=endDate
    *          or
-   *          Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <=endDate</code>
-   *     </li>
+   *          Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <=endDate
+   *       </code>
    * </ol>
    *
    * <p>The <b>parameter</b> below checks patients in last date as transfered out See <b>{@link
@@ -585,39 +577,29 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <p><b>Name: B6: Number of patientes with ART suspension during the current month.
-   * (PT: Nº de suspensos TARV durante o mês)</b></p>
+   * <b>Name: B6: Number of patientes with ART suspension during the current month. (PT: Nº de
+   * suspensos TARV durante o mês)</b>
    *
    * <p><b>Description:</b> Number of patients with ART suspension during the current month.
+   *
    * <ol>
-   *
-   *    <li>
-   *        Select all patients registered in encounter “Ficha Clinica - MasterCard” (encounter id 6) with
-   *        “Patient State” (PT:“Estado de Permanência”) (Concept ID 6273)  to “Suspended Treatment” (PT: “Suspenso”)
-   *        (Concept ID 1709); AND Encounter Date >=startDate and <=endDate
-   *    </li>
-   *
-   *    <li>
-   *      Select all patients registered as suspended in Patient Program State during the reporting period
-   *      <code>Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and
+   *   <li>Select all patients registered in encounter “Ficha Clinica - MasterCard” (encounter id 6)
+   *       with “Patient State” (PT:“Estado de Permanência”) (Concept ID 6273) to “Suspended
+   *       Treatment” (PT: “Suspenso”) (Concept ID 1709); AND Encounter Date >=startDate and
+   *       <=endDate
+   *   <li>Select all patients registered as suspended in Patient Program State during the reporting
+   *       period <code>Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and
    *      Patient_State.state = 8 (Suspended treatment) or
    *      Patient_State.start_date >= startDate and <= endDate</code>
-   *    </li>
-   *
-   *    <li>
-   *        3.Select all patients registered in encounter “Ficha Resumo - MasterCard”
-   *        (encounter id 53) with  “Patient State” (PT:“Estado de Permanência”) (Concept ID 6272)
-   *        to “Suspended Treatment” (PT: “Suspenso”) (Concept ID 1709) AND OBS Datetime >=startDate and <=endDate
-   *    </li>
-   *
-   *    <li>
-   *        Except all patients who after the most recent date from 1.1 to 1.2, have a drugs pick up by reporting end date:
-   *        <code>Encounter Type ID= 18 and
+   *   <li>3.Select all patients registered in encounter “Ficha Resumo - MasterCard” (encounter id
+   *       53) with “Patient State” (PT:“Estado de Permanência”) (Concept ID 6272) to “Suspended
+   *       Treatment” (PT: “Suspenso”) (Concept ID 1709) AND OBS Datetime >=startDate and <=endDate
+   *   <li>Except all patients who after the most recent date from 1.1 to 1.2, have a drugs pick up
+   *       by reporting end date: <code>Encounter Type ID= 18 and
    *        encounter_datetime> the most recent date and <=endDate
    *        or
-   *        Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <=endDate</code>
-   *    </li>
-   *
+   *        Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <=endDate
+   *       </code>
    * </ol>
    *
    * <p>The <b>parameter</b> below checks the patient's state between the start and end date
@@ -743,38 +725,29 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <p><b>Name: B8: Number of died patients during the current month.
-   * (PT: Nº de óbitos TARV durante o mês)</b></p>
+   * <b>Name: B8: Number of died patients during the current month. (PT: Nº de óbitos TARV durante o
+   * mês)</b>
    *
-   *  <ul>
-   *      <li>
-   *         Select all patients registered in encounter “Ficha Clinica- Master Card” (encounter id 6)
-   *        with LAST “Patient State” (PT:“Estado de Permanência”) (Concept ID 6273) is equal to “Patient Has Died”
-   *        (PT: “Obitou”) (Concept ID 1366) and Encounter Date >=startDate and <=endDate
-   *      </li>
-   *      <li>
-   *          Select all patients registered in encounter “Ficha Resumo – Master Card” (encounter id 53)
-   *          with LAST “Patient State” (PT:“Estado de Permanência”) (Concept ID 6272) is equal to “Patient Has Died”
-   *          (PT: “Obitou”) (Concept ID 1366) and Obs_date >=startDate and <=endDate
-   *       </li>
-   *      <li>All patients registered as died in LAST Patient Program State during the reporing period
-   *        Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and
-   *        Patient_State.state = 10 (Died)
-   *        Patient_State.start_date <= endDate >=startDate
-   *        Patient_State.end_date = null -> deve ser selecionar a max (start_date)
-   *       </li>
-   *      <li>
-   *         All deaths registered in Patient Demographics during reporting period
-   *        Person.Dead=1 and death_date <= :endDate and >=startDate
-   *      </li>
-   *      <li> Except all patients who after the most recent date from 1 to 4, have a drugs pick up or consultation:
-   *        Encounter Type ID= 6, 9, 18 and
-   *          encounter_datetime> the most recent date and <=endDate
-   *            or
-   *          Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <= endDate
-   *       </li>
-   *
-   *  </ul>
+   * <ul>
+   *   <li>Select all patients registered in encounter “Ficha Clinica- Master Card” (encounter id 6)
+   *       with LAST “Patient State” (PT:“Estado de Permanência”) (Concept ID 6273) is equal to
+   *       “Patient Has Died” (PT: “Obitou”) (Concept ID 1366) and Encounter Date >=startDate and
+   *       <=endDate
+   *   <li>Select all patients registered in encounter “Ficha Resumo – Master Card” (encounter id
+   *       53) with LAST “Patient State” (PT:“Estado de Permanência”) (Concept ID 6272) is equal to
+   *       “Patient Has Died” (PT: “Obitou”) (Concept ID 1366) and Obs_date >=startDate and
+   *       <=endDate
+   *   <li>All patients registered as died in LAST Patient Program State during the reporing period
+   *       Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 10
+   *       (Died) Patient_State.start_date <= endDate >=startDate Patient_State.end_date = null ->
+   *       deve ser selecionar a max (start_date)
+   *   <li>All deaths registered in Patient Demographics during reporting period Person.Dead=1 and
+   *       death_date <= :endDate and >=startDate
+   *   <li>Except all patients who after the most recent date from 1 to 4, have a drugs pick up or
+   *       consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most recent date
+   *       and <=endDate or Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866
+   *       value_datetime) > the most recent date and <= endDate
+   * </ul>
    *
    * <p>The <b>parameter</b> below checks the patient's state between the start and end date
    *
@@ -911,68 +884,53 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <p><b>Name: B10: Number of cumulative patients who started ART by end of previous month</b></p>
+   * <b>Name: B10: Number of cumulative patients who started ART by end of previous month</b>
    *
    * <ol>
-   *  <li>Select all patients with the earliest ART Start Date from the following criterias:
-   *      <ul>
-   *          <li>All patients who have their first drugs pick-up date (first encounter_datetime) by reporting
-   *              end date in Pharmacy form FILA (Encounter Type ID 18):
-   *            <code>first occurrence of encounter datetime
+   *   <li>Select all patients with the earliest ART Start Date from the following criterias:
+   *       <ul>
+   *         <li>All patients who have their first drugs pick-up date (first encounter_datetime) by
+   *             reporting end date in Pharmacy form FILA (Encounter Type ID 18): <code>
+   *             first occurrence of encounter datetime
    *            Encounter Type Ids = 18</code>
-   *          </li>
-   *          <li>
-   *              b.All patients who have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) = START DRUGS
-   *              (Concept ID 1256) at the pharmacy or clinical visits (Encounter Type IDs 6,9,18)
-   *              <code>first occurrence of encounter datetime
+   *         <li>b.All patients who have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) =
+   *             START DRUGS (Concept ID 1256) at the pharmacy or clinical visits (Encounter Type
+   *             IDs 6,9,18) <code>first occurrence of encounter datetime
    *                Encounter Type Ids = 6,9,18
    *                ARV PLAN (Concept Id 1255) = START DRUGS (Concept ID 1256)</code>
-   *          </li>
-   *          <li>All patients who have the first historical start drugs date (earliest concept ID 1190)
-   *               set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
-   *              earliest “historical start date
-   *              <code>Encounter Type Ids = 6,9,18,53
+   *         <li>All patients who have the first historical start drugs date (earliest concept ID
+   *             1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
+   *             earliest “historical start date <code>Encounter Type Ids = 6,9,18,53
    *                    The earliest “Historical Start Date” (Concept Id 1190)</code>
-   *          </li>
-   *          <li>All patients who have the first historical start drugs date (earliest concept ID 1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
-   *              earliest “historical start date”
-   *              <code>Encounter Type Ids = 6,9,18,53
+   *         <li>All patients who have the first historical start drugs date (earliest concept ID
+   *             1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
+   *             earliest “historical start date” <code>Encounter Type Ids = 6,9,18,53
    *                The earliest “Historical Start Date” (Concept Id 1190)</code>
-   *          </li>
-   *          <li>
-   *              All patients enrolled in ART Program (date_enrolled in program_id 2, from patient program table)
-   *              <code> program_enrollment date
+   *         <li>All patients enrolled in ART Program (date_enrolled in program_id 2, from patient
+   *             program table) <code> program_enrollment date
    *              program_id=2, patient_state_id=29 and date_enrolled</code>
-   *          </li>
-   *          <li>All patients with first drugs pick up date (earliest concept ID 23866 value_datetime)
-   *              set in mastercard pharmacy form “Recepção/Levantou ARV” (Encounter Type ID 52) with Levantou ARV
-   *                (concept id 23865) = Yes (concept id 1065)
-   *              <code>
+   *         <li>All patients with first drugs pick up date (earliest concept ID 23866
+   *             value_datetime) set in mastercard pharmacy form “Recepção/Levantou ARV” (Encounter
+   *             Type ID 52) with Levantou ARV (concept id 23865) = Yes (concept id 1065) <code>
    *                  earliest “Date of Pick up”
    *                  Encounter Type Ids = 52
    *                  The earliest “Data de Levantamento” (Concept Id 23866 value_datetime) <= endDate
    *                  Levantou ARV (concept id 23865) = SIm (1065)
    *              </code>
-   *          </li>
-   *      </ul>
-   *  </li>
-   *  <li>And check if the selected ART Start Date is < startDate</li>
-   *  <li>
-   *        Exclude all patients transferred-in
-   *        <ul>
-   *            <li>
-   *                Registered in encounter “Master Card – Ficha Resumo” (encounter id 53) with
-   *                 “Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) equal to “YES” (Concept ID 1065) AND Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID 6300) = “TARV” (Concept ID 6276)
-   *                AND Date of Transferred In From (PT”: “Data de Transferência”) (Concept ID 1369 obs_datetime) <startDate
-   *            </li>
-   *            <li>
-   *                Registered as Transferred-in in Program Enrollment
-   *              Technical Specs:
-   *              <code>Table: patient_program
+   *       </ul>
+   *   <li>And check if the selected ART Start Date is < startDate
+   *   <li>Exclude all patients transferred-in
+   *       <ul>
+   *         <li>Registered in encounter “Master Card – Ficha Resumo” (encounter id 53) with
+   *             “Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) equal to
+   *             “YES” (Concept ID 1065) AND Type of Patient Transferred From (PT”: “Tipo de
+   *             Paciente Transferido”) (Concept ID 6300) = “TARV” (Concept ID 6276) AND Date of
+   *             Transferred In From (PT”: “Data de Transferência”) (Concept ID 1369 obs_datetime)
+   *             <startDate
+   *         <li>Registered as Transferred-in in Program Enrollment Technical Specs: <code>
+   *             Table: patient_program
    *              Criterias: program_id=2, patient_state_id=29 and start_date <startDate</code>
-   *            </li>
-   *        </ul>
-   *  </li>
+   *       </ul>
    * </ol>
    *
    * @return {@link CohortDefinition}
@@ -1020,65 +978,59 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Name: B.12 Number of active patients in ART by end of previous month
-   * (PT: Nº de pacientes activos em TARV até ao fim do mês anterior (B13 do mês anterior )</b>
+   * <b>Name: B.12 Number of active patients in ART by end of previous month (PT: Nº de pacientes
+   * activos em TARV até ao fim do mês anterior (B13 do mês anterior )</b>
    *
-   *  <ul>
-   *      <li>Select all patients from B10</li>
-   *      <li>OR</li>
-   *      <li>
-   *          B2A- Select all patients registered in encounter “Master Card – Ficha Resumo”
-   *          (encounter id 53) who have the following conditions:
-   *            <ul>
-   *                <li>“Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is equal to “YES” (Concept ID 1065); </li>
-   *                <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID 6300) = “TARV” (Concept ID 6276)</li>
-   *                <li>Date of Transferred In From (PT”: “Data de Transferência”) (Concept ID 1369 obs.datetime) <startDate</li>
-   *            </ul>
-   *      </li>
-   *      <li>OR</li>
-   *      <li>
-   *          Select all patients registered as transferred-in in Program Enrollment
-   *          <p>Technical Specs:
-   *              <code>
+   * <ul>
+   *   <li>Select all patients from B10
+   *   <li>OR
+   *   <li>B2A- Select all patients registered in encounter “Master Card – Ficha Resumo” (encounter
+   *       id 53) who have the following conditions:
+   *       <ul>
+   *         <li>“Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is equal
+   *             to “YES” (Concept ID 1065);
+   *         <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID
+   *             6300) = “TARV” (Concept ID 6276)
+   *         <li>Date of Transferred In From (PT”: “Data de Transferência”) (Concept ID 1369
+   *             obs.datetime) <startDate
+   *       </ul>
+   *   <li>OR
+   *   <li>Select all patients registered as transferred-in in Program Enrollment
+   *       <p>Technical Specs: <code>
    *                Table: patient_program
    *                Criterias: program_id=2, patient_state_id=29 and start_date <startDate and
    *              </code>
-   *          </p>
-   *      </li>
-   *      <li>
-   *          Filter patients who had a drug pick up as
-   *          <ul>
-   *              <li>
-   *                  At least one encounter “Levantamento de ARV Master Card” (encounter id 52) with the following information:
-   *                    PickUp Date (PT: “Data de Levantamento”) (Concept ID 23866) <=(startDate-1D)
-   *              </li>
-   *              <li>
-   *                  Patient had a drug pick in FILA (encounter id 18) by reporting start date minus 1 Day (encounter_datetime <=(startDate-1)) and
-   *                  have next scheduled pick up SET (Concept ID 5096 value_datetime – not empty/null)
-   *              </li>
-   *          </ul>
-   *      </li>
-   *      <li>Except B5</li>
-   *      <li>Except B6</li>
-   *      <li>
-   *          Except all patients who after the most recent date from 1.1 to 1.2, have a drugs pick up by reporting start date:
-   *          <p><code>
+   *   <li>Filter patients who had a drug pick up as
+   *       <ul>
+   *         <li>At least one encounter “Levantamento de ARV Master Card” (encounter id 52) with the
+   *             following information: PickUp Date (PT: “Data de Levantamento”) (Concept ID 23866)
+   *             <=(startDate-1D)
+   *         <li>Patient had a drug pick in FILA (encounter id 18) by reporting start date minus 1
+   *             Day (encounter_datetime <=(startDate-1)) and have next scheduled pick up SET
+   *             (Concept ID 5096 value_datetime – not empty/null)
+   *       </ul>
+   *   <li>Except B5
+   *   <li>Except B6
+   *   <li>Except all patients who after the most recent date from 1.1 to 1.2, have a drugs pick up
+   *       by reporting start date:
+   *       <p><code>
    *              Encounter Type ID= 18 and
    *              encounter_datetime> the most recent date and <startDate
    *                or
    *                Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <startDate
-   *          </code></p>
-   *      </li>
-   *      <li>
-   *          <p>oB7E- All patients having the most recent date between last scheduled drug pickup date (Fila) or 30 days after last ART pickup date (Recepção – Levantou ARV) and adding 60 days and this date being less than reporting start Date.
-   *              Select the most recent date from:</p>
-   *              <ul>
-   *                  <li>a.Last record of Next Drugs Pick Up Appointment (Concept ID 5096 value_datetime – not empty/null) from encounters of type 18 occurred by reporting start date</li>
-   *                  <li>b.The most recent “Data de Levantamento” (Concept Id 23866 value_datetime-not empty/null) <startDate from encounters of type 52 plus(+) 30 days</li>
-   *             </ul>
-   *             <p>And add 60 days and this date should be < startDate</p>
-   *      </li>
-   *  </ul>
+   *          </code>
+   *   <li>
+   *       <p>oB7E- All patients having the most recent date between last scheduled drug pickup date
+   *       (Fila) or 30 days after last ART pickup date (Recepção – Levantou ARV) and adding 60 days
+   *       and this date being less than reporting start Date. Select the most recent date from:
+   *       <ul>
+   *         <li>a.Last record of Next Drugs Pick Up Appointment (Concept ID 5096 value_datetime –
+   *             not empty/null) from encounters of type 18 occurred by reporting start date
+   *         <li>b.The most recent “Data de Levantamento” (Concept Id 23866 value_datetime-not
+   *             empty/null) <startDate from encounters of type 52 plus(+) 30 days
+   *       </ul>
+   *       <p>And add 60 days and this date should be < startDate
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */
@@ -1241,20 +1193,17 @@ public class ResumoMensalCohortQueries {
    * screened for TB
    *
    * <ul>
-   *     <li>A2: {@link ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}</li>
-   *     <b>AND</b>
-   *     <li>
-   *         <p>Filter all patients with following information in their FIRST visit “S.TARV – Adulto Seguimento or Ficha Clinica Master Card” (encounter id 6)</p>
-   *         <ol>
-   *             <li>
-   *                 “Has TB Symptoms” (PT”: “Tem Sintomas TB?”) (Concept ID 23758) = (Concept ID 1065) OR (Concept ID 1066)
-   *             </li>
-   *             <b>AND</b>
-   *             <li>
-   *                 Encounter Date >=startDate and <=endDate (ONLY CONSIDER THE FIRST OCCURRENCE EVER)
-   *             </li>
-   *         </ol>
-   *     </li>
+   *   <li>A2: {@link
+   *       ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}
+   *       <b>AND</b>
+   *   <li>
+   *       <p>Filter all patients with following information in their FIRST visit “S.TARV – Adulto
+   *       Seguimento or Ficha Clinica Master Card” (encounter id 6)
+   *       <ol>
+   *         <li>“Has TB Symptoms” (PT”: “Tem Sintomas TB?”) (Concept ID 23758) = (Concept ID 1065)
+   *             OR (Concept ID 1066) <b>AND</b>
+   *         <li>Encounter Date >=startDate and <=endDate (ONLY CONSIDER THE FIRST OCCURRENCE EVER)
+   *       </ol>
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -1344,33 +1293,32 @@ public class ResumoMensalCohortQueries {
    * started TPI
    *
    * <ul>
-   *     <li>A2:{@link ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}</li>
-   *     <b>AND</b>
-   *     <li>
-   *          <b>Profilaxia com Isoniazida (TPI)</b> {@link ResumoMensalCohortQueries#getPatientsWhoStartedTPI()}
-   *     </li>
-   *     <h4>Exclusions</h4>
-   *
-   *     <ul>
+   *   <li>A2:{@link
+   *       ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}
+   *       <b>AND</b>
+   *   <li><b>Profilaxia com Isoniazida (TPI)</b> {@link
+   *       ResumoMensalCohortQueries#getPatientsWhoStartedTPI()}
+   *       <h4>Exclusions</h4>
+   *       <ul>
    *         <li>
-   *             <p>Exclude all patients registered in encounter “Master Card – Ficha Resumo” (encounter id 53) who have the following conditions:</p>
+   *             <p>Exclude all patients registered in encounter “Master Card – Ficha Resumo”
+   *             (encounter id 53) who have the following conditions:
    *             <ul>
-   *                 <li>“Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is equal to “YES” (Concept ID 1065);</li>
-   *                 <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID 6300) = “Pre-TARV” (Concept ID 6275) </li>
-   *                 <li>Date of Transferred In From (PT”: “Data de Transferência”) (Concept ID 1369 obs_datetime) >=startDate – 1month and <=endDate</li>
+   *               <li>“Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is
+   *                   equal to “YES” (Concept ID 1065);
+   *               <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”)
+   *                   (Concept ID 6300) = “Pre-TARV” (Concept ID 6275)
+   *               <li>Date of Transferred In From (PT”: “Data de Transferência”) (Concept ID 1369
+   *                   obs_datetime) >=startDate – 1month and <=endDate
    *             </ul>
-   *         </li>
    *         <li>
-   *             <p>Exclude all patients registered as “Transferred-in” in Program Enrollment:</p>
-   *                <i>Technical Specs:</i>
-   *                <br>
-   *                 <code>
+   *             <p>Exclude all patients registered as “Transferred-in” in Program Enrollment:
+   *             <i>Technical Specs:</i> <br>
+   *             <code>
    *                     Table: patient_program<br />
    *                     Criterias: program_id=1, patient_state_id=29 and start_date >= startDate-1month and <= endDate
    *                 </code>
-   *         </li>
-   *     </ul>
-   *
+   *       </ul>
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -1411,11 +1359,12 @@ public class ResumoMensalCohortQueries {
    * was diagnosed for active TB
    *
    * <ul>
-   *     <li>
-   *         <li>A2:{@link ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}</li>
-   *         <b>AND</b>
-   *         <li> TB: {@link ResumoMensalCohortQueries#getNumberOfPatientActiveTBInFirstAndSecondEncounter()}</li>
-   *     </li>
+   *   <li>
+   *   <li>A2:{@link
+   *       ResumoMensalCohortQueries#getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2()}
+   *       <b>AND</b>
+   *   <li>TB: {@link
+   *       ResumoMensalCohortQueries#getNumberOfPatientActiveTBInFirstAndSecondEncounter()}
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -1446,11 +1395,14 @@ public class ResumoMensalCohortQueries {
    * <b>Description:</b> Number of patients diagnosed for active TB in first or second encounter
    *
    * <ul>
-   *     <li>Filter all patients with following information in their FIRST OR SECOND visits “S.TARV – Adulto Seguimento” (encounter id 6)</li>
-   *     <ul>
-   *         <li>“Active TB Diagnosis” (PT”: “Diagnóstico TB Activa”) (Concept ID 23761) = (Concept ID 1065) </li>
-   *         <li>Encounter Date >=startDate and <= endDate (ONLY CONSIDER THE FIRST AND SECOND OCCURRENCE EVER)</li>
-   *     </ul>
+   *   <li>Filter all patients with following information in their FIRST OR SECOND visits “S.TARV –
+   *       Adulto Seguimento” (encounter id 6)
+   *       <ul>
+   *         <li>“Active TB Diagnosis” (PT”: “Diagnóstico TB Activa”) (Concept ID 23761) = (Concept
+   *             ID 1065)
+   *         <li>Encounter Date >=startDate and <= endDate (ONLY CONSIDER THE FIRST AND SECOND
+   *             OCCURRENCE EVER)
+   *       </ul>
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -1562,16 +1514,13 @@ public class ResumoMensalCohortQueries {
   /**
    * <b>Description:</b> Patients that have ISONIAZID USE = START DRUGS in their FIRST or SECOND
    * S.TARV – Adulto Seguimento (encounter id 6)
-   * <ul>
-   *     <li>
-   *         “ISONIAZID PROPYLAXIS” (PT”: “Profilaxia com Isoniazida”) (Concept ID 6122) = (Concept ID 1256)
-   *     </li>
-   *     <b>AND</b>
-   *     <li>
-   *         Encounter Date >=startDate and <= endDate (ONLY CONSIDER THE FIRST OR SECOND OCCURRENCE EVER)
-   *     </li>
-   * </ul>
    *
+   * <ul>
+   *   <li>“ISONIAZID PROPYLAXIS” (PT”: “Profilaxia com Isoniazida”) (Concept ID 6122) = (Concept ID
+   *       1256) <b>AND</b>
+   *   <li>Encounter Date >=startDate and <= endDate (ONLY CONSIDER THE FIRST OR SECOND OCCURRENCE
+   *       EVER)
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */
@@ -1865,31 +1814,23 @@ public class ResumoMensalCohortQueries {
    * performed Viral Load Test (Annual Notification) B12 AND NOT (B5 OR B6 OR B7 OR B8)
    *
    * <ul>
-   *     <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}</li>
-   *     <b>AND</b>
-   *     <li>
-   *         Filter all patients registered in encounter “S.TARV – Adulto Seguimento”
-   *         (encounter id 6) with the following information:
-   *         <ul>
-   *             <li>
-   *                 Lab Requests (PT”: “Pedido Exames Laboratoriais”) (Concept ID 23722) = Viral Load (PT:”Carga Viral”) (Concept ID 856)
-   *             </li>
-   *             <li>
-   *                 Encounter Date >=startDate and <= endDate as “LAB REQUEST DATE”
-   *             </li>
-   *         </ul>
-   *     </li>
-   *     <b>AND NOT</b>
-   *     <li>oExclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6) with the following information:
-   *         <ul>
-   *             <li>
-   *                Lab Requests (PT”: “Pedido Exames Laboratoriais”) (Concept ID 23722) =  (Concept ID 856)
-   *             </li>
-   *             <li>
-   *                 Encounter  Date >=newStartDate and <= (startDate-1d)
-   *             </li>
-   *         </ul>
-   *     </li>
+   *   <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}
+   *       <b>AND</b>
+   *   <li>Filter all patients registered in encounter “S.TARV – Adulto Seguimento” (encounter id 6)
+   *       with the following information:
+   *       <ul>
+   *         <li>Lab Requests (PT”: “Pedido Exames Laboratoriais”) (Concept ID 23722) = Viral Load
+   *             (PT:”Carga Viral”) (Concept ID 856)
+   *         <li>Encounter Date >=startDate and <= endDate as “LAB REQUEST DATE”
+   *       </ul>
+   *       <b>AND NOT</b>
+   *   <li>oExclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6)
+   *       with the following information:
+   *       <ul>
+   *         <li>Lab Requests (PT”: “Pedido Exames Laboratoriais”) (Concept ID 23722) = (Concept ID
+   *             856)
+   *         <li>Encounter Date >=newStartDate and <= (startDate-1d)
+   *       </ul>
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -2093,41 +2034,36 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
+   *
+   *
    * <h4>Name: E2</h4>
-   * <p>Number of active patients in ART at the end of current month who received a Viral Load Test Result (Annual Notification)
-   * (PT: Dos activos em TARV no fim do mês (B.13), subgrupo que recebeu um resultado de Carga Viral (CV) durante o mês (Notificação anual) B13=B12+B4-B9)</p>
    *
+   * <p>Number of active patients in ART at the end of current month who received a Viral Load Test
+   * Result (Annual Notification) (PT: Dos activos em TARV no fim do mês (B.13), subgrupo que
+   * recebeu um resultado de Carga Viral (CV) durante o mês (Notificação anual) B13=B12+B4-B9)
    *
-   *  <ul>
-   *         <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}</li>
-   *         <b>AND</b>
-   *         <li>
-   *             Filter all patients registered in encounter “S.TARV – Adulto Seguimento”
-   *             (encounter id 6) with the following information:
-   *             <ul>
-   *                 <li>
-   *                     Viral Load (PT”: “Carga Viral”) (Concept ID 856) = any value Or Viral load Qual (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value
-   *                 </li>
-   *                 <b>AND</b>
-   *                 <li>Encounter Date >=startDate and <= endDate as “LAB RESULT DATE”</li>
-   *             </ul>
-   *         </li>
-   *         <b>AND NOT</b>
-   *         <li>
-   *             Exclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6) with the following information:
-   *              <ul>
-   *                  <li>
-   *                      Viral Load (PT”: “Carga Viral”) (Concept ID 856) = any value Or Viral load Qual (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value
-   *                  </li>
-   *                  <li>
-   *                      Encounter  Date >=newStartDate and <= (startDate-1d)
-   *                  </li>
-   *              </ul>
-   *         </li>
-   *  </ul>
+   * <ul>
+   *   <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}
+   *       <b>AND</b>
+   *   <li>Filter all patients registered in encounter “S.TARV – Adulto Seguimento” (encounter id 6)
+   *       with the following information:
+   *       <ul>
+   *         <li>Viral Load (PT”: “Carga Viral”) (Concept ID 856) = any value Or Viral load Qual
+   *             (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value <b>AND</b>
+   *         <li>Encounter Date >=startDate and <= endDate as “LAB RESULT DATE”
+   *       </ul>
+   *       <b>AND NOT</b>
+   *   <li>Exclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6)
+   *       with the following information:
+   *       <ul>
+   *         <li>Viral Load (PT”: “Carga Viral”) (Concept ID 856) = any value Or Viral load Qual
+   *             (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value
+   *         <li>Encounter Date >=newStartDate and <= (startDate-1d)
+   *       </ul>
+   * </ul>
    *
-   *  <p><b><Note:/b>If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate = startDate
-   *       Else newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate</p>
+   * <p><b><Note:/b>If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate =
+   * startDate Else newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate
    *
    * @return {@link CohortDefinition}
    */
@@ -2170,32 +2106,34 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of active patients in ART at the end of current month who
    * received supressed Viral Load Result (Annual Notification)
    *
-   * <p> Number of active patients in ART at the end of current month who received supressed Viral Load Result (Annual Notification)
-   * (PT: Dos activos em TARV no fim do mês (B.13), subgrupo que recebeu resultado de CV com supressão virológica durante o mês (<1000 cópias/mL) (Notificação anual!) B13=B12+B4-B9)</p>
+   * <p> Number of active patients in ART at the end of current month who received supressed Viral
+   * Load Result (Annual Notification) (PT: Dos activos em TARV no fim do mês (B.13), subgrupo que
+   * recebeu resultado de CV com supressão virológica durante o mês (<1000 cópias/mL) (Notificação
+   * anual!) B13=B12+B4-B9)
    *
    * <ul>
-   *     <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}</li>
-   *     <b>AND</b>
-   *     <li>
-   *         Filter all patients registered in encounter “S.TARV – Adulto Seguimento”
-   *         (encounter id 6) with the following information:
-   *         <ul>
-   *             <li>Viral Load (PT”: “Carga Viral”) (Concept ID 856) < 1000 Or Viral load Qual (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value</li>
-   *             <li>Encounter Date >=startDate and <= endDate as “LAB RESULT DATE”</li>
-   *         </ul>
-   *     </li>
-   *     <b>AND NOT</b>
-   *     <li>
-   *         Exclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6) with the following information:
-   *         <ul>
-   *             <li>Viral Load (PT”: “Carga Viral”) (Concept ID 856) < 1000 Or Viral load Qual (PT: “Carga Viral – Qualitativa) (Concept ID 1305) = any value </li>
-   *             <li>Encounter  Date >=newStartDate and <= (startDate-1d)</li>
-   *         </ul>
-   *     </li>
+   *   <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}
+   *       <b>AND</b>
+   *   <li>Filter all patients registered in encounter “S.TARV – Adulto Seguimento” (encounter id 6)
+   *       with the following information:
+   *       <ul>
+   *         <li>Viral Load (PT”: “Carga Viral”) (Concept ID 856) < 1000 Or Viral load Qual (PT:
+   *             “Carga Viral – Qualitativa) (Concept ID 1305) = any value
+   *         <li>Encounter Date >=startDate and <= endDate as “LAB RESULT DATE”
+   *       </ul>
+   *       <b>AND NOT</b>
+   *   <li>Exclude all patients registered encounter “S.TARV – Adulto Seguimento” (encounter id 6)
+   *       with the following information:
+   *       <ul>
+   *         <li>Viral Load (PT”: “Carga Viral”) (Concept ID 856) < 1000 Or Viral load Qual (PT:
+   *             “Carga Viral – Qualitativa) (Concept ID 1305) = any value
+   *         <li>Encounter Date >=newStartDate and <= (startDate-1d)
+   *       </ul>
    * </ul>
    *
-   * <p>If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate = startDate
-   * Else newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate</p>
+   * <p>If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate = startDate Else
+   * newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getActivePatientsOnArtWhoReceivedVldSuppressionResults() {
@@ -2258,8 +2196,7 @@ public class ResumoMensalCohortQueries {
    * <b>Name: F1</b>
    *
    * <p><b>Description:</b> Number of patients who had clinical appointment during the reporting
-   * month
-   * <code>
+   * month <code>
    *     <ul>
    *        <li>Select all patients from encounter “Master Card  – Ficha Clinica” (encounter type id 6) that occurred between startDate and endDate: <br />
    *        Encounter_Datetime >=startDate and <= endDate</li>
@@ -2283,30 +2220,29 @@ public class ResumoMensalCohortQueries {
   /**
    * <b>Name: F2</b>
    *
-   * <p><b>Description:</b> F2: Number of patients who had clinical appointment during the reporting month and were screened for TB
-   * (PT: Dos pacientes que vieram à consulta durante o mês, subgrupo que foi rastreado para TB)</p>
+   * <p><b>Description:</b> F2: Number of patients who had clinical appointment during the
+   * reporting month and were screened for TB (PT: Dos pacientes que vieram à consulta durante o
+   * mês, subgrupo que foi rastreado para TB)
    *
    * <ul>
-   *     <ul>
-   *         <li>
-   *             Select all patients from encounter “Master Card  – Ficha Clinica ” (encounter type id 6) that occurred between startDate and endDate:
-   *            <code>Encounter Date >=startDate and <= endDate</code>
-   *         </li>
-   *         <li>
-   *             Filter all patients registered in encounter “Master Card  – Ficha Clinica ” (encounter id 6) with the following information:
-   *             <ul>
-   *                 <li>TB Screening (PT”: “Tuberculose – Tem Sintomas?”) (Concept ID 23758) = Yes (PT: “SIM”) (Concept ID 1065) or (Concept ID 23758) = No (PT: “NAO”) (Concept ID 1066)</li>
-   *                <li>Encounter Date >=startDate and <= endDate as “SCREENING DATE”</li>
-   *             </ul>
-   *         </li>
-   *          <li>
-   *              oExclude all patients registered encounter “Master Card  – Ficha Clinica ” (encounter id 6) with the following information:
-   *              <ul>
-   *                  <li>TB Treatment (PT”: “Tratamento TB”) (Concept ID 1268) = any value</li>
-   *                  <li>Encounter Date = ”SCREENING DATE”</li>
-   *              </ul>
-   *          </li>
-   *     </ul>
+   *   <ul>
+   *     <li>Select all patients from encounter “Master Card – Ficha Clinica ” (encounter type id 6)
+   *         that occurred between startDate and endDate: <code>
+   *         Encounter Date >=startDate and <= endDate</code>
+   *     <li>Filter all patients registered in encounter “Master Card – Ficha Clinica ” (encounter
+   *         id 6) with the following information:
+   *         <ul>
+   *           <li>TB Screening (PT”: “Tuberculose – Tem Sintomas?”) (Concept ID 23758) = Yes (PT:
+   *               “SIM”) (Concept ID 1065) or (Concept ID 23758) = No (PT: “NAO”) (Concept ID 1066)
+   *           <li>Encounter Date >=startDate and <= endDate as “SCREENING DATE”
+   *         </ul>
+   *     <li>oExclude all patients registered encounter “Master Card – Ficha Clinica ” (encounter id
+   *         6) with the following information:
+   *         <ul>
+   *           <li>TB Treatment (PT”: “Tratamento TB”) (Concept ID 1268) = any value
+   *           <li>Encounter Date = ”SCREENING DATE”
+   *         </ul>
+   *   </ul>
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -2331,48 +2267,43 @@ public class ResumoMensalCohortQueries {
   /**
    * <b>Name: F3</b>
    *
-   * <p>F3: Number of patients who had at least one clinical appointment during the year
-   * (PT: Nº de pacientes que vieram, pelo menos, a uma consulta durante o ANO (Notificação anual!) (Notificação anual!))</p>
-   * <ul>
-   *     <li>
-   *         Select all patients from encounter “Master Card  – Ficha Clinica ” (encounter id 6) that occurred between startDate and endDate:
-   *          <br />
-   *          <code>Encounter Date >=startDate and <= endDate AS “VISIT DATE”</code>
-   *     </li>
-   *     <li>
-   *         Exclude all patients registered encounter “Master Card  – Ficha Clinica ” (encounter id 6) with the following information:
-   *         <br />
-   *         <code>
-   *             Encounter Date >=newStartDate and < startDate
-   *         </code>
-   *         <br />
-   *         <p><b>
-   *            If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate = startDate
-   *            Else newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate</b></p>
-   *     </li>
+   * <p>F3: Number of patients who had at least one clinical appointment during the year (PT: Nº de
+   * pacientes que vieram, pelo menos, a uma consulta durante o ANO (Notificação anual!)
+   * (Notificação anual!))
    *
-   * </ul>
    * <ul>
-   *     <li>
-   *         Exclude all patients registered as Transferred In during the statistical year:
-   *        <ul>
-   *            <li>B2i - Select all patients registered in encounter “Master Card – Ficha Resumo” (encounter id 53) who have the following conditions:
-   *              <ul>
-   *                  <li>“Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is equal to “YES” (Concept ID 1065) AND</li>
-   *                  <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID 6300) = “TARV” (Concept ID 6276) AND</li>
-   *                  <li>Date of MasterCard File Opening (PT”: “Data de Abertura da Ficha na US”) (Concept ID 23891 value_datetime) >=newStartDate and <= endDate</li>
-   *               </ul>
-   *            </li>
-   *            <li>
-   *                B2ii - Select all patients registered as transferred-in in Program Enrollment
-   *                <h4>Technical Specs:</h4>
-   *                <p>
-   *                    <b>Table: patient_program</b><br />
-   *                    <code>Criterias: program_id=2, patient_state_id=29 and start_date >=newStartDate and <=endDate</code>
-   *                </p>
-   *            </li>
-   *        </ul>
-   *     </li>
+   *   <li>Select all patients from encounter “Master Card – Ficha Clinica ” (encounter id 6) that
+   *       occurred between startDate and endDate: <br>
+   *       <code>Encounter Date >=startDate and <= endDate AS “VISIT DATE”</code>
+   *   <li>Exclude all patients registered encounter “Master Card – Ficha Clinica ” (encounter id 6)
+   *       with the following information: <br>
+   *       <code>
+   *             Encounter Date >=newStartDate and < startDate
+   *         </code> <br>
+   *       <p><b> If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate = startDate
+   *       Else newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate</b>
+   * </ul>
+   *
+   * <ul>
+   *   <li>Exclude all patients registered as Transferred In during the statistical year:
+   *       <ul>
+   *         <li>B2i - Select all patients registered in encounter “Master Card – Ficha Resumo”
+   *             (encounter id 53) who have the following conditions:
+   *             <ul>
+   *               <li>“Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is
+   *                   equal to “YES” (Concept ID 1065) AND
+   *               <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”)
+   *                   (Concept ID 6300) = “TARV” (Concept ID 6276) AND
+   *               <li>Date of MasterCard File Opening (PT”: “Data de Abertura da Ficha na US”)
+   *                   (Concept ID 23891 value_datetime) >=newStartDate and <= endDate
+   *             </ul>
+   *         <li>B2ii - Select all patients registered as transferred-in in Program Enrollment
+   *             <h4>Technical Specs:</h4>
+   *             <p><b>Table: patient_program</b><br>
+   *             <code>
+   *             Criterias: program_id=2, patient_state_id=29 and start_date >=newStartDate and <=endDate
+   *             </code>
+   *       </ul>
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -2469,66 +2400,46 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <p><b>Name:B7: Number of patientes who Abandoned the ART during the current month.
-   * (PT: Nº de abandonos TARV durante o mês)</b></p>
-   *
+   * <b>Name:B7: Number of patientes who Abandoned the ART during the current month. (PT: Nº de
+   * abandonos TARV durante o mês)</b>
    *
    * <ul>
-   *     <li>All patients having the most recent date between last scheduled drug pickup date (Fila) or 30 days after
-   *        last ART pickup date (Recepção – Levantou ARV) and adding 60 days and this date being less than reporting end Date.
-   *        <ol>
-   *           <li>
-   *                Select the most recent date from:
-   *                <ul>
-   *                    <li>
-   *                        a.Last record of Next Drugs Pick Up Appointment (Concept ID 5096 value_datetime – not empty/null)
-   *                      from encounters of type 18 registered by endDate
-   *                    </li>
-   *                    <li>
-   *                        The most recent “Data de Levantamento” (Concept Id 23866 value_datetime-not empty/null)
-   *                        occurred by endDate from encounters of type 52 , plus(+) 30 days
-   *                    </li>
-   *                </ul>
-   *           </li>
-   *
-   *           <li>And add 60 days and this date should be < endDate</li>
-   *        </ol>
-   *      </li>
-   *
-   *     <li>
-   *        Except all patients who abandoned the ART by previous month:
-   *        <ol>
-   *            <li>
-   *                Select the most recent date from:
-   *                <ul>
-   *                    <li>Last record of Next Drugs Pick Up Appointment (Concept ID 5096 value_datetime – not empty/null)
-   *                    from encounters of type 18 registered by startDate</li>
-   *                    <li>d.The most recent “Data de Levantamento” (Concept Id 23866 value_datetime-not empty/null)
-   *                    occurred by startDate from encounters of type 52 , plus(+) 30 days</li>
-   *                </ul>
-   *            </li>
-   *            <li> And add 60 days and this date should be < startDate</li>
-   *        </ol>
-   *     </li>
-   *
-   *     <li>
-   *        Except all patients who were transferred-out by reporting endDate:
-   *          Same criterias as defined in B5, but instead of during the period
-   *          (>=startDate and <=endDate), it should be by reporting endDate (<=endDate)
-   *     </li>
-   *
-   *     <li>
-   *        Except all patients who were suspended by reporting endDate:
-   *         Same criterias as defined in B6, but instead of during the period (>=startDate and <=endDate), it should be by reporting endDate (<=endDate)
-   *     </li>
-   *
-   *     <li>
-   *        Except all patients who died by reporting endDate:
-   *          Same criterias as defined in B8, but instead of during the period
-   *          (>=startDate and <=endDate), it should be by reporting endDate (<=endDate)
-   *     </li>
+   *   <li>All patients having the most recent date between last scheduled drug pickup date (Fila)
+   *       or 30 days after last ART pickup date (Recepção – Levantou ARV) and adding 60 days and
+   *       this date being less than reporting end Date.
+   *       <ol>
+   *         <li>Select the most recent date from:
+   *             <ul>
+   *               <li>a.Last record of Next Drugs Pick Up Appointment (Concept ID 5096
+   *                   value_datetime – not empty/null) from encounters of type 18 registered by
+   *                   endDate
+   *               <li>The most recent “Data de Levantamento” (Concept Id 23866 value_datetime-not
+   *                   empty/null) occurred by endDate from encounters of type 52 , plus(+) 30 days
+   *             </ul>
+   *         <li>And add 60 days and this date should be < endDate
+   *       </ol>
+   *   <li>Except all patients who abandoned the ART by previous month:
+   *       <ol>
+   *         <li>Select the most recent date from:
+   *             <ul>
+   *               <li>Last record of Next Drugs Pick Up Appointment (Concept ID 5096 value_datetime
+   *                   – not empty/null) from encounters of type 18 registered by startDate
+   *               <li>d.The most recent “Data de Levantamento” (Concept Id 23866 value_datetime-not
+   *                   empty/null) occurred by startDate from encounters of type 52 , plus(+) 30
+   *                   days
+   *             </ul>
+   *         <li>And add 60 days and this date should be < startDate
+   *       </ol>
+   *   <li>Except all patients who were transferred-out by reporting endDate: Same criterias as
+   *       defined in B5, but instead of during the period (>=startDate and <=endDate), it should be
+   *       by reporting endDate (<=endDate)
+   *   <li>Except all patients who were suspended by reporting endDate: Same criterias as defined in
+   *       B6, but instead of during the period (>=startDate and <=endDate), it should be by
+   *       reporting endDate (<=endDate)
+   *   <li>Except all patients who died by reporting endDate: Same criterias as defined in B8, but
+   *       instead of during the period (>=startDate and <=endDate), it should be by reporting
+   *       endDate (<=endDate)
    * </ul>
-   *
    *
    * @return {@link CohortDefinition}
    */
@@ -2659,85 +2570,64 @@ public class ResumoMensalCohortQueries {
    * em TARV no fim do mês automaticamente calculado através da seguinte formula)
    *
    * <ol>
-   *     <li>
-   *         Select all patients with the earliest ART Start Date from the following criterias
-   *         <ul>
-   *             <li>
-   *                 <p>All patients who have their first drugs pick-up date (first encounter_datetime) by reporting end date in Pharmacy form FILA (Encounter Type ID 18):</p>
-   *                  <code>
+   *   <li>Select all patients with the earliest ART Start Date from the following criterias
+   *       <ul>
+   *         <li>
+   *             <p>All patients who have their first drugs pick-up date (first encounter_datetime)
+   *             by reporting end date in Pharmacy form FILA (Encounter Type ID 18): <code>
    *                      first occurrence of encounter datetime
    *                      Encounter Type Ids = 18
    *                   </code>
-   *             </li>
-   *             <li>
-   *                 <p>All patients who have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) = START DRUGS (Concept ID 1256) at the pharmacy or clinical visits (Encounter Type IDs 6,9,18)</p>
-   *                  <code>first occurrence of encounter datetime
+   *         <li>
+   *             <p>All patients who have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) =
+   *             START DRUGS (Concept ID 1256) at the pharmacy or clinical visits (Encounter Type
+   *             IDs 6,9,18) <code>first occurrence of encounter datetime
    *                     Encounter Type Ids = 6,9,18
    *                      ARV PLAN (Concept Id 1255) = START DRUGS (Concept ID 1256)
    *                      </code>
-   *            </li>
-   *            <li>
-   *                <p>All patients who have the first historical start drugs date (earliest concept ID 1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
-   *                    earliest “historical start date”</p>
-   *                    <code>
+   *         <li>
+   *             <p>All patients who have the first historical start drugs date (earliest concept ID
+   *             1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
+   *             earliest “historical start date” <code>
    *                          Encounter Type Ids = 6,9,18,53
    *                          The earliest “Historical Start Date” (Concept Id 1190)
    *                    </code>
-   *            </li>
-   *            <li>
-   *                <p>All patients enrolled in ART Program (date_enrolled in program_id 2, from patient program table)</p>
-   *                <code>
+   *         <li>
+   *             <p>All patients enrolled in ART Program (date_enrolled in program_id 2, from
+   *             patient program table) <code>
    *                    program_enrollment date
    *                      program_id=2, patient_state_id=29 and date_enrolled
    *                </code>
-   *            </li>
-   *            <li>
-   *                <p>f.All patients with first drugs pick up date (earliest concept ID 23866 value_datetime) set in mastercard pharmacy form “Recepção/Levantou ARV” (Encounter Type ID 52) with Levantou ARV (concept id 23865) = Yes (concept id 1065)</p>
-   *                <code>
+   *         <li>
+   *             <p>f.All patients with first drugs pick up date (earliest concept ID 23866
+   *             value_datetime) set in mastercard pharmacy form “Recepção/Levantou ARV” (Encounter
+   *             Type ID 52) with Levantou ARV (concept id 23865) = Yes (concept id 1065) <code>
    *                      earliest “Date of Pick up”
    *                      Encounter Type Ids = 52
    *                      The earliest “Data de Levantamento” (Concept Id 23866 value_datetime) <= endDate
    *                      Levantou ARV (concept id 23865) = SIm (1065)
    *                </code>
-   *            </li>
-   *         </ul>
-   *     </li>
-   *     <li>
-   *         And check if the selected ART Start Date  is <= endDate
-   *     </li>
-   *     <li>
-   *         <p>Filter patients who had a drug pick up as</p>
-   *         <code>
+   *       </ul>
+   *   <li>And check if the selected ART Start Date is <= endDate
+   *   <li>
+   *       <p>Filter patients who had a drug pick up as <code>
    *             At least one encounter “Levantamento de ARV Master Card” (encounter id 52) with the following information:
    *              PickUp Date (PT: “Data de Levantamento”) (Concept ID 23866) <=endDate
-   *         </code>
-   *         <code>
+   *         </code> <code>
    *             Patient had a drug pick in FILA (encounter id 18) by reporting end date (encounter_datetime <=endDate) and have next
    *             scheduled pick up SET (Concept ID 5096 value_datetime – not empty/null)
    *         </code>
-   *
-   *     </li>
-   *
    * </ol>
    *
-   * <p>EXCEPT (NOT)</p>
+   * <p>EXCEPT (NOT)
+   *
    * <ol>
-   *     <li>
-   *       B5: {@link ResumoMensalCohortQueries#getPatientsTransferredOutB5(boolean)}  
-   *     </li>
-   *     <li>
-   *         B6: {@link ResumoMensalCohortQueries#getPatientsWhoSuspendedTreatmentB6(boolean)}
-   *     </li>
-   *     <li>
-   *         B7: {@link ResumoMensalCohortQueries#getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7()}
-   *     </li>
-   *     <li>
-   *         B8: {@link ResumoMensalCohortQueries#getPatientsWhoDied(Boolean)}
-   *     </li>
-   *     
+   *   <li>B5: {@link ResumoMensalCohortQueries#getPatientsTransferredOutB5(boolean)}
+   *   <li>B6: {@link ResumoMensalCohortQueries#getPatientsWhoSuspendedTreatmentB6(boolean)}
+   *   <li>B7: {@link
+   *       ResumoMensalCohortQueries#getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7()}
+   *   <li>B8: {@link ResumoMensalCohortQueries#getPatientsWhoDied(Boolean)}
    * </ol>
-   *
-   *
    *
    * @return {@link CohortDefinition}
    */
