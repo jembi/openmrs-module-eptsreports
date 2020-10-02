@@ -2259,6 +2259,12 @@ public class ResumoMensalCohortQueries {
    *
    * <p><b>Description:</b> Number of patients who had clinical appointment during the reporting
    * month
+   * <code>
+   *     <ul>
+   *        <li>Select all patients from encounter “Master Card  – Ficha Clinica” (encounter type id 6) that occurred between startDate and endDate: <br />
+   *        Encounter_Datetime >=startDate and <= endDate</li>
+   *      </ul>
+   * </code>
    *
    * @return {@link CohortDefinition}
    */
@@ -2277,8 +2283,31 @@ public class ResumoMensalCohortQueries {
   /**
    * <b>Name: F2</b>
    *
-   * <p><b>Description:</b> Number of patients who had clinical appointment during the reporting
-   * month and were screened for TB
+   * <p><b>Description:</b> F2: Number of patients who had clinical appointment during the reporting month and were screened for TB
+   * (PT: Dos pacientes que vieram à consulta durante o mês, subgrupo que foi rastreado para TB)</p>
+   *
+   * <ul>
+   *     <ul>
+   *         <li>
+   *             Select all patients from encounter “Master Card  – Ficha Clinica ” (encounter type id 6) that occurred between startDate and endDate:
+   *            <code>Encounter Date >=startDate and <= endDate</code>
+   *         </li>
+   *         <li>
+   *             Filter all patients registered in encounter “Master Card  – Ficha Clinica ” (encounter id 6) with the following information:
+   *             <ul>
+   *                 <li>TB Screening (PT”: “Tuberculose – Tem Sintomas?”) (Concept ID 23758) = Yes (PT: “SIM”) (Concept ID 1065) or (Concept ID 23758) = No (PT: “NAO”) (Concept ID 1066)</li>
+   *                <li>Encounter Date >=startDate and <= endDate as “SCREENING DATE”</li>
+   *             </ul>
+   *         </li>
+   *          <li>
+   *              oExclude all patients registered encounter “Master Card  – Ficha Clinica ” (encounter id 6) with the following information:
+   *              <ul>
+   *                  <li>TB Treatment (PT”: “Tratamento TB”) (Concept ID 1268) = any value</li>
+   *                  <li>Encounter Date = ”SCREENING DATE”</li>
+   *              </ul>
+   *          </li>
+   *     </ul>
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */
@@ -2302,8 +2331,49 @@ public class ResumoMensalCohortQueries {
   /**
    * <b>Name: F3</b>
    *
-   * <p><b>Description:</b> Number of patients who had at least one clinical appointment during the
-   * year
+   * <p>F3: Number of patients who had at least one clinical appointment during the year
+   * (PT: Nº de pacientes que vieram, pelo menos, a uma consulta durante o ANO (Notificação anual!) (Notificação anual!))</p>
+   * <ul>
+   *     <li>
+   *         Select all patients from encounter “Master Card  – Ficha Clinica ” (encounter id 6) that occurred between startDate and endDate:
+   *          <br />
+   *          <code>Encounter Date >=startDate and <= endDate AS “VISIT DATE”</code>
+   *     </li>
+   *     <li>
+   *         Exclude all patients registered encounter “Master Card  – Ficha Clinica ” (encounter id 6) with the following information:
+   *         <br />
+   *         <code>
+   *             Encounter Date >=newStartDate and < startDate
+   *         </code>
+   *         <br />
+   *         <p><b>
+   *            If startDate=”21-Dez-yyyy” where “yyyy” is any year, then newStartDate = startDate
+   *            Else newStartDate = “21-Dez-(yyyy-1) where “yyyy” is the year from startDate</b></p>
+   *     </li>
+   *
+   * </ul>
+   * <ul>
+   *     <li>
+   *         Exclude all patients registered as Transferred In during the statistical year:
+   *        <ul>
+   *            <li>B2i - Select all patients registered in encounter “Master Card – Ficha Resumo” (encounter id 53) who have the following conditions:
+   *              <ul>
+   *                  <li>“Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is equal to “YES” (Concept ID 1065) AND</li>
+   *                  <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID 6300) = “TARV” (Concept ID 6276) AND</li>
+   *                  <li>Date of MasterCard File Opening (PT”: “Data de Abertura da Ficha na US”) (Concept ID 23891 value_datetime) >=newStartDate and <= endDate</li>
+   *               </ul>
+   *            </li>
+   *            <li>
+   *                B2ii - Select all patients registered as transferred-in in Program Enrollment
+   *                <h4>Technical Specs:</h4>
+   *                <p>
+   *                    <b>Table: patient_program</b><br />
+   *                    <code>Criterias: program_id=2, patient_state_id=29 and start_date >=newStartDate and <=endDate</code>
+   *                </p>
+   *            </li>
+   *        </ul>
+   *     </li>
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */
