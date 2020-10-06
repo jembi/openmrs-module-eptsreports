@@ -27,9 +27,9 @@ import org.openmrs.module.eptsreports.reporting.EptsReportInitializer;
  */
 public class EptsReportsActivator extends BaseModuleActivator {
 
-  private final Log log = LogFactory.getLog(this.getClass());
+  private  Log log = LogFactory.getLog(this.getClass());
 
-  private final EptsReportInitializer reportsInitializer = new EptsReportInitializer();
+  private  EptsReportInitializer reportsInitializer = new EptsReportInitializer();
 
   @Override
   public void contextRefreshed() {
