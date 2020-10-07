@@ -234,7 +234,7 @@ public class SummaryQueries {
             + " AND pg.location_id IN(:location) "
             + " AND e.location_id IN(:location) AND e.voided=0 "
             + " AND ps.start_date IS NOT NULL AND ps.end_date IS NULL "
-            + " AND e.encounter_datetime >= ps.start_date "
+            + " AND e.encounter_datetime > ps.start_date "
             + " GROUP BY pg.patient_id ";
     return String.format(query, programId, stateId, str2);
   }

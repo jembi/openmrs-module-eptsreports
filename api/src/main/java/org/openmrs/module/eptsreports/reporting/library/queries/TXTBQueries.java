@@ -72,7 +72,7 @@ public class TXTBQueries {
   /**
    * <b>Description:</b> exited by either transfer out, treatment suspension, treatment abandoned or
    * death of patient
-   * 
+   *
    * @return {@link CohortDefinition}
    */
   public static String patientsAtProgramStates(Integer artProgramId, List<Integer> stateIds) {
@@ -155,7 +155,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Patients with Pulmonary TB Date in Patient Clinical Record of ART date TB
-   * 
+   *
    * @return {@link String}
    */
   public static String pulmonaryTB(
@@ -173,7 +173,7 @@ public class TXTBQueries {
   /**
    * <b>Description:</b> Patients marked as “Tratamento TB= Inicio (I) ” in Ficha Clinica Master
    * Card
-   * 
+   *
    * @return {@link String}
    */
   public static String tbTreatmentStart(
@@ -190,7 +190,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> TUBERCULOSIS SYMPTOMS
-   * 
+   *
    * @return {@link String}
    */
   public static String tuberculosisSymptoms(
@@ -222,7 +222,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> ACTIVE TUBERCULOSIS
-   * 
+   *
    * @return {@link String}
    */
   public static String activeTuberculosis(
@@ -241,7 +241,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> TB OBSERVATIONS
-   * 
+   *
    * @return {@link String}
    */
   public static String tbObservation(
@@ -277,7 +277,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> APPLICATION FOR LABORATORY RESEARCH
-   * 
+   *
    * @return {@link String}
    */
   public static String applicationForLaboratoryResearch(
@@ -300,7 +300,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> TB GENEXPERT TEST
-   * 
+   *
    * @return {@link String}
    */
   public static String tbGenexpertTest(
@@ -361,7 +361,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Test TB LAM
-   * 
+   *
    * @return {@link String}
    */
   public static String testTBLAM(
@@ -380,7 +380,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Result For Basiloscopia
-   * 
+   *
    * @return {@link String}
    */
   public static String resultForBasiloscopia(
@@ -399,7 +399,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Date Obs
-   * 
+   *
    * @return {@link String}
    */
   public static String dateObs(
@@ -422,7 +422,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Date Obs Within Months Before Start Date
-   * 
+   *
    * @return {@link String}
    */
   public static String dateObsWithinXMonthsBeforeStartDate(
@@ -451,7 +451,7 @@ public class TXTBQueries {
 
   /**
    * <b>Description:</b> Patients With First Drug Pickup Encounter In Reporting Period
-   * 
+   *
    * @return {@link String}
    */
   public static String patientWithFirstDrugPickupEncounterInReportingPeriod(
@@ -472,7 +472,6 @@ public class TXTBQueries {
    * @param questionConcept The question concept
    * @param valueCodedConcept The valueCoded concept
    * @param encounterTypesList The encounter types to consider
-   * 
    * @return {@link CohortDefinition}
    */
   public static CohortDefinition getPatientsWithObsBetweenDates(
