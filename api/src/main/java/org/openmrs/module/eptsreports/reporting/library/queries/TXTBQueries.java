@@ -20,10 +20,11 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 public class TXTBQueries {
 
   /**
-   * Copied straight from INICIO DE TRATAMENTO ARV - NUM PERIODO: INCLUI TRANSFERIDOS DE COM DATA DE
-   * INICIO CONHECIDA (SQL) SqlCohortDefinition#91787a86-0362-4820-a4ee-025d5501198b in backup
+   * <b>Description:</b> Copied straight from INICIO DE TRATAMENTO ARV - NUM PERIODO: INCLUI
+   * TRANSFERIDOS DE COM DATA DE INICIO CONHECIDA (SQL)
+   * SqlCohortDefinition#91787a86-0362-4820-a4ee-025d5501198b in backup
    *
-   * @return sql
+   * @return {@link String}
    */
   public static String arvTreatmentIncludesTransfersFromWithKnownStartData(
       Integer arvPlanConceptId,
@@ -68,8 +69,12 @@ public class TXTBQueries {
         pharmacyEncounterTypeId);
   }
 
-  // exited by either transfer out, treatment suspension, treatment abandoned
-  // or death of patient
+  /**
+   * <b>Description:</b> exited by either transfer out, treatment suspension, treatment abandoned or
+   * death of patient
+   *
+   * @return {@link CohortDefinition}
+   */
   public static String patientsAtProgramStates(Integer artProgramId, List<Integer> stateIds) {
     return String.format(
         "SELECT pg.patient_id FROM patient p  "
@@ -200,7 +205,7 @@ public class TXTBQueries {
    * @param asthenia
    * @param cohabitant
    * @param lymphadenopathy
-   * @return
+   * @return String
    */
   public static String tbObservation(
       Integer encounterTypeId,
@@ -241,7 +246,7 @@ public class TXTBQueries {
    * @param tbGenexpertTest
    * @param cultureTest
    * @param testTBLAM
-   * @return
+   * @return String
    */
   public static String applicationForLaboratoryResearch(
       Integer encounterTypeId,
@@ -307,7 +312,7 @@ public class TXTBQueries {
   }
 
   /**
-   * CULTURE TEST
+   * <b>Description:</b> CULTURE TEST
    *
    * @param encounterTypeId
    * @param cultureTest
@@ -413,11 +418,11 @@ public class TXTBQueries {
   }
 
   /**
-   * Gets patients with a coded obs between dates. This method though might seem like a duplicate of
-   * the above method, We are adding it because we faced a situation where a patient had an obs with
-   * a wrong obs date time format (0209-10-22 00:00:00) Using CodedObsCohortDefinition from the
-   * above method was counting this patient. We had to resort to using an SQL query to get around
-   * this issue.
+   * <b>Description:</b> Gets patients with a coded obs between dates. This method though might seem
+   * like a duplicate of the above method, We are adding it because we faced a situation where a
+   * patient had an obs with a wrong obs date time format (0209-10-22 00:00:00) Using
+   * CodedObsCohortDefinition from the above method was counting this patient. We had to resort to
+   * using an SQL query to get around this issue.
    *
    * @param questionId the obs concept Id
    * @param valueId the obs value coded Id

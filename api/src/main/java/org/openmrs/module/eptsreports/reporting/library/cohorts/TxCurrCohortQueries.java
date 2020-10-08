@@ -18,8 +18,13 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.calculation.txcurr.LessThan3MonthsOfArvDispensationCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.txcurr.SixMonthsAndAboveOnArvDispensationCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.txcurr.ThreeToFiveMonthsOnArtDispensationCalculation;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.TXCurrQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -250,10 +255,22 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 1. Cohort of patients registered as START DRUGS (answer to question 1255 = ARV PLAN is 1256 =
-   * START DRUGS) in the first drug pickup (encounter type 18=S.TARV: FARMACIA) or follow up
-   * consultation for adults and children (encounter types 6=S.TARV: ADULTO SEGUIMENTO and 9=S.TARV:
-   * PEDIATRIA SEGUIMENTO) before or on end date
+   * <b>Description: 1 –</b> Number of patients registered with Start Drugs
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * Cohort of patients registered as START DRUGS <b>(concept_id = 1255)</b> in ARV PLAN
+   * <b>(concept_id = 1256)</b>
+   *
+   * <p>In the first drug pickup <b>(encounterType_id = 18)</b> or follow up consultation for adults
+   * and children <b>(encounterType_id = 6 and 5)</b> before or on End Date <b>encounter_datetime <=
+   * endDate</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientWithSTARTDRUGSObs")
   public CohortDefinition getPatientWithSTARTDRUGSObsBeforeOrOnEndDate() {
@@ -273,8 +290,18 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 3.All patients enrolled in ART Program by end of reporting period. (3) Table: patient_program
-   * Criterias: program_id=2, and date_enrolled <= endDate
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>3 –</b> Number of patients enrolled in ART Program <b>(program_id = 2)</b> by end of
+   * reporting period.
+   *
+   * <p>Table: patient_program and date_enrolled <= endDate
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientEnrolledInArtProgramByEndReportingPeriod")
   public CohortDefinition getPatientEnrolledInArtProgramByEndReportingPeriod() {
@@ -292,10 +319,16 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 4.
+   * <b>Techincal Specs</b>
    *
-   * @return Cohort of patients with first drug pickup (encounter type 18=S.TARV: FARMACIA) before
-   *     or on end date
+   * <blockquote>
+   *
+   * <b>4 –</b> Cohort of patients with first drug pickup <b>(encounterType_id = 18)</b> before or
+   * on End Date <b>encounter_datetime <= endDate</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientWithFirstDrugPickupEncounter")
   public CohortDefinition getPatientWithFirstDrugPickupEncounterBeforeOrOnEndDate() {
@@ -313,11 +346,19 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 5. All patients who have picked up drugs (Recepção Levantou ARV) – Master Card by end of
-   * reporting period Encounter Type Ids = 52 The earliest “Data de Levantamento” (Concept Id 23866
-   * value_datetime) <= endDate
+   * <b>Techincal Specs</b>
    *
-   * @return CohortDefinition
+   * <blockquote>
+   *
+   * <b>5 –</b> All patients who have picked up drugs (Recepção Levantou ARV) – Master Card
+   * <b>(encounterType_id = 52)</b>
+   *
+   * <p>The earliest “Data de Levantamento” <b>(concept_id = 23866)</b> by end of reporting period
+   * <b>(obs value_datetime) <= endDate</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod")
   public CohortDefinition getPatientsWhoHavePickedUpDrugsMasterCardByEndReporingPeriod() {
@@ -346,10 +387,21 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 6. All deaths, Transferred-out and Suspensions registered in Patient Program State by reporting
-   * end date Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 10
-   * (Died) or Patient_State.state = 7 (Transferred-out) or Patient_State.state = 8 (Suspended) and
-   * Patient_State.start_date <= endDate Patient_state.end_date is null
+   * <b>Description:</b>
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>6 –</b> All deaths <b>(Patient_State.state = 10)</b>, Transferred-out
+   * <b>(Patient_State.state = 7)</b> and Suspensions <b>(Patient_State.state = 8)</b>
+   *
+   * <p>Registered in Patient Program State by reporting end date <b>Patient_State.start_date <=
+   * endDate Patient_state.end_date</b> is null
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(
       value = "patientsDeadTransferredOutSuspensionsInProgramStateByReportingEndDate")
@@ -375,8 +427,16 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 7. All deaths registered in Patient Demographics by reporting end date Person.Dead=1 and
-   * death_date <= :endDate
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>7 –</b> All deaths registered in Patient Demographics by reporting end date Person.Dead=1
+   * and death_date <= :endDate
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "deadPatientsInDemographiscByReportingEndDate")
   public CohortDefinition getDeadPatientsInDemographiscByReportingEndDate() {
@@ -391,11 +451,20 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 8. All deaths registered in Last Home Visit Card by reporting end date Last Home Visit Card
-   * (Encounter Type 21, 36, 37) Patient not found (Concept ID 2003) = NO (Concept ID 1066) Reason
-   * of Not Finding (Concept ID 2031) = Died (COncpet Id 1383) Last Encounter_datetime <= endDate
+   * <b>Technical Specs</b>
    *
-   * @return CohortDefinition
+   * <blockquote>
+   *
+   * <b>8 –</b> All deaths <b>(concpet_id = 1383)</b> registered in Last Home Visit Card
+   * <b>(EncounterType_ids in 21, 36, 37)</b>
+   *
+   * <p>Where Patient not found <b>(Concept_id = 2003)</b> and NO <b>(concept_id = 1066)</b> With
+   * Reason of Not Finding <b>(concept_id = 2031)</b> by reporting end date Last
+   * <b>encounter_datetime <= endDate</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientDeathRegisteredInLastHomeVisitCardByReportingEndDate")
   public CohortDefinition getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate() {
@@ -419,9 +488,17 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 9. All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end date
-   * Encounter Type ID= 6 or 53 Estado de Permanencia (Concept Id 6272) = Dead (Concept ID 1366)
-   * Encounter_datetime <= endDate
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>9 –</b> All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting
+   * end date Encounter Type ID= 6 or 53 Estado de Permanencia (Concept Id 6272) = Dead (Concept ID
+   * 1366) Encounter_datetime <= endDate
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "deadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate")
   public CohortDefinition getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate() {
@@ -443,9 +520,19 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 10. All tranferred-outs registered in Ficha Resumo and Ficha Clinica of Master Card by
-   * reporting end date Encounter Type ID= 6 or 53 Estado de Permanencia (Concept Id 6272) =
-   * Transferred-out (Concept ID 1706) Encounter_datetime <= endDate
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>10 –</b> All transferred-outs registered in Ficha Resumo and Ficha Clinica of Master Card
+   * <b>(encounterType_id = 6 OR 53)</b>, Estado de Permanencia <b>(concept_id = 6272)</b>
+   *
+   * <p>With Transferred-out <b>(concept_id = 1706)</b> by reporting end date <b>(encounter_datetime
+   * <= endDate)</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(
       value = "transferredOutPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate")
@@ -469,9 +556,19 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 11. All suspensions registered in Ficha Resumo and Ficha Clinica of Master Card by reporting
-   * end date Encounter Type ID= 6 or 53 Estado de Permanencia (Concept Id 6272) = Suspended
-   * (Concept ID 1709) Encounter_datetime <= endDate
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>11 –</b> All suspensions registered in Ficha Resumo and Ficha Clinica of Master Card
+   * <b>(encounterType_id = 6 OR 53)</b>, Estado de Permanencia <b>(concept_id = 6272)</b>
+   *
+   * <p>With Suspended treatment <b>(concept_id = 1709)</b> by reporting end date
+   * <b>(encounter_datetime <= endDate)</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(
       value = "patientSuspendedInFichaResumeAndClinicaOfMasterCardByReportEndDate")
@@ -494,13 +591,26 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 13..All patients having the most recent date between last scheduled drug pickup date (Fila) or
-   * last scheduled consultation date (Ficha Seguimento or Ficha Clínica) or 30 days after last ART
-   * pickup date (Recepção – Levantou ARV) and adding {@code numDays} days and this date being less
-   * than reporting end Date. (For more clarifications refer to scenario Table 1)
+   * <b>Technical Specs</b>
    *
-   * @param numDays - number of days
-   * @return CohortDefinition
+   * <blockquote>
+   *
+   * <b>13 –</b> All patients having the most recent date between last scheduled drug pickup date
+   * <b>(concept_id 5096 = RETURN VISIT DATE FOR ARV DRUG)</b>
+   *
+   * <p>Or last scheduled consultation date (Ficha Seguimento or Ficha Clínica <b>(concept_id =
+   * 1410)</b>)
+   *
+   * <p>Or 30 days after last ART Pickup date (<b>(concept_id = 23866)</b> – Recepção – Levantou
+   * ARV).
+   *
+   * <p>And adding {@code numDays} days and this date being less than reporting end Date. (For more
+   * clarifications refer to scenario Table 1)
+   *
+   * </blockquote>
+   *
+   * @param numDays
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientHavingLastScheduledDrugPickupDate")
   public CohortDefinition getPatientHavingLastScheduledDrugPickupDateDaysBeforeEndDate(
@@ -527,11 +637,23 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 14. All patients who do not have the next scheduled drug pick up date (Fila) and next scheduled
-   * consultation date (Ficha de Seguimento or Ficha Clinica – Master Card) and ART Pickup date
-   * (Recepção – Levantou ARV).
+   * <b>Description:</b> Number of patients without scheduled Date Drug and ART Pickup
    *
-   * @return CohortDefinition
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>14 –</b> All patients who do not have the next scheduled drug pick update <b>(concept_id
+   * 5096 = RETURN VISIT DATE FOR ARV DRUG)</b>
+   *
+   * <p>And next scheduled consultation date (Ficha de Seguimento or Ficha Clinica – Master Card
+   * <b>(concept_id = 1410)</b>)
+   *
+   * <p>And ART Pickup date (<b>(concept_id = 23866)</b> – Recepção – Levantou ARV).
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup")
   public CohortDefinition getPatientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup() {
@@ -555,10 +677,19 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 555
+   * <b>Technical Specs</b>
    *
-   * @return Cohort of patients who left ART program before or on end date(4). Includes: dead,
-   *     transferred to, stopped and abandoned (patient state 10, 7, 8 or 9)
+   * <blockquote>
+   *
+   * <b>555 –</b> Cohort of patients who left ART program <b>(program_id = 2)</b> before or on end
+   * date(4) patient state<b>.start Date <= endDate</b>.
+   *
+   * <p>Includes: dead, transferred to, stopped and abandoned <b>(patient state_id = 10, 7, 8 or
+   * 9)</b> respectively
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "leftARTProgramBeforeOrOnEndDate")
   public CohortDefinition getPatientsWhoLeftARTProgramBeforeOrOnEndDate() {
@@ -594,11 +725,17 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 666
+   * <b>Technical Specs</b>
    *
-   * @return Cohort of patients that from the date scheduled for next drug pickup (concept
-   *     5096=RETURN VISIT DATE FOR ARV DRUG) until end date have completed 28 days and have not
-   *     returned
+   * <blockquote>
+   *
+   * <b>666 –</b> Cohort of patients that from the date scheduled for next drug pickup <b>(concept
+   * 5096=RETURN VISIT DATE FOR ARV DRUG)</b> until end date have completed 28 days and have not
+   * returned
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientsThatMissedNexPickup")
   private CohortDefinition getPatientsThatMissedNexPickup() {
@@ -620,10 +757,16 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 777
+   * <b>Technical Specs</b>
    *
-   * @return Cohort of patients that from the date scheduled for next follow up consultation
-   *     (concept 1410=RETURN VISIT DATE) until the end date have not completed 28 days
+   * <blockquote>
+   *
+   * <b>777 –</b> Cohort of patients that from the date scheduled for next follow up consultation
+   * <b>(concept 1410=RETURN VISIT DATE)</b> until the end date have not completed 28 days
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientsThatDidNotMissNextConsultation")
   private CohortDefinition getPatientsThatDidNotMissNextConsultation() {
@@ -651,11 +794,17 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 888
+   * <b>Technical Specs</b>
    *
-   * @return Cohort of patients that were registered as abandonment (program workflow state is
-   *     9=ABANDONED) but from the date scheduled for next drug pick up (concept 5096=RETURN VISIT
-   *     DATE FOR ARV DRUG) until the end date have not completed 28 days
+   * <blockquote>
+   *
+   * <b>888 –</b> Cohort of patients that were registered as abandonment <b>(patient state_id =
+   * 9)</b> </b> but from the date scheduled for next drug pick up <b>(concept 5096=RETURN VISIT
+   * DATE)</b> until the end date have not completed 28 days
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(value = "patientsReportedAsAbandonmentButStillInPeriod")
   private CohortDefinition getPatientsReportedAsAbandonmentButStillInPeriod() {
@@ -681,10 +830,55 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * 12. Except all patients who after the most recent date from 2.1 to 2.6, have a drugs pick up or
-   * consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most recent date or
-   * Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most
-   * recent date.
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>12 –</b> Except all patients who after the most recent date from 2.1 to 2.6, have a drugs
+   * pick up or consultation <b>(encounterType_id= 6, 9, 18)</b>
+   *
+   * <p>And encounter_datetime > the most recent date or "Drug pickup" <b>(encounterType_id =
+   * 52)</b> and “Data de Levantamento” <b>(Concept Id 23866 value_datetime) > the most recent
+   * date</b>.
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  @DocumentedDefinition(value = "patientWhoAfterMostRecentDateHaveDrusPickupOrConsultation")
+  public CohortDefinition getPatientWhoAfterMostRecentDateHaveDrusPickupOrConsultation() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+
+    definition.setName("patientWhoAfterMostRecentDateHaveDrusPickupOrConsultation");
+
+    definition.setQuery(
+        TXCurrQueries.getPatientWhoAfterMostRecentDateHaveDrusPickupOrConsultation(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+            hivMetadata.getArtDatePickupMasterCard().getConceptId()));
+
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>12 –</b> Except all patients who after the most recent date from 2.1 to 2.6, have a drugs
+   * pick up or consultation <b>(encounterType_id= 6, 9, 18)</b>
+   *
+   * <p>And encounter_datetime > the most recent date or "Drug pickup" <b>(encounterType_id =
+   * 52)</b> and “Data de Levantamento” <b>(concept_id = 23866) value_datetime) > the most recent
+   * date</b>.
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
    */
   @DocumentedDefinition(
       value = "patientWhoAfterMostRecentDateHaveDrusPickupOrConsultationComposition")
@@ -728,6 +922,74 @@ public class TxCurrCohortQueries {
     return defintion;
   }
 
+  @DocumentedDefinition("<3, 3-5, >6 months of ARVs Dispensed")
+  public CohortDefinition getPatientsWithMonthsRangeOfArvDispensationQuantity(String range) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("<3, 3-5, >6 months of ARVs Dispensed");
+    cd.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CalculationCohortDefinition cd1 =
+        new CalculationCohortDefinition(
+            "<3 months on ART",
+            Context.getRegisteredComponents(LessThan3MonthsOfArvDispensationCalculation.class)
+                .get(0));
+    cd1.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
+    cd1.addParameter(new Parameter("location", "Location", Location.class));
+    CalculationCohortDefinition cd2 =
+        new CalculationCohortDefinition(
+            "3-5 months of ARVs dispensed",
+            Context.getRegisteredComponents(ThreeToFiveMonthsOnArtDispensationCalculation.class)
+                .get(0));
+    cd2.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
+    cd2.addParameter(new Parameter("location", "Location", Location.class));
+    CalculationCohortDefinition cd3 =
+        new CalculationCohortDefinition(
+            "6 or more months of ARV dispensed",
+            Context.getRegisteredComponents(SixMonthsAndAboveOnArvDispensationCalculation.class)
+                .get(0));
+    cd3.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
+    cd3.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch("1", EptsReportUtils.map(cd1, "onOrBefore=${onOrBefore},location=${location}"));
+    cd.addSearch("2", EptsReportUtils.map(cd2, "onOrBefore=${onOrBefore},location=${location}"));
+    cd.addSearch("3", EptsReportUtils.map(cd3, "onOrBefore=${onOrBefore},location=${location}"));
+    if (range.equals("<3")) {
+      cd.setCompositionString("1 AND NOT (2 OR 3)");
+    } else if (range.equals("3-5")) {
+      cd.setCompositionString("2 AND NOT 3");
+    } else if (range.equals(">6")) {
+      cd.setCompositionString("3");
+    }
+    return cd;
+  }
+
+  @DocumentedDefinition(
+      "patients whose next ART pick-up is scheduled for >173 days after the date of their last ART drug pick-up")
+  private CohortDefinition getPatientsWithNextPickupMoreThan173Days() {
+    return getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(173, null);
+  }
+
+  @DocumentedDefinition(
+      "Patients whose next ART pick-up is scheduled for 83-173 days after the date of their last ART drug pick-up")
+  private CohortDefinition getPatientsWithNextPickup83to173Days() {
+    return getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(83, 173);
+  }
+
+  @DocumentedDefinition(
+      "Patients whose next ART pick-up is scheduled for <83 days after the date of their last ART drug pick-up")
+  private CohortDefinition getPatientsWithNextPickupLessThan83days() {
+    return getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(null, 83);
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <p>Number of patients with less than 3 Monthly Type of Dispensation <b>(concept_id = 23739)</b>
+   * on ART
+   *
+   * @return {@link SqlCohortDefinition}
+   */
   @DocumentedDefinition("For <3 months of ARVs dispense to active patient’s on ART ")
   public CohortDefinition getPatientsWithLessThan3MonthlyTypeOfDispensation() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -965,6 +1227,18 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * Patients marked as (DT) Quartely Dispensation <b>(concept_id = 23730)</b> on Ficha Clinica
+   * Mastercard on last drug pickup <b>(concept_id = 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link SqlCohortDefinition}
+   */
   @DocumentedDefinition(
       "Patients marked as DT on Ficha Clinica Mastercard on last Tipo de Levantamento")
   public SqlCohortDefinition getPatientsWithQuarterlyTypeOfDispensation() {
@@ -1329,6 +1603,18 @@ public class TxCurrCohortQueries {
     return patientsWithQuarterlyTypeOfDispensation;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * Patients marked as (DS) Semi-annual Dispensation <b>(concept_id = 23888)</b> on Ficha Clinica
+   * Mastercard on last drug pickup <b>(concept_id = 5096 RETURN VISIT DATE FOR ARV DRUG)</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link SqlCohortDefinition}
+   */
   @DocumentedDefinition(
       "Patients marked as DS on Ficha Clinica Mastercard on last Tipo de Levantamento")
   public SqlCohortDefinition getPatientsWithSemiAnnualTypeOfDispensation() {
@@ -1707,9 +1993,9 @@ public class TxCurrCohortQueries {
   }
 
   /**
-   * Dispensation Compositions
+   * <b>Description:</b> Dispensation Compositions, Monthly, Quartely and Semi-annual Dispensations
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition monthlyDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1730,6 +2016,11 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Number of patients with Quartely Dispensation (excluding Semi-annual)
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition quarterlyDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Get patients with Quarterly ARV Dispensation");
@@ -1747,6 +2038,11 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Description:</b> Number of patients with Semi-annual Dispensation
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition semiAnnualDispensationComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Get patients with Quarterly ARV Dispensation");
@@ -1762,7 +2058,92 @@ public class TxCurrCohortQueries {
     return cd;
   }
 
-  /** 15. 2.7 = 15 since version 4 . All transferred-outs registered in Last Home Visit Card */
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * All Patients with next pickup <b>(concept_id = 5096 RETURN VISIT DATE FOR ARV DRUG)</b> between
+   * days after last drug pickup <b>(encounterType_id = 18)</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  private CohortDefinition getPatientsWithNextPickupBetweenDaysAfterLastPharmacyEncounter(
+      Integer minDays, Integer maxDays) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    StringBuilder sb =
+        new StringBuilder()
+            .append("select p.patient_id ")
+            .append("from patient p ")
+            .append(
+                "         join (select e.patient_id, e.encounter_datetime, max(o.value_datetime) value_datetime ")
+            .append("               from encounter e ")
+            .append(
+                "                        join (select patient_id, max(encounter_datetime) encounter_datetime ")
+            .append("                              from encounter e ")
+            .append("                              where e.voided = 0 ")
+            .append("                                and e.encounter_type = %d ")
+            .append("                                and e.encounter_datetime <= :onOrBefore ")
+            .append("                                and e.location_id = :location ")
+            .append("                              group by patient_id) last ")
+            .append("                             on e.patient_id = last.patient_id ")
+            .append(
+                "                                 and e.encounter_datetime = last.encounter_datetime ")
+            .append("                        join obs o on e.encounter_id = o.encounter_id ")
+            .append("               where e.voided = 0 ")
+            .append("                 and o.voided = 0 ")
+            .append("                 and o.concept_id = %d ")
+            .append("                 and e.location_id = :location ")
+            .append("                 and e.encounter_type = %d ")
+            .append("               group by e.patient_id, e.encounter_datetime) last_obs ")
+            .append("              on p.patient_id = last_obs.patient_id ");
+
+    if (minDays != null && maxDays != null) {
+      sb.append(
+              "  where timestampdiff(DAY, last_obs.encounter_datetime, last_obs.value_datetime) BETWEEN ")
+          .append(minDays)
+          .append(" AND ")
+          .append(maxDays);
+    } else if (minDays == null) {
+      sb.append(
+              "  where timestampdiff(DAY, last_obs.encounter_datetime, last_obs.value_datetime) < ")
+          .append(maxDays);
+    } else {
+      sb.append(
+              "  where timestampdiff(DAY, last_obs.encounter_datetime, last_obs.value_datetime) > ")
+          .append(minDays);
+    }
+    sb.append(" and p.voided = 0");
+
+    cd.setQuery(
+        String.format(
+            sb.toString(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+            hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId()));
+
+    return cd;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>15 - 2.7 = 15 since version 4</b>
+   *
+   * <p>All Patients transferred-outs <b>(concept_id = 1706)</b> registered in Last Home Visit Card
+   * <b>(encounterType_id = 21)</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   @DocumentedDefinition(value = "Patients Transfered Out In Last Home Visit Card")
   public CohortDefinition getPatientsTransferedOutInLastHomeVisitCard() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
