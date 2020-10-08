@@ -31,9 +31,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupDsdReport extends EptsDataExportManager {
 
-  private final EriDSDDataset eriDSDDataset;
+  private EriDSDDataset eriDSDDataset;
 
-  private final TxCurrCohortQueries txCurrCohortQueries;
+  private TxCurrCohortQueries txCurrCohortQueries;
 
   @Autowired
   public SetupDsdReport(EriDSDDataset eriDSDDataset, TxCurrCohortQueries txCurrCohortQueries) {

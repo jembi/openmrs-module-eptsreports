@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupResumoTrimestralReport extends EptsDataExportManager {
 
-  private final ResumoTrimestralDataSetDefinition resumoTrimestralDataSetDefinition;
+  private ResumoTrimestralDataSetDefinition resumoTrimestralDataSetDefinition;
 
   @Autowired
   public SetupResumoTrimestralReport(

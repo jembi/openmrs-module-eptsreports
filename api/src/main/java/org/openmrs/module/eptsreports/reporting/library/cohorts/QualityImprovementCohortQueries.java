@@ -37,7 +37,7 @@ public class QualityImprovementCohortQueries {
 
   @Autowired private TbMetadata tbMetadata;
 
-  @Autowired GenderCohortQueries genderCohortQueries;
+  @Autowired private GenderCohortQueries genderCohortQueries;
 
   /**
    * MQ_INICIO TARV NO PERIODO DE INCLUSAO (AMOSTRA TARV) - NOVO

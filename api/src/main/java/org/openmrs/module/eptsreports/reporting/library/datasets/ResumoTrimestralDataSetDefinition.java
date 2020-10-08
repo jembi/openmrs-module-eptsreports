@@ -50,7 +50,7 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
 
   private static final String L = "Nº de pacientes óbitos na coorte atual";
 
-  private final ResumoTrimestralCohortQueries resumoTrimestralCohortQueries;
+  private ResumoTrimestralCohortQueries resumoTrimestralCohortQueries;
 
   @Autowired
   public ResumoTrimestralDataSetDefinition(

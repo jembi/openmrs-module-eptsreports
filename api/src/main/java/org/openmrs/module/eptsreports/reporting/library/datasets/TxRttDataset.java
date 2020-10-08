@@ -29,9 +29,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxRttDataset extends BaseDataSet {
 
-  private final TxRttCohortQueries txRttCohortQueries;
-  private final EptsGeneralIndicator eptsGeneralIndicator;
-  private final EptsCommonDimension eptsCommonDimension;
+  private TxRttCohortQueries txRttCohortQueries;
+  private EptsGeneralIndicator eptsGeneralIndicator;
+  private EptsCommonDimension eptsCommonDimension;
 
   @Autowired
   @Qualifier("commonAgeDimensionCohort")

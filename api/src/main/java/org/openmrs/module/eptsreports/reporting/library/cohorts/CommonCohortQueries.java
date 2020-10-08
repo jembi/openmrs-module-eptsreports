@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommonCohortQueries {
 
-  private final HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
 
-  private final TbMetadata tbMetadata;
+  private TbMetadata tbMetadata;
 
   @Autowired
   public CommonCohortQueries(HivMetadata hivMetadata, TbMetadata tbMetadata) {

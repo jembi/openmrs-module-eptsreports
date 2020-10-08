@@ -56,13 +56,13 @@ public abstract class BaseDataSet {
 
   public static class ColumnParameters {
 
-    private final String name;
+    private String name;
 
-    private final String label;
+    private String label;
 
-    private final String dimensions;
+    private String dimensions;
 
-    private final String column;
+    private String column;
 
     /**
      * Default constructor

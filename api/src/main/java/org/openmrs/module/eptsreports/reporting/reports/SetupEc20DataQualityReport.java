@@ -24,11 +24,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupEc20DataQualityReport extends EptsDataExportManager {
 
-  private final SummaryEc20DataQualityCohorts summaryEc20DataQualityCohorts;
+  private SummaryEc20DataQualityCohorts summaryEc20DataQualityCohorts;
 
-  private final SummaryEc20DataQualityDataset summaryEc20DataQualityDataset;
+  private SummaryEc20DataQualityDataset summaryEc20DataQualityDataset;
 
-  private final Ec20PatientListDataset ec20PatientListDataset;
+  private Ec20PatientListDataset ec20PatientListDataset;
 
   @Autowired
   public SetupEc20DataQualityReport(

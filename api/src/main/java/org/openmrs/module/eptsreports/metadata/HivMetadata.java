@@ -24,9 +24,9 @@ import org.springframework.stereotype.Component;
 @Component("hivMetadata")
 public class HivMetadata extends ProgramsMetadata {
 
-  private  String gpArtProgramUuid = "eptsreports.artProgramUuid";
+  private String gpArtProgramUuid = "eptsreports.artProgramUuid";
 
-  private  String gpPtvEtvProgramUuid = "eptsreports.ptvEtvProgramUuid";
+  private String gpPtvEtvProgramUuid = "eptsreports.ptvEtvProgramUuid";
 
   /**
    * <b>concept_id = 307</b>

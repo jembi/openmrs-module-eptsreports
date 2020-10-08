@@ -33,9 +33,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxPvlsCohortQueries {
 
-  private final HivCohortQueries hivCohortQueries;
+  private HivCohortQueries hivCohortQueries;
 
-  private final HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
 
   @Autowired
   public TxPvlsCohortQueries(HivCohortQueries hivCohortQueries, HivMetadata hivMetadata) {

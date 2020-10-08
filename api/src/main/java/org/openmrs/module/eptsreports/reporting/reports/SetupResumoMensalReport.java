@@ -33,9 +33,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupResumoMensalReport extends EptsDataExportManager {
 
-  private final ResumoMensalDataSetDefinition resumoMensalDataSetDefinition;
+  private ResumoMensalDataSetDefinition resumoMensalDataSetDefinition;
 
-  private final GenericCohortQueries genericCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public SetupResumoMensalReport(

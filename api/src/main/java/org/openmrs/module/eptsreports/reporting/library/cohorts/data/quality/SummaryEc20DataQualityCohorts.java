@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SummaryEc20DataQualityCohorts {
-  private final HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
 
   @Autowired
   public SummaryEc20DataQualityCohorts(HivMetadata hivMetadata) {

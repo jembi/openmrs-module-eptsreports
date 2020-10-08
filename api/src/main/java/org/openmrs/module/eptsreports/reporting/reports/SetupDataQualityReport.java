@@ -37,49 +37,49 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupDataQualityReport extends EptsDataExportManager {
 
-  private final SummaryDataQualityDataset summaryDataQualityDataset;
+  private SummaryDataQualityDataset summaryDataQualityDataset;
 
-  private final SummaryDataQualityCohorts summaryDataQualityCohorts;
+  private SummaryDataQualityCohorts summaryDataQualityCohorts;
 
-  private final Ec1PatientListDataset ec1PatientListDataset;
+  private Ec1PatientListDataset ec1PatientListDataset;
 
-  private final Ec2PatientListDataset ec2PatientListDataset;
+  private Ec2PatientListDataset ec2PatientListDataset;
 
-  private final Ec3PatientListDataset ec3PatientListDataset;
+  private Ec3PatientListDataset ec3PatientListDataset;
 
-  private final Ec4PatientListDataset ec4PatientListDataset;
+  private Ec4PatientListDataset ec4PatientListDataset;
 
-  private final Ec5PatientListDataset ec5PatientListDataset;
+  private Ec5PatientListDataset ec5PatientListDataset;
 
-  private final Ec6PatientListDataset ec6PatientListDataset;
+  private Ec6PatientListDataset ec6PatientListDataset;
 
-  private final Ec7PatientListDataset ec7PatientListDataset;
+  private Ec7PatientListDataset ec7PatientListDataset;
 
-  private final Ec8PatientListDataset ec8PatientListDataset;
+  private Ec8PatientListDataset ec8PatientListDataset;
 
-  private final Ec9PatientListDataset ec9PatientListDataset;
+  private Ec9PatientListDataset ec9PatientListDataset;
 
-  private final Ec10PatientListDataset ec10PatientListDataset;
+  private Ec10PatientListDataset ec10PatientListDataset;
 
-  private final Ec11PatientListDataset ec11PatientListDataset;
+  private Ec11PatientListDataset ec11PatientListDataset;
 
-  private final Ec12PatientListDataset ec12PatientListDataset;
+  private Ec12PatientListDataset ec12PatientListDataset;
 
-  private final Ec13PatientListDataset ec13PatientListDataset;
+  private Ec13PatientListDataset ec13PatientListDataset;
 
-  private final Ec14PatientListDataset ec14PatientListDataset;
+  private Ec14PatientListDataset ec14PatientListDataset;
 
-  private final Ec15PatientListDataset ec15PatientListDataset;
+  private Ec15PatientListDataset ec15PatientListDataset;
 
-  private final Ec16PatientListDataset ec16PatientListDataset;
+  private Ec16PatientListDataset ec16PatientListDataset;
 
-  private final Ec17PatientListDataset ec17PatientListDataset;
+  private Ec17PatientListDataset ec17PatientListDataset;
 
-  private final Ec18PatientListDataset ec18PatientListDataset;
+  private Ec18PatientListDataset ec18PatientListDataset;
 
-  private final Ec19PatientListDataset ec19PatientListDataset;
+  private Ec19PatientListDataset ec19PatientListDataset;
 
-  private final GetCustomConfigurationDataset getCustomConfigurationDataset;
+  private GetCustomConfigurationDataset getCustomConfigurationDataset;
 
   private final HivMetadata hivMetadata;
 

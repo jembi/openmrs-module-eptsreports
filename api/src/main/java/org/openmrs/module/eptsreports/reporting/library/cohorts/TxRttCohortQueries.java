@@ -22,9 +22,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxRttCohortQueries {
 
-  private final HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
 
-  private final GenericCohortQueries genericCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public TxRttCohortQueries(HivMetadata hivMetadata, GenericCohortQueries genericCohortQueries) {

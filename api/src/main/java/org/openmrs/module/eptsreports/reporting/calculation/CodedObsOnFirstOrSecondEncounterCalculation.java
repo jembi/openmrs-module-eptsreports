@@ -26,9 +26,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CodedObsOnFirstOrSecondEncounterCalculation extends AbstractPatientCalculation {
 
-  private final EPTSCalculationService eptsCalculationService;
+  private EPTSCalculationService eptsCalculationService;
 
-  private final HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
 
   @Autowired
   public CodedObsOnFirstOrSecondEncounterCalculation(

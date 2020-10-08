@@ -19,10 +19,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ResumoTrimestralCohortQueries {
 
-  private final GenericCohortQueries genericCohortQueries;
-  private final HivMetadata hivMetadata;
-  private final ResumoMensalCohortQueries resumoMensalCohortQueries;
-  private final CommonCohortQueries commonCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
+  private HivMetadata hivMetadata;
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private CommonCohortQueries commonCohortQueries;
 
   @Autowired
   public ResumoTrimestralCohortQueries(
