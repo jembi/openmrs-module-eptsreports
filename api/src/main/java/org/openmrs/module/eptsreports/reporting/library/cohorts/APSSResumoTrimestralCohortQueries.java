@@ -48,9 +48,9 @@ public class APSSResumoTrimestralCohortQueries {
    */
   public CohortDefinition getA1() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    
+
     sqlCohortDefinition.setName("A1");
-    
+
     return sqlCohortDefinition;
   }
 
@@ -64,9 +64,9 @@ public class APSSResumoTrimestralCohortQueries {
    */
   public CohortDefinition getB1() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    
+
     sqlCohortDefinition.setName("B1");
-    
+
     return sqlCohortDefinition;
   }
 
@@ -80,9 +80,9 @@ public class APSSResumoTrimestralCohortQueries {
    */
   public CohortDefinition getC1() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    
+
     sqlCohortDefinition.setName("C1");
-    
+
     return sqlCohortDefinition;
   }
 
@@ -97,9 +97,9 @@ public class APSSResumoTrimestralCohortQueries {
    */
   public CohortDefinition getD1() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    
+
     sqlCohortDefinition.setName("D1");
-    
+
     return sqlCohortDefinition;
   }
 
@@ -113,9 +113,9 @@ public class APSSResumoTrimestralCohortQueries {
    */
   public CohortDefinition getE1() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    
+
     sqlCohortDefinition.setName("E1");
-    
+
     return sqlCohortDefinition;
   }
 
@@ -129,9 +129,9 @@ public class APSSResumoTrimestralCohortQueries {
    */
   public CohortDefinition getE2() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    
+
     sqlCohortDefinition.setName("E2");
-    
+
     return sqlCohortDefinition;
   }
 
@@ -145,9 +145,9 @@ public class APSSResumoTrimestralCohortQueries {
    */
   public CohortDefinition getE3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    
+
     sqlCohortDefinition.setName("E3");
-    
+
     return sqlCohortDefinition;
   }
 }

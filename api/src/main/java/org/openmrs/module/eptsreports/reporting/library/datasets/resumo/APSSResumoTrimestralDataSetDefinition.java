@@ -71,7 +71,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     addRow(
         dsd,
         "A1",
-        "Annual Notification",
+        "Nº de crianças e adolescentes que receberam revelação total do diagnóstico",
         getA1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
@@ -81,7 +81,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     addRow(
         dsd,
         "B1",
-        "Annual Notification",
+        "Nº de pacientes que iniciou cuidados HIV  e que receberam aconselhamento Pré-TARV",
         getB1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
@@ -91,7 +91,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     addRow(
         dsd,
         "C1",
-        "Annual Notification",
+        "Nº total de pacientes activos em TARV que receberam seguimento de adesão",
         getC1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
@@ -101,7 +101,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     addRow(
         dsd,
         "D1",
-        "Annual Notification",
+        "Nº de pacientes adultos que iniciou TARV e que receberam o pacote completo de prevenção positiva",
         getD1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
@@ -111,7 +111,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     addRow(
         dsd,
         "E1",
-        "Annual Notification",
+        "Nº pacientes faltosos e abandonos referidos para chamadas e/ou visitas de reintegração",
         getE1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
@@ -121,7 +121,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     addRow(
         dsd,
         "E2",
-        "Annual Notification",
+        "Nº de pacientes faltosos e abandonos contactados e/ou encontrados",
         getE2(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
@@ -131,7 +131,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     addRow(
         dsd,
         "E3",
-        "Annual Notification",
+        "Nº de pacientes faltosos e abandonos que retornaram a unidade sanitária ",
         getE3(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
