@@ -10,7 +10,7 @@
  * under the License.
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
- * 
+ *
  */
 
 package org.openmrs.module.eptsreports.reporting.library.datasets.resumo;
@@ -24,8 +24,6 @@ import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionC
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.disaggregations.APSSResumoTrimestraldisaggregations;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -77,11 +75,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
         getA1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
-        dsd.addColumn(
-        "A1TG",
-        "Total patients - Total Geral",
-        getA1(),
-        "");
+    dsd.addColumn("A1TG", "Total patients - Total Geral", getA1(), "");
 
     // B1
     addRow(
@@ -91,11 +85,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
         getB1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
-        dsd.addColumn(
-        "B1TG",
-        "Total patients - Total Geral",
-        getB1(),
-        "");
+    dsd.addColumn("B1TG", "Total patients - Total Geral", getB1(), "");
 
     // C1
     addRow(
@@ -105,124 +95,90 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
         getC1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
-        dsd.addColumn(
-        "C1TG",
-        "Total patients - Total Geral",
-        getC1(),
-        "");
+    dsd.addColumn("C1TG", "Total patients - Total Geral", getC1(), "");
 
     // D1
-        addRow(
+    addRow(
         dsd,
         "D1",
         "Annual Notification",
         getD1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
-        dsd.addColumn(
-        "D1TG",
-        "Total patients - Total Geral",
-        getD1(),
-        "");
+    dsd.addColumn("D1TG", "Total patients - Total Geral", getD1(), "");
 
     // E1
-        addRow(
+    addRow(
         dsd,
         "E1",
         "Annual Notification",
         getE1(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
-        dsd.addColumn(
-        "E1TG",
-        "Total patients - Total Geral",
-        getE1(),
-        "");
+    dsd.addColumn("E1TG", "Total patients - Total Geral", getE1(), "");
 
-        //E2
-        addRow(
+    // E2
+    addRow(
         dsd,
         "E2",
         "Annual Notification",
         getE2(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
-        dsd.addColumn(
-        "E2TG",
-        "Total patients - Total Geral",
-        getE2(),
-        "");
+    dsd.addColumn("E2TG", "Total patients - Total Geral", getE2(), "");
 
-        //E3
-        addRow(
+    // E3
+    addRow(
         dsd,
         "E3",
         "Annual Notification",
         getE3(),
         APSSResumoTrimestraldisaggregations.getAPSSPPDisagg());
 
-        dsd.addColumn(
-        "E3TG",
-        "Total patients - Total Geral",
-        getE3(),
-        "");
+    dsd.addColumn("E3TG", "Total patients - Total Geral", getE3(), "");
 
     return dsd;
   }
-  
+
   private Mapped<CohortIndicator> getA1() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Total patients of A1",
-            mapStraightThrough(
-                APSSResumoTrimestralCohortQueries.getA1())));
+            "Total patients of A1", mapStraightThrough(APSSResumoTrimestralCohortQueries.getA1())));
   }
 
   private Mapped<CohortIndicator> getB1() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Total patients of B1",
-            mapStraightThrough(
-                APSSResumoTrimestralCohortQueries.getB1())));
+            "Total patients of B1", mapStraightThrough(APSSResumoTrimestralCohortQueries.getB1())));
   }
 
   private Mapped<CohortIndicator> getC1() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Total patients of C1",
-            mapStraightThrough(
-                APSSResumoTrimestralCohortQueries.getC1())));
+            "Total patients of C1", mapStraightThrough(APSSResumoTrimestralCohortQueries.getC1())));
   }
 
   private Mapped<CohortIndicator> getD1() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Total patients of D1",
-            mapStraightThrough(
-                APSSResumoTrimestralCohortQueries.getD1())));
+            "Total patients of D1", mapStraightThrough(APSSResumoTrimestralCohortQueries.getD1())));
   }
 
   private Mapped<CohortIndicator> getE1() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Total patients of E1",
-            mapStraightThrough(
-                APSSResumoTrimestralCohortQueries.getE1())));
+            "Total patients of E1", mapStraightThrough(APSSResumoTrimestralCohortQueries.getE1())));
   }
 
   private Mapped<CohortIndicator> getE2() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Total patients of E2",
-            mapStraightThrough(
-                APSSResumoTrimestralCohortQueries.getE2())));
+            "Total patients of E2", mapStraightThrough(APSSResumoTrimestralCohortQueries.getE2())));
   }
 
   private Mapped<CohortIndicator> getE3() {
     return mapStraightThrough(
         eptsGeneralIndicator.getIndicator(
-            "Total patients of E3",
-            mapStraightThrough(
-                APSSResumoTrimestralCohortQueries.getE3())));
+            "Total patients of E3", mapStraightThrough(APSSResumoTrimestralCohortQueries.getE3())));
   }
 }

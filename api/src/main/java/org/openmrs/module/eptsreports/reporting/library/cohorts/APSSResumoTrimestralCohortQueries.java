@@ -15,37 +15,11 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import static org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries.*;
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.Concept;
-import org.openmrs.Location;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.CodedObsOnFirstOrSecondEncounterCalculation;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.ResumoMensalTransferredOutCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.cohort.evaluator.ResumoMensalTransferredOutCohortDefinitionEvaluator;
-import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
-import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.DateObsCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.EncounterCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.EncounterWithCodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.common.RangeComparator;
-import org.openmrs.module.reporting.common.SetComparator;
-import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -67,89 +41,113 @@ public class APSSResumoTrimestralCohortQueries {
   /**
    * <b>Name: A1</b>
    *
-   * <p><b>Description:</b> Nº de crianças e adolescente de 8 -14 anos que 
-   * receberam revelação total do diagnóstico durante o trimestre 
-   * 
+   * <p><b>Description:</b> Nº de crianças e adolescente de 8 -14 anos que receberam revelação total
+   * do diagnóstico durante o trimestre
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getA1() {
-
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    
+    sqlCohortDefinition.setName("A1");
+    
+    return sqlCohortDefinition;
   }
-  
+
   /**
    * <b>Name: B1</b>
    *
-   * <p><b>Description:</b> Nº de pacientes que iniciou cuidados HIV nesta unidade sanitária durante o 
-   * trimestre e que receberam aconselhamento Pré-TARV no mesmo período 
-   * 
+   * <p><b>Description:</b> Nº de pacientes que iniciou cuidados HIV nesta unidade sanitária durante
+   * o trimestre e que receberam aconselhamento Pré-TARV no mesmo período
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getB1() {
-
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    
+    sqlCohortDefinition.setName("B1");
+    
+    return sqlCohortDefinition;
   }
 
   /**
    * <b>Name: C1</b>
    *
-   * <p><b>Description:</b> Nº total de pacientes activos em TARV que receberam seguimento
-   *  de adesão durante o trimestre 
-   * 
+   * <p><b>Description:</b> Nº total de pacientes activos em TARV que receberam seguimento de adesão
+   * durante o trimestre
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getC1() {
-
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    
+    sqlCohortDefinition.setName("C1");
+    
+    return sqlCohortDefinition;
   }
 
   /**
    * <b>Name: D1</b>
    *
-   * <p><b>Description:</b> Nº de pacientes que iniciou TARV (15/+ anos) nesta unidade sanitária no trimestre 
-   * anterior e que receberam o pacote completo de prevenção positiva até ao período de reporte 
-   * 
+   * <p><b>Description:</b> Nº de pacientes que iniciou TARV (15/+ anos) nesta unidade sanitária no
+   * trimestre anterior e que receberam o pacote completo de prevenção positiva até ao período de
+   * reporte
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getD1() {
-
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    
+    sqlCohortDefinition.setName("D1");
+    
+    return sqlCohortDefinition;
   }
 
   /**
    * <b>Name: E1</b>
    *
-   * <p><b>Description:</b> Nº pacientes faltosos e abandonos referidos para chamadas e/ou visitas de reintegração durante o trimestre 
-   * 
+   * <p><b>Description:</b> Nº pacientes faltosos e abandonos referidos para chamadas e/ou visitas
+   * de reintegração durante o trimestre
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getE1() {
-
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    
+    sqlCohortDefinition.setName("E1");
+    
+    return sqlCohortDefinition;
   }
 
   /**
    * <b>Name: E2</b>
    *
-   * <p><b>Description:</b> Nº de pacientes faltosos e abandonos contactados e/ou encontrados durante o trimestre, (dos referidos no mesmo período) 
-   * 
+   * <p><b>Description:</b> Nº de pacientes faltosos e abandonos contactados e/ou encontrados
+   * durante o trimestre, (dos referidos no mesmo período)
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getE2() {
-
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    
+    sqlCohortDefinition.setName("E2");
+    
+    return sqlCohortDefinition;
   }
 
   /**
    * <b>Name: E3</b>
    *
-   * <p><b>Description:</b> Nº de pacientes faltosos e abandonos que retornaram a unidade sanitária durante o trimestre, (dos contactados e/ou encontrados no mesmo período) 
-   * 
+   * <p><b>Description:</b> Nº de pacientes faltosos e abandonos que retornaram a unidade sanitária
+   * durante o trimestre, (dos contactados e/ou encontrados no mesmo período)
    *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getE3() {
-
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    
+    sqlCohortDefinition.setName("E3");
+    
+    return sqlCohortDefinition;
   }
-
 }

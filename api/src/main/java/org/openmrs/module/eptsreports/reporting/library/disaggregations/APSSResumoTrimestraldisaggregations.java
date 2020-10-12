@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class APSSResumoTrimestraldisaggregations {
 
-  public static List<ColumnParameters> getAPSSPPDisagg() {    
+  public static List<ColumnParameters> getAPSSPPDisagg() {
     ColumnParameters zeroTo14yearsMale =
         new ColumnParameters(
             "zeroTo14yearsMale", "0 to  14 years male patients", "gender=M|age=0-14", "01");
@@ -29,8 +29,7 @@ public class APSSResumoTrimestraldisaggregations {
         new ColumnParameters(
             "zeroTo14yearsFemale", "0 to  14 years female patients", "gender=F|age=0-14", "02");
     ColumnParameters zeroTo14yearsTotal =
-        new ColumnParameters(
-            "zeroTo14yearsFemale", "0 to  14 years patients", "age=0-14", "03");
+        new ColumnParameters("zeroTo14yearsFemale", "0 to  14 years patients", "age=0-14", "03");
     ColumnParameters fifteenYearsPlusYearsM =
         new ColumnParameters(
             "fifteenYearsPlusYearsM", "15 years plus male patients", "gender=M|age=15+", "04");
@@ -40,8 +39,12 @@ public class APSSResumoTrimestraldisaggregations {
     ColumnParameters adultsTotal =
         new ColumnParameters("adultsTotal", "Adults patients - Totals", "age=15+", "06");
 
-    return Arrays.asList(zeroTo14yearsMale, zeroTo14yearsFemale, zeroTo14yearsTotal,
-        fifteenYearsPlusYearsM, fifteenYearsPlusYearsF, adultsTotal);
+    return Arrays.asList(
+        zeroTo14yearsMale,
+        zeroTo14yearsFemale,
+        zeroTo14yearsTotal,
+        fifteenYearsPlusYearsM,
+        fifteenYearsPlusYearsF,
+        adultsTotal);
   }
-
 }

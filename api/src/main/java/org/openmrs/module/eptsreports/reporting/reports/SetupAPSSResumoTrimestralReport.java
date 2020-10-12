@@ -39,7 +39,7 @@ public class SetupAPSSResumoTrimestralReport extends EptsDataExportManager {
 
   @Autowired
   public SetupAPSSResumoTrimestralReport(
-    APSSResumoTrimestralDataSetDefinition APSSResumoTrimestralDataSetDefinition,
+      APSSResumoTrimestralDataSetDefinition APSSResumoTrimestralDataSetDefinition,
       GenericCohortQueries genericCohortQueries) {
     this.APSSResumoTrimestralDataSetDefinition = APSSResumoTrimestralDataSetDefinition;
     this.genericCohortQueries = genericCohortQueries;
@@ -74,7 +74,9 @@ public class SetupAPSSResumoTrimestralReport extends EptsDataExportManager {
     rd.addParameters(APSSResumoTrimestralDataSetDefinition.getParameters());
     rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition(
-        "R", mapStraightThrough(APSSResumoTrimestralDataSetDefinition.constructAPSSResumoTrimestralDataset()));
+        "R",
+        mapStraightThrough(
+            APSSResumoTrimestralDataSetDefinition.constructAPSSResumoTrimestralDataset()));
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
