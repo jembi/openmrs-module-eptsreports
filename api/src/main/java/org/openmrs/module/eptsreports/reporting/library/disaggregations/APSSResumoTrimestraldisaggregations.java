@@ -35,7 +35,7 @@ public class APSSResumoTrimestraldisaggregations {
             "fifteenYearsPlusYearsM", "15 years plus male patients", "gender=M|age=15+", "04");
     ColumnParameters fifteenYearsPlusYearsF =
         new ColumnParameters(
-            "fifteenYearsPlusYearsF", "15 years plus female patients", "gender=F|age=15-19", "05");
+            "fifteenYearsPlusYearsF", "15 years plus female patients", "gender=F|age=15+", "05");
     ColumnParameters adultsTotal =
         new ColumnParameters("adultsTotal", "Adults patients - Totals", "age=15+", "06");
 
