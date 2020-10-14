@@ -26,9 +26,9 @@ public class TXRetCohortQueries {
 
   @Autowired private GenderCohortQueries genderCohorts;
 
-  @Autowired TxNewCohortQueries txNewCohortQueries;
+  @Autowired private TxNewCohortQueries txNewCohortQueries;
 
-  private String mappings =
+  private final String mappings =
       "startDate=${startDate},endDate=${endDate},location=${location},months=${months}";
 
   private void addParameters(CohortDefinition cd) {
