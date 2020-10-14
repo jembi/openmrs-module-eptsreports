@@ -202,7 +202,7 @@ public class ResumoMensalCohortQueries {
    */
   public CohortDefinition getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Number of patients who initiated Pre-TARV at this HF d  uring the current month");
+    cd.setName("Number of patients who initiated Pre-TARV at this HF during the current month");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
