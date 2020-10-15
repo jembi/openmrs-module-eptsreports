@@ -33,15 +33,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupAPSSResumoTrimestralReport extends EptsDataExportManager {
 
-  private APSSResumoTrimestralDataSetDefinition APSSResumoTrimestralDataSetDefinition;
+  private APSSResumoTrimestralDataSetDefinition aPSSResumoTrimestralDataSetDefinition;
 
   private GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public SetupAPSSResumoTrimestralReport(
-      APSSResumoTrimestralDataSetDefinition APSSResumoTrimestralDataSetDefinition,
+      APSSResumoTrimestralDataSetDefinition aPSSResumoTrimestralDataSetDefinition,
       GenericCohortQueries genericCohortQueries) {
-    this.APSSResumoTrimestralDataSetDefinition = APSSResumoTrimestralDataSetDefinition;
+    this.aPSSResumoTrimestralDataSetDefinition = aPSSResumoTrimestralDataSetDefinition;
     this.genericCohortQueries = genericCohortQueries;
   }
 
@@ -57,7 +57,7 @@ public class SetupAPSSResumoTrimestralReport extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "RESUMO TRIMESTRAL DAS ACTIVIDADES DE APOIO PSICOSSOCIAL E PREVENÇÃO POSITIVA";
+    return "RESUMO TRIMESTRAL DAS ACTIVIDADES DE APPS/PP";
   }
 
   @Override
@@ -71,12 +71,12 @@ public class SetupAPSSResumoTrimestralReport extends EptsDataExportManager {
     rd.setUuid(getUuid());
     rd.setName(getName());
     rd.setDescription(getDescription());
-    rd.addParameters(APSSResumoTrimestralDataSetDefinition.getParameters());
+    rd.addParameters(aPSSResumoTrimestralDataSetDefinition.getParameters());
     rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition(
         "R",
         mapStraightThrough(
-            APSSResumoTrimestralDataSetDefinition.constructAPSSResumoTrimestralDataset()));
+            aPSSResumoTrimestralDataSetDefinition.constructAPSSResumoTrimestralDataset()));
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));

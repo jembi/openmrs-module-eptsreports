@@ -17,8 +17,12 @@ package org.openmrs.module.eptsreports.reporting.library.datasets.resumo;
 
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
+import java.util.Arrays;
+import java.util.List;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.APSSResumoTrimestralCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet.ColumnParameters;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
@@ -28,10 +32,6 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
-import java.util.Arrays;
-import java.util.List;
-import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet.ColumnParameters;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -80,7 +80,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     dsd.addColumn("A1TG", "Total patients - Total Geral", getA1(), "");
 
     // B1
-    addRow(
+    /*addRow(
         dsd,
         "B1",
         "Nº de pacientes que iniciou cuidados HIV  e que receberam aconselhamento Pré-TARV",
@@ -137,7 +137,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
         getE3(),
         getAPSSPPDisagg());
 
-    dsd.addColumn("E3TG", "Total patients - Total Geral", getE3(), "");
+    dsd.addColumn("E3TG", "Total patients - Total Geral", getE3(), "");*/
 
     return dsd;
   }
