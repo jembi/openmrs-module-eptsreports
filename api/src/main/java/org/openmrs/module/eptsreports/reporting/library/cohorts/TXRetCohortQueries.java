@@ -352,26 +352,46 @@ public class TXRetCohortQueries {
             "menOnArt40To49", TXRetQueries.genderOnArtXToY("M", 40, 49)));
   }
 
-  /** map endDate, location rightly when using this */
+  /**
+   * Female patients on ART treatment aged between 40 t0 49 years endDate and location parameters
+   * need to be mapped correctly
+   *
+   * @return @{@link CohortDefinition}
+   */
   public CohortDefinition womenOnArt40To49() {
     return cohortDefinition(
         genericCohortQueries.generalSql(
             "womenOnArt40To49", TXRetQueries.genderOnArtXToY("F", 40, 49)));
   }
 
-  /** map endDate, location rightly when using this */
+  /**
+   * Male patients on ART treatment aged 50 years and above endDate and location parameters need to
+   * be mapped correctly
+   *
+   * @return @{@link CohortDefinition}
+   */
   public CohortDefinition menOnArtAbove50() {
     return cohortDefinition(
         genericCohortQueries.generalSql("menOnArtAbove50", TXRetQueries.genderOnArtAbove50("M")));
   }
 
-  /** map endDate, location rightly when using this */
+  /**
+   * Female patients on ART treatment aged 50 years and above endDate and location parameters need
+   * to be mapped correctly
+   *
+   * @return @{@link CohortDefinition}
+   */
   public CohortDefinition womenOnArtAbove50() {
     return cohortDefinition(
         genericCohortQueries.generalSql("womenOnArtAbove50", TXRetQueries.genderOnArtAbove50("F")));
   }
 
-  /** map endDate, location rightly when using this */
+  /**
+   * Infants who gave awards 2 years behind the reference date endDate and location parameters need
+   * to be mapped correctly
+   *
+   * @return @{@link CohortDefinition}
+   */
   public CohortDefinition infantsWhoGaveAwardsTwoYearsBehindReferenceDate() {
     return cohortDefinition(
         genericCohortQueries.generalSql(
