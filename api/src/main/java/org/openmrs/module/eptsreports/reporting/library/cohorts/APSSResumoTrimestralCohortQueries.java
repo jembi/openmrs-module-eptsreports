@@ -56,6 +56,8 @@ public class APSSResumoTrimestralCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    // This query is just a placeholder until user story for A1 is finalized
     sqlCohortDefinition.setQuery(
         getAllPatientsWithPreArtStartDateLessThanReportingStartDate(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
