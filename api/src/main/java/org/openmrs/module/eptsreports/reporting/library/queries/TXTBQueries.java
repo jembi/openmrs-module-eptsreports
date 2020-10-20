@@ -357,6 +357,11 @@ public class TXTBQueries {
         encounterTypeId, testTBLAM, positive, negative);
   }
 
+  /**
+   * <b>Description:</b> Result For Basiloscopia
+   *
+   * @return {@link String}
+   */
   public static String resultForBasiloscopia(
       Integer encounterTypeId, Integer basiloscopia, Integer positive, Integer negative) {
     return String.format(
@@ -371,6 +376,11 @@ public class TXTBQueries {
         encounterTypeId, basiloscopia, positive, negative);
   }
 
+  /**
+   * <b>Description:</b> Date Obs
+   *
+   * @return {@link String}
+   */
   public static String dateObs(
       Integer questionId, List<Integer> encounterTypeIds, boolean startDate) {
     String sql =
