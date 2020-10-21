@@ -43,7 +43,7 @@ public class Ec3Queries {
         + " AND pg.location_id IN(:location) "
         + " AND e.location_id IN(:location) AND e.voided=0 "
         + " AND ps.start_date IS NOT NULL AND ps.end_date IS NULL "
-        + " AND e.encounter_datetime >= ps.start_date "
+        + " AND e.encounter_datetime > ps.start_date "
         + " UNION "
         + " SELECT p.patient_id AS patient_id, pe.death_date AS death_date, l.name AS location_name "
         + " FROM patient p "
@@ -73,7 +73,7 @@ public class Ec3Queries {
         + " AND ps.state IN("
         + states
         + ") "
-        + " AND e.encounter_datetime >= dd.death_date "
+        + " AND e.encounter_datetime > dd.death_date "
         + " GROUP BY dd.patient_id";
   }
 }

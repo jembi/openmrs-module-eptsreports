@@ -50,7 +50,7 @@ public class Ec5Queries {
         + " AND e.encounter_type= "
         + labEncounterType
         + " AND pe.death_date IS NOT NULL "
-        + " AND e.encounter_datetime >= pe.death_date "
+        + " AND e.encounter_datetime > pe.death_date "
         + ") dd "
         + " INNER JOIN patient_identifier pi ON dd.patient_id=pi.patient_id "
         + " INNER JOIN person pe ON dd.patient_id=pe.person_id "
