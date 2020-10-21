@@ -103,7 +103,7 @@ public class APSSResumoTrimestralDataSetDefinition extends BaseDataSet {
     addRow(
         dsd,
         "D1",
-        "Nº de pacientes adultos que iniciou TARV e que receberam o pacote completo de prevenção positiva",
+        " Número de pacientes que iniciaram TARV (15/+ anos) nesta unidade sanitária no trimestre anterior e que receberam o pacote completo de prevenção positiva até ao período de reporte",
         getD1(),
         getAPSSPPDisagg());
 

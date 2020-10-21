@@ -157,21 +157,21 @@ public class APSSResumoTrimestralCohortQueries {
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition initiatedArt = this.getPatientsWhoStartedArtByEndOfPreviousMonthB10();
+    CohortDefinition startedART = this.getPatientsWhoStartedArtByEndOfPreviousMonthB10();
     CohortDefinition patientAtAge15OrOlder =
         genericCohortQueries.getAgeOnArtStartDate(15, null, false);
     CohortDefinition registeredInFichaAPSSPP = this.getPatientsRegisteredInFichaAPSSPP();
 
     cd.addSearch(
-        " initiatedART",
+        "startedArt",
         EptsReportUtils.map(
-            initiatedArt, "startDate=${startDate-3m},endDate=${endDate-3m},location=${location}"));
+                startedART, "startDate=${startDate-3m},endDate=${endDate-3m},location=${location}"));
 
     cd.addSearch(
         "patientAtAge15OrOlder",
         EptsReportUtils.map(
             patientAtAge15OrOlder,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "registeredInFichaAPSSPP",
@@ -179,7 +179,7 @@ public class APSSResumoTrimestralCohortQueries {
             registeredInFichaAPSSPP,
             "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("initiatedART AND patientAtAge15OrOlder AND registeredInFichaAPSSPP");
+    cd.setCompositionString("startedArt AND patientAtAge15OrOlder AND registeredInFichaAPSSPP");
 
     return cd;
   }
