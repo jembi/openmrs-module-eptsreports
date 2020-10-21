@@ -22,8 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.calculation.generic.StartedArtOnPeriodCalculation;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -86,11 +91,11 @@ public class APSSResumoTrimestralCohortQueries {
    *   <li>Nº de pacientes que iniciou Pré-TARV (Cuidados de HIV) [ {@link
    *       ResumoMensalCohortQueries#getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1}
    *       from Resumo Mensal only changes the period to quarterly)]
-   *   <li>And filter all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
-   *       have the following conditions:
+   *   <li>And filter all patients registered in encounter “Ficha APSS&PP” (encounter_type =
+   *       ${prevencaoPositivaSeguimentoEncounterType}) who have the following conditions:
    *       <ul>
    *         <li>ACONSELHAMENTO PRÉ-TARV” (concept_id = 23886) with value_coded “SIM” (concept_id =
-   *             1065)
+   *             ${patientFoundYesConcept})
    *         <li>And “encounter_datetime” Between StartDate and EndDate
    *       </ul>
    * </ul>
@@ -146,11 +151,37 @@ public class APSSResumoTrimestralCohortQueries {
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getD1() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Nº de pacientes que iniciou TARV (15/+ anos) no trimestre anteriaor");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
 
-    sqlCohortDefinition.setName("D1");
+    CohortDefinition initiatedArt = this.getPatientsWhoStartedArtByEndOfPreviousMonthB10();
+    CohortDefinition patientAtAge15OrOlder =
+        genericCohortQueries.getAgeOnArtStartDate(15, null, false);
+    CohortDefinition registeredInFichaAPSSPP = this.getPatientsRegisteredInFichaAPSSPP();
 
-    return sqlCohortDefinition;
+    cd.addSearch(
+        " initiatedART",
+        EptsReportUtils.map(
+            initiatedArt, "startDate=${startDate-3m},endDate=${endDate-3m},location=${location}"));
+
+    cd.addSearch(
+        "patientAtAge15OrOlder",
+        EptsReportUtils.map(
+            patientAtAge15OrOlder,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "registeredInFichaAPSSPP",
+        EptsReportUtils.map(
+            registeredInFichaAPSSPP,
+            "startDate=${startDate-3m},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("initiatedART AND patientAtAge15OrOlder AND registeredInFichaAPSSPP");
+
+    return cd;
   }
 
   /**
@@ -214,7 +245,6 @@ public class APSSResumoTrimestralCohortQueries {
         "prevencaoPositivaSeguimentoEncounterType",
         hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put("preARTCounselingConcept", hivMetadata.getPreARTCounselingConcept().getConceptId());
-    map.put("patientFoundYesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id "
@@ -233,6 +263,193 @@ public class APSSResumoTrimestralCohortQueries {
             + "        BETWEEN :startDate AND  :endDate"
             + "    AND e.location_id = :location "
             + "    ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    String replacedQuery = sb.replace(query);
+    cd.setQuery(replacedQuery);
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoStartedArtByEndOfPreviousMonthB10() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of cumulative patients who started ART by end of previous month");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "artStartDate",
+        map(
+            this.getStartedArtBeforeDate(false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "transferredIn",
+        map(
+            this.getTransferredInForB10(),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("artStartDate AND NOT transferredIn");
+
+    return cd;
+  }
+
+  private CohortDefinition getStartedArtBeforeDate(boolean considerTransferredIn) {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(StartedArtOnPeriodCalculation.class).get(0));
+    cd.setName("Art start date");
+    cd.addCalculationParameter("considerTransferredIn", considerTransferredIn);
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    return cd;
+  }
+
+  private CohortDefinition getTransferredInForB10() {
+    EptsTransferredInCohortDefinition cd = new EptsTransferredInCohortDefinition();
+    cd.setName(
+        "Number of patients transferred-in from another HF during a period less than startDate B10 ");
+    cd.setProgramEnrolled(hivMetadata.getARTProgram());
+    cd.setPatientState(hivMetadata.getArtTransferredFromOtherHealthFacilityWorkflowState());
+    cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setB10Flag(true);
+
+    return cd;
+  }
+
+  private CohortDefinition getPatientsRegisteredInFichaAPSSPP() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put(
+        "prevencaoPositivaSeguimentoEncounterType",
+        hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("preARTCounselingConcept", hivMetadata.getPreARTCounselingConcept().getConceptId());
+    map.put("patientFoundYesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("pp1Concept", hivMetadata.getPP1Concept().getConceptId());
+    map.put("pp2Concept", hivMetadata.getPP2Concept().getConceptId());
+    map.put("pp3Concept", hivMetadata.getPP3Concept().getConceptId());
+    map.put("pp4Concept", hivMetadata.getPP4Concept().getConceptId());
+    map.put("familyPlanningConcept", hivMetadata.getfamilyPlanningConcept().getConceptId());
+    map.put("pp6Concept", hivMetadata.getPP6Concept().getConceptId());
+    map.put("pp7Concept", hivMetadata.getPP7Concept().getConceptId());
+
+    String query =
+        ""
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "     INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o "
+            + "        ON o.encounter_id=e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
+            + "    AND (o.concept_id = ${pp1Concept} AND o.value_coded = ${patientFoundYesConcept}) "
+            + "    AND encounter_datetime "
+            + "        BETWEEN :startDate AND :endDate "
+            + "    AND e.location_id = :location "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "     INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o "
+            + "        ON o.encounter_id=e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
+            + "    AND (o.concept_id = ${pp2Concept} AND o.value_coded = ${patientFoundYesConcept}) "
+            + "    AND encounter_datetime "
+            + "        BETWEEN :startDate AND :endDate "
+            + "    AND e.location_id = :location "
+            + "UNION     "
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "     INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o "
+            + "        ON o.encounter_id=e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
+            + "    AND (o.concept_id = ${pp3Concept} AND o.value_coded = ${patientFoundYesConcept}) "
+            + "    AND encounter_datetime "
+            + "        BETWEEN :startDate AND :endDate "
+            + "    AND e.location_id = :location "
+            + "UNION     "
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "     INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o "
+            + "        ON o.encounter_id=e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
+            + "    AND (o.concept_id = ${pp4Concept} AND o.value_coded = ${patientFoundYesConcept}) "
+            + "    AND encounter_datetime "
+            + "        BETWEEN :startDate AND :endDate "
+            + "    AND e.location_id = :location "
+            + "UNION       "
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "     INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o "
+            + "        ON o.encounter_id=e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
+            + "    AND (o.concept_id = ${pp6Concept} AND o.value_coded = ${patientFoundYesConcept}) "
+            + "    AND encounter_datetime "
+            + "        BETWEEN :startDate AND :endDate "
+            + "    AND e.location_id = :location "
+            + "    UNION     "
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "     INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o "
+            + "        ON o.encounter_id=e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
+            + "    AND (o.concept_id = ${pp7Concept} AND o.value_coded = ${patientFoundYesConcept}) "
+            + "    AND encounter_datetime "
+            + "        BETWEEN :startDate AND :endDate "
+            + "    AND e.location_id = :location "
+            + "    UNION     "
+            + "SELECT p.patient_id "
+            + "FROM patient p "
+            + "     INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o "
+            + "        ON o.encounter_id=e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
+            + "    AND (o.concept_id = ${familyPlanningConcept} AND o.value_coded = ${patientFoundYesConcept}) "
+            + "    AND encounter_datetime "
+            + "        BETWEEN :startDate AND :endDate "
+            + "    AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
