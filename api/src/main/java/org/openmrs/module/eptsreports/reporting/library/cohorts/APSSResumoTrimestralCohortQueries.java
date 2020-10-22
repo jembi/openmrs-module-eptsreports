@@ -148,6 +148,39 @@ public class APSSResumoTrimestralCohortQueries {
    * trimestre anterior e que receberam o pacote completo de prevenção positiva até ao período de
    * reporte
    *
+   * <ul>
+   *     <li>
+   *         Select all patients from who initiated ART during previous quarterly period (startDate-3months and endDate-3months):
+   *        <ul>
+   *            <li>Same criterias as B10 indicator from Resumo Mensal only changes the period to previous quarter)</li>
+   *        </ul>
+   *    </li>
+   *     <li>
+   *         And FILTER patients with age older or equal than 15 years, calculated at reporting endDate (endDate minus birthdate);
+   *        <ul>
+   *            <li>Note: patients without birthdate information should not be included.</li>
+   *        </ul>
+   *     </li>
+   *     <li>
+   *         And FILTER all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who have the following conditions:
+   *          <ul>
+   *              <li>“PP1”(concept_id = 6317) with value_coded “SIM” (concecpt_id = 1065); and</li>
+   *              <li>“PP2” (concept_id = 6318) with value_coded “SIM” (concecpt_id = 1065); and</li>
+   *              <li>“PP3” (concept_id = 6319) with value_coded “SIM” (concecpt_id = 1065); and</li>
+   *              <li>“PP4” (concept_id = 6320) with value_coded “SIM” (concecpt_id = 1065); and</li>
+   *              <li>“PLANEAMENTO FAMILIAR” (concept_id = 5271) with value_coded “SIM” (concecpt_id = 1065); and</li>
+   *              <li>“PP6” (concept_id = 6321) with value_coded “SIM” (concecpt_id = 1065); and</li>
+   *              <li>“PP7” (concept_id = 6322) with value_coded “SIM” (concecpt_id = 1065)</li>
+   *              <li>And “encounter_datetime” Between (startDate – 3 months) and endDate</li>
+   *
+   *          </ul>
+   *    </li>
+   * </ul>
+   *
+   * <p><b>NOTE - 1: FIELDS “PP1” TO “PP7” CAN BE FILLED IN MORE THAN ONE CONSULTATION SO CONSIDER ALL “FICHA APSS&PP” </b>(encounter_type = 35) WITHIN THE PERIOD [(startDate – 3 months) and endDate]</p>
+   *
+   * <p><b>NOTE - 2: Only consider patients who have more than 15 years old during StartDate and EndDate</b></p>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getD1() {
@@ -165,7 +198,7 @@ public class APSSResumoTrimestralCohortQueries {
     cd.addSearch(
         "startedArt",
         EptsReportUtils.map(
-                startedART, "startDate=${startDate-3m},endDate=${endDate-3m},location=${location}"));
+            startedART, "startDate=${startDate-3m},endDate=${endDate-3m},location=${location}"));
 
     cd.addSearch(
         "patientAtAge15OrOlder",
@@ -245,6 +278,7 @@ public class APSSResumoTrimestralCohortQueries {
         "prevencaoPositivaSeguimentoEncounterType",
         hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put("preARTCounselingConcept", hivMetadata.getPreARTCounselingConcept().getConceptId());
+    map.put("patientFoundYesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id "
