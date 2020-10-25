@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -62,23 +63,59 @@ public class APSSResumoTrimestralCohortQueries {
    * <p><b>Description:</b> Nº de crianças e adolescente de 8 -14 anos que receberam revelação total
    * do diagnóstico durante o trimestre
    *
+   * <p><b>Normal Flow of Events:</b>
+   *
+   * <ul>
+   *   <li>Select all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
+   *       have the following conditions:
+   *       <ul>
+   *         <li>“ESTADO DA REVELAÇÃO DO DIAGNÓSTICO a criança/adolescente” (concept_id = 6340) with
+   *             value_coded “REVELADO”(concept_id= 6337)
+   *         <li>And “encounter_datetime” Between StartDate and EndDate
+   *       </ul>
+   *   <li>Filter patients with age between 8 and 14 years, calculated at reporting endDate (endDate
+   *       minus birthdate);
+   * </ul>
+   *
+   * <p><b>Note 1:</b> <i> Exclude all patients who have “ESTADO DA REVELAÇÃO DO DIAGNÓSTICO a
+   * criança/adolescente” (concept_id = 6340) with value_coded “REVELADO” (concept_id= 6337) before
+   * startDate </i>
+   *
+   * <p><b>Note 2:</b><i> patients without birthdate information should not be included.</i>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getA1() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    sqlCohortDefinition.setName("A1");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setName("A1");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    // This query is just a placeholder until user story for A1 is finalized
-    sqlCohortDefinition.setQuery(
-        getAllPatientsWithPreArtStartDateLessThanReportingStartDate(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getPreArtStartDate().getConceptId()));
+    CohortDefinition patientsRegisteredInEncounterFichaAPSSANDPP =
+        getAllPatientsRegisteredInEncounterFichaAPSSANDPP(
+            hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept(),
+            hivMetadata.getRevealdConcept());
 
-    return sqlCohortDefinition;
+    CohortDefinition patientAtAgeBetween8And14 =
+        genericCohortQueries.getAgeOnArtStartDate(8, 14, false);
+
+    cd.addSearch(
+        "revealded",
+        EptsReportUtils.map(
+            patientsRegisteredInEncounterFichaAPSSANDPP,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "patientAtAgeBetween8And14",
+        EptsReportUtils.map(
+            patientAtAgeBetween8And14,
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("revealded AND patientAtAgeBetween8And14");
+
+    return cd;
   }
 
   /**
@@ -114,10 +151,14 @@ public class APSSResumoTrimestralCohortQueries {
 
     cd.addSearch("A1", map(a1, "startDate=${startDate},location=${location}"));
 
+    Concept preARTCounselingConceptQuestion = hivMetadata.getPreARTCounselingConcept();
+    Concept patientFoundYesConceptAnswer = hivMetadata.getPatientFoundYesConcept();
+
     cd.addSearch(
         "APSSANDPP",
         map(
-            getAllPatientsRegisteredInEncounterFichaAPSSANDPP(),
+            getAllPatientsRegisteredInEncounterFichaAPSSANDPP(
+                preARTCounselingConceptQuestion, patientFoundYesConceptAnswer),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("A1 AND APSSANDPP");
@@ -149,37 +190,38 @@ public class APSSResumoTrimestralCohortQueries {
    * reporte
    *
    * <ul>
-   *     <li>
-   *         Select all patients from who initiated ART during previous quarterly period (startDate-3months and endDate-3months):
-   *        <ul>
-   *            <li>Same criterias as B10 indicator from Resumo Mensal only changes the period to previous quarter)</li>
-   *        </ul>
-   *    </li>
-   *     <li>
-   *         And FILTER patients with age older or equal than 15 years, calculated at reporting endDate (endDate minus birthdate);
-   *        <ul>
-   *            <li>Note: patients without birthdate information should not be included.</li>
-   *        </ul>
-   *     </li>
-   *     <li>
-   *         And FILTER all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who have the following conditions:
-   *          <ul>
-   *              <li>“PP1”(concept_id = 6317) with value_coded “SIM” (concecpt_id = 1065); and</li>
-   *              <li>“PP2” (concept_id = 6318) with value_coded “SIM” (concecpt_id = 1065); and</li>
-   *              <li>“PP3” (concept_id = 6319) with value_coded “SIM” (concecpt_id = 1065); and</li>
-   *              <li>“PP4” (concept_id = 6320) with value_coded “SIM” (concecpt_id = 1065); and</li>
-   *              <li>“PLANEAMENTO FAMILIAR” (concept_id = 5271) with value_coded “SIM” (concecpt_id = 1065); and</li>
-   *              <li>“PP6” (concept_id = 6321) with value_coded “SIM” (concecpt_id = 1065); and</li>
-   *              <li>“PP7” (concept_id = 6322) with value_coded “SIM” (concecpt_id = 1065)</li>
-   *              <li>And “encounter_datetime” Between (startDate – 3 months) and endDate</li>
-   *
-   *          </ul>
-   *    </li>
+   *   <li>Select all patients from who initiated ART during previous quarterly period
+   *       (startDate-3months and endDate-3months):
+   *       <ul>
+   *         <li>Same criterias as B10 indicator from Resumo Mensal only changes the period to
+   *             previous quarter)
+   *       </ul>
+   *   <li>And FILTER patients with age older or equal than 15 years, calculated at reporting
+   *       endDate (endDate minus birthdate);
+   *       <ul>
+   *         <li>Note: patients without birthdate information should not be included.
+   *       </ul>
+   *   <li>And FILTER all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
+   *       have the following conditions:
+   *       <ul>
+   *         <li>“PP1”(concept_id = 6317) with value_coded “SIM” (concecpt_id = 1065); and
+   *         <li>“PP2” (concept_id = 6318) with value_coded “SIM” (concecpt_id = 1065); and
+   *         <li>“PP3” (concept_id = 6319) with value_coded “SIM” (concecpt_id = 1065); and
+   *         <li>“PP4” (concept_id = 6320) with value_coded “SIM” (concecpt_id = 1065); and
+   *         <li>“PLANEAMENTO FAMILIAR” (concept_id = 5271) with value_coded “SIM” (concecpt_id =
+   *             1065); and
+   *         <li>“PP6” (concept_id = 6321) with value_coded “SIM” (concecpt_id = 1065); and
+   *         <li>“PP7” (concept_id = 6322) with value_coded “SIM” (concecpt_id = 1065)
+   *         <li>And “encounter_datetime” Between (startDate – 3 months) and endDate
+   *       </ul>
    * </ul>
    *
-   * <p><b>NOTE - 1: FIELDS “PP1” TO “PP7” CAN BE FILLED IN MORE THAN ONE CONSULTATION SO CONSIDER ALL “FICHA APSS&PP” </b>(encounter_type = 35) WITHIN THE PERIOD [(startDate – 3 months) and endDate]</p>
+   * <p><b>NOTE - 1: FIELDS “PP1” TO “PP7” CAN BE FILLED IN MORE THAN ONE CONSULTATION SO CONSIDER
+   * ALL “FICHA APSS&PP” </b>(encounter_type = 35) WITHIN THE PERIOD [(startDate – 3 months) and
+   * endDate]
    *
-   * <p><b>NOTE - 2: Only consider patients who have more than 15 years old during StartDate and EndDate</b></p>
+   * <p><b>NOTE - 2: Only consider patients who have more than 15 years old during StartDate and
+   * EndDate</b>
    *
    * @return {@link CohortDefinition}
    */
@@ -265,7 +307,8 @@ public class APSSResumoTrimestralCohortQueries {
     return sqlCohortDefinition;
   }
 
-  public SqlCohortDefinition getAllPatientsRegisteredInEncounterFichaAPSSANDPP() {
+  public SqlCohortDefinition getAllPatientsRegisteredInEncounterFichaAPSSANDPP(
+      Concept question, Concept answer) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
 
@@ -277,8 +320,8 @@ public class APSSResumoTrimestralCohortQueries {
     map.put(
         "prevencaoPositivaSeguimentoEncounterType",
         hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("preARTCounselingConcept", hivMetadata.getPreARTCounselingConcept().getConceptId());
-    map.put("patientFoundYesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("question", question.getConceptId());
+    map.put("answer", answer.getConceptId());
 
     String query =
         " SELECT p.patient_id "
@@ -291,8 +334,8 @@ public class APSSResumoTrimestralCohortQueries {
             + "    AND e.voided = 0 "
             + "    AND o.voided = 0 "
             + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND o.concept_id = ${preARTCounselingConcept} "
-            + "    AND o.value_coded = ${patientFoundYesConcept} "
+            + "    AND o.concept_id = ${question} "
+            + "    AND o.value_coded = ${answer} "
             + "    AND encounter_datetime "
             + "        BETWEEN :startDate AND  :endDate"
             + "    AND e.location_id = :location "
