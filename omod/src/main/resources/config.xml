@@ -2165,6 +2165,53 @@
 		</description>
 	</globalProperty>
 
+
+	<!-- 23716 -->
+	<globalProperty>
+		<property>eptsreports.memberShipPlanConcept</property>
+		<defaultValue>d05c1eec-0757-4efa-a26a-c77152ae3718</defaultValue>
+		<description>
+			MEMBERSHIP PLAN / PLANO DE ADESÃO
+		</description>
+	</globalProperty>
+
+
+	<!-- 23887 -->
+	<globalProperty>
+		<property>eptsreports.counseledOnSideEffectsOfArtConcept</property>
+		<defaultValue>a29f6066-5acd-4e48-92a0-f3faf6e7a448</defaultValue>
+		<description>
+			COUNSELED ON SIDE EFFECTS OF ART / ACONSELHADO SOBRE EFEITOS SECUNDÁRIOS DE TARV
+		</description>
+	</globalProperty>
+
+
+	<!-- 6223 -->
+	<globalProperty>
+		<property>eptsreports.adherenceEvaluationConcept</property>
+		<defaultValue>983773e6-d42c-4ad3-89a7-9191a8b8d52b</defaultValue>
+		<description>
+			ADHERENCE EVALUATION / AVALIACAO DE ADESAO
+		</description>
+	</globalProperty>
+
+	<!-- 1749 -->
+	<globalProperty>
+		<property>eptsreports.arvAdherenceRiskConcept</property>
+		<defaultValue>e1de519e-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			ARV ADHERENCE RISK / TEM ALGUM RISCO DE POBRE ADERÊNCIA
+		</description>
+	</globalProperty>
+
+	<!-- 1385 -->
+	<globalProperty>
+		<property>eptsreports.badConcept</property>
+		<defaultValue>e1dac970-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			BAD / MAU
+		</description>
+	</globalProperty>
 	
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService"> 
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
