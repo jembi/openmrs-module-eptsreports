@@ -16,11 +16,10 @@ import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefiniti
 import org.springframework.stereotype.Component;
 
 /**
- * The Class calculates the age of the patient based on report EndDate
- * <br />
- * <code>PatientAge = ReportEndDate - PatientBirthDate</code>
- * <br />
- * The <i>minAge</i> and the <i>maxAge</i> are the boundaries to evaluate if the patient belong to specific renge of age
+ * The Class calculates the age of the patient based on report EndDate <br>
+ * <code>PatientAge = ReportEndDate - PatientBirthDate</code> <br>
+ * The <i>minAge</i> and the <i>maxAge</i> are the boundaries to evaluate if the patient belong to
+ * specific renge of age
  */
 @Component
 public class AgeOnReportEndDateDateCalculation extends AbstractPatientCalculation {
