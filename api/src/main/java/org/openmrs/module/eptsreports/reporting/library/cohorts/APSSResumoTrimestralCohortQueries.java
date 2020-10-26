@@ -99,7 +99,7 @@ public class APSSResumoTrimestralCohortQueries {
             hivMetadata.getRevealdConcept());
 
     CohortDefinition patientAtAgeBetween8And14 =
-        genericCohortQueries.getAgeOnArtStartDate(8, 14, false);
+        genericCohortQueries.getAgeOnReportEndDate(8, 14, false);
 
     cd.addSearch(
         "revealded",
@@ -234,7 +234,7 @@ public class APSSResumoTrimestralCohortQueries {
 
     CohortDefinition startedART = this.getPatientsWhoStartedArtByEndOfPreviousMonthB10();
     CohortDefinition patientAtAge15OrOlder =
-        genericCohortQueries.getAgeOnArtStartDate(15, null, false);
+        genericCohortQueries.getAgeOnReportEndDate(15, null, false);
     CohortDefinition registeredInFichaAPSSPP = this.getPatientsRegisteredInFichaAPSSPP();
 
     cd.addSearch(
