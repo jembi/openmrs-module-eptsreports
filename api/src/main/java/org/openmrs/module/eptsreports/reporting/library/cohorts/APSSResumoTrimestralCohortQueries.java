@@ -23,14 +23,13 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import  org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
-
 
 @Component
 public class APSSResumoTrimestralCohortQueries {
@@ -70,7 +69,7 @@ public class APSSResumoTrimestralCohortQueries {
 
     // This query is just a placeholder until user story for A1 is finalized
     sqlCohortDefinition.setQuery(
-            ResumoMensalQueries.getAllPatientsWithPreArtStartDateLessThanReportingStartDate(
+        ResumoMensalQueries.getAllPatientsWithPreArtStartDateLessThanReportingStartDate(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getPreArtStartDate().getConceptId()));
 
