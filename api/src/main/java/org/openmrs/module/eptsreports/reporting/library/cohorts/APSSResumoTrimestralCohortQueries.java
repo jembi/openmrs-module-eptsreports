@@ -14,7 +14,6 @@
 
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries.*;
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 
 import java.util.Date;
@@ -54,7 +53,6 @@ public class APSSResumoTrimestralCohortQueries {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.genericCohortQueries = genericCohortQueries;
-    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   /**
@@ -128,11 +126,11 @@ public class APSSResumoTrimestralCohortQueries {
    *   <li>Nº de pacientes que iniciou Pré-TARV (Cuidados de HIV) [ {@link
    *       ResumoMensalCohortQueries#getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1}
    *       from Resumo Mensal only changes the period to quarterly)]
-   *   <li>And filter all patients registered in encounter “Ficha APSS&PP” (encounter_type =
-   *       ${prevencaoPositivaSeguimentoEncounterType}) who have the following conditions:
+   *   <li>And filter all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
+   *       have the following conditions:
    *       <ul>
    *         <li>ACONSELHAMENTO PRÉ-TARV” (concept_id = 23886) with value_coded “SIM” (concept_id =
-   *             ${patientFoundYesConcept})
+   *             1065)
    *         <li>And “encounter_datetime” Between StartDate and EndDate
    *       </ul>
    * </ul>
@@ -153,7 +151,6 @@ public class APSSResumoTrimestralCohortQueries {
 
     Concept preARTCounselingConceptQuestion = hivMetadata.getPreARTCounselingConcept();
     Concept patientFoundYesConceptAnswer = hivMetadata.getPatientFoundYesConcept();
-
     cd.addSearch(
         "APSSANDPP",
         map(
