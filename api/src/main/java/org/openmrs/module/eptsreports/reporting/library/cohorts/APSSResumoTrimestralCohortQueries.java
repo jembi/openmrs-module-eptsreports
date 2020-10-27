@@ -14,7 +14,6 @@
 
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries.*;
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 
 import java.util.Date;
@@ -30,6 +29,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import  org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
+
 
 @Component
 public class APSSResumoTrimestralCohortQueries {
@@ -69,7 +70,7 @@ public class APSSResumoTrimestralCohortQueries {
 
     // This query is just a placeholder until user story for A1 is finalized
     sqlCohortDefinition.setQuery(
-        getAllPatientsWithPreArtStartDateLessThanReportingStartDate(
+            ResumoMensalQueries.getAllPatientsWithPreArtStartDateLessThanReportingStartDate(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getPreArtStartDate().getConceptId()));
 
