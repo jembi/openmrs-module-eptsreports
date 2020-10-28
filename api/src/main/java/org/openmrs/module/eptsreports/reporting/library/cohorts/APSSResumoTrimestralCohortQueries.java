@@ -53,6 +53,7 @@ public class APSSResumoTrimestralCohortQueries {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.genericCohortQueries = genericCohortQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   /**
@@ -60,26 +61,6 @@ public class APSSResumoTrimestralCohortQueries {
    *
    * <p><b>Description:</b> Nº de crianças e adolescente de 8 -14 anos que receberam revelação total
    * do diagnóstico durante o trimestre
-   *
-   * <p><b>Normal Flow of Events:</b>
-   *
-   * <ul>
-   *   <li>Select all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
-   *       have the following conditions:
-   *       <ul>
-   *         <li>“ESTADO DA REVELAÇÃO DO DIAGNÓSTICO a criança/adolescente” (concept_id = 6340) with
-   *             value_coded “REVELADO”(concept_id= 6337)
-   *         <li>And “encounter_datetime” Between StartDate and EndDate
-   *       </ul>
-   *   <li>Filter patients with age between 8 and 14 years, calculated at reporting endDate (endDate
-   *       minus birthdate);
-   * </ul>
-   *
-   * <p><b>Note 1:</b> <i> Exclude all patients who have “ESTADO DA REVELAÇÃO DO DIAGNÓSTICO a
-   * criança/adolescente” (concept_id = 6340) with value_coded “REVELADO” (concept_id= 6337) before
-   * startDate </i>
-   *
-   * <p><b>Note 2:</b><i> patients without birthdate information should not be included.</i>
    *
    * @return {@link CohortDefinition}
    */
@@ -420,107 +401,41 @@ public class APSSResumoTrimestralCohortQueries {
 
     String query =
         ""
-            + "SELECT p.patient_id "
-            + "FROM patient p "
+            + " SELECT p.patient_id "
+            + " FROM patient p "
             + "     INNER JOIN encounter e "
             + "        ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o "
-            + "        ON o.encounter_id=e.encounter_id "
-            + "WHERE p.voided = 0 "
+            + "     INNER JOIN obs pp1 "
+            + "        ON pp1.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp2 "
+            + "        ON pp2.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp3 "
+            + "        ON pp3.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp4 "
+            + "        ON pp4.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp5 "
+            + "        ON pp5.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp6 "
+            + "        ON pp6.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp7 "
+            + "        ON pp7.encounter_id=e.encounter_id "
+            + " WHERE p.voided = 0 "
             + "    AND e.voided = 0 "
-            + "    AND o.voided = 0 "
+            + "    AND pp1.voided = 0 "
+            + "    AND pp2.voided = 0 "
+            + "    AND pp3.voided = 0 "
+            + "    AND pp4.voided = 0 "
+            + "    AND pp5.voided = 0 "
+            + "    AND pp6.voided = 0 "
+            + "    AND pp7.voided = 0 "
             + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (o.concept_id = ${pp1Concept} AND o.value_coded = ${patientFoundYesConcept}) "
-            + "    AND encounter_datetime "
-            + "        BETWEEN :startDate AND :endDate "
-            + "    AND e.location_id = :location "
-            + "UNION "
-            + "SELECT p.patient_id "
-            + "FROM patient p "
-            + "     INNER JOIN encounter e "
-            + "        ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o "
-            + "        ON o.encounter_id=e.encounter_id "
-            + "WHERE p.voided = 0 "
-            + "    AND e.voided = 0 "
-            + "    AND o.voided = 0 "
-            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (o.concept_id = ${pp2Concept} AND o.value_coded = ${patientFoundYesConcept}) "
-            + "    AND encounter_datetime "
-            + "        BETWEEN :startDate AND :endDate "
-            + "    AND e.location_id = :location "
-            + "UNION     "
-            + "SELECT p.patient_id "
-            + "FROM patient p "
-            + "     INNER JOIN encounter e "
-            + "        ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o "
-            + "        ON o.encounter_id=e.encounter_id "
-            + "WHERE p.voided = 0 "
-            + "    AND e.voided = 0 "
-            + "    AND o.voided = 0 "
-            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (o.concept_id = ${pp3Concept} AND o.value_coded = ${patientFoundYesConcept}) "
-            + "    AND encounter_datetime "
-            + "        BETWEEN :startDate AND :endDate "
-            + "    AND e.location_id = :location "
-            + "UNION     "
-            + "SELECT p.patient_id "
-            + "FROM patient p "
-            + "     INNER JOIN encounter e "
-            + "        ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o "
-            + "        ON o.encounter_id=e.encounter_id "
-            + "WHERE p.voided = 0 "
-            + "    AND e.voided = 0 "
-            + "    AND o.voided = 0 "
-            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (o.concept_id = ${pp4Concept} AND o.value_coded = ${patientFoundYesConcept}) "
-            + "    AND encounter_datetime "
-            + "        BETWEEN :startDate AND :endDate "
-            + "    AND e.location_id = :location "
-            + "UNION       "
-            + "SELECT p.patient_id "
-            + "FROM patient p "
-            + "     INNER JOIN encounter e "
-            + "        ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o "
-            + "        ON o.encounter_id=e.encounter_id "
-            + "WHERE p.voided = 0 "
-            + "    AND e.voided = 0 "
-            + "    AND o.voided = 0 "
-            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (o.concept_id = ${pp6Concept} AND o.value_coded = ${patientFoundYesConcept}) "
-            + "    AND encounter_datetime "
-            + "        BETWEEN :startDate AND :endDate "
-            + "    AND e.location_id = :location "
-            + "    UNION     "
-            + "SELECT p.patient_id "
-            + "FROM patient p "
-            + "     INNER JOIN encounter e "
-            + "        ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o "
-            + "        ON o.encounter_id=e.encounter_id "
-            + "WHERE p.voided = 0 "
-            + "    AND e.voided = 0 "
-            + "    AND o.voided = 0 "
-            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (o.concept_id = ${pp7Concept} AND o.value_coded = ${patientFoundYesConcept}) "
-            + "    AND encounter_datetime "
-            + "        BETWEEN :startDate AND :endDate "
-            + "    AND e.location_id = :location "
-            + "    UNION     "
-            + "SELECT p.patient_id "
-            + "FROM patient p "
-            + "     INNER JOIN encounter e "
-            + "        ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o "
-            + "        ON o.encounter_id=e.encounter_id "
-            + "WHERE p.voided = 0 "
-            + "    AND e.voided = 0 "
-            + "    AND o.voided = 0 "
-            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (o.concept_id = ${familyPlanningConcept} AND o.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp1.concept_id = ${pp1Concept} AND pp1.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp2.concept_id = ${pp2Concept} AND pp2.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp3.concept_id = ${pp3Concept} AND pp3.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp4.concept_id = ${pp4Concept} AND pp4.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp5.concept_id = ${familyPlanningConcept} AND pp5.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp6.concept_id = ${pp6Concept} AND pp6.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp7.concept_id = ${pp7Concept} AND pp7.value_coded = ${patientFoundYesConcept}) "
             + "    AND encounter_datetime "
             + "        BETWEEN :startDate AND :endDate "
             + "    AND e.location_id = :location ";
