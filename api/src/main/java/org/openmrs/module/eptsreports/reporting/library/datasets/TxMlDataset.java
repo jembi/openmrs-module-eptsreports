@@ -88,10 +88,10 @@ public class TxMlDataset extends BaseDataSet {
     addRow(
         dsd,
         "M4",
-        "LTFU Less Than 90 days",
+        "IIT Less Than 90 days",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "missed and LTFU Less Than 90 days",
+                "missed and IIT Less Than 90 days",
                 EptsReportUtils.map(
                     txMlCohortQueries.getPatientsLTFULessThan90DaysComposition(), mappings)),
             mappings),
@@ -127,10 +127,10 @@ public class TxMlDataset extends BaseDataSet {
     addRow(
         dsd,
         "M7",
-        "LTFU More Than 90 days",
+        "IIT More Than 90 days",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "missed and LTFU More Than 90 days",
+                "missed and IIT More Than 90 days",
                 EptsReportUtils.map(
                     txMlCohortQueries.getPatientsLTFUMoreThan90DaysComposition(), mappings)),
             mappings),
