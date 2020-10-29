@@ -21,10 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
-import org.openmrs.Concept;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -32,11 +28,6 @@ import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.StartedArtOnPeriodCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.eptsreports.reporting.calculation.generic.StartedArtOnPeriodCalculation;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -386,75 +377,76 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
-    private CohortDefinition getPatientsRegisteredInFichaAPSSPP() {
-        SqlCohortDefinition cd = new SqlCohortDefinition();
-        cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
+  private CohortDefinition getPatientsRegisteredInFichaAPSSPP() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
 
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
-        Map<String, Integer> map = new HashMap<>();
-        map.put(
-                "prevencaoPositivaSeguimentoEncounterType",
-                hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-        map.put("preARTCounselingConcept", hivMetadata.getPreARTCounselingConcept().getConceptId());
-        map.put("patientFoundYesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
-        map.put("pp1Concept", hivMetadata.getPP1Concept().getConceptId());
-        map.put("pp2Concept", hivMetadata.getPP2Concept().getConceptId());
-        map.put("pp3Concept", hivMetadata.getPP3Concept().getConceptId());
-        map.put("pp4Concept", hivMetadata.getPP4Concept().getConceptId());
-        map.put("familyPlanningConcept", hivMetadata.getfamilyPlanningConcept().getConceptId());
-        map.put("pp6Concept", hivMetadata.getPP6Concept().getConceptId());
-        map.put("pp7Concept", hivMetadata.getPP7Concept().getConceptId());
+    Map<String, Integer> map = new HashMap<>();
+    map.put(
+        "prevencaoPositivaSeguimentoEncounterType",
+        hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("preARTCounselingConcept", hivMetadata.getPreARTCounselingConcept().getConceptId());
+    map.put("patientFoundYesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("pp1Concept", hivMetadata.getPP1Concept().getConceptId());
+    map.put("pp2Concept", hivMetadata.getPP2Concept().getConceptId());
+    map.put("pp3Concept", hivMetadata.getPP3Concept().getConceptId());
+    map.put("pp4Concept", hivMetadata.getPP4Concept().getConceptId());
+    map.put("familyPlanningConcept", hivMetadata.getfamilyPlanningConcept().getConceptId());
+    map.put("pp6Concept", hivMetadata.getPP6Concept().getConceptId());
+    map.put("pp7Concept", hivMetadata.getPP7Concept().getConceptId());
 
-        String query =
-                ""
-                        + " SELECT p.patient_id "
-                        + " FROM patient p "
-                        + "     INNER JOIN encounter e "
-                        + "        ON e.patient_id = p.patient_id "
-                        + "     INNER JOIN obs pp1 "
-                        + "        ON pp1.encounter_id=e.encounter_id "
-                        + "     INNER JOIN obs pp2 "
-                        + "        ON pp2.encounter_id=e.encounter_id "
-                        + "     INNER JOIN obs pp3 "
-                        + "        ON pp3.encounter_id=e.encounter_id "
-                        + "     INNER JOIN obs pp4 "
-                        + "        ON pp4.encounter_id=e.encounter_id "
-                        + "     INNER JOIN obs pp5 "
-                        + "        ON pp5.encounter_id=e.encounter_id "
-                        + "     INNER JOIN obs pp6 "
-                        + "        ON pp6.encounter_id=e.encounter_id "
-                        + "     INNER JOIN obs pp7 "
-                        + "        ON pp7.encounter_id=e.encounter_id "
-                        + " WHERE p.voided = 0 "
-                        + "    AND e.voided = 0 "
-                        + "    AND pp1.voided = 0 "
-                        + "    AND pp2.voided = 0 "
-                        + "    AND pp3.voided = 0 "
-                        + "    AND pp4.voided = 0 "
-                        + "    AND pp5.voided = 0 "
-                        + "    AND pp6.voided = 0 "
-                        + "    AND pp7.voided = 0 "
-                        + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-                        + "    AND (pp1.concept_id = ${pp1Concept} AND pp1.value_coded = ${patientFoundYesConcept}) "
-                        + "    AND (pp2.concept_id = ${pp2Concept} AND pp2.value_coded = ${patientFoundYesConcept}) "
-                        + "    AND (pp3.concept_id = ${pp3Concept} AND pp3.value_coded = ${patientFoundYesConcept}) "
-                        + "    AND (pp4.concept_id = ${pp4Concept} AND pp4.value_coded = ${patientFoundYesConcept}) "
-                        + "    AND (pp5.concept_id = ${familyPlanningConcept} AND pp5.value_coded = ${patientFoundYesConcept}) "
-                        + "    AND (pp6.concept_id = ${pp6Concept} AND pp6.value_coded = ${patientFoundYesConcept}) "
-                        + "    AND (pp7.concept_id = ${pp7Concept} AND pp7.value_coded = ${patientFoundYesConcept}) "
-                        + "    AND encounter_datetime "
-                        + "        BETWEEN :startDate AND :endDate "
-                        + "    AND e.location_id = :location ";
+    String query =
+        ""
+            + " SELECT p.patient_id "
+            + " FROM patient p "
+            + "     INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs pp1 "
+            + "        ON pp1.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp2 "
+            + "        ON pp2.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp3 "
+            + "        ON pp3.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp4 "
+            + "        ON pp4.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp5 "
+            + "        ON pp5.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp6 "
+            + "        ON pp6.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp7 "
+            + "        ON pp7.encounter_id=e.encounter_id "
+            + " WHERE p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND pp1.voided = 0 "
+            + "    AND pp2.voided = 0 "
+            + "    AND pp3.voided = 0 "
+            + "    AND pp4.voided = 0 "
+            + "    AND pp5.voided = 0 "
+            + "    AND pp6.voided = 0 "
+            + "    AND pp7.voided = 0 "
+            + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
+            + "    AND (pp1.concept_id = ${pp1Concept} AND pp1.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp2.concept_id = ${pp2Concept} AND pp2.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp3.concept_id = ${pp3Concept} AND pp3.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp4.concept_id = ${pp4Concept} AND pp4.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp5.concept_id = ${familyPlanningConcept} AND pp5.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp6.concept_id = ${pp6Concept} AND pp6.value_coded = ${patientFoundYesConcept}) "
+            + "    AND (pp7.concept_id = ${pp7Concept} AND pp7.value_coded = ${patientFoundYesConcept}) "
+            + "    AND encounter_datetime "
+            + "        BETWEEN :startDate AND :endDate "
+            + "    AND e.location_id = :location ";
 
-        StringSubstitutor sb = new StringSubstitutor(map);
-        String replacedQuery = sb.replace(query);
-        cd.setQuery(replacedQuery);
+    StringSubstitutor sb = new StringSubstitutor(map);
+    String replacedQuery = sb.replace(query);
+    cd.setQuery(replacedQuery);
 
-        return cd;
-    }
+    return cd;
+  }
+
   public CohortDefinition getFichaAPSSAndMinArtStartDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
