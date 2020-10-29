@@ -97,7 +97,7 @@ public class APSSResumoTrimestralCohortQueries {
             hivMetadata.getRevealdConcept());
 
     CohortDefinition patientAtAgeBetween8And14 =
-        genericCohortQueries.getAgeOnReportEndDate(8, 14, false);
+        genericCohortQueries.getAgeOnReportEndDate(8, 14);
 
     cd.addSearch(
         "revealded",
@@ -144,10 +144,11 @@ public class APSSResumoTrimestralCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.setName("B1");
-    CohortDefinition a1 =
-        resumoMensalCohortQueries.getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1();
 
-    cd.addSearch("A1", map(a1, "startDate=${startDate},location=${location}"));
+    CohortDefinition resumoMensalA2 =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2();
+
+    cd.addSearch("resumoMensalA2", map(resumoMensalA2, "startDate=${startDate},location=${location}"));
 
     Concept preARTCounselingConceptQuestion = hivMetadata.getPreARTCounselingConcept();
     Concept patientFoundYesConceptAnswer = hivMetadata.getPatientFoundYesConcept();
@@ -158,7 +159,7 @@ public class APSSResumoTrimestralCohortQueries {
                 preARTCounselingConceptQuestion, patientFoundYesConceptAnswer),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("A1 AND APSSANDPP");
+    cd.setCompositionString("resumoMensalA2 AND APSSANDPP");
 
     return cd;
   }
@@ -272,7 +273,7 @@ public class APSSResumoTrimestralCohortQueries {
 
     CohortDefinition startedART = this.getPatientsWhoStartedArtByEndOfPreviousMonthB10();
     CohortDefinition patientAtAge15OrOlder =
-        genericCohortQueries.getAgeOnReportEndDate(15, null, false);
+        genericCohortQueries.getAgeOnReportEndDate(15, null);
     CohortDefinition registeredInFichaAPSSPP = this.getPatientsRegisteredInFichaAPSSPP();
 
     cd.addSearch(
