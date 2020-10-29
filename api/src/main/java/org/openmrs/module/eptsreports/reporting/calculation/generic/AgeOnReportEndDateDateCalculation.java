@@ -15,6 +15,12 @@ import org.openmrs.module.reporting.common.Birthdate;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.springframework.stereotype.Component;
 
+/**
+ * The Class calculates the age of the patient based on report EndDate <br>
+ * <code>PatientAge = ReportEndDate - PatientBirthDate</code> <br>
+ * The <i>minAge</i> and the <i>maxAge</i> are the boundaries to evaluate if the patient belong to
+ * specific renge of age
+ */
 @Component
 public class AgeOnReportEndDateDateCalculation extends AbstractPatientCalculation {
 
@@ -37,11 +43,7 @@ public class AgeOnReportEndDateDateCalculation extends AbstractPatientCalculatio
     Integer minAge = (Integer) parameterValues.get(MIN_AGE);
     Integer maxAge = (Integer) parameterValues.get(MAX_AGE);
     Date endDate = (Date) context.getFromCache(ON_OR_BEFORE);
-    Boolean considerPatientThatStartedBeforeWasBorn =
-        (Boolean) parameterValues.get("considerPatientThatStartedBeforeWasBorn");
-    if (considerPatientThatStartedBeforeWasBorn == null) {
-      considerPatientThatStartedBeforeWasBorn = false;
-    }
+
     for (Integer patientId : cohort) {
       Date birthDate = getBirthDate(patientId, birthDates);
       if (endDate != null && birthDate != null) {
@@ -51,9 +53,6 @@ public class AgeOnReportEndDateDateCalculation extends AbstractPatientCalculatio
               Years.yearsIn(new Interval(birthDate.getTime(), endDate.getTime())).getYears();
           boolean b = isMinAgeOk(minAge, years) && isMaxAgeOk(maxAge, years);
           map.put(patientId, new BooleanResult(b, this));
-        } else if (considerPatientThatStartedBeforeWasBorn) {
-          map.put(
-              patientId, new BooleanResult(isMinAgeOk(minAge, 0) && isMaxAgeOk(maxAge, 0), this));
         }
       }
     }

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
+import org.openmrs.Concept;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
@@ -115,11 +116,11 @@ public class APSSResumoTrimestralCohortQueries {
    *   <li>Nº de pacientes que iniciou Pré-TARV (Cuidados de HIV) [ {@link
    *       ResumoMensalCohortQueries#getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1}
    *       from Resumo Mensal only changes the period to quarterly)]
-   *   <li>And filter all patients registered in encounter “Ficha APSS&PP” (encounter_type =
-   *       ${prevencaoPositivaSeguimentoEncounterType}) who have the following conditions:
+   *   <li>And filter all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
+   *       have the following conditions:
    *       <ul>
    *         <li>ACONSELHAMENTO PRÉ-TARV” (concept_id = 23886) with value_coded “SIM” (concept_id =
-   *             ${patientFoundYesConcept})
+   *             1065)
    *         <li>And “encounter_datetime” Between StartDate and EndDate
    *       </ul>
    * </ul>
@@ -137,13 +138,14 @@ public class APSSResumoTrimestralCohortQueries {
         resumoMensalCohortQueries.getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1();
 
     cd.addSearch("A1", map(a1, "startDate=${startDate},location=${location}"));
+
     Concept preARTCounselingConceptQuestion = hivMetadata.getPreARTCounselingConcept();
     Concept patientFoundYesConceptAnswer = hivMetadata.getPatientFoundYesConcept();
-
     cd.addSearch(
         "APSSANDPP",
         map(
-            getAllPatientsRegisteredInEncounterFichaAPSSANDPP(preARTCounselingConceptQuestion,patientFoundYesConceptAnswer),
+            getAllPatientsRegisteredInEncounterFichaAPSSANDPP(
+                preARTCounselingConceptQuestion, patientFoundYesConceptAnswer),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("A1 AND APSSANDPP");
@@ -157,55 +159,14 @@ public class APSSResumoTrimestralCohortQueries {
    * <p><b>Description:</b> Nº total de pacientes activos em TARV que receberam seguimento de adesão
    * durante o trimestre
    *
-   * <p>Normal Flow of Events:
-   *
-   * <ul>
-   *   <li>Select all active patients in TARV at end of reporting period ( endDate) from:
-   *       <ul>
-   *         <li>Pacientes activos em TARV no fim do mês (B13 indicator from Resumo Mensal only
-   *             changes the period to quarterly)
-   *       </ul>
-   *   <li>And FILTER all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
-   *       have the following conditions:
-   *       <ul>
-   *         <li>“PLANO DE ADESÃO - Horário; Esquecimento da dose; viagem” (concept_id =23716) with
-   *             value_coded “SIM”/”NAO” [concept_id IN (1065, 1066)] OR
-   *         <li>“EFEITOS SECUNDÁRIOS - O que pode ocorrer; Como manejar efeitos secundários”
-   *             (concept_id =23887) with value_coded “SIM”/”NAO” [concept_id IN (1065, 1066)] OR
-   *         <li>“ADESÃO ao TARV - Boa, Risco, Má, Dias de atraso na toma ARVs) = “B” ou “R” ou “M””
-   *             (concept_id=6223) with value_coded “BOM” or “RISCO” or “MAU” [concept_id IN (1383,
-   *             1749, 1385)]
-   *       </ul>
-   *   <li>AND “encounter_datetime” between (Patient ARTStartDate+30Days) and reporting endDate
-   * </ul>
-   *
-   * <p><b>Note:</b> Patient ARTStartDate is the oldest date from the following dates: <br>
-   * <i>Inclusion criteria of B10 Indicator from Resumo Mensal</i>
-   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getC1() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
-    cd.setName("C1");
+    sqlCohortDefinition.setName("C1");
 
-    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
-
-    CohortDefinition activeInART =
-        this.resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth();
-
-    cd.addSearch("activeInART", EptsReportUtils.map(activeInART, mapping));
-
-    cd.addSearch(
-        "minArtStartDate",
-        map(getFichaAPSSAndMinArtStartDate(), "endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("activeInART AND minArtStartDate");
-
-    return cd;
+    return sqlCohortDefinition;
   }
 
   /**
