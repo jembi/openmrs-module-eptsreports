@@ -62,9 +62,28 @@ public class APSSResumoTrimestralCohortQueries {
    * <p><b>Description:</b> Nº de crianças e adolescente de 8 -14 anos que receberam revelação total
    * do diagnóstico durante o trimestre
    *
+   * <p><b>Normal Flow of Events:</b>
+   *
+   * <ul>
+   *   <li>Select all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
+   *       have the following conditions:
+   *       <ul>
+   *         <li>“ESTADO DA REVELAÇÃO DO DIAGNÓSTICO a criança/adolescente” (concept_id = 6340) with
+   *             value_coded “REVELADO”(concept_id= 6337)
+   *         <li>And “encounter_datetime” Between StartDate and EndDate
+   *       </ul>
+   *   <li>Filter patients with age between 8 and 14 years, calculated at reporting endDate (endDate
+   *       minus birthdate);
+   * </ul>
+   *
+   * <p><b>Note 1:</b> <i> Exclude all patients who have “ESTADO DA REVELAÇÃO DO DIAGNÓSTICO a
+   * criança/adolescente” (concept_id = 6340) with value_coded “REVELADO” (concept_id= 6337) before
+   * startDate </i>
+   *
+   * <p><b>Note 2:</b><i> patients without birthdate information should not be included.</i>
+   *
    * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getA1() {
+   */  public CohortDefinition getA1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("A1");
@@ -150,14 +169,55 @@ public class APSSResumoTrimestralCohortQueries {
    * <p><b>Description:</b> Nº total de pacientes activos em TARV que receberam seguimento de adesão
    * durante o trimestre
    *
+   * <p>Normal Flow of Events:
+   *
+   * <ul>
+   *   <li>Select all active patients in TARV at end of reporting period ( endDate) from:
+   *       <ul>
+   *         <li>Pacientes activos em TARV no fim do mês (B13 indicator from Resumo Mensal only
+   *             changes the period to quarterly)
+   *       </ul>
+   *   <li>And FILTER all patients registered in encounter “Ficha APSS&PP” (encounter_type = 35) who
+   *       have the following conditions:
+   *       <ul>
+   *         <li>“PLANO DE ADESÃO - Horário; Esquecimento da dose; viagem” (concept_id =23716) with
+   *             value_coded “SIM”/”NAO” [concept_id IN (1065, 1066)] OR
+   *         <li>“EFEITOS SECUNDÁRIOS - O que pode ocorrer; Como manejar efeitos secundários”
+   *             (concept_id =23887) with value_coded “SIM”/”NAO” [concept_id IN (1065, 1066)] OR
+   *         <li>“ADESÃO ao TARV - Boa, Risco, Má, Dias de atraso na toma ARVs) = “B” ou “R” ou “M””
+   *             (concept_id=6223) with value_coded “BOM” or “RISCO” or “MAU” [concept_id IN (1383,
+   *             1749, 1385)]
+   *       </ul>
+   *   <li>AND “encounter_datetime” between (Patient ARTStartDate+30Days) and reporting endDate
+   * </ul>
+   *
+   * <p><b>Note:</b> Patient ARTStartDate is the oldest date from the following dates: <br>
+   * <i>Inclusion criteria of B10 Indicator from Resumo Mensal</i>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getC1() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    sqlCohortDefinition.setName("C1");
+    cd.setName("C1");
 
-    return sqlCohortDefinition;
+    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    CohortDefinition activeInART =
+            this.resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth();
+
+    cd.addSearch("activeInART", EptsReportUtils.map(activeInART, mapping));
+
+    cd.addSearch(
+            "minArtStartDate",
+            map(getFichaAPSSAndMinArtStartDate(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("activeInART AND minArtStartDate");
+
+    return cd;
   }
 
   /**
@@ -447,7 +507,7 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getFichaAPSSAndMinArtStartDate() {
+  private CohortDefinition getFichaAPSSAndMinArtStartDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
 
