@@ -588,8 +588,7 @@ public class GenericCohortQueries {
     return sb.replace(query);
   }
 
-  public CohortDefinition getAgeOnReportEndDate(
-      Integer minAge, Integer maxAge) {
+  public CohortDefinition getAgeOnReportEndDate(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(AgeOnReportEndDateDateCalculation.class).get(0));

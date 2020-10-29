@@ -83,7 +83,8 @@ public class APSSResumoTrimestralCohortQueries {
    * <p><b>Note 2:</b><i> patients without birthdate information should not be included.</i>
    *
    * @return {@link CohortDefinition}
-   */  public CohortDefinition getA1() {
+   */
+  public CohortDefinition getA1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("A1");
@@ -96,8 +97,7 @@ public class APSSResumoTrimestralCohortQueries {
             hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept(),
             hivMetadata.getRevealdConcept());
 
-    CohortDefinition patientAtAgeBetween8And14 =
-        genericCohortQueries.getAgeOnReportEndDate(8, 14);
+    CohortDefinition patientAtAgeBetween8And14 = genericCohortQueries.getAgeOnReportEndDate(8, 14);
 
     cd.addSearch(
         "revealded",
@@ -148,7 +148,8 @@ public class APSSResumoTrimestralCohortQueries {
     CohortDefinition resumoMensalA2 =
         resumoMensalCohortQueries.getPatientsWhoInitiatedPreTarvAtAfacilityDuringCurrentMonthA2();
 
-    cd.addSearch("resumoMensalA2", map(resumoMensalA2, "startDate=${startDate},location=${location}"));
+    cd.addSearch(
+        "resumoMensalA2", map(resumoMensalA2, "startDate=${startDate},location=${location}"));
 
     Concept preARTCounselingConceptQuestion = hivMetadata.getPreARTCounselingConcept();
     Concept patientFoundYesConceptAnswer = hivMetadata.getPatientFoundYesConcept();
@@ -208,13 +209,13 @@ public class APSSResumoTrimestralCohortQueries {
     String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     CohortDefinition activeInART =
-            this.resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth();
+        this.resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth();
 
     cd.addSearch("activeInART", EptsReportUtils.map(activeInART, mapping));
 
     cd.addSearch(
-            "minArtStartDate",
-            map(getFichaAPSSAndMinArtStartDate(), "endDate=${endDate},location=${location}"));
+        "minArtStartDate",
+        map(getFichaAPSSAndMinArtStartDate(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("activeInART AND minArtStartDate");
 
@@ -272,8 +273,7 @@ public class APSSResumoTrimestralCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = this.getPatientsWhoStartedArtByEndOfPreviousMonthB10();
-    CohortDefinition patientAtAge15OrOlder =
-        genericCohortQueries.getAgeOnReportEndDate(15, null);
+    CohortDefinition patientAtAge15OrOlder = genericCohortQueries.getAgeOnReportEndDate(15, null);
     CohortDefinition registeredInFichaAPSSPP = this.getPatientsRegisteredInFichaAPSSPP();
 
     cd.addSearch(
