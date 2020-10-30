@@ -70,12 +70,12 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
 
   @Override
   public String getUuid() {
-    return "b57c8c7a-27db-11ea-a2eb-cfdcb6608edf";
+    return "589327cd-1a84-11eb-b9a1-0242ac120002";
   }
 
   @Override
   public String getExcelDesignUuid() {
-    return "d8b5de76-27db-11ea-b629-8f1716d378b1";
+    return "628dbbdc-1a84-11eb-b9a1-0242ac120002";
   }
 
   @Override
