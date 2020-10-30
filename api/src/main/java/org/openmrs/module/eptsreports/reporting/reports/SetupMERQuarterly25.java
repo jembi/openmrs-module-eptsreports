@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TransferredInDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TxCurrDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TxMlDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TxNewDataset;
@@ -48,8 +47,6 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
 
   private GenericCohortQueries genericCohortQueries;
 
-  private TransferredInDataset transferredInDataset;
-
   @Autowired
   public SetupMERQuarterly25(
       TxPvlsDataset txPvlsDataset,
@@ -57,15 +54,13 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
       TxCurrDataset txCurrDataset,
       TxMlDataset txMlDataset,
       TxRttDataset txRttDataset,
-      GenericCohortQueries genericCohortQueries,
-      TransferredInDataset transferredInDataset) {
+      GenericCohortQueries genericCohortQueries) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
     this.txMlDataset = txMlDataset;
     this.txRttDataset = txRttDataset;
     this.genericCohortQueries = genericCohortQueries;
-    this.transferredInDataset = transferredInDataset;
   }
 
   @Override
