@@ -41,12 +41,11 @@ public class TransferredInCohortQueries {
    *
    * <blockquote>
    *
-   * Number Patients who were transferred in from other facility defined as following:
-   * - All patients enrolled in ART Program and who have been registered with the following 
-   * state TRANSFERRED IN FROM OTHER FACILITY 
-   * - All patients who have filled “Transferido de outra US” and checked “Em TARV” in 
-   * Ficha Resumo with MasterCard file opening Date during reporting period
-   * - But excluding patients who were included in Tx CURR of previous reporting period
+   * Number Patients who were transferred in from other facility defined as following: - All
+   * patients enrolled in ART Program and who have been registered with the following state
+   * TRANSFERRED IN FROM OTHER FACILITY - All patients who have filled “Transferido de outra US” and
+   * checked “Em TARV” in Ficha Resumo with MasterCard file opening Date during reporting period -
+   * But excluding patients who were included in Tx CURR of previous reporting period
    *
    * </blockquote>
    *
@@ -56,7 +55,7 @@ public class TransferredInCohortQueries {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    cd.setName("Number of Transferred In patients by end of current month");
+    cd.setName("Number of Transferred In patients by end of current period");
     cd.addParameter(new Parameter("onOrAfter", "Start Date", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));

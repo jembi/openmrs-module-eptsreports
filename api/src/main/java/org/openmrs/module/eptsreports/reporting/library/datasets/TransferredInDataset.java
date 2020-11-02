@@ -61,11 +61,6 @@ public class TransferredInDataset extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
-    dsd.addDimension(
-        "KP",
-        EptsReportUtils.map(
-            eptsCommonDimension.getKeyPopsDimension(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     dsd.setName("R");
     dsd.addParameters(getParameters());
     addRow(
@@ -146,14 +141,15 @@ public class TransferredInDataset extends BaseDataSet {
     ColumnParameters unknownF =
         new ColumnParameters("unknownF", "Unknown age female", "gender=F|age=UK", "26");
 
-    // Key population
-    ColumnParameters pid = new ColumnParameters("pid", "PID", "KP=PID", "27");
-    ColumnParameters msm = new ColumnParameters("msm", "MSM", "KP=MSM", "28");
-    ColumnParameters csw = new ColumnParameters("msm", "CSW", "KP=CSW", "29");
-    ColumnParameters pri = new ColumnParameters("pri", "PRI", "KP=PRI", "30");
+    // Getting subtotals
+    ColumnParameters subTotalF =
+        new ColumnParameters("subTotalF", "Sub Total female", "gender=F", "27");
+
+    ColumnParameters subTotalM =
+        new ColumnParameters("subTotalM", "Sub Total male", "gender=M", "28");
 
     // Getting the totals
-    ColumnParameters totals = new ColumnParameters("totals", "Total", "", "31");
+    ColumnParameters totals = new ColumnParameters("totals", "Total", "", "29");
 
     return Arrays.asList(
         under1YearM,
@@ -182,10 +178,8 @@ public class TransferredInDataset extends BaseDataSet {
         fouty5To49F,
         above50F,
         unknownF,
-        pid,
-        msm,
-        csw,
-        pri,
+        subTotalF,
+        subTotalM,
         totals);
   }
 }
