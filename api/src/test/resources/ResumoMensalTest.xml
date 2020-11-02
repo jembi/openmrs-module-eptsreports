@@ -267,6 +267,12 @@
 		property_value="e1e07fc8-1d5f-11e0-b929-000c29ad1d07"
 		description=" UUID for the REASON PATIENT MISSED VISIT concept "
 		uuid="8de95500-0fa5-4f54-9e11-4474a75ca285" />
+
+		<global_property
+		property="eptsreports.autoTransferConceptUuid"
+		property_value="de2c4ec6-c68e-4d4a-993d-23eba2de8267"
+		description="UUID for the AUTO TRANSFER concept "
+		uuid="58eed846-7495-446c-8dfc-33658e16dadd" />
 					 
 	<concept concept_id="23808" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2012-02-27 11:30:21" uuid="f69b1fe0-a657-4225-a996-20b599132508" />
 
@@ -380,6 +386,11 @@
 		  is_set="0"   class_id="7" datatype_id="2"
 		date_created="2019-10-24 17:23:07" creator="1"
 		uuid="e1e07fc8-1d5f-11e0-b929-000c29ad1d07" />
+
+		<concept concept_id="23863" retired="0" 
+		  is_set="0"   class_id="7" datatype_id="2"
+		date_created="2019-10-24 17:23:07" creator="1"
+		uuid="de2c4ec6-c68e-4d4a-993d-23eba2de8267" />
 
  <concept_name concept_id="1781" name="ARV SERVICE - CARE" locale="en" creator="1" date_created="2008-10-13 05:58:15"
                   concept_name_id="7172" voided="0" uuid="c953fdcc-e049-4c30-b847-a86eb1851f51"
