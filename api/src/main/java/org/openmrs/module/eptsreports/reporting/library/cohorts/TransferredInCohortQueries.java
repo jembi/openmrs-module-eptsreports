@@ -65,7 +65,7 @@ public class TransferredInCohortQueries {
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true);
 
     String mappingsTrfIn = "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}";
-    String mappingsCurr = "onOrBefore=${onOrBefore-3m},location=${location},locations=${location}";
+    String mappingsCurr = "onOrBefore=${onOrBefore-3m},location=${location}";
 
     cd.addSearch("transferredIn", EptsReportUtils.map(transferredIn, mappingsTrfIn));
     cd.addSearch("txCurr", EptsReportUtils.map(txCurr, mappingsCurr));
