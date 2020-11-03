@@ -171,6 +171,7 @@ public class TxMlDataset25 extends BaseDataSet {
         new ColumnParameters("above50M", "50+ male", "gender=M|age=50+", "12");
     ColumnParameters unknownM =
         new ColumnParameters("unknownM", "Unknown age male", "gender=M|age=UK", "13");
+    ColumnParameters totalM = new ColumnParameters("totalM", "Total of Males", "gender=M", "28");
 
     ColumnParameters under1F =
         new ColumnParameters("under1F", "under 1 year female", "gender=F|age=<1", "14");
@@ -199,6 +200,7 @@ public class TxMlDataset25 extends BaseDataSet {
     ColumnParameters unknownF =
         new ColumnParameters("unknownF", "Unknown age female", "gender=F|age=UK", "26");
     ColumnParameters total = new ColumnParameters("totals", "Totals", "", "27");
+    ColumnParameters totalF = new ColumnParameters("totalF", "Total of Females", "gender=F", "29");
 
     return Arrays.asList(
         under1M,
@@ -214,6 +216,7 @@ public class TxMlDataset25 extends BaseDataSet {
         fouty5To49M,
         above50M,
         unknownM,
+        totalM,
         under1F,
         oneTo4F,
         fiveTo9F,
@@ -227,6 +230,7 @@ public class TxMlDataset25 extends BaseDataSet {
         fouty5To49F,
         above50F,
         unknownF,
-        total);
+        total,
+        totalF);
   }
 }
