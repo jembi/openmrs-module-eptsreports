@@ -112,6 +112,7 @@ public class TxRttDataset extends BaseDataSet {
         new ColumnParameters("above50M", "50+ male", "gender=M|age=50+", "12");
     ColumnParameters unknownM =
         new ColumnParameters("unknownM", "Unknown age male", "gender=M|age=UK", "13");
+    ColumnParameters totalM = new ColumnParameters("totalM", "Total  male", "gender=M", "32");
 
     // Children Female
     ColumnParameters under1YearF =
@@ -143,6 +144,7 @@ public class TxRttDataset extends BaseDataSet {
         new ColumnParameters("above50F", "50+ female", "gender=F|age=50+", "25");
     ColumnParameters unknownF =
         new ColumnParameters("unknownF", "Unknown age female", "gender=F|age=UK", "26");
+    ColumnParameters totalF = new ColumnParameters("totalF", "Total  female", "gender=F", "33");
 
     // Key population
     ColumnParameters pid = new ColumnParameters("pid", "PID", "KP=PID", "27");
@@ -184,6 +186,8 @@ public class TxRttDataset extends BaseDataSet {
         msm,
         csw,
         pri,
-        totals);
+        totals,
+        totalM,
+        totalF);
   }
 }
