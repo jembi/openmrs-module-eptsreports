@@ -75,10 +75,7 @@ public class TxRttDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Patients who missed appointment but later showed up for a visit",
-                EptsReportUtils.map(
-                    txRttCohortQueries
-                        .getAllPatientsWhoMissedAppointmentBy28Or30DaysButLaterHadVisit(),
-                    mappings)),
+                EptsReportUtils.map(txRttCohortQueries.getRTTComposition(), mappings)),
             mappings),
         dissagChildrenAndAdultsAndKeyPop());
     return dsd;
