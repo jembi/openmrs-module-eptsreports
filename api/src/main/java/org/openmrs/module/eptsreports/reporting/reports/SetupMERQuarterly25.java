@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.*;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TransferredInDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TxCurrDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TxNewDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TxPvlsDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TxRttDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
@@ -43,6 +48,8 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
 
   private GenericCohortQueries genericCohortQueries;
 
+  private TransferredInDataset transferredInDataset;
+
   @Autowired
   public SetupMERQuarterly25(
       TxPvlsDataset txPvlsDataset,
@@ -50,13 +57,15 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
       TxCurrDataset txCurrDataset,
       TxMlDataset25 txMlDataset25,
       TxRttDataset txRttDataset,
-      GenericCohortQueries genericCohortQueries) {
+      GenericCohortQueries genericCohortQueries,
+      TransferredInDataset transferredInDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
     this.txMlDataset25 = txMlDataset25;
     this.txRttDataset = txRttDataset;
     this.genericCohortQueries = genericCohortQueries;
+    this.transferredInDataset = transferredInDataset;
   }
 
   @Override
@@ -91,16 +100,15 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.setParameters(txPvlsDataset.getParameters());
-    // rd.addDataSetDefinition("N",
-    // Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
-    // rd.addDataSetDefinition(
-    //  "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
-    // rd.addDataSetDefinition("P",
-    // Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
+    rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
+    rd.addDataSetDefinition(
+        "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
+    rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
     rd.addDataSetDefinition(
         "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
-    // rd.addDataSetDefinition("R",
-    // Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
+    rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
+    rd.addDataSetDefinition(
+        "TRFIN", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
