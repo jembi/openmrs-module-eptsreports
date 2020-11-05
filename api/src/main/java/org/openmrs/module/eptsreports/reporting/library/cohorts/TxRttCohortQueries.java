@@ -117,16 +117,17 @@ public class TxRttCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition ficha =
-        getPatientWithFilaOrFicha(
+        getPatientsWithFilaOrFichaOrMasterCardPickup(
             Arrays.asList(
                 hivMetadata.getAdultoSeguimentoEncounterType(),
                 hivMetadata.getPediatriaSeguimentoEncounterType()));
 
     CohortDefinition fila =
-        getPatientWithFilaOrFicha(Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()));
+        getPatientsWithFilaOrFichaOrMasterCardPickup(
+            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()));
 
     CohortDefinition drugPickUp =
-        getPatientWithFilaOrFicha(
+        getPatientsWithFilaOrFichaOrMasterCardPickup(
             Arrays.asList(hivMetadata.getMasterCardDrugPickupEncounterType()),
             hivMetadata.getArtPickupConcept(),
             hivMetadata.getYesConcept(),
@@ -138,12 +139,12 @@ public class TxRttCohortQueries {
 
     cd.addSearch("drugPickUp", EptsReportUtils.map(drugPickUp, DEFAULT_MAPPING));
 
-    cd.setCompositionString("ficha AND fila AND drugPickUp");
+    cd.setCompositionString("ficha OR fila OR drugPickUp");
 
     return cd;
   }
 
-  private CohortDefinition getPatientWithFilaOrFicha(
+  private CohortDefinition getPatientsWithFilaOrFichaOrMasterCardPickup(
       List<EncounterType> encounterTypes, Concept... conceptIds) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -165,7 +166,7 @@ public class TxRttCohortQueries {
     }
     builder.append(" WHERE  ");
     builder.append("    p.voided = 0  ");
-
+    builder.append("    e.voided = 0  ");
     if (encounterTypes.size() > 1) {
       builder.append("   AND e.encounter_type IN (%s,%s) ");
     } else {
