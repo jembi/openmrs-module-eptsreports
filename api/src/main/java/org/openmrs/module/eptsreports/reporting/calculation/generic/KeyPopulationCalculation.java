@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.calculation.generic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -21,6 +22,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.ListMap;
+import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.springframework.stereotype.Component;
 
@@ -209,8 +211,15 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getAdultoSeguimentoEncounterType());
     Concept keyPop = hivMetadata.getKeyPopulationConcept();
-    return eptsCalculationService.lastObs(
-        encounterTypes, keyPop, location, null, endDate, cohort, context);
+    return eptsCalculationService.getObs(
+        keyPop,
+        encounterTypes,
+        cohort,
+        Arrays.asList(location),
+        null,
+        TimeQualifier.ANY,
+        null,
+        context);
   }
 
   private CalculationResultMap getApssPrevencaoPositiva(
@@ -224,7 +233,14 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getPrevencaoPositivaSeguimentoEncounterType());
     Concept keyPop = hivMetadata.getKeyPopulationConcept();
-    return eptsCalculationService.lastObs(
-        encounterTypes, keyPop, location, null, endDate, cohort, context);
+    return eptsCalculationService.getObs(
+        keyPop,
+        encounterTypes,
+        cohort,
+        Arrays.asList(location),
+        null,
+        TimeQualifier.ANY,
+        null,
+        context);
   }
 }
