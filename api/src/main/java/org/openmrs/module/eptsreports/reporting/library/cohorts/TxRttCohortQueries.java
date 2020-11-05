@@ -109,7 +109,7 @@ public class TxRttCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getPatientsReturnedTreatmentDuringReportingPeriod() {
+  public CohortDefinition getPatientsReturnedTreatmentDuringReportingPeriod() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -166,7 +166,7 @@ public class TxRttCohortQueries {
     }
     builder.append(" WHERE  ");
     builder.append("    p.voided = 0  ");
-    builder.append("    e.voided = 0  ");
+    builder.append("    AND e.voided = 0  ");
     if (encounterTypes.size() > 1) {
       builder.append("   AND e.encounter_type IN (%s,%s) ");
     } else {
