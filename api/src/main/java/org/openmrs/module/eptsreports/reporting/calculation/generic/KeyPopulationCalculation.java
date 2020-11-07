@@ -1,5 +1,12 @@
 package org.openmrs.module.eptsreports.reporting.calculation.generic;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -16,18 +23,8 @@ import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.ListMap;
-import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class KeyPopulationCalculation extends AbstractPatientCalculation {
@@ -144,7 +141,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
     ListMap<Date, KeyPopAndSource> keyPopByDate = new ListMap<>(true);
 
-    if (!adultoSeguimento.isEmpty(pId)) {
+    if (adultoSeguimento != null && adultoSeguimento.containsKey(pId)) {
       Obs obs = getRequiredObservation(adultoSeguimento, pId);
       Date date;
       KeyPop keypop;
@@ -169,7 +166,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       }
     }
 
-    if (!apssPrevencaoPositiva.isEmpty(pId)) {
+    if (apssPrevencaoPositiva != null && apssPrevencaoPositiva.containsKey(pId)) {
       Obs obs = getRequiredObservation(apssPrevencaoPositiva, pId);
       Date date;
       KeyPop keypop;
@@ -214,15 +211,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getAdultoSeguimentoEncounterType());
     Concept keyPop = hivMetadata.getKeyPopulationConcept();
-    return eptsCalculationService.getObs(
-        keyPop,
-        encounterTypes,
-        cohort,
-        Arrays.asList(location),
-        null,
-        TimeQualifier.ANY,
-        null,
-        context);
+    return eptsCalculationService.allObservations(
+        keyPop, null, encounterTypes, location, cohort, context);
   }
 
   private CalculationResultMap getApssPrevencaoPositiva(
@@ -236,15 +226,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getPrevencaoPositivaSeguimentoEncounterType());
     Concept keyPop = hivMetadata.getKeyPopulationConcept();
-    return eptsCalculationService.getObs(
-        keyPop,
-        encounterTypes,
-        cohort,
-        Arrays.asList(location),
-        null,
-        TimeQualifier.ANY,
-        null,
-        context);
+    return eptsCalculationService.allObservations(
+        keyPop, null, encounterTypes, location, cohort, context);
   }
 
   private List<Obs> sortObsByObsDatetime(List<Obs> obs) {
