@@ -50,6 +50,8 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
 
   private TransferredInDataset transferredInDataset;
 
+  private TxRTTPLHIVDateset txRTTPLHIVDateset;
+
   @Autowired
   public SetupMERQuarterly25(
       TxPvlsDataset txPvlsDataset,
@@ -58,7 +60,8 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
       TxMlDataset25 txMlDataset25,
       TxRttDataset txRttDataset,
       GenericCohortQueries genericCohortQueries,
-      TransferredInDataset transferredInDataset) {
+      TransferredInDataset transferredInDataset,
+      TxRTTPLHIVDateset txRTTPLHIVDateset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
@@ -66,6 +69,7 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
     this.txRttDataset = txRttDataset;
     this.genericCohortQueries = genericCohortQueries;
     this.transferredInDataset = transferredInDataset;
+    this.txRTTPLHIVDateset = txRTTPLHIVDateset;
   }
 
   @Override
@@ -100,7 +104,7 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.setParameters(txPvlsDataset.getParameters());
-    rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
+    /*rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
     rd.addDataSetDefinition(
         "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
     rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
@@ -108,7 +112,9 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
         "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
     rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
     rd.addDataSetDefinition(
-        "TRFIN", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
+        "TRFIN", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));*/
+    rd.addDataSetDefinition(
+        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
