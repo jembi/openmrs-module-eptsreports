@@ -3,7 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.dimensions;
 import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.eptsreports.reporting.calculation.rtt.ReturnedAdnITTDifferenceDateCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.rtt.ReturnedDateIITDateDaysCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -23,32 +23,30 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxRTTDimenstion {
 
-  public CohortDefinitionDimension getAnBFromRTT() {
+  String mapping = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
-    String mapping =
-        "onOrAfter=${startDate},onOrBefore=${endDate},location=${location},previousPeriod=${startDate-1d}";
+  public CohortDefinitionDimension getAnBFromRTT() {
 
     CohortDefinitionDimension cdd = new CohortDefinitionDimension();
     cdd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cdd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cdd.addParameter(new Parameter("location", "Location", Location.class));
 
-    cdd.setName("A and B difference");
+    cdd.setName("B & A days difference");
 
     cdd.addCohortDefinition(
-        "<365", EptsReportUtils.map(getReturnedAdnITTDifferenceDateCalculation(true), mapping));
+        "<365", EptsReportUtils.map(getPatientsReturnedAndIITDays(true), mapping));
     cdd.addCohortDefinition(
-        "365+", EptsReportUtils.map(getReturnedAdnITTDifferenceDateCalculation(false), mapping));
+        "365+", EptsReportUtils.map(getPatientsReturnedAndIITDays(false), mapping));
 
     return cdd;
   }
 
-  public CohortDefinition getReturnedAdnITTDifferenceDateCalculation(boolean lessThan365Days) {
+  private CohortDefinition getPatientsReturnedAndIITDays(boolean lessThan365Days) {
     CalculationCohortDefinition calculationCohortDefinition =
         new CalculationCohortDefinition(
-            Context.getRegisteredComponents(ReturnedAdnITTDifferenceDateCalculation.class).get(0));
-    calculationCohortDefinition.addParameter(
-        new Parameter("previousPeriod", "previousPeriod", Date.class));
+            Context.getRegisteredComponents(ReturnedDateIITDateDaysCalculation.class).get(0));
+
     calculationCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     calculationCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     calculationCohortDefinition.addParameter(new Parameter("location", "location", Location.class));

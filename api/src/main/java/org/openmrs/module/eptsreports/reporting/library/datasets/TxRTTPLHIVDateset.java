@@ -46,37 +46,29 @@ public class TxRTTPLHIVDateset extends BaseDataSet {
     cohortIndicatorDataSetDefinition.addDimension(
         "days", EptsReportUtils.map(txRTTDimenstion.getAnBFromRTT(), mappings));
 
-    CohortIndicator rtt =
-        eptsGeneralIndicator.getIndicator(
-            "All patients in RTT",
-            EptsReportUtils.map(txRttCohortQueries.getRTTComposition(), mappings));
-
     CohortIndicator plhiv =
         eptsGeneralIndicator.getIndicator(
             "PLHIV", EptsReportUtils.map(txRttCohortQueries.getRTTComposition(), mappings));
 
-    Mapped<CohortIndicator> mappedRTTIndicator = EptsReportUtils.map(rtt, mappings);
-
     Mapped<CohortIndicator> mappedPLHIVIndicator = EptsReportUtils.map(plhiv, mappings);
-
-    cohortIndicatorDataSetDefinition.addColumn("RTT", "Total of RTT", mappedRTTIndicator, "");
 
     addRow(
         cohortIndicatorDataSetDefinition,
         "PLHIV",
         "Patients who returned to treatment and remained on ARV",
         mappedPLHIVIndicator,
-        getDiffFromAnBDisagragation());
+        getDiffInDaysFromAnBDisagragation());
 
     return cohortIndicatorDataSetDefinition;
   }
 
-  private List<ColumnParameters> getDiffFromAnBDisagragation() {
+  private List<ColumnParameters> getDiffInDaysFromAnBDisagragation() {
     ColumnParameters lessThan365 =
         new ColumnParameters("less365", "Less than 365", "days=<365", "01");
     ColumnParameters moreThan365 =
         new ColumnParameters("more365", "more than 365", "days=365+", "02");
+    ColumnParameters total = new ColumnParameters("total", "Total PLHIV", "", "03");
 
-    return Arrays.asList(lessThan365, moreThan365);
+    return Arrays.asList(lessThan365, moreThan365, total);
   }
 }
