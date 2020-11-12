@@ -109,6 +109,74 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
 
     sqlPatientDataDefinition.addParameter(new Parameter(LOCATION, LOCATION, Location.class));
 
+    String query1 = getQuery1FromLTFU(hivMetadata, commonMetadata, endDate);
+    String query2 = getQuery2FromLTFU(hivMetadata, commonMetadata, endDate);
+    String finalQuery = query1 + " UNION " + query2;
+
+    sqlPatientDataDefinition.setSql(finalQuery);
+
+    Map<String, Object> param = new HashMap<>();
+    param.put(LOCATION, location);
+
+    CalculationResultMap calculationResultMap =
+        EptsCalculationUtils.evaluateWithReporting(
+            sqlPatientDataDefinition, cohort, param, null, context);
+
+    return calculationResultMap;
+  }
+
+  /**
+   *
+   *
+   * <h4>Denominated B</h4>
+   *
+   * <ul>
+   *   <li>B: Select the oldest date (encounter datetime for encounter 6, 9, 18 and value datetime
+   *       for 52) of the following conditions:
+   *       <ul>
+   *         <li>patients who returned to the treatment during the reporting period following the
+   *             criterias below:
+   *             <ul>
+   *               <li>At least one Ficha Clinica registered during the reporting period (Encounter
+   *                   Type 6 or 9, and encounter_datetime>= startDate and <=endDate) OR
+   *               <li>At least one Drugs Pick up registered in FILA during the reporting period
+   *                   (Encounter Type 18, and encounter_datetime>= startDate and <=endDate) OR
+   *               <li>At least one Drugs Pick up registered in MasterCard-Recepção/Levantoy ARV,
+   *                   during the reporting period (Encounter Type 52, and “Levantou ARV”- concept
+   *                   ID 23865”= “Yes” (concept id 1065) and “Data de Levantamento” (concept Id
+   *                   23866 value_datetime>= startDate and <=endDate)
+   *             </ul>
+   *       </ul>
+   * </ul>
+   *
+   * @return
+   */
+  private CalculationResultMap getOldestDateForPatientWhoReturned(
+      Collection<Integer> cohort,
+      PatientCalculationContext context,
+      HivMetadata hivMetadata,
+      Location location,
+      Date... dates) {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.addParameter(new Parameter(ON_OR_AFTER, "On Or After", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter(ON_OR_BEFORE, "On Or Before", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter(LOCATION, "Location", Location.class));
+
+    String query = getReturnedInPeriodQuery(hivMetadata);
+
+    sqlPatientDataDefinition.setSql(query);
+
+    Map<String, Object> param = new HashMap<>();
+    param.put(ON_OR_AFTER, dates[0]);
+    param.put(ON_OR_BEFORE, dates[1]);
+    param.put(LOCATION, location);
+
+    return EptsCalculationUtils.evaluateWithReporting(
+        sqlPatientDataDefinition, cohort, param, null, context);
+  }
+
+  private String getQuery1FromLTFU(
+      HivMetadata hivMetadata, CommonMetadata commonMetadata, String endDate) {
     Map<String, Integer> map1 = new HashMap<>();
     map1.put(
         "returnVisitDateForArvDrugConcept",
@@ -211,7 +279,11 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
     StringSubstitutor stringSubstitutor1 = new StringSubstitutor(map1);
     String replacedQeury1 = stringSubstitutor1.replace(query1);
 
-    //
+    return replacedQeury1;
+  }
+
+  private String getQuery2FromLTFU(
+      HivMetadata hivMetadata, CommonMetadata commonMetadata, String endDate) {
 
     Map<String, Integer> map2 = new HashMap<>();
     map2.put(
@@ -364,58 +436,10 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
     StringSubstitutor stringSubstitutor2 = new StringSubstitutor(map2);
     String replacedQeury2 = stringSubstitutor2.replace(query2);
 
-    //
-    String finalQuery = replacedQeury1 + " UNION " + replacedQeury2;
-
-    sqlPatientDataDefinition.setSql(finalQuery);
-
-    Map<String, Object> param = new HashMap<>();
-    param.put(LOCATION, location);
-
-    CalculationResultMap calculationResultMap =
-        EptsCalculationUtils.evaluateWithReporting(
-            sqlPatientDataDefinition, cohort, param, null, context);
-
-    return calculationResultMap;
+    return replacedQeury2;
   }
 
-  /**
-   *
-   *
-   * <h4>Denominated B</h4>
-   *
-   * <ul>
-   *   <li>B: Select the oldest date (encounter datetime for encounter 6, 9, 18 and value datetime
-   *       for 52) of the following conditions:
-   *       <ul>
-   *         <li>patients who returned to the treatment during the reporting period following the
-   *             criterias below:
-   *             <ul>
-   *               <li>At least one Ficha Clinica registered during the reporting period (Encounter
-   *                   Type 6 or 9, and encounter_datetime>= startDate and <=endDate) OR
-   *               <li>At least one Drugs Pick up registered in FILA during the reporting period
-   *                   (Encounter Type 18, and encounter_datetime>= startDate and <=endDate) OR
-   *               <li>At least one Drugs Pick up registered in MasterCard-Recepção/Levantoy ARV,
-   *                   during the reporting period (Encounter Type 52, and “Levantou ARV”- concept
-   *                   ID 23865”= “Yes” (concept id 1065) and “Data de Levantamento” (concept Id
-   *                   23866 value_datetime>= startDate and <=endDate)
-   *             </ul>
-   *       </ul>
-   * </ul>
-   *
-   * @return
-   */
-  private CalculationResultMap getOldestDateForPatientWhoReturned(
-      Collection<Integer> cohort,
-      PatientCalculationContext context,
-      HivMetadata hivMetadata,
-      Location location,
-      Date... dates) {
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.addParameter(new Parameter(ON_OR_AFTER, "On Or After", Date.class));
-    sqlPatientDataDefinition.addParameter(new Parameter(ON_OR_BEFORE, "On Or Before", Date.class));
-    sqlPatientDataDefinition.addParameter(new Parameter(LOCATION, "Location", Location.class));
-
+  String getReturnedInPeriodQuery(HivMetadata hivMetadata) {
     Map<String, Integer> map = new HashMap<>();
     map.put(
         "adultoSeguimentoEncounterType",
@@ -484,14 +508,6 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String replacedQeury = stringSubstitutor.replace(query);
 
-    sqlPatientDataDefinition.setSql(replacedQeury);
-
-    Map<String, Object> param = new HashMap<>();
-    param.put(ON_OR_AFTER, dates[0]);
-    param.put(ON_OR_BEFORE, dates[1]);
-    param.put(LOCATION, location);
-
-    return EptsCalculationUtils.evaluateWithReporting(
-        sqlPatientDataDefinition, cohort, param, null, context);
+    return replacedQeury;
   }
 }
