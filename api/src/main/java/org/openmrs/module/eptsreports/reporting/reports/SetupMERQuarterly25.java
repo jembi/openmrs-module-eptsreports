@@ -50,7 +50,7 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
 
   private TransferredInDataset transferredInDataset;
 
-  private TxRTTPLHIVDateset txRTTPLHIVDateset;
+  private TxRTTPLHIVDataset txRTTPLHIVDateset;
 
   @Autowired
   public SetupMERQuarterly25(
@@ -61,7 +61,7 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
       TxRttDataset txRttDataset,
       GenericCohortQueries genericCohortQueries,
       TransferredInDataset transferredInDataset,
-      TxRTTPLHIVDateset txRTTPLHIVDateset) {
+      TxRTTPLHIVDataset txRTTPLHIVDateset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;

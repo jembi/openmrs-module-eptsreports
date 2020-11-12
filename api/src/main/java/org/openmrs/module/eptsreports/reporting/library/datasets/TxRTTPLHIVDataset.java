@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TxRTTPLHIVDateset extends BaseDataSet {
+public class TxRTTPLHIVDataset extends BaseDataSet {
 
   private TxRttCohortQueries txRttCohortQueries;
 
@@ -23,7 +23,7 @@ public class TxRTTPLHIVDateset extends BaseDataSet {
   private TxRTTDimenstion txRTTDimenstion;
 
   @Autowired
-  public TxRTTPLHIVDateset(
+  public TxRTTPLHIVDataset(
       TxRttCohortQueries txRttCohortQueries,
       EptsGeneralIndicator eptsGeneralIndicator,
       TxRTTDimenstion txRTTDimenstion) {
