@@ -20,14 +20,20 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/** Defines all of the TxCurrCohortQueries we want to expose for EPTS */
 @Component
 public class MISAUKeyPopsCohortQueries {
 
-  @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
-  @Autowired private ResumoTrimestralCohortQueries resumoTrimestralCohortQueries;
+  private ResumoTrimestralCohortQueries resumoTrimestralCohortQueries;
 
+  @Autowired
+  public MISAUKeyPopsCohortQueries(
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      ResumoTrimestralCohortQueries resumoTrimestralCohortQueries) {
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.resumoTrimestralCohortQueries = resumoTrimestralCohortQueries;
+  }
   /**
    * <b>Name: Numero de pacientes que iniciaram TARV</b>
    *
