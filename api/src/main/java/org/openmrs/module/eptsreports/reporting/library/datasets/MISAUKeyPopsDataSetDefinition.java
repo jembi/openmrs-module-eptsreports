@@ -29,24 +29,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
 
-  private MISAUKeyPopsCohortQueries mISAUKeyPopsCohortQueries;
+  @Autowired private MISAUKeyPopsCohortQueries mISAUKeyPopsCohortQueries;
 
-  private EptsGeneralIndicator eptsGeneralIndicator;
+  @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
 
-  private EptsCommonDimension eptsCommonDimension;
-
-  @Qualifier("commonAgeDimensionCohort")
-  private AgeDimensionCohortInterface ageDimensionCohort;
+  @Autowired private EptsCommonDimension eptsCommonDimension;
 
   @Autowired
-  public MISAUKeyPopsDataSetDefinition(
-      MISAUKeyPopsCohortQueries mISAUKeyPopsCohortQueries,
-      EptsGeneralIndicator eptsGeneralIndicator,
-      EptsCommonDimension eptsCommonDimension) {
-    this.mISAUKeyPopsCohortQueries = mISAUKeyPopsCohortQueries;
-    this.eptsGeneralIndicator = eptsGeneralIndicator;
-    this.eptsCommonDimension = eptsCommonDimension;
-  }
+  @Qualifier("commonAgeDimensionCohort")
+  private AgeDimensionCohortInterface ageDimensionCohort;
 
   public CohortIndicatorDataSetDefinition constructMISAUKeyPopsDataset() {
 
