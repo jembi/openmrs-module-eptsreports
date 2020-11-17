@@ -23,7 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxRTTDimenstion {
 
-  String mapping = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+  private final String MAPPINGS =
+      "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
   public CohortDefinitionDimension getAnBFromRTT() {
 
@@ -35,23 +36,31 @@ public class TxRTTDimenstion {
     cdd.setName("B & A days difference");
 
     cdd.addCohortDefinition(
-        "<365", EptsReportUtils.map(getPatientsReturnedAndIITDays(true), mapping));
+        "<365", EptsReportUtils.map(getPatientsReturnedAndIITDays(0), MAPPINGS));
     cdd.addCohortDefinition(
-        "365+", EptsReportUtils.map(getPatientsReturnedAndIITDays(false), mapping));
+        "365+", EptsReportUtils.map(getPatientsReturnedAndIITDays(1), MAPPINGS));
+    cdd.addCohortDefinition("UK", EptsReportUtils.map(getPatientsReturnedAndIITDays(2), MAPPINGS));
 
     return cdd;
   }
 
-  private CohortDefinition getPatientsReturnedAndIITDays(boolean lessThan365Days) {
+  public CohortDefinition getPatientsReturnedAndIITDays(int range) {
     CalculationCohortDefinition calculationCohortDefinition =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(ReturnedDateIITDateDaysCalculation.class).get(0));
+    if (range < 1) {
+      calculationCohortDefinition.setName("lessThan365Days");
+    } else if (range == 1) {
+      calculationCohortDefinition.setName("moreThan365Days");
+    } else {
+      calculationCohortDefinition.setName("unknownRange");
+    }
 
     calculationCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     calculationCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     calculationCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    calculationCohortDefinition.addCalculationParameter("lessThan365Days", lessThan365Days);
+    calculationCohortDefinition.addCalculationParameter("range", range);
 
     return calculationCohortDefinition;
   }
