@@ -56,7 +56,7 @@ public class ViralLoadQueries {
             + " (SELECT p.patient_id, MAX(o.obs_datetime) AS data_carga FROM  patient p INNER JOIN encounter e ON p.patient_id=e.patient_id INNER JOIN "
             + " obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND "
-            + " e.encounter_type IN (%d) AND o.concept_id=%d AND o.value_numeric IS NOT NULL AND "
+            + " e.encounter_type IN (%d, %d, %d) AND o.concept_id=%d AND o.value_numeric IS NOT NULL AND "
             + " o.obs_datetime BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate "
             + " AND e.location_id=:location GROUP BY p.patient_id) comb INNER JOIN obs ON obs.person_id=comb.patient_id AND obs.obs_datetime= "
             + " comb.data_carga  WHERE obs.voided=0 AND obs.concept_id IN (%d) "
@@ -75,6 +75,8 @@ public class ViralLoadQueries {
         vlQualitativeConceptQuestion,
         vlConceptQuestion,
         vlQualitativeConceptQuestion,
+        adultSeguimentoEncounter,
+        labEncounter,
         mastercardEncounter,
         vlConceptQuestion,
         vlConceptQuestion,
