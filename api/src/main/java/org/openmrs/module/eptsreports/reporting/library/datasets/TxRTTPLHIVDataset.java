@@ -67,9 +67,8 @@ public class TxRTTPLHIVDataset extends BaseDataSet {
         new ColumnParameters("less365", "Less than 365", "days=<365", "01");
     ColumnParameters moreThan365 =
         new ColumnParameters("more365", "more than 365", "days=365+", "02");
-    ColumnParameters unknown = new ColumnParameters("unknown", "unknown", "days=UK", "04");
     ColumnParameters total = new ColumnParameters("total", "Total PLHIV", "", "03");
 
-    return Arrays.asList(lessThan365, moreThan365, total, unknown);
+    return Arrays.asList(lessThan365, moreThan365, total);
   }
 }

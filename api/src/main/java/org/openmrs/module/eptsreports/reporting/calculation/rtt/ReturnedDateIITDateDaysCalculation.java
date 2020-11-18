@@ -27,7 +27,7 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
   private final String ON_OR_AFTER = "onOrAfter";
   private final String ON_OR_BEFORE = "onOrBefore";
   private final String LOCATION = "location";
-  private final String RANGE = "range";
+  private final String LESS_THAN_360_DAYS = "lessThan365Days";
 
   @Override
   public CalculationResultMap evaluate(
@@ -53,16 +53,16 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
         getOldestDateForPatientWhoReturned(
             cohort, context, hivMetadata, location, onOrAfter, onOrBefore);
 
-    int range = (Integer) parameterValues.get(RANGE);
+    boolean lessThan365Days = (Boolean) parameterValues.get(LESS_THAN_360_DAYS);
 
     for (Integer pId : cohort) {
 
       Date a = EptsCalculationUtils.resultForPatient(mostRecent, pId);
       Date b = EptsCalculationUtils.resultForPatient(oldestDate, pId);
 
-      if ((a != null && b != null) && (range == 0 || range == 1)) {
+      if (a != null && b != null) {
         int days = Days.daysIn(new Interval(a.getTime(), b.getTime())).getDays();
-        if (range == 0) {
+        if (lessThan365Days) {
           if (days < YEAR_DAYS) {
             calculationResultMap.put(pId, new SimpleResult(days, this));
           }
@@ -71,9 +71,6 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
             calculationResultMap.put(pId, new SimpleResult(days, this));
           }
         }
-      }
-      if ((a == null || b == null) && range == 2) {
-        calculationResultMap.put(pId, new SimpleResult(null, this));
       }
     }
 
