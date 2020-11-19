@@ -277,9 +277,7 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
             + "' ";
 
     StringSubstitutor stringSubstitutor1 = new StringSubstitutor(map1);
-    String replacedQeury1 = stringSubstitutor1.replace(query1);
-
-    return replacedQeury1;
+    return stringSubstitutor1.replace(query1);
   }
 
   private String getQuery2FromLTFU(
@@ -305,13 +303,13 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
     map2.put("artDatePickup", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query2 =
-        " SELECT pat.patient_id,  eeecc.encounter_datetime   "
+        " SELECT pat.patient_id,  enc.encounter_datetime   "
             + " FROM   patient pat "
-            + " INNER JOIN encounter eeecc ON eeecc.encounter_id = pat.patient_id "
+            + " INNER JOIN encounter enc ON enc.encounter_id = pat.patient_id "
             + " WHERE  pat.voided=0 "
-            + " AND eeecc.voided = 0 "
-            + " AND eeecc.location_id = :location "
-            + " AND eeecc.encounter_datetime <= '"
+            + " AND enc.voided = 0 "
+            + " AND enc.location_id = :location "
+            + " AND enc.encounter_datetime <= '"
             + endDate
             + "'"
             + " AND    pat.patient_id NOT IN "
@@ -433,10 +431,8 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
             + "' ) fn)  "
             + "GROUP BY pat.patient_id";
 
-    StringSubstitutor stringSubstitutor2 = new StringSubstitutor(map2);
-    String replacedQeury2 = stringSubstitutor2.replace(query2);
-
-    return replacedQeury2;
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map2);
+    return stringSubstitutor.replace(query2);
   }
 
   String getReturnedInPeriodQuery(HivMetadata hivMetadata) {
@@ -506,8 +502,6 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
             + " GROUP BY outter.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-    String replacedQeury = stringSubstitutor.replace(query);
-
-    return replacedQeury;
+    return stringSubstitutor.replace(query);
   }
 }
