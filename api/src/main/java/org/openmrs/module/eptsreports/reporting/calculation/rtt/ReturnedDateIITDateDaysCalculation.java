@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculation {
 
   private final int YEAR_DAYS = 365;
-
   private final String ON_OR_AFTER = "onOrAfter";
   private final String ON_OR_BEFORE = "onOrBefore";
   private final String LOCATION = "location";
@@ -39,8 +38,9 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
 
     Date onOrAfter = (Date) context.getFromCache(ON_OR_AFTER);
     Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
-    Location location = (Location) context.getFromCache(LOCATION);
     Date previousPeriod = DateUtils.addDays(onOrAfter, -1);
+
+    Location location = (Location) context.getFromCache(LOCATION);
 
     HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
     CommonMetadata commonMetadata = Context.getRegisteredComponents(CommonMetadata.class).get(0);
