@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.QualityImprovement2020DataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.QualityImprovementDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -15,14 +15,12 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class SetupQualityImprovementReport20 extends EptsDataExportManager {
 
   @Autowired protected GenericCohortQueries genericCohortQueries;
 
-  @Autowired private QualityImprovement2020DataSet initQltyImpDataSet;
+  @Autowired private QualityImprovementDataSet initQltyImpDataSet;
 
   @Override
   public String getUuid() {
@@ -57,8 +55,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
     reportDefinition.setDescription(getDescription());
     reportDefinition.setParameters(getParameters());
     reportDefinition.addDataSetDefinition(
-        "ALL",
-        Mapped.mapStraightThrough(initQltyImpDataSet.constructQualityImprovement2020DataSet()));
+        "ALL", Mapped.mapStraightThrough(initQltyImpDataSet.constructInitQltyImpDataSet()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
@@ -75,7 +72,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Melhoria de QualidadegetMQC3D1 - 2020.xls",
+              "Melhoria de Qualidade - 2020.xls",
               "Melhoria de Qualidade - 2020",
               getExcelDesignUuid(),
               null);
