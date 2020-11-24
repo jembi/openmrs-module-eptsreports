@@ -168,11 +168,25 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-  /*
+  /**
+   * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 Criancas <br>
+   * <i> (A AND B) AND NOT (C OR D)</i> <br>
    *
-   * 5.1. Denominador % de crianças em TARV com desnutrição (DAM ou DAG) e
-   * com registo de prescrição de suplementação ou tratamento nutricional
+   * <ul>
+   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
+   *       and endDateInclusion)
+   *   <li>AND
+   *   <li>B - Filter all patients with nutritional state equal to “DAM” or “DAG” registered on a
+   *       clinical consultation during the period
+   *   <li>AND EXCLUDE
+   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
+   *       inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>OR
+   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
+   *       the inclusion period (startDateInclusion and endDateInclusion):
+   * </ul>
    *
+   * @return CohortDefinition
    */
   public CohortDefinition getMQ5Den1() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -206,11 +220,25 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-  /*
+  /**
+   * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 MG <br>
+   * <i> (A AND B AND C) AND NOT D</i> <br>
    *
-   * 5.2. Denominador % de MG em TARV com desnutrição (DAM ou DAG) e
-   * com registo de prescrição de suplementação ou tratamento nutricional
+   * <ul>
+   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
+   *       and endDateInclusion)
+   *   <li>AND
+   *   <li>B - Filter all patients with nutritional state equal to “DAM” or “DAG” registered on a
+   *       clinical consultation during the period
+   *   <li>AND
+   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
+   *       inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>AND EXCLUDE
+   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
+   *       the inclusion period (startDateInclusion and endDateInclusion):
+   * </ul>
    *
+   * @return CohortDefinition
    */
   public CohortDefinition getMQ5Den2() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
