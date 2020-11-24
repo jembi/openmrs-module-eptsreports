@@ -56,12 +56,42 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     .getPatientsWhoInitiatedARTDuringTheInclusionPeriod(),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    CohortIndicator mq5Den1 =
+        eptsGeneralIndicator.getIndicator(
+            "Malnourished Children",
+            EptsReportUtils.map(
+                this.qualityImprovement2020CohortQueries.getMQ5Den1(),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    CohortIndicator mq5Den2 =
+        eptsGeneralIndicator.getIndicator(
+            "Malnourished Pregnant Women",
+            EptsReportUtils.map(
+                this.qualityImprovement2020CohortQueries.getMQ5Den2(),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     addRow(
         dataSetDefinition,
         "ART",
         "initiatedART",
         EptsReportUtils.map(
             initiatedART, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        getDisagregateAdultsAndChildrenSColumn());
+
+    addRow(
+        dataSetDefinition,
+        "MQ5DEN1",
+        "Categoria 5 Pediatrico",
+        EptsReportUtils.map(
+            mq5Den1, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        getDisagregateAdultsAndChildrenSColumn());
+
+    addRow(
+        dataSetDefinition,
+        "MQ5DEN2",
+        "Categoria 5 Mulher Gravida",
+        EptsReportUtils.map(
+            mq5Den2, "startDate=${startDate},endDate=${endDate},location=${location}"),
         getDisagregateAdultsAndChildrenSColumn());
 
     return dataSetDefinition;
