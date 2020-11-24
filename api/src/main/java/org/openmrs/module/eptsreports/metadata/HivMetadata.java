@@ -3444,4 +3444,35 @@ public class HivMetadata extends ProgramsMetadata {
     String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.badConcept");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 22772</b>
+   *
+   * <p><b>Name:</b> TYPE OF HIV TEST
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTypeTestHIVConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.typeTestHIVConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23807</b>
+   *
+   * <p><b>Name:</b> PRESUMPTIVE DIAGNOSIS IN CHILDREN LESS THAN 18 MONTHS
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPresumptiveDiagnosisInChildrenConcep() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.presumptiveDiagnosisInChildrenConceptUuid");
+    return getConcept(uuid);
+  }
 }

@@ -48,6 +48,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
 
+    // Category 3 Numerator
     CohortIndicator initiatedART =
         eptsGeneralIndicator.getIndicator(
             "initiatedART",
@@ -61,6 +62,22 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "initiatedART",
         EptsReportUtils.map(
             initiatedART, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        getDisagregateAdultsAndChildrenSColumn());
+
+    // Category 3 Numerator
+    CohortIndicator MQC3N1 =
+        eptsGeneralIndicator.getIndicator(
+            "MQC3N1",
+            EptsReportUtils.map(
+                this.qualityImprovement2020CohortQueries.getMQC3N1(),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    addRow(
+        dataSetDefinition,
+        "MQC3N1",
+        "Catergory 3  Numerator",
+        EptsReportUtils.map(
+            MQC3N1, "startDate=${startDate},endDate=${endDate},location=${location}"),
         getDisagregateAdultsAndChildrenSColumn());
 
     return dataSetDefinition;
