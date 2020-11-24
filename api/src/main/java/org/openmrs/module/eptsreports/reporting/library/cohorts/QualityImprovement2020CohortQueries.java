@@ -182,7 +182,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
-    CohortDefinition startedART = getPatientsWhoInitiatedARTDuringTheInclusionPeriod();
+    CohortDefinition startedART = getMQC3D1();
 
     CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
 
@@ -220,7 +220,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
-    CohortDefinition startedART = getPatientsWhoInitiatedARTDuringTheInclusionPeriod();
+    CohortDefinition startedART = getMQC3D1();
 
     CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
 
