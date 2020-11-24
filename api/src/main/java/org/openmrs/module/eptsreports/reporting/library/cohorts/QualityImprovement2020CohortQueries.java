@@ -111,7 +111,8 @@ public class QualityImprovement2020CohortQueries {
             + "    AND obs1.voided =0 "
             + "    AND obs2.voided =0 "
             + "    AND e.encounter_type = ${masterCardEncounterType}  "
-            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "    AND obs1.obs_datetime BETWEEN :startDate AND :endDate "
+            + "    AND obs2.obs_datetime BETWEEN :startDate AND :endDate "
             + "    AND e.location_id = :location "
             + "    AND obs1.concept_id = ${transferFromOtherFacilityConcept} AND obs1.value_coded = ${patientFoundYesConcept} "
             + "    AND obs2.concept_id = ${typeOfPatientTransferredFrom} AND obs2.value_coded = ${artStatus} ";
