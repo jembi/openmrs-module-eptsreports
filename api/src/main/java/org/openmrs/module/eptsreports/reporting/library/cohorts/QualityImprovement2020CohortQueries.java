@@ -243,7 +243,7 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQ5Den2() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    compositionCohortDefinition.setName("% de crianças em TARV com desnutrição (DAM ou DAG)");
+    compositionCohortDefinition.setName("% de mulheres gravidas em TARV com desnutrição (DAM ou DAG)");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
