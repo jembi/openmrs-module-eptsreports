@@ -257,9 +257,9 @@ public class QualityImprovement2020CohortQueries {
             + "   p.voided = 0 "
             + "   AND e.voided = 0 "
             + "   AND o.voided = 0 "
-            + "   AND e.encounter_type = $ {fichaClinicaEncounterType} "
-            + "   AND o.concept_id = $ {conceptIdQn} "
-            + "   AND o.value_coded = $ {conceptIdAns} "
+            + "   AND e.encounter_type = ${fichaClinicaEncounterType} "
+            + "   AND o.concept_id = ${conceptIdQn} "
+            + "   AND o.value_coded = ${conceptIdAns} "
             + "   AND e.encounter_datetime BETWEEN :startDate AND :endDate";
 
     return genericCohortQueries.generalSql(
