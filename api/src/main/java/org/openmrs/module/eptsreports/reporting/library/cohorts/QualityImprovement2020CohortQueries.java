@@ -168,6 +168,64 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /*
+   *
+   * All  patients the first clinical consultation with nutricional state equal
+   * to “DAM” or “DAG” occurred during the revision period and
+   * “Apoio/Educação Nutricional” = “ATPU” or “SOJA” in
+   * the same clinical consultation
+   *
+   */
+
+  public CohortDefinition getPatientsWithNutritionalStateAndNutritionalSupport() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with Nutritional Calssification");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6336", commonMetadata.getClassificationOfMalnutritionConcept().getConceptId());
+    map.put("1844", hivMetadata.getChronicMalnutritionConcept().getConceptId());
+    map.put("68", hivMetadata.getMalnutritionConcept().getConceptId());
+    map.put("2152", commonMetadata.getNutritionalSupplememtConcept().getConceptId());
+    map.put("6143", hivMetadata.getATPUSupplememtConcept().getConceptId());
+    map.put("2151", hivMetadata.getSojaSupplememtConcept().getConceptId());
+
+    String query =
+        " SELECT "
+            + " p.patient_id "
+            + " FROM "
+            + " patient p "
+            + "     INNER JOIN "
+            + " (SELECT  "
+            + "     p.patient_id, MIN(e.encounter_datetime) "
+            + " FROM "
+            + "     patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " INNER JOIN obs o1 ON o1.encounter_id = o.encounter_id "
+            + " WHERE "
+            + "     p.voided = 0 AND e.voided = 0 "
+            + "         AND o.voided = 0 "
+            + "         AND o1.voided = 0 "
+            + "         AND e.location_id = :location "
+            + "         AND e.encounter_type = ${6} "
+            + "         AND o.concept_id = ${6336} "
+            + "         AND o.value_coded IN (${1844} , ${68}) "
+            + "         AND o1.concept_id = ${2152} "
+            + "         AND o1.value_coded IN (${6143} , ${2151}) "
+            + "         AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + " GROUP BY p.patient_id) nut ON p.patient_id = nut.patient_id; ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   /**
    * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 Criancas <br>
    * <i> (A AND B) AND NOT (C OR D)</i> <br>
@@ -243,7 +301,8 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQ5Den2() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    compositionCohortDefinition.setName("% de mulheres gravidas em TARV com desnutrição (DAM ou DAG)");
+    compositionCohortDefinition.setName(
+        "% de mulheres gravidas em TARV com desnutrição (DAM ou DAG)");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
