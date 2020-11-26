@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -206,15 +205,35 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
 
-    CohortDefinition pregnant = commonCohortQueries.getMohMQPatientsOnCondition(true, false, hivMetadata.getMasterCardEncounterType(),
-    commonMetadata.getPregnantConcept(), Collections.singletonList(hivMetadata.getYesConcept()), null, null);
+    CohortDefinition pregnant =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getPregnantConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
 
-    CohortDefinition breastfeeding = commonCohortQueries.getMohMQPatientsOnCondition(true, false, hivMetadata.getMasterCardEncounterType(),
-    commonMetadata.getBreastfeeding(), Collections.singletonList(hivMetadata.getYesConcept()), null, null);
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
 
-    CohortDefinition transferIn = commonCohortQueries.getMohMQPatientsOnCondition(false, true, hivMetadata.getMasterCardEncounterType(),
-    commonMetadata.getTransferFromOtherFacilityConcept(), Collections.singletonList(hivMetadata.getYesConcept()), 
-    hivMetadata.getTypeOfPatientTransferredFrom(), Collections.singletonList(hivMetadata.getArtStatus()));
+    CohortDefinition transferIn =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            true,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -254,7 +273,8 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQ5Den2() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    compositionCohortDefinition.setName("% de mulheres gravidas em TARV com desnutrição (DAM ou DAG)");
+    compositionCohortDefinition.setName(
+        "% de mulheres gravidas em TARV com desnutrição (DAM ou DAG)");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
@@ -263,15 +283,35 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
 
-    CohortDefinition pregnant = commonCohortQueries.getMohMQPatientsOnCondition(true, false, hivMetadata.getMasterCardEncounterType(),
-    commonMetadata.getPregnantConcept(), Collections.singletonList(hivMetadata.getYesConcept()), null, null);
+    CohortDefinition pregnant =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getPregnantConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
 
-    CohortDefinition breastfeeding = commonCohortQueries.getMohMQPatientsOnCondition(true, false, hivMetadata.getMasterCardEncounterType(),
-    commonMetadata.getBreastfeeding(), Collections.singletonList(hivMetadata.getYesConcept()), null, null);
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
 
-    CohortDefinition transferIn = commonCohortQueries.getMohMQPatientsOnCondition(false, true, hivMetadata.getMasterCardEncounterType(),
-    commonMetadata.getTransferFromOtherFacilityConcept(), Collections.singletonList(hivMetadata.getYesConcept()), 
-    hivMetadata.getTypeOfPatientTransferredFrom(), Collections.singletonList(hivMetadata.getArtStatus()));
+    CohortDefinition transferIn =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            true,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 

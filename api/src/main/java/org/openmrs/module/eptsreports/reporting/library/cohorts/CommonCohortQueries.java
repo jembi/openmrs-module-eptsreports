@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -188,8 +187,14 @@ public class CommonCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getMohMQPatientsOnCondition(Boolean female,Boolean transfIn,
-      EncounterType encounterType, Concept question, List<Concept> answers, Concept question2, List<Concept> answers2) {
+  public CohortDefinition getMohMQPatientsOnCondition(
+      Boolean female,
+      Boolean transfIn,
+      EncounterType encounterType,
+      Concept question,
+      List<Concept> answers,
+      Concept question2,
+      List<Concept> answers2) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients with Nutritional Calssification");
@@ -200,49 +205,48 @@ public class CommonCohortQueries {
     List<Integer> answerIds = new ArrayList<>();
     List<Integer> answerIds2 = new ArrayList<>();
 
-
     for (Concept concept : answers) {
       answerIds.add(concept.getConceptId());
     }
 
-    if (question2 != null && answers2 != null)
-    {
-    for (Concept concept : answers2) {
-      answerIds2.add(concept.getConceptId());
+    if (question2 != null && answers2 != null) {
+      for (Concept concept : answers2) {
+        answerIds2.add(concept.getConceptId());
+      }
     }
-  }
-    String query = 
-    "SELECT p.person_id FROM person p INNER JOIN encounter e "
-      + "ON p.person_id = e.patient_id "
-      + "INNER JOIN obs o "
-      + "ON e.encounter_id = o.encounter_id ";
-      if (transfIn) {
-        query += "INNER JOIN obs o2 "
-        + "ON e.encounter_id = o2.encounter_id ";
-      }
-      query += "WHERE e.location_id = :location AND e.encounter_type = ${encounterType} "
-      + "AND o.concept_id = ${question}  "
-      + "AND o.value_coded in (${answers}) ";
-      if (transfIn) {
-        query += "AND o2.concept_id = ${question2}  "
-        + "AND o2.value_coded in (${answers2}) AND o2.voided = 0";
-      } 
-      else if (female) {
-        query += "AND p.gender = 'F' ";
-      }
-      query += "AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate "
-      + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
-    
-      Map<String, String> map = new HashMap<>();
+    String query =
+        "SELECT p.person_id FROM person p INNER JOIN encounter e "
+            + "ON p.person_id = e.patient_id "
+            + "INNER JOIN obs o "
+            + "ON e.encounter_id = o.encounter_id ";
+    if (transfIn) {
+      query += "INNER JOIN obs o2 " + "ON e.encounter_id = o2.encounter_id ";
+    }
+    query +=
+        "WHERE e.location_id = :location AND e.encounter_type = ${encounterType} "
+            + "AND o.concept_id = ${question}  "
+            + "AND o.value_coded in (${answers}) ";
+    if (transfIn) {
+      query +=
+          "AND o2.concept_id = ${question2}  "
+              + "AND o2.value_coded in (${answers2}) AND o2.voided = 0";
+    } else if (female) {
+      query += "AND p.gender = 'F' ";
+    }
+    query +=
+        "AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
+
+    Map<String, String> map = new HashMap<>();
     map.put("encounterType", String.valueOf(encounterType.getEncounterTypeId()));
     // Just convert the conceptId to String so it can be added to the map
     map.put("question", String.valueOf(question.getConceptId()));
     map.put("answers", StringUtils.join(answerIds, ","));
 
     if (question2 != null && answers2 != null) {
-    map.put("question2", String.valueOf(question2.getConceptId()));
-    map.put("answers2", StringUtils.join(answerIds2, ","));
-  }
+      map.put("question2", String.valueOf(question2.getConceptId()));
+      map.put("answers2", StringUtils.join(answerIds2, ","));
+    }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
