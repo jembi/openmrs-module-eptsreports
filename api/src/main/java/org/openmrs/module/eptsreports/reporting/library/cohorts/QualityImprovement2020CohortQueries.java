@@ -1,11 +1,17 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.cohort.definition.*;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +25,7 @@ public class QualityImprovement2020CohortQueries {
 
   private CommonMetadata commonMetadata;
 
-  private TxNewCohortQueries txNewCohortQueries;
+  private CommonCohortQueries commonCohortQueries;
 
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -28,11 +34,11 @@ public class QualityImprovement2020CohortQueries {
       GenericCohortQueries genericCohortQueries,
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
-      TxNewCohortQueries txNewCohortQueries) {
+      CommonCohortQueries commonCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
-    this.txNewCohortQueries = txNewCohortQueries;
+    this.commonCohortQueries = commonCohortQueries;
   }
 
   /**
@@ -170,7 +176,7 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 Criancas <br>
-   * <i> (A AND B) AND NOT (C OR D)</i> <br>
+   * <i> (A AND B) AND NOT (C OR D OR E)</i> <br>
    *
    * <ul>
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
@@ -200,9 +206,15 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
 
-    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
+    CohortDefinition pregnant = commonCohortQueries.getMohMQPatientsOnCondition(true, false, hivMetadata.getMasterCardEncounterType(),
+    commonMetadata.getPregnantConcept(), Collections.singletonList(hivMetadata.getYesConcept()), null, null);
 
-    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition(false);
+    CohortDefinition breastfeeding = commonCohortQueries.getMohMQPatientsOnCondition(true, false, hivMetadata.getMasterCardEncounterType(),
+    commonMetadata.getBreastfeeding(), Collections.singletonList(hivMetadata.getYesConcept()), null, null);
+
+    CohortDefinition transferIn = commonCohortQueries.getMohMQPatientsOnCondition(false, true, hivMetadata.getMasterCardEncounterType(),
+    commonMetadata.getTransferFromOtherFacilityConcept(), Collections.singletonList(hivMetadata.getYesConcept()), 
+    hivMetadata.getTypeOfPatientTransferredFrom(), Collections.singletonList(hivMetadata.getArtStatus()));
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -210,19 +222,18 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
-    compositionCohortDefinition.addSearch(
-        "D",
-        EptsReportUtils.map(
-            breastfeeding, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
-    compositionCohortDefinition.setCompositionString("(A AND B) AND NOT (C OR D)");
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
+
+    compositionCohortDefinition.setCompositionString("(A AND B) AND NOT (C OR D OR E)");
 
     return compositionCohortDefinition;
   }
 
   /**
    * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 MG <br>
-   * <i> (A AND B AND C) AND NOT D</i> <br>
+   * <i> (A AND B AND C) AND NOT (D OR E)</i> <br>
    *
    * <ul>
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
@@ -252,9 +263,15 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
 
-    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
+    CohortDefinition pregnant = commonCohortQueries.getMohMQPatientsOnCondition(true, false, hivMetadata.getMasterCardEncounterType(),
+    commonMetadata.getPregnantConcept(), Collections.singletonList(hivMetadata.getYesConcept()), null, null);
 
-    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition(false);
+    CohortDefinition breastfeeding = commonCohortQueries.getMohMQPatientsOnCondition(true, false, hivMetadata.getMasterCardEncounterType(),
+    commonMetadata.getBreastfeeding(), Collections.singletonList(hivMetadata.getYesConcept()), null, null);
+
+    CohortDefinition transferIn = commonCohortQueries.getMohMQPatientsOnCondition(false, true, hivMetadata.getMasterCardEncounterType(),
+    commonMetadata.getTransferFromOtherFacilityConcept(), Collections.singletonList(hivMetadata.getYesConcept()), 
+    hivMetadata.getTypeOfPatientTransferredFrom(), Collections.singletonList(hivMetadata.getArtStatus()));
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -262,12 +279,11 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
-    compositionCohortDefinition.addSearch(
-        "D",
-        EptsReportUtils.map(
-            breastfeeding, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
-    compositionCohortDefinition.setCompositionString("(A AND B AND C) AND NOT D");
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
+
+    compositionCohortDefinition.setCompositionString("(A AND B AND C) AND NOT (D OR E)");
 
     return compositionCohortDefinition;
   }
