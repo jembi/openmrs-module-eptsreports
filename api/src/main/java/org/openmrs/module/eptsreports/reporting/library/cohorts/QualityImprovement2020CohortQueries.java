@@ -23,6 +23,7 @@ public class QualityImprovement2020CohortQueries {
   private HivMetadata hivMetadata;
 
   private CommonMetadata commonMetadata;
+
   private GenderCohortQueries genderCohortQueries;
 
   private CommonCohortQueries commonCohortQueries;
@@ -34,7 +35,7 @@ public class QualityImprovement2020CohortQueries {
       GenericCohortQueries genericCohortQueries,
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
-      GenderCohortQueries genderCohortQueries) {
+      GenderCohortQueries genderCohortQueries,
       CommonCohortQueries commonCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivMetadata = hivMetadata;

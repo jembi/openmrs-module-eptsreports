@@ -229,7 +229,7 @@ public class CommonCohortQueries {
     if (transfIn) {
       query +=
           "AND o2.concept_id = ${question2}  "
-              + "AND o2.value_coded in (${answers2}) AND o2.voided = 0";
+              + "AND o2.value_coded in (${answers2}) AND o2.voided = 0 ";
     } else if (female) {
       query += "AND p.gender = 'F' ";
     }
