@@ -176,7 +176,12 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnArtStartDate(0, 14, true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.setCompositionString("(A AND FEMALE AND CHILDREN) AND NOT (B OR C)");
+    cd.addSearch(
+        "TI",
+        EptsReportUtils.map(
+            getTransferredInPatients(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("(A AND FEMALE AND CHILDREN) AND NOT (B OR C OR TI)");
     return cd;
   }
 
@@ -230,8 +235,13 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getYesConcept().getConceptId()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch("FEMALE", EptsReportUtils.map(genderCohortQueries.femaleCohort(), ""));
+    cd.addSearch(
+        "TI",
+        EptsReportUtils.map(
+            getTransferredInPatients(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(A AND FEMALE) AND NOT (B OR C)");
+    cd.setCompositionString("(A AND FEMALE) AND NOT (B OR C OR TI)");
     return cd;
   }
 
