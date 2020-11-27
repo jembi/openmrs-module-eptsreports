@@ -55,20 +55,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 this.qualityImprovement2020CohortQueries.getMQC3D1(),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    CohortIndicator mq5Den1 =
-        eptsGeneralIndicator.getIndicator(
-            "Malnourished Children",
-            EptsReportUtils.map(
-                this.qualityImprovement2020CohortQueries.getMQ5Den1(),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    CohortIndicator mq5Den2 =
-        eptsGeneralIndicator.getIndicator(
-            "Malnourished Pregnant Women",
-            EptsReportUtils.map(
-                this.qualityImprovement2020CohortQueries.getMQ5Den2(),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
-
     addRow(
         dataSetDefinition,
         "ART",
