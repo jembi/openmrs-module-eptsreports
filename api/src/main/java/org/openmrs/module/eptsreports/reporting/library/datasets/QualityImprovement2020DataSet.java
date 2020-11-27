@@ -92,6 +92,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
+
     // Category 5 denominator indicators
     dataSetDefinition.addColumn(
         "MQ5DEN1",
