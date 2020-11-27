@@ -342,7 +342,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("6336", commonMetadata.getClassificationOfMalnutritionConcept().getConceptId());
     map.put("1844", hivMetadata.getChronicMalnutritionConcept().getConceptId());
     map.put("68", hivMetadata.getMalnutritionConcept().getConceptId());
-    map.put("2152", commonMetadata.getNutritionalSupplememtConcept().getConceptId());
+    map.put("2152", hivMetadata.getNutritionalSupplememtConcept().getConceptId());
     map.put("6143", hivMetadata.getATPUSupplememtConcept().getConceptId());
     map.put("2151", hivMetadata.getSojaSupplememtConcept().getConceptId());
 
@@ -381,28 +381,41 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 Criancas <br>
-   * <i> (A AND B) AND NOT (C OR D OR E)</i> <br>
+   * <i> DENOMINATOR: (A AND B) AND NOT (C OR D OR E)</i> <br>
+   * <i> NOMINATOR: (A AND B) AND NOT (C OR D OR E) AND F</i> <br>
    *
    * <ul>
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
    *       and endDateInclusion)
-   *   <li>AND
+   *   <li>
    *   <li>B - Filter all patients with nutritional state equal to “DAM” or “DAG” registered on a
    *       clinical consultation during the period
-   *   <li>AND EXCLUDE
+   *   <li>
    *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
    *       inclusion period (startDateInclusion and endDateInclusion)
-   *   <li>OR
+   *   <li>
    *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
-   *       the inclusion period (startDateInclusion and endDateInclusion):
+   *       the inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>E - All transferred IN patients
+   *   <li>
+   *   <li>F - F - Filter all patients with “Apoio/Educação Nutricional” equals to “ATPU” or “SOJA”
+   *       in the same clinical consultation where“Grau da Avaliação Nutricional” equals to “DAM” or
+   *       “DAG” during the revision period, clinical consultation >= startDateRevision and
+   *       <=endDateRevision
    * </ul>
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ5Den1() {
+  public CohortDefinition getMQ5A(Boolean den) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    compositionCohortDefinition.setName("% de crianças em TARV com desnutrição (DAM ou DAG)");
+    if (den) {
+      compositionCohortDefinition.setName("% de crianças em TARV com desnutrição (DAM ou DAG)");
+    } else {
+      compositionCohortDefinition.setName(
+          "% de crianças em TARV com desnutrição (DAM ou DAG) e com registo de prescrição de suplementação ou tratamento nutricional");
+    }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
@@ -441,6 +454,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom(),
             Collections.singletonList(hivMetadata.getArtStatus()));
 
+    CohortDefinition nutSupport = getPatientsWithNutritionalStateAndNutritionalSupport();
+
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
     compositionCohortDefinition.addSearch("B", EptsReportUtils.map(nutritionalClass, MAPPING));
@@ -451,36 +466,54 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
 
-    compositionCohortDefinition.setCompositionString("(A AND B) AND NOT (C OR D OR E)");
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(nutSupport, MAPPING));
 
+    if (den) {
+      compositionCohortDefinition.setCompositionString("(A AND B) AND NOT (C OR D OR E)");
+    } else {
+      compositionCohortDefinition.setCompositionString("(A AND B) AND NOT (C OR D OR E) AND F");
+    }
     return compositionCohortDefinition;
   }
 
   /**
    * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 MG <br>
-   * <i> (A AND B AND C) AND NOT (D OR E)</i> <br>
+   * <i> DENOMINATOR: (A AND B AND C) AND NOT (D OR E)</i> <br>
+   * <i> NOMINATOR: (A AND B AND C) AND NOT (D OR E) AND F</i> <br>
    *
    * <ul>
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
    *       and endDateInclusion)
-   *   <li>AND
+   *   <li>
    *   <li>B - Filter all patients with nutritional state equal to “DAM” or “DAG” registered on a
    *       clinical consultation during the period
-   *   <li>AND
+   *   <li>
    *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
    *       inclusion period (startDateInclusion and endDateInclusion)
-   *   <li>AND EXCLUDE
+   *   <li>
    *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
-   *       the inclusion period (startDateInclusion and endDateInclusion):
+   *       the inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>E - All transferred IN patients
+   *   <li>
+   *   <li>F - F - Filter all patients with “Apoio/Educação Nutricional” equals to “ATPU” or “SOJA”
+   *       in the same clinical consultation where“Grau da Avaliação Nutricional” equals to “DAM” or
+   *       “DAG” during the revision period, clinical consultation >= startDateRevision and
+   *       <=endDateRevision
    * </ul>
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ5Den2() {
+  public CohortDefinition getMQ5B(Boolean den) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    compositionCohortDefinition.setName(
-        "% de mulheres gravidas em TARV com desnutrição (DAM ou DAG)");
+    if (den) {
+      compositionCohortDefinition.setName(
+          "% de mulheres gravidas em TARV com desnutrição (DAM ou DAG)");
+    } else {
+      compositionCohortDefinition.setName(
+          "% de MG em TARV com desnutrição (DAM ou DAG) e com registo de prescrição de suplementação ou tratamento nutricional");
+    }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
@@ -519,6 +552,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom(),
             Collections.singletonList(hivMetadata.getArtStatus()));
 
+    CohortDefinition nutSupport = getPatientsWithNutritionalStateAndNutritionalSupport();
+
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
     compositionCohortDefinition.addSearch("B", EptsReportUtils.map(nutritionalClass, MAPPING));
@@ -529,8 +564,13 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
 
-    compositionCohortDefinition.setCompositionString("(A AND B AND C) AND NOT (D OR E)");
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(nutSupport, MAPPING));
 
+    if (den) {
+      compositionCohortDefinition.setCompositionString("(A AND B AND C) AND NOT (D OR E)");
+    } else {
+      compositionCohortDefinition.setCompositionString("(A AND B AND C) AND NOT (D OR E) AND F");
+    }
     return compositionCohortDefinition;
   }
 }
