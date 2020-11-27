@@ -342,9 +342,9 @@ public class QualityImprovement2020CohortQueries {
     map.put("6336", commonMetadata.getClassificationOfMalnutritionConcept().getConceptId());
     map.put("1844", hivMetadata.getChronicMalnutritionConcept().getConceptId());
     map.put("68", hivMetadata.getMalnutritionConcept().getConceptId());
-    map.put("2152", hivMetadata.getNutritionalSupplememtConcept().getConceptId());
-    map.put("6143", hivMetadata.getATPUSupplememtConcept().getConceptId());
-    map.put("2151", hivMetadata.getSojaSupplememtConcept().getConceptId());
+    map.put("2152", commonMetadata.getNutritionalSupplememtConcept().getConceptId());
+    map.put("6143", commonMetadata.getATPUSupplememtConcept().getConceptId());
+    map.put("2151", commonMetadata.getSojaSupplememtConcept().getConceptId());
 
     String query =
         " SELECT "
