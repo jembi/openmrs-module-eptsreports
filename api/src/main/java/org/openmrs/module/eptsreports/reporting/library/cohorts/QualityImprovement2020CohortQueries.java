@@ -491,7 +491,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 MG <br>
+   * <b>MQC5D2</b>: Melhoria de Qualidade Category 5 MG <br>
    * <i> (A AND B AND C) AND NOT (D OR E)</i> <br>
    *
    * <ul>
