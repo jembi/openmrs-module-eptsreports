@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class IMER1DenominaorDataSet extends BaseDataSet {
 
-  private final String MAPPINGS =
-      "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String MAPPINGS = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   private EptsGeneralIndicator eptsGeneralIndicator;
 
@@ -55,7 +54,8 @@ public class IMER1DenominaorDataSet extends BaseDataSet {
             EptsReportUtils.map(imer1DenominatorCohortQueries.getChildreen(), MAPPINGS));
 
     dsd.addColumn("ALL", "ALL Patients", EptsReportUtils.map(all, MAPPINGS), "");
-    dsd.addColumn("BREASTFEEDING", "BREASTFEEDING", EptsReportUtils.map(breastfeeding, MAPPINGS), "");
+    dsd.addColumn(
+        "BREASTFEEDING", "BREASTFEEDING", EptsReportUtils.map(breastfeeding, MAPPINGS), "");
     dsd.addColumn("PREGNANT", "PREGNANT", EptsReportUtils.map(pregnant, MAPPINGS), "");
     dsd.addColumn("ADULTS", "ADULTS", EptsReportUtils.map(adults, MAPPINGS), "");
     dsd.addColumn("CHILDREN", "CHILDREN", EptsReportUtils.map(children, MAPPINGS), "");
