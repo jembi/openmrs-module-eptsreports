@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class IMER1DenominaorDataSet extends BaseDataSet {
 
   private final String MAPPINGS =
-      "startDate=${endDate-1m-1d},endDate=${endDate-1m},location=${location}";
+      "startDate=${startDate},endDate=${endDate},location=${location}";
 
   private EptsGeneralIndicator eptsGeneralIndicator;
 
@@ -55,10 +55,10 @@ public class IMER1DenominaorDataSet extends BaseDataSet {
             EptsReportUtils.map(imer1DenominatorCohortQueries.getChildreen(), MAPPINGS));
 
     dsd.addColumn("ALL", "ALL Patients", EptsReportUtils.map(all, MAPPINGS), "");
-    dsd.addColumn("BREASTFEEDING", "", EptsReportUtils.map(breastfeeding, MAPPINGS), "");
-    dsd.addColumn("PREGNANT", "", EptsReportUtils.map(pregnant, MAPPINGS), "");
-    dsd.addColumn("ADULTS", "", EptsReportUtils.map(adults, MAPPINGS), "");
-    dsd.addColumn("CHILDREN", "", EptsReportUtils.map(children, MAPPINGS), "");
+    dsd.addColumn("BREASTFEEDING", "BREASTFEEDING", EptsReportUtils.map(breastfeeding, MAPPINGS), "");
+    dsd.addColumn("PREGNANT", "PREGNANT", EptsReportUtils.map(pregnant, MAPPINGS), "");
+    dsd.addColumn("ADULTS", "ADULTS", EptsReportUtils.map(adults, MAPPINGS), "");
+    dsd.addColumn("CHILDREN", "CHILDREN", EptsReportUtils.map(children, MAPPINGS), "");
 
     return dsd;
   }
