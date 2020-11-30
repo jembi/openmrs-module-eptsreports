@@ -472,7 +472,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 Criancas <br>
+   * <b>MQ5A</b>: Melhoria de Qualidade Category 5 Criancas <br>
    * <i> DENOMINATOR: (A AND B) AND NOT (C OR D OR E)</i> <br>
    * <i> NOMINATOR: (A AND B) AND NOT (C OR D OR E) AND F</i> <br>
    *
@@ -569,7 +569,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 MG <br>
+   * <b>MQ5B</b>: Melhoria de Qualidade Category 5 MG <br>
    * <i> DENOMINATOR: (A AND B AND C) AND NOT (D OR E)</i> <br>
    * <i> NOMINATOR: (A AND B AND C) AND NOT (D OR E) AND F</i> <br>
    *
