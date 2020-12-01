@@ -23,7 +23,7 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AgeOnCareStartDateCalculation extends AbstractPatientCalculation {
+public class AgeOnPreArtStartDateCalculation extends AbstractPatientCalculation {
 
   private static final String MAX_AGE = "maxAge";
 

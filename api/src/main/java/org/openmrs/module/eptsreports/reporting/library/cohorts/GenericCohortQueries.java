@@ -605,7 +605,7 @@ public class GenericCohortQueries {
   public CohortDefinition getAgeOnPreArtDate(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
-            Context.getRegisteredComponents(AgeOnCareStartDateCalculation.class).get(0));
+            Context.getRegisteredComponents(AgeOnPreArtStartDateCalculation.class).get(0));
     cd.setName("Age on Pre ART start date");
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
