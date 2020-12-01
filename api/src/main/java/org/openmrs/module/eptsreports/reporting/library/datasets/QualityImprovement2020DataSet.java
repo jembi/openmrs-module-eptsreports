@@ -86,6 +86,59 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
+    // Category 4 Numerator indicators
+    CohortIndicator MQC4N1 =
+        eptsGeneralIndicator.getIndicator(
+            "MQC4N1",
+            EptsReportUtils.map(
+                this.qualityImprovement2020CohortQueries.getMQC4N1(),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dataSetDefinition.addColumn(
+        "MQC4N1",
+        "Category 4 numerator 1",
+        EptsReportUtils.map(
+            MQC4N1, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator MQC4N2 =
+        eptsGeneralIndicator.getIndicator(
+            "MQC4N2",
+            EptsReportUtils.map(
+                this.qualityImprovement2020CohortQueries.getMQC4N2(),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dataSetDefinition.addColumn(
+        "MQC4N2",
+        "Category 4 numerator 2",
+        EptsReportUtils.map(
+            MQC4N2, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    // Category 5 denominator indicators
+    dataSetDefinition.addColumn(
+        "MQ5DEN1",
+        "Crianças em TARV com desnutrição (DAM ou DAG) e  com registo de prescrição de suplementação ou tratamento nutricional",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ5DEN1",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ5Den1(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=<15");
+
+    dataSetDefinition.addColumn(
+        "MQ5DEN2",
+        "MG em TARV com desnutrição (DAM ou DAG) e  com registo de prescrição de suplementação ou tratamento nutricional",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ5DEN2",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ5Den2(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
     return dataSetDefinition;
   }
 
