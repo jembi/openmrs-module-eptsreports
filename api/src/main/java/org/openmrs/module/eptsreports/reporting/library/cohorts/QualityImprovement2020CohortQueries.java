@@ -552,20 +552,26 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQ6</b>: Melhoria de Qualidade Category 6 <br>
-   * <i> (A AND B AND C) AND NOT (D OR E)</i> <br>
+   * <i> DENOMINATOR 1: A AND NOT (B OR C OR D OR E)</i> <br>
+   * <i> DENOMINATOR 2: A AND NOT (B OR C OR D OR E)</i> <br>
+   * <i> DENOMINATOR 3: (A AND C) AND NOT (B OR D OR E)</i> <br>
+   * <i> DENOMINATOR 4: A AND D AND NOT (B OR C OR E)</i> <br>
    *
    * <ul>
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
    *       and endDateInclusion)
-   *   <li>AND
-   *   <li>B - Filter all patients with nutritional state equal to “DAM” or “DAG” registered on a
-   *       clinical consultation during the period
-   *   <li>AND
+   *   <li>
+   *   <li>B - B - Filter all patients with the last clinical consultation(encounter type 6) with
+   *       “Diagnótico TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
+   *       Encounter_datetime between startDateInclusion and endDateRevision
+   *   <li>
    *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
    *       inclusion period (startDateInclusion and endDateInclusion)
-   *   <li>AND EXCLUDE
+   *   <li>
    *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
-   *       the inclusion period (startDateInclusion and endDateInclusion):
+   *       the inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>E - All transferred IN patients during the inclusion period
    * </ul>
    *
    * @return CohortDefinition
@@ -653,7 +659,6 @@ public class QualityImprovement2020CohortQueries {
     } else if (den == 4) {
       compositionCohortDefinition.setCompositionString("A AND D AND NOT (B OR C OR E)");
     }
-
     return compositionCohortDefinition;
   }
 }
