@@ -573,8 +573,19 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQ6A(Integer den) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    compositionCohortDefinition.setName(
-        "% de adultos HIV+ em TARV rastreados para TB na última consulta clínica");
+    if (den == 1) {
+      compositionCohortDefinition.setName(
+          "% de adultos HIV+ em TARV rastreados para TB na última consulta clínica");
+    } else if (den == 2) {
+      compositionCohortDefinition.setName(
+          "% de crianças HIV+ em TARV rastreadas para TB na última consulta clínica");
+    } else if (den == 3) {
+      compositionCohortDefinition.setName(
+          "% de mulheres grávidas HIV+ rastreadas para TB na última consulta clínica");
+    } else if (den == 4) {
+      compositionCohortDefinition.setName(
+          "% de mulheres lactantes HIV+ rastreadas para TB  na última consulta");
+    }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
