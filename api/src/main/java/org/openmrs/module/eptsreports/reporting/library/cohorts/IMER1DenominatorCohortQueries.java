@@ -50,24 +50,12 @@ public class IMER1DenominatorCohortQueries {
             "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B",
-        EptsReportUtils.map(
-            txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "C",
-        EptsReportUtils.map(
-            txNewCohortQueries.getTxNewBreastfeedingComposition(false),
-            "onOrAfter=${endDate-2m-1d},onOrBefore=${endDate-1m},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "D",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getTransferredInPatients(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("A AND NOT (B OR C OR D)");
+    compositionCohortDefinition.setCompositionString("A AND NOT D");
 
     return compositionCohortDefinition;
   }
@@ -97,17 +85,15 @@ public class IMER1DenominatorCohortQueries {
             resumoMensalCohortQueries.getTransferredInPatients(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("A AND B  ANd NOT D");
+    compositionCohortDefinition.setCompositionString("A AND B  AND NOT D");
     return compositionCohortDefinition;
   }
 
   public CohortDefinition getBreastfeedingWoman() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("Denominator - IMER1 - Breastfeeding");
-    compositionCohortDefinition.addParameter(
-        new Parameter("cohortStartDate", "Start Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("cohortStartDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
 
     compositionCohortDefinition.addSearch(

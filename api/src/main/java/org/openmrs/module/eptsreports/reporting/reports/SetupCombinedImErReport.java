@@ -28,7 +28,7 @@ public class SetupCombinedImErReport extends EptsDataExportManager {
 
   @Autowired private TxCurrDataset txCurrDataset;
 
-  @Autowired private IMER1DenominaorDataSet imer1DenominaorDataSet;
+  @Autowired private IMER1DataSet imer1DenominaorDataSet;
 
   @Override
   public String getExcelDesignUuid() {
@@ -68,7 +68,7 @@ public class SetupCombinedImErReport extends EptsDataExportManager {
     rd.addDataSetDefinition(
         "ERI4", Mapped.mapStraightThrough(eri4MonthsDataset.constructEri4MonthsDataset()));
     rd.addDataSetDefinition(
-        "DEN1",
+        "IMER1",
         Mapped.mapStraightThrough(imer1DenominaorDataSet.constructIMER1DenominaorDataSet()));
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
