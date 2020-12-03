@@ -39,14 +39,14 @@ public class TxRttCohortQueries {
   private CommonCohortQueries commonCohortQueries;
 
   private final String DEFAULT_MAPPING =
-          "startDate=${startDate},endDate=${endDate},location=${location}";
+      "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public TxRttCohortQueries(
-          HivMetadata hivMetadata,
-          GenericCohortQueries genericCohortQueries,
-          TxCurrCohortQueries txCurrCohortQueries,
-          CommonCohortQueries commonCohortQueries) {
+      HivMetadata hivMetadata,
+      GenericCohortQueries genericCohortQueries,
+      TxCurrCohortQueries txCurrCohortQueries,
+      CommonCohortQueries commonCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
@@ -69,15 +69,15 @@ public class TxRttCohortQueries {
    */
   public CohortDefinition getAllPatientsWhoMissedAppointmentBy28Or30DaysButLaterHadVisit() {
     return genericCohortQueries.generalSql(
-            "Having visit 30 days later",
-            TxRttQueries.getAllPatientsWhoMissedPreviousAppointmentBy28Days(
-                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-                    hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
-                    hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-                    hivMetadata.getReturnVisitDateConcept().getConceptId(),
-                    hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
-                    hivMetadata.getArtDatePickupMasterCard().getConceptId()));
+        "Having visit 30 days later",
+        TxRttQueries.getAllPatientsWhoMissedPreviousAppointmentBy28Days(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+            hivMetadata.getReturnVisitDateConcept().getConceptId(),
+            hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
+            hivMetadata.getArtDatePickupMasterCard().getConceptId()));
   }
 
   /**
@@ -111,35 +111,35 @@ public class TxRttCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.addSearch(
-            "initiatedPreviousPeriod",
-            EptsReportUtils.map(
-                    genericCohortQueries.getStartedArtBeforeDate(false),
-                    "onOrBefore=${startDate-1d},location=${location}"));
+        "initiatedPreviousPeriod",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtBeforeDate(false),
+            "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
-            "LTFU",
-            EptsReportUtils.map(
-                    genericCohortQueries.getPatientsWhoToLostToFollowUp(28),
-                    "onOrBefore=${startDate-1d},location=${location}"));
+        "LTFU",
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientsWhoToLostToFollowUp(28),
+            "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
-            "returned",
-            EptsReportUtils.map(getPatientsReturnedTreatmentDuringReportingPeriod(), DEFAULT_MAPPING));
+        "returned",
+        EptsReportUtils.map(getPatientsReturnedTreatmentDuringReportingPeriod(), DEFAULT_MAPPING));
 
     cd.addSearch(
-            "txcurr",
-            EptsReportUtils.map(
-                    txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true),
-                    "onOrBefore=${endDate},location=${location}"));
+        "txcurr",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true),
+            "onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
-            "transferredout",
-            EptsReportUtils.map(
-                    commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod(),
-                    "onOrBefore=${startDate-1d},location=${location}"));
+        "transferredout",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod(),
+            "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.setCompositionString(
-            "initiatedPreviousPeriod AND returned AND txcurr (LTFU AND NOT transferredout)");
+        "initiatedPreviousPeriod AND returned AND txcurr (LTFU AND NOT transferredout)");
 
     return cd;
   }
@@ -169,21 +169,21 @@ public class TxRttCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition ficha =
-            getPatientsWithFilaOrFichaOrMasterCardPickup(
-                    Arrays.asList(
-                            hivMetadata.getAdultoSeguimentoEncounterType(),
-                            hivMetadata.getPediatriaSeguimentoEncounterType()));
+        getPatientsWithFilaOrFichaOrMasterCardPickup(
+            Arrays.asList(
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getPediatriaSeguimentoEncounterType()));
 
     CohortDefinition fila =
-            getPatientsWithFilaOrFichaOrMasterCardPickup(
-                    Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()));
+        getPatientsWithFilaOrFichaOrMasterCardPickup(
+            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()));
 
     CohortDefinition drugPickUp =
-            getPatientsWithFilaOrFichaOrMasterCardPickup(
-                    Arrays.asList(hivMetadata.getMasterCardDrugPickupEncounterType()),
-                    hivMetadata.getArtPickupConcept(),
-                    hivMetadata.getYesConcept(),
-                    hivMetadata.getArtDatePickupMasterCard());
+        getPatientsWithFilaOrFichaOrMasterCardPickup(
+            Arrays.asList(hivMetadata.getMasterCardDrugPickupEncounterType()),
+            hivMetadata.getArtPickupConcept(),
+            hivMetadata.getYesConcept(),
+            hivMetadata.getArtDatePickupMasterCard());
 
     cd.addSearch("ficha", EptsReportUtils.map(ficha, DEFAULT_MAPPING));
 
@@ -197,7 +197,7 @@ public class TxRttCohortQueries {
   }
 
   private CohortDefinition getPatientsWithFilaOrFichaOrMasterCardPickup(
-          List<EncounterType> encounterTypes, Concept... conceptIds) {
+      List<EncounterType> encounterTypes, Concept... conceptIds) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -229,7 +229,7 @@ public class TxRttCohortQueries {
       builder.append(" AND o2.voided= 0 ");
       builder.append(" AND (o1.concept_id = %s AND o1.value_coded = %s) ");
       builder.append(
-              " AND (o2.concept_id = %s AND o2.value_datetime BETWEEN :startDate AND :endDate) ");
+          " AND (o2.concept_id = %s AND o2.value_datetime BETWEEN :startDate AND :endDate) ");
     } else {
       builder.append(" AND e.encounter_datetime  ");
       builder.append("        BETWEEN :startDate AND :endDate ");
@@ -241,20 +241,20 @@ public class TxRttCohortQueries {
 
     if (conceptIds.length == 3) {
       formattedQuery =
-              String.format(
-                      query,
-                      encounterTypes.get(0).getEncounterTypeId(),
-                      conceptIds[0].getConceptId(),
-                      conceptIds[1].getConceptId(),
-                      conceptIds[2].getConceptId());
+          String.format(
+              query,
+              encounterTypes.get(0).getEncounterTypeId(),
+              conceptIds[0].getConceptId(),
+              conceptIds[1].getConceptId(),
+              conceptIds[2].getConceptId());
     } else {
       formattedQuery =
-              encounterTypes.size() > 1
-                      ? String.format(
-                      query,
-                      encounterTypes.get(0).getEncounterTypeId(),
-                      encounterTypes.get(1).getEncounterTypeId())
-                      : String.format(query, encounterTypes.get(0).getEncounterTypeId());
+          encounterTypes.size() > 1
+              ? String.format(
+                  query,
+                  encounterTypes.get(0).getEncounterTypeId(),
+                  encounterTypes.get(1).getEncounterTypeId())
+              : String.format(query, encounterTypes.get(0).getEncounterTypeId());
     }
 
     cd.setQuery(formattedQuery);
