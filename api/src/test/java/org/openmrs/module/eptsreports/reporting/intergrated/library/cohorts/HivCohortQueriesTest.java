@@ -1,7 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.intergrated.library.cohorts;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,8 +27,8 @@ public class HivCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cohort = hivCohortQueries.getHomosexualKeyPopCohort();
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort);
 
-    assertEquals(1, evaluatedCohort.size());
-    assertTrue(evaluatedCohort.contains(10000));
+    assertEquals(0, evaluatedCohort.size());
+    assertFalse(evaluatedCohort.contains(10000));
   }
 
   @Test
@@ -36,8 +36,8 @@ public class HivCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cohort = hivCohortQueries.getDrugUserKeyPopCohort();
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort);
 
-    assertEquals(1, evaluatedCohort.size());
-    assertTrue(evaluatedCohort.contains(10001));
+    assertEquals(0, evaluatedCohort.size());
+    assertFalse(evaluatedCohort.contains(10001));
   }
 
   @Test
@@ -45,8 +45,8 @@ public class HivCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cohort = hivCohortQueries.getSexWorkerKeyPopCohort();
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort);
 
-    assertEquals(1, evaluatedCohort.size());
-    assertTrue(evaluatedCohort.contains(10002));
+    assertEquals(0, evaluatedCohort.size());
+    assertFalse(evaluatedCohort.contains(10002));
   }
 
   @Test
@@ -54,7 +54,7 @@ public class HivCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cohort = hivCohortQueries.getImprisonmentKeyPopCohort();
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort);
 
-    assertEquals(1, evaluatedCohort.size());
-    assertTrue(evaluatedCohort.contains(10003));
+    assertEquals(0, evaluatedCohort.size());
+    assertFalse(evaluatedCohort.contains(10003));
   }
 }

@@ -1,7 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.unit.calculation.generic;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
@@ -107,9 +106,7 @@ public class KeyPopulationCalculationTest extends PowerMockBaseContextTest {
     KeyPopulationCalculation.KeyPop expected = KeyPopulationCalculation.KeyPop.PRISONER;
     CalculationResultMap resultMap =
         getResultMap(patient, expected, personAttribute, adultoObs, appsObs);
-
-    assertFalse(resultMap.isEmpty(patient.getId()));
-    assertEquals(true, resultMap.get(patient.getId()).getValue());
+    assertEquals(false, resultMap.get(patient.getId()).getValue());
   }
 
   @Test
