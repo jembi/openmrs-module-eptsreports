@@ -110,6 +110,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
     Location location = (Location) context.getFromCache("location");
     Date onOrBefore = (Date) context.getFromCache("onOrBefore");
+    Date onOrAfter = (Date) context.getFromCache("onOrAfter");
 
     CalculationResultMap adultoSeguimento =
         getAdultoSeguimento(cohort, context, location, onOrBefore);
@@ -123,7 +124,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       boolean equals = false;
 
       KeyPop patientKeyPop =
-          getAssignedKeyPop(pId, adultoSeguimento, apssPrevencaoPositiva, personAttribute);
+          getAssignedKeyPop(
+              pId, adultoSeguimento, apssPrevencaoPositiva, personAttribute, onOrAfter, onOrBefore);
       if (type != null && type.equals(patientKeyPop)) {
         equals = true;
       }
@@ -137,7 +139,9 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       Integer pId,
       CalculationResultMap adultoSeguimento,
       CalculationResultMap apssPrevencaoPositiva,
-      CalculationResultMap personAttribute) {
+      CalculationResultMap personAttribute,
+      Date startDate,
+      Date endDate) {
 
     ListMap<Date, KeyPopAndSource> keyPopByDate = new ListMap<>(true);
 
@@ -147,8 +151,12 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       KeyPop keypop;
       if (obs != null
           && obs.getEncounter() != null
+          && startDate != null
+          && endDate != null
           && obs.getEncounter().getEncounterDatetime() != null
-          && obs.getValueCoded() != null) {
+          && obs.getValueCoded() != null
+          && obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0
+          && obs.getEncounter().getEncounterDatetime().compareTo(endDate) <= 0) {
         date = obs.getEncounter().getEncounterDatetime();
         keypop = KeyPop.of(obs.getValueCoded());
         keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.ADULTO_FORM));
@@ -158,11 +166,17 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     if (!personAttribute.isEmpty(pId)) {
       PersonAttribute attr = personAttribute.get(pId).asType(PersonAttribute.class);
       Date date = attr.getDateCreated();
-      try {
-        KeyPop keypop = KeyPop.of(attr);
-        keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.PERSON_ATTRIBUTE));
-      } catch (IllegalArgumentException e) {
-        // Ignore unmapped key population string
+      if (date != null
+          && startDate != null
+          && endDate != null
+          && date.compareTo(startDate) >= 0
+          && date.compareTo(endDate) <= 0) {
+        try {
+          KeyPop keypop = KeyPop.of(attr);
+          keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.PERSON_ATTRIBUTE));
+        } catch (IllegalArgumentException e) {
+          // Ignore unmapped key population string
+        }
       }
     }
 
@@ -172,8 +186,12 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       KeyPop keypop;
       if (obs != null
           && obs.getEncounter() != null
+          && startDate != null
+          && endDate != null
           && obs.getEncounter().getEncounterDatetime() != null
-          && obs.getValueCoded() != null) {
+          && obs.getValueCoded() != null
+          && obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0
+          && obs.getEncounter().getEncounterDatetime().compareTo(endDate) <= 0) {
         date = obs.getEncounter().getEncounterDatetime();
         keypop = KeyPop.of(obs.getValueCoded());
         keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.APSS_FORM));
