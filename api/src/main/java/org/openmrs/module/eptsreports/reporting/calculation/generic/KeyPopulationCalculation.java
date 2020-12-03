@@ -125,7 +125,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
       KeyPop patientKeyPop =
           getAssignedKeyPop(
-              pId, adultoSeguimento, apssPrevencaoPositiva, personAttribute, onOrAfter, onOrBefore);
+              pId, adultoSeguimento, apssPrevencaoPositiva, personAttribute, onOrAfter);
       if (type != null && type.equals(patientKeyPop)) {
         equals = true;
       }
@@ -140,8 +140,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       CalculationResultMap adultoSeguimento,
       CalculationResultMap apssPrevencaoPositiva,
       CalculationResultMap personAttribute,
-      Date startDate,
-      Date endDate) {
+      Date startDate) {
 
     ListMap<Date, KeyPopAndSource> keyPopByDate = new ListMap<>(true);
 
@@ -152,11 +151,9 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       if (obs != null
           && obs.getEncounter() != null
           && startDate != null
-          && endDate != null
           && obs.getEncounter().getEncounterDatetime() != null
           && obs.getValueCoded() != null
-          && obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0
-          && obs.getEncounter().getEncounterDatetime().compareTo(endDate) <= 0) {
+          && obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0) {
         date = obs.getEncounter().getEncounterDatetime();
         keypop = KeyPop.of(obs.getValueCoded());
         keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.ADULTO_FORM));
@@ -166,11 +163,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     if (!personAttribute.isEmpty(pId)) {
       PersonAttribute attr = personAttribute.get(pId).asType(PersonAttribute.class);
       Date date = attr.getDateCreated();
-      if (date != null
-          && startDate != null
-          && endDate != null
-          && date.compareTo(startDate) >= 0
-          && date.compareTo(endDate) <= 0) {
+      if (date != null && startDate != null && date.compareTo(startDate) >= 0) {
         try {
           KeyPop keypop = KeyPop.of(attr);
           keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.PERSON_ATTRIBUTE));
@@ -187,11 +180,9 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       if (obs != null
           && obs.getEncounter() != null
           && startDate != null
-          && endDate != null
           && obs.getEncounter().getEncounterDatetime() != null
           && obs.getValueCoded() != null
-          && obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0
-          && obs.getEncounter().getEncounterDatetime().compareTo(endDate) <= 0) {
+          && obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0) {
         date = obs.getEncounter().getEncounterDatetime();
         keypop = KeyPop.of(obs.getValueCoded());
         keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.APSS_FORM));
