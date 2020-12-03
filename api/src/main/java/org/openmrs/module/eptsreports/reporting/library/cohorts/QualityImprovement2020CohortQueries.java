@@ -1,7 +1,11 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -20,9 +24,14 @@ public class QualityImprovement2020CohortQueries {
   private HivMetadata hivMetadata;
 
   private CommonMetadata commonMetadata;
+
   private GenderCohortQueries genderCohortQueries;
 
   private AgeCohortQueries ageCohortQueries;
+
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
+
+  private CommonCohortQueries commonCohortQueries;
 
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -31,6 +40,8 @@ public class QualityImprovement2020CohortQueries {
       GenericCohortQueries genericCohortQueries,
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      CommonCohortQueries commonCohortQueries,
       AgeCohortQueries ageCohortQueries,
       GenderCohortQueries genderCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
@@ -38,6 +49,8 @@ public class QualityImprovement2020CohortQueries {
     this.commonMetadata = commonMetadata;
     this.ageCohortQueries = ageCohortQueries;
     this.genderCohortQueries = genderCohortQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.commonCohortQueries = commonCohortQueries;
   }
 
   /**
@@ -558,5 +571,292 @@ public class QualityImprovement2020CohortQueries {
 
     return genericCohortQueries.generalSql(
         "Pregnant or breastfeeding females", stringSubstitutor.replace(query));
+  }
+
+  public CohortDefinition getMQC4N1() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+
+    compositionCohortDefinition.setName("Numerator for Category 4");
+
+    compositionCohortDefinition.addSearch(
+        "E", EptsReportUtils.map(getLastClinicalConsultationClassficacaoDesnutricao(), MAPPING));
+
+    compositionCohortDefinition.addSearch("MQC4D1", EptsReportUtils.map(getMQC4D1(), MAPPING));
+
+    compositionCohortDefinition.setCompositionString("MQC4D1 AND E");
+
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getMQC4N2() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+
+    compositionCohortDefinition.setName("Numerator for Category 4");
+
+    compositionCohortDefinition.addSearch(
+        "E", EptsReportUtils.map(getLastClinicalConsultationClassficacaoDesnutricao(), MAPPING));
+
+    compositionCohortDefinition.addSearch("MQC4D2", EptsReportUtils.map(getMQC4D2(), MAPPING));
+
+    compositionCohortDefinition.setCompositionString("MQC4D2 AND E");
+
+    return compositionCohortDefinition;
+  }
+
+  private CohortDefinition getLastClinicalConsultationClassficacaoDesnutricao() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "last clinical consultation registered CLASSIFICAÇÃO DE DESNUTRIÇÃO");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put(
+        "adultoSeguimentoEncounterType",
+        hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put(
+        "classificationOfMalnutritionConcept",
+        commonMetadata.getClassificationOfMalnutritionConcept().getConceptId());
+    map.put("normalConcept", hivMetadata.getNormalConcept().getConceptId());
+    map.put(
+        "malnutritionLightConcept", commonMetadata.getMalnutritionLightConcept().getConceptId());
+    map.put("malnutritionConcept", hivMetadata.getMalnutritionConcept().getConceptId());
+    map.put(
+        "chronicMalnutritionConcept", hivMetadata.getChronicMalnutritionConcept().getConceptId());
+
+    String query =
+        "SELECT max_date.patient_id "
+            + "FROM "
+            + "   ( "
+            + "    SELECT p.patient_id, MAX(encounter_datetime) AS max_encounter_date "
+            + "    FROM patient p "
+            + "        INNER JOIN encounter e "
+            + "            ON e.patient_id = p.patient_id "
+            + "        INNER JOIN obs o "
+            + "            ON o.encounter_id = e.encounter_id "
+            + "    WHERE "
+            + "        p.voided = 0 "
+            + "        AND e.voided = 0 "
+            + "        AND o.voided = 0 "
+            + "        AND e.encounter_type = ${adultoSeguimentoEncounterType} "
+            + "        AND e.location_id = :location "
+            + "        AND e.encounter_datetime  "
+            + "            BETWEEN :startDate AND :endDate "
+            + "        AND o.concept_id = ${classificationOfMalnutritionConcept} "
+            + "        AND o.value_coded IN (${normalConcept}, ${malnutritionLightConcept}, ${malnutritionConcept}, ${chronicMalnutritionConcept}) "
+            + "    GROUP BY patient_id "
+            + "    ) max_date";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /*
+   *
+   * All  patients the first clinical consultation with nutricional state equal
+   * to “DAM” or “DAG” occurred during the revision period.
+   *
+   */
+
+  private CohortDefinition getPatientsWithNutritionalState() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with Nutritional Calssification");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6336", commonMetadata.getClassificationOfMalnutritionConcept().getConceptId());
+    map.put("1844", hivMetadata.getChronicMalnutritionConcept().getConceptId());
+    map.put("68", hivMetadata.getMalnutritionConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM patient p "
+            + " INNER JOIN ( "
+            + " SELECT  p.patient_id, min(e.encounter_datetime) "
+            + " FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " WHERE p.voided = 0 "
+            + " AND e.voided = 0 "
+            + " AND o.voided = 0 "
+            + " AND e.location_id = :location "
+            + " AND e.encounter_type = ${6}  "
+            + " AND o.concept_id = ${6336}  "
+            + " AND o.value_coded IN (${1844},${68}) "
+            + " AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + " GROUP BY p.patient_id) nut ON p.patient_id = nut.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>MQC5D1</b>: Melhoria de Qualidade Category 5 Criancas <br>
+   * <i> (A AND B) AND NOT (C OR D OR E)</i> <br>
+   *
+   * <ul>
+   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
+   *       and endDateInclusion)
+   *   <li>AND
+   *   <li>B - Filter all patients with nutritional state equal to “DAM” or “DAG” registered on a
+   *       clinical consultation during the period
+   *   <li>AND EXCLUDE
+   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
+   *       inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>OR
+   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
+   *       the inclusion period (startDateInclusion and endDateInclusion):
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ5Den1() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("% de crianças em TARV com desnutrição (DAM ou DAG)");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    CohortDefinition startedART = getMQC3D1();
+
+    CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getPregnantConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition transferIn =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            true,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
+
+    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+
+    compositionCohortDefinition.addSearch("B", EptsReportUtils.map(nutritionalClass, MAPPING));
+
+    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+
+    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
+
+    compositionCohortDefinition.setCompositionString("(A AND B) AND NOT (C OR D OR E)");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>MQC5D2</b>: Melhoria de Qualidade Category 5 MG <br>
+   * <i> (A AND B AND C) AND NOT (D OR E)</i> <br>
+   *
+   * <ul>
+   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
+   *       and endDateInclusion)
+   *   <li>AND
+   *   <li>B - Filter all patients with nutritional state equal to “DAM” or “DAG” registered on a
+   *       clinical consultation during the period
+   *   <li>AND
+   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
+   *       inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>AND EXCLUDE
+   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
+   *       the inclusion period (startDateInclusion and endDateInclusion):
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ5Den2() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName(
+        "% de mulheres gravidas em TARV com desnutrição (DAM ou DAG)");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    CohortDefinition startedART = getMQC3D1();
+
+    CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getPregnantConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition transferIn =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            true,
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
+
+    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+
+    compositionCohortDefinition.addSearch("B", EptsReportUtils.map(nutritionalClass, MAPPING));
+
+    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+
+    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
+
+    compositionCohortDefinition.setCompositionString("(A AND B AND C) AND NOT (D OR E)");
+
+    return compositionCohortDefinition;
   }
 }
