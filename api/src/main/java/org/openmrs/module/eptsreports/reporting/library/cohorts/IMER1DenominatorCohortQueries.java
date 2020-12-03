@@ -80,12 +80,18 @@ public class IMER1DenominatorCohortQueries {
             "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
+        "C",
+        EptsReportUtils.map(
+            txNewCohortQueries.getTxNewBreastfeedingComposition(false),
+            "onOrAfter=${endDate-2m-1d},onOrBefore=${endDate-1m},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
         "D",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getTransferredInPatients(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("A AND B  AND NOT D");
+    compositionCohortDefinition.setCompositionString("A AND B  AND NOT (C OR D)");
     return compositionCohortDefinition;
   }
 
@@ -103,6 +109,12 @@ public class IMER1DenominatorCohortQueries {
             "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
+        "B",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
+            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
         "C",
         EptsReportUtils.map(
             txNewCohortQueries.getTxNewBreastfeedingComposition(false),
@@ -114,7 +126,7 @@ public class IMER1DenominatorCohortQueries {
             resumoMensalCohortQueries.getTransferredInPatients(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("A AND C AND NOT D");
+    compositionCohortDefinition.setCompositionString("A AND C AND NOT (B OR D)");
 
     return compositionCohortDefinition;
   }
