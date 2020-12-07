@@ -455,7 +455,7 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getPatientsRegisteredInFichaAPSSPP() {
+  public CohortDefinition getPatientsRegisteredInFichaAPSSPP() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
 
@@ -483,38 +483,14 @@ public class APSSResumoTrimestralCohortQueries {
             + " FROM patient p "
             + "     INNER JOIN encounter e "
             + "        ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs pp1 "
-            + "        ON pp1.encounter_id=e.encounter_id "
-            + "     INNER JOIN obs pp2 "
-            + "        ON pp2.encounter_id=e.encounter_id "
-            + "     INNER JOIN obs pp3 "
-            + "        ON pp3.encounter_id=e.encounter_id "
-            + "     INNER JOIN obs pp4 "
-            + "        ON pp4.encounter_id=e.encounter_id "
-            + "     INNER JOIN obs pp5 "
-            + "        ON pp5.encounter_id=e.encounter_id "
-            + "     INNER JOIN obs pp6 "
-            + "        ON pp6.encounter_id=e.encounter_id "
-            + "     INNER JOIN obs pp7 "
-            + "        ON pp7.encounter_id=e.encounter_id "
+            + "     INNER JOIN obs pp "
+            + "        ON pp.encounter_id=e.encounter_id "
             + " WHERE p.voided = 0 "
             + "    AND e.voided = 0 "
-            + "    AND pp1.voided = 0 "
-            + "    AND pp2.voided = 0 "
-            + "    AND pp3.voided = 0 "
-            + "    AND pp4.voided = 0 "
-            + "    AND pp5.voided = 0 "
-            + "    AND pp6.voided = 0 "
-            + "    AND pp7.voided = 0 "
+            + "    AND pp.voided = 0 "
             + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (pp1.concept_id = ${pp1Concept} AND pp1.value_coded = ${patientFoundYesConcept}) "
-            + "    AND (pp2.concept_id = ${pp2Concept} AND pp2.value_coded = ${patientFoundYesConcept}) "
-            + "    AND (pp3.concept_id = ${pp3Concept} AND pp3.value_coded = ${patientFoundYesConcept}) "
-            + "    AND (pp4.concept_id = ${pp4Concept} AND pp4.value_coded = ${patientFoundYesConcept}) "
-            + "    AND (pp5.concept_id = ${familyPlanningConcept} AND pp5.value_coded = ${patientFoundYesConcept}) "
-            + "    AND (pp6.concept_id = ${pp6Concept} AND pp6.value_coded = ${patientFoundYesConcept}) "
-            + "    AND (pp7.concept_id = ${pp7Concept} AND pp7.value_coded = ${patientFoundYesConcept}) "
-            + "    AND encounter_datetime "
+            + "    AND pp.concept_id IN (${pp1Concept},${pp2Concept},${pp3Concept},${pp4Concept},${familyPlanningConcept},${pp6Concept},${pp7Concept}) AND pp.value_coded = ${patientFoundYesConcept} "
+            + "    AND e.encounter_datetime "
             + "        BETWEEN :startDate AND :endDate "
             + "    AND e.location_id = :location ";
 
