@@ -369,8 +369,6 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-
-
   /*
    *
    * All  patients the first clinical consultation with nutricional state equal
