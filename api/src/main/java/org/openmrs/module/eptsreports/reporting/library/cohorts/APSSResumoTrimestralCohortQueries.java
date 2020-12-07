@@ -455,7 +455,7 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatientsRegisteredInFichaAPSSPP() {
+  private CohortDefinition getPatientsRegisteredInFichaAPSSPP() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
 
