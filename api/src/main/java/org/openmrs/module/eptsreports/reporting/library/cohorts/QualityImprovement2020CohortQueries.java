@@ -7,8 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.calculation.generic.StartedArtOnPeriodCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.APSSPPConsultationAfterDaysOfARTstartDateCalculation;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -754,4 +758,55 @@ public class QualityImprovement2020CohortQueries {
     }
     return compositionCohortDefinition;
   }
+
+  private CohortDefinition getApssConsultationAfterARTstartDate(
+      int lowerBoundary, int upperBoundary) {
+
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(APSSPPConsultationAfterDaysOfARTstartDateCalculation.class).get(0));
+    cd.setName("APSS consultation after ART start date");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addCalculationParameter("considerTransferredIn", false);
+    cd.addCalculationParameter("considerPharmacyEncounter", true);
+    cd.addCalculationParameter("lowerBoundary", lowerBoundary);
+    cd.addCalculationParameter("upperBoundary", upperBoundary);
+
+    return cd;
+  }
+
+  public CohortDefinition getMQC11NG() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("GET G");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition firstApss = getApssConsultationAfterARTstartDate(0, 33);
+
+    CohortDefinition secondApss = getApssConsultationAfterARTstartDate(33, 66);
+
+    CohortDefinition thirdApss = getApssConsultationAfterARTstartDate(66, 99);
+
+    compositionCohortDefinition.addSearch(
+        "firstApss", EptsReportUtils.map(firstApss, "onOrBefore=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "secondApss",
+        EptsReportUtils.map(secondApss, "onOrBefore=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "thirdApss", EptsReportUtils.map(thirdApss, "onOrBefore=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("firstApss AND secondApss AND thirdApss");
+
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getMQC11NH() {
+    return  null;
+  }
+
 }
