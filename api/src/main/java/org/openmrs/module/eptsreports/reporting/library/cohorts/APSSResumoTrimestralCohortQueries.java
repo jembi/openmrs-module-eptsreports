@@ -683,7 +683,7 @@ public class APSSResumoTrimestralCohortQueries {
             + ") art_startdate   "
             + "    WHERE art_startdate.patient_id=external.patient_id ) AND :endDate "
             + "    AND encounter_datetime "
-            + "        BETWEEN :startDate AND :endDate  "
+            + "        >= :startDate AND encounter_datetime <= :endDate  "
             + "    AND e.location_id = :location";
 
     StringSubstitutor sb = new StringSubstitutor(map);
