@@ -229,7 +229,9 @@ public class APSSResumoTrimestralCohortQueries {
 
     cd.addSearch(
         "minArtStartDate",
-        map(getFichaAPSSAndMinArtStartDate(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+        map(
+            getFichaAPSSAndMinArtStartDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("activeInART AND minArtStartDate");
 
