@@ -60,7 +60,7 @@ public class APSSPPConsultationAfterDaysOfARTstartDateCalculation
 
       List<Encounter> appEncounters = EptsCalculationUtils.extractResultValues(listResult);
 
-      if(artStartDate!=null){
+      if (artStartDate != null) {
 
         Date lower = EptsCalculationUtils.addDays(artStartDate, lowerBoundary);
 
@@ -71,9 +71,7 @@ public class APSSPPConsultationAfterDaysOfARTstartDateCalculation
         if (date != null) {
           calculationResultMap.put(patientId, new SimpleResult(date, this));
         }
-
       }
-
     }
     return calculationResultMap;
   }
