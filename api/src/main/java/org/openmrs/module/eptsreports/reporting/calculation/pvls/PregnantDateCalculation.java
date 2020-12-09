@@ -315,7 +315,7 @@ public class PregnantDateCalculation extends AbstractPatientCalculation {
   private Date isPregnantWithLastMens(Date lastVlDate, List<Obs> pregnantWithLastDateObsList) {
     Date isPregnancyWihLastMensDate = null;
     for (Obs obs : pregnantWithLastDateObsList) {
-      if (this.isInPregnantViralLoadRange(lastVlDate, obs.getEncounter().getEncounterDatetime())
+      if (this.isInPregnantViralLoadRange(lastVlDate, obs.getValueDatetime())
           && obs.getValueDatetime() != null) {
         isPregnancyWihLastMensDate = obs.getValueDatetime();
       }
