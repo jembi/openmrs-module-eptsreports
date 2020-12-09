@@ -761,7 +761,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>MQ6</b>: Melhoria de Qualidade Category 7 <br>
+   * <b>MQ7</b>: Melhoria de Qualidade Category 7 <br>
    * <i> DENOMINATOR 1: A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
    * <i> DENOMINATOR 2: (A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
    * <i> DENOMINATOR 3: A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
