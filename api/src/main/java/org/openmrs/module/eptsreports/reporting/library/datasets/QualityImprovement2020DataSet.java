@@ -213,7 +213,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
-        // Category 7 denominator indicators
+    // Category 7 denominator indicators
     dataSetDefinition.addColumn(
         "MQ7DEN1",
         "% de adultos HIV+ em TARV elegíveis ao TPT e que iniciaram TPT",
@@ -262,7 +262,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "age=<15");
 
-        dataSetDefinition.addColumn(
+    dataSetDefinition.addColumn(
         "MQ7DEN5",
         "% de mulheres grávidas HIV+ elegíveis ao TPI e que iniciaram TPI",
         EptsReportUtils.map(
@@ -274,7 +274,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
-        dataSetDefinition.addColumn(
+    dataSetDefinition.addColumn(
         "MQ7DEN6",
         "% de MG HIV+ em TARV que iniciou TPI e que terminou TPI",
         EptsReportUtils.map(

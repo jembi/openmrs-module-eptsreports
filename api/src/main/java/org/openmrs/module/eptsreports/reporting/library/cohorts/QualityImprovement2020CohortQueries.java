@@ -9,7 +9,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.metadata.Metadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -774,24 +773,24 @@ public class QualityImprovement2020CohortQueries {
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
    *       and endDateInclusion)
    *   <li>
-   *   <li>B1 - Filter all patients with a clinical consultation(encounter type 6) with
-   *       “Diagnótico TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
+   *   <li>B1 - Filter all patients with a clinical consultation(encounter type 6) with “Diagnótico
+   *       TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
    *       Encounter_datetime between startDateInclusion and endDateRevision
    *   <li>
-   * <li>
-   *   <li>B2 - Filter all patients with a clinical consultation(encounter type 6) 
-   *    with “TEM SINTOMAS DE TB” (concept_id 23758) value coded “SIM” (concept_id  1065) and
-   *    Encounter_datetime between startDateInclusion and endDateInclusion
    *   <li>
-   * <li>
-   *   <li>B3 - Filter all patients with a clinical consultation(encounter type 6) with
-   *      “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or “Fim” 
-   *    (concept_id IN [1256, 1257, 1267]) Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>B2 - Filter all patients with a clinical consultation(encounter type 6) with “TEM
+   *       SINTOMAS DE TB” (concept_id 23758) value coded “SIM” (concept_id 1065) and
+   *       Encounter_datetime between startDateInclusion and endDateInclusion
    *   <li>
-   * <li>
-   *   <li>B4 - Filter all patients with a clinical consultation(encounter type 6) with
-   *        “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)
-   *          Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>
+   *   <li>B3 - Filter all patients with a clinical consultation(encounter type 6) with “TRATAMENTO
+   *       DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or “Fim” (concept_id
+   *       IN [1256, 1257, 1267]) Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>
+   *   <li>
+   *   <li>B4 - Filter all patients with a clinical consultation(encounter type 6) with “PROFILAXIA
+   *       COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)
+   *       Encounter_datetime between startDateInclusion and endDateInclusion
    *   <li>
    *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
    *       inclusion period (startDateInclusion and endDateInclusion)
@@ -800,7 +799,7 @@ public class QualityImprovement2020CohortQueries {
    *       the inclusion period (startDateInclusion and endDateInclusion)
    *   <li>
    *   <li>E - All transferred IN patients during the inclusion period
-   * <li>
+   *   <li>
    *   <li>F - Filter all patients with the last clinical consultation(encounter type 6) with
    *       “Diagnótico TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
    *       Encounter_datetime between startDateInclusion and endDateRevision
@@ -813,17 +812,15 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (den == 1 || den == 3) {
-      compositionCohortDefinition.setName(
-          "A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+      compositionCohortDefinition.setName("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (den == 2 || den == 4) {
       compositionCohortDefinition.setName(
           "(A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (den == 5) {
-    compositionCohortDefinition.setName(
-        "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+      compositionCohortDefinition.setName("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     } else if (den == 6) {
-  compositionCohortDefinition.setName(
-      "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+      compositionCohortDefinition.setName(
+          "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -860,7 +857,10 @@ public class QualityImprovement2020CohortQueries {
             "once",
             hivMetadata.getAdultoSeguimentoEncounterType(),
             tbMetadata.getTBTreatmentPlanConcept(),
-            Arrays.asList(tbMetadata.getStartDrugsConcept(),hivMetadata.getContinueRegimenConcept(),hivMetadata.getCompletedConcept()),
+            Arrays.asList(
+                tbMetadata.getStartDrugsConcept(),
+                hivMetadata.getContinueRegimenConcept(),
+                hivMetadata.getCompletedConcept()),
             null,
             null);
 
@@ -908,17 +908,17 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom(),
             Collections.singletonList(hivMetadata.getArtStatus()));
 
-            //update to correct TransferOut query
+    // update to correct TransferOut query
     CohortDefinition transferOut =
         commonCohortQueries.getMohMQPatientsOnCondition(
-          false,
-          true,
-          "once",
-          hivMetadata.getMasterCardEncounterType(),
-          commonMetadata.getTransferFromOtherFacilityConcept(),
-          Collections.singletonList(hivMetadata.getYesConcept()),
-          hivMetadata.getTypeOfPatientTransferredFrom(),
-          Collections.singletonList(hivMetadata.getArtStatus()));
+            false,
+            true,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -946,10 +946,10 @@ public class QualityImprovement2020CohortQueries {
           "(A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (den == 5) {
       compositionCohortDefinition.setCompositionString(
-        "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     } else if (den == 6) {
       compositionCohortDefinition.setCompositionString(
-      "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     }
     return compositionCohortDefinition;
   }
