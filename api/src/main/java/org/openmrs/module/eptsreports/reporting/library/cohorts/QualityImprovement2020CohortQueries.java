@@ -9,6 +9,8 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.Metadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -32,6 +34,8 @@ public class QualityImprovement2020CohortQueries {
 
   private CommonCohortQueries commonCohortQueries;
 
+  private TbMetadata tbMetadata;
+
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
@@ -41,13 +45,15 @@ public class QualityImprovement2020CohortQueries {
       CommonMetadata commonMetadata,
       GenderCohortQueries genderCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
-      CommonCohortQueries commonCohortQueries) {
+      CommonCohortQueries commonCohortQueries,
+      TbMetadata tbMetadata) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
     this.genderCohortQueries = genderCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.commonCohortQueries = commonCohortQueries;
+    this.tbMetadata = tbMetadata;
   }
 
   /**
@@ -751,6 +757,199 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString("(A AND C) AND NOT (B OR D OR E)");
     } else if (den == 4) {
       compositionCohortDefinition.setCompositionString("A AND D AND NOT (B OR C OR E)");
+    }
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>MQ6</b>: Melhoria de Qualidade Category 7 <br>
+   * <i> DENOMINATOR 1: A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 2: (A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 3: A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 4: (A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 5: (A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)</i> <br>
+   * <i> DENOMINATOR 6: (A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)</i> <br>
+   *
+   * <ul>
+   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
+   *       and endDateInclusion)
+   *   <li>
+   *   <li>B1 - Filter all patients with a clinical consultation(encounter type 6) with
+   *       “Diagnótico TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
+   *       Encounter_datetime between startDateInclusion and endDateRevision
+   *   <li>
+   * <li>
+   *   <li>B2 - Filter all patients with a clinical consultation(encounter type 6) 
+   *    with “TEM SINTOMAS DE TB” (concept_id 23758) value coded “SIM” (concept_id  1065) and
+   *    Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>
+   * <li>
+   *   <li>B3 - Filter all patients with a clinical consultation(encounter type 6) with
+   *      “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or “Fim” 
+   *    (concept_id IN [1256, 1257, 1267]) Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>
+   * <li>
+   *   <li>B4 - Filter all patients with a clinical consultation(encounter type 6) with
+   *        “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)
+   *          Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>
+   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
+   *       inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
+   *       the inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>E - All transferred IN patients during the inclusion period
+   * <li>
+   *   <li>F - Filter all patients with the last clinical consultation(encounter type 6) with
+   *       “Diagnótico TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
+   *       Encounter_datetime between startDateInclusion and endDateRevision
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ7A(Integer den) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (den == 1 || den == 3) {
+      compositionCohortDefinition.setName(
+          "A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+    } else if (den == 2 || den == 4) {
+      compositionCohortDefinition.setName(
+          "(A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+    } else if (den == 5) {
+    compositionCohortDefinition.setName(
+        "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+    } else if (den == 6) {
+  compositionCohortDefinition.setName(
+      "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+    }
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    CohortDefinition startedART = getMQC3D1();
+
+    CohortDefinition tbActive =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getActiveTBConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition tbSymptoms =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            tbMetadata.getHasTbSymptomsConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition tbTreatment =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            tbMetadata.getTBTreatmentPlanConcept(),
+            Arrays.asList(tbMetadata.getStartDrugsConcept(),hivMetadata.getContinueRegimenConcept(),hivMetadata.getCompletedConcept()),
+            null,
+            null);
+
+    CohortDefinition tbProphilaxy =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "once",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getIsoniazidUsageConcept(),
+            Collections.singletonList(hivMetadata.getContinueRegimenConcept()),
+            null,
+            null);
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getPregnantConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition transferIn =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            true,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
+
+            //update to correct TransferOut query
+    CohortDefinition transferOut =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+          false,
+          true,
+          "once",
+          hivMetadata.getMasterCardEncounterType(),
+          commonMetadata.getTransferFromOtherFacilityConcept(),
+          Collections.singletonList(hivMetadata.getYesConcept()),
+          hivMetadata.getTypeOfPatientTransferredFrom(),
+          Collections.singletonList(hivMetadata.getArtStatus()));
+
+    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+
+    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(tbActive, MAPPING));
+
+    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(tbSymptoms, MAPPING));
+
+    compositionCohortDefinition.addSearch("B3", EptsReportUtils.map(tbTreatment, MAPPING));
+
+    compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(tbProphilaxy, MAPPING));
+
+    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+
+    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
+
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));
+
+    if (den == 1 || den == 3) {
+      compositionCohortDefinition.setCompositionString(
+          "A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+    } else if (den == 2 || den == 4) {
+      compositionCohortDefinition.setCompositionString(
+          "(A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+    } else if (den == 5) {
+      compositionCohortDefinition.setCompositionString(
+        "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+    } else if (den == 6) {
+      compositionCohortDefinition.setCompositionString(
+      "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     }
     return compositionCohortDefinition;
   }
