@@ -812,7 +812,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
 
-    sqlCohortDefinition.setName("Category 11 - Numerator - H!");
+    sqlCohortDefinition.setName("Category 11 - Numerator - H1");
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -820,8 +820,8 @@ public class QualityImprovement2020CohortQueries {
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
-            + "FROM patient p "
+        " SELECT p.patient_id "
+            + " FROM patient p "
             + "    INNER JOIN encounter e "
             + "        ON p.patient_id = e.patient_id "
             + "    INNER JOIN ( "
@@ -840,8 +840,8 @@ public class QualityImprovement2020CohortQueries {
             + "                        AND e.location_id = :location "
             + "                        AND o.concept_id = ${856} AND o.value_numeric >  1000 "
             + "                    GROUP BY p.patient_id "
-            + "                ) viral_load "
-            + "WHERE p.voided = 0  "
+            + "                ) viral_load ON viral_load.patient_id = p.patient_id "
+            + " WHERE p.voided = 0  "
             + "    AND e.voided = 0 "
             + "    AND e.encounter_type = ${35} "
             + "    AND e.encounter_datetime = viral_load.encounter_date "
@@ -867,32 +867,43 @@ public class QualityImprovement2020CohortQueries {
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
+        " SELECT p.patient_id "
             + "FROM patient p "
             + "    INNER JOIN encounter e "
             + "        ON p.patient_id = e.patient_id "
             + "    INNER JOIN ( "
-            + "                    SELECT p.patient_id, MIN(e.encounter_datetime) as  encounter_date "
-            + "                    FROM patient p   "
-            + "                        INNER JOIN encounter e "
-            + "                            ON p.patient_id = e.patient_id "
-            + "                        INNER JOIN obs o "
-            + "                            ON o.encounter_id = e.encounter_id "
-            + "                    WHERE p.voided = 0  "
-            + "                        AND e.voided = 0 "
-            + "                        AND o.voided = 0 "
-            + "                        AND e.encounter_type = ${6} "
-            + "                        AND e.encounter_datetime "
-            + "                            BETWEEN :startDate AND :endDate "
-            + "                        AND e.location_id = :location "
-            + "                        AND o.concept_id = ${856} AND o.value_numeric >  1000 "
-            + "                    GROUP BY p.patient_id "
-            + "                ) viral_load "
-            + "WHERE p.voided = 0  "
+            + "                 SELECT p.patient_id, e.encounter_datetime"
+            + "                 FROM patient p "
+            + "                    INNER JOIN encounter e "
+            + "                        ON p.patient_id = e.patient_id "
+            + "                    INNER JOIN ( "
+            + "                                    SELECT p.patient_id, MIN(e.encounter_datetime) as  encounter_date "
+            + "                                    FROM patient p   "
+            + "                                        INNER JOIN encounter e "
+            + "                                            ON p.patient_id = e.patient_id "
+            + "                                        INNER JOIN obs o "
+            + "                                            ON o.encounter_id = e.encounter_id "
+            + "                                    WHERE p.voided = 0  "
+            + "                                        AND e.voided = 0 "
+            + "                                        AND o.voided = 0 "
+            + "                                        AND e.encounter_type = ${6} "
+            + "                                        AND e.encounter_datetime "
+            + "                                            BETWEEN :startDate AND :endDate "
+            + "                                        AND e.location_id = :location "
+            + "                                        AND o.concept_id = ${856} AND o.value_numeric >  1000 "
+            + "                                    GROUP BY p.patient_id "
+            + "                                ) viral_load ON viral_load.patient_id = p.patient_id "
+            + "                 WHERE p.voided = 0  "
+            + "                     AND e.voided = 0 "
+            + "                    AND e.encounter_type = ${35} "
+            + "                    AND e.encounter_datetime = viral_load.encounter_date "
+            + "                    AND e.location_id = :location "
+            + "                ) h1 ON h1.patient_id = p.patient_id "
+            + " WHERE p.voided = 0  "
             + "    AND e.voided = 0 "
             + "    AND e.encounter_type = ${35} "
-            + "    AND e.encounter_datetime > DATE_ADD(viral_load.encounter_date, INTERVAL 20 DAY)  "
-            + "         AND e.encounter_datetime <= DATE_ADD(viral_load.encounter_date, INTERVAL 33 DAY) "
+            + "    AND e.encounter_datetime > DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
+            + "         AND e.encounter_datetime <= DATE_ADD(h1.encounter_datetime, INTERVAL 33 DAY) "
             + "    AND e.location_id = :location ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -920,27 +931,50 @@ public class QualityImprovement2020CohortQueries {
             + "    INNER JOIN encounter e "
             + "        ON p.patient_id = e.patient_id "
             + "    INNER JOIN ( "
-            + "                    SELECT p.patient_id, MIN(e.encounter_datetime) as  encounter_date "
-            + "                    FROM patient p   "
+            + "                     SELECT p.patient_id, e.encounter_datetime "
+            + "                    FROM patient p "
             + "                        INNER JOIN encounter e "
             + "                            ON p.patient_id = e.patient_id "
-            + "                        INNER JOIN obs o "
-            + "                            ON o.encounter_id = e.encounter_id "
-            + "                    WHERE p.voided = 0  "
+            + "                        INNER JOIN ( "
+            + "                                     SELECT p.patient_id, e.encounter_datetime"
+            + "                                     FROM patient p "
+            + "                                        INNER JOIN encounter e "
+            + "                                            ON p.patient_id = e.patient_id "
+            + "                                        INNER JOIN ( "
+            + "                                                        SELECT p.patient_id, MIN(e.encounter_datetime) as  encounter_date "
+            + "                                                        FROM patient p   "
+            + "                                                            INNER JOIN encounter e "
+            + "                                                                ON p.patient_id = e.patient_id "
+            + "                                                            INNER JOIN obs o "
+            + "                                                                ON o.encounter_id = e.encounter_id "
+            + "                                                        WHERE p.voided = 0  "
+            + "                                                            AND e.voided = 0 "
+            + "                                                            AND o.voided = 0 "
+            + "                                                            AND e.encounter_type = ${6} "
+            + "                                                            AND e.encounter_datetime "
+            + "                                                                BETWEEN :startDate AND :endDate "
+            + "                                                            AND e.location_id = :location "
+            + "                                                            AND o.concept_id = ${856} AND o.value_numeric >  1000 "
+            + "                                                        GROUP BY p.patient_id "
+            + "                                                    ) viral_load ON viral_load.patient_id = p.patient_id "
+            + "                                     WHERE p.voided = 0  "
+            + "                                         AND e.voided = 0 "
+            + "                                        AND e.encounter_type = ${35} "
+            + "                                        AND e.encounter_datetime = viral_load.encounter_date "
+            + "                                        AND e.location_id = :location "
+            + "                                    ) h1 ON h1.patient_id = p.patient_id "
+            + "                     WHERE p.voided = 0  "
             + "                        AND e.voided = 0 "
-            + "                        AND o.voided = 0 "
-            + "                        AND e.encounter_type = ${6} "
-            + "                        AND e.encounter_datetime "
-            + "                            BETWEEN :startDate AND :endDate "
+            + "                        AND e.encounter_type = ${35} "
+            + "                        AND e.encounter_datetime > DATE_ADD(h1.encounter_datetime, INTERVAL 20 DAY)  "
+            + "                             AND e.encounter_datetime <= DATE_ADD(h1.encounter_datetime, INTERVAL 33 DAY) "
             + "                        AND e.location_id = :location "
-            + "                        AND o.concept_id = ${856} AND o.value_numeric >  1000 "
-            + "                    GROUP BY p.patient_id "
-            + "                ) viral_load "
-            + "WHERE p.voided = 0  "
+            + "                ) h2 ON h2.patient_id = p.patient_id "
+            + " WHERE p.voided = 0  "
             + "    AND e.voided = 0 "
             + "    AND e.encounter_type = ${35} "
-            + "    AND e.encounter_datetime > DATE_ADD(viral_load.encounter_date, INTERVAL 33 DAY)  "
-            + "         AND e.encounter_datetime <= DATE_ADD(viral_load.encounter_date, INTERVAL 66 DAY) "
+            + "    AND e.encounter_datetime > DATE_ADD(h2.encounter_datetime, INTERVAL 20 DAY)  "
+            + "         AND e.encounter_datetime <= DATE_ADD(h2.encounter_datetime, INTERVAL 33 DAY) "
             + "    AND e.location_id = :location ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -971,5 +1005,9 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.setCompositionString("h1 AND h2 AND h3");
 
     return compositionCohortDefinition;
+  }
+
+  public  CohortDefinition getMQC11NI(){
+    return  null;
   }
 }
