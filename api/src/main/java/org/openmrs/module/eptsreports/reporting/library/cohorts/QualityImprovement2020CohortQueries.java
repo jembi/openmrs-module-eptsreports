@@ -1008,6 +1008,8 @@ public class QualityImprovement2020CohortQueries {
   }
 
   public  CohortDefinition getMQC11NI(){
+
+
     return  null;
   }
 }
