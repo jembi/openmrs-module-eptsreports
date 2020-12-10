@@ -871,7 +871,7 @@ public class QualityImprovement2020CohortQueries {
             "once",
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getIsoniazidUsageConcept(),
-            Collections.singletonList(hivMetadata.getContinueRegimenConcept()),
+            Collections.singletonList(hivMetadata.getStartDrugsConcept()),
             null,
             null);
 
