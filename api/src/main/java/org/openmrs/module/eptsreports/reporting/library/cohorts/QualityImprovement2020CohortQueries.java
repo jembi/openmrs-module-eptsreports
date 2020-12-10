@@ -670,16 +670,20 @@ public class QualityImprovement2020CohortQueries {
 
 
   /**
-   * <b>MQ5A</b>: Melhoria de Qualidade Category 5 Criancas <br>
-   * <i> DENOMINATOR: (A AND B) AND NOT (C OR D OR E)</i> <br>
-   * <i> NOMINATOR: (A AND B) AND NOT (C OR D OR E) AND F</i> <br>
+   * <b>MQ5A</b>: Melhoria de Qualidade Category 11 Denominator <br>
+   * <i> DENOMINATORS: A,B1,B2,B3,C,D and E</i> <br>
    *
    * <ul>
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
    *       and endDateInclusion)
    *   <li>
-   *   <li>B - Filter all patients with nutritional state equal to “DAM” or “DAG” registered on a
-   *       clinical consultation during the period
+   *   <li>B1 - Select all patients from Ficha Clinica (encounter type 6) who have THE LAST  “LINHA TERAPEUTICA
+   *   <li>
+   *   <li> B2-Select all patients from Ficha Clinica (encounter type 6)
+   *        with “Carga Viral”  registered with numeric value > 1000
+   *   <li>
+   *   <li> B3-Filter all patients with clinical consultation (encounter type 6) with concept “GESTANTE”
+   *        and value coded “SIM”
    *   <li>
    *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
    *       inclusion period (startDateInclusion and endDateInclusion)
@@ -689,11 +693,10 @@ public class QualityImprovement2020CohortQueries {
    *   <li>
    *   <li>E - All transferred IN patients
    *   <li>
-   *   <li>F - F - Filter all patients with “Apoio/Educação Nutricional” equals to “ATPU” or “SOJA”
-   *       in the same clinical consultation where“Grau da Avaliação Nutricional” equals to “DAM” or
-   *       “DAG” during the revision period, clinical consultation >= startDateRevision and
-   *       <=endDateRevision
+   *   <li>F - All Transferred Out patients
    * </ul>
+   * @params indicatorFlag
+   * A to G For inicator 11.1 to 11.7 respectively
    *
    * @return CohortDefinition
    */
@@ -775,6 +778,23 @@ public class QualityImprovement2020CohortQueries {
   }
 
 
+  /**
+   * <b>MQC11B1B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 and B2 <br>
+   * <i> A and not B</i> <br>
+   *
+   * <ul>
+   *   <li>B1 – Select all patients from Ficha Clinica (encounter type 6)
+   *   who have THE LAST  “LINHA TERAPEUTICA”(Concept id 21151) during the Inclusion period (startDateInclusion and endDateInclusion)
+   *   and the  value coded is “PRIMEIRA LINHA”(Concept id 21150)
+   *   </li>
+   *   <li>B2 – Select all patients from Ficha Clinica (encounter type 6)
+   *   with “Carga Viral” (Concept id 856) registered with
+   *   numeric value > 1000 during the Inclusion period (startDateInclusion and endDateInclusion)
+   *   </li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public  CohortDefinition getPatientsFromFichaClinicaB1OrB2(boolean isB1){
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -821,6 +841,19 @@ public class QualityImprovement2020CohortQueries {
   }
 
 
+  /**
+   * <b>MQC11B3</b>: Melhoria de Qualidade Category 11 Deniminator B3 <br>
+   * <i> A and not B</i> <br>
+   *
+   * <ul>
+   *   <li>B3 – Filter all patients with clinical consultation (encounter type 6) with concept “GESTANTE” (Concept Id 1982)
+   *   and value coded “SIM” (Concept Id 1065)  with the Encounter_datetime = ART Start Date (from query A)
+   *   during the Inclusion period (startDateInclusion and endDateInclusion)
+   *   </li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public  CohortDefinition getPatientsWithClinicalConsultationB3(){
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
