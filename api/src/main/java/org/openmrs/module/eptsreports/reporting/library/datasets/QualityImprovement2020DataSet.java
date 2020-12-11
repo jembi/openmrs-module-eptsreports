@@ -61,7 +61,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             initiatedART, "startDate=${startDate},endDate=${endDate},location=${location}"),
         getDisagregateAdultsAndChildrenSColumn());
     // Category 4 denominator indicators
-    /* dataSetDefinition.addColumn(
+     dataSetDefinition.addColumn(
         "MCC4D1",
         "Crianças em TARV com estado (grau) da avaliação nutricional registado na última consulta clínica",
         EptsReportUtils.map(
@@ -270,7 +270,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC11DEN("E"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=2-14");*/
+        "age=2-14");
 
     dataSetDefinition.addColumn(
         "MQ11DEN6",
@@ -282,9 +282,9 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC11DEN("F"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "ageInMonths<9m");
+        "ageInMonths=<9m");
 
-    /* dataSetDefinition.addColumn(
+     dataSetDefinition.addColumn(
     "MQ11DEN7",
     "Crianças (0-14 anos) na 1a linha de TARV com CV acima de 1000 cópias que tiveram 3 consultas mensais consecutivas de APSS/PP para reforço de adesão",
     EptsReportUtils.map(
@@ -294,7 +294,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 qualityImprovement2020CohortQueries.getMQC11DEN("G"),
                 "startDate=${startDate},endDate=${endDate},location=${location}")),
         "startDate=${startDate},endDate=${endDate},location=${location}"),
-    "age<15");*/
+    "age=<15");
 
     return dataSetDefinition;
   }
