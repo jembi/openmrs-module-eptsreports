@@ -10,10 +10,10 @@ import org.openmrs.calculation.patient.PatientCalculation;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.SimpleResult;
-import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.APSSPPConsultationAfterDaysOfARTstartDateCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.EncounterAfterOldestARTStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.intergrated.calculation.BasePatientCalculationTest;
 
-public class APSSPPConsultationAfterDaysOfARTstartDateCalculationTest
+public class EncounterAfterOldestARTStartDateCalculationTest
     extends BasePatientCalculationTest {
 
   @Before
@@ -24,7 +24,7 @@ public class APSSPPConsultationAfterDaysOfARTstartDateCalculationTest
   @Override
   public PatientCalculation getCalculation() {
     return Context.getRegisteredComponents(
-            APSSPPConsultationAfterDaysOfARTstartDateCalculation.class)
+            EncounterAfterOldestARTStartDateCalculation.class)
         .get(0);
   }
 

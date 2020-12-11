@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade;
 
-import java.util.*;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -16,8 +15,10 @@ import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtSt
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.*;
+
 @Component
-public class APSSPPConsultationAfterDaysOfARTstartDateCalculation
+public class MonthlyConsultationUntilEndDateAfterARTStartDateCalculaation
     extends AbstractPatientCalculation {
   @Override
   public CalculationResultMap evaluate(

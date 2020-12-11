@@ -10,7 +10,11 @@ import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.APSSPPConsultationAfterDaysOfARTstartDateCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.ConsultationUntilEndDateAfterStartingART;
+import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.EncounterAfterOldestARTStartDateCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.SecondFollowingEncounterAfterOldestARTStartDateCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.ThirdFollowingEncounterAfterOldestARTStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -758,13 +762,13 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-  private CohortDefinition getApssConsultationAfterARTstartDate(
-      int lowerBoundary, int upperBoundary) {
+  private <T extends AbstractPatientCalculation> CohortDefinition getApssConsultationAfterARTstartDateOrAfterApssConsultation(
+      int lowerBoundary, int upperBoundary, Class<T> clazz) {
 
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(
-                    APSSPPConsultationAfterDaysOfARTstartDateCalculation.class)
+                    clazz)
                 .get(0));
     cd.setName("APSS consultation after ART start date");
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -773,6 +777,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addCalculationParameter("considerPharmacyEncounter", true);
     cd.addCalculationParameter("lowerBoundary", lowerBoundary);
     cd.addCalculationParameter("upperBoundary", upperBoundary);
+
 
     return cd;
   }
@@ -785,11 +790,11 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition firstApss = getApssConsultationAfterARTstartDate(0, 33);
+    CohortDefinition firstApss = getApssConsultationAfterARTstartDateOrAfterApssConsultation(20, 33,EncounterAfterOldestARTStartDateCalculation.class);
 
-    CohortDefinition secondApss = getApssConsultationAfterARTstartDate(33, 66);
+    CohortDefinition secondApss = getApssConsultationAfterARTstartDateOrAfterApssConsultation(20, 33, SecondFollowingEncounterAfterOldestARTStartDateCalculation.class);
 
-    CohortDefinition thirdApss = getApssConsultationAfterARTstartDate(66, 99);
+    CohortDefinition thirdApss = getApssConsultationAfterARTstartDateOrAfterApssConsultation(20, 33, ThirdFollowingEncounterAfterOldestARTStartDateCalculation.class);
 
     compositionCohortDefinition.addSearch(
         "firstApss", EptsReportUtils.map(firstApss, "onOrBefore=${endDate},location=${location}"));
@@ -1007,9 +1012,21 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-  public  CohortDefinition getMQC11NI(){
 
 
-    return  null;
+  public   CohortDefinition getMQC11NI() {
+
+    CalculationCohortDefinition cd =
+            new CalculationCohortDefinition(
+                    Context.getRegisteredComponents(
+                            ConsultationUntilEndDateAfterStartingART.class)
+                            .get(0));
+    cd.setName(" Interval  of APSS consultations after ART start date");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addCalculationParameter("considerTransferredIn", false);
+    cd.addCalculationParameter("considerPharmacyEncounter", true);
+
+    return cd;
   }
 }
