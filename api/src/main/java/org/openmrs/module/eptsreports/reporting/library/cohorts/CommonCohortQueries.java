@@ -299,30 +299,36 @@ public class CommonCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("encounterType", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("patientStateConcept", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("transferredOutConcept", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id FROM patient p "
-            + "INNER JOIN "
-            + "           (SELECT   p.patient_id, "
-            + "                                 MAX(e.encounter_datetime), "
-            + "                                 e.encounter_id FROM patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         e.patient_id = p.patient_id "
-            + "                      JOIN       obs o "
-            + "                      ON         o.encounter_id = e.encounter_id "
-            + "                      WHERE      e.encounter_type = ${encounterType} "
-            + "                      AND        o.concept_id = ${patientStateConcept} "
-            + "                      AND        p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        o.location_id = :location "
-            + "                      AND        o.value_coded = ${transferredOutConcept} "
-            + "                      AND        o.obs_datetime <= :endDate "
-            + "                      GROUP BY   p.patient_id) filtered "
-            + " ON         p.patient_id = filtered.patient_id ";
+        "SELECT union_tbl.patient_id FROM (SELECT filtered.patient_id, MAX(filtered.transfer_date) as transfer_date FROM  "
+            + " (SELECT   p.patient_id, "
+            + "   MAX(o.obs_datetime) as transfer_date "
+            + "    FROM patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "   JOIN  obs o ON o.encounter_id = e.encounter_id WHERE e.encounter_type = ${53} "
+            + "   AND o.concept_id = ${6272} AND p.voided = 0 AND e.voided = 0 "
+            + "   AND e.location_id = :location "
+            + "   AND o.value_coded = ${1706} AND o.obs_datetime BETWEEN :startDate AND :endDate  "
+            + "            GROUP BY   p.patient_id "
+            + "UNION "
+            + " SELECT  p.patient_id, "
+            + "   MAX(e.encounter_datetime) transfer_date "
+            + "   FROM patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "   JOIN  obs o ON o.encounter_id = e.encounter_id WHERE e.encounter_type = ${6} "
+            + "   AND o.concept_id = ${6273} AND p.voided = 0 AND e.voided = 0 "
+            + "   AND e.location_id = :location "
+            + "   AND o.value_coded = ${1706} AND e.encounter_datetime <= :endDate  "
+            + "            GROUP BY   p.patient_id) filtered group by filtered.patient_id) union_tbl "
+            + "Where union_tbl.patient_id NOT IN  "
+            + "            (Select p.patient_id from patient p join encounter e on e.patient_id = p.patient_id  "
+            + "   where e.encounter_type IN (${52},${6}) and e.location_id= :location and e.voided=0 and p.voided =0  "
+            + "            and e.encounter_datetime > union_tbl.transfer_date and e.encounter_datetime <= :endDate)";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
