@@ -139,7 +139,9 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "10-19",
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 10 and 19", 10, 19));
-
+    dim.addCohortDefinition(
+        "2-14",
+        ageDimensionCohort.createXtoYAgeCohort("patients with age between 10 and 19", 2, 14));
     return dim;
   }
 

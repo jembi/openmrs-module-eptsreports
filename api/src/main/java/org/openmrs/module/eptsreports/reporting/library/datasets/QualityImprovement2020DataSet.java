@@ -61,7 +61,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             initiatedART, "startDate=${startDate},endDate=${endDate},location=${location}"),
         getDisagregateAdultsAndChildrenSColumn());
     // Category 4 denominator indicators
-     dataSetDefinition.addColumn(
+    dataSetDefinition.addColumn(
         "MCC4D1",
         "Crianças em TARV com estado (grau) da avaliação nutricional registado na última consulta clínica",
         EptsReportUtils.map(
@@ -222,7 +222,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC11DEN("A"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=14+");
+        "age=15+");
 
     dataSetDefinition.addColumn(
         "MQ11DEN2",
@@ -234,7 +234,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC11DEN("B"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=14+");
+        "age=15+");
 
     dataSetDefinition.addColumn(
         "MQ11DEN3",
@@ -246,7 +246,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC11DEN("C"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age => 0");
+        "");
 
     dataSetDefinition.addColumn(
         "MQ11DEN4",
@@ -258,14 +258,14 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC11DEN("D"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age => 0");
+        "");
 
     dataSetDefinition.addColumn(
         "MQ11DEN5",
         "Crianças > 2 anos de idade em TARV com registo mensal de seguimento da adesão na ficha de APSS/PP nos primeiros 99 dias de TARV",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "MQ11DEN3",
+                "MQ11DEN5",
                 EptsReportUtils.map(
                     qualityImprovement2020CohortQueries.getMQC11DEN("E"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
@@ -284,17 +284,17 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "ageInMonths=<9m");
 
-     dataSetDefinition.addColumn(
-    "MQ11DEN7",
-    "Crianças (0-14 anos) na 1a linha de TARV com CV acima de 1000 cópias que tiveram 3 consultas mensais consecutivas de APSS/PP para reforço de adesão",
-    EptsReportUtils.map(
-        eptsGeneralIndicator.getIndicator(
-            "MQ11DEN7",
-            EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQC11DEN("G"),
-                "startDate=${startDate},endDate=${endDate},location=${location}")),
-        "startDate=${startDate},endDate=${endDate},location=${location}"),
-    "age=<15");
+    dataSetDefinition.addColumn(
+        "MQ11DEN7",
+        "Crianças (0-14 anos) na 1a linha de TARV com CV acima de 1000 cópias que tiveram 3 consultas mensais consecutivas de APSS/PP para reforço de adesão",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ11DEN7",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC11DEN("G"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=<15");
 
     return dataSetDefinition;
   }
