@@ -16,9 +16,12 @@ import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtSt
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.springframework.stereotype.Component;
 
+/**
+ * - FIRST consultation (Encounter_datetime (from encounter type 35)) > “ART Start Date” (oldest
+ * date from A)+20days and <= “ART Start Date” (oldest date from A)+33days
+ */
 @Component
-public class EncounterAfterOldestARTStartDateCalculation
-    extends AbstractPatientCalculation {
+public class EncounterAfterOldestARTStartDateCalculation extends AbstractPatientCalculation {
   @Override
   public CalculationResultMap evaluate(
       Collection<Integer> cohort,

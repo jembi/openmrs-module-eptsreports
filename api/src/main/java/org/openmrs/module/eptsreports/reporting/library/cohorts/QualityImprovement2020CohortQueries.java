@@ -762,14 +762,12 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-  private <T extends AbstractPatientCalculation> CohortDefinition getApssConsultationAfterARTstartDateOrAfterApssConsultation(
-      int lowerBoundary, int upperBoundary, Class<T> clazz) {
+  private <T extends AbstractPatientCalculation>
+      CohortDefinition getApssConsultationAfterARTstartDateOrAfterApssConsultation(
+          int lowerBoundary, int upperBoundary, Class<T> clazz) {
 
     CalculationCohortDefinition cd =
-        new CalculationCohortDefinition(
-            Context.getRegisteredComponents(
-                    clazz)
-                .get(0));
+        new CalculationCohortDefinition(Context.getRegisteredComponents(clazz).get(0));
     cd.setName("APSS consultation after ART start date");
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
@@ -778,10 +776,26 @@ public class QualityImprovement2020CohortQueries {
     cd.addCalculationParameter("lowerBoundary", lowerBoundary);
     cd.addCalculationParameter("upperBoundary", upperBoundary);
 
-
     return cd;
   }
 
+  /**
+   * G: Select all patients who have 3 APSS&PP(encounter type 35) consultation in 99 days after
+   * Starting ART(The oldest date from A) as following the conditions:
+   *
+   * <ul>
+   *   <li>G1 - FIRST consultation (Encounter_datetime (from encounter type 35)) > “ART Start Date”
+   *       (oldest date from A)+20days and <= “ART Start Date” (oldest date from A)+33days AND
+   *   <li>G2 - At least one consultation (Encounter_datetime (from encounter type 35)) registered
+   *       during the period between “1st Consultation Date(from G1)+20days” and “1st Consultation
+   *       Date(from G1)+33days” AND
+   *   <li>G3 - At least one consultation (Encounter_datetime (from encounter type 35)) registered
+   *       during the period between “2nd Consultation Date(from G2, the oldest)+20days” and “2nd
+   *       Consultation Date(from G2, the oldest)+33days” AND
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMQC11NG() {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -790,11 +804,17 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition firstApss = getApssConsultationAfterARTstartDateOrAfterApssConsultation(20, 33,EncounterAfterOldestARTStartDateCalculation.class);
+    CohortDefinition firstApss =
+        getApssConsultationAfterARTstartDateOrAfterApssConsultation(
+            20, 33, EncounterAfterOldestARTStartDateCalculation.class);
 
-    CohortDefinition secondApss = getApssConsultationAfterARTstartDateOrAfterApssConsultation(20, 33, SecondFollowingEncounterAfterOldestARTStartDateCalculation.class);
+    CohortDefinition secondApss =
+        getApssConsultationAfterARTstartDateOrAfterApssConsultation(
+            20, 33, SecondFollowingEncounterAfterOldestARTStartDateCalculation.class);
 
-    CohortDefinition thirdApss = getApssConsultationAfterARTstartDateOrAfterApssConsultation(20, 33, ThirdFollowingEncounterAfterOldestARTStartDateCalculation.class);
+    CohortDefinition thirdApss =
+        getApssConsultationAfterARTstartDateOrAfterApssConsultation(
+            20, 33, ThirdFollowingEncounterAfterOldestARTStartDateCalculation.class);
 
     compositionCohortDefinition.addSearch(
         "firstApss", EptsReportUtils.map(firstApss, "onOrBefore=${endDate},location=${location}"));
@@ -988,6 +1008,23 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * H: Select all patients who have 3 APSS&PP (encounter type 35) consultation in 66 days after
+   * Viral Load result (the oldest date from B2) following the conditions:
+   *
+   * <ul>
+   *   <li>H1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date when
+   *       the Viral Load with >1000 result was recorded (oldest date from B2) AND
+   *   <li>H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st
+   *       consultation” (oldest date from H1)+20 days and <=“1st consultation” (oldest date from
+   *       H1)+33days AND
+   *   <li>H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd
+   *       consultation” (oldest date from H2)+20 days and <=“2nd consultation” (oldest date from
+   *       H2)+33days AND
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMQC11NH() {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -1012,16 +1049,31 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-
-
-  public   CohortDefinition getMQC11NI() {
+  /**
+   * I: Select all patients who have monthly APSS&PP(encounter type 35) consultation (until the end
+   * of the revision period) after Starting ART(The oldest date from A) as following pseudo-code:
+   *
+   * <p>Start pseudo-code:
+   *
+   * <ul>
+   *   <li>For ( i=0; i<(days between “ART Start Date” and endDateRevision; i++)
+   *       <ul>
+   *         <li>Existence of consultation (Encounter_datetime (from encounter type 35)) > [“ART
+   *             Start Date” (oldest date from A)+i] and <= “ART Start Date” (oldest date from
+   *             A)+i+33days
+   *         <li>i= i+33days
+   *       </ul>
+   *   <li>End pseudo-code.
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQC11NI() {
 
     CalculationCohortDefinition cd =
-            new CalculationCohortDefinition(
-                    Context.getRegisteredComponents(
-                            ConsultationUntilEndDateAfterStartingART.class)
-                            .get(0));
-    cd.setName(" Interval  of APSS consultations after ART start date");
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(ConsultationUntilEndDateAfterStartingART.class).get(0));
+    cd.setName("Interval of 33 Daus for APSS consultations after ART start date");
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addCalculationParameter("considerTransferredIn", false);

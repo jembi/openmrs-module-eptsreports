@@ -13,8 +13,7 @@ import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.EncounterAfterOldestARTStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.intergrated.calculation.BasePatientCalculationTest;
 
-public class EncounterAfterOldestARTStartDateCalculationTest
-    extends BasePatientCalculationTest {
+public class EncounterAfterOldestARTStartDateCalculationTest extends BasePatientCalculationTest {
 
   @Before
   public void init() throws Exception {
@@ -23,8 +22,7 @@ public class EncounterAfterOldestARTStartDateCalculationTest
 
   @Override
   public PatientCalculation getCalculation() {
-    return Context.getRegisteredComponents(
-            EncounterAfterOldestARTStartDateCalculation.class)
+    return Context.getRegisteredComponents(EncounterAfterOldestARTStartDateCalculation.class)
         .get(0);
   }
 

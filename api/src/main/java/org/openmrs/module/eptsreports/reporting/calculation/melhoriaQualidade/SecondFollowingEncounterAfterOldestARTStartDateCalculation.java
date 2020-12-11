@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade;
 
+import java.util.*;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -12,12 +13,14 @@ import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
-import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-
+/**
+ * At least one consultation (Encounter_datetime (from encounter type 35)) registered during the
+ * period between “1st Consultation Date(from G1)+20days” and “1st Consultation Date(from
+ * G1)+33days”
+ */
 @Component
 public class SecondFollowingEncounterAfterOldestARTStartDateCalculation
     extends AbstractPatientCalculation {
@@ -57,25 +60,26 @@ public class SecondFollowingEncounterAfterOldestARTStartDateCalculation
 
     for (Integer patientId : cohort) {
 
-      CalculationResult calculationResult =  previousApssEncountersMap.get(patientId);
-      if(calculationResult!=null){
-      Date previousApssEncounter = (Date) calculationResult.getValue();
+      CalculationResult calculationResult = previousApssEncountersMap.get(patientId);
+      if (calculationResult != null) {
+        Date previousApssEncounter = (Date) calculationResult.getValue();
 
-      ListResult listResult = (ListResult) apssEncountersMap.get(patientId);
-      List<Encounter> appEncounters = EptsCalculationUtils.extractResultValues(listResult);
+        ListResult listResult = (ListResult) apssEncountersMap.get(patientId);
+        List<Encounter> appEncounters = EptsCalculationUtils.extractResultValues(listResult);
 
-      if (previousApssEncounter != null) {
+        if (previousApssEncounter != null) {
 
-        Date lower = EptsCalculationUtils.addDays(previousApssEncounter, lowerBoundary);
+          Date lower = EptsCalculationUtils.addDays(previousApssEncounter, lowerBoundary);
 
-        Date upper = EptsCalculationUtils.addDays(previousApssEncounter, upperBoundary);
+          Date upper = EptsCalculationUtils.addDays(previousApssEncounter, upperBoundary);
 
-        Date date = evaluateConsultation(appEncounters, lower, upper);
+          Date date = evaluateConsultation(appEncounters, lower, upper);
 
-        if (date != null) {
-          calculationResultMap.put(patientId, new SimpleResult(date, this));
+          if (date != null) {
+            calculationResultMap.put(patientId, new SimpleResult(date, this));
+          }
         }
-      }}
+      }
     }
     return calculationResultMap;
   }
