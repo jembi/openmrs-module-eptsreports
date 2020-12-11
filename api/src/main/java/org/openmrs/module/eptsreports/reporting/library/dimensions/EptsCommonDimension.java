@@ -368,4 +368,16 @@ public class EptsCommonDimension {
     dim.addCohortDefinition("NPNBNTB", mapStraightThrough(inverse));
     return dim;
   }
+
+  /** Dimension for Age in months */
+  public CohortDefinitionDimension ageInMonths() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Patients having age in months");
+    dim.addParameter(new Parameter("effectiveDate", "End Date", Date.class));
+    dim.addCohortDefinition(
+        "<9m",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeInMonths(0, 8), "effectiveDate=${effectiveDate}"));
+    return dim;
+  }
 }
