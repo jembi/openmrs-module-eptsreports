@@ -434,15 +434,17 @@ public class QualityImprovement2020CohortQueries {
 
   /*
    *
-   * All  patients ll patients with a clinical consultation(encounter type 6) during 
+   * All  patients ll patients with a clinical consultation(encounter type 6) during
    * the Revision period with the following conditions:
+   *
    * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
    * Encounter_datetime between startDateRevision and endDateRevision and:
-   *  - Encounter_datetime(from the last colinical consultation with 
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)) 
-   * MINUS 
-   * - Encounter_datetime (from the colinical consultation with 
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)) 
+   *
+   *  - Encounter_datetime(from the last colinical consultation with
+   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267))
+   * MINUS
+   * - Encounter_datetime (from the colinical consultation with
+   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267))
    * between 6 months and 9 months
    *
    */
@@ -462,42 +464,42 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         " SELECT  "
-        + " p.person_id  "
-        + " FROM  "
-        + " person p  "
-        + "     INNER JOIN  "
-        + " encounter e ON p.person_id = e.patient_id  "
-        + "     INNER JOIN  "
-        + " obs o ON e.encounter_id = o.encounter_id  "
-        + "     INNER JOIN  "
-        + " (SELECT   "
-        + "     p.person_id, MAX(e.encounter_datetime) AS encounter  "
-        + " FROM  "
-        + "     person p  "
-        + " INNER JOIN encounter e ON p.person_id = e.patient_id  "
-        + " INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
-        + " WHERE  "
-        + "     e.location_id = :location  "
-        + "         AND e.encounter_type = ${6}  "
-        + "         AND o.concept_id = ${6122}  "
-        + "         AND o.value_coded IN (${1256})  "
-        + "         AND e.encounter_datetime >= :startDate  "
-        + "         AND e.encounter_datetime <= :endDate  "
-        + "         AND p.voided = 0  "
-        + "         AND e.voided = 0  "
-        + "         AND o.voided = 0  "
-        + " GROUP BY p.person_id) AS last ON p.person_id = last.person_id  "
-        + " WHERE  "
-        + " e.location_id = :location  "
-        + " AND e.encounter_type = ${6}  "
-        + " AND o.concept_id = ${6122}  "
-        + " AND o.value_coded IN (${1267})  "
-        + " AND e.encounter_datetime >= :startDate  "
-        + " AND e.encounter_datetime <= :endDate  "
-        + " AND DATEDIFF(DATE(last.encounter),DATE(e.encounter_datetime)) between 180 and 270  "
-        + " AND p.voided = 0  "
-        + " AND e.voided = 0  "
-        + " AND o.voided = 0; ";
+            + " p.person_id  "
+            + " FROM  "
+            + " person p  "
+            + "     INNER JOIN  "
+            + " encounter e ON p.person_id = e.patient_id  "
+            + "     INNER JOIN  "
+            + " obs o ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN  "
+            + " (SELECT   "
+            + "     p.person_id, MAX(e.encounter_datetime) AS encounter  "
+            + " FROM  "
+            + "     person p  "
+            + " INNER JOIN encounter e ON p.person_id = e.patient_id  "
+            + " INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + " WHERE  "
+            + "     e.location_id = :location  "
+            + "         AND e.encounter_type = ${6}  "
+            + "         AND o.concept_id = ${6122}  "
+            + "         AND o.value_coded IN (${1256})  "
+            + "         AND e.encounter_datetime >= :startDate  "
+            + "         AND e.encounter_datetime <= :endDate  "
+            + "         AND p.voided = 0  "
+            + "         AND e.voided = 0  "
+            + "         AND o.voided = 0  "
+            + " GROUP BY p.person_id) AS last ON p.person_id = last.person_id  "
+            + " WHERE  "
+            + " e.location_id = :location  "
+            + " AND e.encounter_type = ${6}  "
+            + " AND o.concept_id = ${6122}  "
+            + " AND o.value_coded IN (${1267})  "
+            + " AND e.encounter_datetime >= :startDate  "
+            + " AND e.encounter_datetime <= :endDate  "
+            + " AND DATEDIFF(DATE(last.encounter),DATE(e.encounter_datetime)) between 180 and 270  "
+            + " AND p.voided = 0  "
+            + " AND e.voided = 0  "
+            + " AND o.voided = 0; ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -506,19 +508,20 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-
   /*
    *
-   * All  patients ll patients with a clinical consultation(encounter type 6) during 
+   * All  patients ll patients with a clinical consultation(encounter type 6) during
    * the Revision period with the following conditions:
+   *
    * - with “Diagnótico TB activo” (concept_id 23761) value coded “SIM”(concept id 1065)
    * Encounter_datetime between:
-   *  - Encounter_datetime (from the last colinical consultation with 
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) 
-   * AND 
-   * - Encounter_datetime (from the last colinical consultation with 
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) 
-   * PLUS 
+   *
+   *  - Encounter_datetime (from the last colinical consultation with
+   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256))
+   * AND
+   * - Encounter_datetime (from the last colinical consultation with
+   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256))
+   * PLUS
    * 9 MONTHS
    *
    */
@@ -539,41 +542,41 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "  SELECT "
-    + "     p.person_id "
-    + " FROM "
-    + "     person p "
-    + "         INNER JOIN "
-    + "     encounter e ON p.person_id = e.patient_id "
-    + "         INNER JOIN "
-    + "     obs o ON e.encounter_id = o.encounter_id "
-    + "     INNER JOIN (SELECT  "
-    + "         p.person_id, MAX(e.encounter_datetime) AS encounter "
-    + "     FROM "
-    + "         person p "
-    + "     INNER JOIN encounter e ON p.person_id = e.patient_id "
-    + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-    + "     WHERE "
-    + "         e.location_id = :location "
-    + "             AND e.encounter_type = ${6} "
-    + "             AND o.concept_id = ${6122} "
-    + "             AND o.value_coded IN (${1256}) "
-    + "             AND e.encounter_datetime >= :startDate "
-    + "             AND e.encounter_datetime <= :endDate "
-    + "             AND p.voided = 0 "
-    + "             AND e.voided = 0 "
-    + "             AND o.voided = 0 "
-    + "     GROUP BY p.person_id) AS last ON p.person_id = last.person_id "
-    + " WHERE "
-    + "     e.location_id = :location "
-    + "         AND e.encounter_type = ${6} "
-    + "         AND o.concept_id = ${23761} "
-    + "         AND o.value_coded IN (${1065}) "
-    + "         AND e.encounter_datetime >= :startDate "
-    + "         AND e.encounter_datetime <= :endDate "
-    + "         AND e.encounter_datetime BETWEEN last.encounter AND DATE_ADD(last.encounter, INTERVAL 9 MONTH) "
-    + "         AND p.voided = 0 "
-    + "         AND e.voided = 0 "
-    + "         AND o.voided = 0; ";
+            + "     p.person_id "
+            + " FROM "
+            + "     person p "
+            + "         INNER JOIN "
+            + "     encounter e ON p.person_id = e.patient_id "
+            + "         INNER JOIN "
+            + "     obs o ON e.encounter_id = o.encounter_id "
+            + "     INNER JOIN (SELECT  "
+            + "         p.person_id, MAX(e.encounter_datetime) AS encounter "
+            + "     FROM "
+            + "         person p "
+            + "     INNER JOIN encounter e ON p.person_id = e.patient_id "
+            + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "     WHERE "
+            + "         e.location_id = :location "
+            + "             AND e.encounter_type = ${6} "
+            + "             AND o.concept_id = ${6122} "
+            + "             AND o.value_coded IN (${1256}) "
+            + "             AND e.encounter_datetime >= :startDate "
+            + "             AND e.encounter_datetime <= :endDate "
+            + "             AND p.voided = 0 "
+            + "             AND e.voided = 0 "
+            + "             AND o.voided = 0 "
+            + "     GROUP BY p.person_id) AS last ON p.person_id = last.person_id "
+            + " WHERE "
+            + "     e.location_id = :location "
+            + "         AND e.encounter_type = ${6} "
+            + "         AND o.concept_id = ${23761} "
+            + "         AND o.value_coded IN (${1065}) "
+            + "         AND e.encounter_datetime >= :startDate "
+            + "         AND e.encounter_datetime <= :endDate "
+            + "         AND e.encounter_datetime BETWEEN last.encounter AND DATE_ADD(last.encounter, INTERVAL 9 MONTH) "
+            + "         AND p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND o.voided = 0; ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -584,16 +587,18 @@ public class QualityImprovement2020CohortQueries {
 
   /*
    *
-   * All  patients ll patients with a clinical consultation(encounter type 6) during 
+   * All  patients ll patients with a clinical consultation(encounter type 6) during
    * the Revision period with the following conditions:
-   * - with “Diagnótico TB activo” (concept_id 23761) value coded “SIM”(concept id 1065)
+   *
+   * -  “TEM SINTOMAS DE TB” (concept_id 23758) value coded “SIM” or “NÃO”(concept_id IN [1065, 1066]) and
    * Encounter_datetime between:
-   *  - Encounter_datetime (from the last colinical consultation with 
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) 
-   * AND 
-   * - Encounter_datetime (from the last colinical consultation with 
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) 
-   * PLUS 
+   *
+   *  - Encounter_datetime (from the last colinical consultation with
+   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256))
+   * AND
+   * - Encounter_datetime (from the last colinical consultation with
+   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256))
+   * PLUS
    * 9 MONTHS
    *
    */
@@ -615,41 +620,118 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "  SELECT "
-    + "     p.person_id "
-    + " FROM "
-    + "     person p "
-    + "         INNER JOIN "
-    + "     encounter e ON p.person_id = e.patient_id "
-    + "         INNER JOIN "
-    + "     obs o ON e.encounter_id = o.encounter_id "
-    + "     INNER JOIN (SELECT  "
-    + "         p.person_id, MAX(e.encounter_datetime) AS encounter "
-    + "     FROM "
-    + "         person p "
-    + "     INNER JOIN encounter e ON p.person_id = e.patient_id "
-    + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-    + "     WHERE "
-    + "         e.location_id = :location "
-    + "             AND e.encounter_type = ${6} "
-    + "             AND o.concept_id = ${6122} "
-    + "             AND o.value_coded IN (${1256}) "
-    + "             AND e.encounter_datetime >= :startDate "
-    + "             AND e.encounter_datetime <= :endDate "
-    + "             AND p.voided = 0 "
-    + "             AND e.voided = 0 "
-    + "             AND o.voided = 0 "
-    + "     GROUP BY p.person_id) AS last ON p.person_id = last.person_id "
-    + " WHERE "
-    + "     e.location_id = :location "
-    + "         AND e.encounter_type = ${6} "
-    + "         AND o.concept_id = ${23758} "
-    + "         AND o.value_coded IN (${1065},${1066}) "
-    + "         AND e.encounter_datetime >= :startDate "
-    + "         AND e.encounter_datetime <= :endDate "
-    + "         AND e.encounter_datetime BETWEEN last.encounter AND DATE_ADD(last.encounter, INTERVAL 9 MONTH) "
-    + "         AND p.voided = 0 "
-    + "         AND e.voided = 0 "
-    + "         AND o.voided = 0;";
+            + "     p.person_id "
+            + " FROM "
+            + "     person p "
+            + "         INNER JOIN "
+            + "     encounter e ON p.person_id = e.patient_id "
+            + "         INNER JOIN "
+            + "     obs o ON e.encounter_id = o.encounter_id "
+            + "     INNER JOIN (SELECT  "
+            + "         p.person_id, MAX(e.encounter_datetime) AS encounter "
+            + "     FROM "
+            + "         person p "
+            + "     INNER JOIN encounter e ON p.person_id = e.patient_id "
+            + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "     WHERE "
+            + "         e.location_id = :location "
+            + "             AND e.encounter_type = ${6} "
+            + "             AND o.concept_id = ${6122} "
+            + "             AND o.value_coded IN (${1256}) "
+            + "             AND e.encounter_datetime >= :startDate "
+            + "             AND e.encounter_datetime <= :endDate "
+            + "             AND p.voided = 0 "
+            + "             AND e.voided = 0 "
+            + "             AND o.voided = 0 "
+            + "     GROUP BY p.person_id) AS last ON p.person_id = last.person_id "
+            + " WHERE "
+            + "     e.location_id = :location "
+            + "         AND e.encounter_type = ${6} "
+            + "         AND o.concept_id = ${23758} "
+            + "         AND o.value_coded IN (${1065},${1066}) "
+            + "         AND e.encounter_datetime >= :startDate "
+            + "         AND e.encounter_datetime <= :endDate "
+            + "         AND e.encounter_datetime BETWEEN last.encounter AND DATE_ADD(last.encounter, INTERVAL 9 MONTH) "
+            + "         AND p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND o.voided = 0;";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /*
+   *
+   * All  patients ll patients with a clinical consultation(encounter type 6) during
+   * the Revision period with the following conditions:
+   *
+   * -  “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or
+   * “Fim”(concept_id IN [1256, 1257, 1267]) “Data Tratamento TB” (obs datetime 1268) between:
+   *
+   *  - Encounter_datetime (from the last colinical consultation with
+   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256))
+   * AND
+   * - Encounter_datetime (from the last colinical consultation with
+   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256))
+   * PLUS
+   * 9 MONTHS
+   *
+   */
+  public CohortDefinition getPatientsWithTBTreatment() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with TB Diagnosis Active");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
+    map.put("1268", tbMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+
+    String query =
+        " SELECT  "
+            + "     p.person_id  "
+            + " FROM  "
+            + "     person p  "
+            + "         INNER JOIN  "
+            + "     encounter e ON p.person_id = e.patient_id  "
+            + "         INNER JOIN  "
+            + "     obs o ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN (SELECT   "
+            + "         p.person_id, MAX(e.encounter_datetime) AS encounter  "
+            + "     FROM  "
+            + "         person p  "
+            + "     INNER JOIN encounter e ON p.person_id = e.patient_id  "
+            + "     INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "     WHERE  "
+            + "         e.location_id = :location  "
+            + "             AND e.encounter_type = ${6}  "
+            + "             AND o.concept_id = ${6122}  "
+            + "             AND o.value_coded IN (${1256})  "
+            + "             AND e.encounter_datetime >= :startDate  "
+            + "             AND e.encounter_datetime <= :endDate  "
+            + "             AND p.voided = 0  "
+            + "             AND e.voided = 0  "
+            + "             AND o.voided = 0  "
+            + "     GROUP BY p.person_id) AS last ON last.person_id = p.person_id  "
+            + " WHERE  "
+            + "     e.location_id = :location  "
+            + "         AND e.encounter_type = ${6}  "
+            + "         AND o.concept_id = ${1268}  "
+            + "         AND o.value_coded IN (${1256} , ${1257}, ${1267})  "
+            + "         AND e.encounter_datetime >= :startDate  "
+            + "         AND e.encounter_datetime <= :endDate  "
+            + "         AND DATE(o.obs_datetime) between DATE(last.encounter) AND DATE(DATE_ADD(last.encounter, INTERVAL 9 MONTH))  "
+            + "         AND p.voided = 0  "
+            + "         AND e.voided = 0  "
+            + "         AND o.voided = 0;";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1180,7 +1262,6 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-
   /**
    * <b>MQ7</b>: Melhoria de Qualidade Category 7 <br>
    * <i> DENOMINATOR 1: A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
@@ -1191,57 +1272,51 @@ public class QualityImprovement2020CohortQueries {
    * <i> DENOMINATOR 6: (A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)</i> <br>
    *
    * <ul>
-   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
-   *       and endDateInclusion)
-   *   <li>
-   *   <li>B1 - Filter all patients with a clinical consultation(encounter type 6) with “Diagnótico
-   *       TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
-   *       Encounter_datetime between startDateInclusion and endDateRevision
-   *   <li>
-   *   <li>
-   *   <li>B2 - Filter all patients with a clinical consultation(encounter type 6) with “TEM
-   *       SINTOMAS DE TB” (concept_id 23758) value coded “SIM” (concept_id 1065) and
-   *       Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>G - Filter all patients with the last clinical consultation(encounter type 6) with
+   *       “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
+   *       Encounter_datetime between startDateRevision and endDateRevision and
+   *       Encounter_datetime(the most recent from B4) minus Encounter_datetime(the most recent from
+   *       G) between 6 months and 9 months
    *   <li>
    *   <li>
-   *   <li>B3 - Filter all patients with a clinical consultation(encounter type 6) with “TRATAMENTO
-   *       DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or “Fim” (concept_id
-   *       IN [1256, 1257, 1267]) Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>H - Filter all patients with a clinical consultation(encounter type 6) with “Diagnótico
+   *       TB activo” (concept_id 23761) value coded “SIM”(concept id 1065) during the treatment
+   *       period: Encounter_datetime between Encounter_datetime(the most recent from B4) and
+   *       Encounter_datetime(the most recent from B4) + 9 months
    *   <li>
    *   <li>
-   *   <li>B4 - Filter all patients with a clinical consultation(encounter type 6) with “PROFILAXIA
-   *       COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)
-   *       Encounter_datetime between startDateInclusion and endDateInclusion
+   *   <li>I - Filter all patients with a clinical consultation(encounter type 6) during the
+   *       Inclusion period with the following conditions: “TEM SINTOMAS DE TB” (concept_id 23758)
+   *       value coded “SIM” or “NÃO”(concept_id IN [1065, 1066]) and Encounter_datetime between
+   *       Encounter_datetime(the most recent from B4) and Encounter_datetime(the most recent from
+   *       B4) + 9 months
    *   <li>
-   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
-   *       inclusion period (startDateInclusion and endDateInclusion)
    *   <li>
-   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
-   *       the inclusion period (startDateInclusion and endDateInclusion)
-   *   <li>
-   *   <li>E - All transferred IN patients during the inclusion period
-   *   <li>
-   *   <li>F - Filter all patients with the last clinical consultation(encounter type 6) with
-   *       “Diagnótico TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
-   *       Encounter_datetime between startDateInclusion and endDateRevision
+   *   <li>J - Filter all patients with a clinical consultation(encounter type 6) during the
+   *       Inclusion period with the following conditions: “TRATAMENTO DE TUBERCULOSE”(concept_id
+   *       1268) value coded “Inicio” or “Continua” or “Fim”(concept_id IN [1256, 1257, 1267]) “Data
+   *       Tratamento TB” (obs datetime 1268) between Encounter_datetime(the most recent from B4)
+   *       and Encounter_datetime(the most recent from B4) + 9 months
    *   <li>
    * </ul>
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ7B(Integer den) {
+  public CohortDefinition getMQ7B(Integer num) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    if (den == 1 || den == 3) {
-      compositionCohortDefinition.setName("A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
-    } else if (den == 2 || den == 4) {
+    if (num == 1 || num == 3) {
       compositionCohortDefinition.setName(
           "(A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
-    } else if (den == 5) {
-      compositionCohortDefinition.setName("(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
-    } else if (den == 6) {
+    } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setName(
-          "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND B4 AND G) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
+    } else if (num == 5) {
+      compositionCohortDefinition.setName(
+          "(A AND C AND B4) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+    } else if (num == 6) {
+      compositionCohortDefinition.setName(
+          "(A AND B4 AND C AND G) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -1341,7 +1416,13 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom(),
             Collections.singletonList(hivMetadata.getArtStatus()));
 
-    // CohortDefinition 
+    CohortDefinition tbProphylaxyOnPeriod = getPatientsWithProphylaxyDuringRevisionPeriod();
+
+    CohortDefinition tbDiagOnPeriod = getPatientsWithTBDiagActive();
+
+    CohortDefinition tbSymptomsOnPeriod = getPatientsWithTBSymtoms();
+
+    CohortDefinition tbTreatmentOnPeriod = getPatientsWithTBTreatment();
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -1361,18 +1442,26 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));
 
-    if (den == 1 || den == 3) {
-      compositionCohortDefinition.setCompositionString(
-          "A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
-    } else if (den == 2 || den == 4) {
+    compositionCohortDefinition.addSearch("G", EptsReportUtils.map(tbProphylaxyOnPeriod, MAPPING));
+
+    compositionCohortDefinition.addSearch("H", EptsReportUtils.map(tbDiagOnPeriod, MAPPING));
+
+    compositionCohortDefinition.addSearch("I", EptsReportUtils.map(tbSymptomsOnPeriod, MAPPING));
+
+    compositionCohortDefinition.addSearch("J", EptsReportUtils.map(tbTreatmentOnPeriod, MAPPING));
+
+    if (num == 1 || num == 3) {
       compositionCohortDefinition.setCompositionString(
           "(A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
-    } else if (den == 5) {
+    } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
-    } else if (den == 6) {
+          "(A AND B4 AND G) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
+    } else if (num == 5) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND C AND B4) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+    } else if (num == 6) {
+      compositionCohortDefinition.setCompositionString(
+          "(A AND B4 AND C AND G) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
     }
     return compositionCohortDefinition;
   }
