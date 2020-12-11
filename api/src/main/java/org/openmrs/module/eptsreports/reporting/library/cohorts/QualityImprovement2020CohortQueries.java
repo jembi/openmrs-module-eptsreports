@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -1073,7 +1075,7 @@ public class QualityImprovement2020CohortQueries {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(ConsultationUntilEndDateAfterStartingART.class).get(0));
-    cd.setName("Interval of 33 Daus for APSS consultations after ART start date");
+    cd.setName("Categoru 11 - numerator - Session I - Interval of 33 Daus for APSS consultations after ART start date");
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addCalculationParameter("considerTransferredIn", false);
@@ -1081,4 +1083,288 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  /**
+   *<p>
+   *     11.1. % de adultos em TARV com o mínimo de 3 consultas de seguimento de adesão na FM-ficha de APSS/PP nos primeiros 3 meses após início do TARV (Line 56 in the template) Numerador (Column D in the Template) as following:
+   *</p>
+   * <code>A and NOT C and NOT D and NOT E and NOT F  AND G and Age > 14*</code>
+   */
+  public  CohortDefinition getMQC11NumAnotCnotDnotEnotFandGAdultss(){
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("Category 11 : Numeraror 11.1 ");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate","startDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate","endDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location","location",Location.class));
+
+    CohortDefinition a = null;
+    CohortDefinition c = null;
+    CohortDefinition d = null;
+    CohortDefinition e = null;
+    CohortDefinition f = null;
+    CohortDefinition g = getMQC11NG();
+    CohortDefinition adults =  genericCohortQueries.getAgeOnArtStartDate(15, 200, true);
+
+    compositionCohortDefinition.addSearch("A",EptsReportUtils.map(a,""));
+    compositionCohortDefinition.addSearch("C",EptsReportUtils.map(c,""));
+    compositionCohortDefinition.addSearch("D",EptsReportUtils.map(d,""));
+
+    compositionCohortDefinition.addSearch("E",EptsReportUtils.map(e,""));
+    compositionCohortDefinition.addSearch("F",EptsReportUtils.map(f,""));
+    compositionCohortDefinition.addSearch("G",EptsReportUtils.map(g,""));
+    compositionCohortDefinition.addSearch("ADULTS",EptsReportUtils.map(adults,""));
+
+    compositionCohortDefinition.setCompositionString("A AND NOT C AND NOT D AND NOT E AND NOT F  AND G AND ADULTS");
+
+    return  compositionCohortDefinition;
+
+  }
+
+  /**
+   *<p>
+   *     11.2. % de pacientes na 1a linha de TARV com CV acima de 1000 cópias que tiveram 3 consultas de APSS/PP mensais consecutivas para reforço de adesão (Line 57 in the template) Numerador (Column D in the Template) as following:
+   *</p>
+   * <code>B1 and B2 and NOT C and NOT D and NOT E and NOT F AND H and  Age > 14*</code>
+   */
+  public  CohortDefinition getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(){
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("Category 11 : Numeraror 11.2 ");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate","startDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate","endDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location","location",Location.class));
+
+    CohortDefinition b1 = null;
+    CohortDefinition b2 = null;
+    CohortDefinition c = null;
+    CohortDefinition d = null;
+    CohortDefinition e = null;
+    CohortDefinition f = null;
+    CohortDefinition h = getMQC11NH();
+    CohortDefinition adults =  genericCohortQueries.getAgeOnArtStartDate(15, 200, true);
+
+    compositionCohortDefinition.addSearch("B1",EptsReportUtils.map(b1,""));
+    compositionCohortDefinition.addSearch("B2",EptsReportUtils.map(b2,""));
+    compositionCohortDefinition.addSearch("C",EptsReportUtils.map(c,""));
+
+    compositionCohortDefinition.addSearch("D",EptsReportUtils.map(d,""));
+    compositionCohortDefinition.addSearch("E",EptsReportUtils.map(e,""));
+    compositionCohortDefinition.addSearch("F",EptsReportUtils.map(f,""));
+    compositionCohortDefinition.addSearch("H",EptsReportUtils.map(h,""));
+
+    compositionCohortDefinition.addSearch("ADULTS",EptsReportUtils.map(adults,""));
+
+    compositionCohortDefinition.setCompositionString("B1 AND B2 AND NOT C AND NOT D AND NOT E AND NOT F AND H AND  ADULTS");
+
+    return  compositionCohortDefinition;
+
+  }
+
+  /**
+   * <p>11.3.% de MG em TARV com o mínimo de 3 consultas de seguimento de adesão na FM-ficha de APSS/PP nos primeiros 3 meses após início do TARV (Line 58 in the template) Numerador (Column D in the Template) as following:</p>
+   * <code> A and B3 and  C and NOT D and NOT E and NOT F  AND G </code>
+   */
+
+  public  CohortDefinition getMQC11NumAnB3nCnotDnotEnotEnotFnG(){
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("Category 11 : Numeraror 11.3");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate","startDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate","endDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location","location",Location.class));
+
+    CohortDefinition a = null;
+    CohortDefinition b3 = null;
+    CohortDefinition c = null;
+    CohortDefinition d = null;
+    CohortDefinition e = null;
+    CohortDefinition f = null;
+    CohortDefinition g = getMQC11NG();
+
+    compositionCohortDefinition.addSearch("A",EptsReportUtils.map(a,""));
+    compositionCohortDefinition.addSearch("B3",EptsReportUtils.map(b3,""));
+    compositionCohortDefinition.addSearch("C",EptsReportUtils.map(c,""));
+
+    compositionCohortDefinition.addSearch("D",EptsReportUtils.map(d,""));
+    compositionCohortDefinition.addSearch("E",EptsReportUtils.map(e,""));
+    compositionCohortDefinition.addSearch("F",EptsReportUtils.map(f,""));
+    compositionCohortDefinition.addSearch("G",EptsReportUtils.map(g,""));
+
+    compositionCohortDefinition.setCompositionString("A AND B3 AND  C AND NOT D AND NOT E AND NOT F  AND G");
+
+    return  compositionCohortDefinition;
+
+  }
+
+  /**
+   * <p>
+   *     11.4. % de MG na 1a linha de TARV com CV acima de 1000 cópias que tiveram 3 consultas de APSS/PP mensais consecutivas para reforço de adesão (Line 59 in the template) Numerador (Column D in the Template) as following:
+   * </p>
+   * <code> B1 and B2 and B3 and C and NOT D and NOT E and NOT F AND H </code>
+   */
+
+  public  CohortDefinition getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(){
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("Category 11 : Numeraror  11.4");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate","startDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate","endDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location","location",Location.class));
+
+    CohortDefinition b1 = null;
+    CohortDefinition b2 = null;
+    CohortDefinition b3 = null;
+    CohortDefinition c = null;
+    CohortDefinition d = null;
+    CohortDefinition e = null;
+    CohortDefinition f = null;
+    CohortDefinition h = getMQC11NH();
+
+
+    compositionCohortDefinition.addSearch("B1",EptsReportUtils.map(b1,""));
+    compositionCohortDefinition.addSearch("B2",EptsReportUtils.map(b2,""));
+    compositionCohortDefinition.addSearch("B3",EptsReportUtils.map(b3,""));
+    compositionCohortDefinition.addSearch("C",EptsReportUtils.map(c,""));
+    compositionCohortDefinition.addSearch("D",EptsReportUtils.map(d,""));
+    compositionCohortDefinition.addSearch("E",EptsReportUtils.map(e,""));
+    compositionCohortDefinition.addSearch("F",EptsReportUtils.map(f,""));
+    compositionCohortDefinition.addSearch("H",EptsReportUtils.map(h,""));
+
+
+    compositionCohortDefinition.setCompositionString("B1 AND B2 AND B3 AND C AND NOT D AND NOT E AND NOT F AND H");
+
+    return  compositionCohortDefinition;
+
+  }
+
+  /**
+   *
+   * <p>
+   *     11.5. % de crianças >2 anos de idade em TARV com registo mensal de seguimento da adesão na ficha de APSS/PP nos primeiros 99 dias de TARV (Line 60 in the template) Numerador (Column D in the Template) as following:
+   * </p>
+   * <code>A and NOT C and NOT D and NOT E and NOT F  AND G and Age BETWEEN 2 AND 14*</code>
+   */
+
+  public  CohortDefinition getMQC11NumAnotCnotDnotEnotFnotGnChildren(){
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("Category 11 : Numeraror 11.5");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate","startDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate","endDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location","location",Location.class));
+
+    CohortDefinition a = null;
+    CohortDefinition c = null;
+    CohortDefinition d = null;
+    CohortDefinition e = null;
+    CohortDefinition f = null;
+    CohortDefinition g = null;
+    CohortDefinition children = genericCohortQueries.getAgeOnArtStartDate(2, 14, true);
+
+
+    compositionCohortDefinition.addSearch("A",EptsReportUtils.map(a,""));
+    compositionCohortDefinition.addSearch("C",EptsReportUtils.map(c,""));
+    compositionCohortDefinition.addSearch("D",EptsReportUtils.map(d,""));
+    compositionCohortDefinition.addSearch("E",EptsReportUtils.map(e,""));
+    compositionCohortDefinition.addSearch("F",EptsReportUtils.map(f,""));
+    compositionCohortDefinition.addSearch("G",EptsReportUtils.map(g,""));
+    compositionCohortDefinition.addSearch("CHILDREN",EptsReportUtils.map(children,""));
+
+
+    compositionCohortDefinition.setCompositionString("A AND NOT C AND NOT D AND NOT E AND NOT F  AND G AND CHILDREN");
+
+    return  compositionCohortDefinition;
+
+  }
+  /**
+   * <p>
+   *     11.6. % de crianças <2 anos de idade em TARV com registo mensal de seguimento da adesão na ficha de APSS/PP no primeiro ano de TARV (Line 61 in the template) Numerador (Column D in the Template) as following:
+   * </p>
+   * <code> A and NOT C and NOT D and NOT E and NOT F AND I  AND Age  <= 9 MONTHS</code>
+   *
+   */
+
+  public  CohortDefinition getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(){
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("Category 11 : Numeraror 11.6");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate","startDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate","endDate",Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location","location",Location.class));
+
+    CohortDefinition a = null;
+    CohortDefinition c = null;
+    CohortDefinition d = null;
+    CohortDefinition e = null;
+    CohortDefinition f = null;
+    CohortDefinition i = null;
+    CohortDefinition babies = null;
+
+
+    compositionCohortDefinition.addSearch("A",EptsReportUtils.map(a,""));
+    compositionCohortDefinition.addSearch("C",EptsReportUtils.map(c,""));
+    compositionCohortDefinition.addSearch("D",EptsReportUtils.map(d,""));
+    compositionCohortDefinition.addSearch("E",EptsReportUtils.map(e,""));
+    compositionCohortDefinition.addSearch("F",EptsReportUtils.map(f,""));
+    compositionCohortDefinition.addSearch("I",EptsReportUtils.map(i,""));
+    compositionCohortDefinition.addSearch("BABIES",EptsReportUtils.map(babies,""));
+
+
+    compositionCohortDefinition.setCompositionString("A and NOT C and NOT D and NOT E and NOT F AND I  AND BABIES");
+
+    return  compositionCohortDefinition;
+
+  }
+
+
+  /**
+   * <p>
+   *     11.7. % de crianças (0-14 anos) na 1a linha de TARV com CV acima de 1000 cópias que tiveram 3 consultas mensais consecutivas de APSS/PP para reforço de adesão(Line 62 in the template) Numerador (Column D in the Template) as following:
+   * </p>
+   * <code> B1 and B2 and  NOT C and NOT D and NOT E and NOT F  And H and  Age < 15**</code>
+   *
+   */
+
+  public  CohortDefinition getMQC11NumB1nB2notCnotDnotEnotFnHChildren() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("Category 11 : Numeraror 11.6");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition b1 = null;
+    CohortDefinition b2 = null;
+    CohortDefinition c = null;
+    CohortDefinition d = null;
+    CohortDefinition e = null;
+    CohortDefinition f = null;
+    CohortDefinition h = null;
+    CohortDefinition children = genericCohortQueries.getAgeOnArtStartDate(0, 14, true);
+    ;
+
+
+    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, ""));
+    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, ""));
+    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, ""));
+    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, ""));
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, ""));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, ""));
+    compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, ""));
+    compositionCohortDefinition.addSearch("CHILDREN", EptsReportUtils.map(children, ""));
+
+
+    compositionCohortDefinition.setCompositionString("B1 AND B2 AND  NOT C AND NOT D AND NOT E AND NOT F  AND H AND CHILDREN ");
+
+    return compositionCohortDefinition;
+  }
+
 }

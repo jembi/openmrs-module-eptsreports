@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade;
 import java.util.*;
 import org.joda.time.Days;
 import org.joda.time.Interval;
+import org.joda.time.Months;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
