@@ -139,7 +139,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "age=15+");
 
-    // Category 5 nominator indicators
+    // Category 5 numerator indicators
     dataSetDefinition.addColumn(
         "MQ5NOM1",
         "Crianças em TARV com desnutrição (DAM ou DAG) e  com registo de prescrição de suplementação ou tratamento nutricional",
@@ -286,13 +286,13 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
-        // Category 7 nominator indicators
+        // Category 7 numerator indicators
     dataSetDefinition.addColumn(
-        "MQ7NOM1",
+        "MQ7NUM1",
         "% de adultos HIV+ em TARV elegíveis ao TPT e que iniciaram TPT",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "MQ7NOM1",
+                "MQ7NUM1",
                 EptsReportUtils.map(
                     qualityImprovement2020CohortQueries.getMQ7B(1),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
