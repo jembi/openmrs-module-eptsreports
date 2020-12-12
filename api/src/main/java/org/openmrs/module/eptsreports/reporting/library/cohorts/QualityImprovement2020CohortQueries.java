@@ -1450,7 +1450,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
-    compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "G", EptsReportUtils.map(g, "endDate=${endDate},location=${location}"));
     compositionCohortDefinition.addSearch(
         "ADULTS",
         EptsReportUtils.map(
@@ -1591,7 +1592,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
-    compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "G", EptsReportUtils.map(g, "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
         "A AND B3 AND  C AND NOT D AND NOT E AND NOT F  AND G");
@@ -1722,7 +1724,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
-    compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "G", EptsReportUtils.map(g, "endDate=${endDate},location=${location}"));
     compositionCohortDefinition.addSearch(
         "CHILDREN",
         EptsReportUtils.map(
@@ -1789,7 +1792,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
-    compositionCohortDefinition.addSearch("I", EptsReportUtils.map(i, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "I", EptsReportUtils.map(i, "onOrBefore=${endDate},location=${location}"));
     compositionCohortDefinition.addSearch(
         "BABIES", EptsReportUtils.map(babies, "effectiveDate=${effectiveDate}"));
 
@@ -1850,9 +1854,8 @@ public class QualityImprovement2020CohortQueries {
             Collections.singletonList(hivMetadata.getArtStatus()));
 
     CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
-    CohortDefinition h = null;
+    CohortDefinition h = getMQC11NH();
     CohortDefinition children = genericCohortQueries.getAgeOnArtStartDate(0, 14, true);
-    ;
 
     compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING));
     compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING));
