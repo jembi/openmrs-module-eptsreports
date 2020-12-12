@@ -359,6 +359,30 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
+    dataSetDefinition.addColumn(
+            "MQ11NUM6",
+            "11.6. % de crianças <2 anos de idade em TARV com registo mensal de seguimento da adesão na ficha de APSS/PP no primeiro ano de TARV (Line 61 in the template) Numerador (Column D in the",
+            EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                            "MQ11NUM6",
+                            EptsReportUtils.map(
+                                    qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(),
+                                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "");
+
+    dataSetDefinition.addColumn(
+            "MQ11NUM7",
+            "11.7. % de crianças (0-14 anos) na 1a linha de TARV com CV acima de 1000 cópias que tiveram 3  consultas mensais consecutivas de APSS/PP para reforço de adesão",
+            EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                            "MQ11NUM7",
+                            EptsReportUtils.map(
+                                    qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(),
+                                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "");
+
     return dataSetDefinition;
   }
 
