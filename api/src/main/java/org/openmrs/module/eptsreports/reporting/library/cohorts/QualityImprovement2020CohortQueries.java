@@ -173,7 +173,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("MCC4D1 Patients");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("location", "location", Date.class));
 
     cd.addSearch(
         "A",
