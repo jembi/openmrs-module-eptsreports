@@ -1230,17 +1230,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom(),
             Collections.singletonList(hivMetadata.getArtStatus()));
 
-    // update to correct TransferOut query
-    CohortDefinition transferOut =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            true,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getTransferFromOtherFacilityConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            hivMetadata.getTypeOfPatientTransferredFrom(),
-            Collections.singletonList(hivMetadata.getArtStatus()));
+    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -1418,17 +1408,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom(),
             Collections.singletonList(hivMetadata.getArtStatus()));
 
-    // update to correct TransferOut query
-    CohortDefinition transferOut =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            true,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getTransferFromOtherFacilityConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            hivMetadata.getTypeOfPatientTransferredFrom(),
-            Collections.singletonList(hivMetadata.getArtStatus()));
+    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
     CohortDefinition tbProphylaxyOnPeriod = getPatientsWithProphylaxyDuringRevisionPeriod();
 
@@ -1600,7 +1580,7 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-   * <b>MQC11B1B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 and B2 <br>
+  /* <b>MQC11B1B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 and B2 <br>
    * <i> A and not B</i> <br>
    *
    * <ul>

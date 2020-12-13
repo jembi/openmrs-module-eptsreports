@@ -458,7 +458,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
-        // Category 7 numerator indicators
+    // Category 7 numerator indicators
     dataSetDefinition.addColumn(
         "MQ7NUM1",
         "% de adultos HIV+ em TARV elegíveis ao TPT e que iniciaram TPT",
