@@ -273,11 +273,11 @@ public class TxRttCohortQueries {
             txCurrCohortQueries.getPatientHavingLastScheduledDrugPickupDateDaysBeforeEndDate(
                 numDays)));
 
-    definition.addSearch("31 OR 32", mapStraightThrough(getSecondPartFromITT()));
+    definition.addSearch("32", mapStraightThrough(getSecondPartFromITT()));
 
     definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
-    definition.setCompositionString("  32");
+    definition.setCompositionString("31 OR 32");
 
     return definition;
   }
