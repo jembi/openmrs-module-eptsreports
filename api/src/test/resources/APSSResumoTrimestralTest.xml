@@ -236,6 +236,15 @@
                      property_value="be4a76ca-662a-4c39-903b-71983f5f67c9"
                      description="UUID for the Uso de Isoniazida concept" uuid="7a24b039-a3f2-4a53-bdf0-584011db4f42"/>
 
+					 <global_property property="eptsreports.apssPrevencaoPositivaSeguimentoEncounterTypeUuid"
+                     property_value="f4aa93fe-8737-4f70-9532-542b768459d7"
+                     description="UUID for the APSS: PREVENÇÃO POSITIVA - SEGUIMENTO" uuid="b30f277e-8d69-45e0-a4f1-053a433fe84e"/>
+
+					 <global_property property="eptsreports.memberShipPlanConcept"
+                     property_value="d05c1eec-0757-4efa-a26a-c77152ae3718"
+                     description="UUID for PLANO DE ADESÃO" uuid="b1382e34-3938-11eb-a98c-0242ac120002"/>
+
+
 
 
 	<global_property property="eptsreports.apssPrevencaoPositivaSeguimentoEncounterTypeUuid" property_value="f4aa93fe-8737-4f70-9532-542b768459d7" description="UUID for the APSS: PREVENÇÃO POSITIVA - SEGUIMENTO encounter type" uuid="a5bfea04-39f8-11eb-af7e-c74a9dc4e273" />
@@ -468,6 +477,10 @@
 
   <encounter_type encounter_type_id="53" name="Master Card - Ficha Resumo" description="Ficha resumo no master card" creator="1"
                     date_created="2019-07-31 14:23:47" retired="0" uuid="e422ecf9-75dd-4367-b21e-54bccabc4763"/>
+
+<encounter_type encounter_type_id="35" name="APSS: PREVENÇÃO POSITIVA - SEGUIMENTO" description="Ficha de apoio psicossocial e prevenção positiva - Seguimento" creator="1"
+                    date_created="2019-07-09 13:03:45" retired="0" uuid="f4aa93fe-8737-4f70-9532-542b768459d7"/>
+
 
 
 	<encounter_type encounter_type_id="35" name=" APSS: PREVENÇÃO POSITIVA - SEGUIMENTO" description="Ficha de apoio psicossocial e prevenção positiva - Seguimento" creator="1"
