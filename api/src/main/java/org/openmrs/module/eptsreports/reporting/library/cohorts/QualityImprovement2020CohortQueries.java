@@ -1619,8 +1619,21 @@ public class QualityImprovement2020CohortQueries {
     String mapping2 = "startDate=${endDate-14m},endDate=${endDate-11m},location=${location}";
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    compositionCohortDefinition.setName(
-        "% adultos em TARV com o mínimo de 3 consultas de seguimento de adesão na FM-ficha de APSS/PP");
+    if (indicatorFlag == "A")
+      compositionCohortDefinition.setName(
+          "Adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas");
+    if (indicatorFlag == "B")
+      compositionCohortDefinition.setName(
+          "Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrá");
+    if (indicatorFlag == "C")
+      compositionCohortDefinition.setName(
+          "Crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
+    if (indicatorFlag == "D")
+      compositionCohortDefinition.setName(
+          "Crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás");
+    if (indicatorFlag == "E")
+      compositionCohortDefinition.setName(
+          "Mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás");
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
