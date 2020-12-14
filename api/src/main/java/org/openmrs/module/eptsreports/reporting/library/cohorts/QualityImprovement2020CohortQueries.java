@@ -1968,17 +1968,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom(),
             Collections.singletonList(hivMetadata.getArtStatus()));
 
-    /* Query to be updated with the one in MEPTS-692 */
-    CohortDefinition transferOut =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            true,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getTransferFromOtherFacilityConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            hivMetadata.getTypeOfPatientTransferredFrom(),
-            Collections.singletonList(hivMetadata.getArtStatus()));
+    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
     comp.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -1991,12 +1981,14 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             transferIn,
             "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
-
-    comp.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+    /*
+        comp.addSearch(
+            "F",
+            EptsReportUtils.map(
+                transferOut,
+                "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+    */
+    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));
 
     comp.addSearch(
         "CHILDREN",
