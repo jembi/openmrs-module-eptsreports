@@ -1981,14 +1981,12 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             transferIn,
             "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
-    /*
-        comp.addSearch(
-            "F",
-            EptsReportUtils.map(
-                transferOut,
-                "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
-    */
-    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));
+
+    comp.addSearch(
+        "F",
+        EptsReportUtils.map(
+            transferOut,
+            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
 
     comp.addSearch(
         "CHILDREN",
