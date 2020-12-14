@@ -2677,6 +2677,30 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(lastClinical, MAPPING));
 
+    if (num == 1) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
+              MAPPING));
+    } else if (num == 6) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 4), MAPPING));
+    } else if (num == 7) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(5, 9), MAPPING));
+    } else if (num == 8) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(10, 14),
+              MAPPING));
+    }
+
     compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(firstLine6Months, MAPPING));
 
     compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(B2E, MAPPING));
@@ -2693,21 +2717,21 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));*/
 
-    // calculate age at the date of the last consultation
     if (den) {
       if (num == 1) {
-        compositionCohortDefinition.setCompositionString("B2 AND NOT B2E");
+        compositionCohortDefinition.setCompositionString(
+            "(B2 AND NOT B2E) OR (B3 AND NOT B3E) AND age");
         // compositionCohortDefinition.setCompositionString("B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT
-        // B3E)) AND NOT (B4E OR B5E)"); //add age 15+
+        // B3E)) AND NOT (B4E OR B5E)");
       } else if (num == 6) {
         compositionCohortDefinition.setCompositionString(
-            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)"); // add age <= 14
+            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
       } else if (num == 7) {
         compositionCohortDefinition.setCompositionString(
-            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)"); // add age
+            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
       } else if (num == 8) {
         compositionCohortDefinition.setCompositionString(
-            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)"); // add age
+            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
       }
     }
 

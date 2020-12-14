@@ -423,10 +423,7 @@ public class CommonCohortQueries {
       answerIds.add(concept.getConceptId());
     }
 
-    String query = " SELECT  " 
-    + "     patient_id  " 
-    + " FROM  " 
-    + "     (SELECT   ";
+    String query = " SELECT  " + "     patient_id  " + " FROM  " + "     (SELECT   ";
     if (masterCard) {
       query += "         p.patient_id, MAX(o.obs_datetime)  ";
     } else {
@@ -458,7 +455,9 @@ public class CommonCohortQueries {
     if (masterCard) {
       query +=
           "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATEDIFF(o.obs_datetime, clinical.last_visit) >= 180  "; // check other queries for time they use
+              + "             AND DATEDIFF(o.obs_datetime, clinical.last_visit) >= 180  "; // check
+                                                                                           // other
+                                                                                           // queries for time they use
     } else {
       query +=
           "             AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit)  "
@@ -480,21 +479,21 @@ public class CommonCohortQueries {
   }
 
   /**
-   * <b>Description:</b> MOH Patients to Exclude From Treatment  in 6 Months
+   * <b>Description:</b> MOH Patients to Exclude From Treatment in 6 Months
    *
    * <p><b>Technical Specs</b>
    *
    * <blockquote>
-   * 
-   * B2E - Exclude all patients from Ficha Clinica (encounter type 6, encounter_datetime) who have 
-   * “LINHA TERAPEUTICA”(Concept id 21151) with value coded DIFFERENT THAN “PRIMEIRA LINHA”(Concept id 21150) 
-   * and encounter_datetime > first “LINHA TERAPEUTICA” = “PRIMEIRA LINHA” (from B2) 
-   * and <= “Last Clinical Consultation” (last encounter_datetime from B1)
    *
-   * B3E - Exclude all patients from Ficha Clinica (encounter type 6, encounter_datetime) who have 
-   * “LINHA TERAPEUTICA”(Concept id 21151) with value coded DIFFERENT THAN “PRIMEIRA LINHA”(Concept id 21150) 
-   * and encounter_datetime > the most recent “ALTERNATIVA A LINHA - 1a LINHA” (from B3) 
-   * and <= “Last Clinical Consultation” (last encounter_datetime from B1)
+   * B2E - Exclude all patients from Ficha Clinica (encounter type 6, encounter_datetime) who have
+   * “LINHA TERAPEUTICA”(Concept id 21151) with value coded DIFFERENT THAN “PRIMEIRA LINHA”(Concept
+   * id 21150) and encounter_datetime > first “LINHA TERAPEUTICA” = “PRIMEIRA LINHA” (from B2) and
+   * <= “Last Clinical Consultation” (last encounter_datetime from B1)
+   *
+   * <p>B3E - Exclude all patients from Ficha Clinica (encounter type 6, encounter_datetime) who
+   * have “LINHA TERAPEUTICA”(Concept id 21151) with value coded DIFFERENT THAN “PRIMEIRA
+   * LINHA”(Concept id 21150) and encounter_datetime > the most recent “ALTERNATIVA A LINHA - 1a
+   * LINHA” (from B3) and <= “Last Clinical Consultation” (last encounter_datetime from B1)
    *
    * </blockquote>
    *
@@ -569,7 +568,9 @@ public class CommonCohortQueries {
     if (masterCard) {
       query +=
           "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATEDIFF(o.obs_datetime, clinical.last_visit) >= 180  "; // check other queries for time they use
+              + "             AND DATEDIFF(o.obs_datetime, clinical.last_visit) >= 180  "; // check
+                                                                                           // other
+                                                                                           // queries for time they use
     } else {
       query +=
           "             AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit)  "
@@ -606,6 +607,69 @@ public class CommonCohortQueries {
     map.put("exclusionEncounter", String.valueOf(exclusionEncounter.getEncounterTypeId()));
     map.put("exclusionConcept", String.valueOf(exclusionConcept.getConceptId()));
     map.put("exclusionValueCoded", StringUtils.join(answerIds2, ","));
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Description:</b> MOH Last Clinical Consultation Query
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * Select all patients with Last Clinical Consultation (encounter type 6, encounter_datetime)
+   * occurred during the period (encounter_datetime > endDateInclusion and <= endDateRevision)
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMOHPatientsAgeOnLastClinicalConsultationDate(
+      Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients Age at Last Ficha Clinica");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+
+    String query =
+        " SELECT  "
+            + "     p.person_id  "
+            + " FROM  "
+            + "     person p  "
+            + "         INNER JOIN  "
+            + "     (SELECT   "
+            + "         p.patient_id, MAX(e.encounter_datetime) last_visit  "
+            + "     FROM  "
+            + "         patient p  "
+            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "     WHERE  "
+            + "         p.voided = 0 AND e.voided = 0  "
+            + "             AND e.encounter_type = ${6}  "
+            + "             AND e.location_id = :location  "
+            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "     GROUP BY p.patient_id) clinical ON clinical.patient_id = p.person_id  "
+            + " WHERE  ";
+    if (minAge != null && maxAge != null) {
+      query +=
+          "     DATEDIFF(clinical.last_visit, p.birthdate)/365 >= ${minAge}  "
+              + "         AND   "
+              + "   DATEDIFF(clinical.last_visit, p.birthdate)/365 <= ${maxAge}; ";
+    } else if (minAge == null && maxAge != null) {
+      query += "   DATEDIFF(clinical.last_visit, p.birthdate)/365 <= ${maxAge}; ";
+    } else if (minAge != null && maxAge == null) {
+      query += "     DATEDIFF(clinical.last_visit, p.birthdate)/365 >= ${minAge};  ";
+    }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
