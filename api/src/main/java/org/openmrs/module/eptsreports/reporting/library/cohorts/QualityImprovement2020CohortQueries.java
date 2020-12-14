@@ -2594,7 +2594,7 @@ public class QualityImprovement2020CohortQueries {
     switch (den) {
       case 1:
         comp.setName(
-            "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
+            "# de adultos  (15/+anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
         break;
       case 2:
         comp.setName(
