@@ -706,7 +706,8 @@ public class CommonCohortQueries {
   public CohortDefinition getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
       Boolean b4e, Boolean b5e, Integer period) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients to exclude with VL request or results between last clinical visits");
+    sqlCohortDefinition.setName(
+        "Patients to exclude with VL request or results between last clinical visits");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));

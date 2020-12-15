@@ -2725,8 +2725,6 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
-    // CohortDefinition startedART = getMQC3D1();
-
     CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
 
     CohortDefinition firstLine6Months =
@@ -2781,43 +2779,6 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 3);
 
-    /*CohortDefinition pregnant =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            true,
-            false,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getPregnantConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            true,
-            false,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getBreastfeeding(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
-
-    CohortDefinition transferIn =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            false,
-            true,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getTransferFromOtherFacilityConcept(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            hivMetadata.getTypeOfPatientTransferredFrom(),
-            Collections.singletonList(hivMetadata.getArtStatus()));
-
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();*/
-
-    // compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
-
     compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(lastClinical, MAPPING));
 
     if (line == 1) {
@@ -2855,14 +2816,6 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("B4E", EptsReportUtils.map(B4E, MAPPING));
 
     compositionCohortDefinition.addSearch("B5E", EptsReportUtils.map(B5E, MAPPING));
-
-    /*compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-
-    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-
-    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
-
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));*/
 
     if (den) {
       if (line == 1) {
