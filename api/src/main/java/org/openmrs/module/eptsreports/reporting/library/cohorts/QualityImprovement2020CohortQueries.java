@@ -2849,6 +2849,18 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>MQ12</b>: Melhoria de Qualidade Categoria 12 Numerador - P2 <br>
+   *
+   * <p>Select patients from the corresponding denominator and all active patients as done in resumo
+   * mensal report - B13 and apply the following categories <i>12.3 - (A and B1 and NOT (B1E or C or
+   * D or E)) AND NOT G and Age >= 15*</i><br>
+   * <i>12.4 - (A and B2 and NOT (B2E or C or D or E)) AND NOT G and Age > =15*</i><br>
+   * <i>12.8 - (A and B1 and NOT (B1E or C or D or E)) AND NOT G and Age < 15*</i><br>
+   * <i>12.9 - (A and B2) and NOT (B2E or C or D or E) AND NOT G and Age < 15*</i><br>
+   * <i>12.12 - (A and B1 and C) and NOT (B1E or D or E) AND NOT G </i><br>
+   *
+   * <p>All age disaggreagtions should be based on the ART start date
+   *
    * @param flag
    * @return
    */
@@ -2896,7 +2908,7 @@ public class QualityImprovement2020CohortQueries {
             getPatientsFromFichaClinicaDenominatorB("B1"),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "B1",
+        "B1E",
         EptsReportUtils.map(
             getPatientsFromFichaClinicaDenominatorB("B1E"),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
