@@ -1611,27 +1611,27 @@ public class QualityImprovement2020CohortQueries {
    * @return CohortDefinition
    * @params indicatorFlag A to F For inicator 13.2 to 13.14 accordingly to the specs
    */
-  public CohortDefinition getMQC13DEN(String indicatorFlag) {
+  public CohortDefinition getMQC13P3DEN(String indicatorFlag) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    if(indicatorFlag == "A")
+    if(indicatorFlag.equals("A"))
       compositionCohortDefinition.setName("Crianças  (0-4 anos de idade) que iniciaram TARV no período de inclusão");
-    if(indicatorFlag == "B")
+    if(indicatorFlag.equals("B"))
       compositionCohortDefinition.setName("Crianças  (5-9 anos de idade) que iniciaram TARV no período de inclusão");
-    if(indicatorFlag == "C")
+    if(indicatorFlag.equals("C"))
       compositionCohortDefinition.setName("Crianças  (5-9 anos de idade) que iniciaram TARV no período de inclusão");
-    if(indicatorFlag == "D")
+    if(indicatorFlag.equals("D"))
       compositionCohortDefinition.setName("crianças  (10-14 anos de idade) que iniciaram TARV no período de inclusão");
-    if(indicatorFlag == "E")
+    if(indicatorFlag.equals("E"))
       compositionCohortDefinition.setName("Adultos (15/+ anos) que iniciaram a 2a linha do TARV no período de inclusão ");
-    if(indicatorFlag == "F")
+    if(indicatorFlag.equals("F"))
       compositionCohortDefinition.setName("Crianças  > 2 anos que iniciaram a 2a linha do TARV no período de inclusão");
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition startedART = getMQC3D1(); // A
+    CohortDefinition startedART = getMQC3D1();
 
     CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
             getPatientsFromFichaClinicaB1OrB2(true); // B1
