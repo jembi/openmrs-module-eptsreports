@@ -2712,7 +2712,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ13Part1(Boolean den, Integer line) {
+  public CohortDefinition getMQ13(Boolean den, Integer line) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (den) {
