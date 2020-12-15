@@ -2951,6 +2951,16 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getTypeOfPatientTransferredFrom(),
                 Collections.singletonList(hivMetadata.getArtStatus())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B2",
+        EptsReportUtils.map(
+            getPatientsFromFichaClinicaDenominatorB("B2_12"),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B2E",
+        EptsReportUtils.map(
+            getPatientsFromFichaClinicaDenominatorB("B2E"),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     if (flag == 3) {
       cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND NOT G");
     } else if (flag == 4) {
