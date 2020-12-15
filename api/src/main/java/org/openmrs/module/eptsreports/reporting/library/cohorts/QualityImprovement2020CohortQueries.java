@@ -1588,14 +1588,9 @@ public class QualityImprovement2020CohortQueries {
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
    *       and endDateInclusion)
    *   <li>
-   *   <li>B1 - Select all patients from Ficha Clinica (encounter type 6) who have THE LAST “LINHA
-   *       TERAPEUTICA
+   *   <li>B1 - B1= (BI1 and not B1E) : MUDANCA DE REGIME
    *   <li>
-   *   <li>B2-Select all patients from Ficha Clinica (encounter type 6) with “Carga Viral”
-   *       registered with numeric value > 1000
-   *   <li>
-   *   <li>B3-Filter all patients with clinical consultation (encounter type 6) with concept
-   *       “GESTANTE” and value coded “SIM”
+   *   <li>B2 = (BI2 and not B2E) - PACIENTES 2a LINHA
    *   <li>
    *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
    *       inclusion period (startDateInclusion and endDateInclusion)
@@ -1636,6 +1631,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    String mapping = "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
 
     CohortDefinition startedART = getMQC3D1();
 
@@ -1682,7 +1678,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1Patients, MAPPING));
 
-    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2Patients, MAPPING));
+    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2Patients, mapping));
 
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
@@ -2784,6 +2780,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients With Clinical Consultation");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("less3mDate", "less3mDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
@@ -2826,7 +2823,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                     AND e.voided = 0 "
             + "                                     AND p.voided = 0 "
             + "                                     AND e.encounter_datetime BETWEEN "
-            + "                                         :startDate AND :endDate "
+            + "                                         :less3mDate AND :endDate "
             + "                              GROUP  BY p.patient_id)  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
