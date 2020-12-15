@@ -677,6 +677,33 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
+    // M&Q Report - Categoria 12 Numerador - P2 Indicators
+    dataSetDefinition.addColumn(
+        "MQ12NUM123",
+        "# de adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas",
+        EptsReportUtils.map(),
+        "");
+    dataSetDefinition.addColumn(
+        "MQ12NUM124",
+        "# de adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás",
+        EptsReportUtils.map(),
+        "");
+    dataSetDefinition.addColumn(
+        "MQ12NUM128",
+        "# de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás",
+        EptsReportUtils.map(),
+        "");
+    dataSetDefinition.addColumn(
+        "MQ12NUM129",
+        "de crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás",
+        EptsReportUtils.map(),
+        "");
+    dataSetDefinition.addColumn(
+        "MQ12NUM1212",
+        "# de mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás",
+        EptsReportUtils.map(),
+        "");
+
     return dataSetDefinition;
   }
 
@@ -692,7 +719,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         new Parameter("startDate", "Data Inicial Inclusão", Date.class),
         new Parameter("endDate", "Data Final Inclusão", Date.class),
         new Parameter("dataFinalAvaliacao", "Data Final Revisão", Date.class),
-        new Parameter("location", "Unidade Sanitária", Location.class),
-        new Parameter("testStart", "Testar Iniciar", Boolean.class));
+        new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }
