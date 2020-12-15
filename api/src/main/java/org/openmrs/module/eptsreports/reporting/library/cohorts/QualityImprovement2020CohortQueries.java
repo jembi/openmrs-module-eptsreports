@@ -2699,4 +2699,110 @@ public class QualityImprovement2020CohortQueries {
     }
     return comp;
   }
+
+  /**
+   * @param flag
+   * @return
+   */
+  public CohortDefinition getMQ12NumeratorP2(int flag) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    switch (flag) {
+      case 3:
+        cd.setName(
+            "No de adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas");
+        break;
+      case 4:
+        cd.setName("No de adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás");
+        break;
+      case 8:
+        cd.setName("No de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
+        break;
+      case 9:
+        cd.setName("No de crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás");
+        break;
+      case 12:
+        cd.setName("No de mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás");
+        break;
+    }
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    // Start adding the definitions based on the requirements
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtOnPeriod(false, true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "G",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries
+                .getNumberOfActivePatientsInArtAtEndOfCurrentMonthWithVlPerformed(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            getPatientsFromFichaClinicaDenominatorB("B1"),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            getPatientsFromFichaClinicaDenominatorB("B1E"),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                true,
+                false,
+                "once",
+                hivMetadata.getMasterCardEncounterType(),
+                commonMetadata.getPregnantConcept(),
+                Collections.singletonList(hivMetadata.getYesConcept()),
+                null,
+                null),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                true,
+                false,
+                "once",
+                hivMetadata.getMasterCardEncounterType(),
+                commonMetadata.getBreastfeeding(),
+                Collections.singletonList(hivMetadata.getYesConcept()),
+                null,
+                null),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "E",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                false,
+                true,
+                "once",
+                hivMetadata.getMasterCardEncounterType(),
+                commonMetadata.getTransferFromOtherFacilityConcept(),
+                Collections.singletonList(hivMetadata.getYesConcept()),
+                hivMetadata.getTypeOfPatientTransferredFrom(),
+                Collections.singletonList(hivMetadata.getArtStatus())),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    if (flag == 3) {
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND NOT G");
+    } else if (flag == 4) {
+      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR E)) AND NOT G");
+    } else if (flag == 8) {
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND NOT G");
+    } else if (flag == 9) {
+      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR E) AND NOT G");
+    } else if (flag == 12) {
+      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR E) AND NOT G ");
+    }
+
+    return cd;
+  }
 }

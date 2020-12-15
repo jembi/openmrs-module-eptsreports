@@ -681,27 +681,57 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "MQ12NUM123",
         "# de adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas",
-        EptsReportUtils.map(),
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM123",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(3),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}"),
         "");
     dataSetDefinition.addColumn(
         "MQ12NUM124",
         "# de adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás",
-        EptsReportUtils.map(),
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM123",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(4),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}"),
         "");
     dataSetDefinition.addColumn(
         "MQ12NUM128",
         "# de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás",
-        EptsReportUtils.map(),
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM123",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(8),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}"),
         "");
     dataSetDefinition.addColumn(
         "MQ12NUM129",
         "de crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás",
-        EptsReportUtils.map(),
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM123",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(9),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}"),
         "");
     dataSetDefinition.addColumn(
         "MQ12NUM1212",
         "# de mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás",
-        EptsReportUtils.map(),
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM123",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(12),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}"),
         "");
 
     return dataSetDefinition;
