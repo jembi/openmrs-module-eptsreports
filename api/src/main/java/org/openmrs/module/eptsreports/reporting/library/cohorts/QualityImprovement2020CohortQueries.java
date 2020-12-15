@@ -1580,7 +1580,137 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-  /* <b>MQC11B1B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 and B2 <br>
+  /**
+   * <b>MQC13</b>: Melhoria de Qualidade Category 13 Part 3 Denominator <br>
+   * <i> DENOMINATORS: A,B1,B2,B3,C,D and E</i> <br>
+   *
+   * <ul>
+   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
+   *       and endDateInclusion)
+   *   <li>
+   *   <li>B1 - Select all patients from Ficha Clinica (encounter type 6) who have THE LAST “LINHA
+   *       TERAPEUTICA
+   *   <li>
+   *   <li>B2-Select all patients from Ficha Clinica (encounter type 6) with “Carga Viral”
+   *       registered with numeric value > 1000
+   *   <li>
+   *   <li>B3-Filter all patients with clinical consultation (encounter type 6) with concept
+   *       “GESTANTE” and value coded “SIM”
+   *   <li>
+   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
+   *       inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
+   *       the inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>E - All transferred IN patients
+   *   <li>
+   *   <li>F - All Transferred Out patients
+   * </ul>
+   *
+   * @return CohortDefinition
+   * @params indicatorFlag A to F For inicator 13.2 to 13.14 accordingly to the specs
+   */
+  public CohortDefinition getMQC13DEN(String indicatorFlag) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if(indicatorFlag == "A")
+      compositionCohortDefinition.setName("Crianças  (0-4 anos de idade) que iniciaram TARV no período de inclusão");
+    if(indicatorFlag == "B")
+      compositionCohortDefinition.setName("Crianças  (5-9 anos de idade) que iniciaram TARV no período de inclusão");
+    if(indicatorFlag == "C")
+      compositionCohortDefinition.setName("Crianças  (5-9 anos de idade) que iniciaram TARV no período de inclusão");
+    if(indicatorFlag == "D")
+      compositionCohortDefinition.setName("crianças  (10-14 anos de idade) que iniciaram TARV no período de inclusão");
+    if(indicatorFlag == "E")
+      compositionCohortDefinition.setName("Adultos (15/+ anos) que iniciaram a 2a linha do TARV no período de inclusão ");
+    if(indicatorFlag == "F")
+      compositionCohortDefinition.setName("Crianças  > 2 anos que iniciaram a 2a linha do TARV no período de inclusão");
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition startedART = getMQC3D1(); // A
+
+    CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
+            getPatientsFromFichaClinicaB1OrB2(true); // B1
+
+    CohortDefinition patientsFromFichaClinicaCargaViral =
+            getPatientsFromFichaClinicaB1OrB2(false); // B2
+
+    CohortDefinition patientsWithClinicalConsultation =
+            getPatientsWithClinicalConsultationB3(); // B3
+
+    // CohortDefinition nutritionalClass = getPatientsWithNutritionalState();
+
+    CohortDefinition pregnant =
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                    true,
+                    false,
+                    "once",
+                    hivMetadata.getMasterCardEncounterType(),
+                    commonMetadata.getPregnantConcept(),
+                    Collections.singletonList(hivMetadata.getYesConcept()),
+                    null,
+                    null);
+
+    CohortDefinition breastfeeding =
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                    true,
+                    false,
+                    "once",
+                    hivMetadata.getMasterCardEncounterType(),
+                    commonMetadata.getBreastfeeding(),
+                    Collections.singletonList(hivMetadata.getYesConcept()),
+                    null,
+                    null);
+
+    CohortDefinition transferIn =
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                    false,
+                    true,
+                    "once",
+                    hivMetadata.getMasterCardEncounterType(),
+                    commonMetadata.getTransferFromOtherFacilityConcept(),
+                    Collections.singletonList(hivMetadata.getYesConcept()),
+                    hivMetadata.getTypeOfPatientTransferredFrom(),
+                    Collections.singletonList(hivMetadata.getArtStatus()));
+
+    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+
+    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+            "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+            "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+            "B3", EptsReportUtils.map(patientsWithClinicalConsultation, MAPPING));
+
+    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+
+    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
+
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+
+    if (indicatorFlag == "A" || indicatorFlag == "E" || indicatorFlag == "F")
+      compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
+    if (indicatorFlag == "B" || indicatorFlag == "G")
+      compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (C OR D OR E OR F)");
+    if (indicatorFlag == "C")
+      compositionCohortDefinition.setCompositionString("(A AND B3 AND C) AND NOT (D OR E OR F)");
+    if (indicatorFlag == "D")
+      compositionCohortDefinition.setCompositionString("(B1 AND B3 AND C) AND NOT (D OR E OR F)");
+
+    return compositionCohortDefinition;
+  }
+
+  /** <b>MQC11B1B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 and B2 <br>
    * <i> A and not B</i> <br>
    *
    * <ul>
