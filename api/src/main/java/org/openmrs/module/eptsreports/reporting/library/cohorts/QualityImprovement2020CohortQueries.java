@@ -1509,8 +1509,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition patientsFromFichaClinicaCargaViral =
         getPatientsFromFichaClinicaDenominatorB("B2_11");
 
-    CohortDefinition patientsWithClinicalConsultation =
-        getPatientsWithClinicalConsultationB3();
+    CohortDefinition patientsWithClinicalConsultation = getPatientsWithClinicalConsultationB3();
 
     CohortDefinition pregnant =
         commonCohortQueries.getMohMQPatientsOnCondition(
@@ -1702,9 +1701,9 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
 
-    if (indicatorFlag.equals("A") || indicatorFlag.equals("C") )
+    if (indicatorFlag.equals("A") || indicatorFlag.equals("C"))
       compositionCohortDefinition.setCompositionString("(A AND B1) NOT (C OR D OR E)");
-    if (indicatorFlag.equals("B")|| indicatorFlag.equals("D"))
+    if (indicatorFlag.equals("B") || indicatorFlag.equals("D"))
       compositionCohortDefinition.setCompositionString("(A AND B2) AND NOT (C OR D OR E)");
     if (indicatorFlag.equals("E"))
       compositionCohortDefinition.setCompositionString("(A AND B1 AND C) AND NOT (D OR E)");

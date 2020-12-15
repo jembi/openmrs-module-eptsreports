@@ -46,6 +46,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "ageInMonths",
         EptsReportUtils.map(eptsCommonDimension.ageInMonths(), "effectiveDate=${endDate}"));
 
+    dataSetDefinition.addDimension(
+        "ageBasedOnArt",
+        EptsReportUtils.map(
+            eptsCommonDimension.ageBasedOnArtStartDate(), "effectiveDate=${endDate}"));
+
     CohortIndicator initiatedART =
         eptsGeneralIndicator.getIndicator(
             "initiatedART",
@@ -680,7 +685,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     // Category 12 Part 2 denominator indicators
     dataSetDefinition.addColumn(
         "MQ12P2DEN1",
-        "12.3. # de adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás ",
+        "Adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás ",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "MQ12P2DEN1",
@@ -688,11 +693,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC12P2DEN("A"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=15+");
+        "ageBasedOnArt=adultsArt");
 
     dataSetDefinition.addColumn(
         "MQ12P2DEN2",
-        "12.4. # de adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás",
+        "Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "MQ12P2DEN2",
@@ -700,11 +705,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC12P2DEN("B"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=15+");
+        "ageBasedOnArt=adultsArt");
 
     dataSetDefinition.addColumn(
         "MQ12P2DEN3",
-        " MG em TARV com o mínimo de 3 consultas de seguimento de adesão na FM-ficha de APSS/PP nos primeiros 3 meses após início do TARV",
+        "Crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "MQ12P2DEN3",
@@ -712,11 +717,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC12P2DEN("C"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=<15");
+        "ageBasedOnArt=childrenArt");
 
     dataSetDefinition.addColumn(
         "MQ12P2DEN4",
-        "MG na 1a linha de TARV com CV acima de 1000 cópias que tiveram 3 consultas de APSS/PP mensais consecutivas para reforço de adesão",
+        "Crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "MQ12P2DEN4",
@@ -724,11 +729,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC12P2DEN("D"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=<15");
+        "ageBasedOnArt=childrenArt");
 
     dataSetDefinition.addColumn(
         "MQ12P2DEN5",
-        "Crianças > 2 anos de idade em TARV com registo mensal de seguimento da adesão na ficha de APSS/PP nos primeiros 99 dias de TARV",
+        "Mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "MQ12P2DEN5",
