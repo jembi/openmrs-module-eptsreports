@@ -456,8 +456,8 @@ public class CommonCohortQueries {
       query +=
           "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
               + "             AND DATEDIFF(o.obs_datetime, clinical.last_visit) >= 180  "; // check
-                                                                                           // other
-                                                                                           // queries for time they use
+      // other
+      // queries for time they use
     } else {
       query +=
           "             AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit)  "
@@ -569,8 +569,8 @@ public class CommonCohortQueries {
       query +=
           "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
               + "             AND DATEDIFF(o.obs_datetime, clinical.last_visit) >= 180  "; // check
-                                                                                           // other
-                                                                                           // queries for time they use
+      // other
+      // queries for time they use
     } else {
       query +=
           "             AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit)  "
@@ -670,6 +670,95 @@ public class CommonCohortQueries {
     } else if (minAge != null && maxAge == null) {
       query += "     DATEDIFF(clinical.last_visit, p.birthdate)/365 >= ${minAge};  ";
     }
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Description:</b> MOH Patients With Viral Load Request or Result Between Last Clinical
+   * Consultations
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * B4E - Exclude all patients with “Carga Viral” (Concept id 856, value_numeric not null)
+   * registered in Ficha Clinica (encounter type 6, encounter_datetime) or Ficha Resumo (encounter
+   * type 53, obs_datetime) during the last 12 months from the Last Clinical Consultation, i.e, at
+   * least one “Carga Viral” encounter_datetime between “Last Clinical Consultation”-12months (last
+   * encounter_datetime-12months from B1) and “Last Clinical Consultation” (last encounter_datetime
+   * from B1).
+   *
+   * <p>B5E- exclude all patients with concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id
+   * 23722) and value coded “HIV CARGA VIRAL” (Concept Id 856) registered in Ficha Clinica
+   * (encounter type 6) during the last 3 months from the Last Clinical Consultation (at least one
+   * “Pedido de Carga Viral” encounter_datetime between “Last Clinical Consultation”-3months and
+   * “Last Clinical Consultation” (last encounter_datetime from B1).
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+      Boolean b4e, Boolean b5e, Integer period) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients to exclude with VL request or results between last clinical visits");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    String query =
+        " SELECT  "
+            + "     p.patient_id  "
+            + " FROM  "
+            + "     patient p  "
+            + "         INNER JOIN  "
+            + "     encounter e ON e.patient_id = p.patient_id  "
+            + "         INNER JOIN  "
+            + "     obs o ON o.encounter_id = e.encounter_id  "
+            + "         INNER JOIN  "
+            + "     (SELECT   "
+            + "         p.patient_id, MAX(e.encounter_datetime) last_visit  "
+            + "     FROM  "
+            + "         patient p  "
+            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "     WHERE  "
+            + "         p.voided = 0 AND e.voided = 0  "
+            + "             AND e.encounter_type = ${6}  "
+            + "             AND e.location_id = :location  "
+            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "     GROUP BY p.patient_id) clinical ON clinical.patient_id = p.patient_id  "
+            + " WHERE  "
+            + "     p.voided = 0 AND e.voided = 0  "
+            + "         AND o.voided = 0  "
+            + "         AND e.location_id = :location  ";
+    if (b4e) {
+      query += "         AND concept_id = ${856}  " + "         AND o.value_numeric IS NOT NULL  ";
+    } else if (b5e) {
+      query += "         AND concept_id = ${23722}  " + "         AND o.value_coded =  ${856}  ";
+    }
+    query +=
+        "         AND (e.encounter_type = ${6}  "
+            + "         AND DATE(e.encounter_datetime) BETWEEN DATE_SUB(clinical.last_visit,  "
+            + "         INTERVAL ${period} MONTH) AND DATE(clinical.last_visit))  ";
+    if (b4e) {
+      query +=
+          "      OR   "
+              + "         (e.encounter_type = ${53}  "
+              + "         AND o.obs_datetime BETWEEN DATE_SUB(clinical.last_visit,  "
+              + "         INTERVAL 12 MONTH) AND DATE(clinical.last_visit));";
+    }
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("period", period);
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

@@ -2638,6 +2638,14 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTherapeuticLineConcept(),
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
 
+    CohortDefinition B4E =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            true, false, 12);
+
+    CohortDefinition B5E =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            false, true, 3);
+
     /*CohortDefinition pregnant =
         commonCohortQueries.getMohMQPatientsOnCondition(
             true,
@@ -2709,6 +2717,10 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("B3E", EptsReportUtils.map(B3E, MAPPING));
 
+    compositionCohortDefinition.addSearch("B4E", EptsReportUtils.map(B4E, MAPPING));
+
+    compositionCohortDefinition.addSearch("B5E", EptsReportUtils.map(B5E, MAPPING));
+
     /*compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
@@ -2720,9 +2732,7 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (num == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(B2 AND NOT B2E) OR (B3 AND NOT B3E) AND age");
-        // compositionCohortDefinition.setCompositionString("B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT
-        // B3E)) AND NOT (B4E OR B5E)");
+            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) and age");
       } else if (num == 6) {
         compositionCohortDefinition.setCompositionString(
             "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
