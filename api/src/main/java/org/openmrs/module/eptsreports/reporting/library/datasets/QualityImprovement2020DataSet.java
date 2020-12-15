@@ -670,7 +670,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
-        // Category 13 Denominator indicators
+    // Category 13 Denominator indicators
     dataSetDefinition.addColumn(
         "MQ13DEN1",
         "% de adultos (15/+anos) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
@@ -743,7 +743,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
-        // Category 13 Numerator indicators
+    // Category 13 Numerator indicators
     dataSetDefinition.addColumn(
         "MQ13NUM1",
         "% de adultos (15/+anos) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
@@ -752,6 +752,18 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 "MQ13NUM1",
                 EptsReportUtils.map(
                     qualityImprovement2020CohortQueries.getMQ13(false, 1),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM4",
+        "% de adultos (15/+anos) na 2a linha de TARV elegíveis a CV com registo de pedido de CV feito pelo clínico",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM4",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13(false, 4),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
@@ -788,6 +800,18 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 "MQ13NUM8",
                 EptsReportUtils.map(
                     qualityImprovement2020CohortQueries.getMQ13(false, 8),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM13",
+        "% de crianças na  2ª linha de TARV elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM13",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13(false, 13),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");

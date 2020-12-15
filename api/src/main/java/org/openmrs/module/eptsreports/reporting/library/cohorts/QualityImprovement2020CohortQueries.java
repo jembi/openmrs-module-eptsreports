@@ -2855,10 +2855,10 @@ public class QualityImprovement2020CohortQueries {
    *
    * <blockquote>
    *
-   * C - Select all patients with Last Clinical Consultation (encounter type 6, encounter_datetime) 
-   * occurred during the period (encounter_datetime > endDateInclusion and <= endDateRevision) and the concept:
-   * “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA VIRAL” (Concept Id 856)
-   * In this last consultation.
+   * C - Select all patients with Last Clinical Consultation (encounter type 6, encounter_datetime)
+   * occurred during the period (encounter_datetime > endDateInclusion and <= endDateRevision) and
+   * the concept: “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV
+   * CARGA VIRAL” (Concept Id 856) In this last consultation.
    *
    * </blockquote>
    *
@@ -3081,19 +3081,25 @@ public class QualityImprovement2020CohortQueries {
             "B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E) AND age");
       }
     } else {
-        if (line == 1) {
-            compositionCohortDefinition.setCompositionString(
-                "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)) AND C AND age");
-          } else if (line == 6) {
-            compositionCohortDefinition.setCompositionString(
-                "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)) AND C AND age");
-          } else if (line == 7) {
-            compositionCohortDefinition.setCompositionString(
-                "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)) AND C AND age");
-          } else if (line == 8) {
-            compositionCohortDefinition.setCompositionString(
-                "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)) AND C AND age");
-          }
+      if (line == 1) {
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)) AND C AND age");
+      } else if (line == 4) {
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E)) AND C AND age");
+      } else if (line == 6) {
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)) AND C AND age");
+      } else if (line == 7) {
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)) AND C AND age");
+      } else if (line == 8) {
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)) AND C AND age");
+      } else if (line == 13) {
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E)) AND C AND age");
+      }
     }
 
     return compositionCohortDefinition;
