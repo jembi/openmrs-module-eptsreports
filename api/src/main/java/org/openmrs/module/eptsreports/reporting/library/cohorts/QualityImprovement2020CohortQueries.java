@@ -1504,13 +1504,13 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition startedART = getMQC3D1(); // A
 
     CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
-        getPatientsFromFichaClinicaDenominatorB("B1"); // B1
+        getPatientsFromFichaClinicaDenominatorB("B1");
 
     CohortDefinition patientsFromFichaClinicaCargaViral =
-        getPatientsFromFichaClinicaDenominatorB("B2_11"); // B2
+        getPatientsFromFichaClinicaDenominatorB("B2_11");
 
     CohortDefinition patientsWithClinicalConsultation =
-        getPatientsWithClinicalConsultationB3(); // B3
+        getPatientsWithClinicalConsultationB3();
 
     CohortDefinition pregnant =
         commonCohortQueries.getMohMQPatientsOnCondition(
@@ -1566,13 +1566,13 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
 
-    if (indicatorFlag == "A" || indicatorFlag == "E" || indicatorFlag == "F")
+    if (indicatorFlag.equals("A") || indicatorFlag == "E" || indicatorFlag.equals("F"))
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
-    if (indicatorFlag == "B" || indicatorFlag == "G")
+    if (indicatorFlag.equals("B") || indicatorFlag.equals("G"))
       compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (C OR D OR E OR F)");
-    if (indicatorFlag == "C")
+    if (indicatorFlag.equals("C"))
       compositionCohortDefinition.setCompositionString("(A AND B3 AND C) AND NOT (D OR E OR F)");
-    if (indicatorFlag == "D")
+    if (indicatorFlag.equals("D"))
       compositionCohortDefinition.setCompositionString("(B1 AND B3 AND C) AND NOT (D OR E OR F)");
 
     return compositionCohortDefinition;
@@ -1619,19 +1619,19 @@ public class QualityImprovement2020CohortQueries {
     String mapping2 = "startDate=${endDate-14m},endDate=${endDate-11m},location=${location}";
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    if (indicatorFlag == "A")
+    if (indicatorFlag.equals("A"))
       compositionCohortDefinition.setName(
           "Adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas");
-    if (indicatorFlag == "B")
+    if (indicatorFlag.equals("B"))
       compositionCohortDefinition.setName(
           "Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrá");
-    if (indicatorFlag == "C")
+    if (indicatorFlag.equals("C"))
       compositionCohortDefinition.setName(
           "Crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
-    if (indicatorFlag == "D")
+    if (indicatorFlag.equals("D"))
       compositionCohortDefinition.setName(
           "Crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás");
-    if (indicatorFlag == "E")
+    if (indicatorFlag.equals("E"))
       compositionCohortDefinition.setName(
           "Mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás");
 
@@ -1702,11 +1702,11 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
 
-    if (indicatorFlag == "A" || indicatorFlag == "C")
+    if (indicatorFlag.equals("A") || indicatorFlag.equals("C") )
       compositionCohortDefinition.setCompositionString("(A AND B1) NOT (C OR D OR E)");
-    if (indicatorFlag == "B" || indicatorFlag == "D")
+    if (indicatorFlag.equals("B")|| indicatorFlag.equals("D"))
       compositionCohortDefinition.setCompositionString("(A AND B2) AND NOT (C OR D OR E)");
-    if (indicatorFlag == "E")
+    if (indicatorFlag.equals("E"))
       compositionCohortDefinition.setCompositionString("(A AND B1 AND C) AND NOT (D OR E)");
 
     return compositionCohortDefinition;
