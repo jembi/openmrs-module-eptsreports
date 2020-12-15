@@ -955,6 +955,16 @@
 		</description>
 	</globalProperty>
 
+	<!-- Line Alternative Set Concept (23898) -->
+	<globalProperty>
+		<property>@MODULE_ID@.lineAlternativesConceptUuid
+		</property>
+		<defaultValue>c95bf5fa-a04f-48d9-8504-f0575c2e255f</defaultValue>
+		<description>
+			UUID First Line Concept
+		</description>
+	</globalProperty>
+
 	<globalProperty>
 		<property>@MODULE_ID@.apssPrevencaoPositivaInicialInicialEncounterTypeUuid
 		</property>
