@@ -1713,8 +1713,7 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQC11B1B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 and B2 <br>
-  /**
-   * <b>MQC13</b>: Melhoria de Qualidade Category 13 Part 3 Denominator <br>
+   * /** <b>MQC13</b>: Melhoria de Qualidade Category 13 Part 3 Denominator <br>
    * <i> DENOMINATORS: A,B1,B2,B3,C,D and E</i> <br>
    *
    * <ul>
@@ -1764,7 +1763,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    String mapping = "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
+    String mapping =
+        "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
 
     CohortDefinition startedART = getMQC3D1();
 
