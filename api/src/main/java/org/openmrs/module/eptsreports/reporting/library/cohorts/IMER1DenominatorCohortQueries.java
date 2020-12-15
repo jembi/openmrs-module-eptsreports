@@ -51,7 +51,7 @@ public class IMER1DenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "D",
@@ -74,19 +74,19 @@ public class IMER1DenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B",
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "C",
         EptsReportUtils.map(
             txNewCohortQueries.getTxNewBreastfeedingComposition(false),
-            "onOrAfter=${endDate-2m-1d},onOrBefore=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "D",
@@ -108,19 +108,19 @@ public class IMER1DenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B",
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "C",
         EptsReportUtils.map(
             txNewCohortQueries.getTxNewBreastfeedingComposition(false),
-            "onOrAfter=${endDate-2m-1d},onOrBefore=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "D",
@@ -143,19 +143,19 @@ public class IMER1DenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B",
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "C",
         EptsReportUtils.map(
             txNewCohortQueries.getTxNewBreastfeedingComposition(false),
-            "onOrAfter=${endDate-2m-1d},onOrBefore=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "D",
@@ -166,7 +166,7 @@ public class IMER1DenominatorCohortQueries {
         "CHILDREN",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnPreArtDate(0, 14),
-            "onOrAfter=${endDate-2m-1d},onOrBefore=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("(A AND CHILDREN) AND NOT (B OR C OR D)");
 
@@ -184,19 +184,19 @@ public class IMER1DenominatorCohortQueries {
         "A",
         EptsReportUtils.map(
             getEarliestPreART(),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B",
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
-            "startDate=${endDate-2m-1d},endDate=${endDate-1m},location=${location}"));
+            "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "C",
         EptsReportUtils.map(
             txNewCohortQueries.getTxNewBreastfeedingComposition(false),
-            "onOrAfter=${endDate-2m-1d},onOrBefore=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "D",
@@ -207,7 +207,7 @@ public class IMER1DenominatorCohortQueries {
         "ADULTS",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnPreArtDate(15, 200),
-            "onOrAfter=${endDate-2m-1d},onOrBefore=${endDate-1m},location=${location}"));
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("(A AND ADULTS) AND NOT (B OR C OR D)");
 
