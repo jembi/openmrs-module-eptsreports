@@ -618,6 +618,18 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "");
 
     dataSetDefinition.addColumn(
+        "MQ13DEN4",
+        "# de adultos (15/+ anos) na 2a linha de TARV elegíveis a CV.",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13DEN4",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13Part1(true, 4),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
         "MQ13DEN6",
         "% de crianças (0-4 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
@@ -649,6 +661,18 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 "MQ13DEN8",
                 EptsReportUtils.map(
                     qualityImprovement2020CohortQueries.getMQ13Part1(true, 8),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ13DEN13",
+        "# de crianças (>2anos) na 2a linha de TARV elegíveis ao pedido de CV.",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13DEN13",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13Part1(true, 13),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");

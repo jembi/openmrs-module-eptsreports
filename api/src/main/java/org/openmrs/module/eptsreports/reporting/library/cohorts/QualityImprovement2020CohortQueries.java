@@ -2735,6 +2735,14 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTherapeuticLineConcept(),
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
 
+    CohortDefinition secondLine6Months =
+        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
+            false,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getSecondLineConcept()));
+
     CohortDefinition changeRegimen6Months =
         commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
             true,
@@ -2756,6 +2764,17 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getTherapeuticLineConcept(),
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
+
+    CohortDefinition secondLineB2E =
+        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
+            false,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getSecondLineConcept()),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getSecondLineConcept()));
 
     CohortDefinition B3E =
         commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
@@ -2787,6 +2806,12 @@ public class QualityImprovement2020CohortQueries {
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
               MAPPING));
+    } else if (line == 4) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
+              MAPPING));
     } else if (line == 6) {
       compositionCohortDefinition.addSearch(
           "age",
@@ -2803,11 +2828,23 @@ public class QualityImprovement2020CohortQueries {
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(10, 14),
               MAPPING));
+    } else if (line == 13) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(2, null),
+              MAPPING));
     }
 
     compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(firstLine6Months, MAPPING));
 
+    compositionCohortDefinition.addSearch(
+        "secondLineB2", EptsReportUtils.map(secondLine6Months, MAPPING));
+
     compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(B2E, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "secondLineB2E", EptsReportUtils.map(secondLineB2E, MAPPING));
 
     compositionCohortDefinition.addSearch("B3", EptsReportUtils.map(changeRegimen6Months, MAPPING));
 
@@ -2821,6 +2858,9 @@ public class QualityImprovement2020CohortQueries {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
             "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) and age");
+      } else if (line == 4) {
+        compositionCohortDefinition.setCompositionString(
+            "B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E) AND age");
       } else if (line == 6) {
         compositionCohortDefinition.setCompositionString(
             "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
@@ -2830,6 +2870,9 @@ public class QualityImprovement2020CohortQueries {
       } else if (line == 8) {
         compositionCohortDefinition.setCompositionString(
             "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
+      } else if (line == 13) {
+        compositionCohortDefinition.setCompositionString(
+            "B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E) AND age");
       }
     }
 
