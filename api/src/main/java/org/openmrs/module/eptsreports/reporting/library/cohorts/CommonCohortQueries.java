@@ -451,7 +451,7 @@ public class CommonCohortQueries {
             + "             AND e.encounter_type = ${treatmentEncounter}  "
             + "             AND e.location_id = :location  "
             + "             AND o.concept_id = ${treatmentConcept}  "
-            + "             AND o.value_coded = ${treatmentValueCoded}  ";
+            + "             AND o.value_coded IN (${treatmentValueCoded})  ";
     if (masterCard) {
       query +=
           "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
@@ -564,7 +564,7 @@ public class CommonCohortQueries {
             + "             AND e.encounter_type = ${clinicalEncounter}  "
             + "             AND e.location_id = :location  "
             + "             AND o.concept_id = ${treatmentEncounter}  "
-            + "             AND o.value_coded = ${treatmentConcept}  ";
+            + "             AND o.value_coded IN (${treatmentConcept})  ";
     if (masterCard) {
       query +=
           "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
@@ -595,7 +595,7 @@ public class CommonCohortQueries {
             + "         AND e.location_id = :location  "
             + "         AND e.encounter_type = ${exclusionEncounter} "
             + "         AND o.concept_id = ${exclusionConcept}  "
-            + "         AND o.value_coded != ${exclusionValueCoded}  "
+            + "         AND o.value_coded NOT IN (${exclusionValueCoded})  "
             + "         AND DATE(e.encounter_datetime) > DATE(treatment_line.the_time)  "
             + "         AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit);";
 
