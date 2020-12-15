@@ -71,7 +71,6 @@ public class TxMlCohortQueries {
     cd.setCompositionString(
         "((missedAppointment OR noScheduled) AND startedArt) AND NOT (dead OR transferredOut)");
 
-    cd.setCompositionString("(dead)");
     return cd;
   }
   /**
