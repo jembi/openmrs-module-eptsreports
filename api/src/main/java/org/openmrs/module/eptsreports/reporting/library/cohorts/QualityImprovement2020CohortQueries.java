@@ -3033,6 +3033,19 @@ public class QualityImprovement2020CohortQueries {
             genericCohortQueries.getStartedArtOnPeriod(false, true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
+        "B",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                false,
+                true,
+                "once",
+                hivMetadata.getMasterCardDrugPickupEncounterType(),
+                hivMetadata.getTypeTestHIVConcept(),
+                Collections.singletonList(hivMetadata.getHivPCRQualitativeConceptUuid()),
+                null,
+                null),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
         "C",
         EptsReportUtils.map(
             commonCohortQueries.getMohMQPatientsOnCondition(
@@ -3045,10 +3058,15 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getTypeOfPatientTransferredFrom(),
                 Collections.singletonList(hivMetadata.getArtStatus())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            genericCohortQueries.getArtDateMinusDiagnosisDate(),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     if (flag.equals("num")) {
-      cd.setCompositionString("(A AND NOT C) AND infant");
+      cd.setCompositionString("(A AND B AND D AND infant) AND NOT C");
     } else if (flag.equals("den")) {
-      cd.setCompositionString("(A AND NOT C) AND infant");
+      cd.setCompositionString("(A AND B AND infant) AND NOT C");
     }
     return cd;
   }

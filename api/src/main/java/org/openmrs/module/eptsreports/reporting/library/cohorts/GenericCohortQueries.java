@@ -376,6 +376,17 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getArtDateMinusDiagnosisDate() {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(ArtDateMinusDiagnosisDateCalculation.class).get(0));
+    cd.setName("ART date minus diagnosis date");
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    return cd;
+  }
+
   public CohortDefinition getStartedArtOnPeriod(
       boolean considerTransferredIn, boolean considerPharmacyEncounter) {
     CalculationCohortDefinition cd =
