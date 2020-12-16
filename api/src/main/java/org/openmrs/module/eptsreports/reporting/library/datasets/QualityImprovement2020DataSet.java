@@ -788,9 +788,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
-    
     dataSetDefinition.addColumn(
-"MQ12NUM11",
+        "MQ12NUM11",
         "# de mulheres grávidas HIV+  que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -888,14 +887,14 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "");
 
     dataSetDefinition.addColumn(
-            "MQ13NUM4",
-            "% de adultos (15/+anos) na 2a linha de TARV elegíveis a CV com registo de pedido de CV feito pelo clínico",
-            EptsReportUtils.map(
-                eptsGeneralIndicator.getIndicator(
-                    "MQ13NUM4",
-                    EptsReportUtils.map(
-                        qualityImprovement2020CohortQueries.getMQ13(false, 4), 
-                        "startDate=${startDate},endDate=${endDate},location=${location}")),
+        "MQ13NUM4",
+        "% de adultos (15/+anos) na 2a linha de TARV elegíveis a CV com registo de pedido de CV feito pelo clínico",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM4",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13(false, 4),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
@@ -936,7 +935,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "");
 
     dataSetDefinition.addColumn(
-            "MQ13NUM13",
+        "MQ13NUM13",
         "% de crianças na  2ª linha de TARV elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(

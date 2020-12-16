@@ -2980,8 +2980,6 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * <b>MQC13Part3B1</b>: Melhoria de Qualidade Category 13 Deniminator B1 <br>
    * <i> BI1 and not B1E</i> <br>
    *
@@ -3445,7 +3443,6 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
->>>>>>> develop
    * <b>Description:</b> MQ Categoria 13 C query
    *
    * <p><b>Technical Specs</b>
