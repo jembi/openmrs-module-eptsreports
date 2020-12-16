@@ -46,6 +46,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "ageInMonths",
         EptsReportUtils.map(eptsCommonDimension.ageInMonths(), "effectiveDate=${endDate}"));
 
+    dataSetDefinition.addDimension(
+        "ageBasedOnArt",
+        EptsReportUtils.map(
+            eptsCommonDimension.ageBasedOnArtStartDate(), "effectiveDate=${endDate}"));
+
     CohortIndicator initiatedART =
         eptsGeneralIndicator.getIndicator(
             "initiatedART",
@@ -677,6 +682,124 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
+    // Category 12 Part 2 denominator indicators
+    dataSetDefinition.addColumn(
+        "MQ12P2DEN1",
+        "Adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás ",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12P2DEN1",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC12P2DEN("A"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "ageBasedOnArt=adultsArt");
+
+    dataSetDefinition.addColumn(
+        "MQ12P2DEN2",
+        "Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12P2DEN2",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC12P2DEN("B"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "ageBasedOnArt=adultsArt");
+
+    dataSetDefinition.addColumn(
+        "MQ12P2DEN3",
+        "Crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12P2DEN3",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC12P2DEN("C"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "ageBasedOnArt=childrenArt");
+
+    dataSetDefinition.addColumn(
+        "MQ12P2DEN4",
+        "Crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12P2DEN4",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC12P2DEN("D"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "ageBasedOnArt=childrenArt");
+
+    dataSetDefinition.addColumn(
+        "MQ12P2DEN5",
+        "Mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12P2DEN5",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC12P2DEN("E"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    // M&Q Report - Categoria 12 Numerador - P2 Indicators
+    dataSetDefinition.addColumn(
+        "MQ12NUM123",
+        "# de adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM123",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(3),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "ageBasedOnArt=adultsArt");
+    dataSetDefinition.addColumn(
+        "MQ12NUM124",
+        "# de adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM124",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(4),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "ageBasedOnArt=adultsArt");
+    dataSetDefinition.addColumn(
+        "MQ12NUM128",
+        "# de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM128",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(8),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "ageBasedOnArt=childrenArt");
+    dataSetDefinition.addColumn(
+        "MQ12NUM129",
+        "de crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM129",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(9),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "ageBasedOnArt=childrenArt");
+    dataSetDefinition.addColumn(
+        "MQ12NUM1212",
+        "# de mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ12NUM1212",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ12NumeratorP2(12),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
     // Category 12 numerator indicators
     dataSetDefinition.addColumn(
         "MQ12NUM1",
@@ -765,7 +888,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         new Parameter("startDate", "Data Inicial Inclusão", Date.class),
         new Parameter("endDate", "Data Final Inclusão", Date.class),
         new Parameter("dataFinalAvaliacao", "Data Final Revisão", Date.class),
-        new Parameter("location", "Unidade Sanitária", Location.class),
-        new Parameter("testStart", "Testar Iniciar", Boolean.class));
+        new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }
