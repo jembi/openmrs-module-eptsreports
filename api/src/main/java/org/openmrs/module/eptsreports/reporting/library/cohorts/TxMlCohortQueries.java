@@ -752,7 +752,7 @@ public class TxMlCohortQueries {
             + " "
             + "        UNION "
             + " "
-            + "        SELECT  p.patient_id, MAX(e.encounter_type) last_date "
+            + "        SELECT  p.patient_id, MAX(e.encounter_datetime) last_date "
             + "        FROM patient p   "
             + "            INNER JOIN encounter e   "
             + "                ON e.patient_id=p.patient_id   "
@@ -799,7 +799,7 @@ public class TxMlCohortQueries {
             + "      INNER JOIN obs obss ON obss.encounter_id=e.encounter_id  "
             + "WHERE e.voided=0  "
             + "    AND obss.voided=0  "
-            + "    AND   ( "
+            + "    AND   (( "
             + "                e.encounter_type IN (${6},${9},${18})  "
             + "                AND  e.encounter_datetime >  outter.l_date   "
             + "                AND e.encounter_datetime <= :endDate   "
@@ -810,7 +810,7 @@ public class TxMlCohortQueries {
             + "                AND obss.concept_id= ${23866}  "
             + "                AND  obss.value_datetime > outter.l_date  "
             + "                AND obss.value_datetime <= :endDate   "
-            + "            )    "
+            + "            ))    "
             + "    AND e.location_id =   :location  "
             + "GROUP BY outter.patient_id ";
 
