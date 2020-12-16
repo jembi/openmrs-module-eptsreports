@@ -3274,22 +3274,17 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQC13P3NUM_I() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("less3mDate", "Less3months date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
 
-    sqlCohortDefinition.setName("Category 13 Part 3- Numerator - H");
+    sqlCohortDefinition.setName("Category 13 Part 3- Numerator - I");
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put(
-        "23898",
-        hivMetadata
-            .getARVStartDateConcept()
-            .getConceptId()); // TODO: update when denominator is merged
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
     map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
-    map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
+    map.put("21148", hivMetadata.getSecondLineConcept().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
@@ -3304,13 +3299,13 @@ public class QualityImprovement2020CohortQueries {
             + "                         ON e.patient_id = p.patient_id "
             + "                       join obs o "
             + "                         ON o.encounter_id = e.encounter_id "
-            + "                WHERE  e.encounter_type = 6 "
-            + "                       AND o.concept_id = 21151 "
-            + "                       AND o.value_coded IS NOT NULL "
-            + "                       AND e.location_id = 400 "
+            + "                WHERE  e.encounter_type = ${6} "
+            + "                       AND o.concept_id = ${21151} "
+            + "                       AND o.value_coded = ${21148} "
+            + "                       AND e.location_id = :location "
             + "                       AND e.voided = 0 "
             + "                       AND p.voided = 0 "
-            + "                       AND o.obs_datetime BETWEEN '2019-10-21' AND '2020-01-20' "
+            + "                       AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "                GROUP  BY p.patient_id) bI2 "
             + "        WHERE  bI2.patient_id NOT IN (SELECT p.patient_id "
             + "                                      FROM   patient p "
@@ -3319,15 +3314,15 @@ public class QualityImprovement2020CohortQueries {
             + "                                             join obs o "
             + "                                               ON o.encounter_id = "
             + "                                                  e.encounter_id "
-            + "                                      WHERE  e.encounter_type = 6 "
+            + "                                      WHERE  e.encounter_type = ${6} "
             + "                                             AND bI2.patient_id = p.patient_id "
-            + "                                             AND o.concept_id = 23722 "
-            + "                                             AND o.value_coded = 856 "
-            + "                                             AND e.location_id = 400 "
+            + "                                             AND o.concept_id = ${23722} "
+            + "                                             AND o.value_coded = ${856} "
+            + "                                             AND e.location_id = :location "
             + "                                             AND e.voided = 0 "
             + "                                             AND p.voided = 0 "
             + "                                             AND e.encounter_datetime BETWEEN "
-            + "                                                 '2019-07-21' AND '2020-01-20' "
+            + "                                                 :less3mDate AND :startDate "
             + "                                      GROUP  BY p.patient_id)) B2 "
             + "       join (SELECT p.patient_id, "
             + "                    e.encounter_datetime "
@@ -3336,12 +3331,12 @@ public class QualityImprovement2020CohortQueries {
             + "                      ON e.patient_id = p.patient_id "
             + "                    join obs o "
             + "                      ON o.encounter_id = e.encounter_id "
-            + "             WHERE  e.encounter_type = 6 "
+            + "             WHERE  e.encounter_type = ${6} "
             + "                    AND e.voided = 0 "
-            + "                    AND e.location_id = 400 "
-            + "                    AND ( ( o.concept_id = 856 "
+            + "                    AND e.location_id = :location "
+            + "                    AND ( ( o.concept_id = ${856} "
             + "                            AND o.value_numeric IS NOT NULL ) "
-            + "                           OR ( o.concept_id = 1305 "
+            + "                           OR ( o.concept_id = ${1305} "
             + "                                AND o.value_coded IS NOT NULL ) )) I_tbl "
             + "         ON I_tbl.patient_id = B2.patient_id "
             + "WHERE  I_tbl.encounter_datetime BETWEEN Date_add(B2.regime_date, "

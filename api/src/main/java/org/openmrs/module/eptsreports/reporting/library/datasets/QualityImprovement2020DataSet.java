@@ -800,6 +800,81 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
+
+    // M&Q Report - Categoria 13 Numerador - P3 Indicators
+    dataSetDefinition.addColumn(
+            "MQ13P3NUM1",
+            "Adultos (15/+anos) na 1a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
+            EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                            "MQ13P3NUM1",
+                            EptsReportUtils.map(
+                                    qualityImprovement2020CohortQueries.getMQC13P3NUM("A"),
+                                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "age=15+");
+
+    dataSetDefinition.addColumn(
+            "MQ13P3NUM2",
+            "Crianças  (0-4 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
+            EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                            "MQ13P3NUM2",
+                            EptsReportUtils.map(
+                                    qualityImprovement2020CohortQueries.getMQC13P3NUM("B"),
+                                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "age=0-4");
+
+    dataSetDefinition.addColumn(
+            "MQ13P3NUM3",
+            "Crianças  (5-9 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
+            EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                            "MQ13P3NUM3",
+                            EptsReportUtils.map(
+                                    qualityImprovement2020CohortQueries.getMQC13P3NUM("C"),
+                                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "age=5-9");
+
+    dataSetDefinition.addColumn(
+            "MQ13P3NUM4",
+            " crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
+            EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                            "MQ13P3NUM4",
+                            EptsReportUtils.map(
+                                    qualityImprovement2020CohortQueries.getMQC13P3NUM("D"),
+                                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "age=10-14");
+
+    dataSetDefinition.addColumn(
+            "MQ13P3NUM5",
+            "adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
+            EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                            "MQ13P3NUM5",
+                            EptsReportUtils.map(
+                                    qualityImprovement2020CohortQueries.getMQC13P3NUM("E"),
+                                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "age=15+");
+
+    dataSetDefinition.addColumn(
+            "MQ13P3NUM6",
+            "Crianças na 2a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início da 2a linha de TARV",
+            EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                            "MQ13P3NUM6",
+                            EptsReportUtils.map(
+                                    qualityImprovement2020CohortQueries.getMQC13P3NUM("F"),
+                                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "age=2-15");
+
+
     return dataSetDefinition;
   }
 
