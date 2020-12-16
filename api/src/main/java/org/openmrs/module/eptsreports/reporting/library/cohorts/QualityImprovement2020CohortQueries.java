@@ -3016,13 +3016,40 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ10NUMDEN103() {
+  public CohortDefinition getMQ10NUMDEN103(String flag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("MQ10NUMDEN103 Cohort definition");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-
+    cd.addSearch(
+        "infant",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeInMonthsOnArtStartDate(0, 18),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtOnPeriod(false, true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                false,
+                true,
+                "once",
+                hivMetadata.getMasterCardEncounterType(),
+                commonMetadata.getTransferFromOtherFacilityConcept(),
+                Collections.singletonList(hivMetadata.getYesConcept()),
+                hivMetadata.getTypeOfPatientTransferredFrom(),
+                Collections.singletonList(hivMetadata.getArtStatus())),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    if (flag.equals("num")) {
+      cd.setCompositionString("(A AND NOT C) AND infant");
+    } else if (flag.equals("den")) {
+      cd.setCompositionString("(A AND NOT C) AND infant");
+    }
     return cd;
   }
 }
