@@ -17,6 +17,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.En
 import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.SecondFollowingEncounterAfterOldestARTStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.ThirdFollowingEncounterAfterOldestARTStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -41,6 +42,8 @@ public class QualityImprovement2020CohortQueries {
   private CommonCohortQueries commonCohortQueries;
 
   private TbMetadata tbMetadata;
+
+  private QualityImprovement2020Queries qualityImprovement2020Queries;
 
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -2836,13 +2839,20 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>MQ12</b>: Melhoria de Qualidade Category 12 <br>
+   * <b>MQ12DenP1: Melhoria de Qualidade Category 12 Denominator - Part 1</b><br>
+   * <br>
    * <i> DENOMINATOR 1: A AND NOT (C OR D OR E OR F) AND AGE > 15 </i> <br>
+   * <br>
    * <i> DENOMINATOR 2: A AND NOT (C OR D OR E OR F) AND AGE > 15 </i> <br>
+   * <br>
    * <i> DENOMINATOR 6: A AND NOT (C OR D OR E OR F) AND AGE <= 15 </i> <br>
+   * <br>
    * <i> DENOMINATOR 7: A AND NOT (C OR D OR E OR F) AND AGE <= 15 </i> <br>
+   * <br>
    * <i> DENOMINATOR 10: (A AND C) AND NOT (D OR E OR F) </i> <br>
+   * <br>
    * <i> DENOMINATOR 11: (A AND C) AND NOT (D OR E OR F) </i> <br>
+   * <br>
    *
    * <ul>
    *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
@@ -2851,7 +2861,6 @@ public class QualityImprovement2020CohortQueries {
    *       period (startDateInclusion and endDateInclusion)
    *   <li>D - All female patients registered as “Breastfeeding” on MasterCard during the inclusion
    *       period (startDateInclusion and endDateInclusion)
-   *   <li>
    *   <li>E - All transferred IN patients within the revision period
    *   <li>F - All transferred OUT patients within the revision period
    * </ul>
@@ -3115,5 +3124,482 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>MQ12</b>: Melhoria de Qualidade Categoria 12 Numerador - P2 <br>
+   *
+   * <p>Select patients from the corresponding denominator and all active patients as done in resumo
+   * mensal report - B13 and apply the following categories <i>12.3 - (A and B1 and NOT (B1E or C or
+   * D or E)) AND NOT G and Age >= 15*</i><br>
+   * <i>12.4 - (A and B2 and NOT (B2E or C or D or E)) AND NOT G and Age > =15*</i><br>
+   * <i>12.8 - (A and B1 and NOT (B1E or C or D or E)) AND NOT G and Age < 15*</i><br>
+   * <i>12.9 - (A and B2) and NOT (B2E or C or D or E) AND NOT G and Age < 15*</i><br>
+   * <i>12.12 - (A and B1 and C) and NOT (B1E or D or E) AND NOT G </i><br>
+   *
+   * <p>All age disaggreagtions should be based on the ART start date
+   *
+   * @param flag
+   * @return
+   */
+  public CohortDefinition getMQ12NumeratorP2(int flag) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    switch (flag) {
+      case 3:
+        cd.setName(
+            "No de adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas");
+        break;
+      case 4:
+        cd.setName("No de adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás");
+        break;
+      case 8:
+        cd.setName("No de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
+        break;
+      case 9:
+        cd.setName("No de crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás");
+        break;
+      case 12:
+        cd.setName("No de mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás");
+        break;
+    }
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    // Start adding the definitions based on the requirements
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtOnPeriod(false, true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "G",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries
+                .getNumberOfActivePatientsInArtAtEndOfCurrentMonthWithVlPerformed(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            getPatientsFromFichaClinicaDenominatorB("B1"),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B1E",
+        EptsReportUtils.map(
+            getPatientsFromFichaClinicaDenominatorB("B1E"),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                true,
+                false,
+                "once",
+                hivMetadata.getMasterCardEncounterType(),
+                commonMetadata.getPregnantConcept(),
+                Collections.singletonList(hivMetadata.getYesConcept()),
+                null,
+                null),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                true,
+                false,
+                "once",
+                hivMetadata.getMasterCardEncounterType(),
+                commonMetadata.getBreastfeeding(),
+                Collections.singletonList(hivMetadata.getYesConcept()),
+                null,
+                null),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "E",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohMQPatientsOnCondition(
+                false,
+                true,
+                "once",
+                hivMetadata.getMasterCardEncounterType(),
+                commonMetadata.getTransferFromOtherFacilityConcept(),
+                Collections.singletonList(hivMetadata.getYesConcept()),
+                hivMetadata.getTypeOfPatientTransferredFrom(),
+                Collections.singletonList(hivMetadata.getArtStatus())),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B2",
+        EptsReportUtils.map(
+            getPatientsFromFichaClinicaDenominatorB("B2_12"),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B2E",
+        EptsReportUtils.map(
+            getPatientsFromFichaClinicaDenominatorB("B2E"),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    if (flag == 3) {
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND NOT G");
+    } else if (flag == 4) {
+      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR E)) AND NOT G");
+    } else if (flag == 8) {
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND NOT G");
+    } else if (flag == 9) {
+      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR E) AND NOT G");
+    } else if (flag == 12) {
+      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR E) AND NOT G ");
+    }
+
+    return cd;
+  }
+
+  /**
+   * <b>MQ12NumP1: Melhoria de Qualidade Category 12 Numerator - Part 1</b><br>
+   * <br>
+   * <i> NUMERATOR 1: (A and NOT (C or D or E or F)) and H and Age >= 15 </i> <br>
+   * <br>
+   * <i> NUMERATOR 2: (A and NOT (C or D or E or F)) and I and Age >= 15 </i> <br>
+   * <br>
+   * <i> NUMERATOR 6: (A and NOT (C or D or E or F)) and H Age < 15 </i> <br>
+   * <br>
+   * <i> NUMERATOR 7: (A and NOT (C or D or E or F)) and I and Age < 15 </i> <br>
+   * <br>
+   * <i> NUMERATOR 10: ((A and C) and NOT (D or E or F)) and H Age < 15 </i> <br>
+   * <br>
+   * <i> NUMERATOR 11: ((A and C) and NOT (D or E or F)) and I </i> <br>
+   * <br>
+   *
+   * <ul>
+   *   <li>H - Filter all patients that returned for another clinical consultation (encounter type
+   *       6, encounter_datetime) or ARV pickup (encounter type 52, concept ID 23866 value_datetime,
+   *       Levantou ARV (concept id 23865) = Sim (1065)) between 25 and 33 days after ART start
+   *       date(Oldest date From A)
+   *   <li>I1 - FIRST consultation (Encounter_datetime (from encounter type 6)) >= “ART Start Date”
+   *       (oldest date from A)+20days and <= “ART Start Date” (oldest date from A)+33days
+   *   <li>AND
+   *   <li>I2 - At least one consultation (Encounter_datetime (from encounter type 6)) >= “First
+   *       Consultation” (oldest date from I1)+20days and <=“First Consultation” (oldest date from
+   *       I1)+33days
+   *   <li>I3 - At least one consultation (Encounter_datetime (from encounter type 6)) > “Second
+   *       Consultation” (oldest date from I2)+20days and <= “Second Consultation” (oldest date from
+   *       I2)+33days
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ12NUM(Integer den) {
+    CompositionCohortDefinition comp = new CompositionCohortDefinition();
+
+    switch (den) {
+      case 1:
+        comp.setName(
+            "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs entre 25 a 33 dias após o início do TARV");
+        break;
+      case 2:
+        comp.setName(
+            "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que tiveram 3 consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
+        break;
+      case 6:
+        comp.setName(
+            "# de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
+        break;
+      case 7:
+        comp.setName(
+            "# de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
+        break;
+      case 10:
+        comp.setName(
+            "# de mulheres grávidas HIV+ que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
+        break;
+      case 11:
+        comp.setName(
+            "# de mulheres grávidas HIV+ que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
+        break;
+    }
+
+    comp.addParameter(new Parameter("startDate", "startDate", Date.class));
+    comp.addParameter(new Parameter("endDate", "endDate", Date.class));
+    comp.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
+    comp.addParameter(new Parameter("location", "location", Date.class));
+
+    CohortDefinition startedART = getMQC3D1();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getPregnantConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition transferIn =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            true,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
+
+    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+
+    CohortDefinition returnedForAnyConsultationOrPickup =
+        qualityImprovement2020Queries.getMQ12NumH(25, 33);
+
+    CohortDefinition returnedForAnotherConsultationOrPickup =
+        qualityImprovement2020Queries.getMQ12NumI(20, 33);
+
+    comp.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+
+    comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+
+    comp.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+
+    comp.addSearch(
+        "E",
+        EptsReportUtils.map(
+            transferIn,
+            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+
+    comp.addSearch(
+        "F",
+        EptsReportUtils.map(
+            transferOut,
+            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+
+    comp.addSearch(
+        "H",
+        EptsReportUtils.map(
+            returnedForAnyConsultationOrPickup,
+            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+
+    comp.addSearch(
+        "I",
+        EptsReportUtils.map(
+            returnedForAnotherConsultationOrPickup,
+            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+
+    comp.addSearch(
+        "CHILDREN",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnArtStartDate(0, 14, true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    comp.addSearch(
+        "ADULT",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnArtStartDate(15, null, false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    if (den == 1) {
+      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND H AND ADULT");
+    } else if (den == 2) {
+      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND I AND ADULT");
+    } else if (den == 6) {
+      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND H AND CHILDREN");
+    } else if (den == 7) {
+      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND I AND CHILDREN");
+    } else if (den == 10) {
+      comp.setCompositionString("((A AND C) AND NOT (D OR E OR F)) AND H AND CHILDREN");
+    } else if (den == 11) {
+      comp.setCompositionString("((A AND C) AND NOT (D OR E OR F)) AND I");
+    }
+    return comp;
+  }
+
+  /**
+   * <b>MQ13</b>: Melhoria de Qualidade Category 13 <br>
+   * <i></i><br>
+   * <i> <b>DENOMINATOR (1,6,7,8):</b> B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR
+   * B5E)</i> <br>
+   * <i></i><br>
+   * <i> <b>NUMERATOR (1,6,7,8):</b> B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR
+   * B5E) AND C </i> <br>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ13(Boolean den, Integer line) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (den) {
+      compositionCohortDefinition.setName(
+          "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E)");
+    } else {
+      compositionCohortDefinition.setName("B and C");
+    }
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
+
+    CohortDefinition firstLine6Months =
+        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
+            false,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getFirstLineConcept()));
+
+    CohortDefinition secondLine6Months =
+        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
+            false,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getSecondLineConcept()));
+
+    CohortDefinition changeRegimen6Months =
+        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
+            true,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getAlternativeLineConcept(),
+            Arrays.asList(
+                commonMetadata.getAlternativeFirstLineConcept(),
+                commonMetadata.getRegimeChangeConcept(),
+                hivMetadata.getNoConcept()));
+
+    CohortDefinition B2E =
+        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
+            false,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getFirstLineConcept()),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getFirstLineConcept()));
+
+    CohortDefinition secondLineB2E =
+        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
+            false,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getSecondLineConcept()),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getSecondLineConcept()));
+
+    CohortDefinition B3E =
+        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
+            true,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getAlternativeLineConcept(),
+            Arrays.asList(
+                commonMetadata.getAlternativeFirstLineConcept(),
+                commonMetadata.getRegimeChangeConcept(),
+                hivMetadata.getNoConcept()),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getFirstLineConcept()));
+
+    CohortDefinition B4E =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            true, false, 12);
+
+    CohortDefinition B5E =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            false, true, 3);
+
+    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(lastClinical, MAPPING));
+
+    if (line == 1) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
+              MAPPING));
+    } else if (line == 4) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
+              MAPPING));
+    } else if (line == 6) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 4), MAPPING));
+    } else if (line == 7) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(5, 9), MAPPING));
+    } else if (line == 8) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(10, 14),
+              MAPPING));
+    } else if (line == 13) {
+      compositionCohortDefinition.addSearch(
+          "age",
+          EptsReportUtils.map(
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(2, null),
+              MAPPING));
+    }
+
+    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(firstLine6Months, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "secondLineB2", EptsReportUtils.map(secondLine6Months, MAPPING));
+
+    compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(B2E, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "secondLineB2E", EptsReportUtils.map(secondLineB2E, MAPPING));
+
+    compositionCohortDefinition.addSearch("B3", EptsReportUtils.map(changeRegimen6Months, MAPPING));
+
+    compositionCohortDefinition.addSearch("B3E", EptsReportUtils.map(B3E, MAPPING));
+
+    compositionCohortDefinition.addSearch("B4E", EptsReportUtils.map(B4E, MAPPING));
+
+    compositionCohortDefinition.addSearch("B5E", EptsReportUtils.map(B5E, MAPPING));
+
+    if (den) {
+      if (line == 1) {
+        compositionCohortDefinition.setCompositionString(
+            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) and age");
+      } else if (line == 4) {
+        compositionCohortDefinition.setCompositionString(
+            "B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E) AND age");
+      } else if (line == 6) {
+        compositionCohortDefinition.setCompositionString(
+            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
+      } else if (line == 7) {
+        compositionCohortDefinition.setCompositionString(
+            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
+      } else if (line == 8) {
+        compositionCohortDefinition.setCompositionString(
+            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
+      } else if (line == 13) {
+        compositionCohortDefinition.setCompositionString(
+            "B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E) AND age");
+      }
+    }
+
+    return compositionCohortDefinition;
   }
 }
