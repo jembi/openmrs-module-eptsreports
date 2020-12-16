@@ -3718,42 +3718,37 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicatorFlag.equals("A"))
       cd.setName(
-          "Adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas");
+          "Adultos (15/+anos) na 1a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após início do TARV");
     if (indicatorFlag.equals("B"))
-      cd.setName("Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrá");
+      cd.setName(
+          "Crianças  (0-4 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV");
     if (indicatorFlag.equals("C"))
-      cd.setName("Crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
+      cd.setName(
+          "Crianças  (5-9 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV");
     if (indicatorFlag.equals("D"))
-      cd.setName("Crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás");
+      cd.setName(
+          "Crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV");
     if (indicatorFlag.equals("E"))
-      cd.setName("Mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás");
+      cd.setName(
+          "Adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV");
+    if (indicatorFlag.equals("F"))
+      cd.setName(
+          "Crianças na 2a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início da 2a linha de TARV");
 
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
+    String mapping =
+        "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
 
     // Start adding the definitions based on the requirements
     cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch(
-        "G",
-        EptsReportUtils.map(
-            resumoMensalCohortQueries
-                .getNumberOfActivePatientsInArtAtEndOfCurrentMonthWithVlPerformed(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "B1",
-        EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B1"),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "B1E",
-        EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B1E"),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "A", EptsReportUtils.map(genericCohortQueries.getStartedArtOnPeriod(false, true), MAPPING));
+
+    cd.addSearch("B1", EptsReportUtils.map(getPatientsOnRegimeChangeBI1AndNotB1E_B1(), MAPPING));
+
+    cd.addSearch("B2", EptsReportUtils.map(getPatientsOnSecondLineBI2AndNotB2E_B2(), mapping));
+
     cd.addSearch(
         "C",
         EptsReportUtils.map(
@@ -3766,7 +3761,7 @@ public class QualityImprovement2020CohortQueries {
                 Collections.singletonList(hivMetadata.getYesConcept()),
                 null,
                 null),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            MAPPING));
     cd.addSearch(
         "D",
         EptsReportUtils.map(
@@ -3779,7 +3774,7 @@ public class QualityImprovement2020CohortQueries {
                 Collections.singletonList(hivMetadata.getYesConcept()),
                 null,
                 null),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            MAPPING));
     cd.addSearch(
         "E",
         EptsReportUtils.map(
@@ -3792,26 +3787,21 @@ public class QualityImprovement2020CohortQueries {
                 Collections.singletonList(hivMetadata.getYesConcept()),
                 hivMetadata.getTypeOfPatientTransferredFrom(),
                 Collections.singletonList(hivMetadata.getArtStatus())),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "B2",
-        EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B2_12"),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "B2E",
-        EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B2E"),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            MAPPING));
 
-    if (indicatorFlag.equals("A") || indicatorFlag == "E" || indicatorFlag.equals("F"))
-      cd.setCompositionString("A AND NOT (C OR D OR E OR F)");
-    if (indicatorFlag.equals("B") || indicatorFlag.equals("G"))
-      cd.setCompositionString("(B1 AND B2) AND NOT (C OR D OR E OR F)");
-    if (indicatorFlag.equals("C"))
-      cd.setCompositionString("(A AND B3 AND C) AND NOT (D OR E OR F)");
-    if (indicatorFlag.equals("D"))
-      cd.setCompositionString("(B1 AND B3 AND C) AND NOT (D OR E OR F)");
+    cd.addSearch("F", EptsReportUtils.map(commonCohortQueries.getTranferredOutPatients(), MAPPING));
+
+    cd.addSearch("G", EptsReportUtils.map(getMQC13P3NUM_G(), MAPPING));
+    cd.addSearch("H", EptsReportUtils.map(getMQC13P3NUM_H(), MAPPING));
+    cd.addSearch("I", EptsReportUtils.map(getMQC13P3NUM_I(), mapping));
+
+    if (indicatorFlag.equals("A")
+        || indicatorFlag.equals("B")
+        || indicatorFlag.equals("C")
+        || indicatorFlag.equals("D"))
+      cd.setCompositionString("((A AND NOT E AND G) OR (B1 AND H)) AND NOT (C OR D OR F)");
+    if (indicatorFlag.equals("E") || indicatorFlag.equals("F"))
+      cd.setCompositionString("(B2 AND I) AND NOT (C OR D OR F)");
 
     return cd;
   }
