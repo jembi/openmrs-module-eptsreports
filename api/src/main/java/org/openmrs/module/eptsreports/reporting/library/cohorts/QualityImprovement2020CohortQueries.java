@@ -3008,7 +3008,7 @@ public class QualityImprovement2020CohortQueries {
 
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23898", hivMetadata.getLineAlternativesConcept().getConceptId());
+    map.put("23898", commonMetadata.getAlternativeLineConcept().getConceptId());
     map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
     map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
 

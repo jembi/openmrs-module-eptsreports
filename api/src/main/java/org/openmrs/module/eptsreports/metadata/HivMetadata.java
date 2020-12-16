@@ -3231,23 +3231,6 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>concept_id = 23898</b>
-   *
-   * <p><b>Name:</b>LINE ALTERNATIVES
-   *
-   * <p><b>Description: Alternativa a Linha </b>
-   *
-   * @return {@link Concept}
-   */
-  public Concept getLineAlternativesConcept() {
-
-    String uuid =
-        Context.getAdministrationService()
-            .getGlobalProperty("eptsreports.lineAlternativesConceptUuid");
-    return getConcept(uuid);
-  }
-
-  /**
    * <b>concept_id = 6317</b>
    *
    * <p><b>Name:</b> PP1 concept - MESSAGE OF SEXUAL BEHAVIOR AND SUPPLY OF CONDOMS
