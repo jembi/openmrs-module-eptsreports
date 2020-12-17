@@ -92,14 +92,19 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition startedART = this.genericCohortQueries.getStartedArtOnPeriod(false, true);
+    CohortDefinition startedART =
+        commonCohortQueries.getMOHArtStartDate(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
+            hivMetadata.getArtPickupConcept().getConceptId(),
+            hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     CohortDefinition transferredIn = this.getTransferredInPatients();
 
-    compositionCohortDefinition.addSearch(
-        "A",
-        EptsReportUtils.map(
-            startedART, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
     compositionCohortDefinition.addSearch("B", EptsReportUtils.map(transferredIn, MAPPING));
 
@@ -186,8 +191,15 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "A",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            commonCohortQueries.getMOHArtStartDate(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getYesConcept().getConceptId(),
+                hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
+                hivMetadata.getArtPickupConcept().getConceptId(),
+                hivMetadata.getArtDatePickupMasterCard().getConceptId()),
+            MAPPING));
     cd.addSearch(
         "B",
         EptsReportUtils.map(
@@ -245,8 +257,15 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "A",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            commonCohortQueries.getMOHArtStartDate(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getYesConcept().getConceptId(),
+                hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
+                hivMetadata.getArtPickupConcept().getConceptId(),
+                hivMetadata.getArtDatePickupMasterCard().getConceptId()),
+                MAPPING));
     cd.addSearch(
         "B",
         EptsReportUtils.map(
@@ -1829,7 +1848,7 @@ public class QualityImprovement2020CohortQueries {
         || indicatorFlag.equals("C")
         || indicatorFlag.equals("D"))
       compositionCohortDefinition.setCompositionString(
-          "((A AND NOT E) OR B1) AND NOT (C OR D OR F))");
+          "((A AND NOT E) OR B1) AND NOT (C OR D OR F)");
     if (indicatorFlag.equals("E") || indicatorFlag.equals("F"))
       compositionCohortDefinition.setCompositionString("B2 AND NOT (C OR D OR F)");
 
@@ -3172,8 +3191,15 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "A",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(false, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            commonCohortQueries.getMOHArtStartDate(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getYesConcept().getConceptId(),
+                hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
+                hivMetadata.getArtPickupConcept().getConceptId(),
+                hivMetadata.getArtDatePickupMasterCard().getConceptId()),
+                MAPPING));
     cd.addSearch(
         "G",
         EptsReportUtils.map(
@@ -3749,7 +3775,17 @@ public class QualityImprovement2020CohortQueries {
 
     // Start adding the definitions based on the requirements
     cd.addSearch(
-        "A", EptsReportUtils.map(genericCohortQueries.getStartedArtOnPeriod(false, true), MAPPING));
+        "A",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHArtStartDate(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getYesConcept().getConceptId(),
+                hivMetadata.getHistoricalDrugStartDateConcept().getConceptId(),
+                hivMetadata.getArtPickupConcept().getConceptId(),
+                hivMetadata.getArtDatePickupMasterCard().getConceptId()),
+            MAPPING));
 
     cd.addSearch("B1", EptsReportUtils.map(getPatientsOnRegimeChangeBI1AndNotB1E_B1(), MAPPING));
 
