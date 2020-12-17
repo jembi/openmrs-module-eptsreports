@@ -1053,7 +1053,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQ13P4(true, 18),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=2-14");
+        "");
 
     // M&Q Report - Categoria 13 Numerador - P3 Indicators
     dataSetDefinition.addColumn(
