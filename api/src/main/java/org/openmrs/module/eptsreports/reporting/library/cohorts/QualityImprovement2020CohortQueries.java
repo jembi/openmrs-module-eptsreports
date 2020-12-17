@@ -4383,6 +4383,13 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getQuarterlyDispensation().getConceptId(),
             hivMetadata.getTypeOfDispensationConcept().getConceptId());
 
+    CohortDefinition queryA2 =
+        qualityImprovement2020Queries.getMQ15DenA1orA2(
+            "A2",
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            hivMetadata.getGaac().getConceptId());
+
     CohortDefinition queryB1 =
         qualityImprovement2020Queries.getMQ15DenB1(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -4429,6 +4436,8 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
     comp.addSearch("A", EptsReportUtils.map(queryA, MAPPING));
+
+    comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING));
 
     comp.addSearch("B1", EptsReportUtils.map(queryB1, MAPPING));
 
