@@ -4136,35 +4136,35 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         " SELECT  "
-    + "     p.patient_id  "
-    + " FROM  "
-    + "     patient p  "
-    + "         INNER JOIN  "
-    + "     encounter e ON e.patient_id = p.patient_id  "
-    + "         INNER JOIN  "
-    + "     obs o ON o.encounter_id = e.encounter_id  "
-    + "         INNER JOIN  "
-    + "     (SELECT   "
-    + "         p.patient_id, MIN(e.encounter_datetime) encounter_datetime  "
-    + "     FROM  "
-    + "         patient p  "
-    + "     INNER JOIN encounter e ON e.patient_id = p.patient_id  "
-    + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
-    + "     WHERE  "
-    + "         p.voided = 0 AND e.voided = 0  "
-    + "             AND o.voided = 0  "
-    + "             AND e.location_id = :location  "
-    + "             AND e.encounter_type = ${6}  "
-    + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
-    + "             AND o.concept_id = ${856}  "
-    + "     GROUP BY p.patient_id) AS list ON list.patient_id = p.patient_id  "
-    + " WHERE  "
-    + "     p.voided = 0 AND e.voided = 0  "
-    + "         AND o.voided = 0  "
-    + "         AND e.location_id = :location  "
-    + "         AND DATE(e.encounter_datetime) = DATE(list.encounter_datetime)  "
-    + "         AND o.concept_id = ${856}  "
-    + "         AND o.value_numeric > 1000;";
+            + "     p.patient_id  "
+            + " FROM  "
+            + "     patient p  "
+            + "         INNER JOIN  "
+            + "     encounter e ON e.patient_id = p.patient_id  "
+            + "         INNER JOIN  "
+            + "     obs o ON o.encounter_id = e.encounter_id  "
+            + "         INNER JOIN  "
+            + "     (SELECT   "
+            + "         p.patient_id, MIN(e.encounter_datetime) encounter_datetime  "
+            + "     FROM  "
+            + "         patient p  "
+            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "     WHERE  "
+            + "         p.voided = 0 AND e.voided = 0  "
+            + "             AND o.voided = 0  "
+            + "             AND e.location_id = :location  "
+            + "             AND e.encounter_type = ${6}  "
+            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "             AND o.concept_id = ${856}  "
+            + "     GROUP BY p.patient_id) AS list ON list.patient_id = p.patient_id  "
+            + " WHERE  "
+            + "     p.voided = 0 AND e.voided = 0  "
+            + "         AND o.voided = 0  "
+            + "         AND e.location_id = :location  "
+            + "         AND DATE(e.encounter_datetime) = DATE(list.encounter_datetime)  "
+            + "         AND o.concept_id = ${856}  "
+            + "         AND o.value_numeric > 1000;";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -4211,8 +4211,7 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.setName(
             "(B1 and B2)  and NOT (C or D or F) and Age > 2 and Age < 15*");
       } else if (line == 18) {
-        compositionCohortDefinition.setName(
-            "(B1 and B2 and C)  and NOT (D or F)");
+        compositionCohortDefinition.setName("(B1 and B2 and C)  and NOT (D or F)");
       }
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -4391,6 +4390,12 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getGaac().getConceptId(),
             hivMetadata.getQuarterlyDispensation().getConceptId());
 
+    CohortDefinition queryA3 =
+        qualityImprovement2020Queries.getMQ15DenA3(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getQuarterlyConcept().getConceptId(),
+            hivMetadata.getTypeOfDispensationConcept().getConceptId());
+
     CohortDefinition queryB1 =
         qualityImprovement2020Queries.getMQ15DenB1(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -4439,6 +4444,11 @@ public class QualityImprovement2020CohortQueries {
     comp.addSearch("A", EptsReportUtils.map(queryA, MAPPING));
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING));
+
+    comp.addSearch(
+        "A3",
+        EptsReportUtils.map(
+            queryA3, "startDate=${endDate-14m},endDate=${endDate-11m},location=${location}"));
 
     comp.addSearch("B1", EptsReportUtils.map(queryB1, MAPPING));
 
