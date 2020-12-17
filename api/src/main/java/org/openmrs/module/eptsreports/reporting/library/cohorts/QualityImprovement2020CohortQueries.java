@@ -4363,6 +4363,17 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.setName(
             "(B1 and B2 and C)  and NOT (D or F) and Age > 2 and Age < 15*");
       }
+    } else {
+      if (line == 3) {
+        compositionCohortDefinition.setName(
+            "(B1 and B2 AND G AND H)  and NOT (C or D or F) and Age >= 15*");
+      } else if (line == 12) {
+        compositionCohortDefinition.setName(
+            "(B1 and B2 AND G AND H)  and NOT (C or D or F) and Age > 2 and Age < 15*");
+      } else if (line == 18) {
+        compositionCohortDefinition.setName(
+            "(B1 and B2 AND C AND G AND H)  and NOT (D or F)");
+      }
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -4438,6 +4449,9 @@ public class QualityImprovement2020CohortQueries {
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
             "(B1 AND B2 AND G AND H) AND NOT (C OR D OR F)");
+      } else if (line == 18) {
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND B2 AND C AND G AND H) AND NOT (D OR F)");
       }
     }
     return compositionCohortDefinition;
