@@ -1019,6 +1019,42 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "age=2-14");
 
+    dataSetDefinition.addColumn(
+        "MQ13DEN3",
+        "# de adultos na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13DEN3",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(true, 3),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ13DEN12",
+        "# de crianças (>2 anos de idade) na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13DEN12",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(true, 12),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=2-14");
+
+    dataSetDefinition.addColumn(
+        "MQ13DEN18",
+        "# de MG na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13DEN18",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(true, 18),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
     // M&Q Report - Categoria 13 Numerador - P3 Indicators
     dataSetDefinition.addColumn(
         "MQ13NUM2",
@@ -1116,7 +1152,41 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
+    dataSetDefinition.addColumn(
+        "MQ13NUM3",
+        "% de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 e terem  3 sessões consecutivas de APSS/PP",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM3",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(false, 3),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
 
+    dataSetDefinition.addColumn(
+        "MQ13NUM12",
+        "% de crianças (>2 anos de idade) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 cópia e terem  3 sessões consecutivas de APSS/PP",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM12",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(false, 12),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=2-14");
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM18",
+        "% de MG na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 cópia e terem 3 sessões consecutivas de APSS/PP",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM18",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(false, 18),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
     return dataSetDefinition;
   }
 
