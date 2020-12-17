@@ -1126,7 +1126,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC13P3NUM("F"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=2-15");
+        "age=2-14");
 
     dataSetDefinition.addColumn(
         "MQ13NUM3",
@@ -1166,11 +1166,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     // Categoria  13 part 2  Denominator
     dataSetDefinition.addColumn(
-        "MQ13PART2DEN1",
+        "MQ13DEN15",
         "13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de inclusão. (Line 90,Column F in the Template) as following",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "MQ13PART2DEN1",
+                "MQ13DEN15",
                 EptsReportUtils.map(
                     qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod(),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
@@ -1178,11 +1178,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "");
 
     dataSetDefinition.addColumn(
-        "MQ13PART2DEN2",
+        "MQ13DEN16",
         "13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN (MG que entraram em TARV na CPN) Denominator:# de MG que tiveram a primeira CPN no período de inclusão, e que já estavam em TARV há mais de 3 meses  (Line 91,Column F in the Template) as following:",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "MQ13PART2DEN2",
+                "MQ13DEN16",
                 EptsReportUtils.map(
                     qualityImprovement2020CohortQueries
                         .getgetMQC13P2DenMGInIncluisionPeriod33Month(),
@@ -1191,11 +1191,11 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "");
 
     dataSetDefinition.addColumn(
-        "MQ13PART2DEN3",
+        "MQ13DEN17",
         "13.17. % de MG que receberam o resultado da Carga Viral dentro de 33 dias após pedido Denominator: # de MG com registo de pedido de CV no período de revisão (Line 92,Column F in the Template) as following:<",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "MQ13PART2DEN3",
+                "MQ13DEN17",
                 EptsReportUtils.map(
                     qualityImprovement2020CohortQueries
                         .getgetMQC13P2DenMGInIncluisionPeriod33Days(),

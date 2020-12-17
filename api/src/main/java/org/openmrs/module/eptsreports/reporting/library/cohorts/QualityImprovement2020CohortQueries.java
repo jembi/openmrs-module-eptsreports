@@ -2093,6 +2093,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     compositionCohortDefinition.setName("Category 11 Numerator session G");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
