@@ -13,6 +13,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
+import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.MohMQInitiatedARTDuringTheInclusionPeriodCalculation;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,9 @@ public class ArtDateMinusDiagnosisDateCalculation extends AbstractPatientCalcula
 
     CalculationResultMap artStartDates =
         calculate(
-            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0),
+            Context.getRegisteredComponents(
+                    MohMQInitiatedARTDuringTheInclusionPeriodCalculation.class)
+                .get(0),
             cohort,
             context);
     CalculationResultMap diagnosisDateMap =

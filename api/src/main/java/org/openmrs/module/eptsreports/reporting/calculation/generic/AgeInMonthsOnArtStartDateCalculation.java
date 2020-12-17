@@ -11,6 +11,7 @@ import org.openmrs.calculation.result.CalculationResult;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
+import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.MohMQInitiatedARTDuringTheInclusionPeriodCalculation;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.Birthdate;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
@@ -32,7 +33,9 @@ public class AgeInMonthsOnArtStartDateCalculation extends AbstractPatientCalcula
 
     CalculationResultMap artStartDates =
         calculate(
-            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0),
+            Context.getRegisteredComponents(
+                    MohMQInitiatedARTDuringTheInclusionPeriodCalculation.class)
+                .get(0),
             cohort,
             context);
     CalculationResultMap birthDates =
