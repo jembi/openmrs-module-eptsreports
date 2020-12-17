@@ -24,19 +24,15 @@ public class IMER1DenominatorCohortQueries {
 
   private TxNewCohortQueries txNewCohortQueries;
 
-  private ResumoMensalCohortQueries resumoMensalCohortQueries;
-
   private GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public IMER1DenominatorCohortQueries(
       HivMetadata hivMetadata,
       TxNewCohortQueries txNewCohortQueries,
-      ResumoMensalCohortQueries resumoMensalCohortQueries,
       GenericCohortQueries genericCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.txNewCohortQueries = txNewCohortQueries;
-    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
   }
 
