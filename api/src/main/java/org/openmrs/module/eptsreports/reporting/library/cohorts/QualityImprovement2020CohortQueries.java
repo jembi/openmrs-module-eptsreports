@@ -2762,7 +2762,10 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
-    compositionCohortDefinition.addSearch("I", EptsReportUtils.map(i, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "I",
+        EptsReportUtils.map(
+            i, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     compositionCohortDefinition.addSearch(
         "BABIES", EptsReportUtils.map(babies, "effectiveDate=${effectiveDate}"));
 
