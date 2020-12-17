@@ -4469,13 +4469,13 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
 
     comp.addSearch(
-        "AGES_2_9",
+        "AGES29",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnArtStartDate(2, 9, true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     comp.addSearch(
-        "AGES_10_14",
+        "AGES1014",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnArtStartDate(10, 14, true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
@@ -4495,11 +4495,10 @@ public class QualityImprovement2020CohortQueries {
     if (den == 1 || den == 2 || den == 3 || den == 4) {
       comp.setCompositionString("A AND NOT B1 AND NOT C AND NOT D AND NOT F AND ADULT");
     } else if (den == 5 || den == 7 || den == 9 || den == 11) {
-      comp.setCompositionString(
-          "(A2 or A3) AND NOT B1 AND  NOT C AND NOT D AND NOT F AND AGES_2_9");
+      comp.setCompositionString("(A2 or A3) AND NOT B1 AND  NOT C AND NOT D AND NOT F AND AGES29");
     } else if (den == 6 || den == 8 || den == 10 || den == 12) {
       comp.setCompositionString(
-          "(A2 or A3) and NOT B1 and  NOT C and NOT D and NOT F and AGES_10_14");
+          "(A2 or A3) and NOT B1 and  NOT C and NOT D and NOT F and AGES1014");
     }
     return comp;
   }
