@@ -180,7 +180,7 @@ public class QualityImprovement2020Queries {
     map.put("23866", artDatePickupMasterCard);
 
     String query =
-        "SELECT second_visit.patient_id, second_visit.first_visit_1, second_visit.first_visit_2, after_second_visit.first_visit_3  "
+        "SELECT second_visit.patient_id "
             + "FROM   (SELECT first_visit.patient_id, first_visit.first_visit_1, after_first_visit.first_visit_2  "
             + "        FROM   (SELECT inicio_real.patient_id, inicio_real.data_inicio, first_real.first_visit_1  "
             + "                FROM   (SELECT patient_id, data_inicio  "
