@@ -1092,6 +1092,31 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"),
         "age=2-15");
 
+    // M&Q Report - Cat 10 Indicator 10.3 - Numerator and Denominator
+    dataSetDefinition.addColumn(
+        "MQ10NUMDEN1031",
+        "% de crianças com PCR positivo para HIV  que iniciaram TARV dentro de 2 semanas após o diagnóstico/entrega do resultado ao cuidador - denominator",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ10NUMDEN1031",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ10NUMDEN103("den"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ10NUMDEN1032",
+        "% de crianças com PCR positivo para HIV  que iniciaram TARV dentro de 2 semanas após o diagnóstico/entrega do resultado ao cuidador - numerator",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ10NUMDEN1032",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ10NUMDEN103("num"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
     return dataSetDefinition;
   }
 
