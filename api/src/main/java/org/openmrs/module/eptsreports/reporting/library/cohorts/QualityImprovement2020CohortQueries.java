@@ -4191,7 +4191,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 and B2)  and NOT (C or D or F) and Age > 2 and Age < 15*");
       } else if (line == 18) {
         compositionCohortDefinition.setName(
-            "(B1 and B2 and C)  and NOT (D or F) and Age > 2 and Age < 15*");
+            "(B1 and B2 and C)  and NOT (D or F)");
       }
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
