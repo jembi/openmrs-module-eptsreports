@@ -373,7 +373,8 @@ public class QualityImprovement2020Queries {
       String flag,
       int adultoSeguimentoEncounterType,
       int startDrugs,
-      int gaac) {
+      int gaac,
+      int quarterlyDispensation) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
@@ -386,6 +387,7 @@ public class QualityImprovement2020Queries {
     map.put("6", adultoSeguimentoEncounterType);
     map.put("1256", startDrugs);
     map.put("23724", gaac);
+    map.put("23730", quarterlyDispensation);
 
     String middleQuery = "";
     

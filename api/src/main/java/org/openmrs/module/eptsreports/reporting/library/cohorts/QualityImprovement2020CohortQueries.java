@@ -4388,7 +4388,8 @@ public class QualityImprovement2020CohortQueries {
             "A2",
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getGaac().getConceptId());
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId());
 
     CohortDefinition queryB1 =
         qualityImprovement2020Queries.getMQ15DenB1(
