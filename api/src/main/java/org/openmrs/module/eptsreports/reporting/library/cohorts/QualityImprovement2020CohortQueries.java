@@ -4556,8 +4556,8 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getMasterCardDrugPickupEncounterType(),
                 hivMetadata.getTypeTestHIVConcept(),
                 Collections.singletonList(hivMetadata.getHivPCRQualitativeConceptUuid()),
-                null,
-                null),
+                hivMetadata.getTypeTestHIVConcept(),
+                Collections.singletonList(hivMetadata.getHivPCRQualitativeConceptUuid())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "C",
