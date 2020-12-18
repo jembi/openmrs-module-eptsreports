@@ -4491,6 +4491,14 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   * B1 - Select all patients with a clinical consultation (encounter type 6) that have the first
+   * occurrence of concept “GESTANTE” (Concept Id 1982) and value coded “SIM” (Concept Id 1065) in
+   * the same Encounter_datetime as the ART Start Date (the oldest from query A) during the
+   * inclusion period (startDateInclusion and endDateInclusion).
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2DenB1() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -4580,6 +4588,16 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * B2 - Select all patients with a clinical consultation (encounter type 6) that have the concept
+   * “GESTANTE” (Concept Id 1982) and value coded “SIM” (Concept Id 1065) registered (1)during the
+   * inclusion period (first occurrence, encounter_datetime >= startDateInclusion and
+   * <=endDateInclusion) and (2) after the start of ART (encounter_datetime > “Patient ART Start
+   * Date”) and (3) on ART at least for 3 months ( encounter_datetime minus “Patient ART Start
+   * Date”) >= 3months)
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2DenB2() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -4671,6 +4689,15 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * (B3=H from Numerator) - Select all patients with clinical consultation (encounter type 6) with
+   * concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA
+   * VIRAL” (Concept Id 856) on Encounter_datetime between “Patient ART Start Date” (the oldest from
+   * query A)+80days and “Patient ART Start Date” (the oldest from query A)+130days. Note: if more
+   * than one encounter exists that satisfies these conditions, select the oldest one.
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2DenB3() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
@@ -4762,6 +4789,15 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * (B4=J from Numerator) - Select all patients with clinical consultation (encounter type 6) with
+   * concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA
+   * VIRAL” (Concept Id 856) on the first occurrence of concept “GESTANTE” (Concept Id 1982) and
+   * value coded “SIM” ( Concept Id 1065) encounter_datetime during the inclusion period
+   * (encounter_datetime from B2)
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2DenB4() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
@@ -5117,6 +5153,14 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * K - Select all patients from Ficha Clinica (encounter type 6) with concept “Carga Viral”
+   * (Concept id 856, value_numeric not null) OR concept “Carga Viral Qualitative”(Concept id 1305,
+   * value_coded not null) and Encounter_datetime > “Data de Pedido de Carga Viral”(the date from
+   * B3) and Encounter_datetime <= “Data de Pedido de Carga Viral”(the date from B3)+33days
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getgetMQC13P2NumK() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -5236,6 +5280,14 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * L - Select all patients from Ficha Clinica (encounter type 6) with concept “Carga Viral”
+   * (Concept id 856, value_numeric not null) or concept “Carga Viral Qualitative”(Concept id 1305,
+   * value_coded not null) and Encounter_datetime > “Data de Pedido de Carga Viral”(the date from
+   * B4) and Encounter_datetime <= “Data de Pedido de Carga Viral”(the date from B4)+33days
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2NumL() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
