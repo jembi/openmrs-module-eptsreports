@@ -297,7 +297,7 @@ public class QualityImprovement2020Queries {
    *
    * @return SqlCohortDefinition
    */
-  public SqlCohortDefinition getMQ15DenA(
+  public static SqlCohortDefinition getMQ15DenA(
       int adultoSeguimentoEncounterType,
       int startDrugs,
       int quarterlyConcept,
@@ -322,21 +322,7 @@ public class QualityImprovement2020Queries {
 
     String query =
         "SELECT patient_id "
-            + "FROM   (SELECT p.patient_id, e.encounter_datetime "
-            + "       FROM   patient p "
-            + "              INNER JOIN encounter e "
-            + "                      ON p.patient_id = e.patient_id "
-            + "              INNER JOIN obs o "
-            + "                      ON e.encounter_id = o.encounter_id "
-            + "       WHERE  p.voided = 0 "
-            + "              AND e.voided = 0 "
-            + "              AND e.location_id = :location "
-            + "              AND e.encounter_type = ${6} "
-            + "              AND o.concept_id = ${23724} "
-            + "              AND o.value_coded = ${1256} "
-            + "              AND e.encounter_datetime <= :endDate "
-            + "       GROUP  BY p.patient_id "
-            + "       UNION "
+            + "FROM   ( "
             + "       SELECT p.patient_id, e.encounter_datetime "
             + "       FROM   patient p "
             + "              INNER JOIN encounter e "
@@ -347,11 +333,11 @@ public class QualityImprovement2020Queries {
             + "              AND e.voided = 0 "
             + "              AND e.location_id = :location "
             + "              AND e.encounter_type = ${6} "
-            + "              AND o.concept_id = ${23730} "
+            + "              AND ( o.concept_id = ${23724} OR o.concept_id = ${23730} ) "
             + "              AND o.value_coded = ${1256} "
             + "              AND e.encounter_datetime <= :endDate "
             + "       GROUP  BY p.patient_id "
-            + "        UNION "
+            + "        UNION  "
             + "        SELECT p.patient_id, "
             + "               Max(e.encounter_datetime) encounter_datetime "
             + "        FROM   patient p "
@@ -367,8 +353,110 @@ public class QualityImprovement2020Queries {
             + "               AND o.value_coded = ${23720} "
             + "               AND e.encounter_datetime <= :endDate "
             + "        GROUP  BY p.patient_id) encounters "
-            + "WHERE  encounters.encounter_datetime BETWEEN Date_sub(:endDate, INTERVAL 14 MONTH) "
-            + "AND Date_sub(:endDate, INTERVAL 11 MONTH); ";
+            + "WHERE  encounters.encounter_datetime BETWEEN Date_sub(:endDate, INTERVAL 14 month) "
+            + "       AND Date_sub(:endDate, INTERVAL 11 month) ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>MQ15DEN A1 </b> - GAAC (GA) (Concept Id 23724) = “INICIAR” (value_coded = concept Id 1256)
+   * <br>
+   * <b>MQ15DEN A2 </b> - DISPENSA TRIMESTRAL (DT) (Concept Id 23730) = “INICIAR” (value_coded =
+   * concept Id 1256)<br>
+   *
+   * @return SqlCohortDefinition
+   */
+  public static SqlCohortDefinition getMQ15DenA1orA2(
+      String flag,
+      int adultoSeguimentoEncounterType,
+      int startDrugs,
+      int gaac,
+      int quarterlyDispensation) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients who started GAAC)");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("1256", startDrugs);
+    map.put("23724", gaac);
+    map.put("23730", quarterlyDispensation);
+
+    String middleQuery = "";
+
+    if (flag.equals("A1")) middleQuery += "o.concept_id = ${23724}";
+    if (flag.equals("A2")) middleQuery += "o.concept_id = ${23730}";
+
+    String query =
+        "SELECT p.patient_id "
+            + " FROM   patient p "
+            + "        INNER JOIN encounter e "
+            + "                ON p.patient_id = e.patient_id "
+            + "        INNER JOIN obs o "
+            + "                ON e.encounter_id = o.encounter_id "
+            + " WHERE  p.voided = 0 "
+            + "        AND e.voided = 0 "
+            + "        AND e.location_id = :location "
+            + "        AND e.encounter_type = ${6} "
+            + "        AND "
+            + middleQuery
+            + "        AND o.value_coded = ${1256} "
+            + "        AND e.encounter_datetime <= :endDate "
+            + " GROUP  BY p.patient_id; ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>MQ15DEN A2 </b> - DISPENSA TRIMESTRAL (DT) (​ Concept Id 23730​ ) = “INICIAR” (​ value_coded
+   * = concept Id 1256​ )<br>
+   *
+   * @return SqlCohortDefinition
+   */
+  public static SqlCohortDefinition getMQ15DenA3(
+      int adultoSeguimentoEncounterType, int quarterlyConcept, int typeOfDispensationConcept) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients who started GAAC)");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("23720", quarterlyConcept);
+    map.put("23739", typeOfDispensationConcept);
+
+    String query =
+        "SELECT a3.patient_id "
+            + "FROM   (SELECT p.patient_id, "
+            + "               Max(e.encounter_datetime) encounter_datetime "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON p.patient_id = e.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON e.encounter_id = o.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND e.location_id = :location "
+            + "               AND e.encounter_type = ${6} "
+            + "               AND o.concept_id = ${23739} "
+            + "               AND o.value_coded = ${23720} "
+            + "               AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "        GROUP  BY p.patient_id) a3 ";
+
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -391,7 +479,7 @@ public class QualityImprovement2020Queries {
    *
    * @return SqlCohortDefinition
    */
-  public SqlCohortDefinition getMQ15DenB1(
+  public static SqlCohortDefinition getMQ15DenB1(
       int adultoSeguimentoEncounterType,
       int startDrugs,
       int completedConcept,
@@ -531,7 +619,7 @@ public class QualityImprovement2020Queries {
    *
    * @return SqlCohortDefinition
    */
-  public SqlCohortDefinition getMQ15NumH(Integer adultoSeguimentoEncounterType,
+  public static SqlCohortDefinition getMQ15NumH(Integer adultoSeguimentoEncounterType,
   Integer startDrugs,
   Integer quarterlyConcept,
   Integer gaac,
@@ -644,7 +732,7 @@ public class QualityImprovement2020Queries {
    *
    * @return SqlCohortDefinition
    */
-  public SqlCohortDefinition getMQ15NumH2(Integer adultoSeguimentoEncounterType,
+  public static SqlCohortDefinition getMQ15NumH2(Integer adultoSeguimentoEncounterType,
   Integer startDrugs,
   Integer quarterlyConcept,
   Integer gaac,
@@ -778,7 +866,7 @@ public class QualityImprovement2020Queries {
    *
    * @return SqlCohortDefinition
    */
-  public SqlCohortDefinition getMQ15NumI(Integer adultoSeguimentoEncounterType,
+  public static SqlCohortDefinition getMQ15NumI(Integer adultoSeguimentoEncounterType,
   Integer startDrugs,
   Integer quarterlyConcept,
   Integer gaac,

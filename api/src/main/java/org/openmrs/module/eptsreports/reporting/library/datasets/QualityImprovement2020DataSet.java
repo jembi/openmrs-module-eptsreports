@@ -1126,7 +1126,289 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     qualityImprovement2020CohortQueries.getMQC13P3NUM("F"),
                     "startDate=${startDate},endDate=${endDate},location=${location}")),
             "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "age=2-15");
+        "age=2-14");
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM3",
+        "% de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 e terem  3 sessões consecutivas de APSS/PP",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM3",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(false, 3),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM12",
+        "% de crianças (>2 anos de idade) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 cópia e terem  3 sessões consecutivas de APSS/PP",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM12",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(false, 12),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=2-14");
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM18",
+        "% de MG na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 cópia e terem 3 sessões consecutivas de APSS/PP",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM18",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ13P4(false, 18),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    // Categoria  13 part 2  Denominator
+    dataSetDefinition.addColumn(
+        "MQ13DEN15",
+        "13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de inclusão. (Line 90,Column F in the Template) as following",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13DEN15",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ13DEN16",
+        "13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN (MG que entraram em TARV na CPN) Denominator:# de MG que tiveram a primeira CPN no período de inclusão, e que já estavam em TARV há mais de 3 meses  (Line 91,Column F in the Template) as following:",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13DEN16",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries
+                        .getgetMQC13P2DenMGInIncluisionPeriod33Month(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ13DEN17",
+        "13.17. % de MG que receberam o resultado da Carga Viral dentro de 33 dias após pedido Denominator: # de MG com registo de pedido de CV no período de revisão (Line 92,Column F in the Template) as following:<",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13DEN17",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries
+                        .getgetMQC13P2DenMGInIncluisionPeriod33Days(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+    // M&Q Report - Cat 10 Indicator 10.3 - Numerator and Denominator
+    dataSetDefinition.addColumn(
+        "MQ10NUMDEN1031",
+        "% de crianças com PCR positivo para HIV  que iniciaram TARV dentro de 2 semanas após o diagnóstico/entrega do resultado ao cuidador - denominator",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ10NUMDEN1031",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ10NUMDEN103("den"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ10NUMDEN1032",
+        "% de crianças com PCR positivo para HIV  que iniciaram TARV dentro de 2 semanas após o diagnóstico/entrega do resultado ao cuidador - numerator",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ10NUMDEN1032",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ10NUMDEN103("num"),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    // Categoria  13 part 2  Numerator
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM15",
+        "13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de inclusão. (Line 90,Column F in the Template) as following",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM15",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC13P2Num1(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM16",
+        "13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN (MG que entraram em TARV na CPN) Denominator:# de MG que tiveram a primeira CPN no período de inclusão, e que já estavam em TARV há mais de 3 meses  (Line 91,Column F in the Template) as following:",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM16",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC13P2Num2(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ13NUM17",
+        "13.17. % de MG que receberam o resultado da Carga Viral dentro de 33 dias após pedido Denominator: # de MG com registo de pedido de CV no período de revisão (Line 92,Column F in the Template) as following:<",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ13NUM17",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQC13P2Num3(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    // Category 15 denominator indicators
+    dataSetDefinition.addColumn(
+        "MQ15DEN1",
+        "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS  (DT ou GAAC) que continuam activos em TARV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN1",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(1),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN2",
+        "% de Adultos (15/+anos) inscritos há pelo menos 12 meses em algum MDS (DT ou GAAC) com pedido de pelo menos uma CV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN2",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(2),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=<15");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN3",
+        "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) que receberam pelo menos um resultado de CV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN3",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(3),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN4",
+        "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) com CV <1000 Cópias",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN4",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(4),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN5",
+        "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que continuam activos em TARV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN5",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(5),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN6",
+        "% de Crianças (10-14 anos) inscritas há 12 em algum MDS (DT) que continuam activos em TARV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN6",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(6),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN7",
+        "% de Crianças (2-9 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN7",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(7),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN8",
+        "% de Crianças (10-14 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN8",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(8),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN9",
+        "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN9",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(9),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN10",
+        "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN10",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(10),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN11",
+        "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN11",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(11),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN12",
+        "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ15DEN12",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(12),
+                    "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
 
     // Category 15 denominator indicators
     dataSetDefinition.addColumn(
