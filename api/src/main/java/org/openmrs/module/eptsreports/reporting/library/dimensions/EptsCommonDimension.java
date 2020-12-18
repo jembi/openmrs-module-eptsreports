@@ -99,11 +99,13 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "1-4", ageDimensionCohort.createXtoYAgeCohort("patients with age between 1 and 4", 1, 4));
     dim.addCohortDefinition(
-        "2-4", ageDimensionCohort.createXtoYAgeCohort("patients with age between 2 and 4", 2, 4));
+        "2-4", ageDimensionCohort.createXtoYAgeCohort("patients with age between 1 and 4", 2, 4));
     dim.addCohortDefinition(
         "5-9", ageDimensionCohort.createXtoYAgeCohort("patients with age between 5 and 9", 5, 9));
     dim.addCohortDefinition(
         "<15", ageDimensionCohort.createXtoYAgeCohort("patients with age below 15", null, 14));
+    dim.addCohortDefinition(
+        "14+", ageDimensionCohort.createXtoYAgeCohort("patients with age over 14", 14, null));
     dim.addCohortDefinition(
         "10-14",
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 10 and 14", 10, 14));
@@ -139,7 +141,9 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "10-19",
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 10 and 19", 10, 19));
-
+    dim.addCohortDefinition(
+        "2-14",
+        ageDimensionCohort.createXtoYAgeCohort("patients with age between 10 and 19", 2, 14));
     return dim;
   }
 
@@ -366,6 +370,40 @@ public class EptsCommonDimension {
         eriDSDCohortQueries.getPregnantAndBreastfeedingAndOnTBTreatment();
     CohortDefinition inverse = new InverseCohortDefinition(pregnantBreastfeedingTb);
     dim.addCohortDefinition("NPNBNTB", mapStraightThrough(inverse));
+    return dim;
+  }
+
+  /** Dimension for Age in months */
+  public CohortDefinitionDimension ageInMonths() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Patients having age in months");
+    dim.addParameter(new Parameter("effectiveDate", "End Date", Date.class));
+    dim.addCohortDefinition(
+        "<9m",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeInMonths(0, 8), "effectiveDate=${effectiveDate}"));
+    return dim;
+  }
+  /**
+   * Dimension for returning patients age based on their ART start date
+   *
+   * @return @{@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension ageBasedOnArtStartDate() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Patients having age based on ART start date by reporting end date");
+    dim.addParameter(new Parameter("effectiveDate", "End Date", Date.class));
+    dim.addCohortDefinition(
+        "adultsArt",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnArtStartDate(15, null, false),
+            "onOrBefore=${effectiveDate},location=${location}"));
+    dim.addCohortDefinition(
+        "childrenArt",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnArtStartDate(null, 14, false),
+            "onOrBefore=${effectiveDate},location=${location}"));
+
     return dim;
   }
 }

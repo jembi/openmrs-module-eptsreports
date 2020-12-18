@@ -13,7 +13,10 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
 import java.util.*;
+import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -36,6 +39,8 @@ public class TxRttCohortQueries {
 
   private TxCurrCohortQueries txCurrCohortQueries;
 
+  private CommonCohortQueries commonCohortQueries;
+
   private final String DEFAULT_MAPPING =
       "startDate=${startDate},endDate=${endDate},location=${location}";
 
@@ -43,10 +48,12 @@ public class TxRttCohortQueries {
   public TxRttCohortQueries(
       HivMetadata hivMetadata,
       GenericCohortQueries genericCohortQueries,
-      TxCurrCohortQueries txCurrCohortQueries) {
+      TxCurrCohortQueries txCurrCohortQueries,
+      CommonCohortQueries commonCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
+    this.commonCohortQueries = commonCohortQueries;
   }
 
   /**
@@ -55,9 +62,9 @@ public class TxRttCohortQueries {
    * <blockquote>
    *
    * All patients (adults and children) who at ANY clinical contact (clinical consultation or drugs
-   * pick up <b>[Encounter Type Ids = 6,9,18,52]</b>) registered during the reporting period had a
-   * delay greater than 28/30 days from the last scheduled/expected, which may have happened during
-   * or prior to the reporting period period
+   * pick up <b>[Encounter Type Ids = 6,9,${}1}8,52]</b>) registered during the reporting period had
+   * a delay greater than 28/30 days from the last scheduled/expected, which may have happened
+   * during or prior to the reporting period period
    *
    * </blockquote>
    *
@@ -88,6 +95,10 @@ public class TxRttCohortQueries {
    *       (startDate -1 day) following the criterias defined in the common queries:
    *   <li>Filter all patients who experienced IIT by end of previous reporting period (startDate -1
    *       day) following the criterias defined in the common queries:
+   *       <ul>
+   *         <li>And Exclude all IIT patients who are transferred out by previous reporting period,
+   *             following the criterias defined in the common queries:
+   *       </ul>
    *   <li>Filter all patients who returned to the treatment during the reporting period following
    *       the criterias below: {@link
    *       TxRttCohortQueries#getPatientsReturnedTreatmentDuringReportingPeriod() }
@@ -111,8 +122,7 @@ public class TxRttCohortQueries {
     cd.addSearch(
         "LTFU",
         EptsReportUtils.map(
-            genericCohortQueries.getPatientsWhoToLostToFollowUp(28),
-            "onOrBefore=${startDate-1d},location=${location}"));
+            getITTOrLTFUPatients(28), "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "returned",
@@ -124,7 +134,14 @@ public class TxRttCohortQueries {
             txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true),
             "onOrBefore=${endDate},location=${location}"));
 
-    cd.setCompositionString("initiatedPreviousPeriod AND LTFU AND returned AND txcurr");
+    cd.addSearch(
+        "transferredout",
+        EptsReportUtils.map(
+            commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod(),
+            "onOrBefore=${startDate-1d},location=${location}"));
+
+    cd.setCompositionString(
+        "initiatedPreviousPeriod AND returned AND txcurr AND (LTFU AND NOT transferredout)");
 
     return cd;
   }
@@ -137,7 +154,7 @@ public class TxRttCohortQueries {
    *   <li>At least one Ficha Clinica registered during the reporting period (Encounter Type 6 or 9,
    *       and encounter_datetime>= startDate and <=endDate) OR
    *   <li>At least one Drugs Pick up registered in FILA during the reporting period (Encounter Type
-   *       18, and encounter_datetime>= startDate and <=endDate) OR
+   *       ${}1}8, and encounter_datetime>= startDate and <=endDate) OR
    *   <li>At least one Drugs Pick up registered in MasterCard-Recepção/Levantoy ARV, during the
    *       reporting period (Encounter Type 52, and “Levantou ARV”- concept ID 23865”= “Yes”
    *       (concept id 1065) and “Data de Levantamento” (concept Id 23866 value_datetime>= startDate
@@ -245,5 +262,172 @@ public class TxRttCohortQueries {
     cd.setQuery(formattedQuery);
 
     return cd;
+  }
+
+  public CohortDefinition getITTOrLTFUPatients(int numDays) {
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+
+    definition.addSearch(
+        "31",
+        mapStraightThrough(
+            txCurrCohortQueries.getPatientHavingLastScheduledDrugPickupDateDaysBeforeEndDate(
+                numDays)));
+
+    definition.addSearch("32", mapStraightThrough(getSecondPartFromITT()));
+
+    definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+    definition.setCompositionString("31 OR 32");
+
+    return definition;
+  }
+
+  public CohortDefinition getSecondPartFromITT() {
+
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("patientWithoutScheduledDrugPickupDateMasterCardAmdArtPickup");
+    definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+
+    map.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        "SELECT final.patient_id"
+            + " FROM( "
+            + " select totaltotal.patient_id "
+            + " from ( "
+            + "        SELECT total.patient_id FROM "
+            + "            ("
+            + "                SELECT     pat1.patient_id, Max(enc1.encounter_datetime) AS encounter_datetime"
+            + "                FROM  patient pat1 "
+            + "                    INNER JOIN encounter enc1 "
+            + "                        ON         pat1.patient_id=enc1.patient_id "
+            + "                    "
+            + "                WHERE enc1.encounter_datetime<=:onOrBefore"
+            + "                    AND pat1.voided=0 "
+            + "                    AND enc1.voided=0 "
+            + "                    AND enc1.location_id=:location "
+            + "                    AND enc1.encounter_type IN (${6},${9})"
+            + "                GROUP BY   pat1.patient_id"
+            + "            ) AS total"
+            + "            LEFT JOIN"
+            + "                    ("
+            + "                        SELECT p.patient_id "
+            + "                        FROM patient p"
+            + "                            INNER JOIN encounter e"
+            + "                                ON e.patient_id =p.patient_id"
+            + "                            INNER JOIN obs o"
+            + "                                ON o.encounter_id =e.encounter_id"
+            + "                        WHERE"
+            + "                            p.voided = 0"
+            + "                            AND e.voided = 0"
+            + "                            AND o.voided = 0"
+            + "                            AND e.encounter_type IN (${6},${9})"
+            + "                            AND encounter_datetime<=:onOrBefore"
+            + "                            AND e.location_id=:location "
+            + "                            AND o.concept_id = ${1410} "
+            + "                        UNION"
+            + "                        SELECT p.patient_id "
+            + "                        FROM patient p"
+            + "                            INNER JOIN encounter e"
+            + "                                ON e.patient_id =p.patient_id"
+            + "                            INNER JOIN obs o"
+            + "                                ON o.encounter_id =e.encounter_id"
+            + "                        WHERE"
+            + "                            p.voided = 0"
+            + "                            AND e.voided = 0"
+            + "                            AND o.voided = 0"
+            + "                            AND e.encounter_type IN (${6},${9})"
+            + "                            AND encounter_datetime<=:onOrBefore"
+            + "                            AND e.location_id=:location "
+            + "                            AND o.concept_id = ${1410}"
+            + "                            AND o.value_datetime IS NOT NULL"
+            + "                    ) right1"
+            + "            ON total.patient_id = right1.patient_id  "
+            + "        WHERE "
+            + "            right1.patient_id IS NULL"
+            + "        UNION"
+            + "        SELECT total.patient_id FROM"
+            + "            ("
+            + "                SELECT     pat1.patient_id, Max(enc1.encounter_datetime) AS encounter_datetime"
+            + "                FROM  patient pat1 "
+            + "                    INNER JOIN encounter enc1 "
+            + "                        ON         pat1.patient_id=enc1.patient_id "
+            + "                    "
+            + "                WHERE enc1.encounter_datetime<=:onOrBefore"
+            + "                    AND pat1.voided=0 "
+            + "                    AND enc1.voided=0 "
+            + "                    AND enc1.location_id=:location "
+            + "                    AND enc1.encounter_type IN (${18})"
+            + "                GROUP BY   pat1.patient_id"
+            + "            ) AS total"
+            + "            LEFT JOIN"
+            + "                    ("
+            + "                        SELECT p.patient_id "
+            + "                        FROM patient p"
+            + "                            INNER JOIN encounter e"
+            + "                                ON e.patient_id =p.patient_id"
+            + "                            INNER JOIN obs o"
+            + "                                ON o.encounter_id =e.encounter_id"
+            + "                        WHERE"
+            + "                            p.voided = 0"
+            + "                            AND e.voided = 0"
+            + "                            AND o.voided = 0"
+            + "                            AND e.encounter_type IN (${18})"
+            + "                            AND encounter_datetime<=:onOrBefore"
+            + "                            AND e.location_id=:location "
+            + "                            AND o.concept_id = ${5096}"
+            + "                        UNION"
+            + "                        SELECT p.patient_id "
+            + "                        FROM patient p"
+            + "                            INNER JOIN encounter e"
+            + "                                ON e.patient_id =p.patient_id"
+            + "                            INNER JOIN obs o"
+            + "                                ON o.encounter_id =e.encounter_id"
+            + "                        WHERE"
+            + "                            p.voided = 0"
+            + "                            AND e.voided = 0"
+            + "                            AND o.voided = 0"
+            + "                            AND e.encounter_type IN (${18})"
+            + "                            AND encounter_datetime<=:onOrBefore"
+            + "                            AND e.location_id=:location "
+            + "                            AND o.concept_id = ${5096}"
+            + "                            AND o.value_datetime IS NOT NULL"
+            + "                    ) right1"
+            + "            ON total.patient_id = right1.patient_id  "
+            + "        WHERE "
+            + "            right1.patient_id IS NULL"
+            + ") totaltotal group by totaltotal.patient_id HAVING count(totaltotal.patient_id) >=2"
+            + ") AS final "
+            + " WHERE final.patient_id NOT  IN ("
+            + "    SELECT p.patient_id"
+            + "    FROM  patient p"
+            + "        INNER JOIN encounter e "
+            + "            ON e.patient_id = p.patient_id"
+            + "        INNER JOIN obs o "
+            + "            ON e.encounter_id = o.encounter_id"
+            + "    "
+            + "    WHERE p.voided = 0"
+            + "        AND e.voided = 0"
+            + "        AND o.voided = 0"
+            + "        AND e.encounter_type = ${52}"
+            + "        AND e.location_id = :location"
+            + "        AND o.value_datetime <= :onOrBefore"
+            + "        AND o.concept_id = ${23866}"
+            + "       "
+            + "        )";
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    definition.setQuery(stringSubstitutor.replace(query));
+
+    return definition;
   }
 }
