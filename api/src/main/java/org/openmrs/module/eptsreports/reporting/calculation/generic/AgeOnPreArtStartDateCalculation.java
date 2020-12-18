@@ -128,7 +128,7 @@ public class AgeOnPreArtStartDateCalculation extends AbstractPatientCalculation 
             + "                AND e.encounter_type = ${masterCardEncounterType} "
             + "                AND e.location_id = :location "
             + "                AND o.concept_id = ${pPreArtStartDate} "
-            + "                AND o.obs_datetime <= :onOrBefore "
+            + "                AND o.value_datetime <= :onOrBefore "
             + "            GROUP BY p.patient_id "
             + "        ) earliest_date "
             + "    WHERE earliest_date.min_date  "
