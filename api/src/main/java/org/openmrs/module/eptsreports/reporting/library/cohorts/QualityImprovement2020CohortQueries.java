@@ -186,7 +186,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("MCC4D1 Patients");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.addSearch(
         "A",
@@ -484,7 +484,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Patients with Prophylaxy Treatment within Revision Period");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -561,7 +561,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Patients with TB Diagnosis Active");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -638,7 +638,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Patients with TB Diagnosis Active");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -715,7 +715,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Patients with TB Diagnosis Active");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -1168,7 +1168,7 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
 
@@ -1346,7 +1346,7 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
 
@@ -2133,7 +2133,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 11 - Numerator - H1");
 
@@ -2180,7 +2180,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 11 - Numerator - H2");
 
@@ -2239,7 +2239,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 11 - Numerator - H3");
 
@@ -2328,7 +2328,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.setName("Category 11 Numerator session G");
 
@@ -2928,7 +2928,7 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("startDate", "startDate", Date.class));
     comp.addParameter(new Parameter("endDate", "endDate", Date.class));
     comp.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
-    comp.addParameter(new Parameter("location", "location", Date.class));
+    comp.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
 
@@ -3356,7 +3356,7 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("startDate", "startDate", Date.class));
     comp.addParameter(new Parameter("endDate", "endDate", Date.class));
     comp.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
-    comp.addParameter(new Parameter("location", "location", Date.class));
+    comp.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
 
@@ -3498,7 +3498,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Last Ficha Clinica");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -3554,7 +3554,7 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
 
@@ -3861,7 +3861,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 13 Part 3- Numerator - G");
 
@@ -3949,7 +3949,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 13 Part 3- Numerator - H");
 
@@ -4034,7 +4034,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("less3mDate", "Less3months date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 13 Part 3- Numerator - I");
 
@@ -4126,7 +4126,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 13 - Part 4 Denominator - B2");
 
@@ -4194,7 +4194,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 13 - Part 4 Denominator - G");
 
@@ -4303,7 +4303,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     sqlCohortDefinition.setName("Category 13 - Part 4 Denominator - H");
 
@@ -4411,7 +4411,7 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition b1 =
         commonCohortQueries.getMohMQPatientsOnCondition(
@@ -4491,6 +4491,14 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   * B1 - Select all patients with a clinical consultation (encounter type 6) that have the first
+   * occurrence of concept “GESTANTE” (Concept Id 1982) and value coded “SIM” (Concept Id 1065) in
+   * the same Encounter_datetime as the ART Start Date (the oldest from query A) during the
+   * inclusion period (startDateInclusion and endDateInclusion).
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2DenB1() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -4562,7 +4570,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                GROUP BY patient_id "
             + "                        ) inicio1 "
             + "                    WHERE  data_inicio BETWEEN :startDate AND    :endDate "
-            + "                ) art_start_date "
+            + "                ) art_start_date ON art_start_date.patient_id = p.patient_id "
             + " WHERE  "
             + "    p.voided = 0 "
             + "    AND e.voided = 0 "
@@ -4580,6 +4588,16 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * B2 - Select all patients with a clinical consultation (encounter type 6) that have the concept
+   * “GESTANTE” (Concept Id 1982) and value coded “SIM” (Concept Id 1065) registered (1)during the
+   * inclusion period (first occurrence, encounter_datetime >= startDateInclusion and
+   * <=endDateInclusion) and (2) after the start of ART (encounter_datetime > “Patient ART Start
+   * Date”) and (3) on ART at least for 3 months ( encounter_datetime minus “Patient ART Start
+   * Date”) >= 3months)
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2DenB2() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -4652,7 +4670,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                GROUP BY patient_id "
             + "                        ) inicio1 "
             + "                    WHERE  data_inicio BETWEEN :startDate AND    :endDate "
-            + "                ) art_start_date "
+            + "                ) art_start_date ON art_start_date.patient_id = p.patient_id "
             + "WHERE  "
             + "    p.voided = 0 "
             + "    AND e.voided = 0 "
@@ -4671,6 +4689,15 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * (B3=H from Numerator) - Select all patients with clinical consultation (encounter type 6) with
+   * concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA
+   * VIRAL” (Concept Id 856) on Encounter_datetime between “Patient ART Start Date” (the oldest from
+   * query A)+80days and “Patient ART Start Date” (the oldest from query A)+130days. Note: if more
+   * than one encounter exists that satisfies these conditions, select the oldest one.
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2DenB3() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
@@ -4695,8 +4722,8 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         " "
-            + "SELECT p.patient_id  "
-            + "FROM patient p "
+            + " SELECT p.patient_id  "
+            + " FROM patient p "
             + "    INNER JOIN encounter e "
             + "        ON e.patient_id = p.patient_id "
             + "    INNER JOIN obs o "
@@ -4746,8 +4773,8 @@ public class QualityImprovement2020CohortQueries {
             + "                                GROUP BY patient_id "
             + "                        ) inicio1 "
             + "                    WHERE  data_inicio BETWEEN :startDate AND    :endDate "
-            + "                ) art_start_date "
-            + "WHERE  "
+            + "                ) art_start_date ON art_start_date.patient_id = p.patient_id "
+            + " WHERE  "
             + "    p.voided = 0 "
             + "    AND e.voided = 0 "
             + "    AND o.voided  = 0 "
@@ -4762,6 +4789,15 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * (B4=J from Numerator) - Select all patients with clinical consultation (encounter type 6) with
+   * concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA
+   * VIRAL” (Concept Id 856) on the first occurrence of concept “GESTANTE” (Concept Id 1982) and
+   * value coded “SIM” ( Concept Id 1065) encounter_datetime during the inclusion period
+   * (encounter_datetime from B2)
+   *
+   * @return
+   */
   public CohortDefinition getgetMQC13P2DenB4() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
@@ -4845,7 +4881,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                    GROUP BY patient_id "
             + "                                            ) inicio1 "
             + "                                        WHERE  data_inicio BETWEEN :startDate AND    :endDate "
-            + "                                    ) art_start_date "
+            + "                                    ) art_start_date ON art_start_date.patient_id = p.patient_id"
             + "                    WHERE  "
             + "                        p.voided = 0 "
             + "                        AND e.voided = 0 "
@@ -4858,7 +4894,7 @@ public class QualityImprovement2020CohortQueries {
             + "                        AND TIMESTAMPDIFF(month, e.encounter_datetime,art_start_date.data_inicio) >= 3 "
             + "                        AND e.location_id = :location "
             + "                        GROUP BY  p.patient_id "
-            + "                ) b2 "
+            + "                ) b2  ON b2.patient_id = p.patient_id "
             + "WHERE  "
             + "    p.voided = 0 "
             + "    AND e.voided = 0 "
@@ -5114,6 +5150,427 @@ public class QualityImprovement2020CohortQueries {
     } else if (flag.equals("den")) {
       cd.setCompositionString("(A AND B AND infant) AND NOT C");
     }
+    return cd;
+  }
+
+  /**
+   * K - Select all patients from Ficha Clinica (encounter type 6) with concept “Carga Viral”
+   * (Concept id 856, value_numeric not null) OR concept “Carga Viral Qualitative”(Concept id 1305,
+   * value_coded not null) and Encounter_datetime > “Data de Pedido de Carga Viral”(the date from
+   * B3) and Encounter_datetime <= “Data de Pedido de Carga Viral”(the date from B3)+33days
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getgetMQC13P2NumK() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.setName(" K - categoria 13 - Numerador - part 2");
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("856", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        ""
+            + "SELECT p.patient_id   "
+            + "FROM patient p  "
+            + "    INNER JOIN encounter e  "
+            + "        ON e.patient_id = p.patient_id  "
+            + "    INNER JOIN obs o  "
+            + "        ON o.encounter_id = o.encounter_id  "
+            + "    INNER JOIN  "
+            + "                (  "
+            + "                SELECT p.patient_id, e.encounter_datetime AS b3_datetime  "
+            + "                FROM patient p  "
+            + "                    INNER JOIN encounter e  "
+            + "                        ON e.patient_id = p.patient_id  "
+            + "                    INNER JOIN obs o  "
+            + "                        ON o.encounter_id = o.encounter_id  "
+            + "                    INNER JOIN  "
+            + "                                (  "
+            + "                                    SELECT inicio1.patient_id, inicio1.data_inicio  "
+            + "                                    FROM (  "
+            + "                                            SELECT   patient_id,Min(data_inicio) data_inicio  "
+            + "                                            FROM (  "
+            + "                                                    SELECT  p.patient_id, Min(value_datetime) data_inicio  "
+            + "                                                    FROM       patient p  "
+            + "                                                        INNER JOIN encounter e  "
+            + "                                                            ON  p.patient_id = e.patient_id  "
+            + "                                                        INNER JOIN obs o  "
+            + "                                                            ON  e.encounter_id = o.encounter_id  "
+            + "                                                    WHERE      p.voided = 0  "
+            + "                                                        AND e.voided = 0  "
+            + "                                                        AND o.voided = 0  "
+            + "                                                        AND e.encounter_type = ${53}  "
+            + "                                                        AND o.concept_id = ${1190}  "
+            + "                                                        AND o.value_datetime IS NOT NULL  "
+            + "                                                        AND o.value_datetime <= :endDate  "
+            + "                                                        AND e.location_id = :location  "
+            + "                                                    GROUP BY   p.patient_id  "
+            + "                                                    UNION  "
+            + "                                                    SELECT   p.patient_id, Min(pickupdate.value_datetime) AS data_inicio  "
+            + "                                                    FROM     patient p  "
+            + "                                                        INNER JOIN  encounter e  "
+            + "                                                            ON   p.patient_id = e.patient_id  "
+            + "                                                        INNER JOIN  obs pickup  "
+            + "                                                            ON  e.encounter_id = pickup.encounter_id  "
+            + "                                                        INNER JOIN obs pickupdate  "
+            + "                                                            ON e.encounter_id = pickupdate.encounter_id  "
+            + "                                                    WHERE    p.voided = 0  "
+            + "                                                        AND      pickup.voided = 0  "
+            + "                                                        AND      pickup.concept_id = ${23865}  "
+            + "                                                        AND      pickup.value_coded = ${1065}  "
+            + "                                                        AND      pickupdate.voided = 0  "
+            + "                                                        AND      pickupdate.concept_id = ${23866}  "
+            + "                                                        AND      pickupdate.value_datetime <= :endDate  "
+            + "                                                        AND      e.encounter_type = ${52}  "
+            + "                                                        AND      e.voided = 0  "
+            + "                                                        AND      e.location_id = :location  "
+            + "                                                    GROUP BY p.patient_id  "
+            + "                                                ) AS inicio  "
+            + "                                                GROUP BY patient_id  "
+            + "                                        ) inicio1  "
+            + "                                    WHERE  data_inicio BETWEEN :startDate AND    :endDate  "
+            + "                                ) art_start_date ON art_start_date.patient_id = p.patient_id  "
+            + "                WHERE   "
+            + "                    p.voided = 0  "
+            + "                    AND e.voided = 0  "
+            + "                    AND o.voided  = 0  "
+            + "                    AND e.encounter_type = ${6}  "
+            + "                    AND o.concept_id = ${23722}  "
+            + "                    AND o.value_coded = ${856}  "
+            + "                    AND e.encounter_datetime >= DATE_ADD(art_start_date.data_inicio,INTERVAL 80 DAY)  "
+            + "                    AND e.encounter_datetime <= DATE_ADD(art_start_date.data_inicio,INTERVAL 130 DAY)  "
+            + "                    AND e.location_id = :location  "
+            + "                  "
+            + "                            "
+            + "                ) b3 ON b3.patient_id = p.patient_id       "
+            + "WHERE   "
+            + "    p.voided = 0  "
+            + "    AND e.voided = 0  "
+            + "    AND o.voided  = 0  "
+            + "    AND e.encounter_type = ${6}  "
+            + "    AND (  "
+            + "            (o.concept_id = ${856}   AND o.value_numeric IS NOT NULL)  "
+            + "            OR  "
+            + "            (o.concept_id = ${1305}   AND o.value_coded IS NOT NULL)  "
+            + "        )  "
+            + "      "
+            + "    AND e.encounter_datetime > b3.b3_datetime  "
+            + "    AND e.encounter_datetime <= DATE_ADD(b3.b3_datetime, INTERVAL 33 DAY)  "
+            + "    AND e.location_id = :location  ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * L - Select all patients from Ficha Clinica (encounter type 6) with concept “Carga Viral”
+   * (Concept id 856, value_numeric not null) or concept “Carga Viral Qualitative”(Concept id 1305,
+   * value_coded not null) and Encounter_datetime > “Data de Pedido de Carga Viral”(the date from
+   * B4) and Encounter_datetime <= “Data de Pedido de Carga Viral”(the date from B4)+33days
+   *
+   * @return
+   */
+  public CohortDefinition getgetMQC13P2NumL() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.setName(" L - categoria 13 - Numerador - part 2");
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("856", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        " "
+            + "SELECT p.patient_id  "
+            + "FROM patient p "
+            + "    INNER JOIN encounter e "
+            + "        ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o "
+            + "        ON o.encounter_id = o.encounter_id "
+            + "    INNER JOIN "
+            + "                ( "
+            + "                 "
+            + "                SELECT p.patient_id , e.encounter_datetime AS b4_datetime "
+            + "                FROM patient p "
+            + "                    INNER JOIN encounter e "
+            + "                        ON e.patient_id = p.patient_id "
+            + "                    INNER JOIN obs o "
+            + "                        ON o.encounter_id = o.encounter_id "
+            + "                    INNER JOIN "
+            + "                                ( "
+            + "                                SELECT p.patient_id ,MIN(e.encounter_datetime) AS min_datetime "
+            + "                                    FROM patient p "
+            + "                                        INNER JOIN encounter e "
+            + "                                            ON e.patient_id = p.patient_id "
+            + "                                        INNER JOIN obs o "
+            + "                                            ON o.encounter_id = o.encounter_id "
+            + "                                        INNER JOIN "
+            + "                                                    ( "
+            + "                                                        SELECT inicio1.patient_id, inicio1.data_inicio "
+            + "                                                        FROM ( "
+            + "                                                                SELECT   patient_id,Min(data_inicio) data_inicio "
+            + "                                                                FROM ( "
+            + "                                                                        SELECT  p.patient_id, Min(value_datetime) data_inicio "
+            + "                                                                        FROM       patient p "
+            + "                                                                            INNER JOIN encounter e "
+            + "                                                                                ON  p.patient_id = e.patient_id "
+            + "                                                                            INNER JOIN obs o "
+            + "                                                                                ON  e.encounter_id = o.encounter_id "
+            + "                                                                        WHERE      p.voided = 0 "
+            + "                                                                            AND e.voided = 0 "
+            + "                                                                            AND o.voided = 0 "
+            + "                                                                            AND e.encounter_type = ${53} "
+            + "                                                                            AND o.concept_id = ${1190} "
+            + "                                                                            AND o.value_datetime IS NOT NULL "
+            + "                                                                            AND o.value_datetime <= :endDate "
+            + "                                                                            AND e.location_id = :location "
+            + "                                                                        GROUP BY   p.patient_id "
+            + "                                                                        UNION "
+            + "                                                                        SELECT   p.patient_id, Min(pickupdate.value_datetime) AS data_inicio "
+            + "                                                                        FROM     patient p "
+            + "                                                                            INNER JOIN  encounter e "
+            + "                                                                                ON   p.patient_id = e.patient_id "
+            + "                                                                            INNER JOIN  obs pickup "
+            + "                                                                                ON  e.encounter_id = pickup.encounter_id "
+            + "                                                                            INNER JOIN obs pickupdate "
+            + "                                                                                ON e.encounter_id = pickupdate.encounter_id "
+            + "                                                                        WHERE    p.voided = 0 "
+            + "                                                                            AND      pickup.voided = 0 "
+            + "                                                                            AND      pickup.concept_id = ${23865} "
+            + "                                                                            AND      pickup.value_coded = ${1065} "
+            + "                                                                            AND      pickupdate.voided = 0 "
+            + "                                                                            AND      pickupdate.concept_id = ${23866} "
+            + "                                                                            AND      pickupdate.value_datetime <= :endDate "
+            + "                                                                            AND      e.encounter_type = ${52} "
+            + "                                                                            AND      e.voided = 0 "
+            + "                                                                            AND      e.location_id = :location "
+            + "                                                                        GROUP BY p.patient_id "
+            + "                                                                    ) AS inicio "
+            + "                                                                    GROUP BY patient_id "
+            + "                                                            ) inicio1 "
+            + "                                                        WHERE  data_inicio BETWEEN :startDate AND    :endDate "
+            + "                                                    ) art_start_date ON art_start_date.patient_id = p.patient_id "
+            + "                                    WHERE  "
+            + "                                        p.voided = 0 "
+            + "                                        AND e.voided = 0 "
+            + "                                        AND o.voided  = 0 "
+            + "                                        AND e.encounter_type = ${6} "
+            + "                                        AND o.concept_id = ${1982} "
+            + "                                        AND o.value_coded = ${1065} "
+            + "                                        AND e.encounter_datetime > art_start_date.data_inicio "
+            + "                                        AND e.encounter_datetime BETWEEN  :startDate AND    :endDate "
+            + "                                        AND TIMESTAMPDIFF(month,e.encounter_datetime,art_start_date.data_inicio) >= 3 "
+            + "                                        AND e.location_id = :location "
+            + "                                        GROUP BY  p.patient_id "
+            + "                                ) b2  ON b2.patient_id = p.patient_id "
+            + "                WHERE  "
+            + "                    p.voided = 0 "
+            + "                    AND e.voided = 0 "
+            + "                    AND o.voided  = 0 "
+            + "                    AND e.encounter_type = ${6} "
+            + "                    AND o.concept_id = ${23722} "
+            + "                    AND o.value_coded = ${856} "
+            + "                    AND e.encounter_datetime = b2.min_datetime "
+            + "                    AND e.location_id = :location "
+            + "                           "
+            + "                ) b4 ON b4.patient_id = p.patient_id     "
+            + "WHERE  "
+            + "    p.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.voided  = 0 "
+            + "    AND e.encounter_type = ${6} "
+            + "    AND ( "
+            + "            (o.concept_id = ${856}   AND o.value_numeric IS NOT NULL) "
+            + "            OR "
+            + "            (o.concept_id = ${1305}   AND o.value_coded IS NOT NULL) "
+            + "        ) "
+            + "    AND e.encounter_datetime > b4.b4_datetime "
+            + "    AND e.encounter_datetime <= DATE_ADD(b4.b4_datetime, INTERVAL 33 DAY) "
+            + "    AND e.location_id = :location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * 13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram
+   * TARV na CPN) (Line 90 in the template) Numerator (Column E in the Template) as following:
+   * <code>(A and B1 and H) and NOT (D or F) and Age >= 15*</code>
+   */
+  public CohortDefinition getMQC13P2Num1() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    cd.addSearch("A", EptsReportUtils.map(getMQC3D1(), MAPPING));
+    cd.addSearch("B1", EptsReportUtils.map(getgetMQC13P2DenB1(), MAPPING));
+    cd.addSearch("H", EptsReportUtils.map(getgetMQC13P2DenB3(), MAPPING));
+    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    cd.addSearch(
+        "ADULT",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("(A AND B1 AND H) AND NOT (D OR F) AND ADULT");
+    return cd;
+  }
+
+  /**
+   * 13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN
+   * (MG que entraram em TARV na CPN) (Line 91 in the template) Numerator (Column E in the Template)
+   * as following: <code>(B2 and J) and NOT (D or E or F) and Age >= 15*</code>
+   */
+  public CohortDefinition getMQC13P2Num2() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition transferIn =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            true,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
+
+    cd.addSearch("B2", EptsReportUtils.map(getgetMQC13P2DenB2(), MAPPING));
+    cd.addSearch("J", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
+    cd.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
+    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+
+    cd.addSearch(
+        "ADULT",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("(B2 AND J) AND NOT (D or E or F) AND ADULT");
+
+    return cd;
+  }
+
+  /**
+   * 13.17. % de MG que receberam o resultado da Carga Viral dentro de 33 dias após pedido (Line 92
+   * in the template) Numerator (Column E in the Template) as following: <code>
+   * ((A and B1 and B3 and K) or (B2 and B4 and L)) and NOT (D or E or F) and Age >= 15*</code>
+   */
+  public CohortDefinition getMQC13P2Num3() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            true,
+            false,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getBreastfeeding(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition transferIn =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            true,
+            "once",
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getTransferFromOtherFacilityConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            hivMetadata.getTypeOfPatientTransferredFrom(),
+            Collections.singletonList(hivMetadata.getArtStatus()));
+
+    cd.addSearch("A", EptsReportUtils.map(getMQC3D1(), MAPPING));
+    cd.addSearch("B1", EptsReportUtils.map(getgetMQC13P2DenB1(), MAPPING));
+    cd.addSearch("B2", EptsReportUtils.map(getgetMQC13P2DenB2(), MAPPING));
+    cd.addSearch("B3", EptsReportUtils.map(getgetMQC13P2DenB3(), MAPPING));
+    cd.addSearch("B4", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
+    cd.addSearch("K", EptsReportUtils.map(getgetMQC13P2NumK(), MAPPING));
+    cd.addSearch("L", EptsReportUtils.map(getgetMQC13P2NumL(), MAPPING));
+    cd.addSearch("E", EptsReportUtils.map(transferIn, MAPPING));
+    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    cd.addSearch(
+        "ADULT",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "((A AND B1 AND B3 AND K) OR (B2 AND B4 AND L)) AND NOT (D OR E OR F) AND ADULT");
+
     return cd;
   }
 }
