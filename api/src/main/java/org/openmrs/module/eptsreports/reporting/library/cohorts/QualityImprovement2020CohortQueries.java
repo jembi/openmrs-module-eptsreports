@@ -6083,7 +6083,7 @@ public class QualityImprovement2020CohortQueries {
       comp.setCompositionString("(A2 OR A3) AND NOT (B1 OR C OR D OR F) AND G2 AND H2 AND AGES29");
     } else if (num == 10) {
       comp.setCompositionString(
-          "(A2 OR A3) and NOT (B1 OR C OR D OR F) AND G2 AND H2 AND AGES1014");
+          "(A2 OR A3) and NOT (B1 OR C OR D OR F) AND G2 AND H2 AND AGES_10_14");
     } else if (num == 11) {
       comp.setCompositionString("(A2 OR A3) AND NOT (B1 OR C OR D OR F) AND G2 AND I AND AGES29");
     } else if (num == 12) {
