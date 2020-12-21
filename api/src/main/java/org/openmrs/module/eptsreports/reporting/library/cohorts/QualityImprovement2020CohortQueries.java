@@ -47,7 +47,7 @@ public class QualityImprovement2020CohortQueries {
 
   private QualityImprovement2020Queries qualityImprovement2020Queries;
 
-  private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String MAPPING = "startDate=${startDate},endDate=${endDate},endDateRevision=${dataFinalAvaliacao},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -3015,6 +3015,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Patients With Clinical Consultation");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDateRevision", "endDateRevision", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3055,7 +3056,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                     AND e.voided = 0 "
             + "                                     AND p.voided = 0 "
             + "                                     AND e.encounter_datetime > bI1.regime_date "
-            + "                                     AND e.encounter_datetime <= :endDate)";
+            + "                                     AND e.encounter_datetime <= :endDateRevision)";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
