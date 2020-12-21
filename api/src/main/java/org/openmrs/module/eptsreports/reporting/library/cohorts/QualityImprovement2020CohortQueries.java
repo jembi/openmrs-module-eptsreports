@@ -3564,7 +3564,7 @@ public class QualityImprovement2020CohortQueries {
             true,
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getAlternativeLineConcept(),
+            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
             Arrays.asList(
                 commonMetadata.getAlternativeFirstLineConcept(),
                 commonMetadata.getRegimeChangeConcept(),
@@ -3597,7 +3597,7 @@ public class QualityImprovement2020CohortQueries {
             true,
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getAlternativeLineConcept(),
+            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
             Arrays.asList(
                 commonMetadata.getAlternativeFirstLineConcept(),
                 commonMetadata.getRegimeChangeConcept(),
