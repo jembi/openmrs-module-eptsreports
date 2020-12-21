@@ -547,7 +547,8 @@ public class CommonMetadata extends Metadata {
    */
   public Concept getRegimenAlternativeToFirstLineConcept() {
     String uuid =
-        Context.getAdministrationService().getGlobalProperty("eptsreports.regimenAlternativeToFirstLineConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.regimenAlternativeToFirstLineConceptUuid");
     return getConcept(uuid);
   }
 }

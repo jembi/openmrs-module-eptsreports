@@ -47,7 +47,7 @@ public class QualityImprovement2020CohortQueries {
 
   private QualityImprovement2020Queries qualityImprovement2020Queries;
 
-  private final String MAPPING = "startDate=${startDate},endDate=${endDate},endDateRevision=${dataFinalAvaliacao},location=${location}";
+  private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -1772,6 +1772,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
     String mapping =
         "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
+    String mapping2 =
+        "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}";
 
     CohortDefinition startedART = getMQC3D1();
 
@@ -1816,7 +1818,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
-    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1Patients, MAPPING));
+    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1Patients, mapping2));
 
     compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2Patients, mapping));
 
@@ -3015,7 +3017,8 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Patients With Clinical Consultation");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDateRevision", "endDateRevision", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "Data Final de Avaliacao", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3056,7 +3059,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                     AND e.voided = 0 "
             + "                                     AND p.voided = 0 "
             + "                                     AND e.encounter_datetime > bI1.regime_date "
-            + "                                     AND e.encounter_datetime <= :endDateRevision)";
+            + "                                     AND e.encounter_datetime <= :dataFinalAvaliacao)";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -3767,6 +3770,8 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     String mapping =
         "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
+    String mapping2 =
+        "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}";
 
     // Start adding the definitions based on the requirements
     cd.addSearch(
@@ -3782,7 +3787,7 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getArtDatePickupMasterCard().getConceptId()),
             MAPPING));
 
-    cd.addSearch("B1", EptsReportUtils.map(getPatientsOnRegimeChangeBI1AndNotB1E_B1(), MAPPING));
+    cd.addSearch("B1", EptsReportUtils.map(getPatientsOnRegimeChangeBI1AndNotB1E_B1(), mapping2));
 
     cd.addSearch("B2", EptsReportUtils.map(getPatientsOnSecondLineBI2AndNotB2E_B2(), mapping));
 
