@@ -391,18 +391,20 @@ public class EptsCommonDimension {
    */
   public CohortDefinitionDimension ageBasedOnArtStartDateMOH() {
     CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    dim.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
     dim.setName("Patients having age based on ART start date by reporting end date MOH");
-    dim.addParameter(new Parameter("effectiveDate", "End Date", Date.class));
     dim.addCohortDefinition(
         "adultsArt",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
-            "onOrBefore=${effectiveDate},location=${location}"));
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     dim.addCohortDefinition(
         "childrenArt",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnMOHArtStartDate(null, 14, false),
-            "onOrBefore=${effectiveDate},location=${location}"));
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     return dim;
   }

@@ -49,7 +49,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     dataSetDefinition.addDimension(
         "ageBasedOnArt",
         EptsReportUtils.map(
-            eptsCommonDimension.ageBasedOnArtStartDateMOH(), "effectiveDate=${endDate}"));
+            eptsCommonDimension.ageBasedOnArtStartDateMOH(),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     CohortIndicator initiatedART =
         eptsGeneralIndicator.getIndicator(

@@ -2665,7 +2665,14 @@ public class ResumoMensalCohortQueries {
     String mappingsOnDate = "onOrBefore=${endDate},location=${location}";
     String mappingsOnOrBeforeLocationList = "onOrBefore=${endDate},locationList=${location}";
 
-    cd.addSearch("startedArt", map(startedArt, mappingsOnDate));
+    if (isMOH) {
+      cd.addSearch(
+          "startedArt",
+          map(startedArt, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    } else {
+      cd.addSearch("startedArt", map(startedArt, mappingsOnDate));
+    }
     cd.addSearch("fila", map(fila, mappingsOnDate));
     cd.addSearch("masterCardPickup", map(masterCardPickup, mappingsOnDate));
     cd.addSearch("B5E", map(B5E, mappingsOnDate));

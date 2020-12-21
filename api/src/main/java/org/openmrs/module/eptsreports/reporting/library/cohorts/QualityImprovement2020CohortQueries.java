@@ -3252,7 +3252,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B2_12"),
+            getPatientsFromFichaClinicaDenominatorB("B2"),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B2E",
@@ -6016,7 +6016,7 @@ public class QualityImprovement2020CohortQueries {
     comp.addSearch(
         "G2",
         EptsReportUtils.map(
-            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(), MAPPING));
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true), MAPPING));
 
     comp.addSearch("H1", EptsReportUtils.map(h1, MAPPING));
 
