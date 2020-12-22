@@ -94,8 +94,6 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.setName("Patients Who Initiated ART During The Inclusion Period");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART =
@@ -290,8 +288,6 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.setName("Numerator for Category 4");
@@ -310,8 +306,6 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.setName("Numerator for Category 4");
