@@ -48,6 +48,8 @@ public class QualityImprovement2020CohortQueries {
   private QualityImprovement2020Queries qualityImprovement2020Queries;
 
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String MAPPING1 =
+      "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -92,6 +94,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.setName("Patients Who Initiated ART During The Inclusion Period");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART =
@@ -149,6 +153,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("MCC4D1 Patients");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.addSearch(
@@ -215,6 +220,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("MCC4D2 Patients");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.addSearch(
@@ -284,6 +290,8 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.setName("Numerator for Category 4");
@@ -302,6 +310,8 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.setName("Numerator for Category 4");
@@ -755,6 +765,8 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
@@ -863,6 +875,8 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
@@ -976,6 +990,8 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
@@ -1105,6 +1121,8 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
@@ -1204,8 +1222,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));
-
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
     if (den == 1 || den == 3) {
       compositionCohortDefinition.setCompositionString(
           "A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
@@ -1219,6 +1236,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString(
           "(A AND B4 AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     }
+
     return compositionCohortDefinition;
   }
 
@@ -1280,6 +1298,8 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
@@ -1387,7 +1407,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     compositionCohortDefinition.addSearch("G", EptsReportUtils.map(tbProphylaxyOnPeriod, MAPPING));
 
@@ -1452,6 +1472,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1(); // A
@@ -1513,7 +1535,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
     if (indicatorFlag.equals("A") || indicatorFlag == "E" || indicatorFlag.equals("F"))
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
@@ -1586,6 +1608,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedART = getMQC3D1();
@@ -1628,7 +1652,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transfOut = commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod();
+    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, mapping2));
 
@@ -1646,7 +1670,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
     if (indicatorFlag.equals("A") || indicatorFlag.equals("C"))
       compositionCohortDefinition.setCompositionString("(A AND B1) NOT (C OR D OR E)");
@@ -1709,6 +1733,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
     String mapping =
         "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
@@ -1765,7 +1791,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
     if (indicatorFlag.equals("A")
         || indicatorFlag.equals("B")
@@ -1975,6 +2001,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.setName("Category 11 Numerator session G");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition firstApss =
@@ -2208,6 +2236,8 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.setName("Category 11 Numerator session G");
@@ -2276,6 +2306,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition a = getMQC3D1();
@@ -2318,7 +2350,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
     compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING));
     compositionCohortDefinition.addSearch(
         "ADULTS",
@@ -2344,6 +2376,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition b1 = getPatientsFromFichaClinicaDenominatorB("B1");
@@ -2385,7 +2419,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
 
     compositionCohortDefinition.addSearch(
@@ -2411,6 +2445,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition a = getMQC3D1();
@@ -2453,7 +2489,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
     compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING));
 
     compositionCohortDefinition.setCompositionString(
@@ -2475,6 +2511,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition b1 = getPatientsFromFichaClinicaDenominatorB("B1");
@@ -2518,7 +2556,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
 
     compositionCohortDefinition.setCompositionString(
@@ -2540,6 +2578,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition a = getMQC3D1();
@@ -2578,7 +2618,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
     compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING));
     compositionCohortDefinition.addSearch(
         "CHILDREN",
@@ -2603,6 +2643,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition a = getMQC3D1();
@@ -2642,7 +2684,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
     compositionCohortDefinition.addSearch(
         "I",
         EptsReportUtils.map(
@@ -2669,6 +2711,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition b1 = getPatientsFromFichaClinicaDenominatorB("B1");
@@ -2712,7 +2756,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING));
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     compositionCohortDefinition.addSearch(
         "CHILDREN",
@@ -2835,11 +2879,7 @@ public class QualityImprovement2020CohortQueries {
             transferredIn,
             "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
 
-    comp.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     comp.addSearch(
         "CHILDREN",
@@ -3052,6 +3092,7 @@ public class QualityImprovement2020CohortQueries {
     }
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     // Start adding the definitions based on the requirements
@@ -3283,11 +3324,7 @@ public class QualityImprovement2020CohortQueries {
             transferredIn,
             "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
 
-    comp.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     comp.addSearch(
         "H",
@@ -3406,6 +3443,8 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
@@ -3630,6 +3669,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     String mapping =
         "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
@@ -3691,7 +3731,8 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getArtStatus().getConceptId()),
             MAPPING));
 
-    cd.addSearch("F", EptsReportUtils.map(commonCohortQueries.getTranferredOutPatients(), MAPPING));
+    cd.addSearch(
+        "F", EptsReportUtils.map(commonCohortQueries.getTranferredOutPatients(), MAPPING1));
 
     cd.addSearch("G", EptsReportUtils.map(getMQC13P3NUM_G(), MAPPING));
     cd.addSearch("H", EptsReportUtils.map(getMQC13P3NUM_H(), MAPPING));
@@ -4241,6 +4282,8 @@ public class QualityImprovement2020CohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition b1 =
@@ -4292,7 +4335,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING));
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     compositionCohortDefinition.addSearch("G", EptsReportUtils.map(G, MAPPING));
 
@@ -4670,6 +4713,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName(" CAT 13 DEN - part 2 - 13.15. % de MG elegíveis ");
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
@@ -4688,7 +4732,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("A", EptsReportUtils.map(getMQC3D1(), MAPPING));
     cd.addSearch("B1", EptsReportUtils.map(getgetMQC13P2DenB1(), MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch(
         "ADULT",
         EptsReportUtils.map(
@@ -4710,6 +4754,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
@@ -4736,7 +4781,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("B2", EptsReportUtils.map(getgetMQC13P2DenB2(), MAPPING));
     cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch(
         "ADULT",
         EptsReportUtils.map(
@@ -4758,6 +4803,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
@@ -4790,7 +4836,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch(
         "ADULT",
         EptsReportUtils.map(
@@ -4846,6 +4892,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("MQ10NUMDEN103 Cohort definition");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addSearch(
         "infant",
@@ -4909,6 +4956,7 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.setName(" K - categoria 13 - Numerador - part 2");
@@ -5138,6 +5186,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
@@ -5157,7 +5206,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("B1", EptsReportUtils.map(getgetMQC13P2DenB1(), MAPPING));
     cd.addSearch("H", EptsReportUtils.map(getgetMQC13P2DenB3(), MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch(
         "ADULT",
         EptsReportUtils.map(
@@ -5177,6 +5226,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
@@ -5204,7 +5254,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("J", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
     cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
     cd.addSearch(
         "ADULT",
@@ -5226,6 +5276,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
@@ -5258,7 +5309,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("L", EptsReportUtils.map(getgetMQC13P2NumL(), MAPPING));
     cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch(
         "ADULT",
         EptsReportUtils.map(
@@ -5453,11 +5504,7 @@ public class QualityImprovement2020CohortQueries {
             transferredIn,
             "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
 
-    comp.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     comp.addSearch(
         "AGES29",
@@ -5713,11 +5760,7 @@ public class QualityImprovement2020CohortQueries {
             transferredIn,
             "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
 
-    comp.addSearch(
-        "F",
-        EptsReportUtils.map(
-            transferOut,
-            "startDate=${startDate},endDate=${dataFinalAvaliacao},location=${location}"));
+    comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     comp.addSearch(
         "G2",
