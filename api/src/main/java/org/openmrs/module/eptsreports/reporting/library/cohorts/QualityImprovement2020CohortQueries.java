@@ -3222,15 +3222,15 @@ public class QualityImprovement2020CohortQueries {
             getPatientsFromFichaClinicaDenominatorB("B2E"),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     if (flag == 3) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND NOT G");
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND  G");
     } else if (flag == 4) {
-      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR E)) AND NOT G");
+      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR E)) AND G");
     } else if (flag == 8) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND NOT G");
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND G");
     } else if (flag == 9) {
-      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR E) AND NOT G");
+      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR E) AND G");
     } else if (flag == 12) {
-      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR E) AND NOT G ");
+      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR E) AND G ");
     }
 
     return cd;
