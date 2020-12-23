@@ -1,7 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -1880,26 +1878,26 @@ public class QualityImprovement2020CohortQueries {
         " GROUP BY p.patient_id) filtered ON p.patient_id = filtered.patient_id ";
     String valueQuery = "";
 
-    if (key == "B1") {
+    if (key.equals("B1")) {
       valueQuery =
           " AND o.concept_id = ${therapeuticLineConcept} AND o.value_coded = ${firstLineConcept} ";
     }
-    if (key == "B1E") {
+    if (key.equals("B1E")) {
       valueQuery =
           " AND o.concept_id = ${therapeuticLineConcept} AND o.value_coded <> ${firstLineConcept} ";
     }
-    if (key == "B2_11") {
+    if (key.equals("B2_11")) {
       query = "SELECT p.patient_id ";
       valueQuery = " AND o.concept_id = ${viralLoadConcept} AND o.value_numeric > 1000 ";
       queryTermination = "";
     }
-    if (key == "B2_12") {
+    if (key.equals("B2_12")) {
 
       valueQuery =
           " AND o.concept_id = ${therapeuticLineConcept} AND o.value_coded = ${secondLineConcept} ";
     }
 
-    if (key == "B2E") {
+    if (key.equals("B2E")) {
       valueQuery =
           " AND o.concept_id = ${therapeuticLineConcept} AND o.value_coded <> ${secondLineConcept} ";
     }
