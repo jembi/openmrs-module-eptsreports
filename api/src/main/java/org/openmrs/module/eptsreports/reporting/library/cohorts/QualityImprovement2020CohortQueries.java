@@ -3663,7 +3663,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
+    cd.addParameter(new Parameter("dataFinalAvaliacao", "Data final de Revisao", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     String mapping =
         "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
