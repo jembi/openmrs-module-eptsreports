@@ -1453,14 +1453,18 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
-    if (indicatorFlag.equals("A") || indicatorFlag == "E" || indicatorFlag.equals("F"))
+    if (indicatorFlag.equals("A") || indicatorFlag.equals("E") || indicatorFlag.equals("F")) {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
-    if (indicatorFlag.equals("B") || indicatorFlag.equals("G"))
+    }
+    if (indicatorFlag.equals("B") || indicatorFlag.equals("G")) {
       compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (C OR D OR E OR F)");
-    if (indicatorFlag.equals("C"))
+    }
+    if (indicatorFlag.equals("C")) {
       compositionCohortDefinition.setCompositionString("(A AND B3 AND C) AND NOT (D OR E OR F)");
-    if (indicatorFlag.equals("D"))
-      compositionCohortDefinition.setCompositionString("(B1 AND B3 AND C) AND NOT (D OR E OR F)");
+    }
+    if (indicatorFlag.equals("D")) {
+      compositionCohortDefinition.setCompositionString("(B1 AND B2 AND C) AND NOT (D OR E OR F)");
+    }
 
     return compositionCohortDefinition;
   }
