@@ -1437,7 +1437,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
     compositionCohortDefinition.addSearch(
-        "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING));
+        "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING));
@@ -1580,12 +1580,15 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
-    if (indicatorFlag.equals("A") || indicatorFlag.equals("C"))
+    if (indicatorFlag.equals("A") || indicatorFlag.equals("C")) {
       compositionCohortDefinition.setCompositionString("(A AND B1) NOT (C OR D OR E)");
-    if (indicatorFlag.equals("B") || indicatorFlag.equals("D"))
+    }
+    if (indicatorFlag.equals("B") || indicatorFlag.equals("D")) {
       compositionCohortDefinition.setCompositionString("(A AND B2) AND NOT (C OR D OR E)");
-    if (indicatorFlag.equals("E"))
+    }
+    if (indicatorFlag.equals("E")) {
       compositionCohortDefinition.setCompositionString("(A AND B1 AND C) AND NOT (D OR E)");
+    }
 
     return compositionCohortDefinition;
   }
@@ -1723,6 +1726,8 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("encounterType", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -1771,7 +1776,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND p.voided = 0 AND e.voided = 0 "
             + "                          AND e.location_id = :location AND o.location_id = :location "
             + valueQuery
-            + "                          AND e.encounter_datetime BETWEEN  :startDate AND :endDate  "
+            + "                          AND e.encounter_datetime BETWEEN  :startDate AND :dataFinalAvaliacao  "
             + queryTermination;
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
