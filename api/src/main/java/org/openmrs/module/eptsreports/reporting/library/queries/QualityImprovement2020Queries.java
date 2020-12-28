@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Location;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 
@@ -65,27 +67,7 @@ public class QualityImprovement2020Queries {
             + "              AND o.value_datetime IS NOT NULL "
             + "              AND o.value_datetime <= :endDate "
             + "              AND e.location_id = :location "
-            + "          GROUP  BY p.patient_id "
-            + "          UNION "
-            + "          SELECT 	p.patient_id, Min(pickupdate.value_datetime) AS data_inicio "
-            + "          FROM   	patient p "
-            + "              JOIN encounter e "
-            + "                ON p.patient_id = e.patient_id "
-            + "              JOIN obs pickup "
-            + "                ON e.encounter_id = pickup.encounter_id "
-            + "              JOIN obs pickupdate "
-            + "                ON e.encounter_id = pickupdate.encounter_id "
-            + "          WHERE  	p.voided = 0 "
-            + "              AND pickup.voided = 0 "
-            + "              AND pickup.concept_id = ${23865} "
-            + "              AND pickup.value_coded = ${1065} "
-            + "              AND pickupdate.voided = 0 "
-            + "              AND pickupdate.concept_id = ${23866} "
-            + "              AND pickupdate.value_datetime <= :endDate "
-            + "              AND e.encounter_type = ${52} "
-            + "              AND e.voided = 0 "
-            + "              AND e.location_id = :location "
-            + "          GROUP  BY p.patient_id) inicio "
+            + "          GROUP  BY p.patient_id ) inicio "
             + "      GROUP  BY patient_id) inicio1 "
             + "WHERE  data_inicio BETWEEN :startDate AND :endDate) inicio_real "
             + "INNER JOIN ("
@@ -199,29 +181,7 @@ public class QualityImprovement2020Queries {
             + "                                               AND o.value_datetime IS NOT NULL  "
             + "                                               AND o.value_datetime <= :endDate  "
             + "                                               AND e.location_id = :location  "
-            + "                                        GROUP  BY p.patient_id  "
-            + "                                        UNION  "
-            + "                                        SELECT p.patient_id, Min(pickupdate.value_datetime) AS data_inicio  "
-            + "                                        FROM   patient p  "
-            + "                                               JOIN encounter e  "
-            + "                                                 ON p.patient_id = e.patient_id  "
-            + "                                               JOIN obs pickup  "
-            + "                                                 ON e.encounter_id =  "
-            + "                                                    pickup.encounter_id  "
-            + "                                               JOIN obs pickupdate  "
-            + "                                                 ON e.encounter_id =  "
-            + "                                                    pickupdate.encounter_id  "
-            + "                                        WHERE  p.voided = 0  "
-            + "                                               AND pickup.voided = 0  "
-            + "                                               AND pickup.concept_id = ${23865}  "
-            + "                                               AND pickup.value_coded = ${1065}  "
-            + "                                               AND pickupdate.voided = 0  "
-            + "                                               AND pickupdate.concept_id = ${23866}  "
-            + "                                               AND pickupdate.value_datetime <= :endDate  "
-            + "                                               AND e.encounter_type = ${52}  "
-            + "                                               AND e.voided = 0  "
-            + "                                               AND e.location_id = :location  "
-            + "                                        GROUP  BY p.patient_id) inicio  "
+            + "                                        GROUP  BY p.patient_id ) inicio  "
             + "                                GROUP  BY patient_id) inicio1  "
             + "                        WHERE  data_inicio BETWEEN :startDate AND :endDate  "
             + "                       )  "
@@ -987,6 +947,50 @@ public class QualityImprovement2020Queries {
             + "         AND o.value_coded IS NOT NULL)  "
             + "         AND DATE(e.encounter_datetime) > DATE(queryH1.encounter_datetime)  "
             + "         AND e.encounter_datetime BETWEEN :startDate AND :endDate";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  public static CohortDefinition getTransferredInPatients(
+      int masterCardEncounterType,
+      int transferFromOtherFacilityConcept,
+      int patientFoundYesConcept,
+      int typeOfPatientTransferredFrom,
+      int artStatus) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("transferred in patients");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", masterCardEncounterType);
+    map.put("1369", transferFromOtherFacilityConcept);
+    map.put("1065", patientFoundYesConcept);
+    map.put("6300", typeOfPatientTransferredFrom);
+    map.put("6276", artStatus);
+
+    String query =
+        "SELECT  p.patient_id "
+            + "FROM patient p "
+            + "    INNER JOIN encounter e "
+            + "        ON e.patient_id=p.patient_id "
+            + "    INNER JOIN obs obs1 "
+            + "        ON obs1.encounter_id=e.encounter_id "
+            + "    INNER JOIN obs obs2 "
+            + "        ON obs2.encounter_id=e.encounter_id "
+            + "WHERE p.voided =0  "
+            + "    AND e.voided = 0 "
+            + "    AND obs1.voided =0 "
+            + "    AND obs2.voided =0 "
+            + "    AND e.encounter_type = ${53}  "
+            + "    AND e.location_id = :location "
+            + "    AND obs1.concept_id = ${1369} AND obs1.value_coded = ${1065} "
+            + "    AND obs2.concept_id = ${6300} AND obs2.value_coded = ${6276} ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

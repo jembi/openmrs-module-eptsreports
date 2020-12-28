@@ -295,6 +295,8 @@ public class CommonCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients From Ficha Clinica");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
@@ -305,30 +307,77 @@ public class CommonCohortQueries {
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
-        "SELECT union_tbl.patient_id FROM (SELECT filtered.patient_id, MAX(filtered.transfer_date) as transfer_date FROM  "
-            + " (SELECT   p.patient_id, "
-            + "   MAX(o.obs_datetime) as transfer_date "
-            + "    FROM patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "   JOIN  obs o ON o.encounter_id = e.encounter_id WHERE e.encounter_type = ${53} "
-            + "   AND o.concept_id = ${6272} AND p.voided = 0 AND e.voided = 0 "
-            + "   AND e.location_id = :location "
-            + "   AND o.value_coded = ${1706} AND o.obs_datetime BETWEEN :startDate AND :endDate  "
-            + "            GROUP BY   p.patient_id "
-            + "UNION "
-            + " SELECT  p.patient_id, "
-            + "   MAX(e.encounter_datetime) transfer_date "
-            + "   FROM patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "   JOIN  obs o ON o.encounter_id = e.encounter_id WHERE e.encounter_type = ${6} "
-            + "   AND o.concept_id = ${6273} AND p.voided = 0 AND e.voided = 0 "
-            + "   AND e.location_id = :location "
-            + "   AND o.value_coded = ${1706} AND e.encounter_datetime <= :endDate  "
-            + "            GROUP BY   p.patient_id) filtered group by filtered.patient_id) union_tbl "
-            + "Where union_tbl.patient_id NOT IN  "
-            + "            (Select p.patient_id from patient p join encounter e on e.patient_id = p.patient_id  "
-            + "   where e.encounter_type IN (${52},${6}) and e.location_id= :location and e.voided=0 and p.voided =0  "
-            + "            and e.encounter_datetime > union_tbl.transfer_date and e.encounter_datetime <= :endDate)";
+        " SELECT patient_id "
+            + "FROM   (SELECT transferout.patient_id, "
+            + "               Max(transferout.transferout_date) transferout_date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND e.encounter_datetime <= :dataFinalAvaliacao "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6273} "
+            + "                       AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(o.obs_datetime) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${53} "
+            + "                       AND o.obs_datetime BETWEEN :startDate AND :dataFinalAvaliacao "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6272} "
+            + "                       AND o.value_coded = ${1706} "
+            + "                GROUP  BY p.patient_id) transferout "
+            + "        GROUP  BY transferout.patient_id) max_transferout "
+            + "WHERE  max_transferout.patient_id NOT IN (SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                 JOIN encounter e "
+            + "                                                   ON p.patient_id = "
+            + "                                                      e.patient_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND e.encounter_type = ${6} "
+            + "                                                 AND e.location_id = :location "
+            + "                                                 AND "
+            + "              e.encounter_datetime > transferout_date "
+            + "                                                 AND "
+            + "              e.encounter_datetime <= :dataFinalAvaliacao "
+            + "                                          UNION "
+            + "                                          SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                 JOIN encounter e "
+            + "                                                   ON p.patient_id = "
+            + "                                                      e.patient_id "
+            + "                                                 JOIN obs o "
+            + "                                                   ON e.encounter_id = "
+            + "                                                      o.encounter_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND e.encounter_type = ${52} "
+            + "                                                 AND e.location_id = :location "
+            + "                                                 AND o.concept_id = ${23866} "
+            + "                                                 AND o.value_datetime > "
+            + "                                                     transferout_date "
+            + "                                                 AND o.value_datetime <= "
+            + "                                                     :dataFinalAvaliacao)  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -771,15 +820,11 @@ public class CommonCohortQueries {
   /**
    * 17 - MOH MQ: Patients who initiated ART during the inclusion period
    *
-   * <p>A1- All patients with first drugs pick up date (earliest concept ID 23866 value_datetime)
-   * set in mastercard pharmacy form “Recepção/Levantou ARV”(Encounter Type ID 52) with Levantou ARV
-   * (concept id 23865) = Yes (concept id 1065) earliest “Date of Pick up” Encounter Type Ids = 52
-   * The earliest “Data de Levantamento” (Concept Id 23866 value_datetime) <= endDate Levantou ARV
-   * (concept id 23865) = SIm (1065) OR A2-All patients who have the first historical start drugs
-   * date (earliest concept ID 1190) set in FICHA RESUMO (Encounter Type 53) earliest “historical
-   * start date” Encounter Type Ids = 53 The earliest “Historical Start Date” (Concept Id 1190)And
-   * historical start date(Value_datetime) <=EndDate And the earliest date from A1 and A2
-   * (identified as Patient ART Start Date) is >= startDateRevision and <=endDateInclusion
+   * <p>A2-All patients who have the first historical start drugs date (earliest concept ID 1190)
+   * set in FICHA RESUMO (Encounter Type 53) earliest “historical start date” Encounter Type Ids =
+   * 53 The earliest “Historical Start Date” (Concept Id 1190)And historical start
+   * date(Value_datetime) <=EndDate And the earliest date from A1 and A2 (identified as Patient ART
+   * Start Date) is >= startDateRevision and <=endDateInclusion
    *
    * @return SqlCohortDefinition
    */
@@ -808,15 +853,14 @@ public class CommonCohortQueries {
     map.put("23866", artDatePickupMasterCard);
 
     String query =
-        "  SELECT	patient_id "
-            + "      FROM	("
-            + "          SELECT	p.patient_id, Min(value_datetime) data_inicio "
-            + "                    FROM	patient p "
+        " SELECT patient_id "
+            + "        FROM   (SELECT p.patient_id, Min(value_datetime) art_date "
+            + "                    FROM patient p "
             + "              INNER JOIN encounter e "
             + "                  ON p.patient_id = e.patient_id "
             + "              INNER JOIN obs o "
             + "                  ON e.encounter_id = o.encounter_id "
-            + "          WHERE 	p.voided = 0 "
+            + "          WHERE  p.voided = 0 "
             + "              AND e.voided = 0 "
             + "              AND o.voided = 0 "
             + "              AND e.encounter_type = ${53} "
@@ -824,28 +868,59 @@ public class CommonCohortQueries {
             + "              AND o.value_datetime IS NOT NULL "
             + "              AND o.value_datetime <= :endDate "
             + "              AND e.location_id = :location "
-            + "          GROUP  BY p.patient_id "
-            + "          UNION "
-            + "          SELECT 	p.patient_id, Min(pickupdate.value_datetime) AS data_inicio "
-            + "          FROM   	patient p "
-            + "              JOIN encounter e "
-            + "                ON p.patient_id = e.patient_id "
-            + "              JOIN obs pickup "
-            + "                ON e.encounter_id = pickup.encounter_id "
-            + "              JOIN obs pickupdate "
-            + "                ON e.encounter_id = pickupdate.encounter_id "
-            + "          WHERE  	p.voided = 0 "
-            + "              AND pickup.voided = 0 "
-            + "              AND pickup.concept_id = ${23865} "
-            + "              AND pickup.value_coded = ${1065} "
-            + "              AND pickupdate.voided = 0 "
-            + "              AND pickupdate.concept_id = ${23866} "
-            + "              AND pickupdate.value_datetime <= :endDate "
-            + "              AND e.encounter_type = ${52} "
-            + "              AND e.voided = 0 "
-            + "              AND e.location_id = :location "
-            + "          GROUP  BY p.patient_id) inicio "
-            + "      GROUP  BY patient_id ";
+            + "          GROUP  BY p.patient_id  )  "
+            + "               union_tbl  "
+            + "        WHERE  union_tbl.art_date BETWEEN :startDate AND :endDate";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Description:</b> MQ-MOH Query For pregnant or Breastfeeding patients
+   *
+   * <p><b>Technical Specs</b>
+   * <li>A - Select all female patients who are pregnant as following: all patients registered in
+   *     Ficha Resumo (encounter type=53) with “Gestante”(concept_id 1982) value coded equal to
+   *     “Yes” (concept_id 1065) and sex=Female
+   * <li>B - Select all female patients who are breastfeeding as following: all patients registered
+   *     in Ficha Resumo (encounter type=53) with “Lactante”(concept_id 6332) value coded equal to
+   *     “Yes” (concept_id 1065) and sex=Female
+   *
+   * @param question
+   * @param answer
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMOHPregnantORBreastfeeding(int question, int answer) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Pregnant Or Breastfeeding");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("question", question);
+    map.put("answer", answer);
+
+    String query =
+        "SELECT p.person_id  "
+            + "FROM   person p  "
+            + "       JOIN encounter e  "
+            + "         ON e.patient_id = p.person_id  "
+            + "       JOIN obs o  "
+            + "         ON o.encounter_id = e.encounter_id  "
+            + "            AND encounter_type = ${53}  "
+            + "            AND o.concept_id = ${question}  "
+            + "            AND o.value_coded = ${answer}  "
+            + "            AND e.location_id = :location  "
+            + "            AND p.gender = 'F'  "
+            + "            AND e.voided = 0  "
+            + "            AND o.voided = 0  "
+            + "            AND p.voided = 0 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
