@@ -1440,7 +1440,7 @@ public class QualityImprovement2020CohortQueries {
         "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-        "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING));
+        "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "B3", EptsReportUtils.map(patientsWithClinicalConsultation, MAPPING));
@@ -1564,11 +1564,19 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, mapping2));
 
-    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, mapping2));
+    compositionCohortDefinition.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            b1,
+            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},dataFinalAvaliacao=${dataFinalAvaliacao}"));
 
     compositionCohortDefinition.addSearch("B1E", EptsReportUtils.map(b1E, mapping1));
 
-    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, mapping2));
+    compositionCohortDefinition.addSearch(
+        "B2",
+        EptsReportUtils.map(
+            b2,
+            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},dataFinalAvaliacao=${dataFinalAvaliacao}"));
 
     compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(b2E, mapping1));
 
@@ -2934,7 +2942,7 @@ public class QualityImprovement2020CohortQueries {
         "B1E",
         EptsReportUtils.map(
             getPatientsFromFichaClinicaDenominatorB("B1E"),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location},dataFinalAvaliacao=${dataFinalAvaliacao}"));
 
     cd.addSearch(
         "C",
@@ -2964,12 +2972,12 @@ public class QualityImprovement2020CohortQueries {
         "B2",
         EptsReportUtils.map(
             getPatientsFromFichaClinicaDenominatorB("B2"),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location},dataFinalAvaliacao=${dataFinalAvaliacao}"));
     cd.addSearch(
         "B2E",
         EptsReportUtils.map(
             getPatientsFromFichaClinicaDenominatorB("B2E"),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location},dataFinalAvaliacao=${dataFinalAvaliacao}"));
     if (flag == 3) {
       cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND  G");
     } else if (flag == 4) {
