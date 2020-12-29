@@ -1434,11 +1434,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     // M&Q Report - Categoria 13 Numerador - P3 Indicators
 
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM2",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQC13P3NUM("A"),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQC13P3NUM("A"),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1449,13 +1450,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM9",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQC13P3NUM("B"),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQC13P3NUM("B"),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1466,11 +1466,10 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=0-4");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
-        "MQ13NUM10",
-        EptsReportUtils.map(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "MQ13NUM10",
+            EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM("C"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1478,17 +1477,17 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "MQ13NUM10",
         "Crianças  (5-9 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
-        EptsReportUtils.map(cohortIndicator,
+        EptsReportUtils.map(
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=5-9");
 
-
-
-   cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM11",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQC13P3NUM("D"),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQC13P3NUM("D"),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1499,13 +1498,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=10-14");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM5",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQC13P3NUM("E"),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQC13P3NUM("E"),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1516,13 +1514,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM14",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQC13P3NUM("F"),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQC13P3NUM("F"),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1533,13 +1530,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=2-14");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM3",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ13P4(false, 3),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQ13P4(false, 3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1550,14 +1546,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM12",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ13P4(false, 12),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQ13P4(false, 12),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1568,13 +1562,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=2-14");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM18",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ13P4(false, 18),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQ13P4(false, 18),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1585,15 +1578,14 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
-
     // Categoria  13 part 2  Denominator
 
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13DEN15",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod(),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1604,14 +1596,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13DEN16",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries
-                            .getgetMQC13P2DenMGInIncluisionPeriod33Month(),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod33Month(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1623,14 +1613,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13DEN17",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries
-                            .getgetMQC13P2DenMGInIncluisionPeriod33Days(),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod33Days(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1641,15 +1629,14 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
-
     // M&Q Report - Cat 10 Indicator 10.3 - Numerator and Denominator
 
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ10NUMDEN1031",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ10NUMDEN103("den"),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQ10NUMDEN103("den"),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1657,14 +1644,14 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ10NUMDEN1031",
         "% de crianças com PCR positivo para HIV  que iniciaram TARV dentro de 2 semanas após o diagnóstico/entrega do resultado ao cuidador - denominator",
         EptsReportUtils.map(
-           cohortIndicator,
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
-        "MQ10NUMDEN1032",
-        EptsReportUtils.map(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "MQ10NUMDEN1032",
+            EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ10NUMDEN103("num"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -1677,15 +1664,14 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
-
     // Categoria  13 part 2  Numerator
 
-   cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM15",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQC13P2Num1(),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQC13P2Num1(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1696,13 +1682,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
-
-    cohortIndicator =  eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM16",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQC13P2Num2(),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQC13P2Num2(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1710,17 +1695,16 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ13NUM16",
         "13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN (MG que entraram em TARV na CPN) Denominator:# de MG que tiveram a primeira CPN no período de inclusão, e que já estavam em TARV há mais de 3 meses  (Line 91,Column F in the Template) as following:",
         EptsReportUtils.map(
-           cohortIndicator,
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
-
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ13NUM17",
             EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQC13P2Num3(),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMQC13P2Num3(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1733,11 +1717,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "");
 
     // Category 15 denominator indicators
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
-        "MQ15DEN1",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getMQ15DEN(1),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "MQ15DEN1",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1749,7 +1734,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN2",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(2),
@@ -1765,7 +1751,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=<15");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN3",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(3),
@@ -1781,7 +1768,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN4",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(4),
@@ -1797,7 +1785,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN5",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(5),
@@ -1813,7 +1802,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN6",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(6),
@@ -1829,7 +1819,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator= eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN7",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(7),
@@ -1845,7 +1836,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN8",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(8),
@@ -1861,7 +1853,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN9",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(9),
@@ -1877,11 +1870,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
-                "MQ15DEN10",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(10),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "MQ15DEN10",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(10),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -1892,7 +1886,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN11",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(11),
@@ -1908,7 +1903,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN12",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(12),
@@ -1925,11 +1921,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "age=15+");
 
     // Category 15 denominator indicators
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
-        "MQ15DEN1",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getMQ15DEN(1),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "MQ15DEN1",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1941,7 +1938,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN2",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(2),
@@ -1956,7 +1954,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=<15");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN3",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(3),
@@ -1972,11 +1971,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-cohortIndicator = eptsGeneralIndicator.getIndicator(
-    "MQ15DEN4",
-    EptsReportUtils.map(
-        qualityImprovement2020CohortQueries.getMQ15DEN(4),
-        "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "MQ15DEN4",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1988,7 +1988,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN5",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(5),
@@ -2004,7 +2005,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN6",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(6),
@@ -2020,7 +2022,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN7",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(7),
@@ -2036,7 +2039,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN8",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(8),
@@ -2052,7 +2056,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN9",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(9),
@@ -2068,7 +2073,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN10",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(10),
@@ -2084,11 +2090,12 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-cohortIndicator = eptsGeneralIndicator.getIndicator(
-    "MQ15DEN11",
-    EptsReportUtils.map(
-        qualityImprovement2020CohortQueries.getMQ15DEN(11),
-        "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "MQ15DEN11",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(11),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2100,7 +2107,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15DEN12",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DEN(12),
@@ -2117,12 +2125,13 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
         "age=15+");
 
     // Category 15 Numerator indicators
-    cohortIndicator = eptsGeneralIndicator.getIndicator(
-        "MQ15NUM1",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getMQ15NUM(1),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-            
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "MQ15NUM1",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
@@ -2133,7 +2142,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM2",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(2),
@@ -2149,7 +2159,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=<15");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM3",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(3),
@@ -2165,7 +2176,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM4",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(4),
@@ -2181,7 +2193,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM5",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(5),
@@ -2197,7 +2210,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM6",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(6),
@@ -2213,7 +2227,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM7",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(7),
@@ -2229,7 +2244,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM8",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(8),
@@ -2245,7 +2261,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM9",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(9),
@@ -2261,7 +2278,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM10",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(10),
@@ -2277,7 +2295,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM11",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(11),
@@ -2293,7 +2312,8 @@ cohortIndicator = eptsGeneralIndicator.getIndicator(
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        cohortIndicator = eptsGeneralIndicator.getIndicator(
+    cohortIndicator =
+        eptsGeneralIndicator.getIndicator(
             "MQ15NUM12",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NUM(12),
