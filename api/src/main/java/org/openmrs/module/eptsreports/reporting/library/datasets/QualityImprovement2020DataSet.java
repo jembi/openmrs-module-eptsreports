@@ -1677,19 +1677,27 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "");
 
     // Category 15 denominator indicators
+    cohortIndicator = eptsGeneralIndicator.getIndicator(
+        "MQ15DEN1",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ15DEN(1),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ15DEN1",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS  (DT ou GAAC) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN1",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(1),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN2",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(2),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1697,13 +1705,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN2",
         "% de Adultos (15/+anos) inscritos há pelo menos 12 meses em algum MDS (DT ou GAAC) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN2",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(2),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=<15");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN3",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1711,13 +1721,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN3",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN3",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(3),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN4",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1725,13 +1737,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN4",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN4",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(4),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN5",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(5),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1739,13 +1753,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN5",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN5",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(5),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN6",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(6),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1753,13 +1769,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN6",
         "% de Crianças (10-14 anos) inscritas há 12 em algum MDS (DT) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN6",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(6),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator= eptsGeneralIndicator.getIndicator(
+            "MQ15DEN7",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(7),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1767,13 +1785,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN7",
         "% de Crianças (2-9 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN7",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(7),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN8",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(8),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1781,13 +1801,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN8",
         "% de Crianças (10-14 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN8",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(8),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN9",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(9),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1795,27 +1817,30 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN9",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN9",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(9),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+                "MQ15DEN10",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15DEN(10),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ15DEN10",
         "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN10",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(10),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN11",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(11),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1823,13 +1848,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN11",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN11",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(11),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN12",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(12),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1837,42 +1864,47 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN12",
         "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN12",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(12),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
     // Category 15 denominator indicators
+    cohortIndicator = eptsGeneralIndicator.getIndicator(
+        "MQ15DEN1",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ15DEN(1),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ15DEN1",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS  (DT ou GAAC) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN1",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(1),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN2",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(2),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ15DEN2",
         "% de Adultos (15/+anos) inscritos há pelo menos 12 meses em algum MDS (DT ou GAAC) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN2",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(2),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=<15");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN3",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1880,13 +1912,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN3",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN3",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(3),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+cohortIndicator = eptsGeneralIndicator.getIndicator(
+    "MQ15DEN4",
+    EptsReportUtils.map(
+        qualityImprovement2020CohortQueries.getMQ15DEN(4),
+        "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1894,13 +1928,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN4",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN4",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(4),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN5",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(5),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1908,13 +1944,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN5",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN5",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(5),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN6",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(6),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1922,13 +1960,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN6",
         "% de Crianças (10-14 anos) inscritas há 12 em algum MDS (DT) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN6",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(6),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN7",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(7),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1936,13 +1976,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN7",
         "% de Crianças (2-9 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN7",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(7),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN8",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(8),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1950,13 +1992,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN8",
         "% de Crianças (10-14 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN8",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(8),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN9",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(9),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1964,13 +2008,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN9",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN9",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(9),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN10",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(10),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1978,13 +2024,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN10",
         "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN10",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(10),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+cohortIndicator = eptsGeneralIndicator.getIndicator(
+    "MQ15DEN11",
+    EptsReportUtils.map(
+        qualityImprovement2020CohortQueries.getMQ15DEN(11),
+        "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1992,13 +2040,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN11",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN11",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(11),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15DEN12",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DEN(12),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2006,28 +2056,32 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN12",
         "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15DEN12",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15DEN(12),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
 
     // Category 15 Numerator indicators
+    cohortIndicator = eptsGeneralIndicator.getIndicator(
+        "MQ15NUM1",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ15NUM(1),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+            
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ15NUM1",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS  (DT ou GAAC) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM1",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(1),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM2",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(2),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2035,13 +2089,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM2",
         "% de Adultos (15/+anos) inscritos há pelo menos 12 meses em algum MDS (DT ou GAAC) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM2",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(2),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=<15");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM3",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2049,13 +2105,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM3",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM3",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(3),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM4",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2063,13 +2121,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM4",
         "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM4",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(4),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM5",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(5),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2077,13 +2137,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM5",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM5",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(5),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM6",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(6),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2091,13 +2153,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM6",
         "% de Crianças (10-14 anos) inscritas há 12 em algum MDS (DT) que continuam activos em TARV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM6",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(6),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM7",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(7),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2105,13 +2169,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM7",
         "% de Crianças (2-9 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM7",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(7),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM8",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(8),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2119,13 +2185,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM8",
         "% de Crianças (10-14 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM8",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(8),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM9",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(9),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2133,13 +2201,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM9",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM9",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(9),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM10",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(10),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2147,13 +2217,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM10",
         "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM10",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(10),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM11",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(11),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2161,13 +2233,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM11",
         "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM11",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(11),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+        cohortIndicator = eptsGeneralIndicator.getIndicator(
+            "MQ15NUM12",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NUM(12),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2175,11 +2249,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15NUM12",
         "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
         EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ15NUM12",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ15NUM(12),
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")),
+            cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
