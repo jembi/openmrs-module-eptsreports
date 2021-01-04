@@ -46,6 +46,7 @@ public class QualityImprovement2020CohortQueries {
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   private final String MAPPING1 =
       "startDate=${startDate},endDate=${endDate},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}";
+  private final String THERAPUTIC_MAPPINGS = "startDate=${startDate},endDate=${dataFinalAvaliacao},dataFinalAvaliacao=${dataFinalAvaliacao},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -1437,7 +1438,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
     compositionCohortDefinition.addSearch(
-        "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
+        "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, THERAPUTIC_MAPPINGS));
 
     compositionCohortDefinition.addSearch(
         "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING));
@@ -1726,8 +1727,6 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("dataFinalAvaliacao", "dataFinalAvaliacao", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("encounterType", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -1776,7 +1775,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND p.voided = 0 AND e.voided = 0 "
             + "                          AND e.location_id = :location AND o.location_id = :location "
             + valueQuery
-            + "                          AND e.encounter_datetime BETWEEN  :startDate AND :dataFinalAvaliacao  "
+            + "                          AND e.encounter_datetime BETWEEN  :startDate AND :endDate  "
             + queryTermination;
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

@@ -13,6 +13,9 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ViralLoadQueries {
 
   /**
@@ -165,5 +168,23 @@ public class ViralLoadQueries {
         viralLoadRequestReasonConceptId,
         routineViralLoadConceptId,
         unknownConceptId);
+  }
+  /**
+   * <b>Descritpion</b>
+   * <p>Patients whose age is depended on the Viral load - VL date and DOB difference will result into age required</p>
+   */
+  public static String getPatientAgeBasedOnFirstViralLoadDate(int conceptId, int encounterType, int minAge, int maxAge) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("viralLoadConcept", conceptId);
+    map.put("encounterType", encounterType);
+      String query =
+              " SELECT pat.patient_id, pn.birthdate, encounter_datetime FROM patient pat INNER JOIN person pn "
+              +" ON pat.patient_id=pn.person_id INNER JOIN( "
+              +" SELECT patient_id, MIN(encounter_datetime) AS encounter_datetime FROM ("
+              +" SELECT p.patient_id, e.encounter_datetime FROM patient p  INNER JOIN encounter e "
+              +" ON p.patient_id=e.patient_id INNER JOIN obs o ON e.encounter_id=o.encounter_id WHERE o.value_numeric IS NOT NULL "
+              +" AND p.voided=0 AND e.voided=0 AND o.voided=0 AND e.location_id=:location AND e.encounter_datetime "
+              +" BETWEEN :startDate AND :endDate AND  e.encounter_type=${encounterType} AND o.concept_id=${viralLoadConcept} "
+              +" AND o.value_numeric > 1000 ) al GROUP BY patient_id) ex ON pa.patient_id=ex.patient_id ";
   }
 }
