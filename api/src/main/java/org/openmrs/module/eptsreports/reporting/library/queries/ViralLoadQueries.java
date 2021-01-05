@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import org.apache.commons.text.StringSubstitutor;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -186,5 +188,7 @@ public class ViralLoadQueries {
               +" AND p.voided=0 AND e.voided=0 AND o.voided=0 AND e.location_id=:location AND e.encounter_datetime "
               +" BETWEEN :startDate AND :endDate AND  e.encounter_type=${encounterType} AND o.concept_id=${viralLoadConcept} "
               +" AND o.value_numeric > 1000 ) al GROUP BY patient_id) ex ON pa.patient_id=ex.patient_id ";
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
   }
 }

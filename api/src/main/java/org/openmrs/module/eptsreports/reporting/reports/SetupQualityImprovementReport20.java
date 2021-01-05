@@ -63,7 +63,8 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
         EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+            genericCohortQueries.getBaseCohort(),
+            "endDate=${revisionEndDate},location=${location}"));
 
     return reportDefinition;
   }
@@ -94,7 +95,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
     return Arrays.asList(
         new Parameter("startDate", "Data Inicial Inclusão", Date.class),
         new Parameter("endDate", "Data Final Inclusão", Date.class),
-        new Parameter("dataFinalAvaliacao", "Data Final Revisão", Date.class),
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
         new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }
