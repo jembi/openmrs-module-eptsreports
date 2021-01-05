@@ -509,7 +509,7 @@ public class QualityImprovement2020CohortQueries {
             + " AND o.value_coded IN (${1267})  "
             + " AND e.encounter_datetime >= :startDate  "
             + " AND e.encounter_datetime <= :endDate  "
-            + " AND DATEDIFF(DATE(last.encounter),DATE(e.encounter_datetime)) between 180 and 270  "
+            + " AND DATEDIFF(DATE(e.encounter_datetime),DATE(last.encounter)) between 180 and 270  "
             + " AND p.voided = 0  "
             + " AND e.voided = 0  "
             + " AND o.voided = 0; ";
