@@ -213,7 +213,7 @@ public class ViralLoadQueries {
             + " AND o.concept_id=${viralLoadConcept} "
             + " AND o.value_numeric > 1000 ) al "
             + " GROUP BY patient_id) ex "
-            + " ON pa.patient_id=ex.patient_id ) fin "
+            + " ON pat.patient_id=ex.patient_id ) fin "
             + " WHERE  age BETWEEN ${minAge} AND ${maxAge} ";
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
