@@ -1945,7 +1945,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "firstApss",
         EptsReportUtils.map(
-            firstApss, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            firstApss,
+            "onOrAfter=${startDate},onOrBefore=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "secondApss",
