@@ -89,7 +89,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
-    /*cohortIndicator =
+    cohortIndicator =
         eptsGeneralIndicator.getIndicator(
             "MCC4D2",
             EptsReportUtils.map(
@@ -473,7 +473,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");*/
+        "");
 
     // Category 11 denominator indicators
 
@@ -717,7 +717,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=<15");
 
-    /* // Category 12 denominator indicators
+    // Category 12 denominator indicators
     cohortIndicator =
         eptsGeneralIndicator.getIndicator(
             "MQ12DEN1",
@@ -2332,7 +2332,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");*/
+        "");
 
     return dataSetDefinition;
   }
