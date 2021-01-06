@@ -582,7 +582,7 @@ public class QualityImprovement2020Queries {
             + "                       AND o.concept_id = ${23739} "
             + "                       AND o.value_coded <> ${23720} "
             + "                       AND e.encounter_datetime <= :revisionEndDate "
-            + "                GROUP  BY p.patient_id) not_dt) b1; ";
+            + "                GROUP  BY p.patient_id) not_dt) b1 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
