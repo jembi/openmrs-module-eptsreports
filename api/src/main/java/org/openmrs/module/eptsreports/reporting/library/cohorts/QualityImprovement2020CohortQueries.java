@@ -2748,7 +2748,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getYesConcept().getConceptId());
 
     CohortDefinition transferredIn =
-        qualityImprovement2020Queries.getTransferredInPatients(
+        QualityImprovement2020Queries.getTransferredInPatients(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
