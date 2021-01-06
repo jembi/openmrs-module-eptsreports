@@ -467,6 +467,8 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Patients with Prophylaxy Treatment within Revision Period");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -508,7 +510,7 @@ public class QualityImprovement2020CohortQueries {
             + " AND o.concept_id = ${6122}  "
             + " AND o.value_coded IN (${1267})  "
             + " AND e.encounter_datetime >= :startDate  "
-            + " AND e.encounter_datetime <= :endDate  "
+            + " AND e.encounter_datetime <= :revisionEndDate  "
             + " AND DATEDIFF(DATE(e.encounter_datetime),DATE(last.encounter)) between 180 and 270  "
             + " AND p.voided = 0  "
             + " AND e.voided = 0  "
@@ -1357,7 +1359,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
-    compositionCohortDefinition.addSearch("G", EptsReportUtils.map(tbProphylaxyOnPeriod, MAPPING));
+    compositionCohortDefinition.addSearch("G", EptsReportUtils.map(tbProphylaxyOnPeriod, MAPPING1));
 
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(tbDiagOnPeriod, MAPPING));
 
