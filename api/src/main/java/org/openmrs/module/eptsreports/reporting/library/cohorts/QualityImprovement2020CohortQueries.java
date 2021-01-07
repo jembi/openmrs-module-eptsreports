@@ -4718,10 +4718,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getAgeInMonthsOnArtStartDate(0, 18),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-                getMOHArtStartDate(), MAPPING));
+    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch(
         "B",
         EptsReportUtils.map(

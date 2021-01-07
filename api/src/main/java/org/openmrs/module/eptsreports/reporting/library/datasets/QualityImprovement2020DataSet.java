@@ -2130,6 +2130,31 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+    // M&Q Report - Categoria 14 Denominador
+    dataSetDefinition.addColumn(
+        "MQ14DEN1",
+        "% de adultos (15/+anos) em TARV com supressão viral",
+        EptsReportUtils.map(
+            cohortIndicator, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=15+");
+    dataSetDefinition.addColumn(
+        "MQ14DEN2",
+        "% % de crianças (0-14 anos) em TARV com supressão viral",
+        EptsReportUtils.map(
+            cohortIndicator, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "age=0-14");
+    dataSetDefinition.addColumn(
+        "MQ14DEN3",
+        "% de MG em TARV com supressão viral",
+        EptsReportUtils.map(
+            cohortIndicator, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+    dataSetDefinition.addColumn(
+        "MQ14DEN4",
+        "% de ML em TARV com supressão viral",
+        EptsReportUtils.map(
+            cohortIndicator, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
 
     return dataSetDefinition;
   }
