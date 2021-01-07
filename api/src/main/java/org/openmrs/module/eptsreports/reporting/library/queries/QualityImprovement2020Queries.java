@@ -618,6 +618,8 @@ public class QualityImprovement2020Queries {
         "Patients with viral load request since last dispensation type change (Oldest date From A)");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -687,8 +689,8 @@ public class QualityImprovement2020Queries {
             + "            AND e.encounter_datetime <= :endDate  "
             + "    GROUP BY p.patient_id) encounters  "
             + "    WHERE  "
-            + "        encounters.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 14 MONTH)   "
-            + " AND DATE_SUB(:endDate, INTERVAL 11 MONTH)) AS result) queryA ON queryA.patient_id = p.patient_id  "
+            + "        encounters.encounter_datetime BETWEEN DATE_SUB(:revisionEndDate, INTERVAL 14 MONTH)   "
+            + " AND DATE_SUB(:revisionEndDate, INTERVAL 11 MONTH)) AS result) queryA ON queryA.patient_id = p.patient_id  "
             + "WHERE  "
             + "    p.voided = 0 AND e.voided = 0  "
             + "        AND o.voided = 0  "
@@ -698,7 +700,7 @@ public class QualityImprovement2020Queries {
             + "        AND o.value_coded = ${856}  "
             + "        AND DATE(e.encounter_datetime) > DATE(queryA.encounter_datetime)  "
             + "        AND e.encounter_datetime BETWEEN :startDate   "
-            + "        AND :endDate;";
+            + "        AND :revisionEndDate";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -735,6 +737,8 @@ public class QualityImprovement2020Queries {
         "Patients with viral load result since last request after last dispensation type change");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -763,9 +767,12 @@ public class QualityImprovement2020Queries {
             + "         p.patient_id, e.encounter_datetime  "
             + "     FROM  "
             + "         patient p  "
-            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id  "
-            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
-            + "     INNER JOIN (SELECT   "
+            + "         INNER JOIN "
+            + "     encounter e ON e.patient_id = p.patient_id  "
+            + "         INNER JOIN "
+            + "     obs o ON o.encounter_id = e.encounter_id  "
+            + "         INNER JOIN "
+            + "     (SELECT   "
             + "         patient_id, encounter_datetime  "
             + "     FROM  "
             + "         (SELECT   "
@@ -812,8 +819,8 @@ public class QualityImprovement2020Queries {
             + "             AND e.encounter_datetime <= :endDate  "
             + "     GROUP BY p.patient_id) encounters  "
             + "     WHERE  "
-            + "         encounters.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 14 MONTH)  "
-            + " AND DATE_SUB(:endDate, INTERVAL 11 MONTH)) AS result) queryA ON queryA.patient_id = p.patient_id  "
+            + "         encounters.encounter_datetime BETWEEN DATE_SUB(:revisionEndDate, INTERVAL 14 MONTH)  "
+            + " AND DATE_SUB(:revisionEndDate, INTERVAL 11 MONTH)) AS result) queryA ON queryA.patient_id = p.patient_id  "
             + "     WHERE  "
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND o.voided = 0  "
@@ -822,7 +829,8 @@ public class QualityImprovement2020Queries {
             + "             AND o.concept_id = ${23722}  "
             + "             AND o.value_coded = ${856}  "
             + "             AND DATE(e.encounter_datetime) > DATE(queryA.encounter_datetime)  "
-            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate) queryH1 ON queryH1.patient_id = p.patient_id  "
+            + "             AND e.encounter_datetime BETWEEN :startDate "
+            + "             AND :revisionEndDate) queryH1 ON queryH1.patient_id = p.patient_id  "
             + " WHERE  "
             + "     p.voided = 0 AND e.voided = 0  "
             + "         AND o.voided = 0  "
@@ -833,7 +841,7 @@ public class QualityImprovement2020Queries {
             + "         OR (o.concept_id = ${1305}   "
             + "         AND o.value_coded IS NOT NULL)  "
             + "         AND DATE(e.encounter_datetime) > DATE(queryH1.encounter_datetime)  "
-            + "         AND e.encounter_datetime BETWEEN :startDate AND :endDate";
+            + "         AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -871,6 +879,8 @@ public class QualityImprovement2020Queries {
         "Patients with viral load result since last request after last dispensation type change");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -899,9 +909,12 @@ public class QualityImprovement2020Queries {
             + "         p.patient_id, e.encounter_datetime  "
             + "     FROM  "
             + "         patient p  "
-            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id  "
-            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
-            + "     INNER JOIN (SELECT   "
+            + "     INNER JOIN "
+            + "     encounter e ON e.patient_id = p.patient_id  "
+            + "     INNER JOIN "
+            + "     obs o ON o.encounter_id = e.encounter_id  "
+            + "         INNER JOIN "
+            + "     (SELECT   "
             + "         patient_id, encounter_datetime  "
             + "     FROM  "
             + "         (SELECT   "
@@ -948,8 +961,8 @@ public class QualityImprovement2020Queries {
             + "             AND e.encounter_datetime <= :endDate  "
             + "     GROUP BY p.patient_id) encounters  "
             + "     WHERE  "
-            + "         encounters.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 14 MONTH)  "
-            + " AND DATE_SUB(:endDate, INTERVAL 11 MONTH)) AS result) queryA ON queryA.patient_id = p.patient_id  "
+            + "         encounters.encounter_datetime BETWEEN DATE_SUB(:revisionEndDate, INTERVAL 14 MONTH)  "
+            + " AND DATE_SUB(:revisionEndDate, INTERVAL 11 MONTH)) AS result) queryA ON queryA.patient_id = p.patient_id  "
             + "     WHERE  "
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND o.voided = 0  "
@@ -958,7 +971,9 @@ public class QualityImprovement2020Queries {
             + "             AND o.concept_id = ${23722}  "
             + "             AND o.value_coded = ${856}  "
             + "             AND DATE(e.encounter_datetime) > DATE(queryA.encounter_datetime)  "
-            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate) queryH1 ON queryH1.patient_id = p.patient_id  "
+            + "             AND e.encounter_datetime BETWEEN :startDate "
+            + "             AND :revisionEndDate) queryH1 "
+            + "             ON queryH1.patient_id = p.patient_id  "
             + " WHERE  "
             + "     p.voided = 0 AND e.voided = 0  "
             + "         AND o.voided = 0  "
