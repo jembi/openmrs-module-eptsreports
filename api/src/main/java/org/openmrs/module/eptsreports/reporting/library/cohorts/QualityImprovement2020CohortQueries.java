@@ -1529,7 +1529,8 @@ public class QualityImprovement2020CohortQueries {
    */
   public CohortDefinition getMQC12P2DEN(String indicatorFlag) {
     String mapping1 = "startDate=${endDate-14m},endDate=${endDate},location=${location}";
-    String mapping2 = "startDate=${endDate-14m},endDate=${endDate-11m},location=${location}";
+    String mapping2 =
+        "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}";
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (indicatorFlag.equals("A"))
@@ -1590,7 +1591,7 @@ public class QualityImprovement2020CohortQueries {
         "B1",
         EptsReportUtils.map(
             b1,
-            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
     compositionCohortDefinition.addSearch("B1E", EptsReportUtils.map(b1E, mapping1));
 
@@ -1598,7 +1599,7 @@ public class QualityImprovement2020CohortQueries {
         "B2",
         EptsReportUtils.map(
             b2,
-            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
     compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(b2E, mapping1));
 
@@ -4718,10 +4719,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getAgeInMonthsOnArtStartDate(0, 18),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-                getMOHArtStartDate(), MAPPING));
+    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch(
         "B",
         EptsReportUtils.map(
