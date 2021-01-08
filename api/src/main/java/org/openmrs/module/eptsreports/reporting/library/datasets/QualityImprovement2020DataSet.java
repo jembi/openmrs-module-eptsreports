@@ -72,8 +72,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             initiatedART, "startDate=${startDate},endDate=${endDate},location=${location}"),
         getDisagregateAdultsAndChildrenSColumn());
 
-    CohortIndicator cohortIndicator; // !
-    /*
         // Category 4 denominator indicators
 
         CohortIndicator cohortIndicator =
@@ -1723,7 +1721,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 cohortIndicator,
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "");
-    */
+
     // Category 15 denominator indicators
     cohortIndicator =
         eptsGeneralIndicator.getIndicator(
