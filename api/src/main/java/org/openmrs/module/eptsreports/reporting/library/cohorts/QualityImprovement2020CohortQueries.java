@@ -5678,7 +5678,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (flag == 3) {
       cd.setCompositionString("(A AND A1) AND NOT A2");
     } else if (flag == 4) {
-      cd.setCompositionString("(A AND A2) AND NOT A2");
+      cd.setCompositionString("(A AND NOT A1) AND A2");
     }
 
     return cd;
