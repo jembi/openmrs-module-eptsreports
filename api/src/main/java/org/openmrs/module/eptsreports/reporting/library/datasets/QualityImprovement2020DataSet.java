@@ -90,7 +90,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             cohortIndicator,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
-        cohortIndicator =
+    cohortIndicator =
         eptsGeneralIndicator.getIndicator(
             "MCC4D2",
             EptsReportUtils.map(
@@ -272,7 +272,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-        // Category 7 denominator indicators
+    // Category 7 denominator indicators
     cohortIndicator =
         eptsGeneralIndicator.getIndicator(
             "MQ7DEN1",
