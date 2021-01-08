@@ -981,6 +981,8 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    String mapping = "startDate=${startDate},endDate=${revisionEndDate},location=${location}";
+
     CohortDefinition startedART = getMOHArtStartDate();
 
     CohortDefinition tbActive =
@@ -1013,7 +1015,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
-    compositionCohortDefinition.addSearch("B", EptsReportUtils.map(tbActive, MAPPING));
+    compositionCohortDefinition.addSearch("B", EptsReportUtils.map(tbActive, mapping));
 
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
@@ -4718,10 +4720,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getAgeInMonthsOnArtStartDate(0, 18),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(
-                getMOHArtStartDate(), MAPPING));
+    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch(
         "B",
         EptsReportUtils.map(
