@@ -47,7 +47,7 @@ public class QualityImprovement2020CohortQueries {
   private final String MAPPING1 =
       "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}";
   private final String MAPPING2 =
-      "startDate=${endDate-14m},endDate=${endDate-11m},location=${location}";
+      "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -1591,7 +1591,7 @@ public class QualityImprovement2020CohortQueries {
         "B1",
         EptsReportUtils.map(
             b1,
-            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
     compositionCohortDefinition.addSearch("B1E", EptsReportUtils.map(b1E, mapping1));
 
@@ -1599,7 +1599,7 @@ public class QualityImprovement2020CohortQueries {
         "B2",
         EptsReportUtils.map(
             b2,
-            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
     compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(b2E, mapping1));
 
@@ -1680,6 +1680,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
     String mapping =
         "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
+    String mapping2 =
+        "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}";
 
     CohortDefinition startedART = getMOHArtStartDate();
 
@@ -1709,7 +1711,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
-    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1Patients, MAPPING2));
+    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1Patients, mapping2));
 
     compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2Patients, mapping));
 
@@ -2961,7 +2963,8 @@ public class QualityImprovement2020CohortQueries {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    String mapping1 = "startDate=${endDate-14m},endDate=${endDate},location=${location}";
+    String mapping1 =
+        "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}";
 
     switch (flag) {
       case 3:
@@ -2987,61 +2990,71 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     // Start adding the definitions based on the requirements
-    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING2));
-    cd.addSearch(
-        "G",
-        EptsReportUtils.map(
-            resumoMensalCohortQueries
-                .getNumberOfActivePatientsInArtAtEndOfCurrentMonthWithVlPerformed(true),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    CohortDefinition startedART = getMOHArtStartDate();
+
+    CohortDefinition b1 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
+
+    CohortDefinition b1E = getPatientsFromFichaClinicaDenominatorB("B1E");
+
+    CohortDefinition b2 = getPatientsFromFichaClinicaDenominatorB("B2_12");
+
+    CohortDefinition b2E = getPatientsFromFichaClinicaDenominatorB("B2E");
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING2));
+
     cd.addSearch(
         "B1",
         EptsReportUtils.map(
-            getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1(),
-            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
-    cd.addSearch(
-        "B1E", EptsReportUtils.map(getPatientsFromFichaClinicaDenominatorB("B1E"), mapping1));
+            b1,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
-    cd.addSearch(
-        "C",
-        EptsReportUtils.map(
-            commonCohortQueries.getMOHPregnantORBreastfeeding(
-                commonMetadata.getPregnantConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            MAPPING));
-    cd.addSearch(
-        "D",
-        EptsReportUtils.map(
-            commonCohortQueries.getMOHPregnantORBreastfeeding(
-                commonMetadata.getBreastfeeding().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            MAPPING));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            qualityImprovement2020Queries.getTransferredInPatients(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-                hivMetadata.getPatientFoundYesConcept().getConceptId(),
-                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-                hivMetadata.getArtStatus().getConceptId()),
-            MAPPING));
+    cd.addSearch("B1E", EptsReportUtils.map(b1E, mapping1));
+
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B2"),
-            "startDate=${startDate},endDate=${endDate},location=${location},revisionEndDate=${revisionEndDate}"));
+            b2,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+
+    cd.addSearch("B2E", EptsReportUtils.map(b2E, mapping1));
+
+    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+
+    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+
+    cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
+
+    cd.addSearch(
+        "G",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+
     cd.addSearch(
         "B2E",
         EptsReportUtils.map(
             getPatientsFromFichaClinicaDenominatorB("B2E"),
             "startDate=${startDate},endDate=${endDate},location=${location},revisionEndDate=${revisionEndDate}"));
     if (flag == 3) {
-      // 31 Pacientes
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND G");
-      // cd.setCompositionString("(A AND B1");  // 151 Pacientes
-      // cd.setCompositionString("(A AND B1 AND G");  // 35 Pacientes com endDate
-      // cd.setCompositionString("(A AND B1 AND G");  // 53 Pacientes com revisionEndDate
+      cd.setCompositionString("(A AND B1 AND G AND NOT (B1E OR C OR D OR E))");
     } else if (flag == 4) {
       cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR E)) AND G");
     } else if (flag == 8) {
