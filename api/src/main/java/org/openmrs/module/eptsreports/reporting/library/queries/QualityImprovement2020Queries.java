@@ -1021,12 +1021,24 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * All patients ll patients with a clinical consultation(encounter type 6) during the Revision
+   * period with the following conditions:
+   *
+   * <p>- “TEM SINTOMAS DE TB” (concept_id 23758) value coded “SIM” or “NÃO”(concept_id IN [1065,
+   * 1066]) and Encounter_datetime between:
+   *
+   * <p>- Encounter_datetime between startDateRevision and endDateRevision (should be the last
+   * encounter during the revision period)
+   */
   public static CohortDefinition getPatientsWithTBSymptoms(
       int adultoSeguimentoEncounterType, int tbSymptomsConcept, int yesConcept, int noConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("transferred in patients");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Location.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();

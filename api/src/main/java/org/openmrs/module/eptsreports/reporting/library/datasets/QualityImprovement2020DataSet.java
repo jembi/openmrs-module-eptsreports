@@ -272,7 +272,79 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "");
 
-        // Category 7 denominator indicators
+
+      // Category 6 numerator indicators
+
+      cohortIndicator =
+              eptsGeneralIndicator.getIndicator(
+                      "MQ6NUM1",
+                      EptsReportUtils.map(
+                              qualityImprovement2020CohortQueries.getMQ6NUM(1),
+                              "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+      cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+      dataSetDefinition.addColumn(
+              "MQ6NUM1",
+              "Crianças em TARV com desnutrição (DAM ou DAG) e  com registo de prescrição de suplementação ou tratamento nutricional",
+              EptsReportUtils.map(
+                      cohortIndicator,
+                      "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+              "age=15+");
+
+      cohortIndicator =
+              eptsGeneralIndicator.getIndicator(
+                      "MQ6NUM2",
+                      EptsReportUtils.map(
+                              qualityImprovement2020CohortQueries.getMQ6NUM(2),
+                              "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+      cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+      dataSetDefinition.addColumn(
+              "MQ6NUM2",
+              "",
+              EptsReportUtils.map(
+                      cohortIndicator,
+                      "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+              "age=<15");
+
+      cohortIndicator =
+              eptsGeneralIndicator.getIndicator(
+                      "MQ6NUM3",
+                      EptsReportUtils.map(
+                              qualityImprovement2020CohortQueries.getMQ6NUM(3),
+                              "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+      cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+      dataSetDefinition.addColumn(
+              "MQ6NUM3",
+              "% de mulheres grávidas HIV+ rastreadas para TB na última consulta clínica",
+              EptsReportUtils.map(
+                      cohortIndicator,
+                      "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+              "");
+
+      cohortIndicator =
+              eptsGeneralIndicator.getIndicator(
+                      "MQ6NUM4",
+                      EptsReportUtils.map(
+                              qualityImprovement2020CohortQueries.getMQ6NUM(4),
+                              "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+      cohortIndicator.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+      dataSetDefinition.addColumn(
+              "MQ6NUM4",
+              "% de mulheres lactantes HIV+ rastreadas para TB  na última consulta",
+              EptsReportUtils.map(
+                      cohortIndicator,
+                      "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+              "");
+
+
+      // Category 7 denominator indicators
         cohortIndicator =
             eptsGeneralIndicator.getIndicator(
                 "MQ7DEN1",
