@@ -471,24 +471,101 @@
                      property_value="74f6c17f-9819-41da-ba34-5910f67d24d0"
                      description="UUID for the ART pickup concept" uuid="083ed0c9-5875-11ea-8247-a0a4c5d1c75c"/>
 
+<global_property property="eptsreports.activeTBConceptUuid" property_value="63b15479-5a05-4bdc-a6e5-eab175743122"
+description="UUID for the TUBERCULOSE ACTIVO concept" uuid="763a4102-1d49-47ae-b19e-aba7e9d86b52" />
 
 <global_property
 		property="eptsreports.nutritionalSupplememtConceptUuid"
 		property_value="e1e205f0-1d5f-11e0-b929-000c29ad1d07"
 		description="NUTRITIONAL SUPPLEMENT concept"
+		uuid="448d0b8c-3a25-11eb-a98c-0242ac120002"
 	/>
 
 	<global_property property="eptsreports.ATPUSupplememtConceptUuid"
 	property_value="014b76fb-c7ee-404c-b913-9795a108015e"
 			description="ATPU SUPPLEMENT concept"
+			uuid="4f4bf6dd-3a25-11eb-a98c-0242ac120002"
 	/>
 
 	<global_property
-		property="eptsreports.sojaSupplememtConceptUuid" 
+		property="eptsreports.sojaSupplememtConceptUuid"
 		property_value="e1e204ec-1d5f-11e0-b929-000c29ad1d07"
 		description="Soja SUPPLEMENT concept"
+		uuid="58528cd4-3a25-11eb-a98c-0242ac120002"
 	/>
 
+	<global_property property="eptsreports.hasTbSymptomsConceptUuid" 
+	property_value="2eab4e55-d0d0-4fa8-8d23-b40eaaee44c8" 
+	description="UUID for the Has Tb Symptoms concept" 
+	uuid="6fdb03ca-d223-11ea-a9e9-1f1143db8a7b" />
+		
+	<global_property property="eptsreports.continueRegimen" 
+	property_value="e1d9f036-1d5f-11e0-b929-000c29ad1d07" 
+	description="UUID for the TRATAMENTO DE TUBERCULOSE concept" 
+	uuid="6fdb03ca-05fd-4b4e-11e0-8a3659c69981" />
+
+	<global_property property="eptsreports.tuberculosisTreatmentPlanConceptUuid" 
+	property_value="e1d9fbda-1d5f-11e0-b929-000c29ad1d07" 
+	description="UUID for the TRATAMENTO DE TUBERCULOSE concept" 
+	uuid="78a16b62-05fd-4b4e-83e0-8a3659c69981" />
+
+	<global_property property="eptsreports.completedConceptUuid" 
+	property_value="e1d9facc-1d5f-11e0-b929-000c29ad1d07" 
+	uuid="ee89191a-d5ea-450f-9cf3-3eba99272055"/>
+
+	<global_property property="eptsreports.stateOfStayOfPreArtPatient"
+                     property_value="3bd7a5d1-afc0-478d-9aa6-c7bdd9a050c8"
+                     description="UUID for the PRE ART concept" uuid="31c73ffc-5875-11ea-8247-a0a4c5d1c75c"/>
+
+	<global_property property="eptsreports.stateOfStayArtPatient"
+                     property_value="a7d3b5c9-8b8e-4f29-b332-8db47466fed3"
+                     description="UUID for the ART concept" uuid="3d0f0b38-5875-11ea-8247-a0a4c5d1c75c"/>
+
+ <global_property property="eptsreports.transferOutToAnotherFacilityConceptUuid"
+                     property_value="e1de1cf6-1d5f-11e0-b929-000c29ad1d07"
+                     description="UUID for the TRANSFERIDO PARA concept" 
+					 uuid="77e584e7-5a09-11ea-8247-a0a4c5d1c75c"/>
+
+<global_property property="eptsreports.therapeuticLineConceptUuid" 
+property_value="fdff0637-b36f-4dce-90c7-fe9f1ec586f0" 
+description="UUID Therapeutic Line Concept" 
+uuid="6cd165ea-18bf-4a47-b458-aae06b15dab9" />
+
+<global_property property="eptsreports.firstLineConceptUuid" 
+property_value="a6bbe1ac-5243-40e4-98cb-7d4a1467dfbe" 
+description="UUID First Line Concept" 
+uuid="79006c4e-0a82-4f7d-bcfc-651c5aa0b0ec" />
+
+<global_property property="eptsreports.alternativeLineConceptUuid" 
+property_value="c95bf5fa-a04f-48d9-8504-f0575c2e255f" 
+description="UUID First Line Concept" 
+uuid="7856c4e-0a82-4f1d-bcfc-651c5aa7591c" />
+
+<global_property property="eptsreports.alternativeFirstLineConceptUuid" 
+property_value="faa0e305-6803-48a4-a589-db412f52ddaa" 
+description="UUID First Line Concept" 
+uuid="9856c4e-458d-4f1d-bcfc-651c5aa7598s" />
+
+<global_property property="eptsreports.regimeChangeConceptUuid" 
+property_value="e1d83e4e-1d5f-11e0-b929-000c29ad1d07" 
+description="UUID First Line Concept" 
+uuid="7d21b053-3eb6-11eb-b57a-0242ac120002" />
+
+<global_property property="eptsreports.noConceptUuid" 
+property_value="e1d81c70-1d5f-11e0-b929-000c29ad1d07" 
+description="Concept uuid for NO" 
+uuid="78ccd9a7-0f45-4218-ab89-7a04d899f6cf" />
+
+<global_property property="eptsreports.hivViralLoadConceptUuid" 
+property_value="e1d6247e-1d5f-11e0-b929-000c29ad1d07" 
+description="UUID for HIV VIRAL LOAD concept" 
+uuid="25a16b62-05fd-4b4e-83e0-8a3659c69981" />
+
+<global_property property="eptsreports.applicationForLaboratoryResearch" 
+property_value="92653c45-9eb2-486d-90c0-3e00569e99c0" 
+description="UUID for the APPLICATION FOR LABORATORY RESEARCH concept" 
+uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
+		
 		<!-- concept & concept_name -->
 
 	<!--1255 -->
@@ -875,22 +952,52 @@
 	<concept concept_id="23866" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1"
              date_created="2019-07-09 13:00:20" uuid="74f6c17f-9819-41da-ba34-5910f67d24d0"/>
 
-<concept concept_id="2152" retired="0" datatype_id="2" 
-	class_id="7" is_set="0" creator="1" 
-	date_created="2008-10-13 23:14:01" 
+ <concept concept_id="23761" retired="0" datatype_id="2" class_id="4" is_set="0" creator="1" date_created="2018-10-24 09:22:44" changed_by="1" date_changed="2019-01-07 23:01:13" uuid="63b15479-5a05-4bdc-a6e5-eab175743122" />
+<concept concept_id="2152" retired="0" datatype_id="2"
+	class_id="7" is_set="0" creator="1"
+	date_created="2008-10-13 23:14:01"
 	uuid="e1e205f0-1d5f-11e0-b929-000c29ad1d07" />
 
-	<concept concept_id="6143" retired="0" datatype_id="2" 
-	class_id="7" is_set="0" creator="1" 
-	date_created="2008-10-13 23:14:01" 
+	<concept concept_id="6143" retired="0" datatype_id="2"
+	class_id="7" is_set="0" creator="1"
+	date_created="2008-10-13 23:14:01"
 	uuid="014b76fb-c7ee-404c-b913-9795a108015e" />
 
-	<concept concept_id="2151" retired="0" datatype_id="2" 
-	class_id="7" is_set="0" creator="1" 
-	date_created="2008-10-13 23:14:01" 
+	<concept concept_id="2151" retired="0" datatype_id="2"
+	class_id="7" is_set="0" creator="1"
+	date_created="2008-10-13 23:14:01"
 	uuid="e1e204ec-1d5f-11e0-b929-000c29ad1d07" />
 
+	<concept concept_id="23758" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2008-10-13 23:14:01" uuid="2eab4e55-d0d0-4fa8-8d23-b40eaaee44c8" />
 
+<concept concept_id="1268" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1d9fbda-1d5f-11e0-b929-000c29ad1d07" />
+
+<concept concept_id="1257" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1d9f036-1d5f-11e0-b929-000c29ad1d07" />
+
+<concept concept_id="1267" retired="false" datatype_id="11" class_id="3" is_set="false" creator="1" date_created="2019-01-29 00:00:00.0" version="0.1" changed_by="1" date_changed="2019-01-29 14:57:33.0" uuid="e1d9facc-1d5f-11e0-b929-000c29ad1d07"/>
+
+ <concept concept_id="6272" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1"
+             date_created="2012-02-29 09:46:11" uuid="3bd7a5d1-afc0-478d-9aa6-c7bdd9a050c8"/>
+
+ <concept concept_id="6273" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1"
+             date_created="2012-02-29 10:06:33" uuid="a7d3b5c9-8b8e-4f29-b332-8db47466fed3"/>
+   	
+<concept concept_id="21151" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2016-10-28 09:02:02" changed_by="1" date_changed="2018-10-08 12:04:30" uuid="fdff0637-b36f-4dce-90c7-fe9f1ec586f0" />
+
+<concept concept_id="21150" retired="0" datatype_id="2" class_id="11" is_set="0" creator="1" date_created="2016-10-28 08:56:29" changed_by="1" date_changed="2019-02-28 10:48:23" uuid="a6bbe1ac-5243-40e4-98cb-7d4a1467dfbe" />
+
+<concept concept_id="23898" retired="0" datatype_id="2" class_id="11" is_set="0" creator="1" date_created="2016-10-28 08:56:29" changed_by="1" date_changed="2019-02-28 10:48:23" uuid="c95bf5fa-a04f-48d9-8504-f0575c2e255f" />
+
+<concept concept_id="23741" retired="0" datatype_id="2" class_id="11" is_set="0" creator="1" date_created="2016-10-28 08:56:29" changed_by="1" date_changed="2019-02-28 10:48:23" uuid="faa0e305-6803-48a4-a589-db412f52ddaa" />
+
+<concept concept_id="1088" retired="0" datatype_id="2" class_id="11" is_set="0" creator="1" date_created="2016-10-28 08:56:29" changed_by="1" date_changed="2019-02-28 10:48:23" uuid="e1d83e4e-1d5f-11e0-b929-000c29ad1d07" />
+
+<concept concept_id="1066" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1" date_created="2005-01-06 00:00:00" uuid="e1d81c70-1d5f-11e0-b929-000c29ad1d07" />
+
+<concept concept_id="856" retired="0" datatype_id="1" class_id="1" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1d6247e-1d5f-11e0-b929-000c29ad1d07" />
+
+<concept concept_id="23722" retired="0" datatype_id="2" class_id="8" is_set="0" creator="1" date_created="2018-10-23 16:22:43" changed_by="1" date_changed="2019-01-07 23:01:13" uuid="92653c45-9eb2-486d-90c0-3e00569e99c0" />
+		 
 		<!--| program | -->
 
 	<program program_id="1" concept_id="1781" creator="1"

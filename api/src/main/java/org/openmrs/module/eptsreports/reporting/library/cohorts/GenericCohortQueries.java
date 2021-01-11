@@ -32,14 +32,10 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.*;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.BaseQueries;
-import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
+import org.openmrs.module.reporting.cohort.definition.*;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
-import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.InProgramCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.NumericObsCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.common.RangeComparator;
 import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
@@ -367,6 +363,22 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getAgeOnMOHArtStartDate(
+      Integer minAge, Integer maxAge, boolean considerPatientThatStartedBeforeWasBorn) {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(AgeOnMOHArtStartDateCalculation.class).get(0));
+    cd.setName("Age on ART start date");
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addCalculationParameter("minAge", minAge);
+    cd.addCalculationParameter("maxAge", maxAge);
+    cd.addCalculationParameter(
+        "considerPatientThatStartedBeforeWasBorn", considerPatientThatStartedBeforeWasBorn);
+    return cd;
+  }
+
   public CohortDefinition getStartedArtOnPeriod(
       boolean considerTransferredIn, boolean considerPharmacyEncounter) {
     CalculationCohortDefinition cd =
@@ -389,6 +401,19 @@ public class GenericCohortQueries {
     cd.addCalculationParameter("considerTransferredIn", considerTransferredIn);
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    return cd;
+  }
+
+  public CohortDefinition getStartedArtBeforeDateMOH(boolean considerTransferredIn) {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(StartedArtBeforeDateCalculationMOH.class).get(0));
+    cd.setName("Art start date");
+    cd.addCalculationParameter("considerTransferredIn", considerTransferredIn);
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+
     return cd;
   }
 
@@ -600,5 +625,65 @@ public class GenericCohortQueries {
     cd.addCalculationParameter("maxAge", maxAge);
 
     return cd;
+  }
+
+  public CohortDefinition getAgeOnPreArtDate(Integer minAge, Integer maxAge) {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(AgeOnPreArtStartDateCalculation.class).get(0));
+    cd.setName("Age on Pre ART start date");
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addCalculationParameter("minAge", minAge);
+    cd.addCalculationParameter("maxAge", maxAge);
+
+    return cd;
+  }
+
+  public CohortDefinition getAgeInMonths(int minAge, int maxAge) {
+    AgeCohortDefinition cd = new AgeCohortDefinition();
+    cd.setName("Age in months");
+    cd.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+    cd.setMinAge(minAge);
+    cd.setMinAgeUnit(DurationUnit.MONTHS);
+    cd.setMaxAge(maxAge);
+    cd.setMaxAgeUnit(DurationUnit.MONTHS);
+    return cd;
+  }
+
+  public CohortDefinition getAgeInMonthsOnArtStartDate(Integer minAge, Integer maxAge) {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(AgeInMonthsOnArtStartDateCalculation.class).get(0));
+    cd.setName("Age in months based on ART start date");
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addCalculationParameter("minAge", minAge);
+    cd.addCalculationParameter("maxAge", maxAge);
+
+    return cd;
+  }
+
+  public CohortDefinition getArtDateMinusDiagnosisDate() {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(ArtDateMinusDiagnosisDateCalculation.class).get(0));
+    cd.setName("ART date minus diagnosis date");
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    return cd;
+  }
+
+  public CohortDefinition getPatientAgeBasedOnFirstViralLoadDate(int minAge, int maxAge) {
+    return generalSql(
+        "getPatientAgeBasedOnFirstViralLoadDate",
+        ViralLoadQueries.getPatientAgeBasedOnFirstViralLoadDate(
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            minAge,
+            maxAge));
   }
 }
