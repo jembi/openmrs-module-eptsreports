@@ -3435,7 +3435,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "secondLineB2E", EptsReportUtils.map(secondLineB2E, MAPPING));
 
-    compositionCohortDefinition.addSearch("B3", EptsReportUtils.map(changeRegimen6Months, MAPPING));
+    compositionCohortDefinition.addSearch("B3", EptsReportUtils.map(changeRegimen6Months,
+    "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch("B3E", EptsReportUtils.map(B3E, MAPPING));
 
@@ -3451,8 +3452,9 @@ public class QualityImprovement2020CohortQueries {
             //! "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
             // "B1"); // 5833
             // "B2"); // 3450
-            // "B2E"); // 0
-            "B2E"); // 
+            // "B2E"); // 694 | WorkBench 1234
+            // "B3"); // 798
+            "B3E"); // 
             
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
