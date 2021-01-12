@@ -504,13 +504,13 @@ public class CommonCohortQueries {
     if (masterCard) {
       query +=
           "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATEDIFF(o.obs_datetime, clinical.last_visit) >= 180  "; // check
+              + "             AND DATEDIFF(clinical.last_visit, o.obs_datetime) >= 180  "; // check
       // other
       // queries for time they use
     } else {
       query +=
-          "             AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATEDIFF(e.encounter_datetime, clinical.last_visit) >= 180  "; // check other queries for time they use
+          "             AND DATE(e.encounter_datetime) < DATE(clinical.last_visit)  "
+              + "             AND DATEDIFF(clinical.last_visit, e.encounter_datetime) >= 180  "; // check other queries for time they use
     }
     query += "     GROUP BY p.patient_id) AS treatment_line;";
 
@@ -612,18 +612,18 @@ public class CommonCohortQueries {
             + "             AND o.voided = 0  "
             + "             AND e.encounter_type = ${clinicalEncounter}  "
             + "             AND e.location_id = :location  "
-            + "             AND o.concept_id = ${treatmentEncounter}  "
-            + "             AND o.value_coded IN (${treatmentConcept})  ";
+            + "             AND o.concept_id = ${treatmentConcept}  "
+            + "             AND o.value_coded IN (${treatmentValueCoded})  ";
     if (masterCard) {
       query +=
           "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATEDIFF(o.obs_datetime, clinical.last_visit) >= 180  "; // check
+              + "             AND DATEDIFF(clinical.last_visit, o.obs_datetime) >= 180  "; // check
       // other
       // queries for time they use
     } else {
       query +=
-          "             AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATEDIFF(e.encounter_datetime, clinical.last_visit) >= 180  "; // check other queries for time they use
+          "             AND DATE(e.encounter_datetime) < DATE(clinical.last_visit)  "
+              + "             AND DATEDIFF(clinical.last_visit, e.encounter_datetime) >= 180  "; // check other queries for time they use
     }
     query +=
         "     GROUP BY p.patient_id) treatment_line ON treatment_line.patient_id = p.patient_id  "
@@ -642,9 +642,9 @@ public class CommonCohortQueries {
             + "     p.voided = 0 AND e.voided = 0  "
             + "         AND o.voided = 0  "
             + "         AND e.location_id = :location  "
-            + "         AND e.encounter_type = ${exclusionEncounter} "
-            + "         AND o.concept_id = ${exclusionConcept}  "
-            + "         AND o.value_coded NOT IN (${exclusionValueCoded})  "
+            + "         AND e.encounter_type = ${clinicalEncounter} "
+            + "         AND o.concept_id = ${treatmentConcept}  "
+            + "         AND o.value_coded NOT IN (${treatmentValueCoded})  "
             + "         AND DATE(e.encounter_datetime) > DATE(treatment_line.the_time)  "
             + "         AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit);";
 

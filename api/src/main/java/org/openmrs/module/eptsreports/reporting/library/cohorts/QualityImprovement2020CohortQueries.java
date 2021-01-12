@@ -3384,7 +3384,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition C = getMQ13C();
 
-    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(lastClinical, MAPPING));
+    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(lastClinical, 
+    "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     if (line == 1) {
       compositionCohortDefinition.addSearch(
@@ -3422,12 +3423,14 @@ public class QualityImprovement2020CohortQueries {
               MAPPING));
     }
 
-    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(firstLine6Months, MAPPING));
+    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(firstLine6Months, 
+    "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "secondLineB2", EptsReportUtils.map(secondLine6Months, MAPPING));
 
-    compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(B2E, MAPPING));
+    compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(B2E, 
+    "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "secondLineB2E", EptsReportUtils.map(secondLineB2E, MAPPING));
@@ -3445,7 +3448,12 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
+            //! "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
+            // "B1"); // 5833
+            // "B2"); // 3450
+            // "B2E"); // 0
+            "B2E"); // 
+            
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
             "B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E) AND age");
