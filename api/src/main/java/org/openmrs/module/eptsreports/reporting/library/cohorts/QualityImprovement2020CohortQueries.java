@@ -5950,4 +5950,32 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getMQ9Den(int flag) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    switch (flag) {
+      case 1:
+        cd.setName(
+            "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição");
+        break;
+      case 2:
+        cd.setName(
+            "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição");
+        break;
+    }
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getMOHArtStartDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("A");
+
+    return cd;
+  }
 }

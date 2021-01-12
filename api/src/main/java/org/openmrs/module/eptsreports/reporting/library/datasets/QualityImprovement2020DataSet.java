@@ -2295,6 +2295,30 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
         "");
 
+    // MQ indicators category 9 denominator
+    dataSetDefinition.addColumn(
+        "MQ9NUM1",
+        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ9NUM1",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ9Den(1),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+    dataSetDefinition.addColumn(
+        "MQ9NUM2",
+        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MQ9NUM2",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ9Den(2),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
+            "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
     return dataSetDefinition;
   }
 
