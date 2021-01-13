@@ -423,7 +423,7 @@ public class CommonCohortQueries {
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND e.encounter_type = ${6}  "
             + "             AND e.location_id = :location  "
-            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "             AND e.encounter_datetime > :startDate AND e.encounter_datetime <= :endDate  "
             + "     GROUP BY p.patient_id) AS list";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -492,7 +492,7 @@ public class CommonCohortQueries {
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND e.encounter_type = ${lastClinicalEncounter}  "
             + "             AND e.location_id = :location  "
-            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "             AND e.encounter_datetime > :startDate AND e.encounter_datetime <= :endDate  "
             + "     GROUP BY p.patient_id) AS clinical ON clinical.patient_id = p.patient_id  "
             + "     WHERE  "
             + "         p.voided = 0 AND e.voided = 0  "
@@ -608,7 +608,7 @@ public class CommonCohortQueries {
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND e.encounter_type = ${clinicalEncounter}  "
             + "             AND e.location_id = :location  "
-            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "             AND e.encounter_datetime > :startDate AND e.encounter_datetime <= :endDate  "
             + "     GROUP BY p.patient_id) AS clinical ON clinical.patient_id = p.patient_id  "
             + "     WHERE  "
             + "         p.voided = 0 AND e.voided = 0  "
@@ -640,7 +640,7 @@ public class CommonCohortQueries {
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND e.encounter_type = ${clinicalEncounter}  "
             + "             AND e.location_id = :location  "
-            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "             AND e.encounter_datetime > :startDate AND e.encounter_datetime <= :endDate  "
             + "     GROUP BY p.patient_id) AS clinical ON clinical.patient_id = p.patient_id  "
             + " WHERE  "
             + "     p.voided = 0 AND e.voided = 0  "
@@ -648,9 +648,10 @@ public class CommonCohortQueries {
             + "         AND e.location_id = :location  "
             + "         AND e.encounter_type = ${exclusionEncounter} "
             + "         AND o.concept_id = ${exclusionConcept}  "
-            + "         AND o.value_coded NOT IN (${exclusionValueCoded})  "
+            + "         AND o.value_coded <> ${exclusionValueCoded}  "
             + "         AND DATE(e.encounter_datetime) > DATE(treatment_line.the_time)  "
-            + "         AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit);";
+            + "         AND DATE(e.encounter_datetime) <= DATE(clinical.last_visit)"
+            + "       GROUP BY patient_id";
 
     Map<String, String> map = new HashMap<>();
     map.put("clinicalEncounter", String.valueOf(clinicalEncounter.getEncounterTypeId()));
@@ -784,15 +785,16 @@ public class CommonCohortQueries {
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND e.encounter_type = ${6}  "
             + "             AND e.location_id = :location  "
-            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "             AND e.encounter_datetime > :startDate AND e.encounter_datetime <= :endDate  "
             + "     GROUP BY p.patient_id) clinical ON clinical.patient_id = p.patient_id  "
             + " WHERE  "
             + "     p.voided = 0 AND e.voided = 0  "
             + "         AND o.voided = 0  "
             + "         AND e.location_id = :location  ";
     if (b4e) {
-      query += "         AND ((concept_id = ${856} AND o.value_numeric IS NOT NULL)  "
-             + "               OR (concept_id = ${1305}  AND o.value_coded IS NOT NULL) ";
+      query +=
+          "         AND (((concept_id = ${856} AND o.value_numeric IS NOT NULL)  "
+              + "               OR (concept_id = ${1305}  AND o.value_coded IS NOT NULL)) ";
     } else if (b5e) {
       query += "         AND (concept_id = ${23722}  " + "         AND o.value_coded =  ${856}  ";
     }
@@ -809,6 +811,8 @@ public class CommonCohortQueries {
               + "         AND o.obs_datetime BETWEEN DATE_SUB(clinical.last_visit,  "
               + "         INTERVAL 12 MONTH) AND DATE(clinical.last_visit))"
               + " GROUP BY p.patient_id";
+    } else if (b5e) {
+      query += " GROUP BY patient_id";
     }
 
     Map<String, Integer> map = new HashMap<>();

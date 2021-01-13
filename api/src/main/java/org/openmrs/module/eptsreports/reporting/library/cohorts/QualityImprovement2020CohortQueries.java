@@ -1734,10 +1734,10 @@ public class QualityImprovement2020CohortQueries {
         || indicatorFlag.equals("D"))
       compositionCohortDefinition.setCompositionString(
           "((A AND NOT E) OR B1) AND NOT (C OR D OR F)");
-          // "((A))"); // 265
-          // "((B1))"); // 467
-          // "((A) OR B1)"); // 728
-          // "((A AND NOT E) OR B1)"); // 724
+    // "((A))"); // 265
+    // "((B1))"); // 467
+    // "((A) OR B1)"); // 728
+    // "((A AND NOT E) OR B1)"); // 724
     if (indicatorFlag.equals("E") || indicatorFlag.equals("F"))
       compositionCohortDefinition.setCompositionString("B2 AND NOT (C OR D OR F)");
 
@@ -3315,7 +3315,18 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
-
+    // CohortDefinition cohortDefinition =
+    // qualityImprovement2020CohortQueries.getPatientsWithClinicalConsultationB3();
+    // CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC3D1();
+    // CohortDefinition cohortDefinition =
+    // qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss();
+    /* CohortDefinition cohortDefinition =
+    qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss();*/
+    // CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(1);
+    // CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC11DEN("A");
+    // CohortDefinition cohortDefinition =
+    // qualityImprovement2020CohortQueries.getMQ10NUMDEN103("num");
+    // CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6NUM(1);
     CohortDefinition firstLine6Months =
         commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
             false,
@@ -3473,16 +3484,16 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-        //    "(B1 and ((B2 and not B2E) or (B3 and not B3E)) and not B4E and not B5E) AND age");
-        "(B1 and ((B2 and not B2E) or (B3 and not B3E)) and not B4E and not B5E)");
+            // "(B1 and ((B2 and not B2E) or (B3 and not B3E)) and not B4E and not B5E) AND age");
+            "(B1 and ((B2 and not B2E) or (B3 and not B3E)) and not B4E and not B5E)"); // 1447
         // "B1 AND ((B2) OR (B3)) AND age"); // 2387
-        // "B1"); // 5833
+        // "B1"); // 5827
         // "B2"); // 3450
         // "B2E"); // 694
-         // "B3"); // 798
-        // "B3E"); // 104
-        // "B4E"); // 4784
-        // "B5E"); // 898
+        // "B3"); // 797
+        // "B3E"); // 103
+        // "B4E"); // 4784 - 1934
+        // "B5E"); // 897
         // "(B2 and not B2E)");
         // "(B3 and not B3E)");
 
