@@ -48,6 +48,8 @@ public class QualityImprovement2020CohortQueries {
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   private final String MAPPING1 =
       "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING2 =
+      "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -1038,6 +1040,122 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>MQ6NUM</b>: Melhoria de Qualidade Category 6 <br>
+   * <i> NUMERATOR 1: (A AND F) AND NOT (B OR C OR D OR E)</i> <br>
+   * <i> NUMERATOR 2: A AND F NOT (B OR C OR D OR E)</i> <br>
+   * <i> NUMERATOR 3: (A AND C AND F) AND NOT (B OR D OR E)</i> <br>
+   * <i> NUMERATOR 4: (A AND D AND F) AND NOT (B OR C OR E)</i> <br>
+   *
+   * <ul>
+   *   <li>A - Select all patients who initiated ART during the Inclusion period (startDateInclusion
+   *       and endDateInclusion)
+   *   <li>
+   *   <li>B - B - Filter all patients with the last clinical consultation(encounter type 6) with
+   *       “Diagnótico TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and
+   *       Encounter_datetime between startDateInclusion and endDateRevision
+   *   <li>
+   *   <li>C - All female patients registered as “Pregnant” on a clinical consultation during the
+   *       inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>D - All female patients registered as “Breastfeeding” on a clinical consultation during
+   *       the inclusion period (startDateInclusion and endDateInclusion)
+   *   <li>
+   *   <li>E - All transferred IN patients during the inclusion period
+   *   <li>
+   *   <li>D - Filter all patients with the last Ficha Clinica(encounter type 6) during the revision
+   *       period with the following conditions: “TEM SINTOMAS DE TB” (concept id 23758) value coded
+   *       “SIM” or “NÃO”(concept id IN [1065, 1066]) and Encounter_datetime between
+   *       startDateRevision and endDateRevision (should be the last encounter during the revision
+   *       period)
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQ6NUM(Integer num) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (num == 1) {
+      compositionCohortDefinition.setName(
+          "% de adultos HIV+ em TARV rastreados para TB na última consulta clínica");
+    } else if (num == 2) {
+      compositionCohortDefinition.setName(
+          "% de crianças HIV+ em TARV rastreadas para TB na última consulta clínica");
+    } else if (num == 3) {
+      compositionCohortDefinition.setName(
+          "% de mulheres grávidas HIV+ rastreadas para TB na última consulta clínica");
+    } else if (num == 4) {
+      compositionCohortDefinition.setName(
+          "% de mulheres lactantes HIV+ rastreadas para TB  na última consulta");
+    }
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String mapping = "startDate=${startDate},endDate=${revisionEndDate},location=${location}";
+
+    CohortDefinition startedART = getMOHArtStartDate();
+
+    CohortDefinition tbActive =
+        commonCohortQueries.getMohMQPatientsOnCondition(
+            false,
+            false,
+            "last",
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getActiveTBConcept(),
+            Collections.singletonList(hivMetadata.getYesConcept()),
+            null,
+            null);
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+    CohortDefinition transferredIn =
+        qualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    CohortDefinition tbSymptoms =
+        qualityImprovement2020Queries.getPatientsWithTBSymptoms(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getTBSymptomsConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getNoConcept().getConceptId());
+
+    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+
+    compositionCohortDefinition.addSearch("B", EptsReportUtils.map(tbActive, mapping));
+
+    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+
+    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
+
+    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(tbSymptoms, MAPPING1));
+
+    if (num == 1 || num == 2) {
+      compositionCohortDefinition.setCompositionString("(A AND F) AND NOT (B OR C OR D OR E)");
+    } else if (num == 3) {
+      compositionCohortDefinition.setCompositionString("(A AND C AND F) AND NOT (B OR D OR E)");
+    } else if (num == 4) {
+      compositionCohortDefinition.setCompositionString("(A AND D AND F) AND NOT (B OR C OR E)");
+    }
+
+    return compositionCohortDefinition;
+  }
+
+  /**
    * <b>MQ7</b>: Melhoria de Qualidade Category 7 <br>
    * <i> DENOMINATOR 1: A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
    * <i> DENOMINATOR 2: (A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)</i> <br>
@@ -1535,7 +1653,6 @@ public class QualityImprovement2020CohortQueries {
    */
   public CohortDefinition getMQC12P2DEN(String indicatorFlag) {
     String mapping1 = "startDate=${endDate-14m},endDate=${endDate},location=${location}";
-    String mapping2 = "startDate=${endDate-14m},endDate=${endDate-11m},location=${location}";
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (indicatorFlag.equals("A"))
@@ -1566,7 +1683,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition b1E = getPatientsFromFichaClinicaDenominatorB("B1E");
 
-    CohortDefinition b2 = getPatientsFromFichaClinicaDenominatorB("B2_12");
+    CohortDefinition b2 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsSecondLine_B2();
 
     CohortDefinition b2E = getPatientsFromFichaClinicaDenominatorB("B2E");
 
@@ -1590,13 +1707,13 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
 
-    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, mapping2));
+    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING2));
 
     compositionCohortDefinition.addSearch(
         "B1",
         EptsReportUtils.map(
             b1,
-            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
     compositionCohortDefinition.addSearch("B1E", EptsReportUtils.map(b1E, mapping1));
 
@@ -1604,7 +1721,7 @@ public class QualityImprovement2020CohortQueries {
         "B2",
         EptsReportUtils.map(
             b2,
-            "startDate=${endDate-14m},endDate=${endDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
     compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(b2E, mapping1));
 
@@ -1807,9 +1924,17 @@ public class QualityImprovement2020CohortQueries {
             + "                   WHERE  e.encounter_type = ${6}  "
             + "                          AND p.voided = 0 AND e.voided = 0 "
             + "                          AND e.location_id = :location AND o.location_id = :location "
-            + valueQuery
-            + "                          AND e.encounter_datetime BETWEEN  :startDate AND :endDate  "
-            + queryTermination;
+            + valueQuery;
+    if (key.equals("B1E") || key.equals("B2E")) {
+      query +=
+          "                          AND e.encounter_datetime BETWEEN  DATE_SUB(:revisionEndDate, INTERVAL 14 MONTH) "
+              + "                         AND :revisionEndDate  ";
+    } else {
+      query +=
+          "                          AND e.encounter_datetime BETWEEN  :startDate AND :endDate  ";
+    }
+
+    query += queryTermination;
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1875,6 +2000,60 @@ public class QualityImprovement2020CohortQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND o.value_coded = ${21150} "
+            + "       AND e.encounter_type = ${6};  ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsSecondLine_B2() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients From Ficha Clinica");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
+    map.put("21148", hivMetadata.getSecondLineConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          Max(e.encounter_datetime) AS encounter_datetime "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          JOIN obs o "
+            + "                            ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.encounter_type = ${6} "
+            + "                          AND p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND o.voided = 0 "
+            + "                          AND o.concept_id = ${21151} "
+            + "                          AND e.encounter_datetime BETWEEN "
+            + "                              :startDate AND :endDate "
+            + "                   GROUP  BY p.patient_id) filtered "
+            + "               ON p.patient_id = filtered.patient_id "
+            + "WHERE  e.encounter_datetime = filtered.encounter_datetime "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${21151} "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o.value_coded = ${21148} "
             + "       AND e.encounter_type = ${6};  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -2968,6 +3147,9 @@ public class QualityImprovement2020CohortQueries {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
+    String mapping1 =
+        "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}";
+
     switch (flag) {
       case 3:
         cd.setName(
@@ -2992,62 +3174,85 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     // Start adding the definitions based on the requirements
-    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
-    cd.addSearch(
-        "G",
-        EptsReportUtils.map(
-            resumoMensalCohortQueries
-                .getNumberOfActivePatientsInArtAtEndOfCurrentMonthWithVlPerformed(true),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    CohortDefinition startedART = getMOHArtStartDate();
+
+    CohortDefinition b1 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
+
+    CohortDefinition b1E = getPatientsFromFichaClinicaDenominatorB("B1E");
+
+    CohortDefinition b2 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsSecondLine_B2();
+
+    CohortDefinition b2E = getPatientsFromFichaClinicaDenominatorB("B2E");
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition breastfeeding =
+        commonCohortQueries.getMOHPregnantORBreastfeeding(
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING2));
+
     cd.addSearch(
         "B1",
         EptsReportUtils.map(
-            getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1(),
-            "startDate=${startDate},endDate=${endDate},location=${location},revisionEndDate=${revisionEndDate}"));
+            b1,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+
     cd.addSearch(
         "B1E",
         EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B1E"),
-            "startDate=${startDate},endDate=${endDate},location=${location},revisionEndDate=${revisionEndDate}"));
+            b1E,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch(
-        "C",
-        EptsReportUtils.map(
-            commonCohortQueries.getMOHPregnantORBreastfeeding(
-                commonMetadata.getPregnantConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "D",
-        EptsReportUtils.map(
-            commonCohortQueries.getMOHPregnantORBreastfeeding(
-                commonMetadata.getBreastfeeding().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            qualityImprovement2020Queries.getTransferredInPatients(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-                hivMetadata.getPatientFoundYesConcept().getConceptId(),
-                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-                hivMetadata.getArtStatus().getConceptId()),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B2"),
-            "startDate=${startDate},endDate=${endDate},location=${location},revisionEndDate=${revisionEndDate}"));
+            b2,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
+
+    cd.addSearch("B2E", EptsReportUtils.map(b2E, mapping1));
+
+    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+
+    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+
+    cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
+
+    cd.addSearch(
+        "G",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+
     cd.addSearch(
         "B2E",
         EptsReportUtils.map(
             getPatientsFromFichaClinicaDenominatorB("B2E"),
             "startDate=${startDate},endDate=${endDate},location=${location},revisionEndDate=${revisionEndDate}"));
+
+    cd.addSearch(
+        "ADULT",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
     if (flag == 3) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND  G");
+      cd.setCompositionString("(A AND B1 AND G AND NOT (B1E OR C OR D OR E))");
     } else if (flag == 4) {
-      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR E)) AND G");
+      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR E)) AND G AND ADULT");
+      //                       (A and B2 and NOT (B2E or C or D or E)) AND G and Age > =15
     } else if (flag == 8) {
       cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND G");
     } else if (flag == 9) {
@@ -3221,7 +3426,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (den == 7) {
       comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND I AND CHILDREN");
     } else if (den == 10) {
-      comp.setCompositionString("((A AND C) AND NOT (D OR E OR F)) AND H AND CHILDREN");
+      comp.setCompositionString("((A AND C) AND NOT (D OR E OR F)) AND H");
     } else if (den == 11) {
       comp.setCompositionString("((A AND C) AND NOT (D OR E OR F)) AND I");
     }
@@ -5652,25 +5857,25 @@ public class QualityImprovement2020CohortQueries {
     }
 
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("revisionEndDate", "Revision Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addSearch(
         "A",
         EptsReportUtils.map(
             txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "A1",
         EptsReportUtils.map(
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN),
-            "onOrBefore=${revisionEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "A2",
         EptsReportUtils.map(
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN),
-            "onOrBefore=${revisionEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
     if (flag == 1 || flag == 2) {
       cd.setCompositionString("A AND NOT (A1 OR A2)");
     } else if (flag == 3) {
@@ -5716,25 +5921,25 @@ public class QualityImprovement2020CohortQueries {
     }
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("revisionEndDate", "Revision Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
         "B",
         EptsReportUtils.map(
             txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B1",
         EptsReportUtils.map(
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN),
-            "onOrBefore=${revisionEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN),
-            "onOrBefore=${revisionEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
     if (flag == 1 || flag == 2) {
       cd.setCompositionString("B AND NOT (B1 OR B2)");
     } else if (flag == 3) {
