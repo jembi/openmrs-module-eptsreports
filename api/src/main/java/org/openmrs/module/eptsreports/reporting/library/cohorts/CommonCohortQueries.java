@@ -502,13 +502,17 @@ public class CommonCohortQueries {
             + "             AND o.concept_id = ${treatmentConcept}  ";
     if (masterCard) {
       query +=
-            "             AND o.value_coded IS NOT NULL  "
-          + "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "         AND DATEDIFF(clinical.last_visit, o.obs_datetime) >= 180  "; // check other queries for time they use
+          "             AND o.value_coded IS NOT NULL  "
+              + "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
+              + "         AND DATEDIFF(clinical.last_visit, o.obs_datetime) >= 180  "; // check
+      // other
+      // queries
+      // for time
+      // they use
     } else {
       query +=
-            "             AND o.value_coded IN (${treatmentValueCoded})  "
-          + "             AND DATE(e.encounter_datetime) < DATE(clinical.last_visit)  "
+          "             AND o.value_coded IN (${treatmentValueCoded})  "
+              + "             AND DATE(e.encounter_datetime) < DATE(clinical.last_visit)  "
               + "         AND DATEDIFF(clinical.last_visit, e.encounter_datetime) >= 180  "; // check other queries for time they use
     }
     query += "     GROUP BY p.patient_id) AS treatment_line;";
@@ -609,19 +613,20 @@ public class CommonCohortQueries {
             + "     WHERE  "
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND o.voided = 0  "
-            + "             AND e.encounter_type = ${clinicalEncounter}  "
+            + "             AND e.encounter_type = ${treatmentEncounter}  "
             + "             AND e.location_id = :location  "
-            + "             AND o.concept_id = ${treatmentConcept}  "
-            + "             AND o.value_coded IN (${treatmentValueCoded})  ";
+            + "             AND o.concept_id = ${treatmentConcept}  ";
     if (masterCard) {
       query +=
-          "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
+          "             AND o.value_coded IS NOT NULL  "
+              + "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
               + "             AND DATEDIFF(clinical.last_visit, o.obs_datetime) >= 180  "; // check
       // other
       // queries for time they use
     } else {
       query +=
-          "             AND DATE(e.encounter_datetime) < DATE(clinical.last_visit)  "
+          "             AND o.value_coded IN (${treatmentValueCoded})  "
+              + "             AND DATE(e.encounter_datetime) < DATE(clinical.last_visit)  "
               + "             AND DATEDIFF(clinical.last_visit, e.encounter_datetime) >= 180  "; // check other queries for time they use
     }
     query +=
@@ -786,26 +791,31 @@ public class CommonCohortQueries {
             + "         AND o.voided = 0  "
             + "         AND e.location_id = :location  ";
     if (b4e) {
-      query += "         AND concept_id = ${856}  " + "         AND o.value_numeric IS NOT NULL  ";
+      query += "         AND ((concept_id = ${856} AND o.value_numeric IS NOT NULL)  "
+             + "               OR (concept_id = ${1305}  AND o.value_coded IS NOT NULL) ";
     } else if (b5e) {
-      query += "         AND concept_id = ${23722}  " + "         AND o.value_coded =  ${856}  ";
+      query += "         AND (concept_id = ${23722}  " + "         AND o.value_coded =  ${856}  ";
     }
     query +=
-        "         AND (e.encounter_type = ${6}  "
+        "         AND e.encounter_type = ${6}  "
             + "         AND DATE(e.encounter_datetime) BETWEEN DATE_SUB(clinical.last_visit,  "
             + "         INTERVAL ${period} MONTH) AND DATE(clinical.last_visit))  ";
     if (b4e) {
       query +=
           "      OR   "
-              + "         (e.encounter_type = ${53}  "
+              + "         (concept_id = ${856}  "
+              + "         AND o.value_numeric IS NOT NULL "
+              + "         AND e.encounter_type = ${53}  "
               + "         AND o.obs_datetime BETWEEN DATE_SUB(clinical.last_visit,  "
-              + "         INTERVAL 12 MONTH) AND DATE(clinical.last_visit));";
+              + "         INTERVAL 12 MONTH) AND DATE(clinical.last_visit))"
+              + " GROUP BY p.patient_id";
     }
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
     map.put("period", period);
 

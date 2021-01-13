@@ -1705,7 +1705,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getYesConcept().getConceptId());
 
     CohortDefinition transferredIn =
-        qualityImprovement2020Queries.getTransferredInPatients(
+        QualityImprovement2020Queries.getTransferredInPatients(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
@@ -1734,6 +1734,10 @@ public class QualityImprovement2020CohortQueries {
         || indicatorFlag.equals("D"))
       compositionCohortDefinition.setCompositionString(
           "((A AND NOT E) OR B1) AND NOT (C OR D OR F)");
+          // "((A))"); // 265
+          // "((B1))"); // 467
+          // "((A) OR B1)"); // 728
+          // "((A AND NOT E) OR B1)"); // 724
     if (indicatorFlag.equals("E") || indicatorFlag.equals("F"))
       compositionCohortDefinition.setCompositionString("B2 AND NOT (C OR D OR F)");
 
@@ -2830,7 +2834,7 @@ public class QualityImprovement2020CohortQueries {
 
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23898", commonMetadata.getAlternativeLineConcept().getConceptId());
+    map.put("21190", commonMetadata.getRegimenAlternativeToFirstLineConcept().getConceptId());
     map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
     map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
 
@@ -2844,11 +2848,12 @@ public class QualityImprovement2020CohortQueries {
             + "               JOIN obs o "
             + "                 ON o.encounter_id = e.encounter_id "
             + "        WHERE  e.encounter_type = ${53} "
-            + "               AND o.concept_id = ${23898} "
+            + "               AND o.concept_id = ${21190} "
             + "               AND o.value_coded IS NOT NULL "
             + "               AND e.location_id = :location "
             + "               AND e.voided = 0 "
             + "               AND p.voided = 0 "
+            + "               AND o.voided = 0 "
             + "               AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "        GROUP  BY p.patient_id) bI1 "
             + "WHERE  bI1.patient_id NOT IN (SELECT p.patient_id "
@@ -3384,8 +3389,10 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition C = getMQ13C();
 
-    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(lastClinical, 
-    "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            lastClinical, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     if (line == 1) {
       compositionCohortDefinition.addSearch(
@@ -3423,39 +3430,66 @@ public class QualityImprovement2020CohortQueries {
               MAPPING));
     }
 
-    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(firstLine6Months, 
-    "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "B2",
+        EptsReportUtils.map(
+            firstLine6Months,
+            "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "secondLineB2", EptsReportUtils.map(secondLine6Months, MAPPING));
 
-    compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(B2E, 
-    "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "B2E",
+        EptsReportUtils.map(
+            B2E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "secondLineB2E", EptsReportUtils.map(secondLineB2E, MAPPING));
 
-    compositionCohortDefinition.addSearch("B3", EptsReportUtils.map(changeRegimen6Months,
-    "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "B3",
+        EptsReportUtils.map(
+            changeRegimen6Months,
+            "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.addSearch("B3E", EptsReportUtils.map(B3E, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "B3E",
+        EptsReportUtils.map(
+            B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.addSearch("B4E", EptsReportUtils.map(B4E, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "B4E",
+        EptsReportUtils.map(
+            B4E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.addSearch("B5E", EptsReportUtils.map(B5E, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "B5E",
+        EptsReportUtils.map(
+            B5E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(C, MAPPING));
 
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            //! "B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR B5E) AND age");
-            // "B1"); // 5833
-            // "B2"); // 3450
-            // "B2E"); // 694 | WorkBench 1234
-            // "B3"); // 798
-            "B3E"); // 
-            
+        //    "(B1 and ((B2 and not B2E) or (B3 and not B3E)) and not B4E and not B5E) AND age");
+        "(B1 and ((B2 and not B2E) or (B3 and not B3E)) and not B4E and not B5E)");
+        // "B1 AND ((B2) OR (B3)) AND age"); // 2387
+        // "B1"); // 5833
+        // "B2"); // 3450
+        // "B2E"); // 694
+         // "B3"); // 798
+        // "B3E"); // 104
+        // "B4E"); // 4784
+        // "B5E"); // 898
+        // "(B2 and not B2E)");
+        // "(B3 and not B3E)");
+
+        // ! "(B1 and ((B2 and not B2E) or (B3))) AND age"); // 1906
+        // ! "(B1 and ((B2) or (B3 and not B3E))) AND age"); // 2366
+        // ! "(B1 and ((B2) or (B3)) and not B4E) AND age"); // 1823
+        // ! "(B1 and ((B2) or (B3)) and not B5E) AND age"); // 2018
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
             "B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT (B4E OR B5E) AND age");
