@@ -3416,29 +3416,31 @@ public class QualityImprovement2020CohortQueries {
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
-                  "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 6) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
-              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 4), "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 4),
+              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 7) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
-              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(5, 9), "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(5, 9),
+              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 8) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(10, 14),
-                  "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 13) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(2, null),
-                  "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
     }
 
     compositionCohortDefinition.addSearch(
