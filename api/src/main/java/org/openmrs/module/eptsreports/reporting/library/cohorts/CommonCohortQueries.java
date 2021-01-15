@@ -504,7 +504,7 @@ public class CommonCohortQueries {
       query +=
           "             AND o.value_coded IS NOT NULL  "
               + "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "         AND DATEDIFF(clinical.last_visit, o.obs_datetime) >= 180  "; // check
+              + "         AND DATE(o.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH) "; // check
       // other
       // queries
       // for time
@@ -513,7 +513,7 @@ public class CommonCohortQueries {
       query +=
           "             AND o.value_coded IN (${treatmentValueCoded})  "
               + "             AND DATE(e.encounter_datetime) < DATE(clinical.last_visit)  "
-              + "         AND DATEDIFF(clinical.last_visit, e.encounter_datetime) >= 180  "; // check other queries for time they use
+              + "         AND DATE(e.encounter_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH)  "; // check other queries for time they use
     }
     query += "     GROUP BY p.patient_id) AS treatment_line;";
 
@@ -620,14 +620,14 @@ public class CommonCohortQueries {
       query +=
           "             AND o.value_coded IS NOT NULL  "
               + "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATEDIFF(clinical.last_visit, o.obs_datetime) >= 180  "; // check
+              + "             AND DATE(o.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH)  "; // check
       // other
       // queries for time they use
     } else {
       query +=
           "             AND o.value_coded IN (${treatmentValueCoded})  "
               + "             AND DATE(e.encounter_datetime) < DATE(clinical.last_visit)  "
-              + "             AND DATEDIFF(clinical.last_visit, e.encounter_datetime) >= 180  "; // check other queries for time they use
+              + "             AND DATE(e.encounter_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH)  "; // check other queries for time they use
     }
     query +=
         "     GROUP BY p.patient_id) treatment_line ON treatment_line.patient_id = p.patient_id  "
