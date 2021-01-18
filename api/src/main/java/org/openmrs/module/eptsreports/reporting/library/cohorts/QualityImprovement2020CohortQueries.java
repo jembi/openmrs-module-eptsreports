@@ -6422,4 +6422,14 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  /** */
+  public CohortDefinition getMQ10NUM(int flag) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    return cd;
+  }
 }
