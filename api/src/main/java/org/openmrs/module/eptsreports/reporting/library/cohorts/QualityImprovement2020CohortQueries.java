@@ -6341,7 +6341,6 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     if (adults) {
       cd.setName("Category 10 Denominator adults");
@@ -6416,9 +6415,10 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "BABIES",
         EptsReportUtils.map(
-            genericCohortQueries.getAgeInMonths(0, 20), "effectiveDate=${endDate}"));
+            genericCohortQueries.getAgeInMonthsOnArtStartDate(0, 20),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    cd.setCompositionString(" CHILDREN AND NOT BABIES");
+    cd.setCompositionString("CHILDREN AND NOT BABIES");
 
     return cd;
   }
