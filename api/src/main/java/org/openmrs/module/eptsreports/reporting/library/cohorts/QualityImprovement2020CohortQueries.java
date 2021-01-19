@@ -6645,7 +6645,7 @@ public class QualityImprovement2020CohortQueries {
             genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     if (flag == 1) {
-      cd.setCompositionString("A AND F AND NOT (C OR D OR E) AND ADULTS");
+      cd.setCompositionString("A AND F AND NOT (C OR D OR E) AND ADULT");
     } else if (flag == 3) {
       cd.setCompositionString("A AND F AND NOT (C OR D OR E) AND CHILDREN");
     }
