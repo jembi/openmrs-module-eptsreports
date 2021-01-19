@@ -58,19 +58,36 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.getPatientAgeBasedOnFirstViralLoadDate(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    CohortIndicator initiatedART =
+    // Category 3 Denominator
+    CohortIndicator MQC3D1 =
         eptsGeneralIndicator.getIndicator(
-            "initiatedART",
+            "MQC3D1",
             EptsReportUtils.map(
                 this.qualityImprovement2020CohortQueries.getMQC3D1(),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     addRow(
         dataSetDefinition,
-        "ART",
-        "initiatedART",
+        "MQC3D1",
+        "Category 3 Denominator",
         EptsReportUtils.map(
-            initiatedART, "startDate=${startDate},endDate=${endDate},location=${location}"),
+            MQC3D1, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        getDisagregateAdultsAndChildrenSColumn());
+
+    // Category 3 Numerator
+    CohortIndicator MQC3N1 =
+        eptsGeneralIndicator.getIndicator(
+            "MQC3N1",
+            EptsReportUtils.map(
+                this.qualityImprovement2020CohortQueries.getMQC3N1(),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    addRow(
+        dataSetDefinition,
+        "MQC3N1",
+        "Category 3 Numerator",
+        EptsReportUtils.map(
+            MQC3N1, "startDate=${startDate},endDate=${endDate},location=${location}"),
         getDisagregateAdultsAndChildrenSColumn());
 
     // Category 4 denominator indicators
@@ -2315,6 +2332,36 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 qualityImprovement2020CohortQueries.getMQ9Den(2),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MQ indicators category 10 denominator
+
+    CohortIndicator MQ10DEN1A =
+        eptsGeneralIndicator.getIndicator(
+            "",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ10Den(true),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dataSetDefinition.addColumn(
+        "MQ10DEN1A",
+        "%  % de adultos que iniciaram o TARV dentro de 15 dias após diagnóstico",
+        EptsReportUtils.map(
+            MQ10DEN1A, "startDate=${startDate},endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator MQ10DEN1C =
+        eptsGeneralIndicator.getIndicator(
+            "",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ10Den(false),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dataSetDefinition.addColumn(
+        "MQ10DEN1C",
+        "% de crianças HIV+ que iniciaram TARV dentro de 15 dias após diagnóstico",
+        EptsReportUtils.map(
+            MQ10DEN1C, "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
 
     // MQ indicators category 9 numerator
