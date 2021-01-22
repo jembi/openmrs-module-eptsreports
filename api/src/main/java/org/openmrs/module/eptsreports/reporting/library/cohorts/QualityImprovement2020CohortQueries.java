@@ -514,13 +514,12 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
                 hivMetadata.getArtStatus().getConceptId()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("FEMALE", EptsReportUtils.map(genderCohortQueries.femaleCohort(), ""));
     cd.addSearch(
         "CHILDREN",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.setCompositionString("(A AND NOT B AND NOT C AND NOT D) AND CHILDREN AND FEMALE");
+    cd.setCompositionString("(A AND NOT B AND NOT C AND NOT D) AND CHILDREN");
     return cd;
   }
 
