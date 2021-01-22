@@ -503,7 +503,7 @@ public class QualityImprovement2020CohortQueries {
             getPregnantAndBreastfeedingStates(
                 hivMetadata.getBreastfeeding().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${startDate},endDate=${endcDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "D",
         EptsReportUtils.map(
