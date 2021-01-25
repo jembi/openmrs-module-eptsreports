@@ -41,6 +41,8 @@ public class TxRttCohortQueries {
 
   private CommonCohortQueries commonCohortQueries;
 
+  private HivCohortQueries hivCohortQueries;
+
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   private final String DEFAULT_MAPPING =
@@ -52,12 +54,14 @@ public class TxRttCohortQueries {
       GenericCohortQueries genericCohortQueries,
       TxCurrCohortQueries txCurrCohortQueries,
       CommonCohortQueries commonCohortQueries,
-      ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      HivCohortQueries hivCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
     this.commonCohortQueries = commonCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.hivCohortQueries = hivCohortQueries;
   }
 
   /**
