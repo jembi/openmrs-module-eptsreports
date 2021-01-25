@@ -504,11 +504,7 @@ public class CommonCohortQueries {
       query +=
           "             AND o.value_coded IS NOT NULL  "
               + "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "         AND DATE(o.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH) "; // check
-      // other
-      // queries
-      // for time
-      // they use
+              + "         AND DATE(o.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH) ";
     } else {
       query +=
           "             AND o.value_coded IN (${treatmentValueCoded})  "
@@ -716,13 +712,13 @@ public class CommonCohortQueries {
             + " WHERE  ";
     if (minAge != null && maxAge != null) {
       query +=
-          "     DATEDIFF(clinical.last_visit, p.birthdate)/365 >= ${minAge}  "
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, clinical.last_visit) >= ${minAge}  "
               + "         AND   "
-              + "   DATEDIFF(clinical.last_visit, p.birthdate)/365 <= ${maxAge}; ";
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, clinical.last_visit) <= ${maxAge}; ";
     } else if (minAge == null && maxAge != null) {
-      query += "   DATEDIFF(clinical.last_visit, p.birthdate)/365 <= ${maxAge}; ";
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, clinical.last_visit) <= ${maxAge}; ";
     } else if (minAge != null && maxAge == null) {
-      query += "     DATEDIFF(clinical.last_visit, p.birthdate)/365 >= ${minAge};  ";
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, clinical.last_visit) >= ${minAge};  ";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -798,10 +794,17 @@ public class CommonCohortQueries {
     } else if (b5e) {
       query += "         AND (concept_id = ${23722}  " + "         AND o.value_coded =  ${856}  ";
     }
-    query +=
-        "         AND e.encounter_type = ${6}  "
-            + "         AND DATE(e.encounter_datetime) BETWEEN DATE_SUB(clinical.last_visit,  "
-            + "         INTERVAL ${period} MONTH) AND DATE(clinical.last_visit))  ";
+    if (b5e) {
+      query +=
+          "         AND e.encounter_type = ${6}  "
+              + "         AND DATE(e.encounter_datetime) >= DATE_SUB(clinical.last_visit, INTERVAL ${period} MONTH) "
+              + "         AND DATE(e.encounter_datetime) < DATE(clinical.last_visit))  ";
+    } else {
+      query +=
+          "         AND e.encounter_type = ${6}  "
+              + "         AND DATE(e.encounter_datetime) BETWEEN DATE_SUB(clinical.last_visit,  "
+              + "         INTERVAL ${period} MONTH) AND DATE(clinical.last_visit))  ";
+    }
     if (b4e) {
       query +=
           "      OR   "
