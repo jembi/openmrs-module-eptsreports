@@ -3214,6 +3214,22 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
+   * <b>concept_id = 23758</b>
+   *
+   * <p><b>Name:</b> Has TB symptoms
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTBSymptomsConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.hasTbSymptomsConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
    * <b>concept_id = 23886</b>
    *
    * <p><b>Name:</b> Pre-ART Counseling
@@ -3521,6 +3537,22 @@ public class HivMetadata extends ProgramsMetadata {
     String uuid =
         Context.getAdministrationService()
             .getGlobalProperty("eptsreports.hivRapidTest1QualitativeConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23807</b>
+   *
+   * <p><b>Name:</b> PRESUMPTIVE DIAGNOSIS IN CHILDREN LESS THAN 18 MONTHS
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPresumptiveDiagnosisInChildrenConcep() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.presumptiveDiagnosisInChildrenConceptUuid");
     return getConcept(uuid);
   }
 }
