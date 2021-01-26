@@ -1088,8 +1088,7 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-<<<<<<< HEAD
-   * <b>Technical Specs</b>
+   * <<<<<<< HEAD <b>Technical Specs</b>
    *
    * <blockquote>
    *

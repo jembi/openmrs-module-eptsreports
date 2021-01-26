@@ -47,8 +47,6 @@ public class QualityImprovement2020CohortQueries {
 
   private QualityImprovement2020Queries qualityImprovement2020Queries;
 
-  private AgeCohortQueries ageCohortQueries;
-
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   private final String MAPPING1 =
       "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}";
