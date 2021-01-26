@@ -584,6 +584,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             MQ11DEN1,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
+
     CohortIndicator MQ11DEN2 =
         eptsGeneralIndicator.getIndicator(
             "MQ11DEN2",
