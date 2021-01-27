@@ -503,7 +503,7 @@ public class QualityImprovement2020CohortQueries {
             getPregnantAndBreastfeedingStates(
                 hivMetadata.getBreastfeeding().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            "startDate=${startDate},endDate=${endcDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "D",
         EptsReportUtils.map(
@@ -514,13 +514,12 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
                 hivMetadata.getArtStatus().getConceptId()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("FEMALE", EptsReportUtils.map(genderCohortQueries.femaleCohort(), ""));
     cd.addSearch(
         "CHILDREN",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.setCompositionString("(A AND NOT B AND NOT C AND NOT D) AND CHILDREN AND FEMALE");
+    cd.setCompositionString("(A AND NOT B AND NOT C AND NOT D) AND CHILDREN");
     return cd;
   }
 
@@ -622,11 +621,16 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     compositionCohortDefinition.setName("Numerator for Category 4");
 
     compositionCohortDefinition.addSearch(
-        "E", EptsReportUtils.map(getLastClinicalConsultationClassficacaoDesnutricao(), MAPPING));
+        "E",
+        EptsReportUtils.map(
+            getLastClinicalConsultationClassficacaoDesnutricao(),
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch("MQC4D1", EptsReportUtils.map(getMQC4D1(), MAPPING));
 
@@ -640,11 +644,16 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     compositionCohortDefinition.setName("Numerator for Category 4");
 
     compositionCohortDefinition.addSearch(
-        "E", EptsReportUtils.map(getLastClinicalConsultationClassficacaoDesnutricao(), MAPPING));
+        "E",
+        EptsReportUtils.map(
+            getLastClinicalConsultationClassficacaoDesnutricao(),
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch("MQC4D2", EptsReportUtils.map(getMQC4D2(), MAPPING));
 
