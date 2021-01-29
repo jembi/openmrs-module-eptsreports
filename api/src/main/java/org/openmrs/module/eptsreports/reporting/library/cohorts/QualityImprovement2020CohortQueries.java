@@ -690,7 +690,7 @@ public class QualityImprovement2020CohortQueries {
             + " encounter e "
             + " ON e.patient_id = p.patient_id "
             + " WHERE "
-            + " e.encounter_type = $ {adultoSeguimentoEncounterType} "
+            + " e.encounter_type = ${adultoSeguimentoEncounterType} "
             + " AND p.voided = 0 "
             + " AND e.voided = 0 "
             + " AND e.location_id = :location "
@@ -702,11 +702,11 @@ public class QualityImprovement2020CohortQueries {
             + " WHERE "
             + " e.encounter_datetime = filtered.encounter_datetime "
             + " AND e.location_id = :location "
-            + " AND o.concept_id = $ {classificationOfMalnutritionConcept} "
+            + " AND o.concept_id = ${classificationOfMalnutritionConcept} "
             + " AND e.voided = 0 "
             + " AND o.voided = 0 "
-            + " AND o.value_coded IN ($ {normalConcept}, $ {malnutritionLightConcept}, $ {malnutritionConcept}, $ {chronicMalnutritionConcept}) "
-            + " AND e.encounter_type = $ {adultoSeguimentoEncounterType} ";
+            + " AND o.value_coded IN (${normalConcept}, ${malnutritionLightConcept}, ${malnutritionConcept}, ${chronicMalnutritionConcept}) "
+            + " AND e.encounter_type = ${adultoSeguimentoEncounterType} ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
