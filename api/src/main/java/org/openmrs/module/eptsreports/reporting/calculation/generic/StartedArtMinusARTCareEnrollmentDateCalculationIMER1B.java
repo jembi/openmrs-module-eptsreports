@@ -24,7 +24,6 @@ import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
-import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.MohMQInitiatedARTDuringTheInclusionPeriodCalculation;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -46,9 +45,7 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
     CalculationResultMap map = new CalculationResultMap();
     CalculationResultMap artStartDates =
         calculate(
-            Context.getRegisteredComponents(
-                    MohMQInitiatedARTDuringTheInclusionPeriodCalculation.class)
-                .get(0),
+            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0),
             cohort,
             parameterValues,
             context);
