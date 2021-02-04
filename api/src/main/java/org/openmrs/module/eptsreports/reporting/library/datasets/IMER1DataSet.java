@@ -28,10 +28,12 @@ public class IMER1DataSet extends BaseDataSet {
   public IMER1DataSet(
       IMER1DenominatorCohortQueries imer1DenominatorCohortQueries,
       EptsGeneralIndicator eptsGeneralIndicator,
-      IMER1NumeratorCohortQueries imer1NumeratorCohortQueries) {
+      IMER1NumeratorCohortQueries imer1NumeratorCohortQueries,
+      IMER1BNumeratorCohortQueries imer1BNumeratorCohortQueries) {
     this.imer1DenominatorCohortQueries = imer1DenominatorCohortQueries;
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.imer1NumeratorCohortQueries = imer1NumeratorCohortQueries;
+    this.imer1BNumeratorCohortQueries = imer1BNumeratorCohortQueries;
   }
 
   public DataSetDefinition constructIMER1DataSet() {
