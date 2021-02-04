@@ -24,7 +24,9 @@ public class IMER1BNumeratorCohortQueries {
 
   @Autowired
   public IMER1BNumeratorCohortQueries(
-      HivMetadata hivMetadata, IMER1DenominatorCohortQueries imer1DenominatorCohortQueries) {
+      HivMetadata hivMetadata,
+      TxNewCohortQueries txNewCohortQueries,
+      IMER1DenominatorCohortQueries imer1DenominatorCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.txNewCohortQueries = txNewCohortQueries;
     this.imer1DenominatorCohortQueries = imer1DenominatorCohortQueries;
@@ -232,7 +234,7 @@ public class IMER1BNumeratorCohortQueries {
     cd.addSearch(
         "E", EptsReportUtils.map(getE(false), "onOrBefore=${endDate-1m},location=${location}"));
 
-    cd.setCompositionString("A AND NOT B AND NOT C NOT D AND E)");
+    cd.setCompositionString("A AND NOT B AND NOT C NOT D AND E");
 
     return cd;
   }

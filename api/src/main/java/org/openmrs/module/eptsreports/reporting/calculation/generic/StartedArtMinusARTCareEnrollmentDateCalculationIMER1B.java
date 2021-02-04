@@ -21,6 +21,7 @@ import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
+import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
@@ -35,7 +36,7 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
     extends AbstractPatientCalculation {
 
   private static final String ON_OR_BEFORE = "onOrBefore";
-  private final int INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENTDATE = 33;
+  private static final int INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENT_DATE = 15;
 
   @Override
   public CalculationResultMap evaluate(
@@ -49,7 +50,7 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
             cohort,
             parameterValues,
             context);
-    CalculationResultMap preARTCareEnrollment = getARTCareEnrollment(cohort, context);
+    CalculationResultMap preARTCareEnrollmentMap = getARTCareEnrollment(cohort, context);
 
     Date endDate = (Date) parameterValues.get(ON_OR_BEFORE);
 
@@ -62,15 +63,24 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
         boolean lessOrEqualTo15Days = false;
         Date artStartDate =
             InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
-        Date preARTCareEnrollmentDate = (Date) preARTCareEnrollment.get(patientId);
 
-        if (artStartDate != null && preARTCareEnrollmentDate != null) {
-          int days =
-              Days.daysIn(new Interval(artStartDate.getTime(), preARTCareEnrollmentDate.getTime()))
-                  .getDays();
+        SimpleResult preARTCareEnrollmentResult =
+            (SimpleResult) preARTCareEnrollmentMap.get(patientId);
 
-          if (days <= INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENTDATE) {
-            lessOrEqualTo15Days = true;
+        if (preARTCareEnrollmentResult != null) {
+          Date preARTCareEnrollmentDate = (Date) preARTCareEnrollmentResult.getValue();
+
+          if (artStartDate != null
+              && preARTCareEnrollmentDate != null
+              && preARTCareEnrollmentDate.getTime() < artStartDate.getTime()) {
+            int days =
+                Days.daysIn(
+                        new Interval(preARTCareEnrollmentDate.getTime(), artStartDate.getTime()))
+                    .getDays();
+
+            if (days <= INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENT_DATE) {
+              lessOrEqualTo15Days = true;
+            }
           }
         }
 
@@ -88,11 +98,12 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
     SqlPatientDataDefinition def = new SqlPatientDataDefinition();
     def.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     def.addParameter(new Parameter("location", "location", Location.class));
+
     String sql =
-        " SELECT final.patient_id, final.mindate as  mdate "
+        " SELECT final.patient_id, final.mindate AS value_datetime "
             + "    FROM  "
             + "        (  "
-            + "        SELECT earliest_date.patient_id ,MIN(earliest_date.min_date)  as  mindate "
+            + "        SELECT earliest_date.patient_id, MIN(earliest_date.min_date) AS mindate "
             + "        FROM  "
             + "            (  "
             + "                SELECT p.patient_id, MIN(pp.date_enrolled) AS min_date  "
@@ -104,8 +115,8 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
             + "                WHERE  "
             + "                    p.voided = 0  "
             + "                    AND pp.voided = 0  "
-            + "                    AND pp.date_enrolled <= :endDate "
-            + "                    AND pg.program_id = ${1}  "
+            + "                    AND pp.date_enrolled <= :onOrBefore "
+            + "                    AND pg.program_id = %d  "
             + "                    AND pp.location_id = :location  "
             + "                GROUP BY p.patient_id  "
             + "                UNION  "
@@ -119,24 +130,22 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
             + "                    p.voided =0  "
             + "                    AND e.voided = 0  "
             + "                    AND o.voided = 0  "
-            + "                    AND e.encounter_type = ${53}  "
+            + "                    AND e.encounter_type = %d  "
             + "                    AND e.location_id = :location  "
-            + "                    AND o.concept_id = ${23808} "
-            + "                    AND o.value_datetime <= :endDate  "
+            + "                    AND o.concept_id = %d "
+            + "                    AND o.value_datetime <= :onOrBefore  "
             + "                GROUP BY p.patient_id  "
-            + "            ) as earliest_date  "
+            + "            ) AS earliest_date  "
             + "        GROUP BY earliest_date.patient_id  "
-            + "        ) as final   "
-            + "    WHERE final.mindate   "
-            + "        BETWEEN :startDate AND :endDate  ";
+            + "        ) AS final   "
+            + "    WHERE final.mindate <= :onOrBefore  ";
 
     def.setSql(
         String.format(
             sql,
-            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-            hivMetadata.getArtPickupConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            hivMetadata.getArtDatePickupMasterCard().getConceptId()));
+            hivMetadata.getHIVCareProgram().getId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getPreArtStartDate().getConceptId()));
 
     Map<String, Object> params = new HashMap<>();
     params.put("location", context.getFromCache("location"));
