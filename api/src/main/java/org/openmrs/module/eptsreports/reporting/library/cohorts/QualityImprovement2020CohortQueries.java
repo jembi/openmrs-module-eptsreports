@@ -1935,7 +1935,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
     }
     if (indicatorFlag == 2 || indicatorFlag == 7) {
-      compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (D OR E OR F)");
+      compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (D OR E OR F OR B4)");
     }
     if (indicatorFlag == 3) {
       compositionCohortDefinition.setCompositionString("(A AND B3 AND C) AND NOT (D OR E OR F)");
@@ -2956,7 +2956,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
 
     compositionCohortDefinition.setCompositionString(
-        "B1 AND B2 AND NOT D AND NOT E AND NOT F AND H");
+        "B1 AND B2 AND NOT D AND NOT E AND NOT F AND NOT B4 AND H");
 
     return compositionCohortDefinition;
   }
@@ -3231,7 +3231,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
 
     compositionCohortDefinition.setCompositionString(
-        "B1 AND B2 AND NOT D AND NOT E AND NOT F  AND H");
+        "B1 AND B2 AND NOT D AND NOT E AND NOT F AND NOT B4 AND H");
 
     return compositionCohortDefinition;
   }
