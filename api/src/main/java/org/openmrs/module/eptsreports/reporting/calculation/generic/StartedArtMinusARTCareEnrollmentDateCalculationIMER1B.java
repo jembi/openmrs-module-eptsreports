@@ -52,15 +52,10 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
             context);
     CalculationResultMap preARTCareEnrollmentMap = getARTCareEnrollment(cohort, context);
 
-    Date endDate = (Date) parameterValues.get(ON_OR_BEFORE);
-
-    if (endDate == null) {
-      endDate = (Date) context.getFromCache(ON_OR_BEFORE);
-    }
+    Date endDate = (Date) context.getFromCache(ON_OR_BEFORE);
 
     if (endDate != null) {
       for (Integer patientId : cohort) {
-        boolean lessOrEqualTo15Days = false;
         Date artStartDate =
             InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
 
@@ -72,19 +67,17 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
 
           if (artStartDate != null
               && preARTCareEnrollmentDate != null
-              && preARTCareEnrollmentDate.getTime() < artStartDate.getTime()) {
+              && preARTCareEnrollmentDate.compareTo(artStartDate) < 0) {
             int days =
                 Days.daysIn(
                         new Interval(preARTCareEnrollmentDate.getTime(), artStartDate.getTime()))
                     .getDays();
 
             if (days <= INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENT_DATE) {
-              lessOrEqualTo15Days = true;
+              map.put(patientId, new SimpleResult(days, this));
             }
           }
         }
-
-        map.put(patientId, new BooleanResult(lessOrEqualTo15Days, this));
       }
       return map;
     } else {

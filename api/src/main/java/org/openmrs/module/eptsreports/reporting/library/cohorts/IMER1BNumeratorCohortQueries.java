@@ -59,7 +59,6 @@ public class IMER1BNumeratorCohortQueries {
     cd.addCalculationParameter("considerTransferredIn", considerTransferredIn);
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
 
     return cd;
   }
