@@ -1934,7 +1934,7 @@ public class QualityImprovement2020CohortQueries {
     if (indicatorFlag.equals("A") || indicatorFlag.equals("E") || indicatorFlag.equals("F")) {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
     }
-    if (indicatorFlag.equals("B") || indicatorFlag.equals("G")) {
+    if (indicatorFlag.equals("B")) {
       compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (C OR D OR E OR F)");
     }
     if (indicatorFlag.equals("C")) {
@@ -1942,6 +1942,9 @@ public class QualityImprovement2020CohortQueries {
     }
     if (indicatorFlag.equals("D")) {
       compositionCohortDefinition.setCompositionString("(B1 AND B4) AND NOT (D OR E OR F)");
+    }
+    if (indicatorFlag.equals("G")) {
+      compositionCohortDefinition.setCompositionString("B1 AND B2 AND NOT D AND NOT E AND NOT F");
     }
 
     return compositionCohortDefinition;
@@ -2956,7 +2959,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
 
     compositionCohortDefinition.setCompositionString(
-        "B1 AND B2 AND NOT C AND NOT D AND NOT E AND NOT F AND H");
+        "B1 AND B2 AND NOT D AND NOT E AND NOT F AND H");
 
     return compositionCohortDefinition;
   }
@@ -3191,7 +3194,7 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getMQC11NumB1nB2notCnotDnotEnotFnHChildren() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    compositionCohortDefinition.setName("Category 11 : Numeraror 11.6");
+    compositionCohortDefinition.setName("Category 11 : Numeraror 11.7");
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -3212,7 +3215,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getYesConcept().getConceptId());
 
     CohortDefinition e =
-        qualityImprovement2020Queries.getTransferredInPatients(
+        QualityImprovement2020Queries.getTransferredInPatients(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
@@ -3231,7 +3234,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
 
     compositionCohortDefinition.setCompositionString(
-        "B1 AND B2 AND  NOT C AND NOT D AND NOT E AND NOT F  AND H");
+        "B1 AND B2 AND NOT D AND NOT E AND NOT F AND H");
 
     return compositionCohortDefinition;
   }
