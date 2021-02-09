@@ -3619,4 +3619,51 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.elegibitilyDateConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>enconter_type_id = 28</b>
+   *
+   * <p><b>Name:</b> CCU: RASTREIO
+   *
+   * <p><b>Description: Rastreio do cancro do colo uterino</b>
+   *
+   * @return {@link Concept}
+   */
+  public EncounterType getRastreioDoCancroDoColoUterinoEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.rastreioDoCancroDoColoUterinoEncounterTypeUuid");
+    return getEncounterType(uuid);
+  }
+
+  /**
+   * <b>enconter_type_id = 2094</b>
+   *
+   * <p><b>Name:</b> VIA RESULT
+   *
+   * <p><b>Description: RESULTADO DO VIA</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getResultadoViaConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.resultadoViaConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>enconter_type_id = 2093</b>
+   *
+   * <p><b>Name:</b> SUSPECTED CANCER
+   *
+   * <p><b>Description: SUSPEITO DE CANCRO</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getSuspectedCancerConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.suspectedCancerConceptUuid");
+    return getConcept(uuid);
+  }
 }
