@@ -3621,6 +3621,22 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
+   * <b>concept_id = 24004</b>
+   *
+   * <p><b>Name:</b> PATIENT CONTACTED
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPatientContactedConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.patientContactedConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
    * <b>enconter_type_id = 28</b>
    *
    * <p><b>Name:</b> CCU: RASTREIO

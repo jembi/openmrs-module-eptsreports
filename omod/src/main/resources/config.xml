@@ -2499,6 +2499,14 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>eptsreports.patientContactedConceptUuid</property>
+		<defaultValue>ee8262f1-9a13-42a0-b835-589366513750</defaultValue>
+		<description>
+			PATIENT CONTACTED concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>eptsreports.rastreioDoCancroDoColoUterinoEncounterTypeUuid</property>
 		<defaultValue>e2791f26-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
