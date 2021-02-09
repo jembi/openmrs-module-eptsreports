@@ -136,16 +136,18 @@ public class CXCASCRNCalculation extends AbstractPatientCalculation {
       Obs fichaClinica = EptsCalculationUtils.resultForPatient(fichaClinicaResulMap, pId);
       Obs fichaResumo = EptsCalculationUtils.resultForPatient(fichaResumoResulMap, pId);
 
-      if (fichaClinica != null) {
+      if (finchaCCU != null) {
         map.put(pId, new SimpleResult(finchaCCU, this));
+        continue;
 
       } else if (fichaClinica != null && fichaResumo != null) {
         if (fichaClinica
                 .getEncounter()
                 .getEncounterDatetime()
-                .compareTo(fichaResumo.getEncounter().getEncounterDatetime())
+                .compareTo(fichaResumo.getValueDatetime())
             > 0) {
           map.put(pId, new SimpleResult(fichaResumo, this));
+          continue;
         } else {
           map.put(pId, new SimpleResult(fichaClinica, this));
         }

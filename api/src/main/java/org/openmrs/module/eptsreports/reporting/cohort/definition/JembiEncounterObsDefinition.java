@@ -33,10 +33,10 @@ public class JembiEncounterObsDefinition extends BaseDataDefinition
   private Location location;
 
   @ConfigurationProperty(required = false)
-  private Date OnOrAfter;
+  private Date onOrAfter;
 
   @ConfigurationProperty(required = false)
-  private Date OnOrBefore;
+  private Date onOrBefore;
 
   @ConfigurationProperty(required = true)
   private TimeQualifier timeQualifier;
@@ -82,19 +82,19 @@ public class JembiEncounterObsDefinition extends BaseDataDefinition
   }
 
   public Date getOnOrAfter() {
-    return OnOrAfter;
+    return onOrAfter;
   }
 
   public void setOnOrAfter(Date onOrAfter) {
-    OnOrAfter = onOrAfter;
+    this.onOrAfter = onOrAfter;
   }
 
   public Date getOnOrBefore() {
-    return OnOrBefore;
+    return onOrBefore;
   }
 
   public void setOnOrBefore(Date onOrBefore) {
-    OnOrBefore = onOrBefore;
+    this.onOrBefore = onOrBefore;
   }
 
   public TimeQualifier getTimeQualifier() {

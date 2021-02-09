@@ -91,7 +91,7 @@ public class JembiEncounterObsDefinitionEvaluator implements PatientDataEvaluato
     hqb.from(Obs.class, "o");
     hqb.whereEqual("o.encounter.encounterType", def.getEncounterType());
     hqb.whereEqual("o.encounter.location", def.getLocation());
-    hqb.whereEqual("o.conceptId", def.getQuestion());
+    hqb.whereEqual("o.concept", def.getQuestion());
 
     // onOrAfter
     if (def.getOnOrAfter() != null
