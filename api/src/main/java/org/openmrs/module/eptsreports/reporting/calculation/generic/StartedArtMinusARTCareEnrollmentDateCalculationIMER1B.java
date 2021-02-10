@@ -67,14 +67,13 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
 
           if (artStartDate != null
               && preARTCareEnrollmentDate != null
-              && preARTCareEnrollmentDate.compareTo(artStartDate) < 0) {
+              && preARTCareEnrollmentDate.compareTo(artStartDate) <= 0) {
             int days =
                 Days.daysIn(
                         new Interval(preARTCareEnrollmentDate.getTime(), artStartDate.getTime()))
                     .getDays();
-
             if (days <= INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENT_DATE) {
-              map.put(patientId, new SimpleResult(days, this));
+              map.put(patientId, new BooleanResult(true, this));
             }
           }
         }
@@ -108,7 +107,7 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
             + "                WHERE  "
             + "                    p.voided = 0  "
             + "                    AND pp.voided = 0  "
-            + "                    AND pp.date_enrolled <= :onOrBefore "
+            + "                    AND pp.date_enrolled <= DATE_SUB(:onOrBefore,INTERVAL 1 MONTH) "
             + "                    AND pg.program_id = %d  "
             + "                    AND pp.location_id = :location  "
             + "                GROUP BY p.patient_id  "
@@ -126,12 +125,12 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
             + "                    AND e.encounter_type = %d  "
             + "                    AND e.location_id = :location  "
             + "                    AND o.concept_id = %d "
-            + "                    AND o.value_datetime <= :onOrBefore  "
+            + "                    AND o.value_datetime <= DATE_SUB(:onOrBefore,INTERVAL 1 MONTH) "
             + "                GROUP BY p.patient_id  "
             + "            ) AS earliest_date  "
             + "        GROUP BY earliest_date.patient_id  "
             + "        ) AS final   "
-            + "    WHERE final.mindate <= :onOrBefore  ";
+            + "    WHERE final.mindate <= DATE_SUB(:onOrBefore,INTERVAL 1 MONTH) ";
 
     def.setSql(
         String.format(
