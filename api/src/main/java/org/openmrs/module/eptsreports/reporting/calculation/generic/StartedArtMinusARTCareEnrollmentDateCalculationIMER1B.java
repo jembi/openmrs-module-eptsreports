@@ -56,6 +56,7 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
 
     if (endDate != null) {
       for (Integer patientId : cohort) {
+        boolean match = false;
         Date artStartDate =
             InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
 
@@ -73,10 +74,11 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
                         new Interval(preARTCareEnrollmentDate.getTime(), artStartDate.getTime()))
                     .getDays();
             if (days <= INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENT_DATE) {
-              map.put(patientId, new BooleanResult(true, this));
+              match = true;
             }
           }
         }
+        map.put(patientId, new BooleanResult(match, this));
       }
       return map;
     } else {
