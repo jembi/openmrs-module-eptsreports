@@ -1,9 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.calculation.cxcascrn;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
+
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -61,8 +59,12 @@ import org.springframework.stereotype.Component;
 public class CXCASCRNCalculationAA extends AbstractPatientCalculation {
 
   private final String ON_OR_AFTER = "onOrAfter";
+
   private final String ON_OR_BEFORE = "onOrBefore";
+
   private final String LOCATION = "location";
+
+  private final String ANSWERS = "answers";
 
   @Override
   public CalculationResultMap evaluate(
@@ -87,9 +89,8 @@ public class CXCASCRNCalculationAA extends AbstractPatientCalculation {
     EncounterType masterCardEncounterType = hivMetadata.getMasterCardEncounterType();
 
     Concept resultadoViaConcept = hivMetadata.getResultadoViaConcept();
-    Concept suspectedCancerConcept = hivMetadata.getSuspectedCancerConcept();
-    Concept negative = hivMetadata.getNegative();
-    Concept positive = hivMetadata.getPositive();
+
+    List<Concept> conceptsAnswers = (List<Concept>)parameterValues.get(ANSWERS);
 
     CalculationResultMap finchaCCUResulMap =
         eptsCalculationService.getObs(
@@ -97,7 +98,7 @@ public class CXCASCRNCalculationAA extends AbstractPatientCalculation {
             rastreioDoCancroDoColoUterinoEncounterType,
             cohort,
             location,
-            Arrays.asList(suspectedCancerConcept, negative, positive),
+            conceptsAnswers,
             TimeQualifier.FIRST,
             startDate,
             endDate,
@@ -110,7 +111,7 @@ public class CXCASCRNCalculationAA extends AbstractPatientCalculation {
             adultoSeguimentoEncounterType,
             cohort,
             location,
-            Arrays.asList(suspectedCancerConcept, negative, positive),
+            conceptsAnswers,
             TimeQualifier.FIRST,
             startDate,
             endDate,
@@ -123,7 +124,7 @@ public class CXCASCRNCalculationAA extends AbstractPatientCalculation {
             masterCardEncounterType,
             cohort,
             location,
-            Arrays.asList(suspectedCancerConcept, negative, positive),
+            conceptsAnswers,
             TimeQualifier.FIRST,
             startDate,
             endDate,
