@@ -1,7 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.calculation.cxcascrn;
 
 import java.util.*;
-
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -90,7 +89,7 @@ public class CXCASCRNCalculationAA extends AbstractPatientCalculation {
 
     Concept resultadoViaConcept = hivMetadata.getResultadoViaConcept();
 
-    List<Concept> conceptsAnswers = (List<Concept>)parameterValues.get(ANSWERS);
+    List<Concept> conceptsAnswers = (List<Concept>) parameterValues.get(ANSWERS);
 
     CalculationResultMap finchaCCUResulMap =
         eptsCalculationService.getObs(

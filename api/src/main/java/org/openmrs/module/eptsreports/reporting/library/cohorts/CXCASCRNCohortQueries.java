@@ -1,9 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -47,7 +47,8 @@ public class CXCASCRNCohortQueries {
     POSITIVE,
     NEGATIVE,
     ANY,
-    SUSPECTED
+    SUSPECTED,
+    ALL
   }
 
   /**
@@ -127,7 +128,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter("answers",answers);
+    cd.addCalculationParameter("answers", answers);
 
     return cd;
   }
@@ -195,20 +196,15 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
-  public CohortDefinition get1stTimeScreened() {
+  public CohortDefinition get1stTimeScreened(CXCASCRNResult cxcascrnResult) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("1st Time Screened");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    Concept suspectedCancerConcept = hivMetadata.getSuspectedCancerConcept();
-    Concept negative = hivMetadata.getNegative();
-    Concept positive = hivMetadata.getPositive();
-
-    List<Concept> answers = Arrays.asList(suspectedCancerConcept,negative,positive);
-
     CohortDefinition a = getA();
-    CohortDefinition aa = getAA(answers);
+    CohortDefinition aa = getAA(getAnswers(cxcascrnResult));
     CohortDefinition aa1 = getAA1OrAA2(CXCASCRNResult.ANY, true, false);
     CohortDefinition aa2 = getAA1OrAA2(CXCASCRNResult.ANY, false, false);
 
@@ -226,20 +222,15 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getRescreenedAfterPreviousNegative() {
+  public CohortDefinition getRescreenedAfterPreviousNegative(CXCASCRNResult cxcascrnResult) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Negative");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    Concept suspectedCancerConcept = hivMetadata.getSuspectedCancerConcept();
-    Concept negative = hivMetadata.getNegative();
-    Concept positive = hivMetadata.getPositive();
-
-    List<Concept> answers = Arrays.asList(suspectedCancerConcept,negative,positive);
-
     CohortDefinition a = getA();
-    CohortDefinition aa = getAA(answers);
+    CohortDefinition aa = getAA(getAnswers(cxcascrnResult));
     CohortDefinition aa3 = getAA3OrAA4(CXCASCRNResult.NEGATIVE);
 
     cd.addSearch(
@@ -255,19 +246,15 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPostTreatmentFollowUp() {
+  public CohortDefinition getPostTreatmentFollowUp(CXCASCRNResult cxcascrnResult) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Post Treatment FollowUp");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    Concept suspectedCancerConcept = hivMetadata.getSuspectedCancerConcept();
-    Concept negative = hivMetadata.getNegative();
-    Concept positive = hivMetadata.getPositive();
-
-    List<Concept> answers = Arrays.asList(suspectedCancerConcept,negative,positive);
     CohortDefinition a = getA();
-    CohortDefinition aa = getAA(answers);
+    CohortDefinition aa = getAA(getAnswers(cxcascrnResult));
     CohortDefinition aa4 = getAA3OrAA4(CXCASCRNResult.POSITIVE);
     CohortDefinition bb = getBB();
 
@@ -289,23 +276,19 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getRescreenedAfterPreviousPositive() {
+  public CohortDefinition getRescreenedAfterPreviousPositive(CXCASCRNResult cxcascrnResult) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Rescreened After Previous Positive");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    Concept suspectedCancerConcept = hivMetadata.getSuspectedCancerConcept();
-    Concept negative = hivMetadata.getNegative();
-    Concept positive = hivMetadata.getPositive();
-
-    List<Concept> answers = Arrays.asList(suspectedCancerConcept,negative,positive);
-
     CohortDefinition a = getA();
-    CohortDefinition aa = getAA(answers);
-    CohortDefinition fitstTimeScreened = get1stTimeScreened();
-    CohortDefinition rescreenedAfterPreviousNegative = getRescreenedAfterPreviousNegative();
-    CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp();
+    CohortDefinition aa = getAA(getAnswers(cxcascrnResult));
+    CohortDefinition fitstTimeScreened = get1stTimeScreened(cxcascrnResult);
+    CohortDefinition rescreenedAfterPreviousNegative =
+        getRescreenedAfterPreviousNegative(cxcascrnResult);
+    CohortDefinition postTreatmentFollowUp = getPostTreatmentFollowUp(cxcascrnResult);
 
     cd.addSearch(
         "A",
@@ -334,84 +317,72 @@ public class CXCASCRNCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPositive() {
+  public CohortDefinition getPositiveOrNegativeOrSuspetedOrAll(CXCASCRNResult cxcascrnResult) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
+    CohortDefinition a = getA();
+    CohortDefinition aa = getAA(getAnswers(cxcascrnResult));
 
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "AA",
+        EptsReportUtils.map(
+            aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("A AND AA");
+
+    return cd;
+  }
+
+  public CohortDefinition getTotal() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Total of CXCA SCRN");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition aa = getAA(getAnswers(CXCASCRNResult.ALL));
+
+    CohortDefinition txcurr = this.txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true);
+
+    cd.addSearch(
+        "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "AA",
+        EptsReportUtils.map(
+            aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("txcurr AND AA");
+
+    return cd;
+  }
+
+  private List<Concept> getAnswers(CXCASCRNResult cxcascrnResult) {
+    Concept suspectedCancerConcept = hivMetadata.getSuspectedCancerConcept();
+    Concept negative = hivMetadata.getNegative();
     Concept positive = hivMetadata.getPositive();
 
-    List<Concept> answers = Arrays.asList(positive);
+    List<Concept> answers = new ArrayList<>();
 
-    CohortDefinition a = getA();
-    CohortDefinition aa = getAA(answers);
+    if (cxcascrnResult == CXCASCRNResult.ALL) {
+      answers = Arrays.asList(suspectedCancerConcept, negative, positive);
 
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "AA",
-        EptsReportUtils.map(
-            aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    } else if (cxcascrnResult == CXCASCRNResult.SUSPECTED) {
+      answers = Arrays.asList(suspectedCancerConcept);
 
-    cd.setCompositionString("A AND AA");
+    } else if (cxcascrnResult == CXCASCRNResult.POSITIVE) {
+      answers = Arrays.asList(positive);
 
-    return cd;
-  }
-
-  public CohortDefinition getNegative() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-
-    Concept negative = hivMetadata.getNegative();
-
-    List<Concept> answers = Arrays.asList(negative);
-
-    CohortDefinition a = getA();
-    CohortDefinition aa = getAA(answers);
-
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "AA",
-        EptsReportUtils.map(
-            aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.setCompositionString("A AND AA");
-
-    return cd;
-  }
-
-  public CohortDefinition getSupected() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    Concept suspectedCancerConcept = hivMetadata.getSuspectedCancerConcept();
-
-
-    List<Concept> answers = Arrays.asList(suspectedCancerConcept);
-
-    CohortDefinition a = getA();
-    CohortDefinition aa = getAA(answers);
-
-    cd.addSearch(
-        "A",
-        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "AA",
-        EptsReportUtils.map(
-            aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.setCompositionString("A AND AA");
-
-    return cd;
+    } else if (cxcascrnResult == CXCASCRNResult.NEGATIVE) {
+      answers = Arrays.asList(negative);
+    }
+    return answers;
   }
 }

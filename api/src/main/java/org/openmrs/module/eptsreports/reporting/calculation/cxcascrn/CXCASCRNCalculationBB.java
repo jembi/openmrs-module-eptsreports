@@ -196,6 +196,8 @@ public class CXCASCRNCalculationBB extends AbstractPatientCalculation {
 
     String sql = part1 + " UNION " + part2;
 
+    def.setQuery(sql);
+
     Map<String, Object> params = new HashMap<>();
     params.put("location", context.getFromCache("location"));
     params.put("startDate", context.getFromCache("onOrBefore"));
