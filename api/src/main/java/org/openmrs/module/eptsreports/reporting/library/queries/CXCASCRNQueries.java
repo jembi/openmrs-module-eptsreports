@@ -41,7 +41,7 @@ public class CXCASCRNQueries {
     query.append("    INNER JOIN encounter e ");
     query.append("        ON e.patient_id = p.patient_id ");
     query.append("    INNER JOIN obs o ");
-    query.append("        ON o.encounter_id = e.patient_id ");
+    query.append("        ON o.encounter_id = e.encounter_id ");
     query.append(" WHERE p.voided = 0 ");
     query.append("    AND e.voided = 0 ");
     query.append("    AND o.voided = 0 ");
@@ -58,15 +58,15 @@ public class CXCASCRNQueries {
       query.append("    AND o.value_coded = ${703} ");
     }
     if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.SUSPECTED) {
-      query.append("    ND o.value_coded = ${2093}  ");
+      query.append("    AND o.value_coded = ${2093}  ");
     }
     if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.ANY) {
       query.append("    AND o.value_coded IS NOT NULL ");
     }
     if (isAA1) {
-      query.append("    AND e.encounter_datetime < :startDate ");
+      query.append("    AND e.encounter_datetime < :onOrAfter ");
     } else {
-      query.append("    AND o.value_datetime < :startDate ");
+      query.append("    AND o.value_datetime < :onOrAfter ");
     }
     query.append("    AND e.location_id = :location ");
     if (max) {

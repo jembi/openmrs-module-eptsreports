@@ -17,7 +17,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.cxcascrn.CXCASCRNCalculationAA;
 import org.openmrs.module.eptsreports.reporting.intergrated.calculation.BasePatientCalculationTest;
 
-public class CXCASCRNCalculationTest extends BasePatientCalculationTest {
+public class CXCASCRNCalculationAATest extends BasePatientCalculationTest {
   @Override
   public PatientCalculation getCalculation() {
     return Context.getRegisteredComponents(CXCASCRNCalculationAA.class).get(0);
@@ -35,7 +35,7 @@ public class CXCASCRNCalculationTest extends BasePatientCalculationTest {
 
   @Before
   public void setup() throws Exception {
-    executeDataSet("cxcascrnDataset.xml");
+    executeDataSet("cxcascrnAADataset.xml");
   }
 
   @Test

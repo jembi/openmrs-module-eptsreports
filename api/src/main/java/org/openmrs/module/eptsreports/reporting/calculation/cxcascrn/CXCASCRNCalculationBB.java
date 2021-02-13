@@ -1,7 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.calculation.cxcascrn;
 
 import java.util.*;
-import javax.swing.*;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -65,7 +64,7 @@ public class CXCASCRNCalculationBB extends AbstractPatientCalculation {
             parameterValues,
             context);
 
-    CalculationResultMap aa4ResultMap = getMastercardDrugPickupMap(hivMetadata, cohort, context);
+    CalculationResultMap aa4ResultMap = getAA4Map(hivMetadata, cohort, context);
 
     CalculationResultMap criotherapyResulMap =
         eptsCalculationService.getObs(
@@ -162,7 +161,7 @@ public class CXCASCRNCalculationBB extends AbstractPatientCalculation {
     return map;
   }
 
-  private CalculationResultMap getMastercardDrugPickupMap(
+  private CalculationResultMap getAA4Map(
       HivMetadata hivMetadata, Collection<Integer> cohort, PatientCalculationContext context) {
     SqlPatientDataDefinition def = new SqlPatientDataDefinition();
     def.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
@@ -170,7 +169,7 @@ public class CXCASCRNCalculationBB extends AbstractPatientCalculation {
 
     String part1 =
         CXCASCRNQueries.getAA1OrAA2Query(
-            CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE,
+            CXCASCRNCohortQueries.CXCASCRNResult.ANY,
             true,
             true,
             hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId(),
@@ -183,7 +182,7 @@ public class CXCASCRNCalculationBB extends AbstractPatientCalculation {
 
     String part2 =
         CXCASCRNQueries.getAA1OrAA2Query(
-            CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE,
+            CXCASCRNCohortQueries.CXCASCRNResult.ANY,
             false,
             true,
             hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId(),
@@ -200,7 +199,7 @@ public class CXCASCRNCalculationBB extends AbstractPatientCalculation {
 
     Map<String, Object> params = new HashMap<>();
     params.put("location", context.getFromCache("location"));
-    params.put("startDate", context.getFromCache("onOrBefore"));
+    params.put("onOrAfter", context.getFromCache("onOrAfter"));
     return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
   }
 }

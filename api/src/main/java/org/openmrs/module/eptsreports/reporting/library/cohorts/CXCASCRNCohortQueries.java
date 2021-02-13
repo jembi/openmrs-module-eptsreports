@@ -141,7 +141,7 @@ public class CXCASCRNCohortQueries {
       cd.setName("AA2 from CXCA SCRN");
     }
 
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.setQuery(
@@ -174,15 +174,15 @@ public class CXCASCRNCohortQueries {
     CohortDefinition aa1 = getAA1OrAA2(cxcascrnResult, true, false);
     CohortDefinition aa2 = getAA1OrAA2(cxcascrnResult, false, false);
 
-    cd.addSearch("AA1", EptsReportUtils.map(aa1, "startDate=${startDate},location=${location}"));
-    cd.addSearch("AA2", EptsReportUtils.map(aa2, "startDate=${startDate},location=${location}"));
+    cd.addSearch("AA1", EptsReportUtils.map(aa1, "onOrAfter=${startDate},location=${location}"));
+    cd.addSearch("AA2", EptsReportUtils.map(aa2, "onOrAfter=${startDate},location=${location}"));
 
     cd.setCompositionString("AA1 OR AA2");
 
     return cd;
   }
 
-  private CohortDefinition getBB() {
+  private CohortDefinition getBB(List<Concept> answers) {
     CXCASCRNCalculationBB cxcascrnCalculation =
         Context.getRegisteredComponents(CXCASCRNCalculationBB.class).get(0);
 
@@ -192,6 +192,7 @@ public class CXCASCRNCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter("answers", answers);
 
     return cd;
   }
@@ -215,8 +216,8 @@ public class CXCASCRNCohortQueries {
         "AA",
         EptsReportUtils.map(
             aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("AA1", EptsReportUtils.map(aa1, "startDate=${startDate},location=${location}"));
-    cd.addSearch("AA2", EptsReportUtils.map(aa2, "startDate=${startDate},location=${location}"));
+    cd.addSearch("AA1", EptsReportUtils.map(aa1, "onOrAfter=${startDate},location=${location}"));
+    cd.addSearch("AA2", EptsReportUtils.map(aa2, "onOrAfter=${startDate},location=${location}"));
 
     cd.setCompositionString("A AND AA AND NOT (AA1 OR AA2)");
     return cd;
@@ -256,7 +257,7 @@ public class CXCASCRNCohortQueries {
     CohortDefinition a = getA();
     CohortDefinition aa = getAA(getAnswers(cxcascrnResult));
     CohortDefinition aa4 = getAA3OrAA4(CXCASCRNResult.POSITIVE);
-    CohortDefinition bb = getBB();
+    CohortDefinition bb = getBB(getAnswers(CXCASCRNResult.ALL));
 
     cd.addSearch(
         "A",
