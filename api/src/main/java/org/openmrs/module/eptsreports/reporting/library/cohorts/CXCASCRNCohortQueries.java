@@ -174,8 +174,8 @@ public class CXCASCRNCohortQueries {
     CohortDefinition aa1 = getAA1OrAA2(cxcascrnResult, true, false);
     CohortDefinition aa2 = getAA1OrAA2(cxcascrnResult, false, false);
 
-    cd.addSearch("AA1", EptsReportUtils.map(aa1, "onOrAfter=${startDate-1d},location=${location}"));
-    cd.addSearch("AA2", EptsReportUtils.map(aa2, "onOrAfter=${startDate-1d},location=${location}"));
+    cd.addSearch("AA1", EptsReportUtils.map(aa1, "onOrAfter=${startDate},location=${location}"));
+    cd.addSearch("AA2", EptsReportUtils.map(aa2, "onOrAfter=${startDate},location=${location}"));
 
     cd.setCompositionString("AA1 OR AA2");
 
@@ -216,8 +216,8 @@ public class CXCASCRNCohortQueries {
         "AA",
         EptsReportUtils.map(
             aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("AA1", EptsReportUtils.map(aa1, "onOrAfter=${startDate-1d},location=${location}"));
-    cd.addSearch("AA2", EptsReportUtils.map(aa2, "onOrAfter=${startDate-1d},location=${location}"));
+    cd.addSearch("AA1", EptsReportUtils.map(aa1, "onOrAfter=${startDate},location=${location}"));
+    cd.addSearch("AA2", EptsReportUtils.map(aa2, "onOrAfter=${startDate},location=${location}"));
 
     cd.setCompositionString("A AND AA AND NOT (AA1 OR AA2)");
     return cd;
