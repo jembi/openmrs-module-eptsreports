@@ -371,6 +371,13 @@
 	<concept concept_id="1369" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2008-10-13 05:59:00" uuid="e1da7d3a-1d5f-11e0-b929-000c29ad1d07" />
 	<concept_name concept_id="1369" name="TRANSFERIDO DE" locale="pt" creator="1" date_created="2008-10-25 13:54:23" concept_name_id="3145" voided="0" uuid="e24e2ffa-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
+	<concept concept_id="12" retired="0" datatype_id="2" class_id="1" is_set="0" creator="1" date_created="2004-01-01 00:00:00" changed_by="1" date_changed="2020-07-16 14:21:37" uuid="e1cdb3b6-1d5f-11e0-b929-000c29ad1d07" />
+	<concept_name concept_id="12" name="RAIO X: TORAX" locale="pt" creator="1" date_created="2008-10-17 15:31:25" concept_name_id="2959" voided="0" uuid="e24d33e8-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" />
+
+	<concept concept_id="1138" retired="0" datatype_id="2" class_id="1" is_set="0" creator="1" date_created="2004-01-01 00:00:00" changed_by="1" date_changed="2020-07-16 14:21:37" uuid="e1d89f2e-1d5f-11e0-b929-000c29ad1d07" />
+	<concept_name concept_id="1138" name="INDETERMINATE" locale="en" creator="271" date_created="2005-01-26 00:00:00" concept_name_id="1138" voided="0" uuid="e23f9f62-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" />
+
+
 	<concept_set concept_set_id="8777008" concept_id="7777008" concept_set="7777007" sort_weight="1.0" creator="1" date_created="2019-01-29 12:38:58.0" uuid="fdefaa94-3f99-464c-8b1f-3e1d18777008"/>
 	<concept_set concept_set_id="8777009" concept_id="7777009" concept_set="7777007" sort_weight="1.0" creator="1" date_created="2019-01-29 12:38:58.0" uuid="fdefaa94-3f99-464c-8b1f-3e1d18777009"/>
 	<concept_set concept_set_id="8777010" concept_id="7777010" concept_set="7777007" sort_weight="1.0" creator="1" date_created="2019-01-29 12:38:58.0" uuid="fdefaa94-3f99-464c-8b1f-3e1d18777010"/>
