@@ -352,7 +352,7 @@ public class CXCASCRNCohortQueries {
 
     CohortDefinition a = this.getA();
 
-    cd.addSearch("A", EptsReportUtils.map(a, "onOrBefore=${endDate},location=${location}"));
+    cd.addSearch("A", EptsReportUtils.map(a, "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "AA",
