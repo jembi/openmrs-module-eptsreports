@@ -380,14 +380,16 @@ public class TXTBQueries {
             + "INNER JOIN obs o "
             + "ON e.encounter_id = o.encounter_id "
             + "WHERE e.location_id = :location AND e.encounter_type = %s "
-            + "AND (o.concept_id = %s  AND o.value_coded = %s) "
+            + "AND (o.concept_id = %s  AND (o.value_coded = %s OR o.value_coded = %s)) "
             + "AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0",
-        encounterTypeId, basiloscopia, positive);
+        encounterTypeId, basiloscopia, positive, negative);
   }
 
   /**
-   * <b>Description:</b> Test Results for given concept and given answers
+   * <b>Description:</b> Test Results for any given concept
+   *
+   * <p>And all combinations of answers: positive, negative, undetermined
    *
    * @return {@link String}
    */
@@ -410,14 +412,24 @@ public class TXTBQueries {
             + "ON p.patient_id = e.patient_id "
             + "INNER JOIN obs o "
             + "ON e.encounter_id = o.encounter_id "
-            + "WHERE e.location_id = :location AND e.encounter_type = ${6} ";
+            + "WHERE e.location_id = :location AND e.encounter_type = ${6} "
+            + "AND (o.concept_id = ${test}   ";
 
-    if (undetermined == null) {
-      query +=
-          "AND (o.concept_id = ${test}  AND (o.value_coded = ${703} OR o.value_coded = ${664})) ";
+    if (negative == null && undetermined == null) {
+      query += "AND o.value_coded = ${703}) ";
+    } else if (positive == null && undetermined == null) {
+      query += "AND o.value_coded = ${664}) ";
+    } else if (positive == null && negative == null) {
+      query += "AND o.value_coded = ${1138}) ";
+    } else if (undetermined == null) {
+      query += "AND (o.value_coded = ${703} OR o.value_coded = ${664})) ";
+    } else if (negative == null) {
+      query += "AND (o.value_coded = ${703} OR o.value_coded = ${1138})) ";
+    } else if (positive == null) {
+      query += "AND (o.value_coded = ${664} OR o.value_coded = ${1138})) ";
     } else {
       query +=
-          "AND (o.concept_id = ${test}  AND (o.value_coded = ${703} OR o.value_coded = ${664} OR o.value_coded = ${1138})) ";
+          "AND (o.value_coded = ${703} OR o.value_coded = ${664} OR o.value_coded = ${1138})) ";
     }
 
     query +=

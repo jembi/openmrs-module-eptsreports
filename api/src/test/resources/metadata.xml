@@ -373,9 +373,11 @@
 
 	<concept concept_id="12" retired="0" datatype_id="2" class_id="1" is_set="0" creator="1" date_created="2004-01-01 00:00:00" changed_by="1" date_changed="2020-07-16 14:21:37" uuid="e1cdb3b6-1d5f-11e0-b929-000c29ad1d07" />
 	<concept_name concept_id="12" name="RAIO X: TORAX" locale="pt" creator="1" date_created="2008-10-17 15:31:25" concept_name_id="2959" voided="0" uuid="e24d33e8-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" />
+	<global_property property="eptsreports.xrayChestConceptUuid" property_value="e1cdb3b6-1d5f-11e0-b929-000c29ad1d07" description="X-RAY, CHEST concept" uuid="d14cf5aa-45ba-417e-b8c0-12809c41c6e7" />
 
-	<concept concept_id="1138" retired="0" datatype_id="2" class_id="1" is_set="0" creator="1" date_created="2004-01-01 00:00:00" changed_by="1" date_changed="2020-07-16 14:21:37" uuid="e1d89f2e-1d5f-11e0-b929-000c29ad1d07" />
-	<concept_name concept_id="1138" name="INDETERMINATE" locale="en" creator="271" date_created="2005-01-26 00:00:00" concept_name_id="1138" voided="0" uuid="e23f9f62-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" />
+	<concept concept_id="1138" retired="0" datatype_id="4" class_id="11" is_set="0" creator="271" date_created="2005-01-26 00:00:00" changed_by="271" date_changed="2018-10-08 12:50:06" uuid="e1d89f2e-1d5f-11e0-b929-000c29ad1d07" />
+	<concept_name concept_id="1138" name="INDETERMINADO" locale="pt" creator="271" date_created="2008-10-16 15:01:47" concept_name_id="2861" voided="0" uuid="e24cc854-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" />
+	<global_property property="eptsreports.indeterminateConceptUuid" property_value="e1d89f2e-1d5f-11e0-b929-000c29ad1d07" description="INDETERMINATE concept" uuid="03c758ab-d032-4255-bd3c-7199bac34dc4" />
 
 
 	<concept_set concept_set_id="8777008" concept_id="7777008" concept_set="7777007" sort_weight="1.0" creator="1" date_created="2019-01-29 12:38:58.0" uuid="fdefaa94-3f99-464c-8b1f-3e1d18777008"/>
