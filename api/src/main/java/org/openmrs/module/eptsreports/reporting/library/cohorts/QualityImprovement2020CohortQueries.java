@@ -5908,16 +5908,6 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getQuarterlyConcept().getConceptId(),
             hivMetadata.getTypeOfDispensationConcept().getConceptId());
 
-    CohortDefinition queryB1 =
-        QualityImprovement2020Queries.getMQ15DenB1(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getCompletedConcept().getConceptId(),
-            hivMetadata.getQuarterlyConcept().getConceptId(),
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            hivMetadata.getTypeOfDispensationConcept().getConceptId());
-
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
             commonMetadata.getPregnantConcept().getConceptId(),
@@ -5928,14 +5918,6 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
     comp.addSearch("A", EptsReportUtils.map(queryA, MAPPING1));
@@ -5944,50 +5926,18 @@ public class QualityImprovement2020CohortQueries {
 
     comp.addSearch("A3", EptsReportUtils.map(queryA3, MAPPING1));
 
-    comp.addSearch("B1", EptsReportUtils.map(queryB1, MAPPING1));
-
     comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
     comp.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
-    comp.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
-
-    comp.addSearch(
-        "AGES29",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMohMqInitiatedArtDate(2, 9, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    comp.addSearch(
-        "AGES1014",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMohMqInitiatedArtDate(10, 14, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    comp.addSearch(
-        "CHILDREN",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMohMqInitiatedArtDate(0, 14, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    comp.addSearch(
-        "ADULT",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMohMqInitiatedArtDate(15, null, false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     if (den == 1 || den == 2 || den == 3 || den == 4) {
       comp.setCompositionString("A AND NOT C AND NOT D AND NOT F");
     } else if (den == 5 || den == 7 || den == 9 || den == 11) {
-      comp.setCompositionString("(A2 or A3) AND  NOT C AND NOT D AND NOT F");
+      comp.setCompositionString("(A2 OR A3) AND  NOT C AND NOT D AND NOT F");
     } else if (den == 6 || den == 8 || den == 10 || den == 12) {
-      comp.setCompositionString("(A2 or A3) AND NOT C AND NOT D AND NOT F");
+      comp.setCompositionString("(A2 OR A3) AND NOT C AND NOT D AND NOT F");
     }
     return comp;
   }
