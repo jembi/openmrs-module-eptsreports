@@ -5983,12 +5983,11 @@ public class QualityImprovement2020CohortQueries {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     if (den == 1 || den == 2 || den == 3 || den == 4) {
-      comp.setCompositionString("A AND NOT B1 AND NOT C AND NOT D AND NOT F AND ADULT");
+      comp.setCompositionString("A AND NOT C AND NOT D AND NOT F");
     } else if (den == 5 || den == 7 || den == 9 || den == 11) {
-      comp.setCompositionString("(A2 or A3) AND NOT B1 AND  NOT C AND NOT D AND NOT F AND AGES29");
+      comp.setCompositionString("(A2 or A3) AND  NOT C AND NOT D AND NOT F");
     } else if (den == 6 || den == 8 || den == 10 || den == 12) {
-      comp.setCompositionString(
-          "(A2 or A3) and NOT B1 and  NOT C and NOT D and NOT F and AGES1014");
+      comp.setCompositionString("(A2 or A3) AND NOT C AND NOT D AND NOT F");
     }
     return comp;
   }
