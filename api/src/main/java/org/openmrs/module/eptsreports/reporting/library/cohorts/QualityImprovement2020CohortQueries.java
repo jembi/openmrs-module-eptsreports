@@ -6061,16 +6061,6 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getQuarterlyConcept().getConceptId(),
             hivMetadata.getTypeOfDispensationConcept().getConceptId());
 
-    CohortDefinition queryB1 =
-        QualityImprovement2020Queries.getMQ15DenB1(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getCompletedConcept().getConceptId(),
-            hivMetadata.getQuarterlyConcept().getConceptId(),
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            hivMetadata.getTypeOfDispensationConcept().getConceptId());
-
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
             commonMetadata.getPregnantConcept().getConceptId(),
@@ -6134,17 +6124,9 @@ public class QualityImprovement2020CohortQueries {
 
     comp.addSearch("A3", EptsReportUtils.map(queryA3, MAPPING1));
 
-    comp.addSearch("B1", EptsReportUtils.map(queryB1, MAPPING1));
-
     comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
     comp.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-
-    comp.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
@@ -6160,55 +6142,22 @@ public class QualityImprovement2020CohortQueries {
 
     comp.addSearch("I", EptsReportUtils.map(i, MAPPING1));
 
-    comp.addSearch(
-        "AGES29",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMohMqInitiatedArtDate(2, 9, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    comp.addSearch(
-        "AGES1014",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMohMqInitiatedArtDate(10, 14, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    comp.addSearch(
-        "CHILDREN",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMohMqInitiatedArtDate(0, 14, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    comp.addSearch(
-        "ADULT",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMohMqInitiatedArtDate(15, null, false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
     if (num == 1) {
-      comp.setCompositionString("A AND NOT (B1 OR C OR D OR F) AND G2 AND ADULT");
+      comp.setCompositionString("A AND NOT (C OR D OR F) AND G2");
     } else if (num == 2) {
-      comp.setCompositionString("A AND NOT (B1 OR C OR D OR F) AND H1 AND ADULT");
+      comp.setCompositionString("A AND NOT (C OR D OR F) AND H1");
     } else if (num == 3) {
-      comp.setCompositionString("A AND NOT (B1 OR C OR D OR F) AND H2 AND G2 AND ADULT");
+      comp.setCompositionString("A AND NOT (C OR D OR F) AND H2 AND G2");
     } else if (num == 4) {
-      comp.setCompositionString("A AND NOT (B1 OR C OR D OR F) AND G2 AND I AND ADULT");
-    } else if (num == 5) {
-      comp.setCompositionString("(A2 OR A3) AND NOT (B1 OR C OR D OR F) AND G2 AND AGES29");
-    } else if (num == 6) {
-      comp.setCompositionString("(A2 OR A3) AND NOT (B1 OR C OR D OR F) AND G2 AND AGES1014");
-    } else if (num == 7) {
-      comp.setCompositionString("(A2 OR A3) AND NOT (B1 OR C OR D OR F) AND H1 AND AGES29");
-    } else if (num == 8) {
-      comp.setCompositionString("(A2 OR A3) and NOT (B1 OR C OR D OR F) AND H1 AND AGES1014");
-    } else if (num == 9) {
-      comp.setCompositionString("(A2 OR A3) AND NOT (B1 OR C OR D OR F) AND G2 AND H2 AND AGES29");
-    } else if (num == 10) {
-      comp.setCompositionString(
-          "(A2 OR A3) and NOT (B1 OR C OR D OR F) AND G2 AND H2 AND AGES1014");
-    } else if (num == 11) {
-      comp.setCompositionString("(A2 OR A3) AND NOT (B1 OR C OR D OR F) AND G2 AND I AND AGES29");
-    } else if (num == 12) {
-      comp.setCompositionString("(A2 OR A3) and NOT (B1 OR C OR D OR F) AND G2 AND I AND AGES1014");
+      comp.setCompositionString("A AND NOT (C OR D OR F) AND G2 AND I");
+    } else if (num == 5 || num == 6) {
+      comp.setCompositionString("(A2 OR A3) AND NOT (C OR D OR F) AND G2");
+    } else if (num == 7 || num == 8) {
+      comp.setCompositionString("(A2 OR A3) AND NOT (C OR D OR F) AND H1");
+    } else if (num == 9 || num == 10) {
+      comp.setCompositionString("(A2 OR A3) AND NOT (C OR D OR F) AND G2 AND H2");
+    } else if (num == 11 || num == 12) {
+      comp.setCompositionString("(A2 OR A3) AND NOT (C OR D OR F) AND G2 AND I");
     }
     return comp;
   }

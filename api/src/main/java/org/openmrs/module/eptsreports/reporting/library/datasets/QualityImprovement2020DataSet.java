@@ -2051,7 +2051,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM1,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "15+");
 
     CohortIndicator MQ15NUM2 =
         eptsGeneralIndicator.getIndicator(
@@ -2068,7 +2068,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM2,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "15+");
 
     CohortIndicator MQ15NUM3 =
         eptsGeneralIndicator.getIndicator(
@@ -2085,7 +2085,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "15+");
 
     CohortIndicator MQ15NUM4 =
         eptsGeneralIndicator.getIndicator(
@@ -2102,7 +2102,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM4,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "15+");
 
     CohortIndicator MQ15NUM5 =
         eptsGeneralIndicator.getIndicator(
@@ -2119,7 +2119,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM5,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "2-9");
 
     CohortIndicator MQ15NUM6 =
         eptsGeneralIndicator.getIndicator(
@@ -2136,7 +2136,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM6,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "10-14");
 
     CohortIndicator MQ15NUM7 =
         eptsGeneralIndicator.getIndicator(
@@ -2153,7 +2153,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM7,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "2-9");
 
     CohortIndicator MQ15NUM8 =
         eptsGeneralIndicator.getIndicator(
@@ -2170,7 +2170,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM8,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "10-14");
 
     CohortIndicator MQ15NUM9 =
         eptsGeneralIndicator.getIndicator(
@@ -2187,7 +2187,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM9,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "2-9");
 
     CohortIndicator MQ15NUM10 =
         eptsGeneralIndicator.getIndicator(
@@ -2204,7 +2204,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM10,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "10-14");
 
     CohortIndicator MQ15NUM11 =
         eptsGeneralIndicator.getIndicator(
@@ -2221,7 +2221,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM11,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "2-9");
 
     CohortIndicator MQ15NUM12 =
         eptsGeneralIndicator.getIndicator(
@@ -2238,7 +2238,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM12,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "10-14");
 
     // M&Q Report - Categoria 14 Denominador
     dataSetDefinition.addColumn(
