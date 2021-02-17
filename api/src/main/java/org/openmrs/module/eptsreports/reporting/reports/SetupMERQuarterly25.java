@@ -56,6 +56,8 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
 
   private CXCASCRNPositiveDataset cxcascrnPositiveDataset;
 
+  private TXCXCADataset txcxcaDataset;
+
   @Autowired
   public SetupMERQuarterly25(
       TxPvlsDataset txPvlsDataset,
@@ -67,7 +69,8 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
       TransferredInDataset transferredInDataset,
       TxRTTPLHIVDataset txRTTPLHIVDateset,
       CXCASCRNDataset cxcascrnDataset,
-      CXCASCRNPositiveDataset cxcascrnPositiveDataset) {
+      CXCASCRNPositiveDataset cxcascrnPositiveDataset,
+      TXCXCADataset txcxcaDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
@@ -78,6 +81,7 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
     this.txRTTPLHIVDateset = txRTTPLHIVDateset;
     this.cxcascrnDataset = cxcascrnDataset;
     this.cxcascrnPositiveDataset = cxcascrnPositiveDataset;
+    this.txcxcaDataset = txcxcaDataset;
   }
 
   @Override
@@ -112,7 +116,7 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.setParameters(txPvlsDataset.getParameters());
-    rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
+    /* rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
     rd.addDataSetDefinition(
         "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
     rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
@@ -122,12 +126,14 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
     rd.addDataSetDefinition(
         "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
     rd.addDataSetDefinition(
-        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
+        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));*/
     rd.addDataSetDefinition(
         "CXCA", Mapped.mapStraightThrough(cxcascrnDataset.constructCXCASCRNDataset()));
     rd.addDataSetDefinition(
         "CXCAP",
         Mapped.mapStraightThrough(cxcascrnPositiveDataset.constructCXCASCRNPositiveDataset()));
+    rd.addDataSetDefinition(
+        "TXCXCA", Mapped.mapStraightThrough(txcxcaDataset.constructTXCXCASCRNDataset()));
 
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
