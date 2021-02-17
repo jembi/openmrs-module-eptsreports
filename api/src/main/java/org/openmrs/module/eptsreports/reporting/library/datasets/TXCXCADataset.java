@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import java.util.Arrays;
 import java.util.List;
+import org.openmrs.module.eptsreports.reporting.calculation.cxcascrn.TreatmentType;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TXCXCACohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
@@ -59,7 +60,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getf1srtTimeScreened(),
-                    this.cxcatxCohortQueries.getB5(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
                     "TX 1st Time Screened B5  composition"),
                 mappings));
     addRow(
@@ -76,7 +77,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getf1srtTimeScreened(),
-                    this.cxcatxCohortQueries.getB6(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
                     "TX 1st Time Screened B6  composition"),
                 mappings));
     addRow(
@@ -93,7 +94,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getf1srtTimeScreened(),
-                    this.cxcatxCohortQueries.getB7(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
                     "TX 1st Time Screened B7  composition"),
                 mappings));
     addRow(
@@ -122,7 +123,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB5(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
                     "TX Rescreened after previous negative B5 composition"),
                 mappings));
     addRow(
@@ -139,7 +140,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB6(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
                     "TX Rescreened after previous negative B6 composition"),
                 mappings));
     addRow(
@@ -156,7 +157,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getRescreenedAfterPreviousNegative(),
-                    this.cxcatxCohortQueries.getB7(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
                     "TX Rescreened after previous negative B7 composition"),
                 mappings));
     addRow(
@@ -183,7 +184,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB5(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
                     "TX Post-Treatment follow-up B5 composition"),
                 mappings));
     addRow(
@@ -200,7 +201,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB6(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
                     "TX Post-Treatment follow-up B6 composition"),
                 mappings));
     addRow(
@@ -217,7 +218,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 this.cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getPostTreatmentFollowUp(),
-                    this.cxcatxCohortQueries.getB7(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
                     "TX Post-Treatment follow-up B7 composition"),
                 mappings));
     addRow(
@@ -246,7 +247,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB5(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B5),
                     "TX Rescreened after previous positive B6"),
                 mappings));
     addRow(
@@ -263,7 +264,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB6(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B6),
                     "TX Rescreened after previous positive B6"),
                 mappings));
     addRow(
@@ -280,7 +281,7 @@ public class TXCXCADataset extends BaseDataSet {
             EptsReportUtils.map(
                 cxcatxCohortQueries.getFinalComposition(
                     this.cxcatxCohortQueries.getRescreenedAfterPreviousPositive(),
-                    this.cxcatxCohortQueries.getB7(),
+                    this.cxcatxCohortQueries.getB5OrB6OrB7(TreatmentType.B7),
                     "TX Rescreened after previous positive B7"),
                 mappings));
     addRow(

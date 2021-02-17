@@ -8,7 +8,9 @@ import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.cxcascrn.CXCASCRNBBCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.cxcascrn.CXCATreatmentHierarchyCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.cxcascrn.TXCXCACalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.cxcascrn.TreatmentType;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -184,6 +186,33 @@ public class TXCXCACohortQueries {
     return cd;
   }
 
+  public CohortDefinition getB5OrB6OrB7(TreatmentType treatmentType) {
+    CXCATreatmentHierarchyCalculation cxcascrnCalculation =
+        Context.getRegisteredComponents(CXCATreatmentHierarchyCalculation.class).get(0);
+
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    switch (treatmentType) {
+      case B5:
+        cd.setName("TX B5 Cryotherapy");
+        break;
+      case B6:
+        cd.setName("TX B6 Thermocoagulation");
+        break;
+      case B7:
+        cd.setName("TX B7 LEEP");
+        break;
+      default:
+        throw new IllegalArgumentException("Unsupported value");
+    }
+    cd.setCalculation(cxcascrnCalculation);
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter("type", treatmentType);
+
+    return cd;
+  }
+
   public CohortDefinition getTotal() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -323,7 +352,10 @@ public class TXCXCACohortQueries {
     cd.setName(name);
 
     cd.addSearch("CCD", EptsReportUtils.map(ccd, MAPPINGS));
-    cd.addSearch("SCD", EptsReportUtils.map(scd, "location=${location}"));
+    cd.addSearch(
+        "SCD",
+        EptsReportUtils.map(
+            scd, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("CCD AND SCD");
 
