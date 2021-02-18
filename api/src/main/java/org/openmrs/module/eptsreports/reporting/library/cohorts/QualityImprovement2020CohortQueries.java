@@ -1613,7 +1613,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtStatus().getConceptId());
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
-    
+
     CohortDefinition tbDiagOnPeriod = getPatientsWithTBDiagActive();
 
     CohortDefinition tbSymptomsOnPeriod = getPatientsWithTBSymtoms();
