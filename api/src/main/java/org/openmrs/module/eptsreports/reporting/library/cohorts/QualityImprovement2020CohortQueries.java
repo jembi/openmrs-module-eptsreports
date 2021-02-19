@@ -5905,7 +5905,11 @@ public class QualityImprovement2020CohortQueries {
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
 
-    comp.addSearch("A3", EptsReportUtils.map(queryA3, MAPPING1));
+    comp.addSearch(
+        "A3",
+        EptsReportUtils.map(
+            queryA3,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
@@ -6103,7 +6107,11 @@ public class QualityImprovement2020CohortQueries {
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
 
-    comp.addSearch("A3", EptsReportUtils.map(queryA3, MAPPING1));
+    comp.addSearch(
+        "A3",
+        EptsReportUtils.map(
+            queryA3,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
