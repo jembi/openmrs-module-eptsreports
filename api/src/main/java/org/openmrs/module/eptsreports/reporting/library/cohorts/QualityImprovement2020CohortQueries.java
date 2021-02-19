@@ -5914,11 +5914,11 @@ public class QualityImprovement2020CohortQueries {
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     if (den == 1 || den == 2 || den == 3 || den == 4) {
-      comp.setCompositionString("A AND NOT C AND NOT D AND NOT F");
+      comp.setCompositionString("A AND NOT (C OR D OR F)");
     } else if (den == 5 || den == 7 || den == 9 || den == 11) {
-      comp.setCompositionString("(A2 OR A3) AND  NOT C AND NOT D AND NOT F");
+      comp.setCompositionString("(A2 OR A3) AND  NOT (C OR D OR F)");
     } else if (den == 6 || den == 8 || den == 10 || den == 12) {
-      comp.setCompositionString("(A2 OR A3) AND NOT C AND NOT D AND NOT F");
+      comp.setCompositionString("(A2 OR A3) AND NOT (C OR D OR F)");
     }
     return comp;
   }
