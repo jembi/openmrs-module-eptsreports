@@ -303,9 +303,7 @@ public class QualityImprovement2020Queries {
             + "              AND e.encounter_type = ${6} "
             + "              AND ( o.concept_id = ${23724} OR o.concept_id = ${23730} ) "
             + "              AND o.value_coded = ${1256} "
-            + "              AND e.encounter_datetime BETWEEN Date_sub(:revisionEndDate, INTERVAL 14 month) "
-            + "              AND Date_sub(:revisionEndDate, INTERVAL 11 month) "
-            + "       GROUP  BY p.patient_id "
+            + "              AND e.encounter_datetime BETWEEN :startDate AND :endDate"
             + "        UNION  "
             + "        SELECT p.patient_id, "
             + "               Max(e.encounter_datetime) encounter_datetime "
@@ -321,8 +319,7 @@ public class QualityImprovement2020Queries {
             + "               AND e.encounter_type = ${6} "
             + "               AND o.concept_id = ${23739} "
             + "               AND o.value_coded = ${23720} "
-            + "               AND e.encounter_datetime BETWEEN Date_sub(:revisionEndDate, INTERVAL 14 month) "
-            + "               AND Date_sub(:revisionEndDate, INTERVAL 11 month) "
+            + "               AND e.encounter_datetime BETWEEN :startDate AND :endDate"
             + "        GROUP  BY p.patient_id) encounters ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
