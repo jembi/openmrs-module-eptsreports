@@ -430,7 +430,7 @@ public class QualityImprovement2020Queries {
             + " INNER JOIN obs o "
             + " ON o.encounter_id = e.encounter_id "
             + " WHERE "
-            + " AND e.location_id = :location "
+            + " e.location_id = :location "
             + " AND e.encounter_type = ${6} "
             + " AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + " AND o.concept_id =${23739} "
