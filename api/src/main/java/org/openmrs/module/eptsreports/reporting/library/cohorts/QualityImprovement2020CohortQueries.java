@@ -5901,7 +5901,11 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
-    comp.addSearch("A", EptsReportUtils.map(queryA, MAPPING1));
+    comp.addSearch(
+        "A",
+        EptsReportUtils.map(
+            queryA,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}")); // (A1 OR A3
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
 
@@ -5909,11 +5913,19 @@ public class QualityImprovement2020CohortQueries {
         "A3",
         EptsReportUtils.map(
             queryA3,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
+
+    comp.addSearch(
+        "C",
+        EptsReportUtils.map(
+            pregnant,
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-
-    comp.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+    comp.addSearch(
+        "D",
+        EptsReportUtils.map(
+            breastfeeding,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
@@ -6103,7 +6115,11 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
-    comp.addSearch("A", EptsReportUtils.map(queryA, MAPPING1));
+    comp.addSearch(
+        "A",
+        EptsReportUtils.map(
+            queryA,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}")); // A1 OR A3
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
 
@@ -6111,11 +6127,19 @@ public class QualityImprovement2020CohortQueries {
         "A3",
         EptsReportUtils.map(
             queryA3,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
+
+    comp.addSearch(
+        "C",
+        EptsReportUtils.map(
+            pregnant,
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-
-    comp.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+    comp.addSearch(
+        "D",
+        EptsReportUtils.map(
+            breastfeeding,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
