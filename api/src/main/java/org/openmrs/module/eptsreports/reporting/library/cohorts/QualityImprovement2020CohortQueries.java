@@ -5919,13 +5919,13 @@ public class QualityImprovement2020CohortQueries {
         "C",
         EptsReportUtils.map(
             pregnant,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
 
     comp.addSearch(
         "D",
         EptsReportUtils.map(
             breastfeeding,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
@@ -6133,13 +6133,13 @@ public class QualityImprovement2020CohortQueries {
         "C",
         EptsReportUtils.map(
             pregnant,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
 
     comp.addSearch(
         "D",
         EptsReportUtils.map(
             breastfeeding,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
