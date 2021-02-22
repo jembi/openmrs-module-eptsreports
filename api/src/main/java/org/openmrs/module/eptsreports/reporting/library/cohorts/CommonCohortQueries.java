@@ -873,7 +873,7 @@ public class CommonCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("question", question);
     map.put("answer", answer);
 
@@ -884,11 +884,10 @@ public class CommonCohortQueries {
             + "         ON e.patient_id = p.person_id  "
             + "       JOIN obs o  "
             + "         ON o.encounter_id = e.encounter_id  "
-            + "            AND encounter_type = ${6}  "
+            + "            AND encounter_type = ${53}  "
             + "            AND o.concept_id = ${question}  "
             + "            AND o.value_coded = ${answer}  "
             + "            AND e.location_id = :location  "
-            + "            AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "            AND p.gender = 'F'  "
             + "            AND e.voided = 0  "
             + "            AND o.voided = 0  "
