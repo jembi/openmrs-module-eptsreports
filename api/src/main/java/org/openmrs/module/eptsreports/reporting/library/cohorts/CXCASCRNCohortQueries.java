@@ -241,6 +241,7 @@ public class CXCASCRNCohortQueries {
         "AA",
         EptsReportUtils.map(
             aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    //TODO AA3 do a separeted query
     cd.addSearch("AA3", EptsReportUtils.map(aa3, "startDate=${startDate},location=${location}"));
 
     cd.setCompositionString("A AND AA AND AA3");

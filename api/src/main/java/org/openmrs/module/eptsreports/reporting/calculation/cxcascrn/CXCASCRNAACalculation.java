@@ -89,7 +89,10 @@ public class CXCASCRNAACalculation extends AbstractPatientCalculation {
 
     Concept resultadoViaConcept = hivMetadata.getResultadoViaConcept();
 
-    List<Concept> conceptsAnswers = (List<Concept>) parameterValues.get(ANSWERS);
+
+    // TODO load all  concepts here
+    List<Concept> conceptsAnswers = null;
+
 
     CalculationResultMap finchaCCUResulMap =
         eptsCalculationService.getObs(
@@ -131,7 +134,7 @@ public class CXCASCRNAACalculation extends AbstractPatientCalculation {
             context);
 
     for (Integer pId : cohort) {
-
+      // TODO  verify the answer (POSITVE, NEGATIVE, SUSPECTED)
       Obs finchaCCU = EptsCalculationUtils.resultForPatient(finchaCCUResulMap, pId);
       Obs fichaClinica = EptsCalculationUtils.resultForPatient(fichaClinicaResulMap, pId);
       Obs fichaResumo = EptsCalculationUtils.resultForPatient(fichaResumoResulMap, pId);
@@ -151,6 +154,10 @@ public class CXCASCRNAACalculation extends AbstractPatientCalculation {
         } else {
           map.put(pId, new SimpleResult(fichaClinica, this));
         }
+      }
+      //TODO para  caso (fichaClinica == null && fichaResumo != null) or (fichaClinica != null && fichaResumo == null)
+      else if ((fichaClinica == null && fichaResumo != null)){
+
       }
     }
 

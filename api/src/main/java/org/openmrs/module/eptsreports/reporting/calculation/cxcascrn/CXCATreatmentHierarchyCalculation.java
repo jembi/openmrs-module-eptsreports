@@ -85,6 +85,11 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
       Obs b6Obs = EptsCalculationUtils.resultForPatient(b6Map, pId);
       Obs b7Obs = EptsCalculationUtils.resultForPatient(b7Map, pId);
 
+      // TODO fisrt select the oldest  and  compare  with the treatment type
+
+      //TODO  NOTE1: For patients who have more than one treatment registered during the reporting period, the system will consider the oldest one among them.
+ 
+      /** handling treatments in the  same date*/
       // handling b7
       if (treatmentType == TreatmentType.B7 && b7Obs != null) {
         map.put(pId, new SimpleResult(b7Obs.getValueDatetime(), this));
@@ -94,11 +99,11 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
         if (b6Obs.getValueDatetime().compareTo(b7Obs.getValueDatetime()) == 0) {
           continue;
         } else {
-          map.put(pId, new SimpleResult(b7Obs.getValueDatetime(), this));
+          map.put(pId, new SimpleResult(b6Obs.getValueDatetime(), this));
         }
       }
       if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs == null) {
-        map.put(pId, new SimpleResult(b7Obs.getValueDatetime(), this));
+        map.put(pId, new SimpleResult(b6Obs.getValueDatetime(), this));
       }
       // handling b5
       if (treatmentType == TreatmentType.B5 && b5Date != null && b6Obs != null && b7Obs != null) {

@@ -75,7 +75,7 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
             Arrays.asList(yesConcept),
             TimeQualifier.ANY,
             null,
-            null,
+            endDate,
             EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
             context);
 
@@ -88,7 +88,7 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
             null,
             TimeQualifier.ANY,
             null,
-            null,
+            endDate,
             EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
             context);
 
@@ -102,7 +102,7 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
                 pediatricNursingConcept, thermocoagulationConcept, leepConcept, conizationConcept),
             TimeQualifier.ANY,
             null,
-            null,
+            endDate,
             EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
             context);
 

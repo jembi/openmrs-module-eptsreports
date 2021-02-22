@@ -164,7 +164,7 @@ public class TXCXCACohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addCalculationParameter(
         "answers",
-        this.cxcascrnCohortQueries.getAnswers(CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE));
+        this.cxcascrnCohortQueries.getAnswers(CXCASCRNCohortQueries.CXCASCRNResult.ANY));
 
     return cd;
   }
