@@ -20,9 +20,11 @@ import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCoh
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -5884,10 +5886,12 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getQuarterlyDispensation().getConceptId());
 
     CohortDefinition queryA3 =
-        QualityImprovement2020Queries.getMQ15DenA3(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getQuarterlyConcept().getConceptId(),
-            hivMetadata.getTypeOfDispensationConcept().getConceptId());
+        genericCohortQueries.hasCodedObs(
+            hivMetadata.getTypeOfDispensationConcept(),
+            BaseObsCohortDefinition.TimeModifier.LAST,
+            SetComparator.IN,
+            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+            Arrays.asList(hivMetadata.getQuarterlyConcept()));
 
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
@@ -5905,7 +5909,7 @@ public class QualityImprovement2020CohortQueries {
         "A1",
         EptsReportUtils.map(
             queryA1,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}")); // (A1 OR A3
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
 
@@ -5913,19 +5917,19 @@ public class QualityImprovement2020CohortQueries {
         "A3",
         EptsReportUtils.map(
             queryA3,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},locationList=${location}"));
 
     comp.addSearch(
         "C",
         EptsReportUtils.map(
             pregnant,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "D",
         EptsReportUtils.map(
             breastfeeding,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
