@@ -2677,8 +2677,6 @@
 		</description>
 	</globalProperty>
 
-	</globalProperty>
-
 	<globalProperty>
 		<property>eptsreports.dtINHConceptUuid</property>
 		<defaultValue>16e2f8f5-b89f-4972-82e9-2de534cae949</defaultValue>
