@@ -2033,7 +2033,8 @@ public class QualityImprovement2020CohortQueries {
             b1,
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
-    compositionCohortDefinition.addSearch("B1E", EptsReportUtils.map(b1E, mapping1));
+    compositionCohortDefinition.addSearch(
+        "B1E", EptsReportUtils.map(b1E, "location=${location},revisionEndDate=${revisionEndDate}"));
 
     compositionCohortDefinition.addSearch(
         "B2",
@@ -2041,7 +2042,8 @@ public class QualityImprovement2020CohortQueries {
             b2,
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
-    compositionCohortDefinition.addSearch("B2E", EptsReportUtils.map(b2E, mapping1));
+    compositionCohortDefinition.addSearch(
+        "B2E", EptsReportUtils.map(b2E, "location=${location},revisionEndDate=${revisionEndDate}"));
 
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
@@ -2063,8 +2065,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString("(A AND B1 AND C) AND NOT (D OR E)");
     }
     if (indicatorFlag.equals("F")) {
-      compositionCohortDefinition.setCompositionString(
-          "(A AND B1 AND C)  AND NOT B1E  AND  NOT  (C OR D OR F)");
+      compositionCohortDefinition.setCompositionString("A AND NOT   (C OR D OR E OR F)");
     }
 
     return compositionCohortDefinition;
@@ -3600,6 +3601,10 @@ public class QualityImprovement2020CohortQueries {
       case 8:
         cd.setName("No de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
         break;
+      case 7:
+        cd.setName(
+            " # de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás ");
+        break;
       case 9:
         cd.setName("No de crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás");
         break;
@@ -3617,11 +3622,11 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition b1 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
 
-    CohortDefinition b1E = getPatientsFromFichaClinicaDenominatorB("B1E");
+    CohortDefinition b1E = getPatientsFromFichaClinicaDenominatorB1EOrB2E(true);
 
     CohortDefinition b2 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsSecondLine_B2();
 
-    CohortDefinition b2E = getPatientsFromFichaClinicaDenominatorB("B2E");
+    CohortDefinition b2E = getPatientsFromFichaClinicaDenominatorB1EOrB2E(false);
 
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
@@ -3633,13 +3638,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
+    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
     cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING2));
 
@@ -3661,13 +3660,14 @@ public class QualityImprovement2020CohortQueries {
             b2,
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
-    cd.addSearch("B2E", EptsReportUtils.map(b2E, mapping1));
+    cd.addSearch(
+        "B2E", EptsReportUtils.map(b2E, "location=${location},revisionEndDate=${revisionEndDate}"));
 
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
 
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
-    cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
+    cd.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     cd.addSearch(
         "G",
@@ -3678,7 +3678,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "B2E",
         EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB("B2E"),
+            getPatientsFromFichaClinicaDenominatorB1EOrB2E(false),
             "startDate=${startDate},endDate=${endDate},location=${location},revisionEndDate=${revisionEndDate}"));
 
     cd.addSearch(
@@ -3688,16 +3688,19 @@ public class QualityImprovement2020CohortQueries {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     if (flag == 3) {
-      cd.setCompositionString("(A AND B1 AND G AND NOT (B1E OR C OR D OR E))");
+      cd.setCompositionString("(A AND B1 AND G AND NOT (B1E OR C OR D OR F))");
     } else if (flag == 4) {
-      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR E)) AND G AND ADULT");
-      //                       (A and B2 and NOT (B2E or C or D or E)) AND G and Age > =15
+      cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR F)) AND G AND ADULT");
+    } else if (flag == 7) {
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G");
     } else if (flag == 8) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR E)) AND G");
+      cd.setCompositionString("(A AND B1 AND NOT (B2E OR C OR D OR F)) AND G");
     } else if (flag == 9) {
-      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR E) AND G");
+      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR F) AND G");
+    } else if (flag == 11) {
+      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR F) AND G ");
     } else if (flag == 12) {
-      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR E) AND G ");
+      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR F) AND G ");
     }
 
     return cd;
