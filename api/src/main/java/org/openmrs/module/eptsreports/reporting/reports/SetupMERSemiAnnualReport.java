@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TbPrevDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxMlDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxTBDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -28,6 +26,12 @@ public class SetupMERSemiAnnualReport extends EptsDataExportManager {
 
   @Autowired private TbPrevDataset tbPrevDataset;
 
+  @Autowired private CXCASCRNDataset cxcascrnDataset;
+
+  @Autowired private CXCASCRNPositiveDataset cxcascrnPositiveDataset;
+
+  @Autowired private TXCXCADataset txcxcaDataset;
+
   @Override
   public String getExcelDesignUuid() {
     return "61fea06a-472b-11e9-8b42-876961a472ef";
@@ -45,12 +49,12 @@ public class SetupMERSemiAnnualReport extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "PEPFAR MER 2.4 Semi-Annual";
+    return "PEPFAR MER 2.5 SEMI-ANNUAL";
   }
 
   @Override
   public String getDescription() {
-    return "PEPFAR MER 2.4 Semi-Annual Report";
+    return "PEPFAR MER 2.5 Semi-Annual Report";
   }
 
   @Override
@@ -62,6 +66,13 @@ public class SetupMERSemiAnnualReport extends EptsDataExportManager {
     rd.setParameters(txMlDataset.getParameters());
     rd.addDataSetDefinition("T", Mapped.mapStraightThrough(txTBDataset.constructTxTBDataset()));
     rd.addDataSetDefinition("TBPREV", Mapped.mapStraightThrough(tbPrevDataset.constructDatset()));
+    rd.addDataSetDefinition(
+        "CXCA", Mapped.mapStraightThrough(cxcascrnDataset.constructCXCASCRNDataset()));
+    rd.addDataSetDefinition(
+        "CXCAP",
+        Mapped.mapStraightThrough(cxcascrnPositiveDataset.constructCXCASCRNPositiveDataset()));
+    rd.addDataSetDefinition(
+        "TXCXCA", Mapped.mapStraightThrough(txcxcaDataset.constructTXCXCASCRNDataset()));
     // add a base cohort to the report
     rd.setBaseCohortDefinition(
         genericCohortQueries.getBaseCohort(),
@@ -77,8 +88,8 @@ public class SetupMERSemiAnnualReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "PEPFAR_MER_2.4_SEMIANNUAL.xls",
-              "PEPFAR MER 2.4 Semi-Annual Report",
+              "PEPFAR_MER_2.5_SEMIANNUAL.xls",
+              "PEPFAR MER 2.5 Semi-Annual Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
