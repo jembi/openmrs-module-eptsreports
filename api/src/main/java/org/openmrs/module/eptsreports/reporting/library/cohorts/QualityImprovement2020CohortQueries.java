@@ -5894,14 +5894,20 @@ public class QualityImprovement2020CohortQueries {
             Arrays.asList(hivMetadata.getQuarterlyConcept()));
 
     CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
+        genericCohortQueries.hasCodedObs(
+            commonMetadata.getPregnantConcept(),
+            BaseObsCohortDefinition.TimeModifier.ANY,
+            SetComparator.IN,
+            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+            Arrays.asList(hivMetadata.getYesConcept()));
 
     CohortDefinition breastfeeding =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
+        genericCohortQueries.hasCodedObs(
+            commonMetadata.getBreastfeeding(),
+            BaseObsCohortDefinition.TimeModifier.ANY,
+            SetComparator.IN,
+            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+            Arrays.asList(hivMetadata.getYesConcept()));
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
@@ -5923,7 +5929,7 @@ public class QualityImprovement2020CohortQueries {
         "C",
         EptsReportUtils.map(
             pregnant,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "D",
