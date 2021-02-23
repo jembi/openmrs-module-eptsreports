@@ -5929,13 +5929,13 @@ public class QualityImprovement2020CohortQueries {
         "C",
         EptsReportUtils.map(
             pregnant,
-            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate},location=${location}"));
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate},locationList=${location}"));
 
     comp.addSearch(
         "D",
         EptsReportUtils.map(
             breastfeeding,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate},locationList=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
