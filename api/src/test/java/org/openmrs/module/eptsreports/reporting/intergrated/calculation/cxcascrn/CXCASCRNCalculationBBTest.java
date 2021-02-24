@@ -38,7 +38,7 @@ public class CXCASCRNCalculationBBTest extends BasePatientCalculationTest {
   }
 
   @Ignore
-  /** ignored because H2 database is capable to test AA4 query */
+  /** ignored because H2 database is not capable to test AA4 query */
   @Test
   public void evaluate_ShouldGetPatientBetweenAA3AndBB() {
 
