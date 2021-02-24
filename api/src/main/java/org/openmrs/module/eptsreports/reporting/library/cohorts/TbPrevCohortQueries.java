@@ -626,7 +626,6 @@ public class TbPrevCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
-    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
     map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
@@ -659,7 +658,7 @@ public class TbPrevCohortQueries {
             + "                                  AND e.encounter_type = ${60} "
             + "                                  AND o.concept_id = ${23985} "
             + "                                  AND o.value_coded IN (${23954}, ${23984})  "
-            + "                                  AND DATE(e.encounter_datetime) >= DATE_SUB(inh.first_pickup_date, INTERVAL 7 MONTH)  "
+            + "                                  AND DATE(e.encounter_datetime) >= DATE_SUB(inh.first_pickup_date, INTERVAL 4 MONTH)  "
             + "                                  AND DATE(e.encounter_datetime) < DATE(inh.first_pickup_date)) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

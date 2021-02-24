@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.joda.time.DateTime;
@@ -27,11 +28,15 @@ import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
+import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
+import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,6 +65,8 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
   private static final String ON_OR_BEFORE = "onOrBefore";
 
   @Autowired private HivMetadata hivMetadata;
+
+  @Autowired private TbMetadata tbMetadata;
 
   @Autowired private EPTSCalculationService ePTSCalculationService;
 
@@ -114,6 +121,12 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             startDate,
             endDate,
             context);
+    CalculationResultMap tptIsoniazidMap = getTptIsoniazid(cohort, context);
+    CalculationResultMap outrasPrescricoesIsoniazidMap =
+        getOutrasPrescricoesIsoniazid(cohort, context);
+    CalculationResultMap outrasPrescricoes3HPMap = getOutrasPrescricoes3HP(cohort, context);
+    CalculationResultMap tpt3HPMap = getTpt3HP(cohort, context);
+
     if (endDate != null) {
       for (Integer patientId : cohort) {
         Date artStartDate =
@@ -122,7 +135,18 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             EptsCalculationUtils.resultForPatient(startProfilaxiaObservations, patientId);
         Obs fichaClinicaMasterCardStartDrugsObs =
             EptsCalculationUtils.resultForPatient(startDrugsObservations, patientId);
-        if ((seguimentoOrFichaResumo == null && fichaClinicaMasterCardStartDrugsObs == null)
+        Obs tptIsoniazidObs = EptsCalculationUtils.resultForPatient(tptIsoniazidMap, patientId);
+        Obs outrasPrescricoesIsoniazidObs =
+            EptsCalculationUtils.resultForPatient(outrasPrescricoesIsoniazidMap, patientId);
+        Obs outrasPrescricoes3HPObs =
+            EptsCalculationUtils.resultForPatient(outrasPrescricoes3HPMap, patientId);
+        Obs tpt3HPMapObs = EptsCalculationUtils.resultForPatient(tpt3HPMap, patientId);
+
+        if ((seguimentoOrFichaResumo == null && fichaClinicaMasterCardStartDrugsObs == null
+                || tptIsoniazidObs == null
+                || outrasPrescricoesIsoniazidObs == null
+                || outrasPrescricoes3HPObs == null
+                || tpt3HPMapObs == null)
             || artStartDate == null) {
           continue;
         }
@@ -131,7 +155,12 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         DateTime iptStartDateTime =
             new DateTime(
                 getEarliestIptStartDate(
-                        seguimentoOrFichaResumo, fichaClinicaMasterCardStartDrugsObs)
+                        seguimentoOrFichaResumo,
+                        fichaClinicaMasterCardStartDrugsObs,
+                        tptIsoniazidObs,
+                        outrasPrescricoesIsoniazidObs,
+                        outrasPrescricoes3HPObs,
+                        tpt3HPMapObs)
                     .getTime());
         boolean isDiffMoreThanSix =
             isDateDiffGreaterThanSixMonths(artStartDateTime, iptStartDateTime);
@@ -171,17 +200,40 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
    * @return
    */
   private Date getEarliestIptStartDate(
-      Obs seguimentoOrFichaResumoDate, Obs fichaClinicaMasterCardDate) {
-    if (seguimentoOrFichaResumoDate != null && fichaClinicaMasterCardDate != null) {
+      Obs seguimentoOrFichaResumoDate,
+      Obs fichaClinicaMasterCardDate,
+      Obs tptIsoniazidDate,
+      Obs outrasPrescricoesIsoniazidDate,
+      Obs outrasPrescricoes3HPDate,
+      Obs tpt3HPMapDate) {
+    if (seguimentoOrFichaResumoDate != null
+        && fichaClinicaMasterCardDate != null
+        && tptIsoniazidDate != null
+        && outrasPrescricoesIsoniazidDate != null
+        && outrasPrescricoes3HPDate != null) {
       List<Date> dates =
           Arrays.asList(
               getDateFromObs(seguimentoOrFichaResumoDate),
-              fichaClinicaMasterCardDate.getObsDatetime());
+              fichaClinicaMasterCardDate.getObsDatetime(),
+              tptIsoniazidDate.getObsDatetime(),
+              outrasPrescricoesIsoniazidDate.getObsDatetime(),
+              outrasPrescricoes3HPDate.getObsDatetime(),
+              tpt3HPMapDate.getObsDatetime());
       return Collections.min(dates);
     } else {
-      return (getDateFromObs(seguimentoOrFichaResumoDate) != null)
-          ? getDateFromObs(seguimentoOrFichaResumoDate)
-          : fichaClinicaMasterCardDate.getObsDatetime();
+      if (getDateFromObs(seguimentoOrFichaResumoDate) != null) {
+        return getDateFromObs(seguimentoOrFichaResumoDate);
+      } else if (tptIsoniazidDate.getObsDatetime() != null) {
+        return tptIsoniazidDate.getObsDatetime();
+      } else if (outrasPrescricoesIsoniazidDate.getObsDatetime() != null) {
+        return outrasPrescricoesIsoniazidDate.getObsDatetime();
+      } else if (outrasPrescricoes3HPDate.getObsDatetime() != null) {
+        return outrasPrescricoes3HPDate.getObsDatetime();
+      } else if (tpt3HPMapDate.getObsDatetime() != null) {
+        return tpt3HPMapDate.getObsDatetime();
+      } else {
+        return fichaClinicaMasterCardDate.getObsDatetime();
+      }
     }
   }
   /**
@@ -234,5 +286,137 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
       parameterValue = true;
     }
     return parameterValue;
+  }
+
+  /**
+   * <b>Description:</b> Patients who have Regime de TPT with the values (“Isoniazida” or
+   * “Isoniazida + Piridoxina”) marked on the first pick-up date on Ficha de Levantamento de TPT
+   * (FILT) during the previous reporting period (INH Start Date) and no other INH values
+   * (“Isoniazida” or “Isoniazida + Piridoxina”) marked on FILT in the 7 months prior to the INH
+   * Start Date or
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CalculationResultMap}
+   */
+  private CalculationResultMap getTptIsoniazid(
+      Collection<Integer> cohort, PatientCalculationContext context) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("onOrAfter", context.getFromCache("onOrAfter"));
+    params.put("onOrBefore", context.getFromCache("onOrBefore"));
+    params.put("location", context.getFromCache("location"));
+
+    SqlPatientDataDefinition def = new SqlPatientDataDefinition();
+    def.addParameter(new Parameter("startDate", "onOrAfter", Date.class));
+    def.addParameter(new Parameter("endDate", "onOrBefore", Date.class));
+    def.addParameter(new Parameter("location", "location", Location.class));
+    def.setQuery(
+        TbPrevQueries.getRegimeTPTOrOutrasPrescricoes(
+            tbMetadata.getRegimeTPTEncounterType(),
+            tbMetadata.getRegimeTPTConcept(),
+            Arrays.asList(
+                tbMetadata.getIsoniazidConcept(), tbMetadata.getIsoniazidePiridoxinaConcept()),
+            7));
+
+    return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
+  }
+
+  /**
+   * <b>Description:</b> Patients who have Outras Prescrições with the values (DT-INH) marked on
+   * Ficha Clínica - Mastercard during the previous reporting period (INH Start Date) and no other
+   * DT-INH values marked on Ficha Clinica in the 7 months prior to the INH Start Date
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CalculationResultMap}
+   */
+  private CalculationResultMap getOutrasPrescricoesIsoniazid(
+      Collection<Integer> cohort, PatientCalculationContext context) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("onOrAfter", context.getFromCache("onOrAfter"));
+    params.put("onOrBefore", context.getFromCache("onOrBefore"));
+    params.put("location", context.getFromCache("location"));
+
+    SqlPatientDataDefinition def = new SqlPatientDataDefinition();
+    def.addParameter(new Parameter("startDate", "onOrAfter", Date.class));
+    def.addParameter(new Parameter("endDate", "onOrBefore", Date.class));
+    def.addParameter(new Parameter("location", "location", Location.class));
+    def.setQuery(
+        TbPrevQueries.getRegimeTPTOrOutrasPrescricoes(
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            tbMetadata.getTreatmentPrescribedConcept(),
+            Arrays.asList(tbMetadata.getDtINHConcept()),
+            7));
+
+    return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
+  }
+
+  /**
+   * <b>Description:</b> Patients who have Outras Prescrições with the value “3HP” marked on Ficha
+   * Clínica - Mastercard during the previous reporting period (3HP Start Date) and no other 3HP
+   * prescriptions marked on Ficha-Clinica in the 4 months prior to the 3HP Start Date
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CalculationResultMap}
+   */
+  private CalculationResultMap getOutrasPrescricoes3HP(
+      Collection<Integer> cohort, PatientCalculationContext context) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("onOrAfter", context.getFromCache("onOrAfter"));
+    params.put("onOrBefore", context.getFromCache("onOrBefore"));
+    params.put("location", context.getFromCache("location"));
+
+    SqlPatientDataDefinition def = new SqlPatientDataDefinition();
+    def.addParameter(new Parameter("startDate", "onOrAfter", Date.class));
+    def.addParameter(new Parameter("endDate", "onOrBefore", Date.class));
+    def.addParameter(new Parameter("location", "location", Location.class));
+    def.setQuery(
+        TbPrevQueries.getRegimeTPTOrOutrasPrescricoes(
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            tbMetadata.getTreatmentPrescribedConcept(),
+            Arrays.asList(tbMetadata.get3HPConcept()),
+            4));
+
+    return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
+  }
+
+  /**
+   * <b>Description:</b> Patients who have Regime de TPT with the values “3HP or 3HP + Piridoxina”
+   * marked on the first pick-up date on Ficha de Levantamento de TPT (FILT) during the previous
+   * reporting period (3HP Start Date) and no other 3HP pick-ups marked on FILT in the 4 months
+   * prior to the 3HP Start Date
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  private CalculationResultMap getTpt3HP(
+      Collection<Integer> cohort, PatientCalculationContext context) {
+    Map<String, Object> params = new HashMap<>();
+    params.put("onOrAfter", context.getFromCache("onOrAfter"));
+    params.put("onOrBefore", context.getFromCache("onOrBefore"));
+    params.put("location", context.getFromCache("location"));
+
+    SqlPatientDataDefinition def = new SqlPatientDataDefinition();
+    def.addParameter(new Parameter("startDate", "onOrAfter", Date.class));
+    def.addParameter(new Parameter("endDate", "onOrBefore", Date.class));
+    def.addParameter(new Parameter("location", "location", Location.class));
+    def.setQuery(
+        TbPrevQueries.getRegimeTPTOrOutrasPrescricoes(
+            tbMetadata.getRegimeTPTEncounterType(),
+            tbMetadata.getRegimeTPTConcept(),
+            Arrays.asList(tbMetadata.get3HPConcept(), tbMetadata.get3HPPiridoxinaConcept()),
+            4));
+
+    return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
   }
 }
