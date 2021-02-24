@@ -53,7 +53,6 @@ public class TXCXCACalculation extends AbstractPatientCalculation {
     Concept leepConcept = hivMetadata.getLeepConcept();
     Concept conizationConcept = hivMetadata.getconizationConcept();
 
-
     CalculationResultMap aaResultMap =
         calculate(
             Context.getRegisteredComponents(CXCASCRNAACalculation.class).get(0),
@@ -83,7 +82,7 @@ public class TXCXCACalculation extends AbstractPatientCalculation {
             null,
             TimeQualifier.ANY,
             null,
-                endDate,
+            endDate,
             EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
             context);
 
@@ -97,7 +96,7 @@ public class TXCXCACalculation extends AbstractPatientCalculation {
                 pediatricNursingConcept, thermocoagulationConcept, leepConcept, conizationConcept),
             TimeQualifier.ANY,
             null,
-                endDate,
+            endDate,
             EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
             context);
 

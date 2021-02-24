@@ -164,42 +164,17 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
   private CalculationResultMap getAA4Map(
       HivMetadata hivMetadata, Collection<Integer> cohort, PatientCalculationContext context) {
     SqlPatientDataDefinition def = new SqlPatientDataDefinition();
-    def.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    def.addParameter(new Parameter("location", "location", Location.class));
+    def.addParameter(new Parameter(ON_OR_AFTER, ON_OR_AFTER, Date.class));
+    def.addParameter(new Parameter(LOCATION, LOCATION, Location.class));
 
-    String part1 =
-        CXCASCRNQueries.getAA1OrAA2Query(
-            CXCASCRNCohortQueries.CXCASCRNResult.ANY,
-            true,
-            true,
-            hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getResultadoViaConcept().getConceptId(),
-            hivMetadata.getNegative().getConceptId(),
-            hivMetadata.getPositive().getConceptId(),
-            hivMetadata.getSuspectedCancerConcept().getConceptId());
-
-    String part2 =
-        CXCASCRNQueries.getAA1OrAA2Query(
-            CXCASCRNCohortQueries.CXCASCRNResult.ANY,
-            false,
-            true,
-            hivMetadata.getRastreioDoCancroDoColoUterinoEncounterType().getEncounterTypeId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getResultadoViaConcept().getConceptId(),
-            hivMetadata.getNegative().getConceptId(),
-            hivMetadata.getPositive().getConceptId(),
-            hivMetadata.getSuspectedCancerConcept().getConceptId());
-
-    String sql = part1 + " UNION " + part2;
+    String sql =
+        CXCASCRNQueries.getAA3OrAA4Query(
+            CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE, hivMetadata, true);
 
     def.setQuery(sql);
-
     Map<String, Object> params = new HashMap<>();
-    params.put("location", context.getFromCache("location"));
-    params.put("onOrAfter", context.getFromCache("onOrAfter"));
+    params.put(LOCATION, context.getFromCache(LOCATION));
+    params.put(ON_OR_AFTER, context.getFromCache(ON_OR_AFTER));
     return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
   }
 }
