@@ -616,6 +616,136 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
+
+  /**
+   * <b>Name: Indicator ID</b>
+   *
+   * <p><b>Description:</b> Filter all patients registered in encounter “LIVRO DE REGISTO DIÁRIO DE CHAMADAS E VISITAS DOMICILIARES”
+   * (encounter_type = 61) with following conditions:  /**
+   * <b>Name: PatientsRegisteredInLogBook - D </b>
+   *
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsRegisteredInLogBook(String indicatorFlag) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName(
+        "D: patients registered in encounter “LIVRO DE REGISTO DIÁRIO DE CHAMADAS E VISITAS DOMICILIARES");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put(
+        "61",
+        hivMetadata
+            .getLivroRegistoChamadasVisistasDomiciliaresEncounterType()
+            .getEncounterTypeId());
+    map.put("23998", hivMetadata.getPatientContactedOnFirstAttemptConcept().getConceptId());
+    map.put("23999", hivMetadata.getPatientContactedOnSecondAttemptConcept().getConceptId());
+    map.put("24000", hivMetadata.getPatientContactedOnThirdAttemptConcept().getConceptId());
+    map.put("24001", hivMetadata.getDateAgreedForReturnOnFirstCallConcept().getConceptId());
+    map.put("24002", hivMetadata.getDateAgreedForReturnOnSecondCallConcept().getConceptId());
+    map.put("24003", hivMetadata.getDateAgreedForReturnOnThirdCallConcept().getConceptId());
+    map.put("24008", hivMetadata.getPatientFoundOnFirstAttemptConcept().getConceptId());
+    map.put("24009", hivMetadata.getPatientFoundOnSecondAttemptConcept().getConceptId());
+    map.put("24010", hivMetadata.getPatientFoundOnThirdAttemptConcept().getConceptId());
+    map.put("23933", hivMetadata.getReturnDateOnFirstAttemptConcept().getConceptId());
+    map.put("23934", hivMetadata.getReturnDateOnSecondAttemptConcept().getConceptId());
+    map.put("23935", hivMetadata.getReturnDateOnThirdAttemptConcept().getConceptId());
+
+    String query =
+      "SELECT p.patient_id " +
+              "FROM   patient p " +
+              "       INNER JOIN encounter e " +
+              "               ON e.encounter_id = p.patient_id " +
+              "       INNER JOIN obs o " +
+              "               ON o.encounter_id = e.encounter_id " +
+              "       INNER JOIN obs o1 " +
+              "               ON o1.encounter_id = e.encounter_id " +
+              "WHERE  e.encounter_id = ${61} " +
+              "       AND e.voided = 0 " +
+              "       AND e.location_id = :location " +
+              "       AND o.voided = 0 " +
+              "       AND p.voided = 0 ";
+
+    if(indicatorFlag.equalsIgnoreCase("D1")){
+      query += " AND ((o.concept_id = ${23998}  AND o.value_coded = ${1065}) OR " +
+              " (o.concept_id = ${23999}  AND o.value_coded = ${1065}) OR " +
+              " (o.concept_id = ${24000}  AND o.value_coded = ${1065}))";
+    }
+
+    if(indicatorFlag.equalsIgnoreCase("D2")){
+      query += " AND ((o.concept_id = ${24001}  AND o.value_datetime IS NOT NULL) OR " +
+              " (o.concept_id = ${24002}  AND o.value_datetime IS NOT NULL) OR " +
+              " (o.concept_id = ${24003}  AND o.value_datetime IS NOT NULL))";
+    }
+
+    if(indicatorFlag.equalsIgnoreCase("D3")){
+      query += " AND ((o.concept_id = ${24008}  AND o.value_coded = ${1065}) OR " +
+              " (o.concept_id = ${24009}  AND o.value_coded = ${1065}) OR " +
+              " (o.concept_id = ${24010}  AND o.value_coded = ${1065}))";
+    }
+
+    if(indicatorFlag.equalsIgnoreCase("D4")){
+      query += " AND ((o.concept_id = ${23933}  AND o.value_datetime IS NOT NULL) OR " +
+              " (o.concept_id = ${23934}  AND o.value_datetime IS NOT NULL) OR " +
+              " (o.concept_id = ${23935}  AND o.value_datetime IS NOT NULL))";
+    }
+
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+
+   /**
+   * D1- ‘Contactado na 1ª Tentativa ’(concept_id = 23998) value coded ‘SIM’ (concept_id =1065 )
+   *    or ‘Contactado na 2ª Tentativa ’(concept_id = 23999) value coded ‘SIM’ (concept_id =1065 )
+   *    or ‘Contactado na 3ª Tentativa ’(concept_id = 24000) value coded ‘SIM’ (concept_id =1065 )
+   *
+   * D2- And ‘Data Combinada de Retorno na 1ª  Tentativa’ (concept_id=24001) not null
+   *    or ‘Data Combinada de Retorno na 2ª  Tentativa’ (concept_id = 24002) not null
+   *    or ‘Data Combinada de Retorno na 3ª  Tentativa’ (concept_id=24003) not null; OR
+   *
+   * D3- ‘Encontrado na 1ª Tentativa ’(concept_id = 24008) value coded ‘SIM’ (concept_id =1065 )
+   *    or ‘Encontrado na 2ª Tentativa ’(concept_id = 24009) value coded ‘SIM’ (concept_id =1065 )
+   *    or ‘Encontrado na 3ª Tentativa ’(concept_id = 24010) value coded ‘SIM’ (concept_id =1065 )
+   *
+   * D4- And ‘Data Combinada de Retorno na 1ª  Tentativa’ (concept_id=23933) not null
+   *    or ‘Data Combinada de Retorno na 2ª  Tentativa’ (concept_id = 23934) not null
+   *    or ‘Data Combinada de Retorno na 3ª  Tentativa’ (concept_id=23935) not null;
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getD() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients registered in encounter “LIVRO DE REGISTO DIÁRIO DE CHAMADAS E VISITAS DOMICILIARES”");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch("D1", map(this.getPatientsRegisteredInLogBook("D1"),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch("D2", map(this.getPatientsRegisteredInLogBook("D2"),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch("D3", map(this.getPatientsRegisteredInLogBook("D3"),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch("D4", map(this.getPatientsRegisteredInLogBook("D4"),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("(D1 AND D2) OR (D3 AND D4)");
+
+    return cd;
+  }
+
+
+
   private CohortDefinition getStartedArtBeforeDate(boolean considerTransferredIn) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
