@@ -2053,19 +2053,18 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
-    if (indicatorFlag.equals("A") || indicatorFlag.equals("C")) {
+    if (indicatorFlag.equals("A")) {
       compositionCohortDefinition.setCompositionString(
           "(A AND B1) AND  NOT B1E  AND  NOT  (C OR D OR F)");
     }
-    if (indicatorFlag.equals("B") || indicatorFlag.equals("D")) {
+    if (indicatorFlag.equals("B")) {
       compositionCohortDefinition.setCompositionString(
           "(A AND B2) AND  NOT B2E  AND  NOT  (C OR D OR F)");
     }
-    if (indicatorFlag.equals("E")) {
-      compositionCohortDefinition.setCompositionString("(A AND B1 AND C) AND NOT (D OR E)");
-    }
+
     if (indicatorFlag.equals("F")) {
-      compositionCohortDefinition.setCompositionString("A AND NOT   (C OR D OR E OR F)");
+      compositionCohortDefinition.setCompositionString(
+          "(A AND B1 AND C) AND NOT B1E AND NOT (D OR F)");
     }
 
     return compositionCohortDefinition;
@@ -2350,6 +2349,7 @@ public class QualityImprovement2020CohortQueries {
     query.append("                        AND e.encounter_type = ${6} ");
     query.append("                        AND e.location_id = :location ");
     query.append("                        AND e.encounter_datetime = :revisionEndDate ");
+    query.append("                     GROUP BY p.patient_id");
     query.append(")  AS last_ficha ON last_ficha.patient_id = p.patient_id ");
     query.append(" WHERE");
     query.append("    p.voided = 0 ");
@@ -3332,21 +3332,21 @@ public class QualityImprovement2020CohortQueries {
         comp.setName(
             "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
         break;
+      case 5:
+        comp.setName(
+            " # de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV\n");
+        break;
       case 6:
         comp.setName(
-            "# de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
+            "de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
         break;
-      case 7:
-        comp.setName(
-            "# de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
-        break;
-      case 10:
+      case 9:
         comp.setName(
             "# de mulheres grávidas HIV+  que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
         break;
-      case 11:
+      case 10:
         comp.setName(
-            "# de mulheres grávidas HIV+  que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
+            "# de mulheres grávidas HIV+  que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV ");
         break;
     }
 
@@ -3405,9 +3405,14 @@ public class QualityImprovement2020CohortQueries {
 
     if (den == 1 || den == 2) {
       comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND ADULT");
-    } else if (den == 6 || den == 7) {
+    }
+    if (den == 5) {
       comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND CHILDREN");
-    } else if (den == 10 || den == 11) {
+    } else if (den == 6) {
+      comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND CHILDREN");
+    } else if (den == 9) {
+      comp.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
+    } else if (den == 10) {
       comp.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
     }
     return comp;
