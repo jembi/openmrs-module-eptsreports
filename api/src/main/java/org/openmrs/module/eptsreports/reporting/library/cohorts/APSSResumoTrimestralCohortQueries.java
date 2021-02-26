@@ -383,6 +383,7 @@ public class APSSResumoTrimestralCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
         "SELECT "
@@ -449,7 +450,7 @@ public class APSSResumoTrimestralCohortQueries {
    */
   public CohortDefinition getB() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("A: ");
+    cd.setName("B: ");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -459,6 +460,7 @@ public class APSSResumoTrimestralCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
         "SELECT "
@@ -520,11 +522,9 @@ public class APSSResumoTrimestralCohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    String mapping = "startDate=${startDate},endDate=${revisionEndDate},location=${location}";
+    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     CohortDefinition A = getA();
     CohortDefinition B = getB();
