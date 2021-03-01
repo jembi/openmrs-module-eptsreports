@@ -1220,4 +1220,52 @@ public class QualityImprovement2020Queries {
 
     return sqlCohortDefinition;
   }
+  /**
+   * Revised B13 for the MQ 15 indicators
+   *
+   * @return CohortDefinition
+   */
+  public static CohortDefinition getPatientsWithAtLeastAdrugPickup(
+      int encpounterType52, int encounterType18, int dateOfArtPickup, int returnVisitDateForArv) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("B13 for MQ CAT 15");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", encounterType18);
+    map.put("52", encpounterType52);
+    map.put("23866", dateOfArtPickup);
+    map.put("5096", returnVisitDateForArv);
+
+    String query =
+        " SELECT p.patient_id FROM patient p"
+            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+            + " INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + " WHERE e.encounter_type = ${18} "
+            + " AND e.voided = 0 "
+            + " AND o.voided = 0 "
+            + " AND p.voided = 0 "
+            + " AND o.concept_id = ${5096} "
+            + " AND e.encounter_datetime <=:endDate "
+            + " AND o.value_datetime IS NOT NULL "
+            + " UNION "
+            + " SELECT p.patient_id FROM patient p"
+            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+            + " INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + " WHERE e.encounter_type = ${52} "
+            + " AND e.voided = 0 "
+            + " AND o.voided = 0 "
+            + " AND p.voided = 0 "
+            + " AND o.concept_id = ${23866} "
+            + " AND o.value_datetime IS NOT NULL "
+            + " AND e.encounter_datetime <=:endDate ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
