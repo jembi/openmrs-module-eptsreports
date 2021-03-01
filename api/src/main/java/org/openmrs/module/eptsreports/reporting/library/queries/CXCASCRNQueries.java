@@ -93,17 +93,18 @@ public class CXCASCRNQueries {
       query.append(" SELECT final.patient_id ");
       query.append(" FROM( ");
     }
-    query.append(
-        "    SELECT most_recent.patient_id, MAX(most_recent.recent_date) AS  recent_date ");
-    query.append("    FROM ( ");
-    query.append("             SELECT p.patient_id, e.encounter_datetime AS recent_date ");
-    query.append("             FROM patient p ");
+    query.append("      SELECT p.patient_id, most_recent.recent_datetime ");
+    query.append("      FROM patient p ");
     query.append("                      INNER JOIN encounter e ");
     query.append("                                 ON e.patient_id = p.patient_id ");
     query.append("                      INNER JOIN obs o ");
     query.append("                                 ON o.encounter_id = e.encounter_id ");
     query.append("                      INNER JOIN ");
     query.append("                     ( ");
+
+    query.append(
+        "            SELECT recent.patient_id, MAX(recent.x_datetime) AS recent_datetime ");
+    query.append("            FROM (");
     query.append(
         "                      SELECT p.patient_id, MAX(e.encounter_datetime) AS x_datetime ");
     query.append("                      FROM patient p ");
@@ -114,36 +115,30 @@ public class CXCASCRNQueries {
     query.append("                      WHERE p.voided = 0 ");
     query.append("                        AND e.voided = 0 ");
     query.append("                        AND o.voided = 0 ");
-    query.append("                        AND e.encounter_datetime < '2020-12-20' ");
+    query.append("                        AND e.encounter_datetime < :onOrAfter ");
     query.append("                        AND e.location_id = :location ");
-    query.append("                        AND e.encounter_type IN (${6}, ${28}) ");
+    query.append("                        AND e.encounter_type = ${28} ");
     query.append("                        AND o.concept_id = ${2094} ");
     query.append("                        AND o.value_coded IS NOT NULL ");
     query.append("                      GROUP BY p.patient_id ");
-    query.append("                  ) AS recent ON recent.patient_id = p.patient_id ");
-    query.append("             WHERE p.voided = 0 ");
-    query.append("               AND e.voided = 0 ");
-    query.append("               AND o.voided = 0 ");
-    query.append("               AND e.encounter_datetime = recent.patient_id ");
-    query.append("               AND e.location_id = :location ");
-    query.append("               AND e.encounter_type IN (${6}, ${28}) ");
-    query.append("               AND o.concept_id = ${2094} ");
-    if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.NEGATIVE) {
-      query.append("               AND o.value_coded = ${664} ");
-    }
-    if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE) {
-      query.append("               AND o.value_coded = ${703} ");
-    }
-    query.append(" ");
-    query.append("             UNION ");
-    query.append(" ");
-    query.append("             SELECT p.patient_id, o.value_datetime AS recent_date ");
-    query.append("             FROM patient p ");
-    query.append("                      INNER JOIN encounter e ");
-    query.append("                                 ON e.patient_id = p.patient_id ");
-    query.append("                      INNER JOIN obs o ");
-    query.append("                                 ON o.encounter_id = e.encounter_id ");
-    query.append("                      INNER JOIN ( ");
+    query.append("                 UNION ");
+    query.append(
+        "                      SELECT p.patient_id, MAX(e.encounter_datetime) AS x_datetime ");
+    query.append("                      FROM patient p ");
+    query.append("                               INNER JOIN encounter e ");
+    query.append("                                          ON e.patient_id = p.patient_id ");
+    query.append("                               INNER JOIN obs o ");
+    query.append("                                          ON o.encounter_id = e.encounter_id ");
+    query.append("                      WHERE p.voided = 0 ");
+    query.append("                        AND e.voided = 0 ");
+    query.append("                        AND o.voided = 0 ");
+    query.append("                        AND e.encounter_datetime < :onOrAfter ");
+    query.append("                        AND e.location_id = :location ");
+    query.append("                        AND e.encounter_type = ${6} ");
+    query.append("                        AND o.concept_id = ${2094} ");
+    query.append("                        AND o.value_coded IS NOT NULL ");
+    query.append("                      GROUP BY p.patient_id ");
+    query.append("                 UNION ");
     query.append("                 SELECT p.patient_id, MAX(o.value_datetime) AS x_datetime ");
     query.append("                 FROM patient p ");
     query.append("                          INNER JOIN encounter e ");
@@ -155,17 +150,24 @@ public class CXCASCRNQueries {
     query.append("                   AND o.voided = 0 ");
     query.append("                   AND e.encounter_type = ${53} ");
     query.append("                   AND e.location_id = :location ");
-    query.append("                   AND o.value_datetime < '2020-12-20' ");
+    query.append("                   AND o.value_datetime < :onOrAfter ");
     query.append("                   AND o.concept_id = ${2094} ");
     query.append("                   AND o.value_coded IS NOT NULL ");
     query.append("                 GROUP BY p.patient_id ");
-    query.append("             ) AS recent ON recent.patient_id = p.patient_id ");
+    query.append("                  ) AS recent  ");
+    query.append("       GROUP BY recent.patient_id");
+    query.append("            ) AS most_recent  ON most_recent.patient_id = p.patient_id ");
     query.append("             WHERE p.voided = 0 ");
     query.append("               AND e.voided = 0 ");
     query.append("               AND o.voided = 0 ");
-    query.append("               AND e.encounter_type = ${53} ");
+    query.append("               AND (  ");
+    query.append(
+        "                    (e.encounter_type = ${53}  AND o.value_datetime = most_recent.recent_datetime)");
+    query.append("                             OR");
+    query.append(
+        "                     (e.encounter_type IN (${6},${28})  AND e.encounter_datetime = most_recent.recent_datetime)");
+    query.append("                   ) ");
     query.append("               AND e.location_id = :location ");
-    query.append("               AND o.value_datetime = recent.x_datetime ");
     query.append("               AND o.concept_id = ${2094} ");
     if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.NEGATIVE) {
       query.append("               AND o.value_coded = ${664} ");
@@ -173,8 +175,6 @@ public class CXCASCRNQueries {
     if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE) {
       query.append("               AND o.value_coded = ${703} ");
     }
-    query.append("         ) AS most_recent ");
-    query.append("    GROUP BY most_recent.patient_id ");
     if (!isMap) {
       query.append("    ) AS final ");
     }
