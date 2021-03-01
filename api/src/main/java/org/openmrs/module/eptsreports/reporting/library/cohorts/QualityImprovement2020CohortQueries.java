@@ -6149,43 +6149,32 @@ public class QualityImprovement2020CohortQueries {
             getMQ15DEN(1),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
-        "suspended",
-        EptsReportUtils.map(
-            resumoMensalCohortQueries.getPatientsWhoSuspendedTreatmentB6(false),
-            "onOrBefore=${revisionEndDate},location=${location}"));
-    comp.addSearch(
-        "abandoned",
-        EptsReportUtils.map(
-            resumoMensalCohortQueries.getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
-            "date=${revisionEndDate},location=${location}"));
-    comp.addSearch(
-        "dead",
-        EptsReportUtils.map(
-            resumoMensalCohortQueries.getPatientsWhoDied(false),
-            "onOrBefore=${revisionEndDate},locationList=${location}"));
-
-    comp.addSearch(
         "Den5",
         EptsReportUtils.map(
             getMQ15DEN(5),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    comp.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            getCombinedB13ForCat15Indicators(),
+            "revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (num == 1) {
-      comp.setCompositionString("Den1 AND NOT (suspended OR abandoned OR dead)");
+      comp.setCompositionString("Den1 AND B13");
     } else if (num == 2) {
       comp.setCompositionString("Den1 AND H1");
     } else if (num == 3) {
-      comp.setCompositionString("Den1 AND H2 AND NOT (suspended OR abandoned OR dead)");
+      comp.setCompositionString("Den1 AND H2 AND B13");
     } else if (num == 4) {
-      comp.setCompositionString("Den1 AND I AND NOT (suspended OR abandoned OR dead)");
+      comp.setCompositionString("Den1 AND I AND B13");
     } else if (num == 5 || num == 6) {
-      comp.setCompositionString("Den5 AND NOT (suspended OR abandoned OR dead)");
+      comp.setCompositionString("Den5 AND B13");
     } else if (num == 7 || num == 8) {
       comp.setCompositionString("Den5 AND H1");
     } else if (num == 9 || num == 10) {
-      comp.setCompositionString("Den5 AND H2 AND NOT (suspended OR abandoned OR dead)");
+      comp.setCompositionString("Den5 AND H2 AND B13");
     } else if (num == 11 || num == 12) {
-      comp.setCompositionString("Den5 AND I AND NOT (suspended OR abandoned OR dead)");
+      comp.setCompositionString("Den5 AND I AND B13");
     }
     return comp;
   }
@@ -6750,6 +6739,49 @@ public class QualityImprovement2020CohortQueries {
             "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate},locationList=${location}"));
     cd.addSearch("F", EptsReportUtils.map(women, ""));
     cd.setCompositionString("(P OR B) AND F");
+    return cd;
+  }
+
+  /**
+   * Combined B13 for the CAT15 indicators Active patients excluding suspended, abandoned, dead and
+   * transferout by end revision date
+   */
+  private CohortDefinition getCombinedB13ForCat15Indicators() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("B13 for the MQ CAT 15 indicators ");
+    cd.addParameter(new Parameter("revisionEndDate", "End revision Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "Active",
+        EptsReportUtils.map(
+            QualityImprovement2020Queries.getPatientsWithAtLeastAdrugPickup(
+                hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+                hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+                hivMetadata.getArtDatePickupMasterCard().getConceptId(),
+                hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId()),
+            "endDate=${revisionEndDate},location{location}"));
+    cd.addSearch(
+        "suspended",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoSuspendedTreatmentB6(false),
+            "onOrBefore=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "abandoned",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
+            "date=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "dead",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoDied(false),
+            "onOrBefore=${revisionEndDate},locationList=${location}"));
+    cd.addSearch(
+        "TO",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsTransferredOutB5(true),
+            "onOrBefore=${revisionEndDate},location=${location}"));
+    cd.setCompositionString("Active AND NOT (suspended OR abandoned OR dead OR TO)");
+
     return cd;
   }
 }
