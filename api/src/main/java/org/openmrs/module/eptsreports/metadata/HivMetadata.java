@@ -3572,7 +3572,6 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-
   /**
    * <b>concept_id = 23933</b>
    *
@@ -3584,8 +3583,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getReturnDateOnFirstAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.returnDateOnFirstAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.returnDateOnFirstAttemptConceptUuid");
     return getConcept(uuid);
   }
 
@@ -3600,8 +3599,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getReturnDateOnSecondAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.returnDateOnSecondAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.returnDateOnSecondAttemptConceptUuid");
     return getConcept(uuid);
   }
 
@@ -3616,8 +3615,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getReturnDateOnThirdAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.returnDateOnThirdAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.returnDateOnThirdAttemptConceptUuid");
     return getConcept(uuid);
   }
   /**
@@ -3679,11 +3678,10 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getPatientContactedOnFirstAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.contactedOnFirstAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.contactedOnFirstAttemptConceptUuid");
     return getConcept(uuid);
   }
-
 
   /**
    * <b>concept_id = 23999</b>
@@ -3696,11 +3694,10 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getPatientContactedOnSecondAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.contactedOnSecondAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.contactedOnSecondAttemptConceptUuid");
     return getConcept(uuid);
   }
-
 
   /**
    * <b>concept_id = 24000</b>
@@ -3713,8 +3710,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getPatientContactedOnThirdAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.contactedOnThirdAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.contactedOnThirdAttemptConceptUuid");
     return getConcept(uuid);
   }
 
@@ -3729,8 +3726,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getDateAgreedForReturnOnFirstCallConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.dateAgreedForReturnOnFirstCallConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.dateAgreedForReturnOnFirstCallConceptUuid");
     return getConcept(uuid);
   }
 
@@ -3745,8 +3742,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getDateAgreedForReturnOnSecondCallConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.dateAgreedForReturnOnSecondCallConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.dateAgreedForReturnOnSecondCallConceptUuid");
     return getConcept(uuid);
   }
 
@@ -3761,11 +3758,10 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getDateAgreedForReturnOnThirdCallConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.dateAgreedForReturnOnThirdCallConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.dateAgreedForReturnOnThirdCallConceptUuid");
     return getConcept(uuid);
   }
-
 
   /**
    * <b>concept_id = 24004</b>
@@ -3799,8 +3795,6 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-
-
   /**
    * <b>concept_id = 24008</b>
    *
@@ -3812,11 +3806,10 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getPatientFoundOnFirstAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.patientFoundOnFirstAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.patientFoundOnFirstAttemptConceptUuid");
     return getConcept(uuid);
   }
-
 
   /**
    * <b>concept_id = 24009</b>
@@ -3829,11 +3822,10 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getPatientFoundOnSecondAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.patientFoundOnSecondAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.patientFoundOnSecondAttemptConceptUuid");
     return getConcept(uuid);
   }
-
 
   /**
    * <b>concept_id = 24010</b>
@@ -3846,11 +3838,10 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getPatientFoundOnThirdAttemptConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.patientFoundOnThirdAttemptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.patientFoundOnThirdAttemptConceptUuid");
     return getConcept(uuid);
   }
-
 
   /**
    * <b>concept_id = 24011</b>
