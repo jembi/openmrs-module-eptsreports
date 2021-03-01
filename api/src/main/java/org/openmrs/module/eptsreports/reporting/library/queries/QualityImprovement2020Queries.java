@@ -1260,7 +1260,7 @@ public class QualityImprovement2020Queries {
             + " AND p.voided = 0 "
             + " AND o.concept_id = ${23866} "
             + " AND o.value_datetime IS NOT NULL "
-            + " AND e.encounter_datetime <=:endDate ";
+            + " AND o.value_datetime <=:endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
