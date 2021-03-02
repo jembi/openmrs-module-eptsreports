@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import ca.uhn.hl7v2.model.v25.message.TBR_R08;
 import org.joda.time.Days;
 import org.joda.time.Interval;
 import org.openmrs.EncounterType;
@@ -27,6 +29,7 @@ import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.ListResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
@@ -60,6 +63,9 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
 
   @Autowired private HivMetadata hivMetadata;
 
+  @Autowired private TbMetadata tbMetadata;
+
+
   @Autowired private EPTSCalculationService ePTSCalculationService;
 
   @SuppressWarnings("unused")
@@ -83,6 +89,8 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
           EptsCalculationUtils.addMonths(onOrAfter, TREATMENT_BEGIN_PERIOD_OFFSET);
       Date completionPeriodEndDate =
           EptsCalculationUtils.addMonths(onOrBefore, COMPLETION_PERIOD_OFFSET);
+
+      EncounterType regimeTPTEncounterType =tbMetadata.getRegimeTPTEncounterType();
 
       final List<EncounterType> consultationEncounterTypes =
           Arrays.asList(
@@ -111,6 +119,10 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               beginPeriodStartDate,
               onOrAfter,
               context);
+
+      //CalculationResultMap
+
+
       CalculationResultMap endProfilaxiaObservations =
           ePTSCalculationService.lastObs(
               hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept(),
