@@ -6147,7 +6147,10 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             h2, "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("I", EptsReportUtils.map(i, MAPPING1));
+    comp.addSearch(
+        "I",
+        EptsReportUtils.map(
+            i, "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "Den1",
