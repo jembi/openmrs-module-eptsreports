@@ -686,7 +686,7 @@ public class QualityImprovement2020Queries {
             + " AND o.voided = 0 "
             + " AND o.concept_id = ${23722} "
             + " AND o.value_coded = ${856} "
-            + " AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
+            + " AND e.encounter_datetime <= :revisionEndDate "
             + " AND e.encounter_datetime > fin.encounter_datetime) h1 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -821,7 +821,7 @@ public class QualityImprovement2020Queries {
             + " AND e.encounter_datetime <= :revisionEndDate "
             + " AND e.encounter_datetime > fin.encounter_datetime) h1 ) h11 "
             + " ON vl.patient_id = h11.patient_id "
-            + " WHERE vl.encounter_datetime BETWEEN :startDate AND :revisionEndDate AND vl.encounter_datetime > h11.encounter_datetime ";
+            + " WHERE vl.encounter_datetime <=:revisionEndDate AND vl.encounter_datetime > h11.encounter_datetime ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -957,7 +957,7 @@ public class QualityImprovement2020Queries {
             + " AND e.encounter_datetime <= :revisionEndDate "
             + " AND e.encounter_datetime > fin.encounter_datetime) h1 ) h11 "
             + " ON vl.patient_id = h11.patient_id "
-            + " WHERE vl.encounter_datetime BETWEEN :startDate AND :revisionEndDate AND vl.encounter_datetime > h11.encounter_datetime ";
+            + " WHERE vl.encounter_datetime <=:revisionEndDate AND vl.encounter_datetime > h11.encounter_datetime ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
