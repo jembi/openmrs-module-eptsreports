@@ -299,9 +299,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
               first3HPOr3HPPlusPiridoxinaDate);
       return Collections.min(dates);
     } else {
-      if (fichaClinicaMasterCardDate.getObsDatetime() != null) {
-        return fichaClinicaMasterCardDate.getObsDatetime();
-      } else if (getDateFromObs(seguimentoOrFichaResumoDate) != null) {
+      if (getDateFromObs(seguimentoOrFichaResumoDate) != null) {
         return getDateFromObs(seguimentoOrFichaResumoDate);
       } else if (firstINHDate != null) {
         return firstINHDate;
@@ -309,8 +307,10 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         return firstDtINHDate;
       } else if (first3HPDate != null) {
         return first3HPDate;
-      } else {
+      } else if (first3HPOr3HPPlusPiridoxinaDate != null) {
         return first3HPOr3HPPlusPiridoxinaDate;
+      } else {
+        return fichaClinicaMasterCardDate.getObsDatetime();
       }
     }
   }
