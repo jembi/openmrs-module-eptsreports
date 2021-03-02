@@ -36,8 +36,8 @@ public class TbPrevQueries {
             + "                 AND e.encounter_type = ${encounterType} "
             + "                 AND o.concept_id = ${question} "
             + "                 AND o.value_coded IN (${answers}) "
-            + "                 AND DATE(e.encounter_datetime) >= DATE_SUB(:startDate, INTERVAL 6 MONTH) "
-            + "                 AND DATE(e.encounter_datetime) <= DATE_SUB(:endDate, INTERVAL 6 MONTH) "
+            + "                 AND e.encounter_datetime >= :startDate "
+            + "                 AND e.encounter_datetime <= :endDate "
             + "             GROUP BY p.patient_id) AS inh "
             + " WHERE p.patient_id NOT IN ( SELECT patient_id  "
             + "                             FROM patient p "
@@ -48,10 +48,10 @@ public class TbPrevQueries {
             + "                                  AND e.encounter_type = ${encounterType} "
             + "                                  AND o.concept_id = ${question} "
             + "                                  AND o.value_coded IN (${answers}) "
-            + "                                  AND DATE(e.encounter_datetime) >= DATE_SUB(inh.first_pickup_date, INTERVAL "
+            + "                                  AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL "
             + boundary
             + " MONTH)  "
-            + "                                  AND DATE(e.encounter_datetime) < DATE(inh.first_pickup_date)) ";
+            + "                                  AND e.encounter_datetime < inh.first_pickup_date) ";
 
     Map<String, String> map = new HashMap<>();
     map.put("encounterType", String.valueOf(encounterType.getEncounterTypeId()));
