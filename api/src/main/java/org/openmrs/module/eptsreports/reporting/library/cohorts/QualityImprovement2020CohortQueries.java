@@ -6137,9 +6137,15 @@ public class QualityImprovement2020CohortQueries {
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("H1", EptsReportUtils.map(h1, MAPPING1));
+    comp.addSearch(
+        "H1",
+        EptsReportUtils.map(
+            h1, "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    comp.addSearch("H2", EptsReportUtils.map(h2, MAPPING1));
+    comp.addSearch(
+        "H2",
+        EptsReportUtils.map(
+            h2, "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("I", EptsReportUtils.map(i, MAPPING1));
 
