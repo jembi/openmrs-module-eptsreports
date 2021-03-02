@@ -4097,7 +4097,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "B1",
         EptsReportUtils.map(
-            lastClinical, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+            lastClinical, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     if (line == 1) {
       compositionCohortDefinition.addSearch(

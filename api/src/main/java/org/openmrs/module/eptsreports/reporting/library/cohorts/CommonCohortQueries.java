@@ -440,7 +440,7 @@ public class CommonCohortQueries {
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND e.encounter_type = ${6}  "
             + "             AND e.location_id = :location  "
-            + "             AND e.encounter_datetime > :startDate AND e.encounter_datetime <= :endDate  "
+            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "     GROUP BY p.patient_id) AS list";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
