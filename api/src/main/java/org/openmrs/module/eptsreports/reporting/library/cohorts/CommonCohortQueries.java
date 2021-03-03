@@ -899,4 +899,67 @@ public class CommonCohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   * <b>Description:</b> MQ- New Query For pregnant or Breastfeeding patients
+   * <li>C - All female patients registered as “Pregnant” (concept_id 1982, value_coded equal to
+   *     concept_id 1065) on Last Clinical Consultation (encounter type 6, encounter_datetime)
+   *     occurred during the revision period (encounter_datetime >= startDateInclusion and <=
+   *     endDateRevision)
+   * <li>C - All female patients registered as “Pregnant” (concept_id 6332, value_coded equal to
+   *     concept_id 1065) on Last Clinical Consultation (encounter type 6, encounter_datetime)
+   *     occurred during the revision period (encounter_datetime >= startDateInclusion and <=
+   *     endDateRevision)
+   *
+   * @param question
+   * @param answer
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getNewMQPregnantORBreastfeeding(int question, int answer) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Pregnant Or Breastfeeding");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("question", question);
+    map.put("answer", answer);
+
+    String query =
+        " SELECT p.person_id p "
+            + "FROM   person p "
+            + "       JOIN encounter e "
+            + "         ON e.patient_id = p.person_id "
+            + "       JOIN obs o "
+            + "         ON o.encounter_id = e.encounter_id "
+            + "       JOIN (SELECT p.patient_id, "
+            + "                    Max(e.encounter_datetime) AS clinical_encounter "
+            + "             FROM   patient p "
+            + "                    JOIN encounter e "
+            + "                      ON e.patient_id = p.patient_id "
+            + "                    JOIN obs o "
+            + "                      ON o.encounter_id = e.encounter_id "
+            + "             WHERE  e.encounter_type = ${6} "
+            + "                    AND e.location_id = :location "
+            + "                    AND e.voided = 0 "
+            + "                    AND o.voided = 0 "
+            + "                    AND p.voided = 0 "
+            + "                    AND e.encounter_datetime BETWEEN "
+            + "                        :startDate AND :revisionEndDate "
+            + "             GROUP  BY p.patient_id) last_clinical "
+            + "         ON last_clinical.patient_id = p.person_id "
+            + " WHERE  last_clinical.clinical_encounter = e.encounter_datetime "
+            + "       AND p.gender = 'F' "
+            + "       AND o.concept_id = ${question} "
+            + "       AND o.value_coded = ${answer}  ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }

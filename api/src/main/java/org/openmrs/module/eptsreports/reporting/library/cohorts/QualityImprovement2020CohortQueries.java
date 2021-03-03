@@ -4021,6 +4021,16 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
 
+    CohortDefinition pregnant = commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId()
+    );
+
+    CohortDefinition brestfeeding = commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId()
+    );
+
     CohortDefinition firstLine6Months =
         commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
             false,
@@ -4097,7 +4107,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "B1",
         EptsReportUtils.map(
-            lastClinical, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            lastClinical,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     if (line == 1) {
       compositionCohortDefinition.addSearch(
