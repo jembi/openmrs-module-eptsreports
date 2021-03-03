@@ -633,9 +633,9 @@ public class QualityImprovement2020Queries {
 
     String query =
         " SELECT patient_id FROM ( "
-            + " SELECT p.patient_id,e.encounter_datetime FROM patient p "
-            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " SELECT pout.patient_id,eout.encounter_datetime FROM patient pout "
+            + " INNER JOIN encounter eout ON pout.patient_id=eout.patient_id "
+            + " INNER JOIN obs oout ON eout.encounter_id=oout.encounter_id "
             + " INNER JOIN ( "
             + " SELECT patient_id, MAX(encounter_datetime) AS encounter_datetime FROM ( "
             + " SELECT p.patient_id AS patient_id, e.encounter_datetime AS encounter_datetime "
@@ -681,13 +681,14 @@ public class QualityImprovement2020Queries {
             + " AND ob.concept_id = ${23739} "
             + " AND ob.value_coded = ${23720} "
             + " AND ee.encounter_datetime=filt.encounter_datetime) combined group by patient_id) fin "
-            + " WHERE p.voided= 0 "
-            + " AND e.voided = 0 "
-            + " AND o.voided = 0 "
-            + " AND o.concept_id = ${23722} "
-            + " AND o.value_coded = ${856} "
-            + " AND e.encounter_datetime <= :revisionEndDate "
-            + " AND e.encounter_datetime > fin.encounter_datetime) h1 ";
+            + " ON fin.patient_id=pout.patient_id "
+            + " WHERE pout.voided= 0 "
+            + " AND eout.voided = 0 "
+            + " AND oout.voided = 0 "
+            + " AND oout.concept_id = ${23722} "
+            + " AND oout.value_coded = ${856} "
+            + " AND eout.encounter_datetime <= :revisionEndDate "
+            + " AND eout.encounter_datetime > fin.encounter_datetime) h1 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -813,6 +814,7 @@ public class QualityImprovement2020Queries {
             + " AND ob.concept_id = ${23739} "
             + " AND ob.value_coded = ${23720} "
             + " AND ee.encounter_datetime=filt.encounter_datetime) combined group by patient_id) fin "
+            + " ON fin.patient_id=p.patient_id"
             + " WHERE p.voided= 0 "
             + " AND e.voided = 0 "
             + " AND o.voided = 0 "
@@ -949,6 +951,7 @@ public class QualityImprovement2020Queries {
             + " AND ob.concept_id = ${23739} "
             + " AND ob.value_coded = ${23720} "
             + " AND ee.encounter_datetime=filt.encounter_datetime) combined group by patient_id) fin "
+            + " ON fin.patient_id=p.patient_id "
             + " WHERE p.voided= 0 "
             + " AND e.voided = 0 "
             + " AND o.voided = 0 "
