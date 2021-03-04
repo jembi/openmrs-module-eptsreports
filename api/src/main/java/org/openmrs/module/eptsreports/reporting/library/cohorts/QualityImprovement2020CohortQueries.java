@@ -4860,22 +4860,23 @@ public class QualityImprovement2020CohortQueries {
 
     if (den) {
       if (line == 3) {
-        compositionCohortDefinition.setName("(B1 and B2)  and NOT (C or D or F) and Age >= 15*");
+        compositionCohortDefinition.setName(
+            "(B1 and B2)  and NOT (B4 or B5 or E or F) and Age > 14**");
       } else if (line == 12) {
         compositionCohortDefinition.setName(
-            "(B1 and B2)  and NOT (C or D or F) and Age > 2 and Age < 15*");
+            "(B1 and B2)  and NOT (B4 or B5 or E or F) and Age > 2 and Age <= 15*");
       } else if (line == 18) {
-        compositionCohortDefinition.setName("(B1 and B2 and C)  and NOT (D or F)");
+        compositionCohortDefinition.setName("(B1 and B4)  and NOT (B5 or E or F)");
       }
     } else {
       if (line == 3) {
         compositionCohortDefinition.setName(
-            "(B1 and B2 AND G AND H)  and NOT (C or D or F) and Age >= 15*");
+            "(B1 and B2 AND G AND H)  and NOT (B4 or B5 or E or F) and Age >= 15*");
       } else if (line == 12) {
         compositionCohortDefinition.setName(
-            "(B1 and B2 AND G AND H)  and NOT (C or D or F) and Age > 2 and Age < 15*");
+            "(B1 and B2 AND G AND H)  and NOT (B4 or B5 or E or F) and Age > 2 and Age < 14*");
       } else if (line == 18) {
-        compositionCohortDefinition.setName("(B1 and B2 AND C AND G AND H)  and NOT (D or F)");
+        compositionCohortDefinition.setName("(B1 and B4 AND G AND H)  and NOT (B5 or E or F)");
       }
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -4884,23 +4885,33 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition b1 =
-        QualityImprovement2020Queries.getMQ13DenB1(
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getTherapeuticLineConcept(),
-            Collections.singletonList(hivMetadata.getFirstLineConcept()));
+    CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
+        getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
 
-    CohortDefinition b2 = getMQ13P4B();
+    CohortDefinition patientsFromFichaClinicaCargaViral =
+        getPatientsFromFichaClinicaDenominatorB("B2_11");
 
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
+    CohortDefinition pregnantWithCargaViralHigherThan1000 =
+        QualityImprovement2020Queries.getMQ11DenB4(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId());
 
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
+    CohortDefinition breastfeedingWithCargaViralHigherThan1000 =
+        QualityImprovement2020Queries.getMQ11DenB5(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId());
+
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
@@ -4908,23 +4919,19 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition H = getMQ13P4H();
 
-    if (line == 3) {
-      compositionCohortDefinition.addSearch(
-          "age",
-          EptsReportUtils.map(
-              ageCohortQueries.createXtoYAgeCohort(
-                  "% de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 e terem  3 sessões consecutivas de APSS/PP (AMA",
-                  15, null),
-              "effectiveDate=${endDate}"));
-    }
+    compositionCohortDefinition.addSearch(
+        "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
 
-    compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(b1, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING1));
 
-    compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "B4", EptsReportUtils.map(pregnantWithCargaViralHigherThan1000, MAPPING1));
 
-    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+    compositionCohortDefinition.addSearch(
+        "B5", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan1000, MAPPING1));
 
-    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
@@ -4935,22 +4942,23 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B2) AND NOT (C OR D OR F) AND age");
+            "(B1 AND B2) AND NOT (B4 or B5 or E or F)");
       } else if (line == 12) {
-        compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (C OR D OR F)");
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND B2) AND NOT (B4 or B5 or E or F)");
       } else if (line == 18) {
-        compositionCohortDefinition.setCompositionString("(B1 AND B2 AND C) AND NOT (D OR F)");
+        compositionCohortDefinition.setCompositionString("(B1 AND B4) AND NOT (B5 or E or F)");
       }
     } else {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B2 AND G AND H) AND NOT (C OR D OR F) AND age");
+            "(B1 AND B2 AND G AND H) AND NOT (B4 or B5 or E or F)");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B2 AND G AND H) AND NOT (C OR D OR F)");
+            "(B1 AND B2 AND G AND H) AND NOT (B4 or B5 or E or F)");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B2 AND C AND G AND H) AND NOT (D OR F)");
+            "(B1 AND B4 AND G AND H) AND NOT (B5 or E or F)");
       }
     }
     return compositionCohortDefinition;
