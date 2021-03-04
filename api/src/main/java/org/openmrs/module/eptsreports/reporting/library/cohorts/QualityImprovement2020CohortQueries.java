@@ -3937,7 +3937,7 @@ public class QualityImprovement2020CohortQueries {
    * <blockquote>
    *
    * C - Select all patients with Last Clinical Consultation (encounter type 6, encounter_datetime)
-   * occurred during the period (encounter_datetime > endDateInclusion and <= endDateRevision) and
+   * occurred during the period (encounter_datetime >= endDateInclusion and <= endDateRevision) and
    * the concept: “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV
    * CARGA VIRAL” (Concept Id 856) In this last consultation.
    *
@@ -3945,7 +3945,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getMQ13C() {
+  public CohortDefinition getMQ13G() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Last Ficha Clinica");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -4009,9 +4009,9 @@ public class QualityImprovement2020CohortQueries {
 
     if (den) {
       compositionCohortDefinition.setName(
-          "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E)");
+          "B AND NOT C AND NOT D");
     } else {
-      compositionCohortDefinition.setName("B and C");
+      compositionCohortDefinition.setName("(B AND G) AND NOT (C OR D)");
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -4021,23 +4021,17 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
 
-    CohortDefinition pregnant = commonCohortQueries.getNewMQPregnantORBreastfeeding(
+    CohortDefinition pregnant =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
             hivMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId()
-    );
+            hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition brestfeeding = commonCohortQueries.getNewMQPregnantORBreastfeeding(
+    CohortDefinition brestfeeding =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
             hivMetadata.getBreastfeeding().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId()
-    );
+            hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition firstLine6Months =
-        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
-            false,
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getTherapeuticLineConcept(),
-            Collections.singletonList(hivMetadata.getFirstLineConcept()));
+    CohortDefinition b2New = commonCohortQueries.getPatientsWithFirstTherapeuticLineOnLastClinicalEncounterB2NEW();
 
     CohortDefinition secondLine6Months =
         commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
@@ -4057,17 +4051,6 @@ public class QualityImprovement2020CohortQueries {
                 commonMetadata.getAlternativeFirstLineConcept(),
                 commonMetadata.getRegimeChangeConcept(),
                 hivMetadata.getNoConcept()));
-
-    CohortDefinition B2E =
-        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
-            false,
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getTherapeuticLineConcept(),
-            Collections.singletonList(hivMetadata.getFirstLineConcept()),
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getTherapeuticLineConcept(),
-            Collections.singletonList(hivMetadata.getFirstLineConcept()));
 
     CohortDefinition secondLineB2E =
         commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
@@ -4102,13 +4085,7 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 3);
 
-    CohortDefinition C = getMQ13C();
-
-    compositionCohortDefinition.addSearch(
-        "B1",
-        EptsReportUtils.map(
-            lastClinical,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    CohortDefinition G = getMQ13G();
 
     if (line == 1) {
       compositionCohortDefinition.addSearch(
@@ -4149,10 +4126,29 @@ public class QualityImprovement2020CohortQueries {
     }
 
     compositionCohortDefinition.addSearch(
-        "B2",
-        EptsReportUtils.map(
-            firstLine6Months,
-            "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+            "B1",
+            EptsReportUtils.map(
+                    lastClinical,
+                    "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+            "B2NEW",
+            EptsReportUtils.map(
+                    b2New,
+                    "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+            "C",
+            EptsReportUtils.map(
+                    pregnant,
+                    "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+            "D",
+            EptsReportUtils.map(
+                    brestfeeding,
+                    "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
 
     compositionCohortDefinition.addSearch(
         "secondLineB2",
@@ -4160,10 +4156,6 @@ public class QualityImprovement2020CohortQueries {
             secondLine6Months,
             "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.addSearch(
-        "B2E",
-        EptsReportUtils.map(
-            B2E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "secondLineB2E",
@@ -4192,14 +4184,14 @@ public class QualityImprovement2020CohortQueries {
             B5E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "C",
+        "G",
         EptsReportUtils.map(
-            C, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+            G, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     if (den) {
       if (line == 1 || line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND age");
+            "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
             "B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT B4E AND NOT B5E AND age");
@@ -4207,10 +4199,10 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 1 || line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND age AND C");
+            "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND age AND G");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT B4E AND NOT B5E) AND age AND C");
+            "(B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT B4E AND NOT B5E) AND age AND G");
       }
     }
 
