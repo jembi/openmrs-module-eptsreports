@@ -2232,10 +2232,10 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicator == 2)
       compositionCohortDefinition.setCompositionString(
-        "((A AND NOT C AND NOT D) OR B1) AND NOT (F OR E) AND age)");
+          "((A AND NOT C AND NOT D) OR B1) AND NOT (F OR E) AND age)");
     if (indicator == 9 || indicator == 10 || indicator == 11)
       compositionCohortDefinition.setCompositionString(
-        "((A AND NOT C AND NOT D) OR B1) AND NOT (F OR E) AND age");
+          "((A AND NOT C AND NOT D) OR B1) AND NOT (F OR E) AND age");
     if (indicator == 5 || indicator == 14)
       compositionCohortDefinition.setCompositionString("B2New AND NOT (F OR E) AND age");
 
@@ -3541,29 +3541,28 @@ public class QualityImprovement2020CohortQueries {
     map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
     map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
     map.put("1792", hivMetadata.getJustificativeToChangeArvTreatment().getConceptId());
- 
 
     String query =
-    "SELECT p.patient_id"
-    + "FROM"
-    + "  patient p"
-    + "   INNER JOIN"
-    + "   encounter e ON e.patient_id = p.patient_id"
-    + "       INNER JOIN"
-    + "   obs o ON o.encounter_id = e.encounter_id"
-    + "      INNER JOIN"
-    + "   obs o2 ON o2.encounter_id = e.encounter_id"
-    + "   WHERE e.voided = 0 AND p.voided = 0"
-    + "   AND o.voided = 0"
-    + "   AND o2.voided = 0"
-    + "   AND e.encounter_type = ${53}"
-    + "   AND e.location_id = :location  "
-    + "   AND o.concept_id = ${21187}"
-    + "   AND o.value_coded IS NOT NULL"
-    + "   AND o.obs_datetime >= :startDate"
-    + "   AND o.obs_datetime <= :endDate"
-    + "   AND o2.concept_id = ${1792}"
-    + "   AND o2.value_coded <> ${1982};";
+        "SELECT p.patient_id"
+            + "FROM"
+            + "  patient p"
+            + "   INNER JOIN"
+            + "   encounter e ON e.patient_id = p.patient_id"
+            + "       INNER JOIN"
+            + "   obs o ON o.encounter_id = e.encounter_id"
+            + "      INNER JOIN"
+            + "   obs o2 ON o2.encounter_id = e.encounter_id"
+            + "   WHERE e.voided = 0 AND p.voided = 0"
+            + "   AND o.voided = 0"
+            + "   AND o2.voided = 0"
+            + "   AND e.encounter_type = ${53}"
+            + "   AND e.location_id = :location  "
+            + "   AND o.concept_id = ${21187}"
+            + "   AND o.value_coded IS NOT NULL"
+            + "   AND o.obs_datetime >= :startDate"
+            + "   AND o.obs_datetime <= :endDate"
+            + "   AND o2.concept_id = ${1792}"
+            + "   AND o2.value_coded <> ${1982};";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -4328,7 +4327,8 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("I", EptsReportUtils.map(getMQC13P3NUM_I(), mapping));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
-      cd.setCompositionString("((A AND NOT C AND NOT D AND G) OR (B1 AND H)) AND NOT (F OR E) AND age");
+      cd.setCompositionString(
+          "((A AND NOT C AND NOT D AND G) OR (B1 AND H)) AND NOT (F OR E) AND age");
     if (indicator == 5 || indicator == 14)
       cd.setCompositionString("(B2New AND I) AND NOT (F OR E) AND age");
 
