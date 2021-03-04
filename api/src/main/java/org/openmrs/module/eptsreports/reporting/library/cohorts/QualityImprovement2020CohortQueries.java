@@ -6063,14 +6063,6 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
     CohortDefinition h1 =
         QualityImprovement2020Queries.getMQ15NumH(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -6114,7 +6106,7 @@ public class QualityImprovement2020CohortQueries {
         "A1",
         EptsReportUtils.map(
             queryA1,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}")); // A1 OR A3
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
 
@@ -6137,12 +6129,6 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
-
-    comp.addSearch(
-        "G2",
-        EptsReportUtils.map(
-            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "H1",
@@ -6170,27 +6156,27 @@ public class QualityImprovement2020CohortQueries {
             getMQ15DEN(5),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
-        "B13",
+        "G2",
         EptsReportUtils.map(
             getCombinedB13ForCat15Indicators(),
             "revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (num == 1) {
-      comp.setCompositionString("Den1 AND B13");
+      comp.setCompositionString("Den1 AND G2");
     } else if (num == 2) {
       comp.setCompositionString("Den1 AND H1");
     } else if (num == 3) {
-      comp.setCompositionString("Den1 AND H2 AND B13");
+      comp.setCompositionString("Den1 AND H2 AND G2");
     } else if (num == 4) {
-      comp.setCompositionString("Den1 AND I AND B13");
+      comp.setCompositionString("Den1 AND I AND G2");
     } else if (num == 5 || num == 6) {
-      comp.setCompositionString("Den5 AND B13");
+      comp.setCompositionString("Den5 AND G2");
     } else if (num == 7 || num == 8) {
       comp.setCompositionString("Den5 AND H1");
     } else if (num == 9 || num == 10) {
-      comp.setCompositionString("Den5 AND H2 AND B13");
+      comp.setCompositionString("Den5 AND H2 AND G2");
     } else if (num == 11 || num == 12) {
-      comp.setCompositionString("Den5 AND I AND B13");
+      comp.setCompositionString("Den5 AND I AND G2");
     }
     return comp;
   }
