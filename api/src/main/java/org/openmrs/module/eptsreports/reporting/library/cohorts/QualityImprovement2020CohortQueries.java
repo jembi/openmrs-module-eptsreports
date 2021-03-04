@@ -5914,15 +5914,22 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             getPregnantOrBreastfeedingWomen(),
             "revisionEndDate=${revisionEndDate},location=${location}"));
+    comp.addSearch(
+        "G2",
+        EptsReportUtils.map(
+            getCombinedB13ForCat15Indicators(),
+            "revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
-    if (den == 1 || den == 2 || den == 3 || den == 4) {
+    if (den == 1 || den == 2) {
       comp.setCompositionString("(A1 OR A3) AND NOT (CD OR F)");
-    } else if (den == 5 || den == 7 || den == 9 || den == 11) {
+    } else if (den == 3 || den == 4) {
+      comp.setCompositionString("((A1 OR A3) AND NOT (CD OR F)) AND G2");
+    } else if (den == 5 || den == 6) {
       comp.setCompositionString("(A2 OR A3) AND  NOT (CD OR F)");
-    } else if (den == 6 || den == 8 || den == 10 || den == 12) {
-      comp.setCompositionString("(A2 OR A3) AND NOT (CD OR F)");
+    } else if (den == 7 || den == 9 || den == 11 || den == 8 || den == 10 || den == 12) {
+      comp.setCompositionString("((A2 OR A3) AND  NOT (CD OR F)) AND G2");
     }
     return comp;
   }
