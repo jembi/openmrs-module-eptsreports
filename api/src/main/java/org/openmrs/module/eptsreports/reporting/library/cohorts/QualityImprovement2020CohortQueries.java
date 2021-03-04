@@ -3510,6 +3510,75 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+
+  /**
+   * <b>MQC13Part3B2</b>: B2NEW P1_2 <br>
+   *
+   * <ul>
+   *   <li> B2NEW P1_2- Select all patients who have the REGIME ARV SEGUNDA LINHA (Concept Id 21187, value coded different NULL)
+   *   recorded in Ficha Resumo (encounter type 53) and obs_datetime >= inclusionStartDate and <= inclusionEndDate
+   *   AND at least for 6 months (  “Last Clinical Consultation” (last encounter_datetime from B1)
+   *    minus obs_datetime(from B2) >= 6 months)
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsOnRegimeArvSecondLineB2NEWP1_2() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients With Clinical Consultation");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
+    map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    map.put("1792", hivMetadata.getJustificativeToChangeArvTreatment().getConceptId());
+
+
+    String query = "SELECT p.patient_id " +
+            "FROM   patient p" +
+            "       INNER JOIN encounter e " +
+            "               ON e.patient_id = p.patient_id " +
+            "       INNER JOIN obs o " +
+            "               ON o.encounter_id = e.encounter_id " +
+            "       INNER JOIN(SELECT p.patient_id, " +
+            "                         Max(e.encounter_datetime) last_visit " +
+            "                  FROM   patient p " +
+            "                         INNER JOIN encounter e " +
+            "                                 ON e.patient_id = p.patient_id " +
+            "                  WHERE  p.voided = 0 " +
+            "                         AND e.voided = 0 " +
+            "                         AND e.encounter_type = ${6} " +
+            "                         AND e.location_id = :location " +
+            "                         AND e.encounter_datetime BETWEEN " +
+            "                             :startDate AND :endDateRevision " +
+            "                  GROUP  BY p.patient_id) AS last_clinical " +
+            "               ON last_clinical.patient_id = p.patient_id " +
+            "WHERE  e.voided = 0 " +
+            "       AND p.voided = 0 " +
+            "       AND o.voided = 0 " +
+            "       AND e.encounter_type = ${53} " +
+            "       AND e.location_id = :location " +
+            "       AND o.concept_id = ${21187} " +
+            "       AND o.value_coded IS NOT NULL " +
+            "       AND o.obs_datetime >= :startDate " +
+            "       AND o.obs_datetime <= :endDate " +
+            "       AND Date(e.encounter_datetime) <= Date_sub(last_clinical.last_visit," +
+            "                                         INTERVAL 6 month)  ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+
+
+
   /**
    * <b>MQC13Part3B2</b>: Melhoria de Qualidade Category 13 Deniminator B2 <br>
    * <i> BI2 and not B2E</i> <br>

@@ -789,20 +789,64 @@ public class CommonCohortQueries {
     return sqlCohortDefinition;
   }
 
+
   /**
-   * <b>Description:</b> MOH Last Clinical Consultation Query
+   * <b>Description:</b> MOH Patients to Exclude From Treatment in 6 Months
    *
    * <p><b>Technical Specs</b>
    *
    * <blockquote>
    *
-   * Select all patients with Last Clinical Consultation (encounter type 6, encounter_datetime)
-   * occurred during the period (encounter_datetime > endDateInclusion and <= endDateRevision)
+   * B2E - Exclude all patients from Ficha Clinica (encounter type 6, encounter_datetime)
+   * who have “LINHA TERAPEUTICA”(Concept id 21151) with value coded DIFFERENT THAN “SEGUNDA LINHA”(Concept id 21150)
+   * and obs_datetime > “REGIME ARV SEGUNDA LINHA” (from B2New) and <= “Last Clinical Consultation” (last encounter_datetime from B1)
    *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
+  public CohortDefinition getMOHPatientsToExcludeFromTreatmentIn6Months(
+          Boolean masterCard,
+          EncounterType clinicalEncounter,
+          EncounterType treatmentEncounter,
+          Concept treatmentConcept,
+          List<Concept> treatmentValueCoded,
+          EncounterType exclusionEncounter,
+          Concept exclusionConcept,
+          List<Concept> exclusionValueCoded) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients to exclude in treatment in the last 6 months");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+
+    List<Integer> answerIds = new ArrayList<>();
+    List<Integer> answerIds2 = new ArrayList<>();
+
+    for (Concept concept : treatmentValueCoded) {
+      answerIds.add(concept.getConceptId());
+    }
+
+    for (Concept concept : exclusionValueCoded) {
+      answerIds2.add(concept.getConceptId());
+    }
+  }
+
+
+    /**
+     * <b>Description:</b> MOH Last Clinical Consultation Query
+     *
+     * <p><b>Technical Specs</b>
+     *
+     * <blockquote>
+     *
+     * Select all patients with Last Clinical Consultation (encounter type 6, encounter_datetime)
+     * occurred during the period (encounter_datetime > endDateInclusion and <= endDateRevision)
+     *
+     * </blockquote>
+     *
+     * @return {@link CohortDefinition}
+     */
   public CohortDefinition getMOHPatientsAgeOnLastClinicalConsultationDate(
       Integer minAge, Integer maxAge) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
