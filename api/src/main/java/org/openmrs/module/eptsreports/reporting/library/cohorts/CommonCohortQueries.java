@@ -805,31 +805,25 @@ public class CommonCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getMOHPatientsToExcludeFromTreatmentIn6MonthsB2E(
-      Boolean masterCard,
+  public CohortDefinition getPatientsToExcludeFromTreatmentIn6MonthsB2E(
       EncounterType clinicalEncounter,
-      EncounterType treatmentEncounter,
-      Concept treatmentConcept,
-      List<Concept> treatmentValueCoded,
-      EncounterType exclusionEncounter,
-      Concept exclusionConcept,
-      List<Concept> exclusionValueCoded) {
+      EncounterType mastercardEncounter,
+      Concept arvSecondLineConcept,
+      Concept therapeuticLineConcept,
+      Concept firstLineConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients to exclude in treatment in the last 6 months");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
-    List<Integer> answerIds = new ArrayList<>();
-    List<Integer> answerIds2 = new ArrayList<>();
-
-    for (Concept concept : treatmentValueCoded) {
-      answerIds.add(concept.getConceptId());
-    }
-
-    for (Concept concept : exclusionValueCoded) {
-      answerIds2.add(concept.getConceptId());
-    }
+    Map<String, String> map = new HashMap<>();
+    map.put("6", String.valueOf(clinicalEncounter.getEncounterTypeId()));
+    map.put("53", String.valueOf(mastercardEncounter.getEncounterTypeId()));
+    map.put("21187", String.valueOf(arvSecondLineConcept.getConceptId()));
+    map.put("21151", String.valueOf(therapeuticLineConcept.getConceptId()));
+    map.put("21150", String.valueOf(firstLineConcept.getConceptId()));
 
     String query =
         "SELECT p.patient_id FROM patient p "
@@ -850,38 +844,32 @@ public class CommonCohortQueries {
             + "                                          ON e.patient_id = p.patient_id "
             + "                           WHERE  p.voided = 0 "
             + "                                  AND e.voided = 0 "
-            + "                                  AND e.encounter_type = 6 "
-            + "                                  AND e.location_id = 398 "
-            + "                                  AND e.encounter_datetime BETWEEN '2020-01-21' AND '2020-04-20' "
+            + "                                  AND e.encounter_type = ${6} "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
             + "                           GROUP  BY p.patient_id) AS last_clinical "
             + "                           ON last_clinical.patient_id = p.patient_id "
             + "                        WHERE e.voided = 0 AND p.voided = 0 "
             + "                        AND o.voided = 0 "
-            + "                        AND e.encounter_type = 53 "
-            + "                        AND e.location_id = 398  "
-            + "                        AND o.concept_id = 21187 "
+            + "                        AND e.encounter_type = ${53} "
+            + "                        AND e.location_id = :location  "
+            + "                        AND o.concept_id = ${21187} "
             + "                        AND o.value_coded IS NOT NULL "
-            + "                        AND o.obs_datetime >= '2020-01-21' "
-            + "                        AND o.obs_datetime <= '2020-04-20' "
+            + "                        AND o.obs_datetime >= :startDate "
+            + "                        AND o.obs_datetime <= :endDate "
             + "                        AND DATE(o.obs_datetime) <= DATE_SUB(last_clinical.last_visit,INTERVAL 6 MONTH)) b2_new "
             + "                        ON b2_new.patient_id = p.patient_id "
-            + "                        WHERE e.encounter_type = 6 "
-            + "                        AND o.concept_id = 21151 "
-            + "                        AND o.value_coded <> 21150 "
+            + "                        WHERE e.encounter_type = ${6} "
+            + "                        AND o.concept_id = ${21151} "
+            + "                        AND o.value_coded <> ${21150} "
             + "                        AND o.voided = 0 "
             + "                        AND p.voided = 0 "
             + "                        AND e.voided = 0 "
-            + "                        AND e.location_id = 398 "
+            + "                        AND e.location_id = :location "
             + "                        AND DATE(o.obs_datetime) > DATE(b2_new.obs_datetime)";
 
-    Map<String, String> map = new HashMap<>();
-    map.put("clinicalEncounter", String.valueOf(clinicalEncounter.getEncounterTypeId()));
-    map.put("treatmentEncounter", String.valueOf(treatmentEncounter.getEncounterTypeId()));
-    map.put("treatmentConcept", String.valueOf(treatmentConcept.getConceptId()));
-    map.put("treatmentValueCoded", StringUtils.join(answerIds, ","));
-    map.put("exclusionEncounter", String.valueOf(exclusionEncounter.getEncounterTypeId()));
-    map.put("exclusionConcept", String.valueOf(exclusionConcept.getConceptId()));
-    map.put("exclusionValueCoded", StringUtils.join(answerIds2, ","));
+
+
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
