@@ -827,7 +827,7 @@ public class CommonCohortQueries {
 
     String query =
         "SELECT p.patient_id FROM patient p "
-            + "JOIN encounter e ON e.patient_id = p.patient_id"
+            + "JOIN encounter e ON e.patient_id = p.patient_id "
             + "JOIN obs o ON o.encounter_id = e.encounter_id  "
             + "JOIN (SELECT p.patient_id, o.obs_datetime "
             + "                     FROM "
@@ -1143,7 +1143,7 @@ public class CommonCohortQueries {
             + "                    AND o.voided = 0 "
             + "                    AND p.voided = 0 "
             + "                    AND e.encounter_datetime BETWEEN "
-            + "                        :startDate AND :revisionEndDate "
+            + "                        :startDate AND :endDate "
             + "             GROUP  BY p.patient_id) last_clinical "
             + "         ON last_clinical.patient_id = p.person_id "
             + " WHERE  last_clinical.clinical_encounter = e.encounter_datetime "

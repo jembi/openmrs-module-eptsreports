@@ -3527,12 +3527,14 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName("Patients With Clinical Consultation");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
 
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+   // map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
     map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
 
 
@@ -4192,13 +4194,12 @@ public class QualityImprovement2020CohortQueries {
         "secondLineB2",
         EptsReportUtils.map(
             secondLine6Months,
-            "startDate=${startDate},endDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "secondLineB2E",
         EptsReportUtils.map(
             secondLineB2E, "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
     compositionCohortDefinition.addSearch(
         "B3",
         EptsReportUtils.map(
@@ -4223,7 +4224,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "G",
         EptsReportUtils.map(
-            G, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+            G, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     if (den) {
       if (line == 1 || line == 6 || line == 7 || line == 8) {
