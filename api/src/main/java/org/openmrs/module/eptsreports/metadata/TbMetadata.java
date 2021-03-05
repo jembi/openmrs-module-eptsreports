@@ -563,7 +563,8 @@ public class TbMetadata extends ProgramsMetadata {
    */
   public Concept getTypeDispensationTPTConceptUuid() {
     String uuid =
-            Context.getAdministrationService().getGlobalProperty("eptsreports.typeDispensationTPTConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.typeDispensationTPTConceptUuid");
     return getConcept(uuid);
   }
 }
