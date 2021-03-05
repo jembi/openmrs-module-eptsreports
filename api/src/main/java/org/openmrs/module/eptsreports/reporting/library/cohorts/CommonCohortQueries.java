@@ -815,7 +815,8 @@ public class CommonCohortQueries {
     sqlCohortDefinition.setName("Patients to exclude in treatment in the last 6 months");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
     Map<String, String> map = new HashMap<>();
@@ -867,9 +868,6 @@ public class CommonCohortQueries {
             + "                        AND e.voided = 0 "
             + "                        AND e.location_id = :location "
             + "                        AND DATE(o.obs_datetime) > DATE(b2_new.obs_datetime)";
-
-
-
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
