@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.text.StringSubstitutor;
 import org.joda.time.Interval;
 import org.joda.time.Years;
 import org.openmrs.Location;
@@ -33,6 +34,8 @@ public class AgeOnObsDatetimeCalculation extends AbstractPatientCalculation {
 
   private final String ON_OR_BEFORE = "onOrBefore";
 
+  private final String ON_OR_AFTER = "onOrAfter";
+
   private HivMetadata hivMetadata;
   private CommonMetadata commonMetadata;
 
@@ -48,22 +51,21 @@ public class AgeOnObsDatetimeCalculation extends AbstractPatientCalculation {
         EptsCalculationUtils.evaluateWithReporting(
             new BirthdateDataDefinition(), cohort, null, null, context);
 
-    CalculationResultMap PatientAndObsDatetimeMap = getPatientAndObsDatetimeMap(cohort, context);
+    CalculationResultMap PatientAndObsDatetimeMap = getPatientAgeObsDatetimeMap(cohort, context);
 
     Integer minAge = (Integer) parameterValues.get(MIN_AGE);
     Integer maxAge = (Integer) parameterValues.get(MAX_AGE);
-    Date endDate = (Date) context.getFromCache(ON_OR_BEFORE);
 
     for (Integer patientId : cohort) {
-      // Date birthDate = getBirthDate(patientId, birthDates);
-      Date PatientAndObsDatetime =
+      Date birthDate = getBirthDate(patientId, birthDates);
+      Date patientAgeObsDatetime =
           EptsCalculationUtils.resultForPatient(PatientAndObsDatetimeMap, patientId);
 
-      if (PatientAndObsDatetime != null && endDate != null) {
-        final boolean datesConsistent = PatientAndObsDatetime.compareTo(endDate) <= 0;
+      if (patientAgeObsDatetime != null && birthDate != null) {
+        final boolean datesConsistent = patientAgeObsDatetime.compareTo(birthDate) >= 0;
         if (datesConsistent) {
           int years =
-              Years.yearsIn(new Interval(PatientAndObsDatetime.getTime(), endDate.getTime()))
+              Years.yearsIn(new Interval(patientAgeObsDatetime.getTime(), birthDate.getTime()))
                   .getYears();
           boolean b = isMinAgeOk(minAge, years) && isMaxAgeOk(maxAge, years);
           map.put(patientId, new BooleanResult(b, this));
@@ -81,11 +83,19 @@ public class AgeOnObsDatetimeCalculation extends AbstractPatientCalculation {
     return minAge == null || years >= minAge.intValue();
   }
 
-  private CalculationResultMap getPatientAndObsDatetimeMap(
+  private CalculationResultMap getPatientAgeObsDatetimeMap(
       Collection<Integer> cohort, PatientCalculationContext context) {
     SqlPatientDataDefinition def = new SqlPatientDataDefinition();
     def.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    def.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     def.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
+    map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    map.put("1792", hivMetadata.getJustificativeToChangeArvTreatment().getConceptId());
+
     String sql =
         "SELECT p.patient_id, o.obs_datetime"
             + "FROM"
@@ -103,21 +113,17 @@ public class AgeOnObsDatetimeCalculation extends AbstractPatientCalculation {
             + "   AND e.location_id = :location  "
             + "   AND o.concept_id = ${21187}"
             + "   AND o.value_coded IS NOT NULL"
-            + "   AND o.obs_datetime >= :startDate"
-            + "   AND o.obs_datetime <= :endDate"
+            + "   AND o.obs_datetime >= :onOrAfter"
+            + "   AND o.obs_datetime <= :onOrBefore"
             + "   AND o2.concept_id = ${1792}"
             + "   AND o2.value_coded <> ${1982};";
 
-    def.setSql(
-        String.format(
-            sql,
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getRegArvSecondLine().getConceptId(),
-            hivMetadata.getJustificativeToChangeArvTreatment().getConceptId()));
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    def.setSql(stringSubstitutor.replace(sql));
 
     Map<String, Object> params = new HashMap<>();
     params.put("location", context.getFromCache("location"));
+    params.put("onOrAfter", context.getFromCache(ON_OR_AFTER));
     params.put("onOrBefore", context.getFromCache(ON_OR_BEFORE));
     return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
   }
