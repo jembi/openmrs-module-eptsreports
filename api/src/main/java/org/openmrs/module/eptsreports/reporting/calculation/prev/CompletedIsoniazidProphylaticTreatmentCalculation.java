@@ -15,10 +15,7 @@ import java.util.*;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.Days;
 import org.joda.time.Interval;
-import org.openmrs.Concept;
-import org.openmrs.EncounterType;
-import org.openmrs.Location;
-import org.openmrs.Obs;
+import org.openmrs.*;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.ListResult;
@@ -388,7 +385,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c1256),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FichaClínicaINHMap2 =
@@ -400,7 +397,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c1257),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FichaClínicaINHMap3 =
@@ -409,10 +406,22 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               e6,
               cohort,
               location,
+              null,
+              TimeQualifier.ANY,
+              DateUtils.addMonths(onOrAfter, -6),
+              DateUtils.addMonths(onOrBefore, 1),
+              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+              context);
+      CalculationResultMap exclusionAtLeast3FichaClínicaINHMap3 =
+          ePTSCalculationService.getObs(
+              c1719,
+              e6,
+              cohort,
+              location,
               Arrays.asList(c23955),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FichaClínicaINHMap4 =
@@ -424,7 +433,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c1256),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FichaClínicaINHMap5 =
@@ -436,7 +445,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c1257),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FichaClínicaINHMap6 =
@@ -448,7 +457,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c23955),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
@@ -463,7 +472,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c656),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FILTINHMensal1FILTDTINHMap2 =
@@ -475,7 +484,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c23720),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FILTINHMensal1FILTDTINHMap3 =
@@ -487,7 +496,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c23982),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FILTINHMensal1FILTDTINHMap4 =
@@ -499,7 +508,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c23720),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FILTINHMensal1FILTDTINHMap5 =
@@ -511,7 +520,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c656),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FILTINHMensal1FILTDTINHMap6 =
@@ -523,7 +532,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c1098),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FILTINHMensal1FILTDTINHMap7 =
@@ -535,7 +544,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c23982),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
       CalculationResultMap atLeast3FILTINHMensal1FILTDTINHMap8 =
@@ -547,7 +556,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               Arrays.asList(c1098),
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 6),
+              DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
@@ -775,89 +784,127 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
             calculateNumberOfYesAnswers(isoniazidUsageObservationsList, patientId, iptStartDate);
 
         // ix
-        List<Obs> filts = new ArrayList<>();
-        filts.addAll(getObsListFromResultMap(filtMap1, patientId));
-        filts.addAll(getObsListFromResultMap(filtMap2, patientId));
-        filts.addAll(getObsListFromResultMap(filtMap3, patientId));
-        filts.addAll(getObsListFromResultMap(filtMap4, patientId));
-
-        int ix = evaluateOccurrence(filts, iptStartDate, 6, 7);
+        int ixa =
+            evaluateOccurrence(
+                getObsListFromResultMap(filtMap1, patientId),
+                getObsListFromResultMap(filtMap2, patientId),
+                iptStartDate,
+                6,
+                7);
+        int ixb =
+            evaluateOccurrence(
+                getObsListFromResultMap(filtMap3, patientId),
+                getObsListFromResultMap(filtMap4, patientId),
+                iptStartDate,
+                6,
+                7);
 
         // x
-        List<Obs> dtINHs = new ArrayList<>();
-        dtINHs.addAll(getObsListFromResultMap(dtINHMap1, patientId));
-        dtINHs.addAll(getObsListFromResultMap(dtINHMap2, patientId));
-        dtINHs.addAll(getObsListFromResultMap(dtINHMap3, patientId));
-        dtINHs.addAll(getObsListFromResultMap(dtINHMap4, patientId));
-
-        int x = evaluateOccurrence(dtINHs, iptStartDate, 2, 5);
+        int xa =
+            evaluateOccurrence(
+                getObsListFromResultMap(dtINHMap1, patientId),
+                getObsListFromResultMap(dtINHMap2, patientId),
+                iptStartDate,
+                2,
+                5);
+        int xb =
+            evaluateOccurrence(
+                getObsListFromResultMap(dtINHMap3, patientId),
+                getObsListFromResultMap(dtINHMap4, patientId),
+                iptStartDate,
+                2,
+                5);
 
         // xi
-
-        List<Obs> dfiltdtINHs = new ArrayList<>();
-        dfiltdtINHs.addAll(getObsListFromResultMap(dfiltdtINHMap1, patientId));
-        dfiltdtINHs.addAll(getObsListFromResultMap(dfiltdtINHMap2, patientId));
-        dfiltdtINHs.addAll(getObsListFromResultMap(dfiltdtINHMap3, patientId));
-        dfiltdtINHs.addAll(getObsListFromResultMap(dfiltdtINHMap4, patientId));
-
-        int xi = evaluateOccurrence(dfiltdtINHs, iptStartDate, 2, 5);
+        int xia =
+            evaluateOccurrence(
+                getObsListFromResultMap(dfiltdtINHMap1, patientId),
+                getObsListFromResultMap(dfiltdtINHMap2, patientId),
+                iptStartDate,
+                2,
+                5);
+        int xib =
+            evaluateOccurrence(
+                getObsListFromResultMap(dfiltdtINHMap3, patientId),
+                getObsListFromResultMap(dfiltdtINHMap4, patientId),
+                iptStartDate,
+                2,
+                5);
 
         // xii
+        int xiia1 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atLeast3FichaClínicaINHMap1, patientId),
+                iptStartDate,
+                3,
+                7);
+        List<Obs> atLeast3FichaClínicaINHMap3Cleaned =
+            exclude(
+                getObsListFromResultMap(atLeast3FichaClínicaINHMap3, patientId),
+                getObsListFromResultMap(exclusionAtLeast3FichaClínicaINHMap3, patientId));
 
-        List<Obs> atLeast3FichaClínicaINHA = new ArrayList<>();
-        atLeast3FichaClínicaINHA.addAll(
-            getObsListFromResultMap(atLeast3FichaClínicaINHMap1, patientId));
-        atLeast3FichaClínicaINHA.addAll(
-            getObsListFromResultMap(atLeast3FichaClínicaINHMap2, patientId));
-        atLeast3FichaClínicaINHA.addAll(
-            getObsListFromResultMap(atLeast3FichaClínicaINHMap3, patientId));
+        int xiia2 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atLeast3FichaClínicaINHMap2, patientId),
+                atLeast3FichaClínicaINHMap3Cleaned,
+                iptStartDate,
+                3,
+                7);
 
-        int xiia = evaluateOccurrence(atLeast3FichaClínicaINHA, iptStartDate, 3, 7);
-
-        List<Obs> atLeast3FichaClínicaINHB = new ArrayList<>();
-        atLeast3FichaClínicaINHB.addAll(
-            getObsListFromResultMap(atLeast3FichaClínicaINHMap4, patientId));
-        atLeast3FichaClínicaINHB.addAll(
-            getObsListFromResultMap(atLeast3FichaClínicaINHMap5, patientId));
-        atLeast3FichaClínicaINHB.addAll(
-            getObsListFromResultMap(atLeast3FichaClínicaINHMap6, patientId));
-
-        int xiib = evaluateOccurrence(atLeast3FichaClínicaINHB, iptStartDate, 1, 7);
+        int xiib1 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atLeast3FichaClínicaINHMap4, patientId),
+                iptStartDate,
+                1,
+                7);
+        int xiib2 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atLeast3FichaClínicaINHMap5, patientId),
+                getObsListFromResultMap(atLeast3FichaClínicaINHMap6, patientId),
+                iptStartDate,
+                1,
+                7);
 
         // xiii
+        int xiiia1 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap1, patientId),
+                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap2, patientId),
+                iptStartDate,
+                1,
+                7);
+        int xiiia2 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap3, patientId),
+                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap4, patientId),
+                iptStartDate,
+                1,
+                7);
 
-        List<Obs> atLeast3FILTINHMensal1FILTDTINHA = new ArrayList<>();
-        atLeast3FILTINHMensal1FILTDTINHA.addAll(
-            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap1, patientId));
-        atLeast3FILTINHMensal1FILTDTINHA.addAll(
-            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap2, patientId));
-        atLeast3FILTINHMensal1FILTDTINHA.addAll(
-            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap3, patientId));
-        atLeast3FILTINHMensal1FILTDTINHA.addAll(
-            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap4, patientId));
+        int xiiib1 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap5, patientId),
+                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap6, patientId),
+                iptStartDate,
+                3,
+                7);
+        int xiiib2 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap7, patientId),
+                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap8, patientId),
+                iptStartDate,
+                3,
+                7);
 
-        int xiiia = evaluateOccurrence(atLeast3FILTINHMensal1FILTDTINHA, iptStartDate, 1, 7);
-
-        List<Obs> atLeast3FILTINHMensal1FILTDTINHB = new ArrayList<>();
-        atLeast3FILTINHMensal1FILTDTINHB.addAll(
-            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap5, patientId));
-        atLeast3FILTINHMensal1FILTDTINHB.addAll(
-            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap6, patientId));
-        atLeast3FILTINHMensal1FILTDTINHB.addAll(
-            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap7, patientId));
-        atLeast3FILTINHMensal1FILTDTINHB.addAll(
-            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap8, patientId));
-
-        int xiiib = evaluateOccurrence(atLeast3FILTINHMensal1FILTDTINHB, iptStartDate, 3, 7);
         // ( I or II or III or IV ) and (V or VI) or VII or VIII ... XIII)
         if (iptStartDate != null && iptEndDate != null) {
           if (getProfilaxiaDuration(iptStartDate, iptEndDate) >= MINIMUM_DURATION_IN_DAYS
               || viii >= NUMBER_ISONIAZID_USAGE_TO_CONSIDER_COMPLETED
-              || ix >= 6
-              || x >= 2
-              || xi >= 2
-              || (xiia >= 3 && xiib >= 1)
-              || (xiiia >= 1 && xiiib >= 3)) {
+              || (ixa + ixb) >= 6
+              || (xa + ixb) >= 2
+              || (xia + xib) >= 2
+              || ((xiia1 + xiia2) >= 3 && (xiib1 + xiib2) >= 1)
+              || (xiiia1 + xiiia2 >= 1 && xiiib1 + xiiib2 >= 3)) {
             map.put(patientId, new BooleanResult(true, this));
           }
         }
@@ -883,33 +930,47 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                     this.exclude(regimeTPT3HP, exclusionregimeTPT3HP, 4)),
                 Priority.MIN);
 
-        List<Obs> atleast1FILT3HPTrimestrals = new ArrayList<>();
-        filts.addAll(getObsListFromResultMap(atleast1FILT3HPTrimestralMa1, patientId));
-        filts.addAll(getObsListFromResultMap(atleast1FILT3HPTrimestralMa2, patientId));
-        filts.addAll(getObsListFromResultMap(atleast1FILT3HPTrimestralMa3, patientId));
-        filts.addAll(getObsListFromResultMap(atleast1FILT3HPTrimestralMa4, patientId));
+        int atleast1FILT3HPTrimestralsOccurencies1 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atleast1FILT3HPTrimestralMa1, patientId),
+                getObsListFromResultMap(atleast1FILT3HPTrimestralMa2, patientId),
+                first3HPDate,
+                1,
+                4);
 
-        int atleast1FILT3HPTrimestralsOccurencies =
-            evaluateOccurrence(atleast1FILT3HPTrimestrals, first3HPDate, 1, 4);
+        int atleast1FILT3HPTrimestralsOccurencies2 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atleast1FILT3HPTrimestralMa3, patientId),
+                getObsListFromResultMap(atleast1FILT3HPTrimestralMa4, patientId),
+                first3HPDate,
+                1,
+                4);
 
-        List<Obs> atleast3FILTS3HPMensalList = new ArrayList<>();
-        filts.addAll(getObsListFromResultMap(atleast3FILTS3HPMensal1, patientId));
-        filts.addAll(getObsListFromResultMap(atleast3FILTS3HPMensal2, patientId));
-        filts.addAll(getObsListFromResultMap(atleast3FILTS3HPMensal3, patientId));
-        filts.addAll(getObsListFromResultMap(atleast3FILTS3HPMensal4, patientId));
+        int atleast3FILTS3HPMensalOccurencies1 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atleast3FILTS3HPMensal1, patientId),
+                getObsListFromResultMap(atleast3FILTS3HPMensal2, patientId),
+                first3HPDate,
+                3,
+                4);
 
-        int atleast3FILTS3HPMensalOccurencies =
-            evaluateOccurrence(atleast3FILTS3HPMensalList, first3HPDate, 4, 4);
+        int atleast3FILTS3HPMensalOccurencies2 =
+            evaluateOccurrence(
+                getObsListFromResultMap(atleast3FILTS3HPMensal3, patientId),
+                getObsListFromResultMap(atleast3FILTS3HPMensal4, patientId),
+                first3HPDate,
+                3,
+                4);
 
         List<Obs> atLeast3FichaClínicaMastercard3HPUntil4Month =
             getObsListFromResultMap(atLeast3FichaClínicaMastercard3HPUntil4MonthMap, patientId);
 
         int atleast3FILTS3HPMensalListMensalOccurencies =
-            evaluateOccurrence(atleast3FILTS3HPMensalList, first3HPDate, 3, 4);
+            evaluateOccurrence(atLeast3FichaClínicaMastercard3HPUntil4Month, first3HPDate, 3, 4);
 
         if (first3HPDate != null
-            && (atleast1FILT3HPTrimestralsOccurencies >= 1
-                || atleast3FILTS3HPMensalOccurencies >= 3
+            && (atleast1FILT3HPTrimestralsOccurencies1 + atleast1FILT3HPTrimestralsOccurencies2 >= 1
+                || atleast3FILTS3HPMensalOccurencies1 + atleast3FILTS3HPMensalOccurencies2 >= 3
                 || atleast3FILTS3HPMensalListMensalOccurencies >= 3)) {
           map.put(patientId, new BooleanResult(true, this));
         }
@@ -1046,8 +1107,8 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
       if (o.getEncounter()
                   .getEncounterDatetime()
                   .compareTo(DateUtils.addMonths(iptStartDate, plusIPTDate))
-              >= 0
-          && o.getEncounter().getEncounterDatetime().compareTo(iptStartDate) < 0) {
+              <= 0
+          && o.getEncounter().getEncounterDatetime().compareTo(iptStartDate) >= 0) {
         num++;
         if (num == nTimes) {
           break;
@@ -1057,16 +1118,36 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
     return num;
   }
 
+  /**
+   * Given 2 list of obs the method extracts the encounter list from both, and then check for each
+   * encounter in the fisrt list evaluates if it is present in the second list It uses the
+   * implementation of contains method of ArrayList class which behind the schene it check if the
+   * two encounters share the uuid.
+   *
+   * @param a list of OBs
+   * @param b
+   * @param iptStartDate
+   * @param nTimes
+   * @param plusIPTDate
+   * @return
+   */
   private int evaluateOccurrence(
       List<Obs> a, List<Obs> b, Date iptStartDate, int nTimes, int plusIPTDate) {
-    int num = 0;
-    for (Obs o : a) {
+    List<Encounter> encountersA = new ArrayList<>();
+    List<Encounter> encountersB = new ArrayList<>();
 
-      if (o.getEncounter()
-                  .getEncounterDatetime()
-                  .compareTo(DateUtils.addMonths(iptStartDate, plusIPTDate))
-              >= 0
-          && o.getEncounter().getEncounterDatetime().compareTo(iptStartDate) < 0) {
+    for (Obs obs : a) {
+      encountersA.add(obs.getEncounter());
+    }
+    for (Obs obs : b) {
+      encountersB.add(obs.getEncounter());
+    }
+    int num = 0;
+
+    for (Encounter e : encountersA) {
+      if (e.getEncounterDatetime().compareTo(DateUtils.addMonths(iptStartDate, plusIPTDate)) <= 0
+          && e.getEncounterDatetime().compareTo(iptStartDate) >= 0
+          && encountersB.contains(e)) {
         num++;
         if (num == nTimes) {
           break;
@@ -1074,5 +1155,15 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
       }
     }
     return num;
+  }
+
+  private List<Obs> exclude(List<Obs> pure, List<Obs> dirty) {
+    List<Obs> clean = new ArrayList<>();
+    for (Obs o : pure) {
+      if (!dirty.contains(o)) {
+        clean.add(o);
+      }
+    }
+    return clean;
   }
 }
