@@ -228,7 +228,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               cohort,
               context);
       // IX
-      //iptstartdate  + 7m <= iptstartdate
+      // iptstartdate  + 7m <= iptstartdate
       CalculationResultMap filtMap1 =
           ePTSCalculationService.getObs(
               c23985,
@@ -805,49 +805,62 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
         // xii
 
         List<Obs> atLeast3FichaClínicaINHA = new ArrayList<>();
-        atLeast3FichaClínicaINHA.addAll(getObsListFromResultMap(atLeast3FichaClínicaINHMap1, patientId));
-        atLeast3FichaClínicaINHA.addAll(getObsListFromResultMap(atLeast3FichaClínicaINHMap2, patientId));
-        atLeast3FichaClínicaINHA.addAll(getObsListFromResultMap(atLeast3FichaClínicaINHMap3, patientId));
+        atLeast3FichaClínicaINHA.addAll(
+            getObsListFromResultMap(atLeast3FichaClínicaINHMap1, patientId));
+        atLeast3FichaClínicaINHA.addAll(
+            getObsListFromResultMap(atLeast3FichaClínicaINHMap2, patientId));
+        atLeast3FichaClínicaINHA.addAll(
+            getObsListFromResultMap(atLeast3FichaClínicaINHMap3, patientId));
 
         int xiia = evaluateOccurrence(atLeast3FichaClínicaINHA, iptStartDate, 3, 7);
 
         List<Obs> atLeast3FichaClínicaINHB = new ArrayList<>();
-        atLeast3FichaClínicaINHB.addAll(getObsListFromResultMap(atLeast3FichaClínicaINHMap4, patientId));
-        atLeast3FichaClínicaINHB.addAll(getObsListFromResultMap(atLeast3FichaClínicaINHMap5, patientId));
-        atLeast3FichaClínicaINHB.addAll(getObsListFromResultMap(atLeast3FichaClínicaINHMap6, patientId));
+        atLeast3FichaClínicaINHB.addAll(
+            getObsListFromResultMap(atLeast3FichaClínicaINHMap4, patientId));
+        atLeast3FichaClínicaINHB.addAll(
+            getObsListFromResultMap(atLeast3FichaClínicaINHMap5, patientId));
+        atLeast3FichaClínicaINHB.addAll(
+            getObsListFromResultMap(atLeast3FichaClínicaINHMap6, patientId));
 
         int xiib = evaluateOccurrence(atLeast3FichaClínicaINHB, iptStartDate, 1, 7);
 
         // xiii
 
         List<Obs> atLeast3FILTINHMensal1FILTDTINHA = new ArrayList<>();
-        atLeast3FILTINHMensal1FILTDTINHA.addAll(getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap1, patientId));
-        atLeast3FILTINHMensal1FILTDTINHA.addAll(getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap2, patientId));
-        atLeast3FILTINHMensal1FILTDTINHA.addAll(getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap3, patientId));
-        atLeast3FILTINHMensal1FILTDTINHA.addAll(getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap4, patientId));
+        atLeast3FILTINHMensal1FILTDTINHA.addAll(
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap1, patientId));
+        atLeast3FILTINHMensal1FILTDTINHA.addAll(
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap2, patientId));
+        atLeast3FILTINHMensal1FILTDTINHA.addAll(
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap3, patientId));
+        atLeast3FILTINHMensal1FILTDTINHA.addAll(
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap4, patientId));
 
         int xiiia = evaluateOccurrence(atLeast3FILTINHMensal1FILTDTINHA, iptStartDate, 1, 7);
 
         List<Obs> atLeast3FILTINHMensal1FILTDTINHB = new ArrayList<>();
-        atLeast3FILTINHMensal1FILTDTINHB.addAll(getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap5, patientId));
-        atLeast3FILTINHMensal1FILTDTINHB.addAll(getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap6, patientId));
-        atLeast3FILTINHMensal1FILTDTINHB.addAll(getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap7, patientId));
-        atLeast3FILTINHMensal1FILTDTINHB.addAll(getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap8, patientId));
+        atLeast3FILTINHMensal1FILTDTINHB.addAll(
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap5, patientId));
+        atLeast3FILTINHMensal1FILTDTINHB.addAll(
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap6, patientId));
+        atLeast3FILTINHMensal1FILTDTINHB.addAll(
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap7, patientId));
+        atLeast3FILTINHMensal1FILTDTINHB.addAll(
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap8, patientId));
 
         int xiiib = evaluateOccurrence(atLeast3FILTINHMensal1FILTDTINHB, iptStartDate, 3, 7);
         // ( I or II or III or IV ) and (V or VI) or VII or VIII ... XIII)
-        if(iptStartDate != null && iptEndDate != null){
+        if (iptStartDate != null && iptEndDate != null) {
           if (getProfilaxiaDuration(iptStartDate, iptEndDate) >= MINIMUM_DURATION_IN_DAYS
-                  || viii >= NUMBER_ISONIAZID_USAGE_TO_CONSIDER_COMPLETED
-                  || ix >= 6
-                  || x >= 2
-                  || xi >= 2
-                  || (xiia >= 3 && xiib >= 1)
-                  || (xiiia >= 1 && xiiib >= 3)) {
+              || viii >= NUMBER_ISONIAZID_USAGE_TO_CONSIDER_COMPLETED
+              || ix >= 6
+              || x >= 2
+              || xi >= 2
+              || (xiia >= 3 && xiib >= 1)
+              || (xiiia >= 1 && xiiib >= 3)) {
             map.put(patientId, new BooleanResult(true, this));
           }
         }
-
 
         /* 3HP */
         Obs artListTbPrevList3HPPreviousPeriod =
@@ -981,7 +994,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
     if (firstDate != null) {
       if (month < 0) {
         for (Obs o : bGroup) {
-         // >= fisrt-7m and < fisrt
+          // >= fisrt-7m and < fisrt
           if (o.getEncounter()
                       .getEncounterDatetime()
                       .compareTo(
@@ -1044,15 +1057,16 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
     return num;
   }
 
-  private int evaluateOccurrence(List<Obs> a, List<Obs> b, Date iptStartDate, int nTimes, int plusIPTDate) {
+  private int evaluateOccurrence(
+      List<Obs> a, List<Obs> b, Date iptStartDate, int nTimes, int plusIPTDate) {
     int num = 0;
     for (Obs o : a) {
 
       if (o.getEncounter()
-              .getEncounterDatetime()
-              .compareTo(DateUtils.addMonths(iptStartDate, plusIPTDate))
+                  .getEncounterDatetime()
+                  .compareTo(DateUtils.addMonths(iptStartDate, plusIPTDate))
               >= 0
-              && o.getEncounter().getEncounterDatetime().compareTo(iptStartDate) < 0) {
+          && o.getEncounter().getEncounterDatetime().compareTo(iptStartDate) < 0) {
         num++;
         if (num == nTimes) {
           break;
