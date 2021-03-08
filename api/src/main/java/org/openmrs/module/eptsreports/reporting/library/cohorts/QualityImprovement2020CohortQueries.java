@@ -2306,6 +2306,60 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>MQC11B2</b>: Melhoria de Qualidade Category 13 Deniminator B2 <br>
+   *
+   * <ul>
+   *   <li>B2- Select all patients from Ficha Clinica (encounter type 6) with “Carga Viral” (Concept
+   *       id 856) registered with numeric value > 1000 during the Inclusion period
+   *       (startDateInclusion and endDateInclusion). Note: if there is more than one record with
+   *       value_numeric > 1000 than consider the first occurrence during the inclusion period.
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getB2_13() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients From Ficha Clinica");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + " p.patient_id "
+            + " FROM "
+            + " patient p "
+            + "    INNER JOIN "
+            + " (SELECT "
+            + "    p.patient_id, MIN(e.encounter_datetime), e.encounter_id "
+            + " FROM "
+            + "    patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " WHERE "
+            + "    e.encounter_type = ${6} AND p.voided = 0 "
+            + "        AND e.voided = 0 "
+            + "        AND e.location_id = :location "
+            + "        AND o.location_id = :location "
+            + "        AND o.concept_id = ${856} "
+            + "        AND o.value_numeric > 1000 "
+            + " GROUP BY p.patient_id) filtered ON p.patient_id = filtered.patient_id; ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * <b>MQC11B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 <br>
    * <i> A and not B</i> <br>
    *
@@ -4639,7 +4693,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>Select all patients with clinical consultation (encounter type 6) with concept “PEDIDO DE
    *       INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA VIRAL”
    *       (Concept Id 856) on Encounter_datetime between “Viral Load Date” (the oldest date from
-   *       B2)+66 days and “Viral Load Date” (the oldest date from B2)+120 days.
+   *       B2)+80 days and “Viral Load Date” (the oldest date from B2)+130 days.
    *   <li>
    * </ul>
    *
@@ -4691,8 +4745,8 @@ public class QualityImprovement2020CohortQueries {
             + "            AND o.concept_id = ${23722}  "
             + "            AND o.value_coded = ${856}  "
             + "            AND DATE(e.encounter_datetime) BETWEEN DATE_ADD(vl.value_datetime,  "
-            + "            INTERVAL 66 DAY) AND DATE_ADD(vl.value_datetime,  "
-            + "            INTERVAL 120 DAY);";
+            + "            INTERVAL 80 DAY) AND DATE_ADD(vl.value_datetime,  "
+            + "            INTERVAL 130 DAY);";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -4765,8 +4819,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
         getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
 
-    CohortDefinition patientsFromFichaClinicaCargaViral =
-        getPatientsFromFichaClinicaDenominatorB("B2_11");
+    CohortDefinition patientsFromFichaClinicaCargaViral = getB2_13();
 
     CohortDefinition pregnantWithCargaViralHigherThan1000 =
         QualityImprovement2020Queries.getMQ11DenB4(
