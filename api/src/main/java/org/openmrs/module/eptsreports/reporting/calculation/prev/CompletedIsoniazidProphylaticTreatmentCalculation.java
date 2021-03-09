@@ -1031,7 +1031,9 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
     for (Obs o : obss) {
 
       if (o != null) {
-        if (useValueDatetimefor1stObs && o.equals(obss.get(0))) {
+        if (useValueDatetimefor1stObs
+            && o.equals(obss.get(0))
+            && o.getConcept().equals(hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept())) {
           dates.add(o.getValueDatetime());
         } else {
           dates.add(o.getEncounter().getEncounterDatetime());
