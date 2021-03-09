@@ -4834,9 +4834,9 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * B2 - Select all patients with a clinical consultation (encounter type 6) that have the concept
-   * “GESTANTE” (Concept Id 1982) and value coded “SIM” (Concept Id 1065) registered (1)during the
-   * inclusion period (first occurrence, encounter_datetime >= startDateInclusion and
+   * B2 - Select all female patients with first clinical consultation (encounter type 6) that have
+   * the concept “GESTANTE” (Concept Id 1982) and value coded “SIM” (Concept Id 1065) registered
+   * (1)during the inclusion period (first occurrence, encounter_datetime >= startDateInclusion and
    * <=endDateInclusion) and (2) after the start of ART (encounter_datetime > “Patient ART Start
    * Date”)
    *
@@ -4891,9 +4891,11 @@ public class QualityImprovement2020CohortQueries {
             + "            INNER JOIN ( "
             + "                        SELECT p.patient_id, MIN(e.encounter_datetime) AS first_gestante, e.encounter_id "
             + "                        FROM patient p  "
+            + "                            INNER JOIN person per on p.patient_id=per.person_id"
             + "                            INNER JOIN encounter e ON e.patient_id = p.patient_id  "
             + "                            INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
             + "                        WHERE   p.voided = 0  "
+            + "                             AND per.gender='F' "
             + "                            AND e.voided = 0  "
             + "                            AND o.voided  = 0  "
             + "                            AND e.encounter_type = ${6}   "
