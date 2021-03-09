@@ -295,11 +295,14 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
    */
   private Date getEarliestIptStartDate(List<Obs> obs) {
 
+    int i = 0;
     Date date = null;
     List<Date> dates = new ArrayList<>();
 
     for (Obs o : obs) {
-      if (o != null) dates.add(o.getEncounter().getEncounterDatetime());
+      if (i == 0 && o != null) dates.add(o.getValueDatetime());
+      else if (i > 0 && o != null) dates.add(o.getEncounter().getEncounterDatetime());
+      i++;
     }
     if (!dates.isEmpty()) {
       date = Collections.min(dates);
