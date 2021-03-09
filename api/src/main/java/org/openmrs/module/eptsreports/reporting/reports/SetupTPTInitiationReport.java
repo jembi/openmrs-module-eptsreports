@@ -1,14 +1,12 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
+import java.io.IOException;
+import java.util.*;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.data.quality.SummaryEc20DataQualityCohorts;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTInitiationDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.data.quality.Ec20PatientListDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.data.quality.SummaryEc20DataQualityDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -17,24 +15,15 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
-import java.io.IOException;
-import java.util.*;
-
-
 @Component
 public class SetupTPTInitiationReport extends EptsDataExportManager {
 
-
   private TPTInitiationDataset tptInitiationDataset;
 
+  @Autowired protected GenericCohortQueries genericCohortQueries;
 
   @Autowired
-  protected GenericCohortQueries genericCohortQueries;
-
-  @Autowired
-  public SetupTPTInitiationReport(
-      TPTInitiationDataset tptInitiationDataset) {
+  public SetupTPTInitiationReport(TPTInitiationDataset tptInitiationDataset) {
     this.tptInitiationDataset = tptInitiationDataset;
   }
 
@@ -68,9 +57,10 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
 
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
-                genericCohortQueries.getBaseCohort(), "startDate=${startDate}, endDate=${endDate},location=${location}"));
+            genericCohortQueries.getBaseCohort(),
+            "startDate=${startDate}, endDate=${endDate},location=${location}"));
     rd.addDataSetDefinition(
-            "ALL", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset()));
+        "ALL", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset()));
     return rd;
   }
 
@@ -103,11 +93,8 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-            new Parameter("startDate", "Data Inicial Inclusão", Date.class),
-            new Parameter("endDate", "Data Final Inclusão", Date.class),
-            new Parameter("location", "Unidade Sanitária", Location.class));
+        new Parameter("startDate", "Data Inicial Inclusão", Date.class),
+        new Parameter("endDate", "Data Final Inclusão", Date.class),
+        new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }
-
-
-
