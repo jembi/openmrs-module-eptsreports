@@ -165,79 +165,78 @@ public class QualityImprovement2020Queries {
     map.put("1190", historicalDrugStartDateConcept);
     map.put("23865", artPickupConcept);
     map.put("23866", artDatePickupMasterCard);
+    map.put("lowerBound", lowerBound);
+    map.put("upperBound", upperBound);
 
     String query =
-        "SELECT second_visit.patient_id "
-            + "FROM   (SELECT first_visit.patient_id, first_visit.first_visit_1, after_first_visit.first_visit_2  "
-            + "        FROM   (SELECT inicio_real.patient_id, inicio_real.data_inicio, first_real.first_visit_1  "
-            + "                FROM   (SELECT patient_id, data_inicio  "
-            + "                        FROM   (SELECT patient_id, Min(data_inicio) data_inicio  "
-            + "                                FROM   (SELECT p.patient_id, Min(value_datetime) data_inicio  "
-            + "                                        FROM   patient p  "
-            + "                                               INNER JOIN encounter e  "
-            + "                                                       ON p.patient_id = e.patient_id  "
-            + "                                               INNER JOIN obs o  "
-            + "                                                       ON e.encounter_id = o.encounter_id  "
-            + "                                        WHERE  p.voided = 0  "
-            + "                                               AND e.voided = 0  "
-            + "                                               AND o.voided = 0  "
-            + "                                               AND e.encounter_type = ${53}  "
-            + "                                               AND o.concept_id = ${1190}  "
-            + "                                               AND o.value_datetime IS NOT NULL  "
-            + "                                               AND o.value_datetime <= :endDate  "
-            + "                                               AND e.location_id = :location  "
-            + "                                        GROUP  BY p.patient_id ) inicio  "
-            + "                                GROUP  BY patient_id) inicio1  "
-            + "                        WHERE  data_inicio BETWEEN :startDate AND :endDate  "
-            + "                       )  "
-            + "                       inicio_real  "
-            + "                       INNER JOIN (SELECT e.patient_id,  "
-            + "                                          e.encounter_datetime AS first_visit_1  "
-            + "                                   FROM   patient p  "
-            + "                                          INNER JOIN encounter e  "
-            + "                                                  ON e.patient_id = p.patient_id  "
-            + "                                   WHERE  e.voided = 0  "
-            + "                                          AND e.location_id = :location  "
-            + "                                          AND e.encounter_type = ${6}  "
-            + "                                          AND e.encounter_datetime <= :endDate) AS first_real  "
-            + "                               ON inicio_real.patient_id = first_real.patient_id  "
-            + "                WHERE  first_real.first_visit_1 >= DATE_ADD(inicio_real.data_inicio, INTERVAL "
-            + lowerBound
-            + " DAY)  "
-            + "                       AND first_real.first_visit_1 <= DATE_ADD(inicio_real.data_inicio, INTERVAL "
-            + upperBound
-            + " DAY)) AS first_visit  "
-            + "                INNER JOIN (SELECT e.patient_id, e.encounter_datetime AS first_visit_2  "
-            + "                           FROM   patient p  "
-            + "                                  INNER JOIN encounter e  "
-            + "                                          ON e.patient_id = p.patient_id  "
-            + "                           WHERE  e.voided = 0  "
-            + "                                  AND e.location_id = :location  "
-            + "                                  AND e.encounter_type = ${6}  "
-            + "                                  AND e.encounter_datetime <= :endDate) AS  "
-            + "                       after_first_visit  "
-            + "                       ON first_visit.patient_id = after_first_visit.patient_id  "
-            + "        WHERE  after_first_visit.first_visit_2 >= DATE_ADD(first_visit.first_visit_1, INTERVAL "
-            + lowerBound
-            + " DAY)  "
-            + "               AND after_first_visit.first_visit_2 <= DATE_ADD(first_visit.first_visit_1, INTERVAL "
-            + upperBound
-            + " DAY)) AS second_visit  "
-            + "        INNER JOIN (SELECT e.patient_id, e.encounter_datetime AS first_visit_3  "
+        "  SELECT p.patient_id  "
+            + "  FROM   patient p  "
+            + "      INNER JOIN encounter e  "
+            + "         ON e.patient_id = p.patient_id  "
+            + "      INNER JOIN "
+            + "                ( "
+            + "                   SELECT p.patient_id, Min(value_datetime) AS data_inicio  "
             + "                   FROM   patient p  "
-            + "                          INNER JOIN encounter e  "
-            + "                                  ON e.patient_id = p.patient_id  "
-            + "                   WHERE  e.voided = 0  "
-            + "                          AND e.location_id = :location  "
-            + "                          AND e.encounter_type = ${6}  "
-            + "                          AND e.encounter_datetime <= :endDate) AS after_second_visit  "
-            + "        ON after_second_visit.patient_id = second_visit.patient_id  "
-            + "WHERE  after_second_visit.first_visit_3 > DATE_ADD(second_visit.first_visit_2, INTERVAL "
-            + lowerBound
-            + " DAY)  "
-            + "AND after_second_visit.first_visit_3 <= DATE_ADD(second_visit.first_visit_2, INTERVAL "
-            + upperBound
-            + " DAY);";
+            + "                       INNER JOIN encounter e  "
+            + "                           ON p.patient_id = e.patient_id  "
+            + "                       INNER JOIN obs o  "
+            + "                           ON e.encounter_id = o.encounter_id  "
+            + "                   WHERE  p.voided = 0  "
+            + "                       AND e.voided = 0  "
+            + "                       AND o.voided = 0  "
+            + "                       AND e.encounter_type = ${53}  "
+            + "                       AND o.concept_id = ${1190}  "
+            + "                       AND o.value_datetime IS NOT NULL  "
+            + "                       AND o.value_datetime <= :endDate  "
+            + "                       AND e.location_id = :location  "
+            + "                   GROUP  BY p.patient_id "
+            + "                 ) inicio    "
+            + "           ON inicio.patient_id = p.patient_id                   "
+            + "  WHERE p.voided = 0 "
+            + "      AND e.voided = 0  "
+            + "      AND e.location_id = :location  "
+            + "      AND e.encounter_type = ${6}  "
+            + "      AND e.encounter_datetime BETWEEN DATE_ADD(inicio.data_inicio, INTERVAL ${lowerBound} DAY) "
+            + "                        AND DATE_ADD(inicio.data_inicio, INTERVAL ${upperBound} DAY) "
+            + "  UNION "
+            + "  SELECT p.patient_id "
+            + "  FROM   patient p  "
+            + "      INNER JOIN encounter e  "
+            + "         ON e.patient_id = p.patient_id  "
+            + "      INNER JOIN obs o1  "
+            + "         ON o1.encounter_id = e.encounter_id  "
+            + "      INNER JOIN obs o2  "
+            + "         ON o2.encounter_id = e.encounter_id  "
+            + "      INNER JOIN "
+            + "                ( "
+            + "                   SELECT p.patient_id, Min(value_datetime) AS data_inicio  "
+            + "                   FROM   patient p  "
+            + "                       INNER JOIN encounter e  "
+            + "                           ON p.patient_id = e.patient_id  "
+            + "                       INNER JOIN obs o  "
+            + "                           ON e.encounter_id = o.encounter_id  "
+            + "                   WHERE  p.voided = 0  "
+            + "                       AND e.voided = 0  "
+            + "                       AND o.voided = 0  "
+            + "                       AND e.encounter_type = ${53}  "
+            + "                       AND o.concept_id = ${1190}  "
+            + "                       AND o.value_datetime IS NOT NULL  "
+            + "                       AND o.value_datetime <= :endDate  "
+            + "                       AND e.location_id = :location  "
+            + "                   GROUP  BY p.patient_id "
+            + "                 ) inicio    "
+            + "           ON inicio.patient_id = p.patient_id                   "
+            + "  WHERE p.voided = 0 "
+            + "      AND e.voided = 0  "
+            + "      AND o1.voided = 0  "
+            + "      AND o2.voided = 0  "
+            + "      AND e.location_id = :location  "
+            + "      AND e.encounter_type = ${52}  "
+            + "      AND o1.concept_id = ${23866} "
+            + "      AND o1.value_datetime BETWEEN DATE_ADD(inicio.data_inicio, INTERVAL ${lowerBound} DAY) "
+            + "                        AND DATE_ADD(inicio.data_inicio, INTERVAL ${upperBound} DAY) "
+            + "      AND o2.concept_id = ${23865} "
+            + "      AND o2.value_coded = ${1065} ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -1253,6 +1252,84 @@ public class QualityImprovement2020Queries {
             + " AND o.concept_id = ${23866} "
             + " AND o.value_datetime IS NOT NULL "
             + " AND o.value_datetime <=:endDate ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <<<<<<< HEAD <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * B5 - Select all patients from Ficha Clinica (encounter type 6) with “Carga Viral” (Concept id
+   * 856) registered with numeric value > 1000 during the Inclusion period (startDateInclusion and
+   * endDateInclusion) and filter all female patients registered with concept “LACTANTE”(Concept Id
+   * 6332) with value coded ‘SIM’ (Concept Id 1065) on the same encounter. (Note: consider the
+   * oldest encounter in case of more than one encounter “Carga Viral” with numeric value > 1000)
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public static CohortDefinition getMQ11DenB5(
+      int adultoSeguimentoEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int breastfeedingConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Cat11 B5");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Location.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("856", hivViralLoadConcept);
+    map.put("1065", yesConcept);
+    map.put("6332", breastfeedingConcept);
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM patient p "
+            + " INNER JOIN ( "
+            + "             SELECT p.patient_id, MIN(e.encounter_datetime) as first_carga_viral  "
+            + "             FROM patient p  "
+            + "             INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "             WHERE  p.voided = 0   "
+            + "                    AND e.voided = 0   "
+            + "                    AND o.voided = 0  "
+            + "                    AND e.encounter_type = ${6}    "
+            + "                    AND o.concept_id = ${856}   "
+            + "                    AND o.value_numeric > 1000  "
+            + "                    AND e.encounter_datetime BETWEEN :startDate AND :endDate   "
+            + "                    AND e.location_id = :location   "
+            + "             GROUP  BY p.patient_id    "
+            + "           ) AS lab ON lab.patient_id = p.patient_id  "
+            + " INNER JOIN (  "
+            + "             SELECT p.patient_id, e.encounter_datetime AS lactante  "
+            + "             FROM patient p   "
+            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id   "
+            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id   "
+            + "             INNER JOIN person per ON per.person_id= p.patient_id  "
+            + "             WHERE   p.voided = 0   "
+            + "                     AND e.voided = 0   "
+            + "                     AND o.voided = 0   "
+            + "                     AND e.encounter_type = ${6}    "
+            + "                     AND o.concept_id = ${6332}     "
+            + "                     AND o.value_coded = ${1065}    "
+            + "                     AND e.encounter_datetime BETWEEN :startDate AND :endDate   "
+            + "                     AND e.location_id = :location    "
+            + "                     AND per.gender = 'F'      "
+            + "           ) AS mulher ON mulher.patient_id = p.patient_id  "
+            + " WHERE p.voided = 0  "
+            + "       AND lab.first_carga_viral = mulher.lactante";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
