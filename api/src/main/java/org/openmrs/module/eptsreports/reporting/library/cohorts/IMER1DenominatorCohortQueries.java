@@ -7,7 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.calculation.generic.InitiatedArtedBeforeCareEnrollmentCalculation;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition2;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -54,7 +57,13 @@ public class IMER1DenominatorCohortQueries {
         EptsReportUtils.map(
             getTransferredInPatients(), "onOrBefore=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("A AND NOT D");
+    compositionCohortDefinition.addSearch(
+        "E",
+        EptsReportUtils.map(
+            CompareInitArtStartDateAndStartDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("A AND NOT D AND NOT E");
 
     return compositionCohortDefinition;
   }
@@ -89,7 +98,13 @@ public class IMER1DenominatorCohortQueries {
         EptsReportUtils.map(
             getTransferredInPatients(), "onOrBefore=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("A AND B  AND NOT (C OR D)");
+    compositionCohortDefinition.addSearch(
+        "E",
+        EptsReportUtils.map(
+            CompareInitArtStartDateAndStartDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("A AND B  AND NOT (C OR D OR E)");
     return compositionCohortDefinition;
   }
 
@@ -123,7 +138,13 @@ public class IMER1DenominatorCohortQueries {
         EptsReportUtils.map(
             getTransferredInPatients(), "onOrBefore=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("A AND C AND NOT (B OR D)");
+    compositionCohortDefinition.addSearch(
+        "E",
+        EptsReportUtils.map(
+            CompareInitArtStartDateAndStartDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("A AND C AND NOT (B OR D OR E)");
 
     return compositionCohortDefinition;
   }
@@ -164,7 +185,13 @@ public class IMER1DenominatorCohortQueries {
             genericCohortQueries.getAgeOnPreArtDate(0, 14),
             "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("(A AND CHILDREN) AND NOT (B OR C OR D)");
+    compositionCohortDefinition.addSearch(
+        "E",
+        EptsReportUtils.map(
+            CompareInitArtStartDateAndStartDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("(A AND CHILDREN) AND NOT (B OR C OR D OR E)");
 
     return compositionCohortDefinition;
   }
@@ -200,12 +227,18 @@ public class IMER1DenominatorCohortQueries {
             getTransferredInPatients(), "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
+        "E",
+        EptsReportUtils.map(
+            CompareInitArtStartDateAndStartDate(),
+            "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
         "ADULTS",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnPreArtDate(15, 200),
             "onOrAfter=${endDate-2m+1d},onOrBefore=${endDate-1m},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("(A AND ADULTS) AND NOT (B OR C OR D)");
+    compositionCohortDefinition.setCompositionString("(A AND ADULTS) AND NOT (B OR C OR D OR E)");
 
     return compositionCohortDefinition;
   }
@@ -290,5 +323,18 @@ public class IMER1DenominatorCohortQueries {
     transferredInPreviousMonth.addArtProgram(EptsTransferredInCohortDefinition2.ARTProgram.TARV);
 
     return transferredInPreviousMonth;
+  }
+
+  private CohortDefinition CompareInitArtStartDateAndStartDate() {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(InitiatedArtedBeforeCareEnrollmentCalculation.class)
+                .get(0));
+    cd.setName("patients who initiated ART before ART Care Enrollment");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    return cd;
   }
 }
