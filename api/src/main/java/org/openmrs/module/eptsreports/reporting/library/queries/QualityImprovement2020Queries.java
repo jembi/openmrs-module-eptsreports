@@ -673,7 +673,7 @@ public class QualityImprovement2020Queries {
             + " AND e.encounter_type = ${6} "
             + " AND o.concept_id = ${23739} "
             + " AND e.encounter_datetime BETWEEN date_add(:revisionEndDate, INTERVAL -14 month) "
-            + " AND date_add(:revisionEndDate, INTERVAL -11 month) group by p.patient_id) filt "
+            + " AND date_add(:revisionEndDate, INTERVAL -11 month) group by p.patient_id) filt ON pa.patient_id=filt.patient_id "
             + " WHERE pa.voided = 0 "
             + " AND ee.voided = 0 "
             + " AND ob.voided = 0 "
