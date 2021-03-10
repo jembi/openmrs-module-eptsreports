@@ -15,28 +15,33 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import org.joda.time.Days;
-import org.joda.time.Interval;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
+import org.openmrs.calculation.patient.PatientCalculationService;
 import org.openmrs.calculation.result.CalculationResultMap;
-import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/** Returns patients who initiated ART within 15 days from the ART Care Enrollment */
+/** Returns the patients that have started ART before a specific date care enrollment */
 @Component
-public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
-    extends AbstractPatientCalculation {
+public class InitiatedArtedBeforeCareEnrollmentCalculation extends AbstractPatientCalculation {
+
+  private static final String ON_OR_AFTER = "onOrAfter";
 
   private static final String ON_OR_BEFORE = "onOrBefore";
-  private static final int INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENT_DATE = 15;
+
+  private static final String LOCATION = "location";
+
+  @Autowired private HivMetadata hivMetadata;
 
   @Override
   public CalculationResultMap evaluate(
@@ -44,62 +49,58 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
       Map<String, Object> parameterValues,
       PatientCalculationContext context) {
     CalculationResultMap map = new CalculationResultMap();
+
+    PatientCalculationService service = Context.getService(PatientCalculationService.class);
+    PatientCalculationContext artContext = service.createCalculationContext();
+
+    Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
+    Location location = (Location) context.getFromCache(LOCATION);
+
+    Date endDate = DateUtils.addMonths(onOrBefore, 1);
+
+    CalculationResultMap initARTCareEnrollmentDateMap = getEarliestPreART(cohort, context);
+
+    artContext.addToCache(ON_OR_BEFORE, endDate);
+    artContext.addToCache(LOCATION, location);
+
     CalculationResultMap artStartDates =
         calculate(
             Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0),
             cohort,
             parameterValues,
-            context);
-    CalculationResultMap preARTCareEnrollmentMap = getARTCareEnrollment(cohort, context);
+            artContext);
 
-    Date endDate = (Date) context.getFromCache(ON_OR_BEFORE);
-
-    if (endDate != null) {
-      for (Integer patientId : cohort) {
-        boolean match = false;
-        Date artStartDate =
-            InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
-
-        SimpleResult preARTCareEnrollmentResult =
-            (SimpleResult) preARTCareEnrollmentMap.get(patientId);
-
-        if (preARTCareEnrollmentResult != null) {
-          Date preARTCareEnrollmentDate = (Date) preARTCareEnrollmentResult.getValue();
-
-          if (artStartDate != null && preARTCareEnrollmentDate.compareTo(artStartDate) <= 0) {
-            int days =
-                Days.daysIn(
-                        new Interval(preARTCareEnrollmentDate.getTime(), artStartDate.getTime()))
-                    .getDays();
-
-            if (days <= INTERVAL_BETWEEN_ART_START_DATE_MINUS_PATIENT_ART_ENROLLMENT_DATE) {
-              match = true;
-            }
-          }
-        }
-
-        if (match) {
-          map.put(patientId, new BooleanResult(match, this));
+    for (Integer patientId : cohort) {
+      Date artStartDate = InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
+      Date preArtStartDate =
+          EptsCalculationUtils.resultForPatient(initARTCareEnrollmentDateMap, patientId);
+      if (artStartDate != null && preArtStartDate != null) {
+        if (artStartDate.compareTo(preArtStartDate) < 0) {
+          map.put(patientId, new BooleanResult(true, this));
         }
       }
-      return map;
-    } else {
-      throw new IllegalArgumentException(String.format("Parameter %s must be set", ON_OR_BEFORE));
     }
+    return map;
   }
 
-  private CalculationResultMap getARTCareEnrollment(
+  public CalculationResultMap getEarliestPreART(
       Collection<Integer> cohort, PatientCalculationContext context) {
-    HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
-    SqlPatientDataDefinition def = new SqlPatientDataDefinition();
-    def.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    def.addParameter(new Parameter("location", "location", Location.class));
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Get Earliest Pre-ART");
+    sqlPatientDataDefinition.addParameter(new Parameter(ON_OR_AFTER, "onOrAfter", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter(ON_OR_BEFORE, "onOrBefore", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter(LOCATION, "Location", Location.class));
 
-    String sql =
-        " SELECT final.patient_id, final.mindate AS value_datetime "
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1", hivMetadata.getHIVCareProgram().getId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("23808", hivMetadata.getPreArtStartDate().getConceptId());
+
+    String query =
+        "    SELECT final.patient_id, final.mindate as  mdate "
             + "    FROM  "
             + "        (  "
-            + "        SELECT earliest_date.patient_id, MIN(earliest_date.min_date) AS mindate "
+            + "        SELECT earliest_date.patient_id ,MIN(earliest_date.min_date)  as  mindate "
             + "        FROM  "
             + "            (  "
             + "                SELECT p.patient_id, MIN(pp.date_enrolled) AS min_date  "
@@ -111,8 +112,8 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
             + "                WHERE  "
             + "                    p.voided = 0  "
             + "                    AND pp.voided = 0  "
-            + "                    AND pp.date_enrolled <= DATE_SUB(:onOrBefore,INTERVAL 1 MONTH) "
-            + "                    AND pg.program_id = %d  "
+            + "                    AND pp.date_enrolled <= :onOrBefore "
+            + "                    AND pg.program_id = ${1}  "
             + "                    AND pp.location_id = :location  "
             + "                GROUP BY p.patient_id  "
             + "                UNION  "
@@ -126,26 +127,26 @@ public class StartedArtMinusARTCareEnrollmentDateCalculationIMER1B
             + "                    p.voided =0  "
             + "                    AND e.voided = 0  "
             + "                    AND o.voided = 0  "
-            + "                    AND e.encounter_type = %d  "
+            + "                    AND e.encounter_type = ${53}  "
             + "                    AND e.location_id = :location  "
-            + "                    AND o.concept_id = %d "
-            + "                    AND o.value_datetime <= DATE_SUB(:onOrBefore,INTERVAL 1 MONTH) "
+            + "                    AND o.concept_id = ${23808} "
+            + "                    AND o.value_datetime <= :onOrBefore  "
             + "                GROUP BY p.patient_id  "
-            + "            ) AS earliest_date  "
+            + "            ) as earliest_date  "
             + "        GROUP BY earliest_date.patient_id  "
-            + "        ) AS final   "
-            + "    WHERE final.mindate <= DATE_SUB(:onOrBefore,INTERVAL 1 MONTH) ";
+            + "        ) as final   "
+            + "    WHERE final.mindate   "
+            + "        BETWEEN :onOrAfter AND :onOrBefore ";
 
-    def.setSql(
-        String.format(
-            sql,
-            hivMetadata.getHIVCareProgram().getId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getPreArtStartDate().getConceptId()));
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    Map<String, Object> params = new HashMap<>();
-    params.put("location", context.getFromCache("location"));
-    params.put("onOrBefore", context.getFromCache("onOrBefore"));
-    return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
+    Map<String, Object> param = new HashMap<>();
+    param.put(ON_OR_AFTER, context.getFromCache(ON_OR_AFTER));
+    param.put(ON_OR_BEFORE, context.getFromCache(ON_OR_BEFORE));
+    param.put(LOCATION, context.getFromCache(LOCATION));
+
+    return EptsCalculationUtils.evaluateWithReporting(
+        sqlPatientDataDefinition, cohort, param, null, context);
   }
 }
