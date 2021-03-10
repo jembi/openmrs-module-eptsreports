@@ -903,6 +903,8 @@ public class QualityImprovement2020Queries {
             + " AND ee.encounter_datetime <= :revisionEndDate "
             + " AND ob.value_coded IS NOT NULL ) vl "
             + " INNER JOIN ( "
+            + " SELECT patient_id, MAX(encounter_datetime) AS encounter_datetime "
+            + " FROM ("
             + " SELECT patient_id, encounter_datetime FROM ( "
             + " SELECT p.patient_id,e.encounter_datetime FROM patient p "
             + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
@@ -959,9 +961,9 @@ public class QualityImprovement2020Queries {
             + " AND o.concept_id = ${23722} "
             + " AND o.value_coded = ${856} "
             + " AND e.encounter_datetime <= :revisionEndDate "
-            + " AND e.encounter_datetime > fin.encounter_datetime) h1 ) h11 "
-            + " ON vl.patient_id = h11.patient_id "
-            + " WHERE vl.encounter_datetime <=:revisionEndDate AND vl.encounter_datetime > h11.encounter_datetime ";
+            + " AND e.encounter_datetime > fin.encounter_datetime) h1 ) h11 group by patient_id) h111 "
+            + " ON vl.patient_id = h111.patient_id "
+            + " WHERE vl.encounter_datetime <=:revisionEndDate AND vl.encounter_datetime > h111.encounter_datetime ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
