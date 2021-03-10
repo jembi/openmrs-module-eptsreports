@@ -15,10 +15,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
+import org.openmrs.calculation.patient.PatientCalculationService;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
@@ -48,34 +50,37 @@ public class InitiatedArtedBeforeCareEnrollmentCalculation extends AbstractPatie
       PatientCalculationContext context) {
     CalculationResultMap map = new CalculationResultMap();
 
+    PatientCalculationService service = Context.getService(PatientCalculationService.class);
+    PatientCalculationContext artContext = service.createCalculationContext();
+
+    Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
+    Location location = (Location) context.getFromCache(LOCATION);
+
+    Date endDate = DateUtils.addMonths(onOrBefore, 1);
+
     CalculationResultMap initARTCareEnrollmentDateMap = getEarliestPreART(cohort, context);
+
+    artContext.addToCache(ON_OR_BEFORE, endDate);
+    artContext.addToCache(LOCATION, location);
 
     CalculationResultMap artStartDates =
         calculate(
             Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0),
             cohort,
             parameterValues,
-            context);
-    Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
-    Date onOrAfter = (Date) context.getFromCache(ON_OR_AFTER);
+            artContext);
 
-    if (onOrBefore != null && onOrAfter != null) {
-      for (Integer patientId : cohort) {
-        Date artStartDate =
-            InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
-        Date preArtStartDate =
-            EptsCalculationUtils.resultForPatient(initARTCareEnrollmentDateMap, patientId);
-        if (artStartDate != null && preArtStartDate != null) {
-          if (artStartDate.compareTo(preArtStartDate) < 0) {
-            map.put(patientId, new BooleanResult(true, this));
-          }
+    for (Integer patientId : cohort) {
+      Date artStartDate = InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
+      Date preArtStartDate =
+          EptsCalculationUtils.resultForPatient(initARTCareEnrollmentDateMap, patientId);
+      if (artStartDate != null && preArtStartDate != null) {
+        if (artStartDate.compareTo(preArtStartDate) < 0) {
+          map.put(patientId, new BooleanResult(true, this));
         }
       }
-      return map;
-    } else {
-      throw new IllegalArgumentException(
-          String.format("Parameters %s and %s must be set", ON_OR_AFTER, ON_OR_BEFORE));
     }
+    return map;
   }
 
   public CalculationResultMap getEarliestPreART(
