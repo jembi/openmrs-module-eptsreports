@@ -3577,7 +3577,6 @@ public class QualityImprovement2020CohortQueries {
 
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    // map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
     map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
 
     String query =
@@ -4219,7 +4218,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "B2NEW",
         EptsReportUtils.map(
-            b2New, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            b2New,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "C",

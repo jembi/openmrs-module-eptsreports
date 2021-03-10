@@ -566,10 +566,16 @@ public class CommonCohortQueries {
     sqlCohortDefinition.setName("Pregnant Or Breastfeeding");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
+    map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
+    map.put("1190", hivMetadata.getFirstLineConcept().getConceptId());
 
     String query =
         " SELECT pa.patient_id  "
@@ -593,23 +599,22 @@ public class CommonCohortQueries {
             + "                                               ON e.patient_id = p.patient_id  "
             + "                                       JOIN obs o  "
             + "                                         ON o.encounter_id = e.encounter_id  "
-            + "                                WHERE  e.encounter_type = 6  "
+            + "                                WHERE  e.encounter_type = ${6}  "
             + "                                       AND p.voided = 0  "
             + "                                       AND e.voided = 0  "
-            + "                                       AND e.location_id = 398  "
+            + "                                       AND e.location_id = :location  "
             + "                                       AND o.voided = 0  "
-            + "                                       AND o.concept_id = 21151  "
             + "                                       AND e.encounter_datetime BETWEEN  "
-            + "                                           '2020-01-21' AND '2021-01-20'  "
+            + "                                           :startDate AND :revisionEndDate  "
             + "                                GROUP  BY p.patient_id) filtered  "
             + "                            ON filtered.patient_id = p.patient_id  "
             + "             WHERE  e.encounter_datetime = filtered.encounter_datetime  "
-            + "                    AND e.location_id = 398  "
-            + "                    AND o.concept_id = 21151  "
+            + "                    AND e.location_id = :location  "
+            + "                    AND o.concept_id = ${21151}  "
             + "                    AND e.voided = 0  "
             + "                    AND o.voided = 0  "
-            + "                    AND o.value_coded = 21150  "
-            + "                    AND e.encounter_type = 6) first_line  "
+            + "                    AND o.value_coded = ${21150}  "
+            + "                    AND e.encounter_type = ${6}) first_line  "
             + "         ON first_line.patient_id = pa.patient_id  "
             + "       INNER JOIN (SELECT p.patient_id,  "
             + "                          Max(e.encounter_datetime) last_visit  "
@@ -618,10 +623,10 @@ public class CommonCohortQueries {
             + "                                  ON e.patient_id = p.patient_id  "
             + "                   WHERE  p.voided = 0  "
             + "                          AND e.voided = 0  "
-            + "                          AND e.encounter_type = 6  "
-            + "                          AND e.location_id = 398  "
+            + "                          AND e.encounter_type = ${6}  "
+            + "                          AND e.location_id = :location  "
             + "                          AND e.encounter_datetime BETWEEN  "
-            + "                              '2020-01-21' AND '2020-04-20'  "
+            + "                              :startDate AND :endDate  "
             + "                   GROUP  BY p.patient_id) AS last_clinical  "
             + "               ON last_clinical.patient_id = pa.patient_id  "
             + "       INNER JOIN (SELECT p.patient_id,  "
@@ -631,9 +636,9 @@ public class CommonCohortQueries {
             + "                                  ON e.patient_id = p.patient_id  "
             + "                          INNER JOIN obs o  "
             + "                                  ON o.encounter_id = e.encounter_id  "
-            + "                   WHERE  o.concept_id = 1190  "
-            + "                          AND e.encounter_type = 53  "
-            + "                          AND e.location_id = 398  "
+            + "                   WHERE  o.concept_id = ${1190}  "
+            + "                          AND e.encounter_type = ${53}  "
+            + "                          AND e.location_id = :location  "
             + "                          AND p.voided = 0  "
             + "                          AND e.voided = 0  "
             + "                          AND o.voided = 0) arv_start_date  "
