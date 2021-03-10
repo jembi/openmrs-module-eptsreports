@@ -60,7 +60,7 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
             genericCohortQueries.getBaseCohort(),
             "startDate=${startDate}, endDate=${endDate},location=${location}"));
     rd.addDataSetDefinition(
-        "ALL", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset()));
+        "ALL", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset(getParameters())));
     return rd;
   }
 

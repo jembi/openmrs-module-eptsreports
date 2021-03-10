@@ -13,17 +13,18 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TPT_InitiationCohortQueries;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TPT_InitiationQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TbPrevCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
+import org.openmrs.module.reporting.dataset.definition.SqlDataSetDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class TPTInitiationDataset extends BaseDataSet {
@@ -32,30 +33,28 @@ public class TPTInitiationDataset extends BaseDataSet {
 
   @Autowired private TbPrevCohortQueries tbPrevCohortQueries;
 
-  @Autowired private TPT_InitiationCohortQueries tptInitiationCohortQueries;
+  @Autowired private TPT_InitiationQueries tptInitiationQueries;
 
   @Autowired private EptsCommonDimension eptsCommonDimension;
 
-  @Autowired
-  @Qualifier("commonAgeDimensionCohort")
-  private AgeDimensionCohortInterface ageDimensionCohort;
+  private HivMetadata hivMetadata;
 
-  public DataSetDefinition constructDatset() {
-    CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
-    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
-    dsd.setName("TPT Initiation Data Set");
-    dsd.addParameters(getParameters());
-    dsd.addColumn(
-        "TPT",
-        "Numerator Total",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Numerator Total",
-                EptsReportUtils.map(
-                    tptInitiationCohortQueries.getAorB(),
-                    "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}")),
-            mappings),
-        "");
-    return dsd;
+  @Autowired
+  public TPTInitiationDataset(HivMetadata hivMetadata) {
+    this.hivMetadata = hivMetadata;
+  }
+
+
+  public DataSetDefinition constructDatset(List<Parameter> parameterList) {
+
+    SqlDataSetDefinition sdd = new SqlDataSetDefinition();
+
+    sdd.setName("TPT Initiation Data Set");
+    sdd.addParameters(parameterList);
+    sdd.setSqlQuery(tptInitiationQueries.getTPTInitiationPatients(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()
+    ));
+
+    return sdd;
   }
 }
