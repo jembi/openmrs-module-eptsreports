@@ -2173,7 +2173,7 @@ public class QualityImprovement2020CohortQueries {
           "age",
           EptsReportUtils.map(
               getAgeOnObsDatetime(15, null),
-              "onOrAfter=${startDate},orOrBefore=${endDate},location=${location}"));
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     } else if (indicator == 9) {
       compositionCohortDefinition.addSearch(
           "age",
@@ -2206,7 +2206,7 @@ public class QualityImprovement2020CohortQueries {
           "age",
           EptsReportUtils.map(
               getAgeOnObsDatetime(3, 14),
-              "onOrAfter=${startDate},orOrBefore=${endDate},location=${location}"));
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     }
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
@@ -3659,15 +3659,15 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "SELECT p.patient_id"
-            + "FROM"
-            + "  patient p"
+            + "   FROM"
+            + "   patient p"
             + "       INNER JOIN"
             + "   encounter e ON e.patient_id = p.patient_id"
             + "       INNER JOIN"
             + "   obs o ON o.encounter_id = e.encounter_id"
             + "      INNER JOIN"
             + "   obs o2 ON o2.encounter_id = e.encounter_id"
-            + "WHERE e.voided = 0 AND p.voided = 0"
+            + "   WHERE e.voided = 0 AND p.voided = 0"
             + "   AND o.voided = 0"
             + "   AND o2.voided = 0"
             + "   AND e.encounter_type = ${53}"
@@ -3677,7 +3677,7 @@ public class QualityImprovement2020CohortQueries {
             + "   AND o.obs_datetime >= :startDate"
             + "   AND o.obs_datetime <= :endDate"
             + "   AND o2.concept_id = ${1792}"
-            + "   AND o2.value_coded <> ${1982};";
+            + "   AND o2.value_coded <> ${1982}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -4387,7 +4387,7 @@ public class QualityImprovement2020CohortQueries {
           "age",
           EptsReportUtils.map(
               getAgeOnObsDatetime(3, 14),
-              "onOrAfter=${startDate},orOrBefore=${endDate},location=${location}"));
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     }
 
     // Start adding the definitions based on the requirements
@@ -7013,9 +7013,9 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("Calculate Age based on ObsDatetime");
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addCalculationParameter("minAge", minAge);
-    cd.addCalculationParameter("maxAge", maxAge);
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter("minAgeOnObsDatetime", minAge);
+    cd.addCalculationParameter("maxAgeOnObsDatetime", maxAge);
     return cd;
   }
 }

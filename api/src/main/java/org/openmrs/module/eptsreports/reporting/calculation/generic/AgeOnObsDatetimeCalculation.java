@@ -102,8 +102,8 @@ public class AgeOnObsDatetimeCalculation extends AbstractPatientCalculation {
 
     String sql =
         "SELECT p.patient_id, o.obs_datetime"
-            + "FROM"
-            + "  patient p"
+            + "   FROM"
+            + "   patient p"
             + "   INNER JOIN"
             + "   encounter e ON e.patient_id = p.patient_id"
             + "       INNER JOIN"
@@ -120,7 +120,7 @@ public class AgeOnObsDatetimeCalculation extends AbstractPatientCalculation {
             + "   AND o.obs_datetime >= :onOrAfter"
             + "   AND o.obs_datetime <= :onOrBefore"
             + "   AND o2.concept_id = ${1792}"
-            + "   AND o2.value_coded <> ${1982};";
+            + "   AND o2.value_coded <> ${1982}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     def.setSql(stringSubstitutor.replace(sql));
