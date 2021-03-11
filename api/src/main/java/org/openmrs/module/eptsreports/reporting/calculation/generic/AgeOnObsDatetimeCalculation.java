@@ -20,6 +20,7 @@ import org.openmrs.module.reporting.common.Birthdate;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,8 +41,9 @@ public class AgeOnObsDatetimeCalculation extends AbstractPatientCalculation {
 
   private final String LOCATION = "location";
 
-  private HivMetadata hivMetadata;
-  private CommonMetadata commonMetadata;
+  @Autowired private HivMetadata hivMetadata;
+
+  @Autowired private CommonMetadata commonMetadata;
 
   @Override
   public CalculationResultMap evaluate(
