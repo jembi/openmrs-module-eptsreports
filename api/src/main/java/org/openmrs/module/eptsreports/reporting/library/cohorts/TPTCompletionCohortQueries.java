@@ -76,9 +76,9 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR with TPT Completion");
-    compositionCohortDefinition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
+        new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.addSearch(
@@ -135,10 +135,46 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithoutTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR without TPT Completion");
-    compositionCohortDefinition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
+        new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "txcurr",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true), mapping));
+
+    // validate this queries use startDate
+    compositionCohortDefinition.addSearch(
+        "startedINH",
+        EptsReportUtils.map(
+            tbPrevCohortQueries.getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(), mapping));
+
+    compositionCohortDefinition.addSearch(
+        "startedINH2",
+        EptsReportUtils.map(tbPrevCohortQueries.getPatientsThatInitiatedProfilaxia(), mapping));
+
+    compositionCohortDefinition.addSearch(
+        "startedINH3",
+        EptsReportUtils.map(
+            tbPrevCohortQueries.getPatientsWhoHaveRegimeTPTWithINHMarkedOnFirstPickUpDateOnFILT(),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "started3HP",
+        EptsReportUtils.map(
+            tbPrevCohortQueries.getPatientsWhoHaveOutrasPrescricoesWith3HPMarkedOnFichaClinica(),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "completedAll",
+        EptsReportUtils.map(
+            tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
+            "onOrAfter=${startDate},orOrBefore=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "txcurr AND NOT ((startedINH OR startedINH2 OR startedINH3 OR started3HP) OR completedAll)");
 
     return compositionCohortDefinition;
   }
@@ -158,9 +194,9 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithoutTPTCompletionWithTB() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR without TPT Completion with TB Treatment");
-    compositionCohortDefinition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
+        new Parameter("endDate", "end Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     return compositionCohortDefinition;
@@ -182,9 +218,9 @@ public class TPTCompletionCohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName(
         "TX_CURR without TPT Completion with Positive TB Screening");
-    compositionCohortDefinition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
+        new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     return compositionCohortDefinition;
@@ -205,9 +241,9 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrEligibleForTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR eligible for TPT Completion");
-    compositionCohortDefinition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
+        new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     return compositionCohortDefinition;
@@ -228,9 +264,9 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithTPTInLast7Months() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR with TPT in last 7 months");
-    compositionCohortDefinition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
+        new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     return compositionCohortDefinition;
@@ -251,9 +287,9 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrEligibleForTPTInitiation() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR eligible for TPT Initiation");
-    compositionCohortDefinition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(
-        new Parameter("onOrBefore", "Before Date", Date.class));
+        new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     return compositionCohortDefinition;

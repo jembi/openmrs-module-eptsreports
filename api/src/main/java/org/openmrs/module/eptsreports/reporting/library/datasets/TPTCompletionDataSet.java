@@ -66,6 +66,11 @@ public class TPTCompletionDataSet extends BaseDataSet {
             "TX_CURRwithTPTCompletion",
             EptsReportUtils.map(tPTCompletionCohortQueries.getTxCurrWithTPTCompletion(), mappings));
 
+            CohortIndicator txCurrWithoutTPTCompIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "TX_CURRwithTPTCompletion",
+            EptsReportUtils.map(tPTCompletionCohortQueries.getTxCurrWithoutTPTCompletion(), mappings));
+
     dataSetDefinition.addColumn(
         "TXCURR", "TX_CURR: Currently on ART", EptsReportUtils.map(txCurrIndicator, mappings), "");
 
@@ -74,6 +79,12 @@ public class TPTCompletionDataSet extends BaseDataSet {
         "TX_CURR with TPT Completion",
         EptsReportUtils.map(txCurrWithTPTCompIndicator, mappings),
         "");
+
+        dataSetDefinition.addColumn(
+            "TXCURRNOTTPTCOMP",
+            "TX_CURR without TPT Completion",
+            EptsReportUtils.map(txCurrWithoutTPTCompIndicator, mappings),
+            "");
 
     return dataSetDefinition;
   }
