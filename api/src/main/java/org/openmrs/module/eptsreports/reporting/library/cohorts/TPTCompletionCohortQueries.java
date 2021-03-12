@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TbPrevCohortQueries;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,9 @@ public class TPTCompletionCohortQueries {
 
   private TxPvlsCohortQueries txPvls;
 
-  private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
+  @Autowired private TbPrevCohortQueries tbPrevCohortQueries;
+
+  private final String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public TPTCompletionCohortQueries(
@@ -56,7 +59,7 @@ public class TPTCompletionCohortQueries {
   /**
    *
    *
-   * <h4></h4>
+   * <h4>TX_CURR with TPT Completion</h4>
    *
    * <ul>
    *   <li>
@@ -65,8 +68,123 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getAandB() {
+  public CohortDefinition getTxCurrWithTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>TX_CURR without TPT Completion</h4>
+   *
+   * <ul>
+   *   <li>
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getTxCurrWithoutTPTCompletion() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>TX_CURR without TPT Completion with TB Treatment</h4>
+   *
+   * <ul>
+   *   <li>
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getTxCurrWithoutTPTCompletionWithTB() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>TX_CURR without TPT Completion with Positive TB Screening</h4>
+   *
+   * <ul>
+   *   <li>
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getTxCurrWithoutTPTCompletionWithPositiveTBScreening() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>TX_CURR eligible for TPT Completion</h4>
+   *
+   * <ul>
+   *   <li>
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getTxCurrEligibleForTPTCompletion() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>TX_CURR with TPT in last 7 months</h4>
+   *
+   * <ul>
+   *   <li>
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getTxCurrWithTPTInLast7Months() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>TX_CURR eligible for TPT Initiation</h4>
+   *
+   * <ul>
+   *   <li>
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getTxCurrEligibleForTPTInitiation() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    
 
     return compositionCohortDefinition;
   }
