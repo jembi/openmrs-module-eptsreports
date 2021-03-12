@@ -86,11 +86,22 @@ public class TPTCompletionDataSet extends BaseDataSet {
                 mappings));
 
     CohortIndicator txCurrEligibleForTPTCompletion =
-                eptsGeneralIndicator.getIndicator(
-                    "TxCurrEligibleForTPTCompletion",
-                    EptsReportUtils.map(
-                        tPTCompletionCohortQueries.getTxCurrEligibleForTPTCompletion(),
-                        mappings));
+        eptsGeneralIndicator.getIndicator(
+            "TxCurrEligibleForTPTCompletion",
+            EptsReportUtils.map(
+                tPTCompletionCohortQueries.getTxCurrEligibleForTPTCompletion(), mappings));
+
+    CohortIndicator txCurrWithTPTinLast7Months =
+        eptsGeneralIndicator.getIndicator(
+            "TxCurrWithTPTInLast7Months",
+            EptsReportUtils.map(
+                tPTCompletionCohortQueries.getTxCurrWithTPTInLast7Months(), mappings));
+
+    CohortIndicator txCurrEligibleForTPTInitiation =
+        eptsGeneralIndicator.getIndicator(
+            "TxCurrEligibleForTPTInitiation",
+            EptsReportUtils.map(
+                tPTCompletionCohortQueries.getTxCurrEligibleForTPTInitiation(), mappings));
 
     dataSetDefinition.addColumn(
         "TXCURR", "TX_CURR: Currently on ART", EptsReportUtils.map(txCurrIndicator, mappings), "");
@@ -123,6 +134,18 @@ public class TPTCompletionDataSet extends BaseDataSet {
         "TPT4",
         "TX_CURR eligible for TPT Completion",
         EptsReportUtils.map(txCurrEligibleForTPTCompletion, mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "TPT5",
+        "TX_CURR With TPT Completion in Last 7 Months",
+        EptsReportUtils.map(txCurrWithTPTinLast7Months, mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "TPT6",
+        "TX_CURR eligible for TPT Initiation",
+        EptsReportUtils.map(txCurrEligibleForTPTInitiation, mappings),
         "");
 
     return dataSetDefinition;

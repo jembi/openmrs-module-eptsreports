@@ -226,10 +226,11 @@ public class TPTCompletionCohortQueries {
         "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
 
     compositionCohortDefinition.addSearch(
-          "tpt2", EptsReportUtils.map(getTxCurrWithoutTPTCompletionWithTB(), mapping));
-    
+        "tpt2", EptsReportUtils.map(getTxCurrWithoutTPTCompletionWithTB(), mapping));
+
     compositionCohortDefinition.addSearch(
-            "tpt3", EptsReportUtils.map(getTxCurrWithoutTPTCompletionWithPositiveTBScreening(), mapping));
+        "tpt3",
+        EptsReportUtils.map(getTxCurrWithoutTPTCompletionWithPositiveTBScreening(), mapping));
 
     compositionCohortDefinition.setCompositionString("tpt1 AND (tpt2 OR tpt3)");
 
@@ -255,6 +256,17 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
+    String generalParameterMapping =
+        "startDate=${endDate-210d},endDate=${endDate},location=${location}";
+
+    compositionCohortDefinition.addSearch(
+        "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
+
+    compositionCohortDefinition.addSearch(
+        "G", EptsReportUtils.map(tbPrevCohortQueries.getDenominator(), generalParameterMapping));
+
+    compositionCohortDefinition.setCompositionString("tpt1 AND G");
+
     return compositionCohortDefinition;
   }
 
@@ -276,6 +288,14 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "tpt4", EptsReportUtils.map(getTxCurrEligibleForTPTCompletion(), mapping));
+
+    compositionCohortDefinition.addSearch(
+        "tpt5", EptsReportUtils.map(getTxCurrWithTPTInLast7Months(), mapping));
+
+    compositionCohortDefinition.setCompositionString("tpt4 AND NOT tpt5");
 
     return compositionCohortDefinition;
   }
