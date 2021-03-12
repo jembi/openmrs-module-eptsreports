@@ -66,25 +66,64 @@ public class TPTCompletionDataSet extends BaseDataSet {
             "TX_CURRwithTPTCompletion",
             EptsReportUtils.map(tPTCompletionCohortQueries.getTxCurrWithTPTCompletion(), mappings));
 
-            CohortIndicator txCurrWithoutTPTCompIndicator =
+    CohortIndicator txCurrWithoutTPTCompIndicator =
         eptsGeneralIndicator.getIndicator(
-            "TX_CURRwithTPTCompletion",
-            EptsReportUtils.map(tPTCompletionCohortQueries.getTxCurrWithoutTPTCompletion(), mappings));
+            "TX_CURRwithoutTPTCompletion",
+            EptsReportUtils.map(
+                tPTCompletionCohortQueries.getTxCurrWithoutTPTCompletion(), mappings));
+
+    CohortIndicator txCurrWithoutTPTCompAndTxTBIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "TX_CURRwithoutTPTCompletionWithTB",
+            EptsReportUtils.map(
+                tPTCompletionCohortQueries.getTxCurrWithoutTPTCompletionWithTB(), mappings));
+
+    CohortIndicator txCurrWithoutTPTCompAndTBPosScreeningIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "TX_CURRwithoutTPTCompletionWithTBPositiveScreening",
+            EptsReportUtils.map(
+                tPTCompletionCohortQueries.getTxCurrWithoutTPTCompletionWithPositiveTBScreening(),
+                mappings));
+
+    CohortIndicator txCurrEligibleForTPTCompletion =
+                eptsGeneralIndicator.getIndicator(
+                    "TxCurrEligibleForTPTCompletion",
+                    EptsReportUtils.map(
+                        tPTCompletionCohortQueries.getTxCurrEligibleForTPTCompletion(),
+                        mappings));
 
     dataSetDefinition.addColumn(
         "TXCURR", "TX_CURR: Currently on ART", EptsReportUtils.map(txCurrIndicator, mappings), "");
 
     dataSetDefinition.addColumn(
-        "TXCURRTPTCOMP",
+        "TPT0",
         "TX_CURR with TPT Completion",
         EptsReportUtils.map(txCurrWithTPTCompIndicator, mappings),
         "");
 
-        dataSetDefinition.addColumn(
-            "TXCURRNOTTPTCOMP",
-            "TX_CURR without TPT Completion",
-            EptsReportUtils.map(txCurrWithoutTPTCompIndicator, mappings),
-            "");
+    dataSetDefinition.addColumn(
+        "TPT1",
+        "TX_CURR without TPT Completion",
+        EptsReportUtils.map(txCurrWithoutTPTCompIndicator, mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "TPT2",
+        "TX_CURR without TPT Completion and TxTB",
+        EptsReportUtils.map(txCurrWithoutTPTCompAndTxTBIndicator, mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "TPT3",
+        "TX_CURR without TPT Completion and TB Positive Screening",
+        EptsReportUtils.map(txCurrWithoutTPTCompAndTBPosScreeningIndicator, mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "TPT4",
+        "TX_CURR eligible for TPT Completion",
+        EptsReportUtils.map(txCurrEligibleForTPTCompletion, mappings),
+        "");
 
     return dataSetDefinition;
   }

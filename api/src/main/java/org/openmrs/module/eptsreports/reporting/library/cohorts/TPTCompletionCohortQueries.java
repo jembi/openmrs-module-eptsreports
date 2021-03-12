@@ -2,9 +2,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.metadata.CommonMetadata;
-import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -15,51 +12,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class TPTCompletionCohortQueries {
 
-  private GenericCohortQueries genericCohortQueries;
-
-  private HivMetadata hivMetadata;
-
-  private CommonMetadata commonMetadata;
-
-  private GenderCohortQueries genderCohortQueries;
-
-  private AgeCohortQueries ageCohortQueries;
-
-  private ResumoMensalCohortQueries resumoMensalCohortQueries;
-
-  private CommonCohortQueries commonCohortQueries;
-
-  private TbMetadata tbMetadata;
-
-  private TxPvlsCohortQueries txPvls;
-
   @Autowired private TbPrevCohortQueries tbPrevCohortQueries;
 
   @Autowired private TxCurrCohortQueries txCurrCohortQueries;
 
-  private final String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+  @Autowired private TXTBCohortQueries txtbCohortQueries;
 
-  @Autowired
-  public TPTCompletionCohortQueries(
-      GenericCohortQueries genericCohortQueries,
-      HivMetadata hivMetadata,
-      CommonMetadata commonMetadata,
-      GenderCohortQueries genderCohortQueries,
-      ResumoMensalCohortQueries resumoMensalCohortQueries,
-      CommonCohortQueries commonCohortQueries,
-      TbMetadata tbMetadata,
-      TxPvlsCohortQueries txPvls,
-      AgeCohortQueries ageCohortQueries) {
-    this.genericCohortQueries = genericCohortQueries;
-    this.hivMetadata = hivMetadata;
-    this.commonMetadata = commonMetadata;
-    this.genderCohortQueries = genderCohortQueries;
-    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
-    this.commonCohortQueries = commonCohortQueries;
-    this.tbMetadata = tbMetadata;
-    this.txPvls = txPvls;
-    this.ageCohortQueries = ageCohortQueries;
-  }
+  private final String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   /**
    *
@@ -77,8 +36,7 @@ public class TPTCompletionCohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR with TPT Completion");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.addSearch(
@@ -136,8 +94,7 @@ public class TPTCompletionCohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR without TPT Completion");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.addSearch(
@@ -195,9 +152,19 @@ public class TPTCompletionCohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR without TPT Completion with TB Treatment");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("endDate", "end Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "end Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    String generalParameterMapping =
+        "startDate=${endDate-1095d},endDate=${endDate},location=${location}";
+
+    compositionCohortDefinition.addSearch(
+        "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
+
+    compositionCohortDefinition.addSearch(
+        "E", EptsReportUtils.map(txtbCohortQueries.txTbNumerator(), generalParameterMapping));
+
+    compositionCohortDefinition.setCompositionString("tpt1 AND E");
 
     return compositionCohortDefinition;
   }
@@ -219,9 +186,19 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.setName(
         "TX_CURR without TPT Completion with Positive TB Screening");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    String generalParameterMapping =
+        "startDate=${endDate-14d},endDate=${endDate},location=${location}";
+
+    compositionCohortDefinition.addSearch(
+        "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
+
+    compositionCohortDefinition.addSearch(
+        "F", EptsReportUtils.map(txtbCohortQueries.getDenominator(), generalParameterMapping));
+
+    compositionCohortDefinition.setCompositionString("tpt1 AND F");
 
     return compositionCohortDefinition;
   }
@@ -242,9 +219,19 @@ public class TPTCompletionCohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR eligible for TPT Completion");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
+
+    compositionCohortDefinition.addSearch(
+          "tpt2", EptsReportUtils.map(getTxCurrWithoutTPTCompletionWithTB(), mapping));
+    
+    compositionCohortDefinition.addSearch(
+            "tpt3", EptsReportUtils.map(getTxCurrWithoutTPTCompletionWithPositiveTBScreening(), mapping));
+
+    compositionCohortDefinition.setCompositionString("tpt1 AND (tpt2 OR tpt3)");
 
     return compositionCohortDefinition;
   }
@@ -265,8 +252,7 @@ public class TPTCompletionCohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR with TPT in last 7 months");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     return compositionCohortDefinition;
@@ -288,8 +274,7 @@ public class TPTCompletionCohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR eligible for TPT Initiation");
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     return compositionCohortDefinition;
