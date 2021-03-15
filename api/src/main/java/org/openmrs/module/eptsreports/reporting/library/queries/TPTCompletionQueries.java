@@ -11,12 +11,11 @@ import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class TPTCompletionQueries {
 
-  @Autowired private HivMetadata hivMetadata;
-  @Autowired private TbMetadata tbMetadata;
+  private HivMetadata hivMetadata;
+  private TbMetadata tbMetadata;
 
   public static String getRegimeTPTOrOutrasPrescricoes(
       EncounterType encounterType, Concept question, List<Concept> answers, Integer boundary) {
@@ -70,6 +69,69 @@ public class TPTCompletionQueries {
     return sb.replace(query);
   }
 
+  private CohortDefinition getINHStartA1(int masterCardEncounterType, int dataInicioProfilaxiaIsoniazidaConcept ) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    String query =
+        "  SELECT"
+            + "  p.patient_id, MAX(e.encounter_id) as ultima_profilaxia"
+            + "  FROM"
+            + "  patient p"
+            + "     INNER JOIN"
+            + "  encounter e ON p.patient_id = e.patient_id"
+            + "     INNER JOIN"
+            + " obs o ON e.encounter_id = o.encounter_id"
+            + " WHERE"
+            + " p.voided = 0 AND e.voided AND o.voided"
+            + " and e.encounter_type = ${masterCardEncounterType}"
+            + " and o.concept_id = ${dataInicioProfilaxiaIsoniazidaConcept}"
+            + " and o.value_datetime IS NOT NULL"
+            + " and e.encounter_datetime <= :endDAte"
+            + " and e.location_id = :location";
+            Map<String, Integer> map = new HashMap<>();
+
+            map.put("masterCardEncounterType", masterCardEncounterType);
+            map.put("dataInicioProfilaxiaIsoniazidaConcept", dataInicioProfilaxiaIsoniazidaConcept);
+    StringSubstitutor sb = new StringSubstitutor(map);
+   
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  private CohortDefinition getINHStartA2(int adultoSeguimentoEncounterType, int startDrugsConcept, int isoniazidUsageConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    Map<String, Integer> map = new HashMap<>();
+    
+
+    String query =
+        " SELECT"
+            + " p.patient_id"
+            + " FROM"
+            + " patient p"
+            + " INNER JOIN"
+            + " encounter e ON p.patient_id = e.patient_id"
+            + " INNER JOIN"
+            + " obs o ON e.encounter_id = o.encounter_id"
+            + " WHERE"
+            + " p.voided = 0 AND e.voided AND o.voided"
+            + "    AND e.encounter_type = ${adultoSeguimentoEncounterType}"
+            + "    AND o.concept_id = ${startDrugsConcept}"
+            + "     AND o.value_coded = ${isoniazidUsageConcept}"
+            + "     AND e.encounter_datetime <= :endDate"
+            + "    AND e.location_id = :location";
+
+            map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
+            map.put("startDrugsConcept", startDrugsConcept);
+           map.put("isoniazidUsageConcept", isoniazidUsageConcept);
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+  
   public static String getINHStartA3(int encounterType, int profilaxiaIsoniazidaConcept) {
     String query =
         "SELECT p.patient_id FROM patient p "
@@ -127,6 +189,37 @@ public class TPTCompletionQueries {
     return sqlCohortDefinition;
   }
 
+  private CohortDefinition getINHStartA5(int regimeTPTEncounterType, int regimeTPTConcept, int isoniazidConcept, int isoniazidePiridoxinaConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    Map<String, Integer> map = new HashMap<>();
+
+    String query =
+        " SELECT"
+            + " p.patient_id"
+            + " FROM"
+            + " patient p"
+            + "    INNER JOIN"
+            + "  encounter e ON p.patient_id = e.patient_id"
+            + "    INNER JOIN"
+            + " obs o ON e.encounter_id = o.encounter_id"
+            + " WHERE"
+            + " p.voided = 0 AND e.voided AND o.voided"
+            + "     AND e.encounter_type = ${regimeTPTEncounterType}"
+            + "     AND o.concept_id = ${regimeTPTConcept}"
+            + "    AND o.value_coded IN (${isoniazidConcept} , ${isoniazidePiridoxinaConcept})"
+            + "     AND e.encounter_datetime < :endDate"
+            + "        AND e.location_id = :location";
+
+            map.put("regimeTPTEncounterType", regimeTPTEncounterType);
+            map.put("regimeTPTConcept", regimeTPTConcept);
+            map.put("isoniazidConcept", isoniazidConcept);
+           map.put("isoniazidePiridoxinaConcept", isoniazidePiridoxinaConcept);
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+  
   public static String get3HPStartC1(
       int encounterType, int treatmentPrescribedConcept, int threeHPConcept) {
     String query =
@@ -189,4 +282,5 @@ public class TPTCompletionQueries {
 
     return sqlCohortDefinition;
   }
+  
 }
