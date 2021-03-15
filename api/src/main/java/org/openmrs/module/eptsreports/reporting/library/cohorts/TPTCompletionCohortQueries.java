@@ -19,7 +19,8 @@ public class TPTCompletionCohortQueries {
   @Autowired private TXTBCohortQueries txtbCohortQueries;
 
   private final String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
-  private final String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+  private final String mapping2 =
+      "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
   /**
    *
