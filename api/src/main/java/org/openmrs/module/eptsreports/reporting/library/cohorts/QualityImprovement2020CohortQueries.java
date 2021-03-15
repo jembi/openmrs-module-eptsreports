@@ -1980,7 +1980,7 @@ public class QualityImprovement2020CohortQueries {
     if (indicatorFlag == 4)
       compositionCohortDefinition.setName(
           "Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás");
-     if (indicatorFlag == 7)
+    if (indicatorFlag == 7)
       compositionCohortDefinition.setName(
           "Crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
     if (indicatorFlag == 8)
@@ -3692,29 +3692,22 @@ public class QualityImprovement2020CohortQueries {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
-    String mapping1 =
-        "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}";
-
     switch (flag) {
       case 3:
         cd.setName(
-            "No de adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas");
+            "Adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saídas");
         break;
       case 4:
-        cd.setName("No de adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás");
-        break;
-      case 8:
-        cd.setName("No de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
+        cd.setName("Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás");
         break;
       case 7:
-        cd.setName(
-            " # de crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás ");
+        cd.setName("Crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
         break;
-      case 9:
-        cd.setName("No de crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás");
+      case 8:
+        cd.setName("Crianças (0-14 anos) que iniciaram 2ª linha TARV há 12 meses atrás");
         break;
-      case 12:
-        cd.setName("No de mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás");
+      case 11:
+        cd.setName("Mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás");
         break;
     }
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -3793,19 +3786,15 @@ public class QualityImprovement2020CohortQueries {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     if (flag == 3) {
-      cd.setCompositionString("(A AND B1 AND G AND NOT (B1E OR C OR D OR F))");
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G");
     } else if (flag == 4) {
       cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR F)) AND G AND ADULT");
     } else if (flag == 7) {
       cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G");
     } else if (flag == 8) {
-      cd.setCompositionString("(A AND B1 AND NOT (B2E OR C OR D OR F)) AND G");
-    } else if (flag == 9) {
       cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR F) AND G");
     } else if (flag == 11) {
-      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR F) AND G ");
-    } else if (flag == 12) {
-      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR F) AND G ");
+      cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR F) AND G");
     }
 
     return cd;
