@@ -63,6 +63,26 @@ public class TPTCompletionQueries {
     return sb.replace(query);
   }
 
+  public static String getINHStartA3(int encounterType, int profilaxiaIsoniazidaConcept) {
+    String query =
+        "SELECT p.patient_id FROM patient p "
+            + "INNER JOIN encounter e ON p.patient_id  = e.encounter_id "
+            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "WHERE e.encounter_type = ${encounterType} "
+            + "AND o.concept_id = ${profilaxiaIsoniazidaConcept} "
+            + "AND e.location = :location "
+            + "AND o.value_datetime < :endDate "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("encounterType", encounterType);
+    map.put("profilaxiaIsoniazidaConcept", profilaxiaIsoniazidaConcept);
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    return sb.replace(query);
+  }
+
   public SqlCohortDefinition getINHStartA4(
       int pediatriaSeguimentoEncounterType, int dataInicioProfilaxiaIsoniazidaConcept) {
 
@@ -98,6 +118,28 @@ public class TPTCompletionQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  public static String get3HPStartC1(
+      int encounterType, int treatmentPrescribedConcept, int threeHPConcept) {
+    String query =
+        "SELECT p.patient_id FROM patient p "
+            + "INNER JOIN encounter e ON p.patient_id  = e.encounter_id "
+            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "WHERE e.encounter_type = ${encounterType} "
+            + "AND o.concept_id = ${treatmentPrescribedConcept} AND o.value_coded = ${threeHPConcept} "
+            + "AND e.location = :location "
+            + "AND e.encounter_datetime < :endDate "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("encounterType", encounterType);
+    map.put("treatmentPrescribedConcept", treatmentPrescribedConcept);
+    map.put("threeHPConcept", threeHPConcept);
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    return sb.replace(query);
   }
 
   public SqlCohortDefinition get3HPStartC2(
