@@ -42,7 +42,8 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "txcurr",
         EptsReportUtils.map(
-            txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true), mapping));
+            txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     // validate this queries use startDate
     compositionCohortDefinition.addSearch(

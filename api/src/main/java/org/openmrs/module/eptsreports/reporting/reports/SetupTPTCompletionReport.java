@@ -1,14 +1,18 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTCompletionDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +56,7 @@ public class SetupTPTCompletionReport extends EptsDataExportManager {
     reportDefinition.setUuid(getUuid());
     reportDefinition.setName(getName());
     reportDefinition.setDescription(getDescription());
-    reportDefinition.setParameters(getParameters());
+    reportDefinition.setParameters(getDataParameters());
     reportDefinition.addDataSetDefinition(
         "ALL", Mapped.mapStraightThrough(tPTCompletionDataSet.constructTPTCompletionDataSet()));
 
@@ -82,7 +86,14 @@ public class SetupTPTCompletionReport extends EptsDataExportManager {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
     return Arrays.asList(reportDesign);
+  }
+
+  private List<Parameter> getDataParameters() {
+    List<Parameter> parameters = new ArrayList<>();
+    parameters.add(ReportingConstants.START_DATE_PARAMETER);
+    parameters.add(ReportingConstants.END_DATE_PARAMETER);
+    parameters.add(new Parameter("location", "Facilities", Location.class, List.class, null));
+    return parameters;
   }
 }
