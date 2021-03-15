@@ -19,6 +19,7 @@ public class TPTCompletionCohortQueries {
   @Autowired private TXTBCohortQueries txtbCohortQueries;
 
   private final String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
   /**
    *
@@ -49,11 +50,11 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "startedINH",
         EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(), mapping));
+            tbPrevCohortQueries.getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(), mapping2));
 
     compositionCohortDefinition.addSearch(
         "startedINH2",
-        EptsReportUtils.map(tbPrevCohortQueries.getPatientsThatInitiatedProfilaxia(), mapping));
+        EptsReportUtils.map(tbPrevCohortQueries.getPatientsThatInitiatedProfilaxia(), mapping2));
 
     compositionCohortDefinition.addSearch(
         "startedINH3",
@@ -71,7 +72,7 @@ public class TPTCompletionCohortQueries {
         "completedAll",
         EptsReportUtils.map(
             tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
-            "onOrAfter=${startDate},orOrBefore=${endDate},location=${location}"));
+            mapping2));
 
     compositionCohortDefinition.setCompositionString(
         "txcurr AND ((startedINH OR startedINH2 OR startedINH3 OR started3HP) OR completedAll)");
@@ -108,11 +109,11 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "startedINH",
         EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(), mapping));
+            tbPrevCohortQueries.getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(), mapping2));
 
     compositionCohortDefinition.addSearch(
         "startedINH2",
-        EptsReportUtils.map(tbPrevCohortQueries.getPatientsThatInitiatedProfilaxia(), mapping));
+        EptsReportUtils.map(tbPrevCohortQueries.getPatientsThatInitiatedProfilaxia(), mapping2));
 
     compositionCohortDefinition.addSearch(
         "startedINH3",
@@ -130,7 +131,7 @@ public class TPTCompletionCohortQueries {
         "completedAll",
         EptsReportUtils.map(
             tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
-            "onOrAfter=${startDate},orOrBefore=${endDate},location=${location}"));
+            mapping2));
 
     compositionCohortDefinition.setCompositionString(
         "txcurr AND NOT ((startedINH OR startedINH2 OR startedINH3 OR started3HP) OR completedAll)");
