@@ -1969,32 +1969,26 @@ public class QualityImprovement2020CohortQueries {
    * </ul>
    *
    * @return CohortDefinition
-   * @params indicatorFlag A to E For inicator 12.3 to 12.12 respectively
+   * @params indicatorFlag
    */
-  public CohortDefinition getMQC12P2DEN(String indicatorFlag) {
-    String mapping1 = "startDate=${endDate-14m},endDate=${endDate},location=${location}";
+  public CohortDefinition getMQC12P2DEN(Integer indicatorFlag) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    if (indicatorFlag.equals("A"))
+    if (indicatorFlag == 3)
       compositionCohortDefinition.setName(
-          "Adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás sem registo de saidas");
-    if (indicatorFlag.equals("B"))
+          "Adultos (15/+anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
+    if (indicatorFlag == 4)
       compositionCohortDefinition.setName(
-          "Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrá");
-    if (indicatorFlag.equals("C"))
+          "Adultos (15/+anos) que iniciaram 2ª linha TARV há 12 meses atrás");
+     if (indicatorFlag == 7)
       compositionCohortDefinition.setName(
           "Crianças (0-14 anos) na 1ª linha que iniciaram o TARV há 12 meses atrás");
-    if (indicatorFlag.equals("D"))
+    if (indicatorFlag == 8)
       compositionCohortDefinition.setName(
-          "Crianças (0-14 anos)  que iniciaram 2ª linha TARV há 12 meses atrás");
-    if (indicatorFlag.equals("E"))
+          "Crianças (0-14 anos) que iniciaram 2ª linha TARV há 12 meses atrás");
+    if (indicatorFlag == 11)
       compositionCohortDefinition.setName(
           "Mulheres grávidas HIV+ 1ª linha que iniciaram o TARV há 12 meses atrás");
-
-    if (indicatorFlag.equals("F"))
-      compositionCohortDefinition.setName(
-          "12.5. # de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que "
-              + "retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV (Line 67 in the template)");
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -2022,14 +2016,6 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING2));
@@ -2056,20 +2042,17 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
-    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
-
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
-    if (indicatorFlag.equals("A")) {
+    if (indicatorFlag == 3 || indicatorFlag == 7) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND B1) AND  NOT B1E  AND  NOT  (C OR D OR F)");
+          "(A AND B1) AND NOT B1E AND NOT (C OR D OR F)");
     }
-    if (indicatorFlag.equals("B")) {
+    if (indicatorFlag == 4 || indicatorFlag == 8) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND B2) AND  NOT B2E  AND  NOT  (C OR D OR F)");
+          "(A AND B2) AND NOT B2E AND NOT (C OR D OR F)");
     }
-
-    if (indicatorFlag.equals("F")) {
+    if (indicatorFlag == 11) {
       compositionCohortDefinition.setCompositionString(
           "(A AND B1 AND C) AND NOT B1E AND NOT (D OR F)");
     }
