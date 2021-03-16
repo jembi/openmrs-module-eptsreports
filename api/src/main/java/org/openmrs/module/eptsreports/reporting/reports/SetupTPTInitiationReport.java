@@ -6,7 +6,6 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTInitiationDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -54,9 +53,9 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
-    rd.setBaseCohortDefinition(
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+    /*    rd.setBaseCohortDefinition(
+    EptsReportUtils.map(
+        genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));*/
     rd.addDataSetDefinition(
         "TPT", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset(getParameters())));
     return rd;

@@ -14,7 +14,10 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import java.util.List;
+
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPT_InitiationQueries;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.SqlDataSetDefinition;
@@ -26,10 +29,14 @@ import org.springframework.stereotype.Component;
 public class TPTInitiationDataset extends BaseDataSet {
 
   private HivMetadata hivMetadata;
+  private TbMetadata tbMetadata;
+  private CommonMetadata commonMetadata;
 
   @Autowired
-  public TPTInitiationDataset(HivMetadata hivMetadata) {
+  public TPTInitiationDataset(HivMetadata hivMetadata, TbMetadata tbMetadata, CommonMetadata commonMetadata) {
     this.hivMetadata = hivMetadata;
+    this.tbMetadata = tbMetadata;
+    this.commonMetadata = commonMetadata;
   }
 
   public DataSetDefinition constructDatset(List<Parameter> parameterList) {
@@ -40,7 +47,50 @@ public class TPTInitiationDataset extends BaseDataSet {
     sdd.addParameters(parameterList);
     sdd.setSqlQuery(
         TPT_InitiationQueries.getTPTInitiationPatients(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+            tbMetadata.get3HPConcept().getConceptId(),
+            tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+            tbMetadata.getRegimeTPTConcept().getConceptId(),
+            tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+            hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+            tbMetadata.getIsoniazidConcept().getConceptId(),
+            tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+            hivMetadata.getARVPlanConcept().getConceptId(),
+            hivMetadata.getARVStartDateConcept().getConceptId(),
+            hivMetadata.getARTProgram().getProgramId(),
+            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+            hivMetadata.getArtDatePickupMasterCard().getConceptId(),
+            hivMetadata.getArtPickupConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            hivMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId(),
+            commonMetadata.getNumberOfWeeksPregnant().getConceptId(),
+            commonMetadata.getPregnancyDueDate().getConceptId(),
+            hivMetadata.getCriteriaForArtStart().getConceptId(),
+            hivMetadata.getBpostiveConcept().getConceptId(),
+            hivMetadata.getPtvEtvProgram().getProgramId(),
+            hivMetadata.getDateOfLastMenstruationConcept().getConceptId(),
+            commonMetadata.getPriorDeliveryDateConcept().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId(),
+            tbMetadata.getDtINHConcept().getConceptId(),
+            hivMetadata.getContinueRegimenConcept().getConceptId(),
+            tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+            hivMetadata.getMonthlyConcept().getConceptId(),
+            hivMetadata.getQuarterlyConcept().getConceptId(),
+
+            hivMetadata.getCompletedConcept().getConceptId(),
+            hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId()
+
+                ));
+
+
 
     return sdd;
   }
