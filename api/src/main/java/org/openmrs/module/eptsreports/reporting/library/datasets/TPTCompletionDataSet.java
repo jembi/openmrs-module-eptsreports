@@ -36,24 +36,8 @@ public class TPTCompletionDataSet extends BaseDataSet {
     dataSetDefinition.addParameters(getParameters());
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
-    /* add dimensions */
-    dataSetDefinition.addDimension(
-        "age",
-        EptsReportUtils.map(
-            eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
-
-    dataSetDefinition.addDimension(
-        "ageInMonths",
-        EptsReportUtils.map(eptsCommonDimension.ageInMonths(), "effectiveDate=${endDate}"));
-
-    dataSetDefinition.addDimension(
-        "ageBasedOnArt",
-        EptsReportUtils.map(
-            eptsCommonDimension.ageBasedOnArtStartDateMOH(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
     CohortDefinition txCurrCompositionCohort =
-        txCurrCohortQueries.getTxCurrCompositionCohort("compositionCohort", true);
+        txCurrCohortQueries.getTxCurrCompositionCohort("txCurrCompositionTPT", true);
 
     CohortIndicator txCurrIndicator =
         eptsGeneralIndicator.getIndicator(

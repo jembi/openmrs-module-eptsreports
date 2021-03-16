@@ -63,8 +63,7 @@ public class SetupTPTCompletionReport extends EptsDataExportManager {
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
         EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(),
-            "endDate=${endDate},location=${location}"));
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     return reportDefinition;
   }
