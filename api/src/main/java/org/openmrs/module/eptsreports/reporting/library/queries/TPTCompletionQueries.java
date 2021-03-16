@@ -113,7 +113,13 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  public static String getINHStartA3(int encounterType, int profilaxiaIsoniazidaConcept) {
+  private CohortDefinition getINHStartA3(int encounterType, int profilaxiaIsoniazidaConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(" all patients with Ficha Clinica ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", encounterType);
@@ -131,7 +137,9 @@ public class TPTCompletionQueries {
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
-    return sb.replace(query);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
   }
 
   /**
@@ -243,8 +251,14 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  public static String get3HPStartC1(
+  private CohortDefinition get3HPStartC1(
       int encounterType, int treatmentPrescribedConcept, int threeHPConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(" all patients with Ficha Clinica Master Card ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", encounterType);
@@ -263,7 +277,9 @@ public class TPTCompletionQueries {
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
-    return sb.replace(query);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
   }
 
   /**
