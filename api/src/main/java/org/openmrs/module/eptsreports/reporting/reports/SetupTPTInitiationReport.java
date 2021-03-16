@@ -6,10 +6,10 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTInitiationDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-import org.openmrs.module.reporting.evaluation.parameter.ParameterizableUtil;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +29,12 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
 
   @Override
   public String getExcelDesignUuid() {
-    return "0638ab60-bf2c-11e9-b8ed-7b0ec2ec93ad";
+    return "39571f02-8626-11eb-84e8-d3239fe29d04";
   }
 
   @Override
   public String getUuid() {
-    return "10b6239c-bf2c-11e9-a2e5-63fb38259292";
+    return "5516d872-8626-11eb-9e73-335a85ba4e67";
   }
 
   @Override
@@ -55,8 +55,8 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
     rd.setBaseCohortDefinition(
-        genericCohortQueries.getBaseCohort(),
-        ParameterizableUtil.createParameterMappings("endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
     rd.addDataSetDefinition(
         "TPT", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset(getParameters())));
     return rd;
@@ -79,6 +79,7 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
+      props.put("repeatingSections", "sheet:2,row:4,dataset:TPT");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
