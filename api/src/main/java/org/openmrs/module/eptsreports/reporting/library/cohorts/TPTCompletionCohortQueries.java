@@ -1,7 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
-
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
@@ -26,22 +25,18 @@ public class TPTCompletionCohortQueries {
 
   private TXTBCohortQueries txTbCohortQueries;
 
-  private TPTCompletionQueries tptCompletionQueries;
-
   @Autowired
   public TPTCompletionCohortQueries(
       HivMetadata hivMetadata,
       TbMetadata tbMetadata,
       TbPrevCohortQueries tbPrevCohortQueries,
       TxCurrCohortQueries txCurrCohortQueries,
-      TXTBCohortQueries txTbCohortQueries,
-      TPTCompletionQueries tptCompletionQueries) {
+      TXTBCohortQueries txTbCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.tbPrevCohortQueries = tbPrevCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
     this.txTbCohortQueries = txTbCohortQueries;
-    this.tptCompletionQueries = tptCompletionQueries;
   }
 
   private final String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
@@ -76,7 +71,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "A1",
         EptsReportUtils.map(
-            tptCompletionQueries.getINHStartA1(
+            TPTCompletionQueries.getINHStartA1(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
@@ -84,7 +79,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "A2",
         EptsReportUtils.map(
-            tptCompletionQueries.getINHStartA2(
+            TPTCompletionQueries.getINHStartA2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getStartDrugs().getConceptId(),
                 hivMetadata.getIsoniazidUsageConcept().getConceptId()),
@@ -93,7 +88,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "A3",
         EptsReportUtils.map(
-            tptCompletionQueries.getINHStartA3(
+            TPTCompletionQueries.getINHStartA3(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
@@ -101,7 +96,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "A4",
         EptsReportUtils.map(
-            tptCompletionQueries.getINHStartA4(
+            TPTCompletionQueries.getINHStartA4(
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
@@ -109,7 +104,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "A5",
         EptsReportUtils.map(
-            tptCompletionQueries.getINHStartA5(
+            TPTCompletionQueries.getINHStartA5(
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
@@ -119,7 +114,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "C1",
         EptsReportUtils.map(
-            tptCompletionQueries.get3HPStartC1(
+            TPTCompletionQueries.get3HPStartC1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId()),
@@ -128,7 +123,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "C2",
         EptsReportUtils.map(
-            tptCompletionQueries.get3HPStartC2(
+            TPTCompletionQueries.get3HPStartC2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),

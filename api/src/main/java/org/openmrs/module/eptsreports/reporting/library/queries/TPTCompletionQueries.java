@@ -19,7 +19,7 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartA1(
+  public static CohortDefinition getINHStartA1(
       int masterCardEncounterType, int dataInicioProfilaxiaIsoniazidaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
@@ -66,7 +66,7 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartA2(
+  public static CohortDefinition getINHStartA2(
       int adultoSeguimentoEncounterType, int startDrugsConcept, int isoniazidUsageConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
@@ -113,7 +113,7 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getINHStartA3(int encounterType, int profilaxiaIsoniazidaConcept) {
+  public static CohortDefinition getINHStartA3(int encounterType, int profilaxiaIsoniazidaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Ficha Clinica ");
@@ -152,7 +152,7 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  public SqlCohortDefinition getINHStartA4(
+  public static CohortDefinition getINHStartA4(
       int pediatriaSeguimentoEncounterType, int dataInicioProfilaxiaIsoniazidaConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -199,7 +199,7 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartA5(
+  public static CohortDefinition getINHStartA5(
       int regimeTPTEncounterType,
       int regimeTPTConcept,
       int isoniazidConcept,
@@ -251,7 +251,7 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  private CohortDefinition get3HPStartC1(
+  public static CohortDefinition get3HPStartC1(
       int encounterType, int treatmentPrescribedConcept, int threeHPConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
@@ -293,7 +293,7 @@ public class TPTCompletionQueries {
    *
    * @return CohortDefinition
    */
-  public SqlCohortDefinition get3HPStartC2(
+  public static CohortDefinition get3HPStartC2(
       int adultoSeguimentoEncounterType,
       int regimeTPTConcept,
       int hPConcept,
