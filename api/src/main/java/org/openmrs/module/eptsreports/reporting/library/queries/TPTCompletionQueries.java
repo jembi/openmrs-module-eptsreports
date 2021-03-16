@@ -23,6 +23,11 @@ public class TPTCompletionQueries {
       int masterCardEncounterType, int dataInicioProfilaxiaIsoniazidaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
+    sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Data Inicio)");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
     Map<String, Integer> map = new HashMap<>();
     map.put("53", masterCardEncounterType);
     map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
@@ -65,6 +70,11 @@ public class TPTCompletionQueries {
   public CohortDefinition getINHStartA2(
       int adultoSeguimentoEncounterType, int startDrugsConcept, int isoniazidUsageConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(" all patients with Profilaxia INH");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", adultoSeguimentoEncounterType);
@@ -190,6 +200,11 @@ public class TPTCompletionQueries {
       int isoniazidConcept,
       int isoniazidePiridoxinaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(" all patients with Regime de TPT");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("60", regimeTPTEncounterType);
