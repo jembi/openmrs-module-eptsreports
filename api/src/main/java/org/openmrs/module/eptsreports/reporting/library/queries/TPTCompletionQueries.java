@@ -1,86 +1,26 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
 import java.util.*;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.Concept;
-import org.openmrs.EncounterType;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 
 public class TPTCompletionQueries {
 
-  private HivMetadata hivMetadata;
-  private TbMetadata tbMetadata;
-
-  public static String getRegimeTPTOrOutrasPrescricoes(
-      EncounterType encounterType, Concept question, List<Concept> answers, Integer boundary) {
-
-    List<Integer> answerIds = new ArrayList<>();
-
-    for (Concept concept : answers) {
-      answerIds.add(concept.getConceptId());
-    }
-
-    String query =
-        " SELECT p.patient_id "
-            + " FROM  patient p  "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id  "
-            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
-            + " INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date "
-            + "             FROM    patient p  "
-            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
-            + "             WHERE   p.voided = 0  "
-            + "                 AND e.voided = 0  "
-            + "                 AND o.voided = 0  "
-            + "                 AND e.location_id = :location "
-            + "                 AND e.encounter_type = ${encounterType} "
-            + "                 AND o.concept_id = ${question} "
-            + "                 AND o.value_coded IN (${answers}) "
-            + "                 AND e.encounter_datetime >= :startDate "
-            + "                 AND e.encounter_datetime <= :endDate "
-            + "             GROUP BY p.patient_id) AS inh "
-            + " WHERE p.patient_id NOT IN ( SELECT patient_id  "
-            + "                             FROM patient p "
-            + "                             WHERE 	 p.voided = 0  "
-            + "                                  AND e.voided = 0  "
-            + "                                  AND o.voided = 0  "
-            + "                                  AND e.location_id = :location "
-            + "                                  AND e.encounter_type = ${encounterType} "
-            + "                                  AND o.concept_id = ${question} "
-            + "                                  AND o.value_coded IN (${answers}) "
-            + "                                  AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL "
-            + boundary
-            + " MONTH)  "
-            + "                                  AND e.encounter_datetime < inh.first_pickup_date) ";
-
-    Map<String, String> map = new HashMap<>();
-    map.put("encounterType", String.valueOf(encounterType.getEncounterTypeId()));
-    map.put("question", String.valueOf(question.getConceptId()));
-    map.put("answers", StringUtils.join(answerIds, ","));
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    return sb.replace(query);
-  }
-/**
-   * 
-  <b>IMER1</b>: User_Story_ TPT <br>
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
-   *   <li>A -A1: Select all patients with Ficha Resumo (encounter type 53) with 
-   * “Ultima profilaxia Isoniazida (Data Inicio)” 
-   * (concept id 6128) value datetime not null and before end date
+   *   <li>A -A1: Select all patients with Ficha Resumo (encounter type 53) with “Ultima profilaxia
+   *       Isoniazida (Data Inicio)” (concept id 6128) value datetime not null and before end date
    *   <li>
    *
    * @return CohortDefinition
    */
-  private CohortDefinition getINHStartA1(int masterCardEncounterType, int dataInicioProfilaxiaIsoniazidaConcept ) {
+  public CohortDefinition getINHStartA1(
+      int masterCardEncounterType, int dataInicioProfilaxiaIsoniazidaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     Map<String, Integer> map = new HashMap<>();
@@ -103,36 +43,33 @@ public class TPTCompletionQueries {
             + " and o.value_datetime IS NOT NULL"
             + " and e.encounter_datetime <= :endDate"
             + " and e.location_id = :location";
-   
 
     StringSubstitutor sb = new StringSubstitutor(map);
-   
+
     sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
   /**
-   * 
-  <b>IMER1</b>: User_Story_ TPT <br>
+   * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
-   *   <li>A2: Select all patients with Ficha clinica (encounter type 6)
-   *  with “Profilaxia INH” (concept id 6122) with value code “Inicio” 
-   * (concept id 1256) and encounter datetime before end date
+   *   <li>A2: Select all patients with Ficha clinica (encounter type 6) with “Profilaxia INH”
+   *       (concept id 6122) with value code “Inicio” (concept id 1256) and encounter datetime
+   *       before end date
    *   <li>
    *
    * @return CohortDefinition
    */
-
-  private CohortDefinition getINHStartA2(int adultoSeguimentoEncounterType, int startDrugsConcept, int isoniazidUsageConcept) {
+  public CohortDefinition getINHStartA2(
+      int adultoSeguimentoEncounterType, int startDrugsConcept, int isoniazidUsageConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", adultoSeguimentoEncounterType);
     map.put("6122", isoniazidUsageConcept);
     map.put("1256", startDrugsConcept);
-   
 
     String query =
         " SELECT"
@@ -151,28 +88,25 @@ public class TPTCompletionQueries {
             + "    AND e.encounter_datetime <= :endDate"
             + "    AND e.location_id = :location";
 
-          
     StringSubstitutor sb = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
-  
+
   /**
-   * 
-  <b>IMER1</b>: User_Story_ TPT <br>
+   * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
-   *   <li>A3: Select all patients with Ficha clinica (encounter type 6) with 
-   * “Profilaxia com  INH” (concept id 6128) value datetime before end date
-
+   *   <li>A3: Select all patients with Ficha clinica (encounter type 6) with “Profilaxia com INH”
+   *       (concept id 6128) value datetime before end date
    *   <li>
    *
    * @return CohortDefinition
    */
   public static String getINHStartA3(int encounterType, int profilaxiaIsoniazidaConcept) {
-    
+
     Map<String, Integer> map = new HashMap<>();
     map.put("6", encounterType);
     map.put("6128", profilaxiaIsoniazidaConcept);
@@ -187,26 +121,21 @@ public class TPTCompletionQueries {
             + "AND o.value_datetime < :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
-   
-
     StringSubstitutor sb = new StringSubstitutor(map);
 
     return sb.replace(query);
   }
 
   /**
-   * 
-  <b>IMER1</b>: User_Story_ TPT <br>
+   * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
    *   <li>A4: Select all patients with Ficha Seguimento PEdiatrico (encounter type 9) with
-   *  “Profilaxia com  INH” (concept id 6128) value datetime before end date
-
+   *       “Profilaxia com INH” (concept id 6128) value datetime before end date
    *   <li>
    *
    * @return CohortDefinition
    */
-  
   public SqlCohortDefinition getINHStartA4(
       int pediatriaSeguimentoEncounterType, int dataInicioProfilaxiaIsoniazidaConcept) {
 
@@ -245,27 +174,28 @@ public class TPTCompletionQueries {
   }
 
   /**
-   * 
-  <b>IMER1</b>: User_Story_ TPT <br>
+   * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
-   *   <li>A5: Select all patients with FILT (encounter type 60) with 
-   * “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or ‘Isoniazid + piridoxina’ 
-   * (concept id in [656, 23982]) and encounter datetime before the reporting period
-
+   *   <li>A5: Select all patients with FILT (encounter type 60) with “Regime de TPT” (concept id
+   *       23985) value coded ‘Isoniazid’ or ‘Isoniazid + piridoxina’ (concept id in [656, 23982])
+   *       and encounter datetime before the reporting period
    *   <li>
    *
    * @return CohortDefinition
    */
-
-  private CohortDefinition getINHStartA5(int regimeTPTEncounterType, int regimeTPTConcept, int isoniazidConcept, int isoniazidePiridoxinaConcept) {
+  public CohortDefinition getINHStartA5(
+      int regimeTPTEncounterType,
+      int regimeTPTConcept,
+      int isoniazidConcept,
+      int isoniazidePiridoxinaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     Map<String, Integer> map = new HashMap<>();
     map.put("60", regimeTPTEncounterType);
-     map.put("23985", regimeTPTConcept);
-     map.put("656", isoniazidConcept);
-     map.put("23982", isoniazidePiridoxinaConcept);
+    map.put("23985", regimeTPTConcept);
+    map.put("656", isoniazidConcept);
+    map.put("23982", isoniazidePiridoxinaConcept);
 
     String query =
         " SELECT"
@@ -284,36 +214,33 @@ public class TPTCompletionQueries {
             + "     AND e.encounter_datetime < :endDate"
             + "        AND e.location_id = :location";
 
-            
     StringSubstitutor sb = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
-  
-   /**
-   * 
-  <b>IMER1</b>: User_Story_ TPT <br>
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
-   *   <li>C1: Select all patients with Ficha Clinica - Master Card (encounter type 6) with 
-   * “Outras prescricoes” (concept id 1719) with value coded equal to “3HP” (concept id 23954) 
-   * and encounter datetime before end date;
+   *   <li>C1: Select all patients with Ficha Clinica - Master Card (encounter type 6) with “Outras
+   *       prescricoes” (concept id 1719) with value coded equal to “3HP” (concept id 23954) and
+   *       encounter datetime before end date;
    *   <li>
    *
    * @return CohortDefinition
    */
-
   public static String get3HPStartC1(
       int encounterType, int treatmentPrescribedConcept, int threeHPConcept) {
-       
-        Map<String, Integer> map = new HashMap<>();
-        map.put("6", encounterType);
-        map.put("1719", treatmentPrescribedConcept);
-        map.put("23954", threeHPConcept);
 
-        String query =
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", encounterType);
+    map.put("1719", treatmentPrescribedConcept);
+    map.put("23954", threeHPConcept);
+
+    String query =
         "SELECT p.patient_id FROM patient p "
             + "INNER JOIN encounter e ON p.patient_id  = e.encounter_id "
             + "INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -323,27 +250,22 @@ public class TPTCompletionQueries {
             + "AND e.encounter_datetime < :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
-    
-
     StringSubstitutor sb = new StringSubstitutor(map);
 
     return sb.replace(query);
   }
 
   /**
-   * 
-  <b>IMER1</b>: User_Story_ TPT <br>
+   * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
-   *   <li>C2: Select all patients with FILT (encounter type 6) with 
-   * “Regime de TPT” (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” 
-   * (concept id in [23954, 23984]) and encounter datetime before end date; 
-
+   *   <li>C2: Select all patients with FILT (encounter type 6) with “Regime de TPT” (concept id
+   *       23985) value coded “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and
+   *       encounter datetime before end date;
    *   <li>
    *
    * @return CohortDefinition
    */
-
   public SqlCohortDefinition get3HPStartC2(
       int adultoSeguimentoEncounterType,
       int regimeTPTConcept,
@@ -384,5 +306,4 @@ public class TPTCompletionQueries {
 
     return sqlCohortDefinition;
   }
-
 }
