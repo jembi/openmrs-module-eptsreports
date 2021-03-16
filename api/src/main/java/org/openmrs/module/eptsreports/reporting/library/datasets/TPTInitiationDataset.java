@@ -16,9 +16,6 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import java.util.List;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPT_InitiationQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TbPrevCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
-import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.SqlDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -27,14 +24,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TPTInitiationDataset extends BaseDataSet {
-
-  @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
-
-  @Autowired private TbPrevCohortQueries tbPrevCohortQueries;
-
-  @Autowired private TPT_InitiationQueries tptInitiationQueries;
-
-  @Autowired private EptsCommonDimension eptsCommonDimension;
 
   private HivMetadata hivMetadata;
 
@@ -50,7 +39,7 @@ public class TPTInitiationDataset extends BaseDataSet {
     sdd.setName("TPT");
     sdd.addParameters(parameterList);
     sdd.setSqlQuery(
-        tptInitiationQueries.getTPTInitiationPatients(
+        TPT_InitiationQueries.getTPTInitiationPatients(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
 
     return sdd;

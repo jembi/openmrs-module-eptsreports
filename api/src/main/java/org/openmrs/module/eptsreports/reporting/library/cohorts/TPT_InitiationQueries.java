@@ -3,32 +3,21 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class TPT_InitiationQueries {
-  private HivMetadata hivMetadata;
-
-  @Autowired
-  public TPT_InitiationQueries(HivMetadata hivMetadata) {
-    this.hivMetadata = hivMetadata;
-  }
 
   /**
    * Unique query to get TPT Initiation patients
    *
-   * @return CohortDefinition
+   * @return String
    */
-  public String getTPTInitiationPatients(int clinicalEncounter) {
+  public static String getTPTInitiationPatients(int clinicalEncounter) {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", clinicalEncounter);
 
     String query =
-        "  SELECT p.person_id, pi.identifier AS NID, p.gender as gender, CONCAT(pn.given_name, ' ', pn.family_name ) AS name, "
-            + " "
+        "  SELECT p.person_id, pi.identifier AS NID, p.gender, CONCAT(pn.given_name, ' ', pn.family_name ) AS name, "
             + "CASE  "
             + "WHEN p.birthdate IS NULL THEN 'N/A' "
             + "ELSE TIMESTAMPDIFF(YEAR,p.birthdate,'2020-04-20') "

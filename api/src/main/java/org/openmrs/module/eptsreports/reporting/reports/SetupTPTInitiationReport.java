@@ -6,10 +6,10 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTInitiationDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.openmrs.module.reporting.evaluation.parameter.ParameterizableUtil;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +54,11 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
-
     rd.setBaseCohortDefinition(
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(),
-            "startDate=${startDate}, endDate=${endDate},location=${location}"));
+        genericCohortQueries.getBaseCohort(),
+        ParameterizableUtil.createParameterMappings("endDate=${endDate},location=${location}"));
     rd.addDataSetDefinition(
-        "ALL", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset(getParameters())));
+        "TPT", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset(getParameters())));
     return rd;
   }
 
@@ -93,8 +91,8 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("startDate", "Data Inicial Inclusão", Date.class),
-        new Parameter("endDate", "Data Final Inclusão", Date.class),
-        new Parameter("location", "Unidade Sanitária", Location.class));
+        new Parameter("startDate", "Start date", Date.class),
+        new Parameter("endDate", "End date", Date.class),
+        new Parameter("location", "Location", Location.class));
   }
 }
