@@ -836,6 +836,23 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
+    CohortIndicator MQ12DEN5 =
+        eptsGeneralIndicator.getIndicator(
+            "MQ12DEN5",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ12DEN(5),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ12DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ12DEN5",
+        "Crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV",
+        EptsReportUtils.map(
+            MQ12DEN5,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "age=<15");
+
     CohortIndicator MQ12DEN6 =
         eptsGeneralIndicator.getIndicator(
             "MQ12DEN6",
@@ -904,23 +921,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             MQ12DEN4,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=15+");
-
-    CohortIndicator MQ12DEN5 =
-        eptsGeneralIndicator.getIndicator(
-            "MQ12DEN5",
-            EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ12DEN(5),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    MQ12DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-
-    dataSetDefinition.addColumn(
-        "MQ12DEN5",
-        " de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV ",
-        EptsReportUtils.map(
-            MQ12DEN5,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=<15");
 
     CohortIndicator MQ12DEN7 =
         eptsGeneralIndicator.getIndicator(

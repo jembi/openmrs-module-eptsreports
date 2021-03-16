@@ -3373,27 +3373,27 @@ public class QualityImprovement2020CohortQueries {
     switch (den) {
       case 1:
         comp.setName(
-            "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
+            "Adultos (15/+anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
         break;
       case 2:
         comp.setName(
-            "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
+            "Adultos (15/+anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
         break;
       case 5:
         comp.setName(
-            " # de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV\n");
+            "Crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
         break;
       case 6:
         comp.setName(
-            "de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
+            "Crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
         break;
       case 9:
         comp.setName(
-            "# de mulheres grávidas HIV+  que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
+            "Mulheres grávidas HIV+ que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV");
         break;
       case 10:
         comp.setName(
-            "# de mulheres grávidas HIV+  que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV ");
+            "Mulheres grávidas HIV+ que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV");
         break;
     }
 
@@ -3453,13 +3453,9 @@ public class QualityImprovement2020CohortQueries {
     if (den == 1 || den == 2) {
       comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND ADULT");
     }
-    if (den == 5) {
+    if (den == 5 || den == 6) {
       comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND CHILDREN");
-    } else if (den == 6) {
-      comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND CHILDREN");
-    } else if (den == 9) {
-      comp.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
-    } else if (den == 10) {
+    } else if (den == 9 || den == 10) {
       comp.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
     }
     return comp;
