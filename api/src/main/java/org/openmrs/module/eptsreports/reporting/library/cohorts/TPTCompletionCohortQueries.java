@@ -42,6 +42,7 @@ public class TPTCompletionCohortQueries {
   private final String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
   private final String mapping2 =
       "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+  private final String mapping3 = "endDate=${endDate},location=${location}";
 
   /**
    *
@@ -74,7 +75,7 @@ public class TPTCompletionCohortQueries {
             TPTCompletionQueries.getINHStartA1(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
-            "endDate=${endDate},location=${location}"));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "A2",
@@ -83,7 +84,7 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getStartDrugs().getConceptId(),
                 hivMetadata.getIsoniazidUsageConcept().getConceptId()),
-            "endDate=${endDate},location=${location}"));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "A3",
@@ -91,7 +92,7 @@ public class TPTCompletionCohortQueries {
             TPTCompletionQueries.getINHStartA3(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
-            "endDate=${endDate},location=${location}"));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "A4",
@@ -99,7 +100,7 @@ public class TPTCompletionCohortQueries {
             TPTCompletionQueries.getINHStartA4(
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
-            "endDate=${endDate},location=${location}"));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "A5",
@@ -109,7 +110,7 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            "endDate=${endDate},location=${location}"));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -118,7 +119,7 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId()),
-            "endDate=${endDate},location=${location}"));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "C2",
@@ -128,7 +129,7 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
-            "endDate=${endDate},location=${location}"));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "completedAll",
