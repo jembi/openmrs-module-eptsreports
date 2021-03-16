@@ -2342,7 +2342,7 @@ public class QualityImprovement2020CohortQueries {
     query.append("                        AND e.voided = 0 ");
     query.append("                        AND e.encounter_type = ${6} ");
     query.append("                        AND e.location_id = :location ");
-    query.append("                        AND e.encounter_datetime = :revisionEndDate ");
+    query.append("                        AND e.encounter_datetime <= :revisionEndDate ");
     query.append("                     GROUP BY p.patient_id");
     query.append(")  AS last_ficha ON last_ficha.patient_id = p.patient_id ");
     query.append(" WHERE");
@@ -2350,13 +2350,13 @@ public class QualityImprovement2020CohortQueries {
     query.append("    AND e.voided = 0 ");
     query.append("    AND o.voided = 0 ");
     query.append("    AND e.encounter_type = ${6} ");
-    query.append("    AND e.encounter_datetime = last_ficha.max_date ");
+    query.append("    AND e.encounter_datetime <= last_ficha.max_date ");
     query.append("    AND o.concept_id = ${21151} ");
     if (b1e) {
-      query.append("  AND o.value_coded !=  ${21150} ");
+      query.append("  AND o.value_coded <>  ${21150} ");
 
     } else {
-      query.append("  AND o.value_coded !=  ${21150} ");
+      query.append("  AND o.value_coded <>  ${21148} ");
     }
     query.append("    AND e.location_id = :location ");
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -3747,10 +3747,7 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location},revisionEndDate=${revisionEndDate}"));
 
     cd.addSearch(
-        "B1E",
-        EptsReportUtils.map(
-            b1E,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"));
+        "B1E", EptsReportUtils.map(b1E, "location=${location},revisionEndDate=${revisionEndDate}"));
 
     cd.addSearch(
         "B2",
@@ -3772,12 +3769,6 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "B2E",
-        EptsReportUtils.map(
-            getPatientsFromFichaClinicaDenominatorB1EOrB2E(false),
-            "startDate=${startDate},endDate=${endDate},location=${location},revisionEndDate=${revisionEndDate}"));
 
     cd.addSearch(
         "ADULT",
