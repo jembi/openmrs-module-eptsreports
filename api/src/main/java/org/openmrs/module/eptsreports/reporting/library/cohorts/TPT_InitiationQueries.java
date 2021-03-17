@@ -1159,7 +1159,7 @@ public class TPT_InitiationQueries {
             + "                 GROUP BY patient_id) tbl_21 "
             + "                 ON tbl_21.patient_id = p.patient_id "
             + "              ) AS expected_registered_date_difference "
-            + "              ON expected_registered_date_difference.patient_id = p.person_id ";
+            + "              ON expected_registered_date_difference.patient_id = p.person_id WHERE p.voided=0 AND pn.voided=0";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
     return substitutor.replace(query);
@@ -1418,7 +1418,7 @@ public class TPT_InitiationQueries {
             + "                                                                         AND o.value_coded IN (${656},${23982})  "
             + "                                                                         AND e.encounter_datetime >= DATE_SUB(pickup.first_pickup_date, INTERVAL 7 MONTH)   "
             + "                                                                         AND e.encounter_datetime < pickup.first_pickup_date)  "
-            + "                           ) TPT ON TPT.patient_id = p.person_id ) TPT";
+            + "                           ) TPT ON TPT.patient_id = p.person_id WHERE p.voided=0 and pn.voided=0) TPT";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
     return substitutor.replace(query);
