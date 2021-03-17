@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TPTCompletionDataSet extends BaseDataSet {
 
-  @Autowired private EptsCommonDimension eptsCommonDimension;
-
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
 
   @Autowired private TPTCompletionCohortQueries tPTCompletionCohortQueries;
@@ -34,7 +32,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
     dataSetDefinition.setName("TPT Completion Cascade Report");
     dataSetDefinition.addParameters(getParameters());
-    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mappings = "endDate=${endDate},location=${location}";
 
     CohortDefinition txCurrCompositionCohort =
         txCurrCohortQueries.getTxCurrCompositionCohort("txCurrCompositionTPT", true);
