@@ -33,7 +33,7 @@ public class TPTCompletionQueries {
 
     String query =
         "  SELECT"
-            + "  p.patient_id, MAX(e.encounter_id) as ultima_profilaxia"
+            + "  p.patient_id"
             + "  FROM"
             + "  patient p"
             + "     INNER JOIN"
@@ -45,8 +45,8 @@ public class TPTCompletionQueries {
             + " and e.encounter_type = ${53}"
             + " and o.concept_id = ${6128}"
             + " and o.value_datetime IS NOT NULL"
-            + " and e.encounter_datetime <= :endDate"
-            + " and e.location_id = :location";
+            + " and o.value_datetime < :endDate"
+            + " and e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -127,11 +127,11 @@ public class TPTCompletionQueries {
 
     String query =
         "SELECT p.patient_id FROM patient p "
-            + "INNER JOIN encounter e ON p.patient_id  = e.encounter_id "
+            + "INNER JOIN encounter e ON p.patient_id  = e.patient_id "
             + "INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "WHERE e.encounter_type = ${6} "
             + "AND o.concept_id = ${6128} "
-            + "AND e.location = :location "
+            + "AND e.location_id = :location "
             + "AND o.value_datetime < :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
@@ -179,7 +179,7 @@ public class TPTCompletionQueries {
             + "     	AND e.encounter_type = ${9} "
             + "     	AND o.concept_id = ${6128} "
             + " 	AND e.location_id = :location "
-            + "     	AND e.encounter_datetime < :endDate ";
+            + "     	AND o.value_datetime < :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -267,11 +267,11 @@ public class TPTCompletionQueries {
 
     String query =
         "SELECT p.patient_id FROM patient p "
-            + "INNER JOIN encounter e ON p.patient_id  = e.encounter_id "
+            + "INNER JOIN encounter e ON p.patient_id  = e.patient_id "
             + "INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "WHERE e.encounter_type = ${6} "
             + "AND o.concept_id = ${1719} AND o.value_coded = ${23954} "
-            + "AND e.location = :location "
+            + "AND e.location_id = :location "
             + "AND e.encounter_datetime < :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 

@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTCompletionCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TPTCompletionDataSet extends BaseDataSet {
+
+  @Autowired private EptsCommonDimension eptsCommonDimension;
 
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
 
@@ -31,7 +34,7 @@ public class TPTCompletionDataSet extends BaseDataSet {
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
     dataSetDefinition.setName("TPT Completion Cascade Report");
     dataSetDefinition.addParameters(getParameters());
-    String mappings = "endDate=${endDate},location=${location}";
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     CohortDefinition txCurrCompositionCohort =
         txCurrCohortQueries.getTxCurrCompositionCohort("txCurrCompositionTPT", true);
