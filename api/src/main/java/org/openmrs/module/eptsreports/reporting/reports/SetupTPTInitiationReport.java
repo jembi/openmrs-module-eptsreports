@@ -24,8 +24,10 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
   @Autowired protected GenericCohortQueries genericCohortQueries;
 
   @Autowired
-  public SetupTPTInitiationReport(TPTInitiationDataset tptInitiationDataset) {
+  public SetupTPTInitiationReport(
+      TPTInitiationDataset tptInitiationDataset, TPTTotalsDataset tptTotalsDataset) {
     this.tptInitiationDataset = tptInitiationDataset;
+    this.tptTotalsDataset = tptTotalsDataset;
   }
 
   @Override
