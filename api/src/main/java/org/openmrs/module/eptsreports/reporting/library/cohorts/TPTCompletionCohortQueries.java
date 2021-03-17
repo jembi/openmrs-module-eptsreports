@@ -39,10 +39,9 @@ public class TPTCompletionCohortQueries {
     this.txTbCohortQueries = txTbCohortQueries;
   }
 
-  private final String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private final String mapping = "endDate=${endDate},location=${location}";
   private final String mapping2 =
       "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
-  private final String mapping3 = "endDate=${endDate},location=${location}";
 
   /**
    *
@@ -59,7 +58,6 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR with TPT Completion");
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -75,7 +73,7 @@ public class TPTCompletionCohortQueries {
             TPTCompletionQueries.getINHStartA1(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
-            mapping3));
+            mapping));
 
     compositionCohortDefinition.addSearch(
         "A2",
@@ -84,7 +82,7 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getStartDrugs().getConceptId(),
                 hivMetadata.getIsoniazidUsageConcept().getConceptId()),
-            mapping3));
+            mapping));
 
     compositionCohortDefinition.addSearch(
         "A3",
@@ -92,7 +90,7 @@ public class TPTCompletionCohortQueries {
             TPTCompletionQueries.getINHStartA3(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
-            mapping3));
+            mapping));
 
     compositionCohortDefinition.addSearch(
         "A4",
@@ -100,7 +98,7 @@ public class TPTCompletionCohortQueries {
             TPTCompletionQueries.getINHStartA4(
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
-            mapping3));
+            mapping));
 
     compositionCohortDefinition.addSearch(
         "A5",
@@ -110,7 +108,7 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping3));
+            mapping));
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -119,7 +117,7 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId()),
-            mapping3));
+            mapping));
 
     compositionCohortDefinition.addSearch(
         "C2",
@@ -129,7 +127,7 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
-            mapping3));
+            mapping));
 
     compositionCohortDefinition.addSearch(
         "completedAll",
@@ -158,7 +156,6 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithoutTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR without TPT Completion");
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -191,7 +188,6 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithoutTPTCompletionWithTB() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR without TPT Completion with TB Treatment");
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "end Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -258,7 +254,6 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrEligibleForTPTCompletion() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR eligible for TPT Completion");
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -292,7 +287,6 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrWithTPTInLast7Months() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR with TPT in last 7 months");
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -325,7 +319,6 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getTxCurrEligibleForTPTInitiation() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.setName("TX_CURR eligible for TPT Initiation");
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
