@@ -5,6 +5,7 @@ import java.util.*;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTInitiationDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TPTTotalsDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 public class SetupTPTInitiationReport extends EptsDataExportManager {
 
   private TPTInitiationDataset tptInitiationDataset;
+  private TPTTotalsDataset tptTotalsDataset;
 
   @Autowired protected GenericCohortQueries genericCohortQueries;
 
@@ -53,11 +55,12 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
-    /*    rd.setBaseCohortDefinition(
-    EptsReportUtils.map(
-        genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));*/
+    // Base Cohort embeded in TPT Initiation query
     rd.addDataSetDefinition(
-        "TPT", Mapped.mapStraightThrough(tptInitiationDataset.constructDatset(getParameters())));
+        "TOTAL", Mapped.mapStraightThrough(tptTotalsDataset.constructDataset(getParameters())));
+
+    rd.addDataSetDefinition(
+        "TPT", Mapped.mapStraightThrough(tptInitiationDataset.constructDataset(getParameters())));
     return rd;
   }
 

@@ -25,14 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TPTInitiationDataset extends BaseDataSet {
+public class TPTTotalsDataset extends BaseDataSet {
 
   private HivMetadata hivMetadata;
   private TbMetadata tbMetadata;
   private CommonMetadata commonMetadata;
 
   @Autowired
-  public TPTInitiationDataset(
+  public TPTTotalsDataset(
       HivMetadata hivMetadata, TbMetadata tbMetadata, CommonMetadata commonMetadata) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
@@ -43,10 +43,10 @@ public class TPTInitiationDataset extends BaseDataSet {
 
     SqlDataSetDefinition sdd = new SqlDataSetDefinition();
 
-    sdd.setName("TPT");
+    sdd.setName("TOTAL");
     sdd.addParameters(parameterList);
     sdd.setSqlQuery(
-        TPT_InitiationQueries.getTPTInitiationPatients(
+        TPT_InitiationQueries.getTPTInitiationTOTALS(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
             tbMetadata.get3HPConcept().getConceptId(),

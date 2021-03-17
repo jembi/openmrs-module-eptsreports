@@ -1164,4 +1164,263 @@ public class TPT_InitiationQueries {
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
     return substitutor.replace(query);
   }
+
+  /**
+   * Query to get TPT Initiation TOTALS
+   *
+   * @return String
+   */
+  public static String getTPTInitiationTOTALS(
+      int clinicalEncounter,
+      int treatmentPrescribedConcept,
+      int concept3HP,
+      int regimeTPTEncounterType,
+      int regimeTPTConcept,
+      int piridoxina3HPConcept,
+      int masterCardEncounterType,
+      int dataInicioProfilaxiaIsoniazidaConcept,
+      int isoniazidUsageConcept,
+      int getStartDrugs,
+      int pediatriaSeguimentoEncounterType,
+      int isoniazidConcept,
+      int isoniazidePiridoxinaConcept,
+      int arvPharmaciaEncounterType,
+      int arvPlanConcept,
+      int arvStartDateConcept,
+      int artProgram,
+      int masterCardDrugPickupEncounterType,
+      int artDatePickupMasterCard,
+      int artPickupConcept,
+      int yesConcept,
+      int pregnantConcept,
+      int arvAdultInitialEncounterType,
+      int numberOfWeeksPregnant,
+      int pregnancyDueDate,
+      int criteriaForArtStart,
+      int bPostiveConcept,
+      int ptvEtvProgram,
+      int dateOfLastMenstruationConcept,
+      int priorDeliveryDateConcept,
+      int breastfeedingConcept,
+      int patientGaveBirthWorkflowState,
+      int dtINHConcept,
+      int continuaConcept,
+      int typeDispensationTPTConceptUuid,
+      int monthlyConcept,
+      int quarterlyConcept,
+      int completedConcept,
+      int dataFinalizacaoProfilaxiaIsoniazidaConcept,
+      int arvPediatriaInitialEncounterType,
+      int dateOfMasterCardFileOpeningConcept,
+      int hivCareProgram) {
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", clinicalEncounter);
+    valuesMap.put("1719", treatmentPrescribedConcept);
+    valuesMap.put("23954", concept3HP);
+    valuesMap.put("60", regimeTPTEncounterType);
+    valuesMap.put("23985", regimeTPTConcept);
+    valuesMap.put("23984", piridoxina3HPConcept);
+    valuesMap.put("53", masterCardEncounterType);
+    valuesMap.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
+    valuesMap.put("6122", isoniazidUsageConcept);
+    valuesMap.put("1256", getStartDrugs);
+    valuesMap.put("9", pediatriaSeguimentoEncounterType);
+    valuesMap.put("656", isoniazidConcept);
+    valuesMap.put("23982", isoniazidePiridoxinaConcept);
+    valuesMap.put("18", arvPharmaciaEncounterType);
+    valuesMap.put("1255", arvPlanConcept);
+    valuesMap.put("1190", arvStartDateConcept);
+    valuesMap.put("2", artProgram);
+    valuesMap.put("52", masterCardDrugPickupEncounterType);
+    valuesMap.put("23866", artDatePickupMasterCard);
+    valuesMap.put("23865", artPickupConcept);
+    valuesMap.put("1065", yesConcept);
+    valuesMap.put("1982", pregnantConcept);
+    valuesMap.put("5", arvAdultInitialEncounterType);
+    valuesMap.put("1279", numberOfWeeksPregnant);
+    valuesMap.put("1600", pregnancyDueDate);
+    valuesMap.put("6334", criteriaForArtStart);
+    valuesMap.put("6331", bPostiveConcept);
+    valuesMap.put("8", ptvEtvProgram);
+    valuesMap.put("1465", dateOfLastMenstruationConcept);
+    valuesMap.put("5599", priorDeliveryDateConcept);
+    valuesMap.put("6332", breastfeedingConcept);
+    valuesMap.put("27", patientGaveBirthWorkflowState);
+    valuesMap.put("23955", dtINHConcept);
+    valuesMap.put("1257", continuaConcept);
+    valuesMap.put("23986", typeDispensationTPTConceptUuid);
+    valuesMap.put("1098", monthlyConcept);
+    valuesMap.put("23720", quarterlyConcept);
+    valuesMap.put("1267", completedConcept);
+    valuesMap.put("6129", dataFinalizacaoProfilaxiaIsoniazidaConcept);
+    valuesMap.put("7", arvPediatriaInitialEncounterType);
+    valuesMap.put("23891", dateOfMasterCardFileOpeningConcept);
+    valuesMap.put("1", hivCareProgram);
+
+    String query =
+        "  SELECT (SELECT name FROM location WHERE location_id = :location) AS location, COUNT(TPT.person_id) AS total, CONCAT(:startDate','Até',:endDate) AS period "
+            + "  FROM ("
+            + "  SELECT p.person_id"
+            + "                           FROM person p "
+            + "                           JOIN person_name pn ON p.person_id = pn.person_id "
+            + "                           JOIN patient_identifier pi ON pi.patient_id = p.person_id "
+            + "                  JOIN ( "
+            + "                 SELECT p.patient_id FROM patient p JOIN encounter e ON e.patient_id=p.patient_id "
+            + "                          WHERE e.voided=0 AND p.voided=0 AND "
+            + "                          e.encounter_type IN (${5},${7}) "
+            + "                          AND e.encounter_datetime <=  :endDate "
+            + "                          AND e.location_id = :location "
+            + "                          UNION  "
+            + "                          SELECT p.patient_id FROM patient p "
+            + "                          JOIN encounter e ON e.patient_id=p.patient_id "
+            + "                          JOIN obs o ON e.encounter_id=o.encounter_id "
+            + "                          WHERE e.voided=0 AND p.voided=0 AND o.voided=0 AND "
+            + "                          e.encounter_type = ${53}"
+            + "                          AND o.concept_id =${23891} "
+            + "                          AND o.value_datetime <=  :endDate "
+            + "                          AND e.location_id = :location "
+            + "                          UNION "
+            + "                          SELECT pg.patient_id FROM patient p JOIN patient_program pg ON p.patient_id=pg.patient_id "
+            + "                          WHERE pg.voided=0 AND p.voided=0 AND program_id IN (${1},${2}) AND pg.date_enrolled <=  :endDate AND location_id= :location"
+            + "                           ) base_cohort ON base_cohort.patient_id = p.person_id "
+            + "                           JOIN  "
+            + "                           (  "
+            + "                            "
+            + "                           SELECT p.patient_id "
+            + "                                        FROM  patient p   "
+            + "                                        INNER JOIN encounter e ON e.patient_id = p.patient_id   "
+            + "                                        INNER JOIN obs o ON o.encounter_id = e.encounter_id   "
+            + "                                        INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date  "
+            + "                                                    FROM    patient p   "
+            + "                                                    INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "                                                    INNER JOIN obs o ON o.encounter_id = e.encounter_id   "
+            + "                                                    WHERE   p.voided = 0   "
+            + "                                                        AND e.voided = 0   "
+            + "                                                        AND o.voided = 0   "
+            + "                                                        AND e.location_id = :location  "
+            + "                                                        AND e.encounter_type = ${6} "
+            + "                                                        AND o.concept_id = ${1719} "
+            + "                                                        AND o.value_coded IN (${23954})  "
+            + "                                                        AND e.encounter_datetime >= :startDate "
+            + "                                                        AND e.encounter_datetime <= :endDate "
+            + "                                                    GROUP BY p.patient_id) AS pickup  "
+            + "                                                    ON pickup.patient_id = p.patient_id "
+            + "                                        WHERE p.patient_id NOT IN ( SELECT patient_id   "
+            + "                                                                    FROM patient p  "
+            + "                                                                    WHERE p.voided = 0   "
+            + "                                                                         AND e.voided = 0   "
+            + "                                                                         AND o.voided = 0   "
+            + "                                                                         AND e.location_id = :location  "
+            + "                                                                         AND e.encounter_type = ${6} "
+            + "                                                                         AND o.concept_id = ${1719} "
+            + "                                                                         AND o.value_coded IN (${23954})  "
+            + "                                                                         AND e.encounter_datetime >= DATE_SUB(pickup.first_pickup_date, INTERVAL 4 MONTH)   "
+            + "                                                                         AND e.encounter_datetime < pickup.first_pickup_date)  "
+            + "                                                                          "
+            + "                                                                         UNION "
+            + "                                                                          "
+            + "                           SELECT p.patient_id "
+            + "                                        FROM  patient p   "
+            + "                                        INNER JOIN encounter e ON e.patient_id = p.patient_id   "
+            + "                                        INNER JOIN obs o ON o.encounter_id = e.encounter_id   "
+            + "                                        INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date  "
+            + "                                                    FROM    patient p   "
+            + "                                                    INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "                                                    INNER JOIN obs o ON o.encounter_id = e.encounter_id   "
+            + "                                                    WHERE   p.voided = 0   "
+            + "                                                        AND e.voided = 0   "
+            + "                                                        AND o.voided = 0   "
+            + "                                                        AND e.location_id = :location  "
+            + "                                                        AND e.encounter_type = ${6} "
+            + "                                                        AND o.concept_id = ${23985} "
+            + "                                                        AND o.value_coded IN (${23954},${23984})  "
+            + "                                                        AND e.encounter_datetime >= :startDate "
+            + "                                                        AND e.encounter_datetime <= :endDate "
+            + "                                                    GROUP BY p.patient_id) AS pickup  "
+            + "                                                    ON pickup.patient_id = p.patient_id "
+            + "                                        WHERE p.patient_id NOT IN ( SELECT patient_id   "
+            + "                                                                    FROM patient p  "
+            + "                 WHERE p.voided = 0   "
+            + "                                                                         AND e.voided = 0   "
+            + "                                                                         AND o.voided = 0   "
+            + "                                                                         AND e.location_id = :location  "
+            + "                                                                         AND e.encounter_type = ${60} "
+            + "                                                                         AND o.concept_id = ${23985} "
+            + "                                                                         AND o.value_coded IN (${23954},${23984})  "
+            + "                                                                         AND e.encounter_datetime >= DATE_SUB(pickup.first_pickup_date, INTERVAL 4 MONTH)   "
+            + "                                                                         AND e.encounter_datetime < pickup.first_pickup_date) "
+            + "                            "
+            + "                            "
+            + "                           UNION "
+            + "                            "
+            + "                           SELECT p.patient_id FROM patient p  "
+            + "                          JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                          JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          WHERE e.encounter_type = ${53} AND o.concept_id = ${6128} "
+            + "                          AND o.voided = 0 AND e.voided = 0  "
+            + "                          AND p.voided = 0 AND e.location_id = :location "
+            + "                          AND o.value_datetime IS NOT NULL "
+            + "                          AND o.value_datetime BETWEEN :startDate AND :endDate "
+            + "                           "
+            + "                          UNION "
+            + "                           "
+            + "                          SELECT p.patient_id FROM patient p  "
+            + "                          JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                          JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          WHERE e.encounter_type = ${6} AND o.concept_id = ${6122} "
+            + "                          AND o.voided = 0 AND e.voided = 0  "
+            + "                          AND p.voided = 0 AND e.location_id = :location "
+            + "                          AND o.value_coded = ${1256} "
+            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                           "
+            + "                          UNION "
+            + "                           "
+            + "                          SELECT p.patient_id FROM patient p  "
+            + "                          JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                          JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          WHERE e.encounter_type IN (${6},${9}) AND o.concept_id = ${6128} "
+            + "                          AND o.voided = 0 AND e.voided = 0  "
+            + "                          AND p.voided = 0 AND e.location_id = :location "
+            + "                          AND o.value_datetime IS NOT NULL "
+            + "                          AND o.value_datetime BETWEEN :startDate AND :endDate "
+            + "                           "
+            + "                          UNION "
+            + "                           "
+            + "                           "
+            + "                          SELECT p.patient_id "
+            + "                                        FROM  patient p   "
+            + "                                        INNER JOIN encounter e ON e.patient_id = p.patient_id   "
+            + "                                        INNER JOIN obs o ON o.encounter_id = e.encounter_id   "
+            + "                                        INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date  "
+            + "                                                    FROM    patient p   "
+            + "                                                    INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "                                                    INNER JOIN obs o ON o.encounter_id = e.encounter_id   "
+            + "                                                    WHERE   p.voided = 0   "
+            + "                                                        AND e.voided = 0   "
+            + "                                                        AND o.voided = 0   "
+            + "                                                        AND e.location_id = :location  "
+            + "                                                        AND e.encounter_type = ${60} "
+            + "                                                        AND o.concept_id = ${23985} "
+            + "                                                        AND o.value_coded IN (${656},${23982})  "
+            + "                                                        AND e.encounter_datetime >= :startDate "
+            + "                                                        AND e.encounter_datetime <= :endDate "
+            + "                                                    GROUP BY p.patient_id) AS pickup  "
+            + "                                                    ON pickup.patient_id = p.patient_id "
+            + "                                        WHERE p.patient_id NOT IN ( SELECT patient_id   "
+            + "                                                                    FROM patient p  "
+            + "                                                                    WHERE p.voided = 0   "
+            + "                                                                         AND e.voided = 0   "
+            + "                                                                         AND o.voided = 0   "
+            + "                                                                         AND e.location_id = :location  "
+            + "                                                                         AND e.encounter_type = ${60} "
+            + "                                                                         AND o.concept_id = ${23985} "
+            + "                                                                         AND o.value_coded IN (${656},${23982})  "
+            + "                                                                         AND e.encounter_datetime >= DATE_SUB(pickup.first_pickup_date, INTERVAL 7 MONTH)   "
+            + "                                                                         AND e.encounter_datetime < pickup.first_pickup_date)  "
+            + "                           ) TPT ON TPT.patient_id = p.person_id ) TPT";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+    return substitutor.replace(query);
+  }
 }
