@@ -14,7 +14,6 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import java.util.List;
-
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
@@ -33,7 +32,8 @@ public class TPTInitiationDataset extends BaseDataSet {
   private CommonMetadata commonMetadata;
 
   @Autowired
-  public TPTInitiationDataset(HivMetadata hivMetadata, TbMetadata tbMetadata, CommonMetadata commonMetadata) {
+  public TPTInitiationDataset(
+      HivMetadata hivMetadata, TbMetadata tbMetadata, CommonMetadata commonMetadata) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.commonMetadata = commonMetadata;
@@ -84,13 +84,11 @@ public class TPTInitiationDataset extends BaseDataSet {
             tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
             hivMetadata.getMonthlyConcept().getConceptId(),
             hivMetadata.getQuarterlyConcept().getConceptId(),
-
             hivMetadata.getCompletedConcept().getConceptId(),
-            hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId()
-
-                ));
-
-
+            hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
+            hivMetadata.getARVPediatriaInitialEncounterType().getEncounterTypeId(),
+            hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId(),
+            hivMetadata.getHIVCareProgram().getProgramId()));
 
     return sdd;
   }
