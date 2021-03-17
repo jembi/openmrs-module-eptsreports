@@ -75,7 +75,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
     Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
     Date onOrAfter = (Date) context.getFromCache(ON_OR_AFTER);
 
-    if (onOrAfter != null && onOrBefore != null) {
+    if (onOrBefore != null) {
       Date beginPeriodEndDate =
           EptsCalculationUtils.addMonths(onOrBefore, TREATMENT_BEGIN_PERIOD_OFFSET);
       Date completionPeriodEndDate =
@@ -106,35 +106,65 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
       Concept c23984 = tbMetadata.get3HPPiridoxinaConcept();
       Concept c6129 = hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept();
 
-      /** ----- all patients who started IPT in the previous reporting period ---- */
-      // I.
-      CalculationResultMap startProfilaxiaObservations =
-          ePTSCalculationService.firstObs(
+      /** ----- all patients who started IPT ---- */
+      // A1
+       CalculationResultMap startProfilaxiaObservation53 =
+            ePTSCalculationService.getObs(
               hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept(),
-              null,
+              e53,
+              cohort,
               location,
-              false,
               null,
-              beginPeriodEndDate,
-              consultationEncounterTypes,
-              cohort,
-              context);
-      // II
-      CalculationResultMap startDrugsObservations =
-          ePTSCalculationService.getObs(
-              hivMetadata.getIsoniazidUsageConcept(),
-              Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
-              cohort,
-              Arrays.asList(location),
-              Arrays.asList(hivMetadata.getStartDrugs()),
               TimeQualifier.FIRST,
-              null,
-              onOrAfter,
+              null, 
+              onOrBefore, 
+              EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
               context);
-      // III. Patients who have Regime de TPT with the values marked on the first pick-up date
-      // during the previous period
 
-      CalculationResultMap regimeTPT1stPickUpPreviousPeriodMap =
+        // A2
+      CalculationResultMap startDrugsObservations =
+      ePTSCalculationService.getObs(
+          hivMetadata.getIsoniazidUsageConcept(),
+          Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+          cohort,
+          Arrays.asList(location),
+          Arrays.asList(hivMetadata.getStartDrugs()),
+          TimeQualifier.FIRST,
+          null,
+          onOrBefore,
+          context);
+
+        // A3
+      CalculationResultMap startProfilaxiaObservation6 =
+          ePTSCalculationService.getObs(
+            hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept(),
+            e6,
+            cohort,
+            location,
+            null,
+            TimeQualifier.FIRST,
+            null, 
+            onOrBefore, 
+            EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+            context);
+
+        // A4
+        CalculationResultMap startProfilaxiaObservation9 =
+          ePTSCalculationService.getObs(
+            hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept(),
+            e9,
+            cohort,
+            location,
+            null,
+            TimeQualifier.FIRST,
+            null, 
+            onOrBefore, 
+            EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+            context);
+
+
+      // A5 - FILT - Patients who have Regime de TPT with the values marked on the first pick-up date 
+      CalculationResultMap regimeTPT1stPickUpMap =
           ePTSCalculationService.getObs(
               c23985,
               e60,
@@ -142,12 +172,12 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               location,
               Arrays.asList(c656, c23982),
               TimeQualifier.FIRST,
-              DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, -6),
+              null,
+              onOrBefore,
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
-      CalculationResultMap exclisionRegimeTPT1stPickUpPreviousPeriodMap =
+      /*CalculationResultMap exclisionregimeTPT1stPickUpMap =
           ePTSCalculationService.getObs(
               c23985,
               e60,
@@ -158,21 +188,10 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               DateUtils.addMonths(onOrAfter, -13),
               DateUtils.addMonths(onOrBefore, -6),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
+              context);*/
 
       // IV. Patients who have Outras Prescrições with the values (DT-INH) */
-      CalculationResultMap outrasPrescricoesPreviousPeriodMap =
-          ePTSCalculationService.getObs(
-              c1719,
-              e6,
-              cohort,
-              location,
-              Arrays.asList(c23955),
-              TimeQualifier.FIRST,
-              DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, -6),
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
+      /*
 
       CalculationResultMap exclusionOutrasPrescricoesPreviousPeriodMap =
           ePTSCalculationService.getObs(
@@ -185,10 +204,37 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               DateUtils.addMonths(onOrAfter, -13),
               DateUtils.addMonths(onOrBefore, -6),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
+              context);*/
 
       /** ------ who completed IPT treatment during the reporting period--- */
-      // V
+      // B1
+     CalculationResultMap endProfilaxiaObservations53 =
+      ePTSCalculationService.getObs(
+          c6129,
+          e53,
+          cohort,
+          location,
+          null,
+          TimeQualifier.LAST,
+          null, 
+          onOrBefore, 
+          EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
+          context);
+
+        // B2
+     CalculationResultMap completedDrugsObservations =
+    ePTSCalculationService.getObs(
+        hivMetadata.getIsoniazidUsageConcept(),
+        Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+        cohort,
+        Arrays.asList(location),
+        Arrays.asList(hivMetadata.getCompletedConcept()),
+        TimeQualifier.LAST,
+        null,
+        onOrBefore,
+        context);   
+
+        // B3
      CalculationResultMap endProfilaxiaObservations6 =
           ePTSCalculationService.getObs(
               c6129,
@@ -197,22 +243,12 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               location,
               null,
               TimeQualifier.LAST,
-              null, // colocar startDate da profilaxia + 173
-              onOrBefore, // colocar startDate da profilaxia + 365
+              null, 
+              onOrBefore, 
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
-      CalculationResultMap endProfilaxiaObservations53 =
-          ePTSCalculationService.getObs(
-              c6129,
-              e53,
-              cohort,
-              location,
-              null,
-              TimeQualifier.LAST,
-              null, // colocar startDate da profilaxia + 173
-              onOrBefore, // colocar startDate da profilaxia + 365
-              EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
-              context);
+      
+      // B4
       CalculationResultMap endProfilaxiaObservations9 =
           ePTSCalculationService.getObs(
               c6129,
@@ -221,22 +257,24 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               location,
               null,
               TimeQualifier.LAST,
-              null, // colocar startDate da profilaxia + 173
-              onOrBefore, // colocar startDate da profilaxia + 365
+              null, 
+              onOrBefore, 
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
-      // VI
-      CalculationResultMap completedDrugsObservations =
-          ePTSCalculationService.getObs(
-              hivMetadata.getIsoniazidUsageConcept(),
-              Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
-              cohort,
-              Arrays.asList(location),
-              Arrays.asList(hivMetadata.getCompletedConcept()),
-              TimeQualifier.LAST,
-              null,
-              completionPeriodEndDate,
-              context);
+
+     CalculationResultMap outrasPrescricoesMap =
+              ePTSCalculationService.getObs(
+                  c1719,
+                  e6,
+                  cohort,
+                  location,
+                  Arrays.asList(c23955),
+                  TimeQualifier.FIRST,
+                  null,
+                  onOrBefore,
+                  EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+                  context);
+      
 
       /** ------ with IPTStarteDate-IPTEndDate>=173days--- */
       // VI is omitted, actually is: vii.have at least 173 days apart between the IPT Start date
@@ -247,14 +285,15 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
       CalculationResultMap isoniazidUsageObservationsList =
           ePTSCalculationService.allObservations(
               hivMetadata.getIsoniazidUsageConcept(),
-              Arrays.asList(hivMetadata.getYesConcept(), hivMetadata.getContinueRegimenConcept()),
+              Arrays.asList(hivMetadata.getStartDrugs(), hivMetadata.getContinueRegimenConcept()),
               consultationEncounterTypes,
               location,
               cohort,
               context);
+      
       // IX
       // iptstartdate  + 7m <= iptstartdate
-      CalculationResultMap filtMap1 =
+      /*CalculationResultMap filtMap1 =
           ePTSCalculationService.getObs(
               c23985,
               e60,
@@ -586,7 +625,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               DateUtils.addMonths(onOrAfter, -6),
               DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
+              context);*/
 
       /** START and END 3HP Treatment */
 
@@ -600,12 +639,12 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               location,
               Arrays.asList(c23954),
               TimeQualifier.FIRST,
-              DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, -6),
+              null,
+              onOrBefore,
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
-      CalculationResultMap exclucsionAartListTbPrevList3HPPreviousPeriodMap =
+      /*CalculationResultMap exclucsionAartListTbPrevList3HPPreviousPeriodMap =
           ePTSCalculationService.getObs(
               c1719,
               e6,
@@ -616,7 +655,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               DateUtils.addMonths(onOrAfter, -12),
               DateUtils.addMonths(onOrBefore, -6),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
+              context);*/
       // II
       CalculationResultMap regimeTPT3HPMap =
           ePTSCalculationService.getObs(
@@ -626,12 +665,12 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               location,
               Arrays.asList(c23954, c23984),
               TimeQualifier.FIRST,
-              DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, -6),
+              null,
+              onOrBefore,
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
-      CalculationResultMap exclusionregimeTPT3HPMap =
+      /*CalculationResultMap exclusionregimeTPT3HPMap =
           ePTSCalculationService.getObs(
               c1719,
               e60,
@@ -755,7 +794,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               DateUtils.addMonths(onOrAfter, -10),
               DateUtils.addMonths(onOrBefore, -6),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
+              context);*/
 
       for (Integer patientId : cohort) {
         // ipt start date section
@@ -765,16 +804,15 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
         Obs startDrugsObs =
             EptsCalculationUtils.obsResultForPatient(startDrugsObservations, patientId);
 
-        Obs regimeTPT1stPickUpPreviousPeriod =
-            EptsCalculationUtils.obsResultForPatient(
-                regimeTPT1stPickUpPreviousPeriodMap, patientId);
-        List<Obs> exclisionRegimeTPT1stPickUpPreviousPeriod =
-            getObsListFromResultMap(exclisionRegimeTPT1stPickUpPreviousPeriodMap, patientId);
+        Obs regimeTPT1stPickUpPreviousPeriod = EptsCalculationUtils.obsResultForPatient(regimeTPT1stPickUpMap, patientId);
+
+        /*List<Obs> exclisionRegimeTPT1stPickUpPreviousPeriod =
+            getObsListFromResultMap(exclisionregimeTPT1stPickUpMap, patientId);
 
         Obs outrasPrescricoesPreviousPeriod =
             EptsCalculationUtils.obsResultForPatient(outrasPrescricoesPreviousPeriodMap, patientId);
         List<Obs> exclusionOutrasPrescricoesPreviousPeriod =
-            getObsListFromResultMap(exclusionOutrasPrescricoesPreviousPeriodMap, patientId);
+            getObsListFromResultMap(exclusionOutrasPrescricoesPreviousPeriodMap, patientId);*/
 
         // ipt end date section
         // Obs endProfilaxiaObs =
@@ -787,10 +825,9 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
             EptsCalculationUtils.obsResultForPatient(endProfilaxiaObservations9, patientId);
         Obs endDrugsObs =
             EptsCalculationUtils.obsResultForPatient(completedDrugsObservations, patientId);
-        /*
-                 * If We can't find a startDatvamos ao room1
-        ￼
-        e from Ficha de Seguimento (adults and children) / Ficha
+        
+            /*
+                 * If We can't find a startDate from Ficha de Seguimento (adults and children) / Ficha
                  * Resumo or Ficha Clinica-MasterCard, we can't do the calculations. -Just move to the next
                  * patient.
                  */
@@ -802,14 +839,14 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                 Arrays.asList(
                     startProfilaxiaObs,
                     startDrugsObs,
-                    this.exclude(
+                    null /*this.exclude(
                         regimeTPT1stPickUpPreviousPeriod,
                         exclusionOutrasPrescricoesPreviousPeriod,
-                        -7),
-                    this.exclude(
+                        -7)*/,
+                    null /*this.exclude(
                         outrasPrescricoesPreviousPeriod,
                         exclusionOutrasPrescricoesPreviousPeriod,
-                        -7)),
+                        -7)*/),
                 Priority.MIN,
                 true);
 
