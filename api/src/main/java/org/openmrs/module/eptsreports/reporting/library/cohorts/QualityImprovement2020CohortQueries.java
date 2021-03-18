@@ -2131,8 +2131,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    String mapping =
-        "startDate=${startDate},endDate=${endDate},less3mDate=${startDate-3m},location=${location}";
+
     String mapping2 =
         "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}";
 
@@ -3534,7 +3533,7 @@ public class QualityImprovement2020CohortQueries {
             + "               AND o.concept_id = ${21190} "
             + "               AND o.value_coded IS NOT NULL "
             + "               AND e.location_id = :location "
-            + "               AND o2.concept_id = ${1792} AND o2.value_coded <> ${1982}"
+            + "               AND ((o2.concept_id = ${1792} AND o2.value_coded <> ${1982}) OR (o2.concept_id IS NULL OR o2.value_coded IS NULL)) "
             + "               AND e.voided = 0 "
             + "               AND p.voided = 0 "
             + "               AND o.voided = 0 "
@@ -3662,20 +3661,20 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "SELECT p.patient_id "
-    + "  FROM patient p "
-    + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
-    + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-    + "       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
-    + "  WHERE e.voided = 0 AND p.voided = 0 "
-    + "    AND o.voided = 0 "
-    + "    AND o2.voided = 0 "
-    + "    AND e.encounter_type = ${53} "
-    + "    AND e.location_id = :location "
-    + "    AND (o.concept_id = ${21187} AND o.value_coded IS NOT NULL) "
-    + "    AND ((o2.concept_id = ${1792} AND o2.value_coded <> ${1982}) OR (o2.concept_id IS NULL OR o2.value_coded IS NULL)) "
-    + "    AND o.obs_datetime >= :startDate "
-    + "    AND o.obs_datetime <= :endDate "
-    + "  GROUP BY p.patient_id";
+            + "  FROM patient p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "  WHERE e.voided = 0 AND p.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND o2.voided = 0 "
+            + "    AND e.encounter_type = ${53} "
+            + "    AND e.location_id = :location "
+            + "    AND (o.concept_id = ${21187} AND o.value_coded IS NOT NULL) "
+            + "    AND ((o2.concept_id = ${1792} AND o2.value_coded <> ${1982}) OR (o2.concept_id IS NULL OR o2.value_coded IS NULL)) "
+            + "    AND o.obs_datetime >= :startDate "
+            + "    AND o.obs_datetime <= :endDate "
+            + "  GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
