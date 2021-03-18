@@ -2044,13 +2044,33 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
 
-    if (indicatorFlag == 3 || indicatorFlag == 7) {
+    compositionCohortDefinition.addSearch(
+        "ADULT",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "CHILDREN",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
+
+    if (indicatorFlag == 3) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND B1) AND NOT B1E AND NOT (C OR D OR F)");
+          "(A AND B1) AND NOT B1E AND NOT (C OR D OR F) AND ADULT");
     }
-    if (indicatorFlag == 4 || indicatorFlag == 8) {
+    if (indicatorFlag == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND B2) AND NOT B2E AND NOT (C OR D OR F)");
+          "(A AND B2) AND NOT B2E AND NOT (C OR D OR F) AND ADULT");
+    }
+    if (indicatorFlag == 7) {
+      compositionCohortDefinition.setCompositionString(
+          "(A AND B1) AND NOT B1E AND NOT (C OR D OR F) AND CHILDREN");
+    }
+    if (indicatorFlag == 8) {
+      compositionCohortDefinition.setCompositionString(
+          "(A AND B2) AND NOT B2E AND NOT (C OR D OR F) AND CHILDREN");
     }
     if (indicatorFlag == 11) {
       compositionCohortDefinition.setCompositionString(
@@ -2350,7 +2370,7 @@ public class QualityImprovement2020CohortQueries {
     query.append("    AND e.voided = 0 ");
     query.append("    AND o.voided = 0 ");
     query.append("    AND e.encounter_type = ${6} ");
-    query.append("    AND e.encounter_datetime <= last_ficha.max_date ");
+    query.append("    AND e.encounter_datetime = last_ficha.max_date ");
     query.append("    AND o.concept_id = ${21151} ");
     if (b1e) {
       query.append("  AND o.value_coded <>  ${21150} ");
@@ -3770,16 +3790,22 @@ public class QualityImprovement2020CohortQueries {
         "ADULT",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
+
+    cd.addSearch(
+        "CHILDREN",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
 
     if (flag == 3) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G");
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G AND ADULT");
     } else if (flag == 4) {
       cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR F)) AND G AND ADULT");
     } else if (flag == 7) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G");
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G AND CHILDREN");
     } else if (flag == 8) {
-      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR F) AND G");
+      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR F) AND G AND CHILDREN");
     } else if (flag == 11) {
       cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR F) AND G");
     }
@@ -3950,18 +3976,18 @@ public class QualityImprovement2020CohortQueries {
         "I",
         EptsReportUtils.map(
             returnedForAnotherConsultationOrPickup,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "II",
         EptsReportUtils.map(
             returnedForAnotherConsultationOrPickup3466,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "III",
         EptsReportUtils.map(
             returnedForAnotherConsultationOrPickup6799,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "CHILDREN",
