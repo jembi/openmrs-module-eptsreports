@@ -557,9 +557,14 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
   }
 
   private List<Obs> getObsListFromResultMap(CalculationResultMap map, Integer pid) {
-    ListResult listResult = (ListResult) map.get(pid);
-    List<Obs> obss = EptsCalculationUtils.extractResultValues(listResult);
-    obss.removeAll(Collections.singleton(null));
+    List<Obs> obss = new ArrayList<>();
+    if (map.get(pid) instanceof ListResult) {
+
+      ListResult listResult = (ListResult) map.get(pid);
+      obss = EptsCalculationUtils.extractResultValues(listResult);
+      obss.removeAll(Collections.singleton(null));
+    }
+
     return obss;
   }
 
