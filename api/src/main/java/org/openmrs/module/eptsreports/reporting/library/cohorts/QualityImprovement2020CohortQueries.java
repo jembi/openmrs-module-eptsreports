@@ -5155,7 +5155,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
-    map.put("856", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
