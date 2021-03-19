@@ -2431,6 +2431,8 @@ public class QualityImprovement2020CohortQueries {
             + "        AND o.location_id = :location "
             + "        AND o.concept_id = ${856} "
             + "        AND o.value_numeric > 1000 "
+            + "        AND e.encounter_datetime BETWEEN "
+            + "        :startDate AND :endDate "
             + " GROUP BY p.patient_id) filtered ON p.patient_id = filtered.patient_id; ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -4134,14 +4136,6 @@ public class QualityImprovement2020CohortQueries {
                 commonMetadata.getRegimeChangeConcept(),
                 hivMetadata.getNoConcept()));
 
-    CohortDefinition secondLineB2E =
-        commonCohortQueries.getPatientsToExcludeFromTreatmentIn6MonthsB2E(
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getMasterCardEncounterType(),
-            hivMetadata.getRegArvSecondLine(),
-            hivMetadata.getTherapeuticLineConcept(),
-            hivMetadata.getFirstLineConcept());
-
     CohortDefinition B3E =
         commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
             true,
@@ -4171,37 +4165,37 @@ public class QualityImprovement2020CohortQueries {
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
-              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 4) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
-              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 6) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(0, 4),
-              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 7) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(5, 9),
-              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 8) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(10, 14),
-              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     } else if (line == 13) {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
               commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(2, null),
-              "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+              "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     }
 
     compositionCohortDefinition.addSearch(
@@ -4234,11 +4228,6 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "secondLineB2E",
-        EptsReportUtils.map(
-            secondLineB2E,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-    compositionCohortDefinition.addSearch(
         "B3",
         EptsReportUtils.map(
             changeRegimen6Months,
@@ -4270,7 +4259,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+            "(B1 AND secondLineB2 AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       }
     } else {
       if (line == 1 || line == 6 || line == 7 || line == 8) {
@@ -4278,7 +4267,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND (secondLineB2 AND NOT secondLineB2E) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "(B1 AND secondLineB2 AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
       }
     }
 
@@ -4962,6 +4951,8 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    CohortDefinition adults = this.ageCohortQueries.createXtoYAgeCohort("adullts", 2, 14);
+
     CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
         getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
 
@@ -4994,7 +4985,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition G = getMQ13P4G();
 
     CohortDefinition H = getMQ13P4H();
-
+    compositionCohortDefinition.addSearch("adults", EptsReportUtils.map(adults, ""));
     compositionCohortDefinition.addSearch(
         "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
 
@@ -5021,7 +5012,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND B2) AND NOT (B4 or B5 or E or F)");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B2) AND NOT (B4 or B5 or E or F)");
+            "((B1 AND B2) AND NOT (B4 or B5 or E or F)) AND adults");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString("(B1 AND B4) AND NOT (B5 or E or F)");
       }
