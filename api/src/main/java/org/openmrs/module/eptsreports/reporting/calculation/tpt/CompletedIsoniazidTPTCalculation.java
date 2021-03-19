@@ -262,7 +262,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
-     CalculationResultMap outrasPrescricoesMap =
+     /*CalculationResultMap outrasPrescricoesMap =
               ePTSCalculationService.getObs(
                   c1719,
                   e6,
@@ -273,23 +273,24 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                   null,
                   onOrBefore,
                   EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-                  context);
+                  context);*/
       
 
       /** ------ with IPTStarteDate-IPTEndDate>=173days--- */
-      // VI is omitted, actually is: vii.have at least 173 days apart between the IPT Start date
-      // (the most oldest date from above criterias) and IPT End date (the most recent date from
-      // above criterias).
-
+    
       // VIII
       CalculationResultMap isoniazidUsageObservationsList =
-          ePTSCalculationService.allObservations(
-              hivMetadata.getIsoniazidUsageConcept(),
-              Arrays.asList(hivMetadata.getStartDrugs(), hivMetadata.getContinueRegimenConcept()),
-              consultationEncounterTypes,
-              location,
-              cohort,
-              context);
+      ePTSCalculationService.getObs(
+        c6122,
+        e6,
+        cohort,
+        location,
+        Arrays.asList(c1256,c1257),
+        TimeQualifier.FIRST,
+        null,
+        onOrBefore,
+        EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+        context);
       
       // IX
       // iptstartdate  + 7m <= iptstartdate
@@ -329,19 +330,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               DateUtils.addMonths(onOrBefore, 1),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
-      CalculationResultMap filtMap4 =
-          ePTSCalculationService.getObs(
-              c23986,
-              e60,
-              cohort,
-              location,
-              Arrays.asList(c1098),
-              TimeQualifier.ANY,
-              DateUtils.addMonths(onOrAfter, -6),
-              DateUtils.addMonths(onOrBefore, 1),
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
-
+      
       // X
       CalculationResultMap dtINHMap1 =
           ePTSCalculationService.getObs(
@@ -629,9 +618,23 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
       /** START and END 3HP Treatment */
 
-      // I
+      // Tipo de dispensa - Trimestral
+      CalculationResultMap filtMap4 =
+          ePTSCalculationService.getObs(
+              c23986,
+              e60,
+              cohort,
+              location,
+              Arrays.asList(c1098),
+              TimeQualifier.ANY,
+              DateUtils.addMonths(onOrAfter, -6),
+              onOrBefore,
+              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+              context);
 
-      CalculationResultMap artListTbPrevList3HPPreviousPeriodMap =
+      // C1 and D part 1
+
+      CalculationResultMap artListTbPrevList3HPMap =
           ePTSCalculationService.getObs(
               c1719,
               e6,
@@ -656,7 +659,8 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               DateUtils.addMonths(onOrBefore, -6),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);*/
-      // II
+      
+              // C2
       CalculationResultMap regimeTPT3HPMap =
           ePTSCalculationService.getObs(
               c23985,
@@ -670,6 +674,50 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
+
+            // D part 1
+              CalculationResultMap atLeast3FichaClínicaMastercard3HPUntil4Month =
+          ePTSCalculationService.getObs(
+              c1719,
+              e6,
+              cohort,
+              location,
+              Arrays.asList(c23954),
+              TimeQualifier.ANY,
+              null,
+              onOrBefore,
+              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+              context);
+
+
+              // D part 2
+      CalculationResultMap atleast1FILT3HPTrimestral =
+      ePTSCalculationService.getObs(
+          c23985,
+          e60,
+          cohort,
+          location,
+          Arrays.asList(c23954,c23984),
+          TimeQualifier.ANY,
+          null,
+          onOrBefore,
+          EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+          context);
+
+          // D part 3
+          CalculationResultMap atleast3FILT3HPTrimestral =
+      ePTSCalculationService.getObs(
+          c23985,
+          e60,
+          cohort,
+          location,
+          Arrays.asList(c23954,c23984),
+          TimeQualifier.ANY,
+          null,
+          onOrBefore,
+          EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+          context);
+
       /*CalculationResultMap exclusionregimeTPT3HPMap =
           ePTSCalculationService.getObs(
               c1719,
@@ -682,19 +730,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               DateUtils.addMonths(onOrBefore, -6),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
-      // III
-      CalculationResultMap atleast1FILT3HPTrimestralMa1 =
-          ePTSCalculationService.getObs(
-              c23985,
-              e60,
-              cohort,
-              location,
-              Arrays.asList(c23954),
-              TimeQualifier.ANY,
-              DateUtils.addMonths(onOrAfter, -10),
-              DateUtils.addMonths(onOrBefore, -6),
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
+      
       CalculationResultMap atleast1FILT3HPTrimestralMa2 =
           ePTSCalculationService.getObs(
               c23986,
@@ -783,23 +819,19 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               context);
 
       // IV
-      CalculationResultMap atLeast3FichaClínicaMastercard3HPUntil4MonthMap =
-          ePTSCalculationService.getObs(
-              c1719,
-              e6,
-              cohort,
-              location,
-              Arrays.asList(c23954),
-              TimeQualifier.ANY,
-              DateUtils.addMonths(onOrAfter, -10),
-              DateUtils.addMonths(onOrBefore, -6),
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);*/
+      */
 
       for (Integer patientId : cohort) {
+              
         // ipt start date section
-        Obs startProfilaxiaObs =
-            EptsCalculationUtils.obsResultForPatient(startProfilaxiaObservations, patientId);
+        Obs startProfilaxiaObs53 =
+            EptsCalculationUtils.obsResultForPatient(startProfilaxiaObservation53, patientId);
+
+        Obs startProfilaxiaObs6 =
+            EptsCalculationUtils.obsResultForPatient(startProfilaxiaObservation6, patientId);
+
+        Obs startProfilaxiaObs9 =
+            EptsCalculationUtils.obsResultForPatient(startProfilaxiaObservation9, patientId);
 
         Obs startDrugsObs =
             EptsCalculationUtils.obsResultForPatient(startDrugsObservations, patientId);
@@ -831,22 +863,17 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                  * Resumo or Ficha Clinica-MasterCard, we can't do the calculations. -Just move to the next
                  * patient.
                  */
-        if (startProfilaxiaObs == null && startDrugsObs == null) {
+        if (startProfilaxiaObs53 == null && startProfilaxiaObs6 == null && startProfilaxiaObs9 == null
+        && startDrugsObs == null) {
           continue;
         }
         Date iptStartDate =
             getMinOrMaxObsDate(
                 Arrays.asList(
-                    startProfilaxiaObs,
-                    startDrugsObs,
-                    null /*this.exclude(
-                        regimeTPT1stPickUpPreviousPeriod,
-                        exclusionOutrasPrescricoesPreviousPeriod,
-                        -7)*/,
-                    null /*this.exclude(
-                        outrasPrescricoesPreviousPeriod,
-                        exclusionOutrasPrescricoesPreviousPeriod,
-                        -7)*/),
+                    startProfilaxiaObs53,
+                    startProfilaxiaObs6,
+                    startProfilaxiaObs9,
+                    startDrugsObs),
                 Priority.MIN,
                 true);
 
@@ -856,6 +883,19 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                     endProfilaxiaObs53, endProfilaxiaObs6, endProfilaxiaObs9, endDrugsObs),
                 Priority.MAX,
                 true);
+
+        Obs B1 = returnObsBetweenIptStartDateAndIptEndDate(ArrayList(endProfilaxiaObs53),iptStartDate, 173, 365);
+        Obs B2 = returnObsBetweenIptStartDateAndIptEndDate(ArrayList(endDrugsObs),iptStartDate, 173, 365);
+        Obs B3 = returnObsBetweenIptStartDateAndIptEndDate(ArrayList(endProfilaxiaObs6),iptStartDate, 173, 365);
+        Obs B4 = returnObsBetweenIptStartDateAndIptEndDate(ArrayList(endProfilaxiaObs9),iptStartDate, 173, 365);
+
+        if (B1 != null || B2 != null || B3 != null || B4 != null) {
+            
+            
+            
+            map.put(patientId, new BooleanResult(true, this));
+        }
+        
 
         // viii
         int viii =
@@ -990,7 +1030,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
         /* 3HP */
         Obs artListTbPrevList3HPPreviousPeriod =
             EptsCalculationUtils.obsResultForPatient(
-                artListTbPrevList3HPPreviousPeriodMap, patientId);
+                artListTbPrevList3HPMap, patientId);
         Obs regimeTPT3HP = EptsCalculationUtils.obsResultForPatient(regimeTPT3HPMap, patientId);
 
         List<Obs> exclucsionAartListTbPrevList3HPPreviousPeriod =
@@ -1011,13 +1051,21 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
         int atleast1FILT3HPTrimestralsOccurencies1 =
             evaluateOccurrence(
-                getObsListFromResultMap(atleast1FILT3HPTrimestralMa1, patientId),
-                getObsListFromResultMap(atleast1FILT3HPTrimestralMa2, patientId),
+                getObsListFromResultMap(atleast1FILT3HPTrimestral, patientId),
+                getObsListFromResultMap(filtMap4, patientId),
                 first3HPDate,
                 1,
                 4);
 
-        int atleast1FILT3HPTrimestralsOccurencies2 =
+                int atleast3FILTS3HPTrimestralOccurencies =
+                evaluateOccurrence(
+                    getObsListFromResultMap(atleast3FILT3HPTrimestral, patientId),
+                    getObsListFromResultMap(filtMap4, patientId),
+                    first3HPDate,
+                    3,
+                    4);
+
+        /*int atleast1FILT3HPTrimestralsOccurencies2 =
             evaluateOccurrence(
                 getObsListFromResultMap(atleast1FILT3HPTrimestralMa3, patientId),
                 getObsListFromResultMap(atleast1FILT3HPTrimestralMa4, patientId),
@@ -1033,16 +1081,18 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                 3,
                 4);
 
+        
+
         int atleast3FILTS3HPMensalOccurencies2 =
             evaluateOccurrence(
                 getObsListFromResultMap(atleast3FILTS3HPMensal3, patientId),
                 getObsListFromResultMap(atleast3FILTS3HPMensal4, patientId),
                 first3HPDate,
                 3,
-                4);
+                4);*/
 
         List<Obs> atLeast3FichaClínicaMastercard3HPUntil4Month =
-            getObsListFromResultMap(atLeast3FichaClínicaMastercard3HPUntil4MonthMap, patientId);
+            getObsListFromResultMap(atLeast3FichaClínicaMastercard3HPUntil4Month, patientId);
 
         int atleast3FILTS3HPMensalListMensalOccurencies =
             evaluateOccurrence(atLeast3FichaClínicaMastercard3HPUntil4Month, first3HPDate, 3, 4);
@@ -1246,6 +1296,48 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
     }
     return num;
   }
+
+  /**
+   * Given iptStartDate evaluate if Obs is between IPT startDate plus some number 
+   * of days and IPT and some number of days
+   *
+   * @param a list of OBs
+   * @param iptStartDate
+   * @param nTimes
+   * @param plusIPTDate
+   * @return
+   */
+  private Obs returnObsBetweenIptStartDateAndIptEndDate(List<Obs> a, Date iptStartDate, int plusIPTStartDate,
+          int plusIPTEndDate, boolean encounterDate) {
+
+      Obs returnedObs = null;
+
+      if (iptStartDate == null) {
+          return returnedObs;
+      }
+
+      Date startDate = DateUtils.addDays(iptStartDate, plusIPTStartDate);
+      Date endDate = DateUtils.addDays(iptStartDate, plusIPTEndDate);
+
+      for (Obs obs : a) {
+          if (encounterDate) {
+              if (obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0
+                      && obs.getEncounter().getEncounterDatetime().compareTo(endDate) <= 0) {
+                  returnedObs = obs;
+                  break;
+              }
+          } else {
+            if (obs.getValueDatetime().compareTo(startDate) >= 0
+            && obs.getValueDatetime().compareTo(endDate) <= 0) {
+        returnedObs = obs;
+        break;
+          }
+      }
+      return returnedObs;
+  }
+}
+
+
 
   private List<Obs> exclude(List<Obs> pure, List<Obs> dirty) {
     List<Obs> clean = new ArrayList<>();
