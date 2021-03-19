@@ -5,9 +5,9 @@ import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.library.queries.TPTCompletionQueries;
 import org.openmrs.module.eptsreports.reporting.calculation.tpt.CompletedIsoniazidTPTCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.TPTCompletionQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -43,23 +43,17 @@ public class TPTCompletionCohortQueries {
   }
 
   private final String mapping = "endDate=${endDate},location=${location}";
-  private final String mapping2 =
-      "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+  private final String mapping2 = "onOrBefore=${endDate},location=${location}";
 
-
-
-      public CohortDefinition getPatientsThatCompletedProphylaticTreatment() {
-        CalculationCohortDefinition cd =
-            new CalculationCohortDefinition(
-                Context.getRegisteredComponents(CompletedIsoniazidTPTCalculation.class)
-                    .get(0));
-        cd.setName("Patients that completed prophylatic treatment");
-        cd.addParameter(new Parameter("location", "Location", Location.class));
-        cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-        return cd;
-      }
-
-
+  public CohortDefinition getPatientsThatCompletedProphylaticTreatment() {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(CompletedIsoniazidTPTCalculation.class).get(0));
+    cd.setName("Patients that completed prophylatic treatment");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    return cd;
+  }
 
   /**
    *
@@ -150,7 +144,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch(
         "completedAll",
         EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
+            TPTCompletionQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
             mapping2));
 
     compositionCohortDefinition.setCompositionString(

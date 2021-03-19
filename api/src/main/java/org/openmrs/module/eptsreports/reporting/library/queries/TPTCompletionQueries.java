@@ -3,6 +3,9 @@ package org.openmrs.module.eptsreports.reporting.library.queries;
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.calculation.tpt.CompletedIsoniazidTPTCalculation;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -331,5 +334,24 @@ public class TPTCompletionQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>B - INH final and D - 3HP Final
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public static CohortDefinition getPatientsThatCompletedIsoniazidProphylacticTreatment() {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(CompletedIsoniazidTPTCalculation.class).get(0));
+    cd.setName("Patients that completed Isoniazid prophylatic treatment");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    return cd;
   }
 }
