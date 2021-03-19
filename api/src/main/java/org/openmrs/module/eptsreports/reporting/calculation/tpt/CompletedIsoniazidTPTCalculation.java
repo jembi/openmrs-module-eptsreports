@@ -567,7 +567,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
    * Given 1 list of obs the method extracts the encounter list , and then check for each encounter
    * in the list evaluates if it reocurred ntimes during period.
    *
-   * @param a
+   * @param obss
    * @param iptStartDate
    * @param nTimes
    * @param plusIPTDate
@@ -637,8 +637,8 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
    *
    * @param a list of OBs
    * @param iptStartDate
-   * @param nTimes
-   * @param plusIPTDate
+   * @param plusIPTStartDate
+   * @param plusIPTEndDate
    * @return
    */
   private Obs returnObsBetweenIptStartDateAndIptEndDate(
@@ -658,17 +658,23 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
     Date endDate = DateUtils.addDays(iptStartDate, plusIPTEndDate);
 
     for (Obs obs : a) {
-      if (encounterDate) {
-        if (obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0
-            && obs.getEncounter().getEncounterDatetime().compareTo(endDate) <= 0) {
-          returnedObs = obs;
-          break;
-        }
-      } else {
-        if (obs.getValueDatetime().compareTo(startDate) >= 0
-            && obs.getValueDatetime().compareTo(endDate) <= 0) {
-          returnedObs = obs;
-          break;
+      if (obs != null) {
+        if (encounterDate) {
+          if (obs.getEncounter() != null) {
+            if (obs.getEncounter().getEncounterDatetime().compareTo(startDate) >= 0
+                && obs.getEncounter().getEncounterDatetime().compareTo(endDate) <= 0) {
+              returnedObs = obs;
+              break;
+            }
+          }
+        } else {
+          if (obs.getValueDatetime() != null) {
+            if (obs.getValueDatetime().compareTo(startDate) >= 0
+                && obs.getValueDatetime().compareTo(endDate) <= 0) {
+              returnedObs = obs;
+              break;
+            }
+          }
         }
       }
     }
