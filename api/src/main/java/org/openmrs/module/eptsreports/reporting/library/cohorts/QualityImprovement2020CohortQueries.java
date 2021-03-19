@@ -5092,8 +5092,6 @@ public class QualityImprovement2020CohortQueries {
             + "                                            AND e.location_id = :location  "
             + "                                        GROUP  BY p.patient_id   "
             + "                                    ) union_tbl  "
-            + "                            WHERE  union_tbl.art_date  "
-            + "                                BETWEEN :startDate AND :endDate   "
             + "                        ) AS inicio ON inicio.patient_id = p.patient_id   "
             + "            INNER JOIN ( "
             + "                        SELECT p.patient_id, MIN(e.encounter_datetime) AS first_gestante, e.encounter_id "
@@ -5121,7 +5119,8 @@ public class QualityImprovement2020CohortQueries {
             + "            AND o.value_coded = ${1065}  "
             + "            AND e.encounter_datetime > inicio.art_date "
             + "            AND e.encounter_datetime BETWEEN  :startDate AND :endDate "
-            + "            AND e.location_id = :location ";
+            + "            AND e.location_id = :location "
+            + "      GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
