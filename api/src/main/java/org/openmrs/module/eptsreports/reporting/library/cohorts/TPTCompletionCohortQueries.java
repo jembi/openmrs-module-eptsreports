@@ -678,7 +678,7 @@ public class TPTCompletionCohortQueries {
             + "         	AND o.concept_id = ${23985} "
             + "         	AND o.value_coded in (${23954},${23984}) "
             + "         	AND e.location_id = :location "
-            + "         	AND e.encounter_datetime < =:endDate ";
+            + "         	AND e.encounter_datetime <= :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
