@@ -48,16 +48,6 @@ public class TPTCompletionCohortQueries {
   private final String mapping = "endDate=${endDate},location=${location}";
   private final String mapping2 = "onOrBefore=${endDate},location=${location}";
 
-  public CohortDefinition getPatientsThatCompletedProphylaticTreatment() {
-    CalculationCohortDefinition cd =
-        new CalculationCohortDefinition(
-            Context.getRegisteredComponents(CompletedIsoniazidTPTCalculation.class).get(0));
-    cd.setName("Patients that completed prophylatic treatment");
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    return cd;
-  }
-
   /**
    *
    *
@@ -149,7 +139,7 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(getPatientsThatCompletedIsoniazidProphylacticTreatment(), mapping2));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND (((A1 OR A2 OR A3 OR A4 OR A5) AND completedAll) OR ((C1 OR C2) AND completedAll))");
+        "txcurr AND ((A1 OR A2 OR A3 OR A4 OR A5 OR C1 OR C2) AND completedAll)");
 
     return compositionCohortDefinition;
   }
@@ -396,12 +386,12 @@ public class TPTCompletionCohortQueries {
             + "     INNER JOIN"
             + " obs o ON e.encounter_id = o.encounter_id"
             + " WHERE"
-            + " p.voided = 0 AND e.voided AND o.voided"
-            + " and e.encounter_type = ${53}"
-            + " and o.concept_id = ${6128}"
-            + " and o.value_datetime IS NOT NULL"
-            + " and o.value_datetime <= :endDate"
-            + " and e.location_id = :location ";
+            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
+            + " AND e.encounter_type = ${53}"
+            + " AND o.concept_id = ${6128}"
+            + " AND o.value_datetime IS NOT NULL"
+            + " AND o.value_datetime <= :endDate"
+            + " AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -444,7 +434,7 @@ public class TPTCompletionCohortQueries {
             + " INNER JOIN"
             + " obs o ON e.encounter_id = o.encounter_id"
             + " WHERE"
-            + " p.voided = 0 AND e.voided AND o.voided"
+            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
             + "    AND e.encounter_type = ${6}"
             + "    AND o.concept_id = ${6122}"
             + "    AND o.value_coded = ${1256}"
@@ -580,7 +570,7 @@ public class TPTCompletionCohortQueries {
             + "    INNER JOIN"
             + " obs o ON e.encounter_id = o.encounter_id"
             + " WHERE"
-            + " p.voided = 0 AND e.voided AND o.voided"
+            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
             + "     AND e.encounter_type = ${60}"
             + "     AND o.concept_id = ${23985}"
             + "    AND o.value_coded IN (${656} , ${23982})"

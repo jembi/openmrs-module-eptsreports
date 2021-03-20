@@ -55,7 +55,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
       Collection<Integer> cohort,
       Map<String, Object> parameterValues,
       PatientCalculationContext context) {
-    CalculationResultMap map = new CalculationResultMap();
+    CalculationResultMap patientMap = new CalculationResultMap();
     Location location = (Location) context.getFromCache("location");
 
     Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
@@ -329,14 +329,8 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
         Obs startTPTFilt =
             EptsCalculationUtils.obsResultForPatient(regimeTPT1stPickUpMap, patientId);
 
-        /*Obs outrasPrescricoesCleanObs = EptsCalculationUtils.obsResultForPatient(outrasPrescricoesExcludeINHMap,
-        patientId);*/
-
         List<Obs> outrasPrescricoesCleanObsList =
             getObsListFromResultMap(outrasPrescricoesExcludeINHMap, patientId);
-
-        /*Obs outrasPrescricoesINHObs = EptsCalculationUtils.obsResultForPatient(outrasPrescricoesINHMap,
-        patientId);*/
 
         List<Obs> outrasPrescricoesINHObsList =
             getObsListFromResultMap(outrasPrescricoesINHMap, patientId);
@@ -357,6 +351,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
             && startDrugsObs == null) {
           continue;
         }
+
         Date iptStartDate =
             getMinOrMaxObsDate(
                 Arrays.asList(
@@ -366,13 +361,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                     startDrugsObs,
                     startTPTFilt),
                 Priority.MIN,
-                true);
-
-        Date iptEndDate =
-            getMinOrMaxObsDate(
-                Arrays.asList(
-                    endProfilaxiaObs53, endProfilaxiaObs6, endProfilaxiaObs9, endDrugsObs),
-                Priority.MAX,
                 true);
 
         Obs B1 =
@@ -425,7 +413,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
             if (evaluateINHOccurrences6 >= 6
                 && evaluateINHOccurences2 >= 2
                 && evaluateINHOccurrences3 >= 3) {
-              map.put(patientId, new BooleanResult(true, this));
+              patientMap.put(patientId, new BooleanResult(true, this));
             }
 
           } else if (startTPTFilt != null) {
@@ -469,11 +457,11 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                 && evaluateRegimeTPTOccurrences2 >= 2
                 && evaluateRegimeTPTOccurrences3DM >= 3
                 && evaluateRegimeTPTOccurrences3DT >= 3) {
-              map.put(patientId, new BooleanResult(true, this));
+              patientMap.put(patientId, new BooleanResult(true, this));
             }
           }
 
-          map.put(patientId, new BooleanResult(true, this));
+          patientMap.put(patientId, new BooleanResult(true, this));
         }
 
         /* 3HP */
@@ -512,10 +500,10 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                 && (atLeastThree3HPOccurrence >= 3
                     || atLeast1FILT3HPTrimestralsOccurence >= 1
                     || atleast3FILTS3HPTrimestralOccurencies >= 3)) {
-          map.put(patientId, new BooleanResult(true, this));
+          patientMap.put(patientId, new BooleanResult(true, this));
         }
       }
-      return map;
+      return patientMap;
     } else {
       throw new IllegalArgumentException(
           String.format("Parameters %s and %s must be set", ON_OR_BEFORE));
