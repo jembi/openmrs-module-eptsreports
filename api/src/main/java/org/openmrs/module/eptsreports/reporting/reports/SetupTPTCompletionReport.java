@@ -75,7 +75,7 @@ public class SetupTPTCompletionReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "TPT_Completion_Report_v1.0.xls",
+              "TPT_Completion_Report_v1.1.xls",
               "TPT Completion Report",
               getExcelDesignUuid(),
               null);
