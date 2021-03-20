@@ -400,7 +400,7 @@ public class TPTCompletionCohortQueries {
             + " and e.encounter_type = ${53}"
             + " and o.concept_id = ${6128}"
             + " and o.value_datetime IS NOT NULL"
-            + " and o.value_datetime < :endDate"
+            + " and o.value_datetime <= :endDate"
             + " and e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -472,7 +472,6 @@ public class TPTCompletionCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Ficha Clinica ");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -487,7 +486,7 @@ public class TPTCompletionCohortQueries {
             + "WHERE e.encounter_type = ${6} "
             + "AND o.concept_id = ${6128} "
             + "AND e.location_id = :location "
-            + "AND o.value_datetime < :endDate "
+            + "AND e.encounter_datetime <= :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -534,7 +533,7 @@ public class TPTCompletionCohortQueries {
             + "     	AND e.encounter_type = ${9} "
             + "     	AND o.concept_id = ${6128} "
             + " 	AND e.location_id = :location "
-            + "     	AND o.value_datetime < :endDate ";
+            + "     	AND e.encounter_datetime <= :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -585,7 +584,7 @@ public class TPTCompletionCohortQueries {
             + "     AND e.encounter_type = ${60}"
             + "     AND o.concept_id = ${23985}"
             + "    AND o.value_coded IN (${656} , ${23982})"
-            + "     AND e.encounter_datetime < :endDate"
+            + "     AND e.encounter_datetime <= :endDate"
             + "        AND e.location_id = :location";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -627,7 +626,7 @@ public class TPTCompletionCohortQueries {
             + "WHERE e.encounter_type = ${6} "
             + "AND o.concept_id = ${1719} AND o.value_coded = ${23954} "
             + "AND e.location_id = :location "
-            + "AND e.encounter_datetime < :endDate "
+            + "AND e.encounter_datetime <= :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -679,7 +678,7 @@ public class TPTCompletionCohortQueries {
             + "         	AND o.concept_id = ${23985} "
             + "         	AND o.value_coded in (${23954},${23984}) "
             + "         	AND e.location_id = :location "
-            + "         	AND e.encounter_datetime <:endDate ";
+            + "         	AND e.encounter_datetime < =:endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

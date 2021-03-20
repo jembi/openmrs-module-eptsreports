@@ -100,13 +100,14 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
       CalculationResultMap startDrugsObservations =
           ePTSCalculationService.getObs(
               hivMetadata.getIsoniazidUsageConcept(),
-              Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+              e6,
               cohort,
-              Arrays.asList(location),
+              location,
               Arrays.asList(hivMetadata.getStartDrugs()),
               TimeQualifier.FIRST,
               null,
               onOrBefore,
+              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
       // A3
@@ -171,13 +172,14 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
       CalculationResultMap completedDrugsObservations =
           ePTSCalculationService.getObs(
               hivMetadata.getIsoniazidUsageConcept(),
-              Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+              e6,
               cohort,
-              Arrays.asList(location),
+              location,
               Arrays.asList(hivMetadata.getCompletedConcept()),
               TimeQualifier.LAST,
               null,
               onOrBefore,
+              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
       // B3
@@ -216,7 +218,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               cohort,
               location,
               Arrays.asList(c1256, c1257),
-              TimeQualifier.FIRST,
+              TimeQualifier.ANY,
               null,
               onOrBefore,
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
