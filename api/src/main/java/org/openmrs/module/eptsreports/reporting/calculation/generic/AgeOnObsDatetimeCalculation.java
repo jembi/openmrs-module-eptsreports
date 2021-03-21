@@ -128,7 +128,7 @@ public class AgeOnObsDatetimeCalculation extends AbstractPatientCalculation {
             + "                 SELECT * FROM obs oo "
             + "                 WHERE oo.voided = 0 "
             + "                 AND oo.encounter_id = e.encounter_id "
-            + "                 AND oo.concept_id = 1792 " 
+            + "                 AND oo.concept_id = 1792 "
             + "             ) "
             + "       ) "
             + "      ) "

@@ -3542,7 +3542,7 @@ public class QualityImprovement2020CohortQueries {
             + "                               SELECT * FROM obs oo "
             + "                               WHERE oo.voided = 0 "
             + "                               AND oo.encounter_id = e.encounter_id "
-            + "                               AND oo.concept_id = 1792 " 
+            + "                               AND oo.concept_id = 1792 "
             + "                           ) "
             + "                     ) "
             + "                    ) "
@@ -3693,7 +3693,7 @@ public class QualityImprovement2020CohortQueries {
             + "                               SELECT * FROM obs oo "
             + "                               WHERE oo.voided = 0 "
             + "                               AND oo.encounter_id = e.encounter_id "
-            + "                               AND oo.concept_id = 1792 " 
+            + "                               AND oo.concept_id = 1792 "
             + "                           ) "
             + "                     ) "
             + "                    ) "
@@ -4377,6 +4377,12 @@ public class QualityImprovement2020CohortQueries {
                   15,
                   null),
               "effectiveDate=${endDate}"));
+    } else if (indicator == 5) {
+      cd.addSearch(
+          "age",
+          EptsReportUtils.map(
+              getAgeOnObsDatetime(15, null),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     } else if (indicator == 9) {
       cd.addSearch(
           "age",
@@ -4404,7 +4410,7 @@ public class QualityImprovement2020CohortQueries {
                   10,
                   14),
               "effectiveDate=${endDate}"));
-    } else if (indicator == 14 || indicator == 5) {
+    } else if (indicator == 14) {
       cd.addSearch(
           "age",
           EptsReportUtils.map(
@@ -4454,8 +4460,10 @@ public class QualityImprovement2020CohortQueries {
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
           "((A AND NOT C AND NOT D AND G) OR (B1 AND H)) AND NOT (F OR E) AND age");
-    if (indicator == 5 || indicator == 14)
-      cd.setCompositionString("(B2New AND I) AND NOT (F OR E) AND age");
+
+    if (indicator == 5) cd.setCompositionString("(B2New AND I) AND NOT (F OR E) AND age");
+
+    if (indicator == 14) cd.setCompositionString("(B2New AND I) AND NOT (F OR E) AND age");
 
     return cd;
   }
@@ -4650,7 +4658,7 @@ public class QualityImprovement2020CohortQueries {
             + "                               SELECT * FROM obs oo "
             + "                               WHERE oo.voided = 0 "
             + "                               AND oo.encounter_id = e.encounter_id "
-            + "                               AND oo.concept_id = 1792 " 
+            + "                               AND oo.concept_id = 1792 "
             + "                           ) "
             + "                     ) "
             + "                    ) "
