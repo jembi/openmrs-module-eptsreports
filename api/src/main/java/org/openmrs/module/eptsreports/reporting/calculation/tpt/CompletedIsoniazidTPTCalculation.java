@@ -355,13 +355,21 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
         Date iptStartDate =
             getMinOrMaxObsDate(
                 Arrays.asList(
-                    startProfilaxiaObs53,
-                    startProfilaxiaObs6,
-                    startProfilaxiaObs9,
-                    startDrugsObs,
-                    startTPTFilt),
+                    startProfilaxiaObs53, // A1
+                    startProfilaxiaObs6, // A3
+                    startProfilaxiaObs9, // A4
+                    startDrugsObs, // A2
+                    startTPTFilt), // A5
                 Priority.MIN,
                 true);
+
+        // A2 min date
+        Date obsDrugsStartDate =
+            getMinOrMaxObsDate(Arrays.asList(startDrugsObs), Priority.MIN, true);
+
+        // A3 min date
+        Date obs6StartDate =
+            getMinOrMaxObsDate(Arrays.asList(startProfilaxiaObs6), Priority.MIN, true);
 
         Obs B1 =
             returnObsBetweenIptStartDateAndIptEndDate(
@@ -376,12 +384,12 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
             returnObsBetweenIptStartDateAndIptEndDate(
                 Arrays.asList(endProfilaxiaObs9), iptStartDate, 173, 365, true);
 
+        Date filtStartDate = getMinOrMaxObsDate(Arrays.asList(startTPTFilt), Priority.MIN, true);
+
         if (B1 != null || B2 != null || B3 != null || B4 != null) {
 
-          if (startProfilaxiaObs6 != null) {
-
-            Date obs6StartDate =
-                getMinOrMaxObsDate(Arrays.asList(startProfilaxiaObs6), Priority.MIN, true);
+          if (obsDrugsStartDate != null && obsDrugsStartDate.equals(iptStartDate)
+              || obs6StartDate != null && obs6StartDate.equals(iptStartDate)) {
 
             List<Obs> cleanList =
                 this.excludeObs(outrasPrescricoesCleanObsList, outrasPrescricoesINHObsList);
@@ -390,7 +398,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                 evaluateOccurrence(
                     getObsListFromResultMap(isoniazidStartContinueMap, patientId),
                     cleanList,
-                    obs6StartDate,
+                    iptStartDate,
                     6,
                     7);
 
@@ -398,7 +406,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
                 evaluateOccurrence(
                     getObsListFromResultMap(isoniazidStartContinueMap, patientId),
                     cleanList,
-                    obs6StartDate,
+                    iptStartDate,
                     2,
                     5);
 
@@ -416,10 +424,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               patientMap.put(patientId, new BooleanResult(true, this));
             }
 
-          } else if (startTPTFilt != null) {
-
-            Date filtStartDate =
-                getMinOrMaxObsDate(Arrays.asList(startTPTFilt), Priority.MIN, true);
+          } else if (startTPTFilt != null && filtStartDate.equals(iptStartDate)) {
 
             int evaluateRegimeTPTOccurrences6 =
                 evaluateOccurrence(
