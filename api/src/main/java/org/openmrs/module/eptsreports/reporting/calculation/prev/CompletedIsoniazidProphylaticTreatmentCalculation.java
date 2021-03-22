@@ -954,8 +954,13 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
 
         // ( I or II or III or IV ) and (V or VI) or VII or VIII ... XIII)
         if (iptStartDate != null && iptEndDate != null) {
-          if (getProfilaxiaDuration(iptStartDate, iptEndDate) >= MINIMUM_DURATION_IN_DAYS
-              || viii >= NUMBER_ISONIAZID_USAGE_TO_CONSIDER_COMPLETED
+          if (getProfilaxiaDuration(iptStartDate, iptEndDate) >= MINIMUM_DURATION_IN_DAYS) {
+            map.put(patientId, new BooleanResult(true, this));
+          }
+        }
+
+        if (iptStartDate != null) {
+          if (viii >= NUMBER_ISONIAZID_USAGE_TO_CONSIDER_COMPLETED
               || (ixa + ixb) >= 6
               || (xa + xb) >= 2
               || (xia + xib) >= 2
@@ -1170,19 +1175,23 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
 
   private int evaluateOccurrence(List<Obs> obss, Date iptStartDate, int nTimes, int plusIPTDate) {
     int num = 0;
-    for (Obs o : obss) {
-
-      if (o.getEncounter()
-                  .getEncounterDatetime()
-                  .compareTo(DateUtils.addMonths(iptStartDate, plusIPTDate))
-              <= 0
-          && o.getEncounter().getEncounterDatetime().compareTo(iptStartDate) >= 0) {
-        num++;
-        if (num == nTimes) {
-          break;
+    if (iptStartDate != null) {
+      for (Obs o : obss) {
+        if (o.getEncounter() != null) {
+          if (o.getEncounter()
+                      .getEncounterDatetime()
+                      .compareTo(DateUtils.addMonths(iptStartDate, plusIPTDate))
+                  <= 0
+              && o.getEncounter().getEncounterDatetime().compareTo(iptStartDate) >= 0) {
+            num++;
+            if (num == nTimes) {
+              break;
+            }
+          }
         }
       }
     }
+
     return num;
   }
 
