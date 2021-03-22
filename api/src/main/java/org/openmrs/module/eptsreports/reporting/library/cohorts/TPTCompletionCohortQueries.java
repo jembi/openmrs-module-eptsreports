@@ -128,7 +128,7 @@ public class TPTCompletionCohortQueries {
         "C2",
         EptsReportUtils.map(
             get3HPStartC2(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
@@ -638,10 +638,7 @@ public class TPTCompletionCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition get3HPStartC2(
-      int adultoSeguimentoEncounterType,
-      int regimeTPTConcept,
-      int hPConcept,
-      int hPPiridoxinaConcept) {
+      int fILT, int regimeTPTConcept, int hPConcept, int hPPiridoxinaConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with FILT ");
@@ -649,7 +646,7 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", adultoSeguimentoEncounterType);
+    map.put("60", fILT);
     map.put("23985", regimeTPTConcept);
     map.put("23954", hPConcept);
     map.put("23984", hPPiridoxinaConcept);
@@ -662,7 +659,7 @@ public class TPTCompletionCohortQueries {
             + " 	INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " 	INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + " 	WHERE "
-            + "    	e.encounter_type = ${6} AND p.voided = 0 "
+            + "    	e.encounter_type = ${60} AND p.voided = 0 "
             + "         	AND e.voided = 0 "
             + "         	AND o.voided = 0 "
             + "         	AND o.concept_id = ${23985} "
