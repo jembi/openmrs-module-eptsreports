@@ -355,269 +355,279 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
         // A1 AND (B1 OR B2 OR B3 OR B4)
         for (Obs a1 : Arrays.asList(startProfilaxiaObs53)) {
-          Obs b1 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs53), a1.getValueDatetime(), 173, 365, false);
+          if (a1 != null) {
+            Obs b1 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs53), a1.getValueDatetime(), 173, 365, false);
 
-          Obs b2 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endDrugsObs), a1.getValueDatetime(), 173, 365, true);
+            Obs b2 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endDrugsObs), a1.getValueDatetime(), 173, 365, true);
 
-          Obs b3 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs6), a1.getValueDatetime(), 173, 365, true);
+            Obs b3 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs6), a1.getValueDatetime(), 173, 365, true);
 
-          Obs b4 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs9), a1.getValueDatetime(), 173, 365, true);
+            Obs b4 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs9), a1.getValueDatetime(), 173, 365, true);
 
-          if (b1 != null || b2 != null || b3 != null || b4 != null) {
-            patientMap.put(patientId, new BooleanResult(true, this));
-            continue;
+            if (b1 != null || b2 != null || b3 != null || b4 != null) {
+              patientMap.put(patientId, new BooleanResult(true, this));
+              continue;
+            }
           }
         }
 
         for (Obs a2 : Arrays.asList(startDrugsObs)) {
-          Obs b1 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs53),
-                  a2.getEncounter().getEncounterDatetime(),
-                  173,
-                  365,
-                  false);
+          if (a2 != null) {
+            Obs b1 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs53),
+                    a2.getEncounter().getEncounterDatetime(),
+                    173,
+                    365,
+                    false);
 
-          Obs b2 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endDrugsObs),
-                  a2.getEncounter().getEncounterDatetime(),
-                  173,
-                  365,
-                  true);
+            Obs b2 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endDrugsObs),
+                    a2.getEncounter().getEncounterDatetime(),
+                    173,
+                    365,
+                    true);
 
-          Obs b3 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs6),
-                  a2.getEncounter().getEncounterDatetime(),
-                  173,
-                  365,
-                  true);
+            Obs b3 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs6),
+                    a2.getEncounter().getEncounterDatetime(),
+                    173,
+                    365,
+                    true);
 
-          Obs b4 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs9),
-                  a2.getEncounter().getEncounterDatetime(),
-                  173,
-                  365,
-                  true);
+            Obs b4 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs9),
+                    a2.getEncounter().getEncounterDatetime(),
+                    173,
+                    365,
+                    true);
 
-          // B5 is a obs list made of
-          CalculationResultMap b5Map = new CalculationResultMap();
+            // B5 is a obs list made of
+            CalculationResultMap b5Map = new CalculationResultMap();
 
-          List<Obs> cleanList =
-              this.excludeObs(outrasPrescricoesCleanObsList, outrasPrescricoesINHObsList);
+            List<Obs> cleanList =
+                this.excludeObs(outrasPrescricoesCleanObsList, outrasPrescricoesINHObsList);
 
-          int evaluateINHOccurrences6 =
-              evaluateOccurrence(
-                  getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                  cleanList,
-                  a2.getEncounter().getEncounterDatetime(),
-                  6,
-                  7);
+            int evaluateINHOccurrences6 =
+                evaluateOccurrence(
+                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
+                    cleanList,
+                    a2.getEncounter().getEncounterDatetime(),
+                    6,
+                    7);
 
-          int evaluateINHOccurences2 =
-              evaluateOccurrence(
-                  getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                  cleanList,
-                  a2.getEncounter().getEncounterDatetime(),
-                  2,
-                  5);
+            int evaluateINHOccurences2 =
+                evaluateOccurrence(
+                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
+                    cleanList,
+                    a2.getEncounter().getEncounterDatetime(),
+                    2,
+                    5);
 
-          int evaluateINHOccurrences3 =
-              evaluateOccurrence(
-                  getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                  cleanList,
-                  a2.getEncounter().getEncounterDatetime(),
-                  3,
-                  7);
+            int evaluateINHOccurrences3 =
+                evaluateOccurrence(
+                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
+                    cleanList,
+                    a2.getEncounter().getEncounterDatetime(),
+                    3,
+                    7);
 
-          if (evaluateINHOccurrences6 >= 6
-              && evaluateINHOccurences2 >= 2
-              && evaluateINHOccurrences3 >= 3) {
-            b5Map.put(patientId, new BooleanResult(true, this));
-          }
+            if (evaluateINHOccurrences6 >= 6
+                && evaluateINHOccurences2 >= 2
+                && evaluateINHOccurrences3 >= 3) {
+              b5Map.put(patientId, new BooleanResult(true, this));
+            }
 
-          List<Obs> b5 = getObsListFromResultMap(b5Map, patientId);
+            List<Obs> b5 = getObsListFromResultMap(b5Map, patientId);
 
-          if (b1 != null || b2 != null || b3 != null || b4 != null || b5 != null) {
-            patientMap.put(patientId, new BooleanResult(true, this));
-            continue;
+            if (b1 != null || b2 != null || b3 != null || b4 != null || b5 != null) {
+              patientMap.put(patientId, new BooleanResult(true, this));
+              continue;
+            }
           }
         }
 
         for (Obs a3 : Arrays.asList(startProfilaxiaObs6)) {
-          Obs b1 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs53), a3.getValueDatetime(), 173, 365, false);
+          if (a3 != null) {
+            Obs b1 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs53), a3.getValueDatetime(), 173, 365, false);
 
-          Obs b2 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endDrugsObs), a3.getValueDatetime(), 173, 365, true);
+            Obs b2 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endDrugsObs), a3.getValueDatetime(), 173, 365, true);
 
-          Obs b3 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs6), a3.getValueDatetime(), 173, 365, true);
+            Obs b3 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs6), a3.getValueDatetime(), 173, 365, true);
 
-          Obs b4 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs9), a3.getValueDatetime(), 173, 365, true);
+            Obs b4 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs9), a3.getValueDatetime(), 173, 365, true);
 
-          // B5 is a obs list made of
-          CalculationResultMap b5Map = new CalculationResultMap();
+            // B5 is a obs list made of
+            CalculationResultMap b5Map = new CalculationResultMap();
 
-          List<Obs> cleanList =
-              this.excludeObs(outrasPrescricoesCleanObsList, outrasPrescricoesINHObsList);
+            List<Obs> cleanList =
+                this.excludeObs(outrasPrescricoesCleanObsList, outrasPrescricoesINHObsList);
 
-          int evaluateINHOccurrences6 =
-              evaluateOccurrence(
-                  getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                  cleanList,
-                  a3.getValueDatetime(),
-                  6,
-                  7);
+            int evaluateINHOccurrences6 =
+                evaluateOccurrence(
+                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
+                    cleanList,
+                    a3.getValueDatetime(),
+                    6,
+                    7);
 
-          int evaluateINHOccurences2 =
-              evaluateOccurrence(
-                  getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                  cleanList,
-                  a3.getValueDatetime(),
-                  2,
-                  5);
+            int evaluateINHOccurences2 =
+                evaluateOccurrence(
+                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
+                    cleanList,
+                    a3.getValueDatetime(),
+                    2,
+                    5);
 
-          int evaluateINHOccurrences3 =
-              evaluateOccurrence(
-                  getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                  cleanList,
-                  a3.getValueDatetime(),
-                  3,
-                  7);
+            int evaluateINHOccurrences3 =
+                evaluateOccurrence(
+                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
+                    cleanList,
+                    a3.getValueDatetime(),
+                    3,
+                    7);
 
-          if (evaluateINHOccurrences6 >= 6
-              && evaluateINHOccurences2 >= 2
-              && evaluateINHOccurrences3 >= 3) {
-            b5Map.put(patientId, new BooleanResult(true, this));
-          }
+            if (evaluateINHOccurrences6 >= 6
+                && evaluateINHOccurences2 >= 2
+                && evaluateINHOccurrences3 >= 3) {
+              b5Map.put(patientId, new BooleanResult(true, this));
+            }
 
-          List<Obs> b5 = getObsListFromResultMap(b5Map, patientId);
+            List<Obs> b5 = getObsListFromResultMap(b5Map, patientId);
 
-          if (b1 != null || b2 != null || b3 != null || b4 != null || b5 != null) {
-            patientMap.put(patientId, new BooleanResult(true, this));
-            continue;
+            if (b1 != null || b2 != null || b3 != null || b4 != null || b5 != null) {
+              patientMap.put(patientId, new BooleanResult(true, this));
+              continue;
+            }
           }
         }
 
         for (Obs a4 : Arrays.asList(startProfilaxiaObs9)) {
-          Obs b1 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs53), a4.getValueDatetime(), 173, 365, false);
+          if (a4 != null) {
+            Obs b1 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs53), a4.getValueDatetime(), 173, 365, false);
 
-          Obs b2 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endDrugsObs), a4.getValueDatetime(), 173, 365, true);
+            Obs b2 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endDrugsObs), a4.getValueDatetime(), 173, 365, true);
 
-          Obs b3 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs6), a4.getValueDatetime(), 173, 365, true);
+            Obs b3 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs6), a4.getValueDatetime(), 173, 365, true);
 
-          Obs b4 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs9), a4.getValueDatetime(), 173, 365, true);
+            Obs b4 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs9), a4.getValueDatetime(), 173, 365, true);
 
-          if (b1 != null || b2 != null || b3 != null || b4 != null) {
-            patientMap.put(patientId, new BooleanResult(true, this));
-            continue;
+            if (b1 != null || b2 != null || b3 != null || b4 != null) {
+              patientMap.put(patientId, new BooleanResult(true, this));
+              continue;
+            }
           }
         }
 
         for (Obs a5 : Arrays.asList(startTPTFilt)) {
-          Obs b1 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs53),
-                  a5.getEncounter().getEncounterDatetime(),
-                  173,
-                  365,
-                  false);
+          if (a5 != null) {
+            Obs b1 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs53),
+                    a5.getEncounter().getEncounterDatetime(),
+                    173,
+                    365,
+                    false);
 
-          Obs b2 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endDrugsObs),
-                  a5.getEncounter().getEncounterDatetime(),
-                  173,
-                  365,
-                  true);
+            Obs b2 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endDrugsObs),
+                    a5.getEncounter().getEncounterDatetime(),
+                    173,
+                    365,
+                    true);
 
-          Obs b3 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs6),
-                  a5.getEncounter().getEncounterDatetime(),
-                  173,
-                  365,
-                  true);
+            Obs b3 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs6),
+                    a5.getEncounter().getEncounterDatetime(),
+                    173,
+                    365,
+                    true);
 
-          Obs b4 =
-              returnObsBetweenIptStartDateAndIptEndDate(
-                  Arrays.asList(endProfilaxiaObs9),
-                  a5.getEncounter().getEncounterDatetime(),
-                  173,
-                  365,
-                  true);
+            Obs b4 =
+                returnObsBetweenIptStartDateAndIptEndDate(
+                    Arrays.asList(endProfilaxiaObs9),
+                    a5.getEncounter().getEncounterDatetime(),
+                    173,
+                    365,
+                    true);
 
-          // B6 is a obs list made of
-          CalculationResultMap b6Map = new CalculationResultMap();
+            // B6 is a obs list made of
+            CalculationResultMap b6Map = new CalculationResultMap();
 
-          int evaluateRegimeTPTOccurrences6 =
-              evaluateOccurrence(
-                  getObsListFromResultMap(regimeTPT1stPickUpMap, patientId),
-                  getObsListFromResultMap(filtTypeOfDispensationMonthlyMap, patientId),
-                  a5.getEncounter().getEncounterDatetime(),
-                  6,
-                  7);
+            int evaluateRegimeTPTOccurrences6 =
+                evaluateOccurrence(
+                    getObsListFromResultMap(regimeTPT1stPickUpMap, patientId),
+                    getObsListFromResultMap(filtTypeOfDispensationMonthlyMap, patientId),
+                    a5.getEncounter().getEncounterDatetime(),
+                    6,
+                    7);
 
-          int evaluateRegimeTPTOccurrences2 =
-              evaluateOccurrence(
-                  getObsListFromResultMap(regimeTPT1stPickUpMap, patientId),
-                  getObsListFromResultMap(filtTypeOfDispensationTrimestralMap, patientId),
-                  a5.getEncounter().getEncounterDatetime(),
-                  2,
-                  7);
+            int evaluateRegimeTPTOccurrences2 =
+                evaluateOccurrence(
+                    getObsListFromResultMap(regimeTPT1stPickUpMap, patientId),
+                    getObsListFromResultMap(filtTypeOfDispensationTrimestralMap, patientId),
+                    a5.getEncounter().getEncounterDatetime(),
+                    2,
+                    7);
 
-          int evaluateRegimeTPTOccurrences3DM =
-              evaluateOccurrence(
-                  getObsListFromResultMap(regimeTPT1stPickUpMap, patientId),
-                  getObsListFromResultMap(filtTypeOfDispensationMonthlyMap, patientId),
-                  a5.getEncounter().getEncounterDatetime(),
-                  3,
-                  7);
+            int evaluateRegimeTPTOccurrences3DM =
+                evaluateOccurrence(
+                    getObsListFromResultMap(regimeTPT1stPickUpMap, patientId),
+                    getObsListFromResultMap(filtTypeOfDispensationMonthlyMap, patientId),
+                    a5.getEncounter().getEncounterDatetime(),
+                    3,
+                    7);
 
-          int evaluateRegimeTPTOccurrences3DT =
-              evaluateOccurrence(
-                  getObsListFromResultMap(regimeTPT1stPickUpMap, patientId),
-                  getObsListFromResultMap(filtTypeOfDispensationTrimestralMap, patientId),
-                  a5.getEncounter().getEncounterDatetime(),
-                  3,
-                  7);
+            int evaluateRegimeTPTOccurrences3DT =
+                evaluateOccurrence(
+                    getObsListFromResultMap(regimeTPT1stPickUpMap, patientId),
+                    getObsListFromResultMap(filtTypeOfDispensationTrimestralMap, patientId),
+                    a5.getEncounter().getEncounterDatetime(),
+                    3,
+                    7);
 
-          if (evaluateRegimeTPTOccurrences6 >= 6
-              && evaluateRegimeTPTOccurrences2 >= 2
-              && evaluateRegimeTPTOccurrences3DM >= 3
-              && evaluateRegimeTPTOccurrences3DT >= 3) {
-            b6Map.put(patientId, new BooleanResult(true, this));
-          }
+            if (evaluateRegimeTPTOccurrences6 >= 6
+                && evaluateRegimeTPTOccurrences2 >= 2
+                && evaluateRegimeTPTOccurrences3DM >= 3
+                && evaluateRegimeTPTOccurrences3DT >= 3) {
+              b6Map.put(patientId, new BooleanResult(true, this));
+            }
 
-          List<Obs> b6 = getObsListFromResultMap(b6Map, patientId);
+            List<Obs> b6 = getObsListFromResultMap(b6Map, patientId);
 
-          if (b1 != null || b2 != null || b3 != null || b4 != null || b6 != null) {
-            patientMap.put(patientId, new BooleanResult(true, this));
-            continue;
+            if (b1 != null || b2 != null || b3 != null || b4 != null || b6 != null) {
+              patientMap.put(patientId, new BooleanResult(true, this));
+              continue;
+            }
           }
         }
 
@@ -630,42 +640,44 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
         // for each startDate 3HP obs
 
         for (Obs c1 : Arrays.asList(start3HPObs)) {
+          if (c1 != null) {
+            int atLeastThree3HPOccurrence =
+                evaluateOccurrenceSingleList(
+                    getObsListFromResultMap(start3HPMap, patientId),
+                    c1.getEncounter().getEncounterDatetime(),
+                    3,
+                    4);
 
-          int atLeastThree3HPOccurrence =
-              evaluateOccurrenceSingleList(
-                  getObsListFromResultMap(start3HPMap, patientId),
-                  c1.getEncounter().getEncounterDatetime(),
-                  3,
-                  4);
-
-          if (atLeastThree3HPOccurrence >= 3) {
-            patientMap.put(patientId, new BooleanResult(true, this));
-            continue;
+            if (atLeastThree3HPOccurrence >= 3) {
+              patientMap.put(patientId, new BooleanResult(true, this));
+              continue;
+            }
           }
         }
 
         for (Obs c2 : Arrays.asList(regimeTPT3HPObs)) {
+          if (c2 != null) {
+            int atLeast1FILT3HPTrimestralsOccurence =
+                evaluateOccurrence(
+                    getObsListFromResultMap(regimeTPTStart3HPMap, patientId),
+                    getObsListFromResultMap(filtTypeOfDispensationTrimestralMap, patientId),
+                    c2.getEncounter().getEncounterDatetime(),
+                    1,
+                    4);
 
-          int atLeast1FILT3HPTrimestralsOccurence =
-              evaluateOccurrence(
-                  getObsListFromResultMap(regimeTPTStart3HPMap, patientId),
-                  getObsListFromResultMap(filtTypeOfDispensationTrimestralMap, patientId),
-                  c2.getEncounter().getEncounterDatetime(),
-                  1,
-                  4);
+            int atleast3FILTS3HPTrimestralOccurencies =
+                evaluateOccurrence(
+                    getObsListFromResultMap(regimeTPTStart3HPMap, patientId),
+                    getObsListFromResultMap(filtTypeOfDispensationTrimestralMap, patientId),
+                    c2.getEncounter().getEncounterDatetime(),
+                    3,
+                    4);
 
-          int atleast3FILTS3HPTrimestralOccurencies =
-              evaluateOccurrence(
-                  getObsListFromResultMap(regimeTPTStart3HPMap, patientId),
-                  getObsListFromResultMap(filtTypeOfDispensationTrimestralMap, patientId),
-                  c2.getEncounter().getEncounterDatetime(),
-                  3,
-                  4);
-
-          if (atLeast1FILT3HPTrimestralsOccurence >= 1
-              || atleast3FILTS3HPTrimestralOccurencies >= 3) {
-            patientMap.put(patientId, new BooleanResult(true, this));
-            continue;
+            if (atLeast1FILT3HPTrimestralsOccurence >= 1
+                || atleast3FILTS3HPTrimestralOccurencies >= 3) {
+              patientMap.put(patientId, new BooleanResult(true, this));
+              continue;
+            }
           }
         }
       }
