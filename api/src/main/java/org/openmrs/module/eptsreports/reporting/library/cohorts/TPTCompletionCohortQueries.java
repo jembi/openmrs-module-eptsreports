@@ -139,7 +139,8 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(getPatientsThatCompletedIsoniazidProphylacticTreatment(), mapping2));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND ((A1 OR A2 OR A3 OR A4 OR A5 OR C1 OR C2) AND completedAll)");
+        // "txcurr AND ((A1 OR A2 OR A3 OR A4 OR A5 OR C1 OR C2) AND completedAll)");
+        "txcurr AND completedAll");
 
     return compositionCohortDefinition;
   }

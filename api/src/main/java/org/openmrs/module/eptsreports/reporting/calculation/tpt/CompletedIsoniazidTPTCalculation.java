@@ -451,7 +451,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             List<Obs> b5 = getObsListFromResultMap(b5Map, patientId);
 
-            if (b1 != null || b2 != null || b3 != null || b4 != null || b5 != null) {
+            if (b1 != null || b2 != null || b3 != null || b4 != null || !b5.isEmpty()) {
               patientMap.put(patientId, new BooleanResult(true, this));
               continue;
             }
@@ -514,7 +514,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             List<Obs> b5 = getObsListFromResultMap(b5Map, patientId);
 
-            if (b1 != null || b2 != null || b3 != null || b4 != null || b5 != null) {
+            if (b1 != null || b2 != null || b3 != null || b4 != null || !b5.isEmpty()) {
               patientMap.put(patientId, new BooleanResult(true, this));
               continue;
             }
@@ -624,7 +624,7 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             List<Obs> b6 = getObsListFromResultMap(b6Map, patientId);
 
-            if (b1 != null || b2 != null || b3 != null || b4 != null || b6 != null) {
+            if (b1 != null || b2 != null || b3 != null || b4 != null || !b6.isEmpty()) {
               patientMap.put(patientId, new BooleanResult(true, this));
               continue;
             }
