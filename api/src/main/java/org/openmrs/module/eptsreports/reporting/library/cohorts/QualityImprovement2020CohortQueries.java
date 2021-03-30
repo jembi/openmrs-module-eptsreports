@@ -5625,7 +5625,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
-    map.put("856", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
