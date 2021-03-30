@@ -5506,7 +5506,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getgetMQC13P2NumK() {
+  public CohortDefinition getMQC13P2NumK() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
@@ -5519,12 +5519,7 @@ public class QualityImprovement2020CohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
     map.put("856", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
@@ -5853,7 +5848,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
     cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
     cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
-    cd.addSearch("K", EptsReportUtils.map(getgetMQC13P2NumK(), MAPPING));
+    cd.addSearch("K", EptsReportUtils.map(getMQC13P2NumK(), MAPPING));
     cd.addSearch("L", EptsReportUtils.map(getgetMQC13P2NumL(), MAPPING));
 
     cd.setCompositionString("((A AND C AND B3 AND K) AND NOT (D OR E OR F)) OR (B2 AND B4 AND L)");
