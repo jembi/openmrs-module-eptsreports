@@ -367,7 +367,6 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               DateUtils.addMonths(onOrBefore, 6),
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
-
       // XI
       CalculationResultMap dfiltdtINHMap1 =
           ePTSCalculationService.getObs(
@@ -802,16 +801,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
             EptsCalculationUtils.obsResultForPatient(endProfilaxiaObservations9, patientId);
         Obs endDrugsObs =
             EptsCalculationUtils.obsResultForPatient(completedDrugsObservations, patientId);
-        /*
-                 * If We can't find a startDatvamos ao room1
-        ￼
-        e from Ficha de Seguimento (adults and children) / Ficha
-                 * Resumo or Ficha Clinica-MasterCard, we can't do the calculations. -Just move to the next
-                 * patient.
-                 */
-        if (startProfilaxiaObs == null && startDrugsObs == null) {
-          continue;
-        }
+
         Date iptStartDate =
             getMinOrMaxObsDate(
                 Arrays.asList(
@@ -819,7 +809,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                     startDrugsObs,
                     this.exclude(
                         regimeTPT1stPickUpPreviousPeriod,
-                        exclusionOutrasPrescricoesPreviousPeriod,
+                        exclisionRegimeTPT1stPickUpPreviousPeriod,
                         -7),
                     this.exclude(
                         outrasPrescricoesPreviousPeriod,
