@@ -825,6 +825,10 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                 Priority.MAX,
                 true);
 
+        if (iptStartDate == null && iptEndDate == null) {
+          continue;
+        }
+
         // viii
         int viii =
             calculateNumberOfYesAnswers(isoniazidUsageObservationsList, patientId, iptStartDate);
