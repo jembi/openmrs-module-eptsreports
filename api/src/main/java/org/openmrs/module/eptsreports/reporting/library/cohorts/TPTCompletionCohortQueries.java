@@ -48,6 +48,16 @@ public class TPTCompletionCohortQueries {
   private final String mapping = "endDate=${endDate},location=${location}";
   private final String mapping2 = "onOrBefore=${endDate},location=${location}";
 
+  public CohortDefinition getPatientsThatCompletedProphylaticTreatment() {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(CompletedIsoniazidTPTCalculation.class).get(0));
+    cd.setName("Patients that completed prophylatic treatment");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    return cd;
+  }
+
   /**
    *
    *
