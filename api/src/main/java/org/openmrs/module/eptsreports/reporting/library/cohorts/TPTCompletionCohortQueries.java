@@ -48,6 +48,16 @@ public class TPTCompletionCohortQueries {
   private final String mapping = "endDate=${endDate},location=${location}";
   private final String mapping2 = "onOrBefore=${endDate},location=${location}";
 
+  public CohortDefinition getPatientsThatCompletedProphylaticTreatment() {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            Context.getRegisteredComponents(CompletedIsoniazidTPTCalculation.class).get(0));
+    cd.setName("Patients that completed prophylatic treatment");
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    return cd;
+  }
+
   /**
    *
    *
@@ -128,7 +138,7 @@ public class TPTCompletionCohortQueries {
         "C2",
         EptsReportUtils.map(
             get3HPStartC2(
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
@@ -139,8 +149,7 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(getPatientsThatCompletedIsoniazidProphylacticTreatment(), mapping2));
 
     compositionCohortDefinition.setCompositionString(
-        // "txcurr AND ((A1 OR A2 OR A3 OR A4 OR A5 OR C1 OR C2) AND completedAll)");
-        "txcurr AND completedAll");
+        "txcurr AND (((A1 OR A2 OR A3 OR A4 OR A5) AND completedAll) OR ((C1 OR C2) AND completedAll))");
 
     return compositionCohortDefinition;
   }
@@ -395,12 +404,12 @@ public class TPTCompletionCohortQueries {
             + "     INNER JOIN"
             + " obs o ON e.encounter_id = o.encounter_id"
             + " WHERE"
-            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
-            + " AND e.encounter_type = ${53}"
-            + " AND o.concept_id = ${6128}"
-            + " AND o.value_datetime IS NOT NULL"
-            + " AND o.value_datetime < :endDate"
-            + " AND e.location_id = :location ";
+            + " p.voided = 0 AND e.voided AND o.voided"
+            + " and e.encounter_type = ${53}"
+            + " and o.concept_id = ${6128}"
+            + " and o.value_datetime IS NOT NULL"
+            + " and o.value_datetime <= :endDate"
+            + " and e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -443,11 +452,11 @@ public class TPTCompletionCohortQueries {
             + " INNER JOIN"
             + " obs o ON e.encounter_id = o.encounter_id"
             + " WHERE"
-            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
+            + " p.voided = 0 AND e.voided AND o.voided"
             + "    AND e.encounter_type = ${6}"
             + "    AND o.concept_id = ${6122}"
             + "    AND o.value_coded = ${1256}"
-            + "    AND e.encounter_datetime < :endDate"
+            + "    AND e.encounter_datetime <= :endDate"
             + "    AND e.location_id = :location";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -485,7 +494,7 @@ public class TPTCompletionCohortQueries {
             + "WHERE e.encounter_type = ${6} "
             + "AND o.concept_id = ${6128} "
             + "AND e.location_id = :location "
-            + "AND e.encounter_datetime < :endDate "
+            + "AND e.encounter_datetime <= :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -532,7 +541,7 @@ public class TPTCompletionCohortQueries {
             + "     	AND e.encounter_type = ${9} "
             + "     	AND o.concept_id = ${6128} "
             + " 	AND e.location_id = :location "
-            + "     	AND e.encounter_datetime < :endDate ";
+            + "     	AND e.encounter_datetime <= :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -579,11 +588,11 @@ public class TPTCompletionCohortQueries {
             + "    INNER JOIN"
             + " obs o ON e.encounter_id = o.encounter_id"
             + " WHERE"
-            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
+            + " p.voided = 0 AND e.voided AND o.voided"
             + "     AND e.encounter_type = ${60}"
             + "     AND o.concept_id = ${23985}"
             + "    AND o.value_coded IN (${656} , ${23982})"
-            + "     AND e.encounter_datetime < :endDate"
+            + "     AND e.encounter_datetime <= :endDate"
             + "        AND e.location_id = :location";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -625,7 +634,7 @@ public class TPTCompletionCohortQueries {
             + "WHERE e.encounter_type = ${6} "
             + "AND o.concept_id = ${1719} AND o.value_coded = ${23954} "
             + "AND e.location_id = :location "
-            + "AND e.encounter_datetime < :endDate "
+            + "AND e.encounter_datetime <= :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -647,7 +656,10 @@ public class TPTCompletionCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition get3HPStartC2(
-      int fILT, int regimeTPTConcept, int hPConcept, int hPPiridoxinaConcept) {
+      int adultoSeguimentoEncounterType,
+      int regimeTPTConcept,
+      int hPConcept,
+      int hPPiridoxinaConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with FILT ");
@@ -655,7 +667,7 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("60", fILT);
+    map.put("6", adultoSeguimentoEncounterType);
     map.put("23985", regimeTPTConcept);
     map.put("23954", hPConcept);
     map.put("23984", hPPiridoxinaConcept);
@@ -668,13 +680,13 @@ public class TPTCompletionCohortQueries {
             + " 	INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " 	INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + " 	WHERE "
-            + "    	e.encounter_type = ${60} AND p.voided = 0 "
+            + "    	e.encounter_type = ${6} AND p.voided = 0 "
             + "         	AND e.voided = 0 "
             + "         	AND o.voided = 0 "
             + "         	AND o.concept_id = ${23985} "
             + "         	AND o.value_coded in (${23954},${23984}) "
             + "         	AND e.location_id = :location "
-            + "         	AND e.encounter_datetime < :endDate ";
+            + "         	AND e.encounter_datetime <= :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
