@@ -371,7 +371,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             if (b1 != null || b2 != null || b3 != null || b4 != null) {
               patientMap.put(patientId, new BooleanResult(true, this));
-              continue;
             }
           }
         }
@@ -400,26 +399,24 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
             List<Obs> cleanList =
                 this.excludeObs(outrasPrescricoesCleanObsList, outrasPrescricoesINHObsList);
 
+            List<Obs> obsICList = getObsListFromResultMap(isoniazidStartContinueMap, patientId);
+
             int evaluateINHOccurrences6 =
                 evaluateOccurrence(
-                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                    cleanList,
-                    a2.getEncounter().getEncounterDatetime(),
-                    6,
-                    7);
+                    obsICList, cleanList, a2.getEncounter().getEncounterDatetime(), 6, 7);
 
             int evaluateINHOccurences2 =
                 evaluateOccurrence(
-                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                    cleanList,
+                    obsICList,
+                    outrasPrescricoesINHObsList,
                     a2.getEncounter().getEncounterDatetime(),
                     2,
                     5);
 
             int evaluateINHOccurrences3 =
                 evaluateOccurrence(
-                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                    cleanList,
+                    obsICList,
+                    outrasPrescricoesINHObsList,
                     a2.getEncounter().getEncounterDatetime(),
                     3,
                     7);
@@ -434,7 +431,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             if (b1 != null || b2 != null || b3 != null || b4 != null || !b5.isEmpty()) {
               patientMap.put(patientId, new BooleanResult(true, this));
-              continue;
             }
           }
         }
@@ -463,29 +459,18 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
             List<Obs> cleanList =
                 this.excludeObs(outrasPrescricoesCleanObsList, outrasPrescricoesINHObsList);
 
+            List<Obs> obsICList = getObsListFromResultMap(isoniazidStartContinueMap, patientId);
+
             int evaluateINHOccurrences6 =
-                evaluateOccurrence(
-                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                    cleanList,
-                    a3.getValueDatetime(),
-                    6,
-                    7);
+                evaluateOccurrence(obsICList, cleanList, a3.getValueDatetime(), 6, 7);
 
             int evaluateINHOccurences2 =
                 evaluateOccurrence(
-                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                    cleanList,
-                    a3.getValueDatetime(),
-                    2,
-                    5);
+                    obsICList, outrasPrescricoesINHObsList, a3.getValueDatetime(), 2, 5);
 
             int evaluateINHOccurrences3 =
                 evaluateOccurrence(
-                    getObsListFromResultMap(isoniazidStartContinueMap, patientId),
-                    cleanList,
-                    a3.getValueDatetime(),
-                    3,
-                    7);
+                    obsICList, outrasPrescricoesINHObsList, a3.getValueDatetime(), 3, 7);
 
             if (evaluateINHOccurrences6 >= 6
                 || evaluateINHOccurences2 >= 2
@@ -497,7 +482,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             if (b1 != null || b2 != null || b3 != null || b4 != null || !b5.isEmpty()) {
               patientMap.put(patientId, new BooleanResult(true, this));
-              continue;
             }
           }
         }
@@ -522,7 +506,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             if (b1 != null || b2 != null || b3 != null || b4 != null) {
               patientMap.put(patientId, new BooleanResult(true, this));
-              continue;
             }
           }
         }
@@ -591,7 +574,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             if (b1 != null || b2 != null || b3 != null || b4 != null || !b6.isEmpty()) {
               patientMap.put(patientId, new BooleanResult(true, this));
-              continue;
             }
           }
         }
@@ -615,7 +597,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
 
             if (atLeastThree3HPOccurrence >= 3) {
               patientMap.put(patientId, new BooleanResult(true, this));
-              continue;
             }
           }
         }
@@ -641,7 +622,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
             if (atLeast1FILT3HPTrimestralsOccurence >= 1
                 || atleast3FILTS3HPTrimestralOccurencies >= 3) {
               patientMap.put(patientId, new BooleanResult(true, this));
-              continue;
             }
           }
         }
