@@ -890,16 +890,10 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                 7);
         List<Obs> atLeast3FichaClínicaINHMap3Cleaned =
             exclude(
-                getObsListFromResultMap(atLeast3FichaClínicaINHMap3, patientId),
-                getObsListFromResultMap(exclusionAtLeast3FichaClínicaINHMap3, patientId));
-
-        int xiia2 =
-            evaluateOccurrence(
                 getObsListFromResultMap(atLeast3FichaClínicaINHMap2, patientId),
-                atLeast3FichaClínicaINHMap3Cleaned,
-                iptStartDate,
-                3,
-                7);
+                getObsListFromResultMap(atLeast3FichaClínicaINHMap3, patientId));
+
+        int xiia2 = evaluateOccurrence(atLeast3FichaClínicaINHMap3Cleaned, iptStartDate, 3, 7);
 
         int xiib1 =
             evaluateOccurrence(
@@ -959,7 +953,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               || (xa + xb) >= 2
               || (xia + xib) >= 2
               || ((xiia1 + xiia2) >= 3 && (xiib1 + xiib2) >= 1)
-              || (xiiia1 + xiiia2 >= 1 && xiiib1 + xiiib2 >= 3)) {
+              || ((xiiia1 + xiiia2) >= 1 && (xiiib1 + xiiib2) >= 3)) {
             map.put(patientId, new BooleanResult(true, this));
           }
         }
