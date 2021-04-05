@@ -828,136 +828,137 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
         if (iptStartDate == null && iptEndDate == null) {
           continue;
         }
-
-        // viii
-        int viii =
-            calculateNumberOfYesAnswers(isoniazidUsageObservationsList, patientId, iptStartDate);
-
-        // ix
-        int ixa =
-            evaluateOccurrence(
-                getObsListFromResultMap(filtMap1, patientId),
-                getObsListFromResultMap(filtMap2, patientId),
-                iptStartDate,
-                6,
-                7);
-        int ixb =
-            evaluateOccurrence(
-                getObsListFromResultMap(filtMap3, patientId),
-                getObsListFromResultMap(filtMap4, patientId),
-                iptStartDate,
-                6,
-                7);
-
-        // x
-        int xa =
-            evaluateOccurrence(
-                getObsListFromResultMap(dtINHMap1, patientId),
-                getObsListFromResultMap(dtINHMap2, patientId),
-                iptStartDate,
-                2,
-                5);
-        int xb =
-            evaluateOccurrence(
-                getObsListFromResultMap(dtINHMap3, patientId),
-                getObsListFromResultMap(dtINHMap4, patientId),
-                iptStartDate,
-                2,
-                5);
-
-        // xi
-        int xia =
-            evaluateOccurrence(
-                getObsListFromResultMap(dfiltdtINHMap1, patientId),
-                getObsListFromResultMap(dfiltdtINHMap2, patientId),
-                iptStartDate,
-                2,
-                5);
-        int xib =
-            evaluateOccurrence(
-                getObsListFromResultMap(dfiltdtINHMap3, patientId),
-                getObsListFromResultMap(dfiltdtINHMap4, patientId),
-                iptStartDate,
-                2,
-                5);
-
-        // xii
-        int xiia1 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atLeast3FichaClínicaINHMap1, patientId),
-                iptStartDate,
-                3,
-                7);
-        List<Obs> atLeast3FichaClínicaINHMap3Cleaned =
-            exclude(
-                getObsListFromResultMap(atLeast3FichaClínicaINHMap2, patientId),
-                getObsListFromResultMap(atLeast3FichaClínicaINHMap3, patientId));
-
-        int xiia2 = evaluateOccurrence(atLeast3FichaClínicaINHMap3Cleaned, iptStartDate, 3, 7);
-
-        int xiib1 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atLeast3FichaClínicaINHMap4, patientId),
-                iptStartDate,
-                1,
-                7);
-        int xiib2 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atLeast3FichaClínicaINHMap5, patientId),
-                getObsListFromResultMap(atLeast3FichaClínicaINHMap6, patientId),
-                iptStartDate,
-                1,
-                7);
-
-        // xiii
-        int xiiia1 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap1, patientId),
-                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap2, patientId),
-                iptStartDate,
-                1,
-                7);
-        int xiiia2 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap3, patientId),
-                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap4, patientId),
-                iptStartDate,
-                1,
-                7);
-
-        int xiiib1 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap5, patientId),
-                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap6, patientId),
-                iptStartDate,
-                3,
-                7);
-        int xiiib2 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap7, patientId),
-                getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap8, patientId),
-                iptStartDate,
-                3,
-                7);
-
-        // ( I or II or III or IV ) and (V or VI) or VII or VIII ... XIII)
-        if (iptStartDate != null && iptEndDate != null) {
-          if (getProfilaxiaDuration(iptStartDate, iptEndDate) >= MINIMUM_DURATION_IN_DAYS) {
-            map.put(patientId, new BooleanResult(true, this));
-          }
-        }
-
+        int viii = 0;
         if (iptStartDate != null) {
-          if (viii >= NUMBER_ISONIAZID_USAGE_TO_CONSIDER_COMPLETED
-              || (ixa + ixb) >= 6
-              || (xa + xb) >= 2
-              || (xia + xib) >= 2
-              || ((xiia1 + xiia2) >= 3 && (xiib1 + xiib2) >= 1)
-              || ((xiiia1 + xiiia2) >= 1 && (xiiib1 + xiiib2) >= 3)) {
-            map.put(patientId, new BooleanResult(true, this));
+          // viii
+          viii =
+              calculateNumberOfYesAnswers(isoniazidUsageObservationsList, patientId, iptStartDate);
+
+          // ix
+          int ixa =
+              evaluateOccurrence(
+                  getObsListFromResultMap(filtMap1, patientId),
+                  getObsListFromResultMap(filtMap2, patientId),
+                  iptStartDate,
+                  6,
+                  7);
+          int ixb =
+              evaluateOccurrence(
+                  getObsListFromResultMap(filtMap3, patientId),
+                  getObsListFromResultMap(filtMap4, patientId),
+                  iptStartDate,
+                  6,
+                  7);
+
+          // x
+          int xa =
+              evaluateOccurrence(
+                  getObsListFromResultMap(dtINHMap1, patientId),
+                  getObsListFromResultMap(dtINHMap2, patientId),
+                  iptStartDate,
+                  2,
+                  5);
+          int xb =
+              evaluateOccurrence(
+                  getObsListFromResultMap(dtINHMap3, patientId),
+                  getObsListFromResultMap(dtINHMap4, patientId),
+                  iptStartDate,
+                  2,
+                  5);
+
+          // xi
+          int xia =
+              evaluateOccurrence(
+                  getObsListFromResultMap(dfiltdtINHMap1, patientId),
+                  getObsListFromResultMap(dfiltdtINHMap2, patientId),
+                  iptStartDate,
+                  2,
+                  5);
+          int xib =
+              evaluateOccurrence(
+                  getObsListFromResultMap(dfiltdtINHMap3, patientId),
+                  getObsListFromResultMap(dfiltdtINHMap4, patientId),
+                  iptStartDate,
+                  2,
+                  5);
+
+          // xii
+          int xiia1 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atLeast3FichaClínicaINHMap1, patientId),
+                  iptStartDate,
+                  3,
+                  7);
+          List<Obs> atLeast3FichaClínicaINHMap3Cleaned =
+              exclude(
+                  getObsListFromResultMap(atLeast3FichaClínicaINHMap2, patientId),
+                  getObsListFromResultMap(atLeast3FichaClínicaINHMap3, patientId));
+
+          int xiia2 = evaluateOccurrence(atLeast3FichaClínicaINHMap3Cleaned, iptStartDate, 3, 7);
+
+          int xiib1 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atLeast3FichaClínicaINHMap4, patientId),
+                  iptStartDate,
+                  1,
+                  7);
+          int xiib2 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atLeast3FichaClínicaINHMap5, patientId),
+                  getObsListFromResultMap(atLeast3FichaClínicaINHMap6, patientId),
+                  iptStartDate,
+                  1,
+                  7);
+
+          // xiii
+          int xiiia1 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap1, patientId),
+                  getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap2, patientId),
+                  iptStartDate,
+                  1,
+                  7);
+          int xiiia2 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap3, patientId),
+                  getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap4, patientId),
+                  iptStartDate,
+                  1,
+                  7);
+
+          int xiiib1 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap5, patientId),
+                  getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap6, patientId),
+                  iptStartDate,
+                  3,
+                  7);
+          int xiiib2 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap7, patientId),
+                  getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap8, patientId),
+                  iptStartDate,
+                  3,
+                  7);
+
+          // ( I or II or III or IV ) and (V or VI) or VII or VIII ... XIII)
+          if (iptStartDate != null && iptEndDate != null) {
+            if (getProfilaxiaDuration(iptStartDate, iptEndDate) >= MINIMUM_DURATION_IN_DAYS) {
+              map.put(patientId, new BooleanResult(true, this));
+            }
+          }
+
+          if (iptStartDate != null) {
+            if (viii >= NUMBER_ISONIAZID_USAGE_TO_CONSIDER_COMPLETED
+                || (ixa + ixb) >= 6
+                || (xa + xb) >= 2
+                || (xia + xib) >= 2
+                || ((xiia1 + xiia2) >= 3 && (xiib1 + xiib2) >= 1)
+                || ((xiiia1 + xiiia2) >= 1 && (xiiib1 + xiiib2) >= 3)) {
+              map.put(patientId, new BooleanResult(true, this));
+            }
           }
         }
-
         /* 3HP */
         Obs artListTbPrevList3HPPreviousPeriod =
             EptsCalculationUtils.obsResultForPatient(
