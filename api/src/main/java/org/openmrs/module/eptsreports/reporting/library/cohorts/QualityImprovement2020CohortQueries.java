@@ -4176,7 +4176,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition B5E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            false, true, 3);
+            false, true, -3);
 
     CohortDefinition G = getMQ13G();
 
