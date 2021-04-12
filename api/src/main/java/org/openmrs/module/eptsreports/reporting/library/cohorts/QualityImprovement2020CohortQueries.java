@@ -879,8 +879,6 @@ public class QualityImprovement2020CohortQueries {
             + "         AND e.encounter_type = ${6} "
             + "         AND o.concept_id = ${23761} "
             + "         AND o.value_coded IN (${1065}) "
-            + "         AND e.encounter_datetime >= :startDate "
-            + "         AND e.encounter_datetime <= :endDate "
             + "         AND e.encounter_datetime BETWEEN last.encounter AND DATE_ADD(last.encounter, INTERVAL 9 MONTH) "
             + "         AND p.voided = 0 "
             + "         AND e.voided = 0 "
@@ -1021,8 +1019,6 @@ public class QualityImprovement2020CohortQueries {
             + "         AND e.encounter_type = ${6}  "
             + "         AND o.concept_id = ${1268}  "
             + "         AND o.value_coded IN (${1256} , ${1257}, ${1267})  "
-            + "         AND e.encounter_datetime >= :startDate  "
-            + "         AND e.encounter_datetime <= :endDate  "
             + "         AND DATE(o.obs_datetime) between DATE(last.encounter) AND DATE(DATE_ADD(last.encounter, INTERVAL 9 MONTH))  "
             + "         AND p.voided = 0  "
             + "         AND e.voided = 0  "
@@ -1678,7 +1674,7 @@ public class QualityImprovement2020CohortQueries {
           "(A AND B4) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setName(
-          "(A AND B4 AND G) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+          "(A AND B4 AND G) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F )");
     } else if (num == 5) {
       compositionCohortDefinition.setName(
           "(A AND C AND B4) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
@@ -4085,12 +4081,12 @@ public class QualityImprovement2020CohortQueries {
             + "         p.voided = 0 AND e.voided = 0  "
             + "             AND e.encounter_type = ${6}  "
             + "             AND e.location_id = :location  "
-            + "             AND e.encounter_datetime > :startDate AND e.encounter_datetime <= :endDate  "
+            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "     GROUP BY p.patient_id) b1 ON b1.patient_id = e.patient_id"
             + "     WHERE p.voided = 0 AND e.voided = 0  AND o.voided = 0"
             + "    AND e.encounter_type = ${6}  "
             + "    AND e.location_id = :location  "
-            + "    AND e.encounter_datetime > :startDate AND e.encounter_datetime <= :endDate  "
+            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "    AND e.encounter_datetime = b1.last_visit"
             + "        AND o.concept_id = ${23722}"
             + "        AND o.value_coded = ${856}";
@@ -4176,7 +4172,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition B5E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            false, true, 3);
+            false, true, -3);
 
     CohortDefinition G = getMQ13G();
 
@@ -5071,55 +5067,34 @@ public class QualityImprovement2020CohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id "
-            + " FROM patient p "
-            + "    INNER JOIN ( "
-            + "        SELECT patient_id, art_date, encounter_id "
-            + "        FROM	( "
-            + "            SELECT p.patient_id, Min(value_datetime) as art_date, e.encounter_id "
-            + "            FROM patient p "
-            + "            INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        "    SELECT patient_id "
+            + "    FROM    ("
+            + "        SELECT p.patient_id, MIN(e.encounter_datetime) AS first_gestante "
+            + "        FROM patient p "
+            + "            INNER JOIN person per on p.patient_id=per.person_id "
+            + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "            INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "            WHERE  p.voided = 0 "
-            + "              AND e.voided = 0 "
-            + "              AND o.voided = 0 "
-            + "              AND e.encounter_type = ${53} "
-            + "              AND o.concept_id = ${1190} "
-            + "              AND o.value_datetime IS NOT NULL "
-            + "              AND o.value_datetime <= :endDate "
-            + "              AND e.location_id = :location "
-            + "            GROUP  BY p.patient_id "
-            + "        ) union_tbl "
-            + "    ) AS inicio ON inicio.patient_id = p.patient_id "
-            + "    INNER JOIN ( "
-            + "        SELECT patient_id, first_gestante "
-            + "        FROM	( "
-            + "            SELECT p.patient_id, MIN(e.encounter_datetime) AS first_gestante "
-            + "            FROM patient p "
-            + "                INNER JOIN person per on p.patient_id=per.person_id "
-            + "                INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "            WHERE   p.voided = 0 "
-            + "              AND per.gender = 'F' "
-            + "              AND e.voided = 0 "
-            + "              AND o.voided  = 0 "
-            + "              AND e.encounter_type = ${6} "
-            + "              AND o.concept_id = ${1982} "
-            + "              AND o.value_coded = ${1065} "
-            + "              AND e.location_id = :location "
-            + "            GROUP BY p.patient_id "
-            + "        ) gest "
-            + "        WHERE  gest.first_gestante BETWEEN :startDate AND :endDate "
-            + "    ) AS gestante  ON gestante.patient_id = p.patient_id AND gestante.first_gestante > inicio.art_date "
-            + " GROUP BY p.patient_id";
+            + "        WHERE   p.voided = 0 "
+            + "        AND per.voided=0 AND per.gender = 'F' "
+            + "          AND e.voided = 0 AND o.voided  = 0 "
+            + "          AND e.encounter_type = ${6} AND o.concept_id = ${1982} "
+            + "          AND o.value_coded = ${1065} AND e.location_id = :location "
+            + "        GROUP BY p.patient_id) gest  "
+            + "  WHERE  gest.first_gestante >= :startDate AND gest.first_gestante <= :endDate "
+            + "  AND gest.first_gestante > (SELECT MIN(o.value_datetime) as art_date "
+            + "        FROM encounter e "
+            + "  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "        WHERE   "
+            + "  gest.patient_id = e.patient_id "
+            + "          AND e.voided = 0 AND o.voided = 0 "
+            + "          AND e.encounter_type = ${53} AND o.concept_id = ${1190} "
+            + "          AND o.value_datetime IS NOT NULL AND o.value_datetime <= :endDate AND e.location_id = :location "
+            + "    LIMIT 1) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
