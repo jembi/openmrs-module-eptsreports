@@ -20,9 +20,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
 
-  @Autowired protected GenericCohortQueries genericCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
 
-  @Autowired private QualityImprovement2020DataSet initQltyImpDataSet;
+  private QualityImprovement2020DataSet initQltyImpDataSet;
+
+  @Autowired
+  public SetupIntensiveMonitoringReport(
+      GenericCohortQueries genericCohortQueries, QualityImprovement2020DataSet initQltyImpDataSet) {
+    this.genericCohortQueries = genericCohortQueries;
+    this.initQltyImpDataSet = initQltyImpDataSet;
+  }
 
   @Override
   public String getUuid() {
