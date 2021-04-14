@@ -3,8 +3,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,13 +52,5 @@ public class IntensiveMonitoringCohortQueries {
     this.tbMetadata = tbMetadata;
     this.txPvls = txPvls;
     this.ageCohortQueries = ageCohortQueries;
-  }
-
-  public CohortDefinition getMI12DEN() {
-    return new SqlCohortDefinition();
-  }
-
-  public CohortDefinition getMI12NUM() {
-    return new SqlCohortDefinition();
   }
 }

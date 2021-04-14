@@ -74,6 +74,10 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
         Mapped.mapStraightThrough(
             intensiveMonitoringDataSet.constructIntensiveMonitoringDataSet()));
 
+    reportDefinition.addDataSetDefinition(
+        "ALL",
+        Mapped.mapStraightThrough(initQltyImpDataSet.constructQualityImprovement2020DataSet()));
+
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
         EptsReportUtils.map(
