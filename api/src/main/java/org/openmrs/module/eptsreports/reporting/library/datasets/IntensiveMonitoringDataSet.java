@@ -358,12 +358,13 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    // Category 7 denominator indicators
+    //  CATEGORY 7 from report named “Monitoria Intensiva MQHIV 2021 denominator
+    // 7.1
     CohortIndicator MQ7DEN1 =
         eptsGeneralIndicator.getIndicator(
             "MQ7DEN1",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ7A(1),
+                intensiveMonitoringCohortQueries.getCat7MOHIV202171Definition("DEN"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ7DEN1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -459,12 +460,13 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    // Category 7 numerator indicators
+    // CATEGORY 7 from report named “Monitoria Intensiva MQHIV 2021 numerator
+    // 7.1
     CohortIndicator MQ7NUM1 =
         eptsGeneralIndicator.getIndicator(
             "MQ7NUM1",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ7B(1),
+                intensiveMonitoringCohortQueries.getCat7MOHIV202171Definition("NUM"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ7NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -475,7 +477,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ7NUM1,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "ageBasedOnArt=adultsArt");
 
     CohortIndicator MQ7NUM2 =
         eptsGeneralIndicator.getIndicator(

@@ -74,16 +74,18 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
-  public CohortDefinition getCat7MOHIV2021Definition() {
+  public CohortDefinition getCat7MOHIV202171Definition(String type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("7.1 Numerator and denominator");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addSearch(
         "A",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMOHArtStartDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch(
         "B1",
         EptsReportUtils.map(
@@ -96,7 +98,7 @@ public class IntensiveMonitoringCohortQueries {
                 Collections.singletonList(hivMetadata.getYesConcept()),
                 null,
                 null),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
@@ -109,7 +111,7 @@ public class IntensiveMonitoringCohortQueries {
                 Collections.singletonList(hivMetadata.getYesConcept()),
                 null,
                 null),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch(
         "B3",
         EptsReportUtils.map(
@@ -125,7 +127,7 @@ public class IntensiveMonitoringCohortQueries {
                     hivMetadata.getCompletedConcept()),
                 null,
                 null),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch(
         "B4",
         EptsReportUtils.map(
@@ -138,7 +140,7 @@ public class IntensiveMonitoringCohortQueries {
                 Collections.singletonList(hivMetadata.getStartDrugs()),
                 null,
                 null),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch(
         "C",
         EptsReportUtils.map(
@@ -194,6 +196,14 @@ public class IntensiveMonitoringCohortQueries {
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getPatientsWithTBTreatment(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    if (type.equals("DEN")) {
+      cd.setCompositionString(
+          "A AND NOT B1 AND NOT B2 AND NOT B3 AND NOT C AND NOT D AND NOT E AND NOT F");
+
+    } else if (type.equals("NUM")) {
+      cd.setCompositionString(
+          "A AND NOT B1 AND NOT B2 AND NOT B3 AND B4 AND NOT C AND NOT D AND NOT E AND NOT F");
+    }
     return cd;
   }
 }
