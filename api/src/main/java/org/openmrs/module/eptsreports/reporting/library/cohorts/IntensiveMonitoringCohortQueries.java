@@ -7,6 +7,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -137,6 +138,61 @@ public class IntensiveMonitoringCohortQueries {
                 Collections.singletonList(hivMetadata.getStartDrugs()),
                 null,
                 null),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPregnantORBreastfeeding(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPregnantORBreastfeeding(
+                commonMetadata.getBreastfeeding().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "E",
+        EptsReportUtils.map(
+            QualityImprovement2020Queries.getTransferredInPatients(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+                hivMetadata.getPatientFoundYesConcept().getConceptId(),
+                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+                hivMetadata.getArtStatus().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "F",
+        EptsReportUtils.map(
+            commonCohortQueries.getTranferredOutPatients(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "G",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWithProphylaxyDuringRevisionPeriod(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "H",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "I",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "J",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPatientsWithTBTreatment(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     return cd;
   }
