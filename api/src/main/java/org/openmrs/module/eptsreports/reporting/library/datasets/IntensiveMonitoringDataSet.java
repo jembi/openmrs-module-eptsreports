@@ -1142,7 +1142,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     MI12NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ12NUM2",
+        "MI12NUM2",
         "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que tiveram 3 consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV",
         EptsReportUtils.map(
             MI12NUM2,
