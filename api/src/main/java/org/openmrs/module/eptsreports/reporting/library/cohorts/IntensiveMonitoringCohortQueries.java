@@ -619,7 +619,7 @@ public class IntensiveMonitoringCohortQueries {
 
     } else if (type.equals("NUM")) {
       cd.setCompositionString(
-          "A AND NOT B1 AND NOT B2 AND NOT B3 AND  B4 AND NOT C anANDd NOT D AND NOT E AND NOT F AND G AND NOT H AND NOT I AND NOT J");
+          "A AND NOT B1 AND NOT B2 AND NOT B3 AND  B4 AND NOT C AND NOT D AND NOT E AND NOT F AND G AND NOT H AND NOT I AND NOT J ");
     }
     return cd;
   }
