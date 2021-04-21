@@ -64,20 +64,48 @@ public class EncounterAfterOldestARTStartDateCalculation extends AbstractPatient
 
       List<Encounter> appEncounters = EptsCalculationUtils.extractResultValues(listResult);
 
-      if (artStartDate != null) {
+      List<Encounter> orderedApssList = orderEncounterByEncounterDateTime(appEncounters);
+      if (orderedApssList.size() > 0) {
 
-        Date lower = EptsCalculationUtils.addDays(artStartDate, lowerBoundary);
+        List<Encounter> firstApss = new ArrayList<>();
 
-        Date upper = EptsCalculationUtils.addDays(artStartDate, upperBoundary);
+        for (Encounter e : orderedApssList) {
+          if (artStartDate != null) {
 
-        Date date = evaluateConsultation(appEncounters, lower, upper);
+            if (e.getEncounterDatetime().compareTo(artStartDate) > 0) {
 
-        if (date != null) {
-          calculationResultMap.put(patientId, new SimpleResult(date, this));
+              if (firstApss.size() < 1) {
+
+                firstApss.add(e);
+
+                Date lower = EptsCalculationUtils.addDays(artStartDate, lowerBoundary);
+
+                Date upper = EptsCalculationUtils.addDays(artStartDate, upperBoundary);
+
+                Date date = evaluateConsultation(firstApss, lower, upper);
+
+                if (date != null) {
+                  calculationResultMap.put(patientId, new SimpleResult(date, this));
+                }
+              }
+            }
+          }
         }
       }
     }
     return calculationResultMap;
+  }
+
+  private List<Encounter> orderEncounterByEncounterDateTime(List<Encounter> encounters) {
+    Collections.sort(
+        encounters,
+        new Comparator<Encounter>() {
+          @Override
+          public int compare(Encounter a, Encounter b) {
+            return a.getEncounterDatetime().compareTo(b.getEncounterDatetime());
+          }
+        });
+    return encounters;
   }
 
   private Date evaluateConsultation(List<Encounter> appEncounters, Date lower, Date upper) {
