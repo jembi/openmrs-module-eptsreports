@@ -106,7 +106,9 @@ public class TbPrevCohortQueries {
             getPatientsThatCompletedIsoniazidProphylacticTreatment(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     definition.setCompositionString(
-        "started-by-end-previous-reporting-period AND completed-isoniazid");
+        // "started-by-end-previous-reporting-period AND completed-isoniazid");
+        " completed-isoniazid");
+
     return definition;
   }
 

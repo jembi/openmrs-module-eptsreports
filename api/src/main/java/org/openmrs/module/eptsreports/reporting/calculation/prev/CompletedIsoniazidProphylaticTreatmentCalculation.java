@@ -862,6 +862,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
           int xiib1 =
               evaluateOccurrence(
                   getObsListFromResultMap(atLeast3FichaClínicaINHMap4, patientId),
+                  getObsListFromResultMap(atLeast3FichaClínicaINHMap6, patientId),
                   iptStartDate,
                   1,
                   7);
