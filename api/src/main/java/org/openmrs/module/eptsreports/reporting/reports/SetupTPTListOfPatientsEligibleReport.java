@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import java.io.IOException;
 import java.util.*;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTTotalListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
@@ -19,14 +18,14 @@ import org.springframework.stereotype.Component;
 public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager {
 
   private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
-  private TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet;
 
-  @Autowired protected GenericCohortQueries genericCohortQueries;
+  private TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet;
 
   @Autowired
   public SetupTPTListOfPatientsEligibleReport(
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet) {
+
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.tptTotalListOfPatientsEligibleDataSet = tptTotalListOfPatientsEligibleDataSet;
   }
