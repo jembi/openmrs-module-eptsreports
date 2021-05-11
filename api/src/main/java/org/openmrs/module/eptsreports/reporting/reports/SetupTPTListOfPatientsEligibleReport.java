@@ -5,6 +5,7 @@ import java.util.*;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTListOfPatientsEligibleDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TPTTotalListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -18,13 +19,16 @@ import org.springframework.stereotype.Component;
 public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager {
 
   private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
+  private TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet;
 
   @Autowired protected GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public SetupTPTListOfPatientsEligibleReport(
-      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet) {
+      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
+      TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet) {
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
+    this.tptTotalListOfPatientsEligibleDataSet = tptTotalListOfPatientsEligibleDataSet;
   }
 
   @Override
@@ -55,9 +59,13 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
     rd.addDataSetDefinition(
-        "TOTAL", Mapped.mapStraightThrough(tptListOfPatientsEligibleDataSet.constructDataset()));
+        "TOTAL",
+        Mapped.mapStraightThrough(
+            tptTotalListOfPatientsEligibleDataSet.constructDataset(getParameters())));
     rd.addDataSetDefinition(
-        "PETPT", Mapped.mapStraightThrough(tptListOfPatientsEligibleDataSet.constructDataset()));
+        "TPT",
+        Mapped.mapStraightThrough(
+            tptListOfPatientsEligibleDataSet.constructDataset(getParameters())));
     return rd;
   }
 

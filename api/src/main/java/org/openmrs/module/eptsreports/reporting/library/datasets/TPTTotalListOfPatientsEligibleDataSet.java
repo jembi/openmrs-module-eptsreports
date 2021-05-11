@@ -7,13 +7,13 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
+public class TPTTotalListOfPatientsEligibleDataSet extends BaseDataSet {
 
   public DataSetDefinition constructDataset(List<Parameter> parameterList) {
 
     SqlDataSetDefinition sdd = new SqlDataSetDefinition();
 
-    sdd.setName("TPT");
+    sdd.setName("TOTAL");
 
     sdd.addParameters(parameterList);
 
