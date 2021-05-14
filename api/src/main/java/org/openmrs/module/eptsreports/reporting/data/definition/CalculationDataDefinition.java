@@ -1,4 +1,4 @@
-package org.openmrs.module.eptsreports.reporting.cohort.definition;
+package org.openmrs.module.eptsreports.reporting.data.definition;
 
 import java.util.Date;
 import java.util.HashMap;
