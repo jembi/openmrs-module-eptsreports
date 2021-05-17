@@ -2820,6 +2820,14 @@
 			 	SUGESTIVE concept
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.tuberculosisUuid</property>
+		<defaultValue>1eca98ee-b718-11eb-84f8-5feda90684de</defaultValue>
+		<description>
+			 	TUBERCULOSIS concept
+		</description>
+	</globalProperty>
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 
