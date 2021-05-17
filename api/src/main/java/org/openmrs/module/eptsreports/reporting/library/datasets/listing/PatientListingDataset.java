@@ -1,18 +1,27 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets.listing;
 
 import java.util.Date;
+import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
+import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.EncounterDatetimeConverter;
+import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.BaseDataSet;
+import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
+import org.openmrs.module.reporting.data.converter.ObsValueConverter;
 import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.EncountersForPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.BirthdateDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
@@ -29,6 +38,7 @@ public class PatientListingDataset extends BaseDataSet {
     dsd.setName("test");
     dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    dsd.addParameter(new Parameter("location", "Location", Location.class));
     String defParam = "startDate=${startDate},endDate=${endDate}";
 
     PatientIdentifierType identifierType =
@@ -49,6 +59,33 @@ public class PatientListingDataset extends BaseDataSet {
     dsd.addColumn("Identifier", identifierDef, "");
     dsd.addColumn("Sex", new GenderDataDefinition(), "", null);
     dsd.addColumn("DOB", new BirthdateDataDefinition(), "", new BirthdateConverter(DATE_FORMAT));
+    dsd.addColumn(
+        "ART Start Date",
+        new CalculationDataDefinition("ART Start Date", new InitialArtStartDateCalculation()),
+        "",
+        new CalculationResultConverter());
+    dsd.addColumn(
+        "Return Visit Date",
+        new ObsForPersonDataDefinition(
+            "Return Visit Date",
+            TimeQualifier.LAST,
+            Context.getConceptService().getConceptByUuid("e1e2efd8-1d5f-11e0-b929-000c29ad1d07"),
+            null,
+            null),
+        "onOrBefore=${endDate},onOrAfter=${startDate},locationList=${location}",
+        new ObsValueConverter());
+    dsd.addColumn(
+        "Last encounter",
+        getLastEncounterDate(),
+        "onOrBefore=${endDate},onOrAfter=${startDate},locationList=${location}",
+        new EncounterDatetimeConverter());
     return dsd;
+  }
+
+  private DataDefinition getLastEncounterDate() {
+    EncountersForPatientDataDefinition def =
+        new EncountersForPatientDataDefinition("Last encounter");
+    def.setWhich(TimeQualifier.LAST);
+    return def;
   }
 }
