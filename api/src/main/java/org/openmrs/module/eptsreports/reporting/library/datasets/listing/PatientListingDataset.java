@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets.listing;
 
 import java.util.Date;
+import java.util.Locale;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
@@ -66,18 +67,13 @@ public class PatientListingDataset extends BaseDataSet {
         new CalculationResultConverter());
     dsd.addColumn(
         "Return Visit Date",
-        new ObsForPersonDataDefinition(
-            "Return Visit Date",
-            TimeQualifier.LAST,
-            Context.getConceptService().getConceptByUuid("e1e2efd8-1d5f-11e0-b929-000c29ad1d07"),
-            null,
-            null),
-        "onOrBefore=${endDate},onOrAfter=${startDate},locationList=${location}",
+        getObsForPersonData("e1e2efd8-1d5f-11e0-b929-000c29ad1d07"),
+        "onOrBefore=${endDate},locationList=${location}",
         new ObsValueConverter());
     dsd.addColumn(
         "Last encounter",
         getLastEncounterDate(),
-        "onOrBefore=${endDate},onOrAfter=${startDate},locationList=${location}",
+        "onOrBefore=${endDate},locationList=${location}",
         new EncounterDatetimeConverter());
     return dsd;
   }
@@ -85,6 +81,8 @@ public class PatientListingDataset extends BaseDataSet {
   private DataDefinition getLastEncounterDate() {
     EncountersForPatientDataDefinition def =
         new EncountersForPatientDataDefinition("Last encounter");
+    def.addParameter(new Parameter("onOrBefore", "On or before", Date.class));
+    def.addParameter(new Parameter("locationList", "Location", Locale.class));
     def.setWhich(TimeQualifier.LAST);
     return def;
   }
@@ -97,5 +95,16 @@ public class PatientListingDataset extends BaseDataSet {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
     return cd;
+  }
+
+  private DataDefinition getObsForPersonData(String uuid) {
+    ObsForPersonDataDefinition obsForPersonDataDefinition = new ObsForPersonDataDefinition();
+    obsForPersonDataDefinition.addParameter(
+        new Parameter("onOrBefore", "On or before", Date.class));
+    obsForPersonDataDefinition.addParameter(
+        new Parameter("locationList", "Location", Locale.class));
+    obsForPersonDataDefinition.setQuestion(Context.getConceptService().getConceptByUuid(uuid));
+    obsForPersonDataDefinition.setWhich(TimeQualifier.LAST);
+    return obsForPersonDataDefinition;
   }
 }
