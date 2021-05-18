@@ -91,10 +91,11 @@ public class PatientListingDataset extends BaseDataSet {
 
   private DataDefinition getArtStartDate() {
     CalculationDataDefinition cd =
-        new CalculationDataDefinition("Art start date", new InitialArtStartDateCalculation());
+        new CalculationDataDefinition(
+            "Art start date",
+            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
-
     return cd;
   }
 }
