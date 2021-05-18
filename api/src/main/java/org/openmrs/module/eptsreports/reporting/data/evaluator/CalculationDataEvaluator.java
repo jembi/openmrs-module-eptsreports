@@ -39,12 +39,12 @@ public class CalculationDataEvaluator implements PatientDataEvaluator {
       return c;
     }
 
-    // Use date from cohort definition, or from ${date} or ${endDate} or now
-    Date onDate = def.getOnDate();
+    // Use date from cohort definition, or from ${date} or ${onOrBefore} or now
+    Date onDate = def.getOnOrBefore();
     if (onDate == null) {
       onDate = (Date) context.getParameterValue("date");
       if (onDate == null) {
-        onDate = (Date) context.getParameterValue("endDate");
+        onDate = (Date) context.getParameterValue("onOrBefore");
         if (onDate == null) {
           onDate = new Date();
         }
@@ -53,6 +53,8 @@ public class CalculationDataEvaluator implements PatientDataEvaluator {
     // evaluate the calculation
     PatientCalculationService service = Context.getService(PatientCalculationService.class);
     PatientCalculationContext calcContext = service.createCalculationContext();
+    calcContext.addToCache("location", def.getLocation());
+    calcContext.addToCache("onOrBefore", def.getOnOrBefore());
     calcContext.setNow(onDate);
     CalculationResultMap resultMap =
         service.evaluate(

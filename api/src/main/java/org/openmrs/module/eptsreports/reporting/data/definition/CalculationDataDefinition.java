@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.data.definition;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import org.openmrs.Location;
 import org.openmrs.calculation.patient.PatientCalculation;
 import org.openmrs.calculation.result.CalculationResult;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
@@ -20,19 +21,41 @@ public class CalculationDataDefinition extends BaseDataDefinition implements Pat
   @ConfigurationProperty(required = true, group = "calculation")
   private PatientCalculation calculation;
 
+  public Location getLocation() {
+    return location;
+  }
+
+  public void setLocation(Location location) {
+    this.location = location;
+  }
+
+  @ConfigurationProperty(group = "calculation")
+  private Location location;
+
   @ConfigurationProperty(group = "calculation")
   private Map<String, Object> calculationParameters;
 
-  public Date getOnDate() {
-    return onDate;
+  public Date getOnOrAfter() {
+    return onOrAfter;
   }
 
-  public void setOnDate(Date onDate) {
-    this.onDate = onDate;
+  public void setOnOrAfter(Date onOrAfter) {
+    this.onOrAfter = onOrAfter;
+  }
+
+  public Date getOnOrBefore() {
+    return onOrBefore;
+  }
+
+  public void setOnOrBefore(Date onOrBefore) {
+    this.onOrBefore = onOrBefore;
   }
 
   @ConfigurationProperty(group = "calculation")
-  private Date onDate;
+  private Date onOrAfter;
+
+  @ConfigurationProperty(group = "calculation")
+  private Date onOrBefore;
 
   /** Default Constructor */
   public CalculationDataDefinition() {

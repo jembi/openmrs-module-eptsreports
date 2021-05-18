@@ -39,7 +39,7 @@ public class PatientListingDataset extends BaseDataSet {
     dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
     dsd.addParameter(new Parameter("location", "Location", Location.class));
-    String defParam = "startDate=${startDate},endDate=${endDate}";
+    String defParam = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     PatientIdentifierType identifierType =
         Context.getPatientService()
@@ -61,8 +61,8 @@ public class PatientListingDataset extends BaseDataSet {
     dsd.addColumn("DOB", new BirthdateDataDefinition(), "", new BirthdateConverter(DATE_FORMAT));
     dsd.addColumn(
         "ART Start Date",
-        new CalculationDataDefinition("ART Start Date", new InitialArtStartDateCalculation()),
-        "",
+        getArtStartDate(),
+        "onOrBefore=${endDate},location=${location}",
         new CalculationResultConverter());
     dsd.addColumn(
         "Return Visit Date",
@@ -87,5 +87,14 @@ public class PatientListingDataset extends BaseDataSet {
         new EncountersForPatientDataDefinition("Last encounter");
     def.setWhich(TimeQualifier.LAST);
     return def;
+  }
+
+  private DataDefinition getArtStartDate() {
+    CalculationDataDefinition cd =
+        new CalculationDataDefinition("Art start date", new InitialArtStartDateCalculation());
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
+
+    return cd;
   }
 }

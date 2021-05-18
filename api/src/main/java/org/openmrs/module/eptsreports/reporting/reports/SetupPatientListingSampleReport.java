@@ -85,6 +85,7 @@ public class SetupPatientListingSampleReport extends EptsDataExportManager {
     List<Parameter> parameters = new ArrayList<>();
     parameters.add(ReportingConstants.START_DATE_PARAMETER);
     parameters.add(ReportingConstants.END_DATE_PARAMETER);
+    parameters.add(ReportingConstants.LOCATION_PARAMETER);
     return parameters;
   }
 }

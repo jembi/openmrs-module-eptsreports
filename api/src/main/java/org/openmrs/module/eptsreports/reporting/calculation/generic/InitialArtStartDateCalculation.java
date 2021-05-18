@@ -66,6 +66,7 @@ public class InitialArtStartDateCalculation extends AbstractPatientCalculation {
       PatientCalculationContext context) {
 
     Date onOrBefore = (Date) context.getFromCache(ON_OR_BEFORE);
+    System.out.println("The parameters added are >>" + onOrBefore + " and location is ");
 
     if (onOrBefore == null) {
       throw new IllegalArgumentException(String.format("Parameter %s must be set", ON_OR_BEFORE));
@@ -73,6 +74,9 @@ public class InitialArtStartDateCalculation extends AbstractPatientCalculation {
 
     CalculationResultMap map = new CalculationResultMap();
     Location location = (Location) context.getFromCache("location");
+
+    System.out.println(
+        "The parameters added are >>" + onOrBefore + " and location is >>" + location);
 
     boolean considerTransferredIn = getBooleanParameter(parameterValues, "considerTransferredIn");
     boolean considerPharmacyEncounter =
