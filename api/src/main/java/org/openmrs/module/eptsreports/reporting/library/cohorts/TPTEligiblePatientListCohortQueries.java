@@ -317,7 +317,7 @@ public class TPTEligiblePatientListCohortQueries {
             getTBTreatmentPart2(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.getTuberculosis().getConceptId()),
+                tbMetadata.getPulmonaryTB().getConceptId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
