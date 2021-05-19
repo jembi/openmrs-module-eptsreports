@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTCompletionCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.listing.PatientListingDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -21,9 +23,14 @@ public class SetupPatientListingSampleReport extends EptsDataExportManager {
 
   private PatientListingDataset patientListingDataset;
 
+  private TPTCompletionCohortQueries tptCompletionCohortQueries;
+
   @Autowired
-  public SetupPatientListingSampleReport(PatientListingDataset patientListingDataset) {
+  public SetupPatientListingSampleReport(
+      PatientListingDataset patientListingDataset,
+      TPTCompletionCohortQueries tptCompletionCohortQueries) {
     this.patientListingDataset = patientListingDataset;
+    this.tptCompletionCohortQueries = tptCompletionCohortQueries;
   }
 
   @Override
@@ -55,6 +62,10 @@ public class SetupPatientListingSampleReport extends EptsDataExportManager {
     rd.addParameters(getDataParameters());
     rd.addDataSetDefinition(
         "test", Mapped.mapStraightThrough(patientListingDataset.getPatientListForIpt()));
+    rd.setBaseCohortDefinition(
+        EptsReportUtils.map(
+            tptCompletionCohortQueries.getTxCurrWithoutTPTCompletion(),
+            "endDate=${endDate},location=${location}"));
     return rd;
   }
 
