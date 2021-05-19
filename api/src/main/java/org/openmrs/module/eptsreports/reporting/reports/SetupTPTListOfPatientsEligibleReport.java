@@ -32,12 +32,12 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
 
   @Override
   public String getExcelDesignUuid() {
-    return "5e17f214-af0f-11eb-852c-ef10820bc4bd";
+    return "5e17f214-af0f-11eb-852c-ef10820bc4bj";
   }
 
   @Override
   public String getUuid() {
-    return "6ee04286-af0f-11eb-afea-e3389adce11f";
+    return "6ee04286-af0f-11eb-afea-e3389adce11h";
   }
 
   @Override
