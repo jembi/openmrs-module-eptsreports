@@ -370,7 +370,6 @@ public class TPTEligiblePatientListCohortQueries {
 
     compositionCohortDefinition.setCompositionString(
            "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR threeHPA1 OR threeHPA2 OR IPTB1 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR threeHPC1 OR threeHPC2 OR threeHPC3 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR E1 OR F)"); 
-        // "IPTB1 OR IPTB2 OR IPTB3 OR IPTB4");
         return compositionCohortDefinition;
   }
 
@@ -447,7 +446,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1256", startDrugsConcept);
 
     String query =
-        "SELECT p.patient_id FROM patient p  "
+        " SELECT p.patient_id FROM patient p  "
             + "          JOIN encounter e ON e.patient_id = p.patient_id "
             + "          JOIN obs o ON o.encounter_id = e.encounter_id "
             + "          WHERE e.encounter_type = ${6} AND o.concept_id = ${6122} "
@@ -2647,10 +2646,10 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND e.voided = 0    "
             + "          AND e.location_id = :location "
             + "          AND e.encounter_type IN ( ${6}, ${9} )    "
-            + "          AND o.concept_id = ${1268} "
-            + "          AND o.value_coded IN ( ${1256}, ${1113} ) "
-            + "           OR o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) AND "
-            + "                                     :endDate "
+            + "          AND ((o.concept_id = ${1268} "
+            + "          AND o.value_coded IN ( ${1256}, ${1113})) OR ( "
+            + "          o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) AND "
+            + "                                     :endDate)) "
             + "   GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
