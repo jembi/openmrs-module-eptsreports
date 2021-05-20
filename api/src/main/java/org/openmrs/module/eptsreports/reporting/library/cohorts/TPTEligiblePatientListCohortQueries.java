@@ -368,7 +368,7 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR 3HPA1 OR 3HPA2 OR IPTB1 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part3 OR 3HPC1 OR 3HPC2 OR 3HPC3 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR E1 OR F)");
+         "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR 3HPA1 OR 3HPA2 OR IPTB1 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR 3HPC1 OR 3HPC2 OR 3HPC3 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR E1 OR F)"); 
 
     return compositionCohortDefinition;
   }
@@ -407,7 +407,7 @@ public class TPTEligiblePatientListCohortQueries {
             + " p.voided = 0"
             + " AND e.voided = 0"
             + " AND o.voided = 0"
-            + " e.encounter_type = ${53} "
+            + " AND e.encounter_type = ${53} "
             + " AND o.value_datetime IS NOT NULL"
             + " AND o.concept_id = ${6128}"
             + " AND e.location_id = :location"
@@ -1769,7 +1769,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1065", yesConcept);
 
     String query =
-    "   SELECT result.patient_id, result.encounter_datetime " +
+    "   SELECT result.patient_id " +
     "         FROM (SELECT p.patient_id,tabela.encounter_datetime   " +
     "            FROM   patient p   " +
     "            INNER JOIN encounter e " +
@@ -1859,7 +1859,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23955", dtINHConcept);
 
     String query =
-    "   SELECT result.patient_id, result.encounter_datetime    " +
+    "   SELECT result.patient_id    " +
     "                FROM (SELECT p.patient_id,tabela.encounter_datetime    " +
     "                   FROM   patient p    " +
     "                   INNER JOIN encounter e  " +
@@ -1956,7 +1956,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23955", dtINHConcept);
 
     String query =
-    " SELECT result.patient_id, result.encounter_datetime    " +
+    " SELECT result.patient_id    " +
     "            FROM (SELECT p.patient_id,tabela.encounter_datetime    " +
     "               FROM   patient p    " +
     "               INNER JOIN encounter e  " +
