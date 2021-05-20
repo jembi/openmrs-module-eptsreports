@@ -104,7 +104,7 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-        "3HPA1",
+        "threeHPA1",
         EptsReportUtils.map(
             get3HPStartA1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -113,7 +113,7 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-        "3HPA2",
+        "threeHPA2",
         EptsReportUtils.map(
             get3HPStartA2(
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
@@ -268,7 +268,7 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-        "3HPC1",
+        "threeHPC1",
         EptsReportUtils.map(
             get3HPC1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -277,7 +277,7 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-        "3HPC2",
+        "threeHPC2",
         EptsReportUtils.map(
             get3HPC2(
                 tbMetadata.get3HPConcept().getConceptId(),
@@ -289,7 +289,7 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-        "3HPC3",
+        "threeHPC3",
         EptsReportUtils.map(
             get3HPC3(
                 tbMetadata.get3HPConcept().getConceptId(),
@@ -369,9 +369,9 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.setCompositionString(
-         "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR 3HPA1 OR 3HPA2 OR IPTB1 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR 3HPC1 OR 3HPC2 OR 3HPC3 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR E1 OR F)"); 
-
-    return compositionCohortDefinition;
+           "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR threeHPA1 OR threeHPA2 OR IPTB1 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR threeHPC1 OR threeHPC2 OR threeHPC3 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR E1 OR F)"); 
+        // "IPTB1 OR IPTB2 OR IPTB3 OR IPTB4");
+        return compositionCohortDefinition;
   }
 
   /**
@@ -675,7 +675,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23954", threeHPConcept);
     map.put("23984", hPPiridoxinaConcept);
 
-    String query =
+    String query = 
         "           SELECT p.patient_id "
             + "         FROM  patient p   "
             + "         INNER JOIN encounter e ON e.patient_id = p.patient_id   "
@@ -690,7 +690,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND e.location_id = :location  "
             + "          AND e.encounter_type = ${60} "
             + "          AND o.concept_id = ${23985} "
-            + "          AND o.value_coded IN (${23954},${23984})  "
+            + "          AND o.value_coded IN (${23954}, ${23984})  "
             + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 120 DAY) AND :endDate"
             + "      GROUP BY p.patient_id) AS pickup  "
             + "      ON pickup.patient_id = p.patient_id "
@@ -762,7 +762,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23982", isoniazidePiridoxinaConcept);
 
     String query =
-        "SELECT "
+        "   SELECT "
             + "                p.patient_id "
             + "            FROM "
             + "                patient p "
@@ -1256,13 +1256,13 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23982", isoniazidePiridoxinaConcept);
 
     String query =
-        "SELECT p.patient_id"
-            + "FROM   patient p"
+        "   SELECT p.patient_id"
+            + " FROM   patient p"
             + "       INNER JOIN encounter e"
             + "               ON e.patient_id = p.patient_id"
             + "       INNER JOIN obs o"
             + "               ON o.encounter_id = e.encounter_id"
-            + "WHERE  p.voided = 0"
+            + " WHERE  p.voided = 0"
             + "       AND e.voided = 0"
             + "       AND o.voided = 0"
             + "       AND e.location_id = :location"
@@ -1522,7 +1522,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23982", isoniazidePiridoxinaConcept);
 
     String query =
-        "SELECT"
+        "   SELECT"
             + "            p.patient_id"
             + "        FROM"
             + "            patient p"
@@ -2176,7 +2176,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                          AND e.location_id = :location  "
             + "                          AND e.encounter_datetime <= :endDate) AS tabela  "
             + "               ON tabela.patient_id = p.patient_id "
-            + "WHERE  p.voided = 0    "
+            + " WHERE  p.voided = 0    "
             + "       AND e.voided = 0    "
             + "       AND o.voided = 0    "
             + "       AND e.location_id = :location "
@@ -2203,7 +2203,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                          tabela.encounter_datetime AND    "
             + "              Date_add(tabela.encounter_datetime,  "
             + "              INTERVAL 210 DAY)) >= 2 ))   "
-            + "GROUP  BY p.patient_id  ";
+            + " GROUP  BY p.patient_id  ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -2451,7 +2451,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         " SELECT p.patient_id   "
-            + "FROM   patient p   "
+            + " FROM   patient p   "
             + "       inner join encounter e  "
             + "               ON e.patient_id = p.patient_id  "
             + "       inner join obs o    "
@@ -2472,7 +2472,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                          AND o.value_coded IN ( ${23954}, ${23984} )    "
             + "                          AND e.encounter_datetime <= :endDate) AS tabela  "
             + "               ON tabela.patient_id = p.patient_id "
-            + "WHERE  p.voided = 0    "
+            + " WHERE  p.voided = 0    "
             + "       AND e.voided = 0    "
             + "       AND o.voided = 0    "
             + "       AND e.location_id = :location "
@@ -2501,7 +2501,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                         tabela.encounter_datetime AND "
             + "             Date_add(tabela.encounter_datetime,   "
             + "             INTERVAL 120 DAY)) >= 1 ) "
-            + "GROUP  BY p.patient_id ";
+            + " GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -2545,7 +2545,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         " SELECT p.patient_id   "
-            + "FROM   patient p   "
+            + " FROM   patient p   "
             + "       inner join encounter e  "
             + "               ON e.patient_id = p.patient_id  "
             + "       inner join obs o    "
@@ -2566,7 +2566,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                          AND o.value_coded IN ( ${23954}, ${23984} )    "
             + "                          AND e.encounter_datetime <= :endDate) AS tabela  "
             + "               ON tabela.patient_id = p.patient_id "
-            + "WHERE  p.voided = 0    "
+            + " WHERE  p.voided = 0    "
             + "       AND e.voided = 0    "
             + "       AND o.voided = 0    "
             + "       AND e.location_id = :location "
@@ -2595,7 +2595,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                         tabela.encounter_datetime AND "
             + "             Date_add(tabela.encounter_datetime,   "
             + "             INTERVAL 120 DAY)) >= 3 ) "
-            + "GROUP  BY p.patient_id";
+            + " GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -2794,7 +2794,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND o.concept_id = ${23761}    "
             + "       AND o.value_coded = ${1065}    "
             + "       AND e.encounter_datetime BETWEEN :endDate "
-            + "       AND  Date_sub(:endDate, INTEVAL 210 DAY)   "
+            + "       AND  Date_sub(:endDate, INTERVAL 210 DAY)   "
             + "   GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
