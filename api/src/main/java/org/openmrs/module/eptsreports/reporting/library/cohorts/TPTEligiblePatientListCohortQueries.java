@@ -364,7 +364,8 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getTbScreeningConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId(),
                 tbMetadata.getResearchResultConcept().getConceptId(),
-                tbMetadata.getNoConcept().getConceptId()),
+                tbMetadata.getNoConcept().getConceptId(),
+                hivMetadata.getApplicationForLaboratoryResearch().getConceptId()),
             mapping));
 
     compositionCohortDefinition.setCompositionString(
@@ -2874,7 +2875,8 @@ public class TPTEligiblePatientListCohortQueries {
       int tbScreeningConcept,
       int yesConcept,
       int researchResultConcept,
-      int noConcept) {
+      int noConcept,
+      int applicationForLaboratoryResearch) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
@@ -2908,125 +2910,144 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1065", yesConcept);
     map.put("6277", researchResultConcept);
     map.put("1066", noConcept);
+    map.put("23722", applicationForLaboratoryResearch);
 
     String query =
-        " SELECT p.patient_id  "
-            + "  FROM   patient p  "
-            + "       inner join encounter e "
-            + "               ON e.patient_id = p.patient_id "
-            + "       inner join obs o   "
-            + "               ON o.encounter_id = e.encounter_id "
-            + "  WHERE  p.voided = 0   "
-            + "       AND o.voided = 0   "
-            + "       AND e.voided = 0   "
-            + "       AND e.location_id = :location    "
-            + "       AND e.encounter_datetime BETWEEN  :endDate "
-            + "                                        AND   "
-            + "                                   Date_sub(:endDate, INTERVAL 14 DAY)  "
-            + "       AND ( ( e.encounter_type = ${6}   "
-            + "               AND ( ( o.concept_id = ${23758}   "
-            + "                       AND o.value_coded = ${1065} ) "
-            + "                      OR ( o.concept_id = ${1766}    "
-            + "                           AND o.value_coded IN ( ${1763}, ${1762}, ${1764}, ${1760}, "
-            + "                                                  ${23760}, ${1765}, ${161} ) )    "
-            + "                      OR ( o.concept_id = ${23722}   "
-            + "                           AND o.value_coded IN ( ${23951}, ${23723}, ${307}, ${12}, ${23774} )  "
-            + "                         )    "
-            + "                      OR ( EXISTS(SELECT o.person_id  "
-            + "                                  FROM   obs o    "
-            + "                                  WHERE  o.encounter_id = e.encounter_id  "
-            + "                                         AND o.concept_id = ${23951} "
-            + "                                         AND o.value_coded IN ( ${703}, ${664} ))   "
-            + "                            OR EXISTS(SELECT o.person_id  "
-            + "                                      FROM   obs o    "
-            + "                                      WHERE  o.encounter_id = e.encounter_id  "
-            + "                                             AND o.concept_id = ${23723} "
-            + "                                             AND o.value_coded IN ( ${703}, ${664} ))   "
-            + "                            OR EXISTS (SELECT o.person_id "
-            + "                                       FROM   obs o   "
-            + "                                       WHERE  o.encounter_id = e.encounter_id "
-            + "                                              AND o.concept_id = ${23774}    "
-            + "                                              AND o.value_coded IN ( ${703}, ${664} ))  "
-            + "                            OR EXISTS (SELECT o.person_id "
-            + "                                       FROM   obs o   "
-            + "                                       WHERE  o.encounter_id = e.encounter_id "
-            + "                                              AND o.concept_id = ${307}  "
-            + "                                              AND o.value_coded IN ( ${703}, ${664} ))  "
-            + "                            OR EXISTS (SELECT o.person_id "
-            + "                                       FROM   obs o   "
-            + "                                       WHERE  o.encounter_id = e.encounter_id "
-            + "                                              AND o.concept_id = ${12}   "
-            + "                                              AND o.value_coded IN (  "
-            + "                                                  ${23956}, ${664}, ${1138} )  "
-            + "                                      ) ) "
-            + "                   )  "
-            + "             )    "
-            + "              OR ( e.encounter_type = ${13}  "
-            + "                   AND ( ( o.concept_id = ${23758}   "
-            + "                           AND o.value_coded = ${1065} ) "
-            + "                          OR ( o.concept_id = ${1766}    "
-            + "                               AND o.value_coded IN ( ${1763}, ${1762}, ${1764}, ${1760}, "
-            + "                                                      ${23760}, ${1765}, ${161} ) )    "
-            + "                          OR ( o.concept_id = ${23722}   "
-            + "                               AND o.value_coded IN ( ${23951}, ${23723}, ${307}, ${12},  "
-            + "                                                      ${23774} ) )   "
-            + "                          OR ( EXISTS(SELECT o.person_id  "
-            + "                                      FROM   obs o    "
-            + "                                      WHERE  o.encounter_id = e.encounter_id  "
-            + "                                             AND o.concept_id = ${23951} "
-            + "                                             AND o.value_coded IN ( ${703}, ${664} ))   "
-            + "                                OR EXISTS(SELECT o.person_id  "
-            + "                                          FROM   obs o    "
-            + "                                          WHERE  o.encounter_id = e.encounter_id  "
-            + "                                                 AND o.concept_id = ${23723} "
-            + "                                                 AND o.value_coded IN "
-            + "                                                     ( ${703}, ${664} ))    "
-            + "                                OR EXISTS (SELECT o.person_id "
-            + "                                           FROM   obs o   "
-            + "                                           WHERE  o.encounter_id =    "
-            + "                                                  e.encounter_id  "
-            + "                                                  AND o.concept_id = ${23774}    "
-            + "                                                  AND o.value_coded IN ( ${703}, "
-            + "                                                      ${664} ))  "
-            + "                                OR EXISTS (SELECT o.person_id "
-            + "                                           FROM   obs o   "
-            + "                                           WHERE  o.encounter_id =    "
-            + "                                                  e.encounter_id  "
-            + "                                                  AND o.concept_id = ${307}  "
-            + "                                                  AND o.value_coded IN ( ${703}, "
-            + "                                                      ${664} ))  "
-            + "                                OR EXISTS (SELECT o.person_id "
-            + "                                           FROM   obs o   "
-            + "                                           WHERE  o.encounter_id =    "
-            + "                                                  e.encounter_id  "
-            + "                                                  AND o.concept_id = ${12}   "
-            + "                                                  AND o.value_coded IN (  "
-            + "                                                      ${23956}, ${664}, ${1138} )  "
-            + "                                          )   "
-            + "                             ) ) )    "
-            + "              OR ( e.encounter_type IN ( ${6}, ${9} )   "
-            + "                   AND ( EXISTS(SELECT o.person_id    "
-            + "                                FROM   obs o  "
-            + "                                WHERE  o.encounter_id = e.encounter_id    "
-            + "                                       AND o.concept_id = ${6257}    "
-            + "                                       AND o.value_coded = ${1065})  "
-            + "                          OR EXISTS(SELECT o.person_id    "
-            + "                                    FROM   obs o  "
-            + "                                    WHERE  o.encounter_id = e.encounter_id    "
-            + "                                           AND o.concept_id = ${6277}    "
-            + "                                           AND o.value_coded = ${703})   "
-            + "                          OR EXISTS (SELECT o.person_id   "
-            + "                                     FROM   obs o "
-            + "                                     WHERE  o.encounter_id = e.encounter_id   "
-            + "                                            AND ( ( o.concept_id = ${6277}   "
-            + "                                                    AND o.value_coded = ${664} ) "
-            + "                                                   OR ( o.concept_id = ${6257}   "
-            + "                                                        AND o.value_coded IN( "
-            + "                                                            ${1065}, "
-            + "                                                            ${1066} )    "
-            + "                                                      )   "
-            + "                                                )) ) ) )  "
-            + "  GROUP  BY p.patient_id  ";
+    "   SELECT     " +
+            "    p.patient_id   " +
+            "   FROM   " +
+            "    patient p  " +
+            "        INNER JOIN " +
+            "    encounter e ON e.patient_id = p.patient_id " +
+            "        INNER JOIN " +
+            "    obs o ON o.encounter_id = e.encounter_id   " +
+            "   WHERE  " +
+            "    p.voided = 0 AND o.voided = 0  " +
+            "        AND e.voided = 0   " +
+            "        AND e.location_id = :location    " +
+            "        AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 14 DAY) AND :endDate  " +
+            "        AND ((e.encounter_type = ${6} " +
+            "        AND ((o.concept_id = ${23758} " +
+            "        AND o.value_coded = ${1065})  " +
+            "        OR (o.concept_id = ${1766}    " +
+            "        AND o.value_coded IN (${1763} , ${1762}, ${1764}, ${1760}, ${23760}, ${1765}, ${161}))  " +
+            "        OR (o.concept_id = ${23722}   " +
+            "        AND o.value_coded IN (${23951} , ${23723}, ${307}, ${12}, ${23774}))  " +
+            "        OR (EXISTS( SELECT     " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${23951}   " +
+            "                AND o.value_coded IN (${703} , ${664}))  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${23723}   " +
+            "                AND o.value_coded IN (${703} , ${664}))  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${23774}   " +
+            "                AND o.value_coded IN (${703} , ${664}))  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${307} " +
+            "                AND o.value_coded IN (${703} , ${664}))  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${12}  " +
+            "                AND o.value_coded IN (${23956} , ${664}, ${1138})))))   " +
+            "        OR (e.encounter_type = ${13}  " +
+            "        AND ((o.concept_id = ${23758} " +
+            "        AND o.value_coded = ${1065})  " +
+            "        OR (o.concept_id = ${1766}    " +
+            "        AND o.value_coded IN (${1763} , ${1762}, ${1764}, ${1760}, ${23760}, ${1765}, ${161}))  " +
+            "        OR (o.concept_id = ${23722}   " +
+            "        AND o.value_coded IN (${23951} , ${23723}, ${307}, ${12}, ${23774}))  " +
+            "        OR (EXISTS( SELECT     " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${23951}   " +
+            "                AND o.value_coded IN (${703} , ${664}))  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${23723}   " +
+            "                AND o.value_coded IN (${703} , ${664}))  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${23774}   " +
+            "                AND o.value_coded IN (${703} , ${664}))  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${307} " +
+            "                AND o.value_coded IN (${703} , ${664}))  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${12}  " +
+            "                AND o.value_coded IN (${23956} , ${664}, ${1138})))))   " +
+            "        OR (e.encounter_type IN (${6} , ${9})    " +
+            "        AND (EXISTS( SELECT    " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${6257}    " +
+            "                AND o.value_coded = ${1065})  " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND o.concept_id = ${6277}    " +
+            "                AND o.value_coded = ${703})   " +
+            "        OR EXISTS( SELECT  " +
+            "            o.person_id    " +
+            "        FROM   " +
+            "            obs o  " +
+            "        WHERE  " +
+            "            o.encounter_id = e.encounter_id    " +
+            "                AND ((o.concept_id = ${6277}  " +
+            "                AND o.value_coded = ${664})   " +
+            "                OR (o.concept_id = ${6257}    " +
+            "                AND o.value_coded IN (${1065} , ${1066})))))))   " +
+            "   GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
