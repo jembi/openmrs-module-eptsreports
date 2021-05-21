@@ -3,9 +3,11 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import java.io.IOException;
 import java.util.*;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTEligiblePatientListCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTTotalListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -18,16 +20,18 @@ import org.springframework.stereotype.Component;
 public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager {
 
   private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
-
+  private TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries;
   private TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet;
 
   @Autowired
   public SetupTPTListOfPatientsEligibleReport(
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
-      TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet) {
+      TPTTotalListOfPatientsEligibleDataSet tptTotalListOfPatientsEligibleDataSet,
+      TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries) {
 
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.tptTotalListOfPatientsEligibleDataSet = tptTotalListOfPatientsEligibleDataSet;
+    this.tPTEligiblePatientListCohortQueries = tPTEligiblePatientListCohortQueries;
   }
 
   @Override
@@ -57,6 +61,11 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
+    rd.setBaseCohortDefinition(
+        EptsReportUtils.map(
+            tPTEligiblePatientListCohortQueries.getTxCurrWithoutTPT(),
+            "endDate=${endDate},location=${location}"));
+
     rd.addDataSetDefinition(
         "TOTAL",
         Mapped.mapStraightThrough(tptTotalListOfPatientsEligibleDataSet.constructDataset()));
