@@ -4330,7 +4330,7 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E AND NOT B6E) AND NOT (C OR D) AND age");
+            "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
@@ -6901,7 +6901,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  private CohortDefinition getB4And2() {
+  public CohortDefinition getB4And2() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("B4_2");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -6936,7 +6936,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  private CohortDefinition getB4And1() {
+  public CohortDefinition getB4And1() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("B4_1");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -6973,7 +6973,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  private CohortDefinition getGNew() {
+  public CohortDefinition getGNew() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("G new ");
