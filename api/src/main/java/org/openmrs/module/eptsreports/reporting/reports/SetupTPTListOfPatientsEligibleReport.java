@@ -70,9 +70,7 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
         "TOTAL",
         Mapped.mapStraightThrough(tptTotalListOfPatientsEligibleDataSet.constructDataset()));
     rd.addDataSetDefinition(
-        "TPT",
-        Mapped.mapStraightThrough(
-            tptListOfPatientsEligibleDataSet.constructDataset(getParameters())));
+        "TPT", Mapped.mapStraightThrough(tptListOfPatientsEligibleDataSet.constructDataset()));
     return rd;
   }
 
