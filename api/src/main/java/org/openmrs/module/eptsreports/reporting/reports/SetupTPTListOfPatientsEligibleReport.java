@@ -91,6 +91,7 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
+      props.put("repeatingSections", "sheet:1,row:4,dataset:TPT");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
