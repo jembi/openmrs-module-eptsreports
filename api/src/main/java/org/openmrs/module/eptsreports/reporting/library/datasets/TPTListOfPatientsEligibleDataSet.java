@@ -51,11 +51,11 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
 
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
     pdd.addColumn("name", nameDef, "");
-    pdd.addColumn("NID", identifierDef, "");
+    pdd.addColumn("nid", identifierDef, "");
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
     pdd.addColumn(
-        "ART Start Date",
+        "inicio_tarv",
         getArtStartDate(),
         "onOrBefore=${endDate},location=${location}",
         new CalculationResultConverter());
