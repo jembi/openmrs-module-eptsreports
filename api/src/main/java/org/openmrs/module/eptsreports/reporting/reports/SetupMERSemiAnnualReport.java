@@ -64,8 +64,10 @@ public class SetupMERSemiAnnualReport extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.setParameters(txMlDataset.getParameters());
-    rd.addDataSetDefinition("T", Mapped.mapStraightThrough(txTBDataset.constructTxTBDataset()));
-    rd.addDataSetDefinition("TBPREV", Mapped.mapStraightThrough(tbPrevDataset.constructDatset()));
+    //    rd.addDataSetDefinition("T",
+    // Mapped.mapStraightThrough(txTBDataset.constructTxTBDataset()));
+    //    rd.addDataSetDefinition("TBPREV",
+    // Mapped.mapStraightThrough(tbPrevDataset.constructDatset()));
     rd.addDataSetDefinition(
         "CXCA", Mapped.mapStraightThrough(cxcascrnDataset.constructCXCASCRNDataset()));
     rd.addDataSetDefinition(
