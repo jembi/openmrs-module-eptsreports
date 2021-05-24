@@ -706,7 +706,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11NUM6,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "ageBasedOnArt=<2");
 
     CohortIndicator MI11NUM7 =
         eptsGeneralIndicator.getIndicator(
