@@ -79,11 +79,11 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
         getLastEncounterDate(),
         "onOrBefore=${endDate},locationList=${location}",
         new EncounterDatetimeConverter());
+    DataDefinition dd = pregnantBreasfeediDefinition();
+    dd.addParameter(new Parameter("endDate", "On or before", Date.class));
+    dd.addParameter(new Parameter("location", "Location", Location.class));
     pdd.addColumn(
-        "pregnant_or_breastfeeding",
-        pregnantBreasfeediDefinition(),
-        "onOrBefore=${endDate},locationList=${location}",
-        null);
+        "pregnant_or_breastfeeding", dd, "onOrBefore=${endDate},location=${location}", null);
 
     return pdd;
   }
@@ -129,6 +129,7 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
   private DataDefinition pregnantBreasfeediDefinition() throws EvaluationException {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     CohortDefinition cd = tPTEligiblePatientListCohortQueries.getTxCurrWithoutTPT();
+    cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
     EvaluationContext context = new EvaluationContext();
     CohortDefinitionService cohortDefinitionService =
         Context.getService(CohortDefinitionService.class);
