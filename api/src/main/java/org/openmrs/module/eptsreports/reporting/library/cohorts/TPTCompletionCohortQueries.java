@@ -316,7 +316,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     String generalParameterMapping =
-        "onOrAfter=${endDate-7m},onOrBefore=${endDate},location=${location}";
+        "onOrAfter=${endDate-210d},onOrBefore=${endDate},location=${location}";
 
     compositionCohortDefinition.addSearch(
         "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
