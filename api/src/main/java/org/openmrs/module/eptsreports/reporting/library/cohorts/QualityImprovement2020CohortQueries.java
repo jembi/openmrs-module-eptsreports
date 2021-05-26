@@ -2307,7 +2307,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch(
           "age",
           EptsReportUtils.map(
-              getAgeOnObsDatetime(3, 14),
+              getAgeOnObsDatetime(2, 14),
               "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     }
 
@@ -4541,7 +4541,7 @@ public class QualityImprovement2020CohortQueries {
       cd.addSearch(
           "age",
           EptsReportUtils.map(
-              getAgeOnObsDatetime(3, 14),
+              getAgeOnObsDatetime(2, 14),
               "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     }
 
