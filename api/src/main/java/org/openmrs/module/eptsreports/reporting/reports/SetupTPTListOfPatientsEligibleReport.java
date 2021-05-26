@@ -9,6 +9,7 @@ import org.openmrs.module.eptsreports.reporting.library.datasets.TPTTotalListOfP
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
@@ -69,8 +70,12 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
     rd.addDataSetDefinition(
         "TOTAL",
         Mapped.mapStraightThrough(tptTotalListOfPatientsEligibleDataSet.constructDataset()));
-    rd.addDataSetDefinition(
-        "TPT", Mapped.mapStraightThrough(tptListOfPatientsEligibleDataSet.constructDataset()));
+    try {
+      rd.addDataSetDefinition(
+          "TPT", Mapped.mapStraightThrough(tptListOfPatientsEligibleDataSet.constructDataset()));
+    } catch (EvaluationException e) {
+      e.printStackTrace();
+    }
     return rd;
   }
 
