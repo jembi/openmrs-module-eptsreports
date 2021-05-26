@@ -130,6 +130,9 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     CohortDefinition cd = tPTEligiblePatientListCohortQueries.getTxCurrWithoutTPT();
     cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
+    spdd.setName("Nome da definition");
+    spdd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
     EvaluationContext context = new EvaluationContext();
     CohortDefinitionService cohortDefinitionService =
         Context.getService(CohortDefinitionService.class);
@@ -141,15 +144,16 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     Set<Integer> setMemberIds = evaluatedCohort.getMemberIds();
     String memberIds = setMemberIds.toString();
     String formattedIds = memberIds.substring(1, memberIds.length() - 1);
+    System.out.println(formattedIds);
     String sql =
         "SELECT p.patient_id, CASE "
             + "                       WHEN (pregnancy_date IS NULL AND breastfeeding_date IS NULL) THEN 'N/A' "
             + "                       WHEN pregnancy_date IS NOT NULL THEN 'Grávida' "
             + "                       WHEN breastfeeding_date IS NOT NULL THEN 'Lactante' "
             + "                       END AS pregnance_state"
-            + "FROM patient p "
-            + "LEFT JOIN"
-            + "( Select max_pregnant.patient_id, pregnancy_date FROM   "
+            + " FROM patient p "
+            + " LEFT JOIN"
+            + " ( Select max_pregnant.patient_id, pregnancy_date FROM   "
             + "                       (SELECT pregnant.patient_id, MAX(pregnant.pregnancy_date) AS pregnancy_date FROM   "
             + "                        ( SELECT p.patient_id , MAX(e.encounter_datetime) AS pregnancy_date   "
             + "                            FROM patient p   "
@@ -194,7 +198,6 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
             + "                            between DATE_SUB(curdate(), INTERVAL 9 MONTH) AND curdate() "
             + "                            AND e.location_id=398 AND pe.gender='F' GROUP BY p.patient_id   "
             + "                            UNION   "
-            + "              "
             + "                            Select p.patient_id, MAX(e.encounter_datetime) as pregnancy_date   "
             + "                            FROM patient p   "
             + "                            INNER JOIN person pe ON p.patient_id=pe.person_id   "
@@ -222,7 +225,7 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
             + "                            AND e.encounter_type = 6 AND pe.gender='F' AND o.value_datetime "
             + "                            BETWEEN DATE_SUB(curdate(), INTERVAL 9 MONTH) AND curdate() "
             + "                            GROUP BY p.patient_id) as pregnant   "
-            + "                            GROUP BY patient_id) max_pregnant   "
+            + "                            GROUP BY pregnant.patient_id) max_pregnant   "
             + "                LEFT JOIN   "
             + "                            (SELECT breastfeeding.patient_id, max(breastfeeding.last_date) as breastfeeding_date "
             + "                            FROM (   "
@@ -236,7 +239,6 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
             + "                            BETWEEN DATE_SUB(curdate(), INTERVAL 18 MONTH) AND curdate()    "
             + "                            AND e.location_id=398 AND pe.gender='F'   "
             + "                            GROUP BY p.patient_id   "
-            + "                            "
             + "                            UNION   "
             + "                            SELECT p.patient_id, MAX(e.encounter_datetime) AS last_date   "
             + "                            FROM patient p   "
@@ -284,13 +286,11 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
             + "                            AND hist.concept_id=  1190 "
             + "                            AND pe.gender='F' AND hist.value_datetime IS NOT NULL    "
             + "                            AND hist.value_datetime BETWEEN DATE_SUB(curdate(), INTERVAL 18 MONTH) AND curdate()    "
-            + "                                    GROUP BY p.patient_id   "
-            + "                            ) AS breastfeeding   "
-            + "                            GROUP BY patient_id) max_breastfeeding   "
+            + "                                    GROUP BY p.patient_id ) AS breastfeeding   "
+            + "                            GROUP BY breastfeeding.patient_id) max_breastfeeding   "
             + "                                            ON max_pregnant.patient_id = max_breastfeeding.patient_id   "
             + "                                            WHERE (max_pregnant.pregnancy_date Is NOT NULL AND max_pregnant.pregnancy_date >= max_breastfeeding.breastfeeding_date)   "
-            + "                                            OR (max_breastfeeding.breastfeeding_date Is NULL)  "
-            + "                                        )pregnancy ON pregnancy.patient_id = p.patient_id "
+            + "                                            OR (max_breastfeeding.breastfeeding_date Is NULL)) pregnancy ON pregnancy.patient_id = p.patient_id "
             + "         LEFT JOIN"
             + "                            (Select max_breastfeeding.patient_id, breastfeeding_date FROM   "
             + "                            (SELECT breastfeeding.patient_id, max(breastfeeding.last_date) as breastfeeding_date FROM (   "
@@ -304,7 +304,6 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
             + "                            BETWEEN DATE_SUB(curdate(), INTERVAL 18 MONTH) AND curdate()    "
             + "                                        AND e.location_id=398 AND pe.gender='F'   "
             + "                            GROUP BY p.patient_id   "
-            + "                            "
             + "                            UNION   "
             + "                            SELECT p.patient_id, MAX(e.encounter_datetime) AS last_date   "
             + "                            FROM patient p   "
@@ -317,7 +316,6 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
             + "                            AND e.encounter_datetime BETWEEN DATE_SUB(curdate(), INTERVAL 18 MONTH) AND curdate()   "
             + "                            AND e.location_id=398 AND pe.gender='F'   "
             + "                            GROUP BY p.patient_id  "
-            + "                            "
             + "                            UNION   "
             + "                            SELECT     p.patient_id, MAX(e.encounter_datetime) AS last_date   "
             + "                            FROM patient p   "
@@ -427,6 +425,8 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
             + " WHERE p.patient_id IN ("
             + formattedIds
             + ")";
+
+    System.out.println(sql);
     spdd.setQuery(sql);
     return spdd;
   }
