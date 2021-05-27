@@ -7,7 +7,6 @@ import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionC
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
@@ -50,17 +49,6 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
 
     dsd.addColumn("TOTALPP", "Total Positive", EptsReportUtils.map(total, mappings), "");
 
-    // 1st Time Screened - FTS
-    //    CohortIndicator f1rstTimeScreened =
-    //        eptsGeneralIndicator.getIndicator(
-    //            "FTSPP",
-    //            EptsReportUtils.map(
-    //                cxcascrnCohortQueries.get1stTimeScreened(
-    //                    CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
-    //                mappings));
-    //    dsd.addColumn(
-    //        "FTSPP", "1st Time Screened", EptsReportUtils.map(f1rstTimeScreened, mappings), "");
-
     // 1st Time Screened (POSITIVE) - FTSP
     CohortIndicator f1rstTimeScreenedPositive =
         eptsGeneralIndicator.getIndicator(
@@ -69,27 +57,13 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
                 cxcascrnCohortQueries.get1stTimeScreened(
                     CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE),
                 mappings));
-    new GenderDataDefinition()
+
     addRow(
         dsd,
         "FTSPPP",
         "1st Time Screened POSITIVE",
         EptsReportUtils.map(f1rstTimeScreenedPositive, mappings),
         getColumnsForAge());
-
-    // Rescreened after previous negative - RAPN
-    /*CohortIndicator rescreenedAfterPreviousNegative =
-        eptsGeneralIndicator.getIndicator(
-            "RAPNPP",
-            EptsReportUtils.map(
-                cxcascrnCohortQueries.getRescreenedAfterPreviousNegative(
-                    CXCASCRNCohortQueries.CXCASCRNResult.ALL),
-                mappings));
-    dsd.addColumn(
-        "RAPNPP",
-        "Rescreened after previous negative",
-        EptsReportUtils.map(rescreenedAfterPreviousNegative, mappings),
-        "");*/
 
     // Rescreened after previous negative (POSITIVE) - RAPNP
     CohortIndicator rescreenedAfterPreviousNegativePositive =
@@ -106,20 +80,6 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
         EptsReportUtils.map(rescreenedAfterPreviousNegativePositive, mappings),
         getColumnsForAge());
 
-    // Post-Treatment follow-up - PTFU
-    //    CohortIndicator postTreatmentFollowUp =
-    //        eptsGeneralIndicator.getIndicator(
-    //            "PTFUPP",
-    //            EptsReportUtils.map(
-    //                cxcascrnCohortQueries.getPostTreatmentFollowUp(
-    //                    CXCASCRNCohortQueries.CXCASCRNResult.ALL),
-    //                mappings));
-    //    dsd.addColumn(
-    //        "PTFUPP",
-    //        "Post-Treatment follow-up",
-    //        EptsReportUtils.map(postTreatmentFollowUp, mappings),
-    //        "");
-
     // Post-Treatment follow-up (POSITIVE) - PTFUP
     CohortIndicator postTreatmentFollowUpPositive =
         eptsGeneralIndicator.getIndicator(
@@ -134,20 +94,6 @@ public class CXCASCRNPositiveDataset extends BaseDataSet {
         "Post-Treatment follow-up POSITIVE",
         EptsReportUtils.map(postTreatmentFollowUpPositive, mappings),
         getColumnsForAge());
-
-    // Rescreened after previous positive - RAPP
-    /*CohortIndicator rescreenedAfterPreviousPositive =
-        eptsGeneralIndicator.getIndicator(
-            "RAPPPP",
-            EptsReportUtils.map(
-                cxcascrnCohortQueries.getRescreenedAfterPreviousPositive(
-                    CXCASCRNCohortQueries.CXCASCRNResult.ALL),
-                mappings));
-    dsd.addColumn(
-        "RAPPPP",
-        "Rescreened after previous positive",
-        EptsReportUtils.map(rescreenedAfterPreviousPositive, mappings),
-        "");*/
 
     // Rescreened after previous positive (POSITIVE) - RAPPP
     CohortIndicator rescreenedAfterPreviousPositivePositive =
