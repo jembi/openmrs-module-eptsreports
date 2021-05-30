@@ -274,10 +274,7 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
             + "' "
             + "                       GROUP  BY pa.patient_id "
             + "                   ) most_recent "
-            + "               GROUP BY most_recent.patient_id "
-            + "               HAVING final_encounter_date < '"
-            + endDate
-            + "' ";
+            + "               GROUP BY most_recent.patient_id ";
 
     StringSubstitutor stringSubstitutor1 = new StringSubstitutor(map1);
     return stringSubstitutor1.replace(query1);
