@@ -100,7 +100,7 @@ public class TPT_InitiationQueries {
     valuesMap.put("1", hivCareProgram);
 
     String query =
-        "  SELECT p.person_id, nid.nid, p.gender, last_person_name.nome AS name, "
+        "  SELECT p.person_id, nid.nid AS NID , p.gender, last_person_name.nome AS name, "
             + " CASE  WHEN p.birthdate IS NULL THEN 'N/A' "
             + "  ELSE TIMESTAMPDIFF(YEAR,p.birthdate,:endDate) "
             + "  END AS age, "
