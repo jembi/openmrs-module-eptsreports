@@ -64,7 +64,7 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
       if (a != null && b != null) {
         DateTime mostRecentDateTime = new DateTime(a.getTime());
         DateTime oldestDateTime = new DateTime(b.getTime());
-        int days = Days.daysBetween(oldestDateTime, mostRecentDateTime).getDays();
+        int days = Days.daysBetween(mostRecentDateTime, oldestDateTime).getDays();
         if (period == PLHIVDays.LESS_THAN_365 && days < YEAR_DAYS) {
           calculationResultMap.put(pId, new SimpleResult(days, this));
         } else if (period == PLHIVDays.MORE_THAN_365 && days >= YEAR_DAYS) {
