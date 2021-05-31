@@ -65,14 +65,10 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
         DateTime mostRecentDateTime = new DateTime(a.getTime());
         DateTime oldestDateTime = new DateTime(b.getTime());
         int days = Days.daysBetween(oldestDateTime, mostRecentDateTime).getDays();
-        if (period == PLHIVDays.LESS_THAN_365) {
-          if (days < YEAR_DAYS) {
-            calculationResultMap.put(pId, new SimpleResult(days, this));
-          }
-        } else if (period == PLHIVDays.MORE_THAN_365) {
-          if (days >= YEAR_DAYS) {
-            calculationResultMap.put(pId, new SimpleResult(days, this));
-          }
+        if (period == PLHIVDays.LESS_THAN_365 && days < YEAR_DAYS) {
+          calculationResultMap.put(pId, new SimpleResult(days, this));
+        } else if (period == PLHIVDays.MORE_THAN_365 && days >= YEAR_DAYS) {
+          calculationResultMap.put(pId, new SimpleResult(days, this));
         }
       } else if ((a == null || b == null) && period == PLHIVDays.UNKNOWN) {
         calculationResultMap.put(pId, new SimpleResult(null, this));
