@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.text.StringSubstitutor;
+import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.joda.time.Interval;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -62,7 +62,9 @@ public class ReturnedDateIITDateDaysCalculation extends AbstractPatientCalculati
       Date b = EptsCalculationUtils.resultForPatient(oldestDate, pId);
 
       if (a != null && b != null) {
-        int days = Days.daysIn(new Interval(a.getTime(), b.getTime())).getDays();
+        DateTime mostRecentDateTime = new DateTime(a.getTime());
+        DateTime oldestDateTime = new DateTime(b.getTime());
+        int days = Days.daysBetween(oldestDateTime, mostRecentDateTime).getDays();
         if (period == PLHIVDays.LESS_THAN_365) {
           if (days < YEAR_DAYS) {
             calculationResultMap.put(pId, new SimpleResult(days, this));
