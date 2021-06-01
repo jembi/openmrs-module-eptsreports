@@ -1519,7 +1519,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13NUM2",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM(2),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1528,7 +1528,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Adultos (15/+anos) na 1a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após início do TARV",
         EptsReportUtils.map(
             MI13NUM2,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM9 =
@@ -1536,7 +1536,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13NUM9",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM(9),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM9.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1545,7 +1545,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Crianças  (0-4 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
         EptsReportUtils.map(
             MI13NUM9,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM10 =
@@ -1553,7 +1553,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13NUM10",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM(10),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM10.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1562,7 +1562,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Crianças  (5-9 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
         EptsReportUtils.map(
             MI13NUM10,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM11 =
@@ -1570,7 +1570,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13NUM11",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM(11),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM11.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1579,7 +1579,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         " crianças  (10-14 anos de idade) na 1a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início do TARV",
         EptsReportUtils.map(
             MI13NUM11,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM5 =
@@ -1587,7 +1587,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13NUM5",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM(5),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1596,7 +1596,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "adultos (15/+anos) na 2a linha de TARV que receberam o resultado da CV entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             MI13NUM5,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM14 =
@@ -1604,7 +1604,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13NUM14",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQC13P3NUM(14),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1613,7 +1613,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Crianças na 2a linha de TARV que receberam o resultado da Carga Viral entre o sexto e o nono mês após o início da 2a linha de TARV",
         EptsReportUtils.map(
             MI13NUM14,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM3 =
