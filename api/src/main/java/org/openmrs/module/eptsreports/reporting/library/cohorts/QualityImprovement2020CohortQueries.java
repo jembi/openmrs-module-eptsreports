@@ -5455,14 +5455,15 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
+    String MAPPING =
+        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
+    String MAPPING1 =
+        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
+
     cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
     cd.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     cd.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
@@ -5482,6 +5483,8 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+    String MAPPING =
+        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
 
     cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
 
@@ -5528,6 +5531,10 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPregnantORBreastfeeding(
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
+    String MAPPING =
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
+    String MAPPING1 =
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}";
 
     cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
 
@@ -6089,15 +6096,14 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-
+    String MAPPING =
+        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
+    String MAPPING1 =
+        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
     cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch(
-        "E",
-        EptsReportUtils.map(
-            transferredIn,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
     cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch("H", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
 
@@ -6116,6 +6122,8 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+    String MAPPING =
+        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
 
     cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
     cd.addSearch("J", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
@@ -6162,6 +6170,10 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPregnantORBreastfeeding(
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
+    String MAPPING =
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
+    String MAPPING1 =
+        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}";
 
     cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
 
