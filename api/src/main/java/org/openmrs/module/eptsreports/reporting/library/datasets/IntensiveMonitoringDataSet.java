@@ -1178,7 +1178,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13DEN4",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ13(true, 4),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13DEN4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1187,7 +1187,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de adultos (15/+ anos) na 2a linha de TARV elegíveis a CV.",
         EptsReportUtils.map(
             MI13DEN4,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13DEN6 =
@@ -1246,7 +1246,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13DEN13",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ13(true, 13),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1255,7 +1255,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de crianças (>2anos) na 2a linha de TARV elegíveis ao pedido de CV.",
         EptsReportUtils.map(
             MI13DEN13,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     // Category 13 Numerator indicators
@@ -1281,7 +1281,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13NUM4",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ13(false, 4),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1290,7 +1290,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de adultos (15/+anos) na 2a linha de TARV elegíveis a CV com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
             MI13NUM4,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM6 =
@@ -1349,7 +1349,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "MI13NUM13",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ13(false, 13),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI13NUM13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1358,7 +1358,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças na  2ª linha de TARV elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
             MI13NUM13,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     // Category 13 Part 3 Denominator Indicators
