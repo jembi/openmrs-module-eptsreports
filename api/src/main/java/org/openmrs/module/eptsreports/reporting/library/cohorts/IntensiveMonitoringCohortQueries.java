@@ -18,31 +18,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class IntensiveMonitoringCohortQueries {
 
-  private GenericCohortQueries genericCohortQueries;
-
   private HivMetadata hivMetadata;
 
   private CommonMetadata commonMetadata;
-
-  private GenderCohortQueries genderCohortQueries;
-
-  private AgeCohortQueries ageCohortQueries;
-
-  private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   private CommonCohortQueries commonCohortQueries;
 
   private TbMetadata tbMetadata;
 
-  private TxPvlsCohortQueries txPvls;
-
   private QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries;
-
-  private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
-  private final String MAPPING1 =
-      "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}";
-  private final String MAPPING2 =
-      "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}";
 
   @Autowired
   public IntensiveMonitoringCohortQueries(
@@ -56,15 +40,10 @@ public class IntensiveMonitoringCohortQueries {
       TxPvlsCohortQueries txPvls,
       AgeCohortQueries ageCohortQueries,
       QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries) {
-    this.genericCohortQueries = genericCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
-    this.genderCohortQueries = genderCohortQueries;
-    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.commonCohortQueries = commonCohortQueries;
     this.tbMetadata = tbMetadata;
-    this.txPvls = txPvls;
-    this.ageCohortQueries = ageCohortQueries;
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
   }
 
