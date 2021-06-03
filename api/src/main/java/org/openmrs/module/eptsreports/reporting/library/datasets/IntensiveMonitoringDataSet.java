@@ -46,7 +46,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getCat7MOHIV202171Definition("DEN"),
-                "startDate=${revisionEndDate},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
     // 7.2
@@ -56,7 +56,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getCat7MOHIV202172Definition("DEN"),
-                "startDate=${revisionEndDate},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
     // 7.3
@@ -66,7 +66,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getCat7MOHIV202173Definition("DEN"),
-                "startDate=${revisionEndDate},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
     // 7.4
@@ -76,7 +76,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getCat7MOHIV202174Definition("DEN"),
-                "startDate=${revisionEndDate},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
     // 7.5
@@ -86,7 +86,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getCat7MOHIV202175Definition("DEN"),
-                "startDate=${revisionEndDate},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
     // 7.6
@@ -96,7 +96,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getCat7MOHIV202176Definition("DEN"),
-                "startDate=${revisionEndDate},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
