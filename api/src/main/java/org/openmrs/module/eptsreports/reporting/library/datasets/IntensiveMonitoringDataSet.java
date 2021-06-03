@@ -1207,9 +1207,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "MI13NUM15",
         "13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de inclusão. (Line 90,Column F in the Template) as following",
-        EptsReportUtils.map(
-            MI13NUM15,
-            "revisionEndDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MI13NUM15, "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM16 =
@@ -1224,9 +1222,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "MI13NUM16",
         "13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN (MG que entraram em TARV na CPN) Denominator:# de MG que tiveram a primeira CPN no período de inclusão, e que já estavam em TARV há mais de 3 meses  (Line 91,Column F in the Template) as following:",
-        EptsReportUtils.map(
-            MI13NUM16,
-            "revisionEndDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MI13NUM16, "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM17 =
@@ -1241,9 +1237,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "MI13NUM17",
         "13.17. % de MG que receberam o resultado da Carga Viral dentro de 33 dias após pedido Denominator: # de MG com registo de pedido de CV no período de revisão (Line 92,Column F in the Template) as following:<",
-        EptsReportUtils.map(
-            MI13NUM17,
-            "revisionEndDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MI13NUM17, "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI13NUM18 =
