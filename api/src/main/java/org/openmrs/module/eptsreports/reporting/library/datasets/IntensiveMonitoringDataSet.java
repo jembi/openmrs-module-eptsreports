@@ -40,27 +40,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.setName("Intensive Monitoring DataSet");
     dataSetDefinition.addParameters(getParameters());
 
-    /** ***************************** DIMENSIONS ***************************** */
-    dataSetDefinition.addDimension(
-        "age",
-        EptsReportUtils.map(
-            eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
-
-    dataSetDefinition.addDimension(
-        "ageInMonths",
-        EptsReportUtils.map(eptsCommonDimension.ageInMonths(), "effectiveDate=${endDate}"));
-
-    dataSetDefinition.addDimension(
-        "ageBasedOnArt",
-        EptsReportUtils.map(
-            eptsCommonDimension.ageBasedOnArtStartDateMOH(),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    dataSetDefinition.addDimension(
-        "mqAge",
-        EptsReportUtils.map(
-            eptsCommonDimension.getPatientAgeBasedOnFirstViralLoadDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    /**
+     * ******** DIMENSIONS will be added here based on individual indicators required
+     * *****************************
+     */
 
     /**
      * **************************************************** CATEGORY 7
@@ -77,7 +60,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7MOHIV202171Definition("DEN"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "");
     // 7.2
     dataSetDefinition.addColumn(
         "MI7DEN2",
@@ -87,7 +70,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7MOHIV202172Definition("DEN"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "");
     // 7.3
     dataSetDefinition.addColumn(
         "MI7DEN3",
@@ -97,7 +80,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7MOHIV202173Definition("DEN"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "");
     // 7.4
     dataSetDefinition.addColumn(
         "MI7DEN4",
@@ -107,7 +90,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7MOHIV202174Definition("DEN"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "");
     // 7.5
     dataSetDefinition.addColumn(
         "MI7DEN5",
@@ -140,7 +123,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7MOHIV202171Definition("NUM"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "");
     // 7.2
     dataSetDefinition.addColumn(
         "MI7NUM2",
@@ -150,7 +133,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7MOHIV202172Definition("NUM"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "");
     // 7.3
     dataSetDefinition.addColumn(
         "MI7NUM3",
@@ -160,7 +143,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7MOHIV202173Definition("NUM"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "");
     // 7.4
     dataSetDefinition.addColumn(
         "MI7NUM4",
@@ -170,7 +153,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7MOHIV202174Definition("NUM"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "");
     // 7.5
     dataSetDefinition.addColumn(
         "MI7NUM5",
@@ -213,7 +196,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11DEN1,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "");
 
     CohortIndicator MI11DEN2 =
         eptsGeneralIndicator.getIndicator(
@@ -230,7 +213,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11DEN2,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "");
 
     CohortIndicator MI11DEN3 =
         eptsGeneralIndicator.getIndicator(
@@ -281,7 +264,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11DEN5,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=2-14");
+        "");
 
     CohortIndicator MI11DEN6 =
         eptsGeneralIndicator.getIndicator(
@@ -298,7 +281,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11DEN6,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=<2");
+        "");
 
     CohortIndicator MI11DEN7 =
         eptsGeneralIndicator.getIndicator(
@@ -315,7 +298,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11DEN7,
             "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "mqAge=MqChildren");
+        "");
 
     /** ***************************** NUMERATOR ***************************** */
     CohortIndicator MI11NUM1 =
@@ -333,7 +316,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11NUM1,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "");
 
     CohortIndicator MI11NUM2 =
         eptsGeneralIndicator.getIndicator(
@@ -351,7 +334,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11NUM2,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "");
 
     CohortIndicator MI11NUM3 =
         eptsGeneralIndicator.getIndicator(
@@ -402,7 +385,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11NUM5,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=2-14");
+        "");
 
     CohortIndicator MI11NUM6 =
         eptsGeneralIndicator.getIndicator(
@@ -420,7 +403,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11NUM6,
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=<2");
+        "");
 
     CohortIndicator MI11NUM7 =
         eptsGeneralIndicator.getIndicator(
@@ -438,7 +421,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI11NUM7,
             "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "mqAge=MqChildren");
+        "");
 
     /**
      * **************************************************** CATEGORY 12
@@ -495,7 +478,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI12DEN5,
             "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "");
 
     CohortIndicator MI12DEN6 =
         eptsGeneralIndicator.getIndicator(
@@ -702,7 +685,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI13DEN3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "mqAge=MqAdults");
+        "");
 
     CohortIndicator MI13DEN4 =
         eptsGeneralIndicator.getIndicator(
@@ -1006,7 +989,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI13NUM3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "mqAge=MqAdults");
+        "");
 
     CohortIndicator MI13NUM4 =
         eptsGeneralIndicator.getIndicator(
@@ -1157,7 +1140,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI13NUM12,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2-14");
+        "");
 
     CohortIndicator MI13NUM13 =
         eptsGeneralIndicator.getIndicator(
@@ -1278,7 +1261,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15DEN1,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "");
 
     CohortIndicator MI15DEN2 =
         eptsGeneralIndicator.getIndicator(
@@ -1295,7 +1278,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15DEN2,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "");
 
     CohortIndicator MI15DEN3 =
         eptsGeneralIndicator.getIndicator(
@@ -1312,7 +1295,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15DEN3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "");
 
     /** ***************************** NUMERATOR ***************************** */
     CohortIndicator MI15NUM1 =
@@ -1330,7 +1313,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15NUM1,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "");
 
     CohortIndicator MI15NUM2 =
         eptsGeneralIndicator.getIndicator(
@@ -1347,7 +1330,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15NUM2,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "");
 
     CohortIndicator MI15NUM3 =
         eptsGeneralIndicator.getIndicator(
@@ -1364,7 +1347,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15NUM3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "");
 
     return dataSetDefinition;
   }
