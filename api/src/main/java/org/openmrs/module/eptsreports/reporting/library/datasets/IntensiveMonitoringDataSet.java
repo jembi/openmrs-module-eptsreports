@@ -45,7 +45,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de adultos HIV+ em TARV elegíveis ao TPT e que iniciaram TPT",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCat7MOHIV202171Definition("DEN"),
+                intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(1),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -55,7 +55,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de adultos HIV+ em TARV elegiveis ao TPT que iniciaram e  completaram TPT",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCat7MOHIV202172Definition("DEN"),
+                intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(2),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -65,7 +65,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças HIV+ em TARV elegiveis ao TPT  e que iniciaram TPT",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCat7MOHIV202173Definition("DEN"),
+                intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(3),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -75,7 +75,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças HIV+ em TARV elegíveis que iniciaram e completaram TPT",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCat7MOHIV202174Definition("DEN"),
+                intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -85,7 +85,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de mulheres grávidas HIV+ elegíveis ao TPI e que iniciaram TPI",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCat7MOHIV202175Definition("DEN"),
+                intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(5),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -95,7 +95,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de MG HIV+ em TARV que iniciou TPI e que terminou TPI",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getCat7MOHIV202176Definition("DEN"),
+                intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
