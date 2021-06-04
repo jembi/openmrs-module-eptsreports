@@ -2122,11 +2122,11 @@ public class QualityImprovement2020CohortQueries {
     }
     if (indicatorFlag == 7) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND B1) AND NOT B1E AND NOT (C OR D OR F) AND CHILDREN");
+          "(A AND B1) AND NOT B1E AND NOT (C OR D OR F)");
     }
     if (indicatorFlag == 8) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND B2) AND NOT B2E AND NOT (C OR D OR F) AND CHILDREN");
+          "(A AND B2) AND NOT B2E AND NOT (C OR D OR F)");
     }
     if (indicatorFlag == 11) {
       compositionCohortDefinition.setCompositionString(
@@ -3515,12 +3515,6 @@ public class QualityImprovement2020CohortQueries {
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     comp.addSearch(
-        "CHILDREN",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    comp.addSearch(
         "ADULT",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
@@ -3530,7 +3524,7 @@ public class QualityImprovement2020CohortQueries {
       comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND ADULT");
     }
     if (den == 5 || den == 6) {
-      comp.setCompositionString("A AND NOT (C OR D OR E OR F) AND CHILDREN");
+      comp.setCompositionString("A AND NOT (C OR D OR E OR F)");
     } else if (den == 9 || den == 10) {
       comp.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
     }
@@ -3868,20 +3862,14 @@ public class QualityImprovement2020CohortQueries {
             genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
             "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
 
-    cd.addSearch(
-        "CHILDREN",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
-            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
-
     if (flag == 3) {
       cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G AND ADULT");
     } else if (flag == 4) {
       cd.setCompositionString("(A AND B2 AND NOT (B2E OR C OR D OR F)) AND G AND ADULT");
     } else if (flag == 7) {
-      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G AND CHILDREN");
+      cd.setCompositionString("(A AND B1 AND NOT (B1E OR C OR D OR F)) AND G");
     } else if (flag == 8) {
-      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR F) AND G AND CHILDREN");
+      cd.setCompositionString("(A AND B2) AND NOT (B2E OR C OR D OR F) AND G");
     } else if (flag == 11) {
       cd.setCompositionString("(A AND B1 AND C) AND NOT (B1E OR D OR F) AND G");
     }
@@ -4082,9 +4070,9 @@ public class QualityImprovement2020CohortQueries {
     } else if (den == 2) {
       comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND I AND II AND III AND ADULT");
     } else if (den == 5) {
-      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND H AND CHILDREN");
+      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND H");
     } else if (den == 6) {
-      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND I AND II AND III AND CHILDREN");
+      comp.setCompositionString("(A AND NOT (C OR D OR E OR F)) AND I AND II AND III");
     } else if (den == 9) {
       comp.setCompositionString("((A AND C) AND NOT (D OR E OR F)) AND H ");
     } else if (den == 10) {
