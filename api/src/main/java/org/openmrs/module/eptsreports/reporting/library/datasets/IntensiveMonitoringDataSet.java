@@ -42,10 +42,15 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.addParameters(getParameters());
     // dimensions to be added here
     dataSetDefinition.addDimension(
-        "ageBasedOnArt",
+        "ageBasedOnArt135",
         EptsReportUtils.map(
             eptsCommonDimension.ageBasedOnArtStartDateMOH(),
             "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},location=${location}"));
+    dataSetDefinition.addDimension(
+        "ageBasedOnArt246",
+        EptsReportUtils.map(
+            eptsCommonDimension.ageBasedOnArtStartDateMOH(),
+            "onOrAfter=${revisionEndDate-8m+1d},onOrBefore=${revisionEndDate-7m},location=${location}"));
     // CAT 7 Denominator
     // 7.1
     dataSetDefinition.addColumn(
@@ -56,7 +61,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(1, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "ageBasedOnArt135=adultsArt");
     // 7.2
     dataSetDefinition.addColumn(
         "MI7DEN2",
@@ -66,7 +71,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMOHIV202172Definition(2, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "ageBasedOnArt246=adultsArt");
     // 7.3
     dataSetDefinition.addColumn(
         "MI7DEN3",
@@ -76,7 +81,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(3, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "ageBasedOnArt135=childrenArt");
     // 7.4
     dataSetDefinition.addColumn(
         "MI7DEN4",
@@ -86,7 +91,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMOHIV202172Definition(4, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "ageBasedOnArt246=childrenArt");
     // 7.5
     dataSetDefinition.addColumn(
         "MI7DEN5",
@@ -118,7 +123,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(1, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "ageBasedOnArt135=adultsArt");
     // 7.2
     dataSetDefinition.addColumn(
         "MI7NUM2",
@@ -128,7 +133,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMOHIV202172Definition(2, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=adultsArt");
+        "ageBasedOnArt246=adultsArt");
     // 7.3
     dataSetDefinition.addColumn(
         "MI7NUM3",
@@ -138,7 +143,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMOHIV202171Definition(3, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "ageBasedOnArt135=childrenArt");
     // 7.4
     dataSetDefinition.addColumn(
         "MI7NUM4",
@@ -148,7 +153,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMOHIV202172Definition(4, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=childrenArt");
+        "ageBasedOnArt246=childrenArt");
     // 7.5
     dataSetDefinition.addColumn(
         "MI7NUM5",
