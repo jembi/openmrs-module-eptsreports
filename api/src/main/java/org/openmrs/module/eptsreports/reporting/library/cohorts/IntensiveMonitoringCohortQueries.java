@@ -108,6 +108,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.setName("MI 13.1, 13.6, 13.7, 13.8 numerator and denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    String mapp = "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
     cd.addSearch(
         "MI13DEN",
         EptsReportUtils.map(
