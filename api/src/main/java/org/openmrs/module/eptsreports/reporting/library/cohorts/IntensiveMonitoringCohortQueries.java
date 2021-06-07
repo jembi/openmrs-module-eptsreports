@@ -117,7 +117,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13NUM",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQ13(false, level),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+            mapp));
     if ("DEN".equals(type)) {
       cd.setCompositionString("MI13DEN");
     } else if ("NUM".equals(type)) {
