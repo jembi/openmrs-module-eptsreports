@@ -61,7 +61,7 @@ public class IntensiveMonitoringCohortQueries {
 
   /**
    * Get CAT 13 Part-1 DENOMINADOR Monitoria Intensiva MQHIV 2021 for the selected location and
-   * reporting period Section 7.1 (endDateRevision)
+   * reporting period Section (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -81,7 +81,7 @@ public class IntensiveMonitoringCohortQueries {
 
   /**
    * Get CAT 13 Part-1 NUMERATOR Monitoria Intensiva MQHIV 2021 for the selected location and
-   * reporting period Section 7.1 (endDateRevision)
+   * reporting period Section (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
