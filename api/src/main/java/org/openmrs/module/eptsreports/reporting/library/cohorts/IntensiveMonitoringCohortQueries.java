@@ -60,8 +60,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.2 Denominator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.2 Denominator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -80,8 +80,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.2 Numerator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.2 Numerator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -100,8 +100,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.5 Denominator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.5 Denominator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -120,8 +120,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.5 Numerator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.5 Numerator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -140,8 +140,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.9 Denominator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.9 Denominator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -160,8 +160,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.9 Numerator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.9 Numerator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -180,8 +180,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.10 Denominator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.10 Denominator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -200,8 +200,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.10 Numerator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.10 Numerator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -220,8 +220,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.11 Denominator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.11 Denominator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -240,8 +240,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.11 Numerator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.11 Numerator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -260,8 +260,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.14 Denominator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.14 Denominator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -280,8 +280,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
-   * 13.14 Numerator (endDateRevision)
+   * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
+   * Section 13.14 Numerator (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -298,6 +298,4 @@ public class IntensiveMonitoringCohortQueries {
     cd.setCompositionString("MI13NUM14");
     return cd;
   }
-
-  
 }
