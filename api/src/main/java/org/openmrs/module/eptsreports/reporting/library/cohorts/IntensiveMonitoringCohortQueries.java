@@ -113,7 +113,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13DEN",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQ13(true, level),
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+            mapp));
     cd.addSearch(
         "MI13NUM",
         EptsReportUtils.map(
