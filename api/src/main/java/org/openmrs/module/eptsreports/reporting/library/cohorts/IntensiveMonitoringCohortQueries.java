@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
+
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -15,14 +16,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class IntensiveMonitoringCohortQueries {
 
-  private HivMetadata hivMetadata;
-
-  private CommonMetadata commonMetadata;
-
-  private CommonCohortQueries commonCohortQueries;
-
-  private TbMetadata tbMetadata;
-
   private QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries;
 
   @Autowired
@@ -32,10 +25,6 @@ public class IntensiveMonitoringCohortQueries {
       CommonCohortQueries commonCohortQueries,
       TbMetadata tbMetadata,
       QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries) {
-    this.hivMetadata = hivMetadata;
-    this.commonMetadata = commonMetadata;
-    this.commonCohortQueries = commonCohortQueries;
-    this.tbMetadata = tbMetadata;
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
   }
 
@@ -121,6 +110,32 @@ public class IntensiveMonitoringCohortQueries {
     } else if ("NUM".equals(type)) {
       cd.setCompositionString("MI13NUM");
     }
+    return cd;
+  }
+  /**
+   * Get the indicators (denominators) from CATEGORY 11 from report named “Monitoria Intensiva de
+   * HIV-2021” for the selected location and reporting month (endDateRevision)
+   */
+  public CohortDefinition getMIC11DEN(int indicatorFlag) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("MI 11.1 to 11.7 denominator");
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    if (indicatorFlag == 1 || indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
+      cd.addSearch(
+          "MI11DEN",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag),
+              "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
+    } else if (indicatorFlag == 2 || indicatorFlag == 4 || indicatorFlag == 7) {
+      cd.addSearch(
+          "MI11DEN",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag),
+              "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}"));
+    }
+    cd.setCompositionString("MI11DEN");
     return cd;
   }
 }
