@@ -1,7 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
-
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -136,6 +135,66 @@ public class IntensiveMonitoringCohortQueries {
               "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}"));
     }
     cd.setCompositionString("MI11DEN");
+    return cd;
+  }
+
+  /**
+   * Get the indicators (numerators) from CATEGORY 11 from report named “Monitoria Intensiva de
+   * HIV-2021” for the selected location and reporting month (endDateRevision)
+   */
+  public CohortDefinition getMIC11NUM(int indicatorFlag) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("MI 11.1 to 11.7 Numerator");
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    String MAPPING =
+        "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
+    String MAPPING1 =
+        "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}";
+    if (indicatorFlag == 1) {
+      cd.addSearch(
+          "MI11NUM",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss(),
+              MAPPING));
+    } else if (indicatorFlag == 2) {
+      cd.addSearch(
+          "MI11NUM",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries
+                  .getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(),
+              MAPPING1));
+    } else if (indicatorFlag == 3) {
+      cd.addSearch(
+          "MI11NUM",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG(), MAPPING));
+    } else if (indicatorFlag == 4) {
+      cd.addSearch(
+          "MI11NUM",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(),
+              MAPPING1));
+    } else if (indicatorFlag == 5) {
+      cd.addSearch(
+          "MI11NUM",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren(),
+              MAPPING));
+    } else if (indicatorFlag == 6) {
+      cd.addSearch(
+          "MI11NUM",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(),
+              MAPPING));
+    } else if (indicatorFlag == 7) {
+      cd.addSearch(
+          "MI11NUM",
+          EptsReportUtils.map(
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(),
+              MAPPING1));
+    }
+    cd.setCompositionString("MI11NUM");
     return cd;
   }
 }
