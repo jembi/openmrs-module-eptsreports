@@ -100,8 +100,85 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
+    
+    /**
+     * Category 12 Denominator Indicators
+     */
+    //12.1
+    dataSetDefinition.addColumn(
+        "MI12DEN1",
+        "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV ",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat12Den1(1),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                ""
+    );
+
+    //12.2
+    dataSetDefinition.addColumn(
+        "MI12DEN2",
+        "# de adultos (15/+anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat12Den2(2),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                ""
+    );
+
+    //12.5
+    dataSetDefinition.addColumn(
+        "MI12DEN5",
+        "# de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat12Den1(5),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                ""
+    );
+
+    //12.6
+    dataSetDefinition.addColumn(
+        "MI12DEN6",
+        "# de crianças (0-14 anos) que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat12Den2(6),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                ""
+    );
+
+    //12.9
+    dataSetDefinition.addColumn(
+        "MI12DEN9",
+        "# de mulheres grávidas HIV+  que iniciaram o TARV no período de inclusão e que retornaram para uma consulta clínica ou levantamento de ARVs dentro de 33 dias após o início do TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat12Den1(9),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                ""
+    );
+
+    //12.10
+    dataSetDefinition.addColumn(
+        "MI12DEN10",
+        "# de mulheres grávidas HIV+  que iniciaram o TARV no período de inclusão e que tiveram consultas clínicas ou levantamentos de ARVs dentro de 99 dias após o início do TARV",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat12Den2(10),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+                ""
+    );
+
     return dataSetDefinition;
   }
+
 
   @Override
   public List<Parameter> getParameters() {
