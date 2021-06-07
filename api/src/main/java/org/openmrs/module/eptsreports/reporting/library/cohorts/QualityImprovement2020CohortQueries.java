@@ -1922,7 +1922,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId());
-    
+
     CohortDefinition breastfeedingWithCargaViralHigherThan1000 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -3102,7 +3102,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition b1 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
-    
+
     CohortDefinition b2 = getB2_13();
 
     CohortDefinition b4 =
@@ -3120,7 +3120,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
-            
+
     CohortDefinition e =
         QualityImprovement2020Queries.getTransferredInPatients(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
@@ -3222,7 +3222,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId());
-        
+
     CohortDefinition b5 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -3384,7 +3384,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition b1 = getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
-    
+
     CohortDefinition b2 = getB2_13();
 
     CohortDefinition b4 =
@@ -3394,7 +3394,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId());
-        
+
     CohortDefinition b5 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -5099,7 +5099,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND B2) AND NOT (B4 or B5 or E or F)");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-               "((B1 AND B2) AND NOT (B4 or B5 or E or F)) AND adults");
+            "((B1 AND B2) AND NOT (B4 or B5 or E or F)) AND adults");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString("(B1 AND B4) AND NOT (B5 or E or F)");
       }
