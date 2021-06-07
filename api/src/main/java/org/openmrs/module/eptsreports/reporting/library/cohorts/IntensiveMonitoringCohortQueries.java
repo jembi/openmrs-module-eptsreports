@@ -136,4 +136,33 @@ public class IntensiveMonitoringCohortQueries {
     cd.setCompositionString("MI13NUM");
     return cd;
   }
+
+  /**
+   * Get CAT 13.1, 13.6, 13.7, 13.8 Monitoria Intensiva MQHIV 2021 for the selected location and
+   * reporting period Section 7.1 (endDateRevision)
+   *
+   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   */
+  public CohortDefinition getCat13Den(Integer level, String type) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("MI 13.1, 13.6, 13.7, 13.8 numerator and denominator");
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addSearch(
+        "MI13DEN",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ13(true, level),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+    cd.addSearch(
+        "MI13NUM",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ13(false, level),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+    if ("DEN".equals(type)) {
+      cd.setCompositionString("MI13DEN");
+    } else if ("NUM".equals(type)) {
+      cd.setCompositionString("MI13NUM");
+    }
+    return cd;
+  }
 }

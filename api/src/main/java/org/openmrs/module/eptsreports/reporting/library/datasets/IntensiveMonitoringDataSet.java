@@ -182,7 +182,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de adultos (15/+anos) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part1DEN(1),
+                intensiveMonitoringCohortQueries.getCat13Den(1, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -192,7 +192,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (0-4 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part1DEN(6),
+                intensiveMonitoringCohortQueries.getCat13Den(6, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -202,7 +202,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (5-9 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part1DEN(7),
+                intensiveMonitoringCohortQueries.getCat13Den(7, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -212,7 +212,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (10-14 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part1DEN(8),
+                intensiveMonitoringCohortQueries.getCat13Den(8, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -222,7 +222,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de adultos (15/+anos) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part1NUM(1),
+                intensiveMonitoringCohortQueries.getCat13Den(1, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -232,7 +232,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (0-4 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part1NUM(6),
+                intensiveMonitoringCohortQueries.getCat13Den(6, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -242,7 +242,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (5-9 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part1NUM(7),
+                intensiveMonitoringCohortQueries.getCat13Den(7, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -252,7 +252,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (10-14 anos de idade) na 1a linha de TARV que tiveram consulta clínica no período de revisão, eram elegíveis ao pedido de CV e com registo de pedido de CV feito pelo clínico.",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part1NUM(8),
+                intensiveMonitoringCohortQueries.getCat13Den(8, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
