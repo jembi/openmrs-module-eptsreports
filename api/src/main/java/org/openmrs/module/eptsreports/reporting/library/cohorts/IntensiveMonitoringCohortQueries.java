@@ -67,7 +67,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMICat13Part1DEN(Integer level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("MI 13 Part-1");
+    cd.setName("MI 13 Part-1 Denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addSearch(
@@ -80,14 +80,14 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 Part-1 NUMERATOR Monitoria Intensiva MQHIV 2021 for the selected location and
+   * Get CAT 13 Part-1 NUMERADOR Monitoria Intensiva MQHIV 2021 for the selected location and
    * reporting period Section (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMICat13Part1NUM(Integer level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("MI 13 Part-1");
+    cd.setName("MI 13 Part-1 Numerador");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addSearch(

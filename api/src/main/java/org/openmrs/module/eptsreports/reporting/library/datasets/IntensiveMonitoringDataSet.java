@@ -100,7 +100,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    // Category 13 Denominator indicators
+    // Category 13 Part-1
     // 13.1
     dataSetDefinition.addColumn(
         "MI13DEN1",
