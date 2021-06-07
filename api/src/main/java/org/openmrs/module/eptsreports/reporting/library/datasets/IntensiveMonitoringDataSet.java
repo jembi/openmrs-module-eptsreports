@@ -256,6 +256,48 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+    // Category 13 Part-2
+    // 13.4
+    dataSetDefinition.addColumn(
+        "MI13DEN4",
+        "# de adultos (15/+ anos) na 2a linha de TARV elegíveis a CV.",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat13Den(4, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    // 13.13
+    dataSetDefinition.addColumn(
+        "MI13DEN13",
+        "# de crianças (>2anos) na 2a linha de TARV elegíveis ao pedido de CV.",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat13Den(13, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    // 13.4
+    dataSetDefinition.addColumn(
+        "MI13NUM4",
+        "# de adultos (15/+ anos) na 2a linha de TARV elegíveis a CV.",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat13Den(4, "NUM"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    // 13.13
+    dataSetDefinition.addColumn(
+        "MI13NUM13",
+        "# de crianças (>2anos) na 2a linha de TARV elegíveis ao pedido de CV.",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat13Den(13, "NUM"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
     return dataSetDefinition;
   }
 
