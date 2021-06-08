@@ -148,7 +148,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     String MAPPING =
-        "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
+        "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
     String MAPPING1 =
         "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}";
     if (indicatorFlag == 1) {
