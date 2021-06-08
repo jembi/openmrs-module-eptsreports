@@ -59,44 +59,35 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
-  /**
-   * Get Cat 12.1
-   */
-  public CohortDefinition getCat12Den1(){
+  /** Get Cat 12.1 */
+  public CohortDefinition getCat12Den1(Integer level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("MI Cat12.1 Denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addSearch(
-      "MI121DEN",
-      EptsReportUtils.map(
-        qualityImprovement2020CohortQueries.getMQ12DEN(level),
-        "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"
-      )
-    );
+        "MI121DEN",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ12DEN(level),
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
     cd.setCompositionString("MI121DEN");
     return cd;
   }
 
-  /**
-   * Get Cat 12.2
-   */
-  public CohortDefinition getCat12Den2(){
+  /** Get Cat 12.2 */
+  public CohortDefinition getCat12Den2(Integer level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("MI Cat12.2 Denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addSearch(
-      "MI132DEN",
-      EptsReportUtils.map(
-        qualityImprovement2020CohortQueries.getMQ12DEN(level),
-        "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"
-      )
-    );
+        "MI132DEN",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ12DEN(level),
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
     cd.setCompositionString("MI132DEN");
     return cd;
   }
-
 }
