@@ -124,11 +124,8 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
-
-  /**
-   * 12.1 Numerator
-   */
-  public CohortDefinition getCat12Num1(Integer level){
+  /** 12.1 Numerator */
+  public CohortDefinition getCat12Num1(Integer level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("MI Cat12.1 Numerator");
@@ -143,11 +140,8 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
-
-  /**
-   * 12.2 Numerator
-   */
-  public CohortDefinition getCat12Num1(Integer level){
+  /** 12.2 Numerator */
+  public CohortDefinition getCat12Num2(Integer level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("MI Cat12.2 Numerator");
