@@ -202,7 +202,36 @@ public class IntensiveMonitoringCohortQueries {
               "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}"));
     }
     cd.setCompositionString("MI11DEN");
-
+    return cd; 
+  }
+   * Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
+   * location and reporting period (endDateRevision)
+   *
+   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
+   */
+  public CohortDefinition getCat12P1DenNum(Integer level, String type) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("MI 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 numerator and denominator");
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    String MAPPING = "";
+    if (level == 1 || level == 5 || level == 9)
+      MAPPING =
+          "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}";
+    else
+      MAPPING =
+          "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
+    cd.addSearch(
+        "MI12P1DEN",
+        EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ12DEN(level), MAPPING));
+    cd.addSearch(
+        "MI12P1NUM",
+        EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ12NUM(level), MAPPING));
+    if ("DEN".equals(type)) {
+      cd.setCompositionString("MI12P1DEN");
+    } else if ("NUM".equals(type)) {
+      cd.setCompositionString("MI12P1NUM");
+    }
     return cd;
   }
 
