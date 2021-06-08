@@ -25,6 +25,9 @@ public class IntensiveMonitoringCohortQueries {
 
   private QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries;
 
+  private final String MAPPING2 =
+      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
+
   @Autowired
   public IntensiveMonitoringCohortQueries(
       HivMetadata hivMetadata,
@@ -60,42 +63,30 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13 P4 Denominator Monitoria Intensiva MQHIV 2021 for the selected location and
-   * reporting period Section (endDateRevision)
+   * Get CAT 13 P4 NUMERATOR AND DENOMINATOR Monitoria Intensiva MQHIV 2021 for the selected
+   * location and reporting period (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
-  public CohortDefinition getMICat13Part4Den(Integer level) {
+  public CohortDefinition getMICat13Part4(Integer level, String type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("MI 13.3, 13.12 AND 13.18 Denominator");
+    cd.setName("MI 13.3, 13.12 AND 13.18 Numerator AND Denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     cd.addSearch(
         "MI13DEN",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getMQ13P4(true, level),
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
-    cd.setCompositionString("MI13DEN");
-    return cd;
-  }
+        EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13P4(true, level), MAPPING2));
 
-  /**
-   * Get CAT 13 P4 Numerator Monitoria Intensiva MQHIV 2021 for the selected location and reporting
-   * period Section (endDateRevision)
-   *
-   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
-   */
-  public CohortDefinition getMICat13Part4Num(Integer level) {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("MI 13.3, 13.12 AND 13.18 Numerator");
-    cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addSearch(
         "MI13NUM",
-        EptsReportUtils.map(
-            qualityImprovement2020CohortQueries.getMQ13P4(false, level),
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
-    cd.setCompositionString("MI13NUM");
+        EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13P4(false, level), MAPPING2));
+
+    if ("DEN".equals(type)) {
+      cd.setCompositionString("MI13DEN");
+    } else if ("NUM".equals(type)) {
+      cd.setCompositionString("MI13NUM");
+    }
     return cd;
   }
 }

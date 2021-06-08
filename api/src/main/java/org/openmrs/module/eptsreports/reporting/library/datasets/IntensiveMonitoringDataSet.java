@@ -119,7 +119,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de adultos na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part4Den(3),
+                intensiveMonitoringCohortQueries.getMICat13Part4(3, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "miAge=MqAdults");
@@ -130,7 +130,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de crianças (>2 anos de idade) na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part4Den(12),
+                intensiveMonitoringCohortQueries.getMICat13Part4(12, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -141,7 +141,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "# de MG na 1a linha de TARV que receberam um resultado de CV acima de 1000 cópias no período de inclusão",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part4Den(18),
+                intensiveMonitoringCohortQueries.getMICat13Part4(18, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
@@ -152,7 +152,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 e terem  3 sessões consecutivas de APSS/PP",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part4Num(3),
+                intensiveMonitoringCohortQueries.getMICat13Part4(3, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "miAge=MqAdults");
@@ -163,7 +163,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de crianças (>2 anos de idade) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 cópia e terem  3 sessões consecutivas de APSS/PP",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part4Num(12),
+                intensiveMonitoringCohortQueries.getMICat13Part4(12, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "age=2-14");
@@ -174,7 +174,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "% de MG na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV acima de 1000 cópia e terem 3 sessões consecutivas de APSS/PP",
         EptsReportUtils.map(
             customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMICat13Part4Num(18),
+                intensiveMonitoringCohortQueries.getMICat13Part4(18, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
