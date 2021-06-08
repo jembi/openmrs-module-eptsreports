@@ -175,7 +175,6 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
     // CAT 13 P2 DENOMINATOR
     // 13.15
     dataSetDefinition.addColumn(
@@ -240,6 +239,9 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMICat13Part2(17, "NUM17"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
 
     // Category 13 Part-1
     // 13.1
@@ -439,12 +441,9 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMI13NUM14(14),
-
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
-
-
 
     // Category 13 Part-2
     // 13.4

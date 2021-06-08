@@ -101,9 +101,9 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
- MEPTS-862_MI_REPORT_CAT13_P2
-   * Get CAT 13.15, 13.16 and 13.17 P2 for Numerator and Denominator Monitoria Intensiva MQHIV 2021
-   * for the selected location and reporting period Section (endDateRevision)
+   * MEPTS-862_MI_REPORT_CAT13_P2 Get CAT 13.15, 13.16 and 13.17 P2 for Numerator and Denominator
+   * Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
+   * (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
@@ -161,9 +161,10 @@ public class IntensiveMonitoringCohortQueries {
     } else if ("NUM17".equals(type)) {
       cd.setCompositionString("MI13NUM17");
     }
+    return cd;
   }
-  
-   * Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
+
+  /* Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period Section (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
