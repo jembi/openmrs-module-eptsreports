@@ -61,10 +61,11 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.ageBasedOnArtStartDateMOH(),
             "onOrAfter=${revisionEndDate-4m+1d},onOrBefore=${revisionEndDate-3m},location=${location}"));
-   dataSetDefinition.addDimension(
+    dataSetDefinition.addDimension(
         "ageInMonths54",
-        EptsReportUtils.map(eptsCommonDimension.ageInMonths(), "effectiveDate=${revisionEndDate-4m}"));    
-            /**
+        EptsReportUtils.map(
+            eptsCommonDimension.ageInMonths(), "effectiveDate=${revisionEndDate-4m}"));
+    /**
      * *********************************** CATEGORY 7 ********************* //*********************
      * Denominator CAT7 **************
      */
@@ -509,7 +510,6 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-
     /**
      * *********************************** CATEGORY 11 ********************* //*********************
      * Denominator **************
@@ -563,7 +563,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(5),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt54=3-14");// porque isto inclui intervalos
+        "ageBasedOnArt54=3-14"); // porque isto inclui intervalos
     // 11.6
     dataSetDefinition.addColumn(
         "MI11DEN6",

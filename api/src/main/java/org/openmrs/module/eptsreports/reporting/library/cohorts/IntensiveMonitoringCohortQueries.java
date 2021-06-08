@@ -177,7 +177,7 @@ public class IntensiveMonitoringCohortQueries {
     }
     return cd;
   }
-  
+
   /**
    * Get the indicators (denominators) from CATEGORY 11 from report named “Monitoria Intensiva de
    * HIV-2021” for the selected location and reporting month (endDateRevision)
@@ -202,6 +202,9 @@ public class IntensiveMonitoringCohortQueries {
               "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}"));
     }
     cd.setCompositionString("MI11DEN");
+
+    return cd;
+  }
 
   /**
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
@@ -482,6 +485,9 @@ public class IntensiveMonitoringCohortQueries {
     }
     cd.setCompositionString("MI11NUM");
 
+    return cd;
+  }
+  /*
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.14 Numerator (endDateRevision)
    *
