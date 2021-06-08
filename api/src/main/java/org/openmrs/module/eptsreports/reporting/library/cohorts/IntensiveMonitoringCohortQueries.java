@@ -219,6 +219,8 @@ public class IntensiveMonitoringCohortQueries {
     } else if ("NUM".equals(type)) {
       cd.setCompositionString("MI12P1NUM");
     }
+    return cd;
+  }
 
   /**
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
@@ -457,7 +459,7 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getMQC13P3NUM(indicator),
             "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},location=${location}"));
     cd.setCompositionString("MI13NUM14");
-    
+
     return cd;
   }
 }
