@@ -101,8 +101,8 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13.15, 13.16 and 13.17 P2 for Numerator and Denominator Monitoria Intensiva MQHIV 2021 for the selected location and
-   * reporting period Section (endDateRevision)
+   * Get CAT 13.15, 13.16 and 13.17 P2 for Numerator and Denominator Monitoria Intensiva MQHIV 2021
+   * for the selected location and reporting period Section (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
