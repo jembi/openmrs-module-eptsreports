@@ -101,14 +101,14 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * Get CAT 13.15, 13.16 and 13.17 Monitoria Intensiva MQHIV 2021 for the selected location and
-   * reporting period Section 7.1 (endDateRevision)
+   * Get CAT 13.15, 13.16 and 13.17 P2 for Numerator and Denominator Monitoria Intensiva MQHIV 2021 for the selected location and
+   * reporting period Section (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMICat13Part2(Integer level, String type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("MI 13.15, 13.16 and 13.17 numerator and denominator");
+    cd.setName("MI 13.15, 13.16 and 13.17 Numerator and Denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
