@@ -51,7 +51,20 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.ageBasedOnArtStartDateMOH(),
             "onOrAfter=${revisionEndDate-8m+1d},onOrBefore=${revisionEndDate-7m},location=${location}"));
-    /**
+    dataSetDefinition.addDimension(
+        "ageBasedOnArt54",
+        EptsReportUtils.map(
+            eptsCommonDimension.ageBasedOnArtStartDateMOH(),
+            "onOrAfter=${revisionEndDate-5m+1d},onOrBefore=${revisionEndDate-4m},location=${location}"));
+    dataSetDefinition.addDimension(
+        "ageBasedOnArt43",
+        EptsReportUtils.map(
+            eptsCommonDimension.ageBasedOnArtStartDateMOH(),
+            "onOrAfter=${revisionEndDate-4m+1d},onOrBefore=${revisionEndDate-3m},location=${location}"));
+   dataSetDefinition.addDimension(
+        "ageInMonths54",
+        EptsReportUtils.map(eptsCommonDimension.ageInMonths(), "effectiveDate=${revisionEndDate-4m}"));    
+            /**
      * *********************************** CATEGORY 7 ********************* //*********************
      * Denominator CAT7 **************
      */
@@ -320,7 +333,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(1),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt135=adultsArt");
+        "ageBasedOnArt54=adultsArt");
     // 11.2
     dataSetDefinition.addColumn(
         "MI11DEN2",
@@ -330,7 +343,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(2),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=adultsArt");
+        "ageBasedOnArt43=adultsArt");
     // 11.3
     dataSetDefinition.addColumn(
         "MI11DEN3",
@@ -340,7 +353,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(3),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt135=childrenArt");
+        "");
     // 11.4
     dataSetDefinition.addColumn(
         "MI11DEN4",
@@ -350,7 +363,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=childrenArt");
+        "");
     // 11.5
     dataSetDefinition.addColumn(
         "MI11DEN5",
@@ -360,7 +373,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(5),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "ageBasedOnArt54=3-14");// porque isto inclui intervalos
     // 11.6
     dataSetDefinition.addColumn(
         "MI11DEN6",
@@ -370,7 +383,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "ageInMonths54<9m");
     // 11.7
     dataSetDefinition.addColumn(
         "MI11DEN7",
@@ -380,7 +393,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(7),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "ageBasedOnArt43=adultsArt");
 
     // ********************* Numerator **************
     // 11.1
