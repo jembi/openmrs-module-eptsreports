@@ -123,4 +123,42 @@ public class IntensiveMonitoringCohortQueries {
     }
     return cd;
   }
+
+
+  /**
+   * 12.1 Numerator
+   */
+  public CohortDefinition getCat12Num1(Integer level){
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("MI Cat12.1 Numerator");
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addSearch(
+        "MI121NUM",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ12NUM(level),
+            "startDate=${revisionEndDate-3m+1d},endDate=${revisionEndDate-2m},location=${location}"));
+    cd.setCompositionString("MI121NUM");
+    return cd;
+  }
+
+
+  /**
+   * 12.2 Numerator
+   */
+  public CohortDefinition getCat12Num1(Integer level){
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("MI Cat12.2 Numerator");
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addSearch(
+        "MI122NUM",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ12NUM(level),
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
+    cd.setCompositionString("MI122NUM");
+    return cd;
+  }
 }
