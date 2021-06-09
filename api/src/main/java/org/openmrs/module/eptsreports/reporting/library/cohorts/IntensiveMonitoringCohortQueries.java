@@ -520,28 +520,28 @@ public class IntensiveMonitoringCohortQueries {
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
 
     String query =
-    "SELECT tabela.patient_id  " +
-    "             FROM  " +
-    "             (SELECT p.patient_id, min(o.value_datetime) as value_datetime  " +
-    "             FROM patient p INNER JOIN encounter e on e.patient_id=p.patient_id  " +
-    "             INNER JOIN obs o ON o.encounter_id=e.encounter_id  " +
-    "             WHERE o.voided=0 AND e.voided=0 AND p.voided=0 AND  " +
-    "             o.concept_id=${1190} AND o.value_datetime is not NULL AND  " +
-    "             e.encounter_type=${53} AND  " +
-    "             e.location_id= :location  " +
-    "             GROUP by p.patient_id) as tabela  " +
-    "             INNER JOIN ( " +
-    "                 SELECT pp.patient_id, MAX(e.encounter_datetime) as encounter_datetime " +
-    "             FROM   patient pp INNER JOIN encounter e  " +
-    "             ON e.patient_id = pp.patient_id  " +
-    "             WHERE  pp.voided = 0 AND e.voided = 0  " +
-    "             AND e.location_id = :location  " +
-    "             AND e.encounter_type = 6  " +
-    "             AND  e.encounter_datetime BETWEEN :startDate AND :endDate " +
-    "             GROUP by pp.patient_id) as last_encounter " +
-    "        ON last_encounter.patient_id=tabela.patient_id " +
-    "WHERE timestampdiff(month,tabela.value_datetime,( last_encounter.encounter_datetime " +
-    "             ))>21";
+        "SELECT tabela.patient_id  "
+            + "             FROM  "
+            + "             (SELECT p.patient_id, min(o.value_datetime) as value_datetime  "
+            + "             FROM patient p INNER JOIN encounter e on e.patient_id=p.patient_id  "
+            + "             INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
+            + "             WHERE o.voided=0 AND e.voided=0 AND p.voided=0 AND  "
+            + "             o.concept_id=${1190} AND o.value_datetime is not NULL AND  "
+            + "             e.encounter_type=${53} AND  "
+            + "             e.location_id= :location  "
+            + "             GROUP by p.patient_id) as tabela  "
+            + "             INNER JOIN ( "
+            + "                 SELECT pp.patient_id, MAX(e.encounter_datetime) as encounter_datetime "
+            + "             FROM   patient pp INNER JOIN encounter e  "
+            + "             ON e.patient_id = pp.patient_id  "
+            + "             WHERE  pp.voided = 0 AND e.voided = 0  "
+            + "             AND e.location_id = :location  "
+            + "             AND e.encounter_type = 6  "
+            + "             AND  e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "             GROUP by pp.patient_id) as last_encounter "
+            + "        ON last_encounter.patient_id=tabela.patient_id "
+            + "WHERE timestampdiff(month,tabela.value_datetime,( last_encounter.encounter_datetime "
+            + "             ))>21";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     cd.setQuery(stringSubstitutor.replace(query));
@@ -610,28 +610,28 @@ public class IntensiveMonitoringCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
 
     String query =
-    "SELECT tabela.patient_id  " +
-    "             FROM  " +
-    "             (SELECT p.patient_id, min(o.value_datetime) as value_datetime  " +
-    "             FROM patient p INNER JOIN encounter e on e.patient_id=p.patient_id  " +
-    "             INNER JOIN obs o ON o.encounter_id=e.encounter_id  " +
-    "             WHERE o.voided=0 AND e.voided=0 AND p.voided=0 AND  " +
-    "             o.concept_id=${1190} AND o.value_datetime is not NULL AND  " +
-    "             e.encounter_type=${53} AND  " +
-    "             e.location_id= :location  " +
-    "             GROUP by p.patient_id) as tabela  " +
-    "             INNER JOIN ( " +
-    "                 SELECT pp.patient_id, MAX(e.encounter_datetime) as encounter_datetime " +
-    "             FROM   patient pp INNER JOIN encounter e  " +
-    "             ON e.patient_id = pp.patient_id  " +
-    "             WHERE  pp.voided = 0 AND e.voided = 0  " +
-    "             AND e.location_id = :location  " +
-    "             AND e.encounter_type = 6  " +
-    "             AND  e.encounter_datetime BETWEEN :startDate AND :endDate " +
-    "             GROUP by pp.patient_id) as last_encounter " +
-    "        ON last_encounter.patient_id=tabela.patient_id " +
-    "WHERE timestampdiff(month,tabela.value_datetime,( last_encounter.encounter_datetime " +
-    "             ))>3";
+        "SELECT tabela.patient_id  "
+            + "             FROM  "
+            + "             (SELECT p.patient_id, min(o.value_datetime) as value_datetime  "
+            + "             FROM patient p INNER JOIN encounter e on e.patient_id=p.patient_id  "
+            + "             INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
+            + "             WHERE o.voided=0 AND e.voided=0 AND p.voided=0 AND  "
+            + "             o.concept_id=${1190} AND o.value_datetime is not NULL AND  "
+            + "             e.encounter_type=${53} AND  "
+            + "             e.location_id= :location  "
+            + "             GROUP by p.patient_id) as tabela  "
+            + "             INNER JOIN ( "
+            + "                 SELECT pp.patient_id, MAX(e.encounter_datetime) as encounter_datetime "
+            + "             FROM   patient pp INNER JOIN encounter e  "
+            + "             ON e.patient_id = pp.patient_id  "
+            + "             WHERE  pp.voided = 0 AND e.voided = 0  "
+            + "             AND e.location_id = :location  "
+            + "             AND e.encounter_type = 6  "
+            + "             AND  e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "             GROUP by pp.patient_id) as last_encounter "
+            + "        ON last_encounter.patient_id=tabela.patient_id "
+            + "WHERE timestampdiff(month,tabela.value_datetime,( last_encounter.encounter_datetime "
+            + "             ))>3";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -815,41 +815,41 @@ public class IntensiveMonitoringCohortQueries {
     map.put("23731", hivMetadata.getCommunityDispensation().getConceptId());
 
     String query =
-    "SELECT p.patient_id " +
-    "FROM   patient p " +
-    "       INNER JOIN encounter e " +
-    "               ON e.patient_id = p.patient_id " +
-    "       INNER JOIN obs o " +
-    "               ON o.encounter_id = e.encounter_id " +
-    "       INNER JOIN (SELECT p.patient_id, " +
-    "                          Max(e.encounter_datetime) AS encounter_datetime " +
-    "                   FROM   patient p " +
-    "                          INNER JOIN encounter e " +
-    "                                  ON e.patient_id = p.patient_id " +
-    "                   WHERE  p.voided = 0 " +
-    "                          AND e.voided = 0 " +
-    "                          AND e.location_id = :location " +
-    "                          AND e.encounter_type = ${6} " +
-    "                          AND e.encounter_datetime BETWEEN " +
-    "                              :startDate AND :endDate " +
-    "                   GROUP  BY p.patient_id) last_consultation " +
-    "               ON last_consultation.patient_id = p.patient_id " +
-    "WHERE  p.voided = 0 " +
-    "       AND o.voided = 0 " +
-    "       AND e.voided = 0 " +
-    "       AND e.location_id = :location " +
-    "       AND e.encounter_type = ${6} " +
-    "       AND ( ( o.concept_id = ${23724} " +
-    "               AND o.value_coded = ${1257} ) " +
-    "              OR ( o.concept_id = ${23730} " +
-    "                   AND o.value_coded = ${1257} ) " +
-    "              OR ( o.concept_id = ${23888} " +
-    "                   AND o.value_coded = ${1257} ) " +
-    "              OR ( o.concept_id = ${23729} " +
-    "                   AND o.value_coded = ${1257} ) " +
-    "              OR ( o.concept_id = ${23731} " +
-    "                   AND o.value_coded = ${1257} ) ) " +
-    "       AND e.encounter_datetime < last_consultation.encounter_datetime";
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          Max(e.encounter_datetime) AS encounter_datetime "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND e.encounter_datetime BETWEEN "
+            + "                              :startDate AND :endDate "
+            + "                   GROUP  BY p.patient_id) last_consultation "
+            + "               ON last_consultation.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND ( ( o.concept_id = ${23724} "
+            + "               AND o.value_coded = ${1257} ) "
+            + "              OR ( o.concept_id = ${23730} "
+            + "                   AND o.value_coded = ${1257} ) "
+            + "              OR ( o.concept_id = ${23888} "
+            + "                   AND o.value_coded = ${1257} ) "
+            + "              OR ( o.concept_id = ${23729} "
+            + "                   AND o.value_coded = ${1257} ) "
+            + "              OR ( o.concept_id = ${23731} "
+            + "                   AND o.value_coded = ${1257} ) ) "
+            + "       AND e.encounter_datetime < last_consultation.encounter_datetime";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -929,41 +929,41 @@ public class IntensiveMonitoringCohortQueries {
     map.put("23731", hivMetadata.getCommunityDispensation().getConceptId());
 
     String query =
-    "SELECT p.patient_id " +
-    "FROM   patient p " +
-    "       INNER JOIN encounter e " +
-    "               ON e.patient_id = p.patient_id " +
-    "       INNER JOIN obs o " +
-    "               ON o.encounter_id = e.encounter_id " +
-    "       INNER JOIN (SELECT p.patient_id, " +
-    "                          Max(e.encounter_datetime) AS encounter_datetime " +
-    "                   FROM   patient p " +
-    "                          INNER JOIN encounter e " +
-    "                                  ON e.patient_id = p.patient_id " +
-    "                   WHERE  p.voided = 0 " +
-    "                          AND e.voided = 0 " +
-    "                          AND e.location_id = :location " +
-    "                          AND e.encounter_type = ${6} " +
-    "                          AND e.encounter_datetime BETWEEN " +
-    "                              :startDate AND :endDate " +
-    "                   GROUP  BY p.patient_id) last_consultation " +
-    "               ON last_consultation.patient_id = p.patient_id " +
-    "WHERE  p.voided = 0 " +
-    "       AND o.voided = 0 " +
-    "       AND e.voided = 0 " +
-    "       AND e.location_id = :location " +
-    "       AND e.encounter_type = ${6} " +
-    "       AND ( ( o.concept_id = ${23724} " +
-    "               AND o.value_coded = ${1256} ) " +
-    "              OR ( o.concept_id = ${23730} " +
-    "                   AND o.value_coded = ${1256} ) " +
-    "              OR ( o.concept_id = ${23888} " +
-    "                   AND o.value_coded = ${1256} ) " +
-    "              OR ( o.concept_id = ${23729} " +
-    "                   AND o.value_coded = ${1256} ) " +
-    "              OR ( o.concept_id = ${23731} " +
-    "                   AND o.value_coded = ${1256} ) ) " +
-    "       AND e.encounter_datetime < last_consultation.encounter_datetime";
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          Max(e.encounter_datetime) AS encounter_datetime "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND e.encounter_datetime BETWEEN "
+            + "                              :startDate AND :endDate "
+            + "                   GROUP  BY p.patient_id) last_consultation "
+            + "               ON last_consultation.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND ( ( o.concept_id = ${23724} "
+            + "               AND o.value_coded = ${1256} ) "
+            + "              OR ( o.concept_id = ${23730} "
+            + "                   AND o.value_coded = ${1256} ) "
+            + "              OR ( o.concept_id = ${23888} "
+            + "                   AND o.value_coded = ${1256} ) "
+            + "              OR ( o.concept_id = ${23729} "
+            + "                   AND o.value_coded = ${1256} ) "
+            + "              OR ( o.concept_id = ${23731} "
+            + "                   AND o.value_coded = ${1256} ) ) "
+            + "       AND e.encounter_datetime < last_consultation.encounter_datetime";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -997,41 +997,41 @@ public class IntensiveMonitoringCohortQueries {
     map.put("23731", hivMetadata.getCommunityDispensation().getConceptId());
 
     String query =
-    "SELECT p.patient_id " +
-    "FROM   patient p " +
-    "       INNER JOIN encounter e " +
-    "               ON e.patient_id = p.patient_id " +
-    "       INNER JOIN obs o " +
-    "               ON o.encounter_id = e.encounter_id " +
-    "       INNER JOIN (SELECT p.patient_id, " +
-    "                          Max(e.encounter_datetime) AS encounter_datetime " +
-    "                   FROM   patient p " +
-    "                          INNER JOIN encounter e " +
-    "                                  ON e.patient_id = p.patient_id " +
-    "                   WHERE  p.voided = 0 " +
-    "                          AND e.voided = 0 " +
-    "                          AND e.location_id = :location " +
-    "                          AND e.encounter_type = ${6} " +
-    "                          AND e.encounter_datetime BETWEEN " +
-    "                              :startDate AND :endDate " +
-    "                   GROUP  BY p.patient_id) last_consultation " +
-    "               ON last_consultation.patient_id = p.patient_id " +
-    " WHERE  p.voided = 0 " +
-    "       AND o.voided = 0 " +
-    "       AND e.voided = 0 " +
-    "       AND e.location_id = :location " +
-    "       AND e.encounter_type = ${6} " +
-    "       AND ( ( o.concept_id = ${23724} " +
-    "               AND o.value_coded = ${1267} ) " +
-    "              OR ( o.concept_id = ${23730} " +
-    "                   AND o.value_coded = ${1267} ) " +
-    "              OR ( o.concept_id = ${23888} " +
-    "                   AND o.value_coded = ${1267} ) " +
-    "              OR ( o.concept_id = ${23729} " +
-    "                   AND o.value_coded = ${1267} ) " +
-    "              OR ( o.concept_id = ${23731} " +
-    "                   AND o.value_coded = ${1267} ) ) " +
-    "       AND e.encounter_datetime < last_consultation.encounter_datetime";
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          Max(e.encounter_datetime) AS encounter_datetime "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND e.encounter_datetime BETWEEN "
+            + "                              :startDate AND :endDate "
+            + "                   GROUP  BY p.patient_id) last_consultation "
+            + "               ON last_consultation.patient_id = p.patient_id "
+            + " WHERE  p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND ( ( o.concept_id = ${23724} "
+            + "               AND o.value_coded = ${1267} ) "
+            + "              OR ( o.concept_id = ${23730} "
+            + "                   AND o.value_coded = ${1267} ) "
+            + "              OR ( o.concept_id = ${23888} "
+            + "                   AND o.value_coded = ${1267} ) "
+            + "              OR ( o.concept_id = ${23729} "
+            + "                   AND o.value_coded = ${1267} ) "
+            + "              OR ( o.concept_id = ${23731} "
+            + "                   AND o.value_coded = ${1267} ) ) "
+            + "       AND e.encounter_datetime < last_consultation.encounter_datetime";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1216,7 +1216,6 @@ public class IntensiveMonitoringCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String str = stringSubstitutor.replace(query);
-    System.out.println(str);
     cd.setQuery(str);
     return cd;
   }
@@ -1244,6 +1243,7 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition j = getMI15J();
     // CohortDefinition K = getMI15K();
     CohortDefinition l = getMI15L();
+    CohortDefinition major2 = getAgeOnLastConsultationMoreThan2Years();
     String MAPPINGA =
         "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
     String MAPPINGC =
@@ -1263,12 +1263,13 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch("I", EptsReportUtils.map(i, MAPPINGA));
     cd.addSearch("J", EptsReportUtils.map(j, MAPPINGA));
     cd.addSearch("L", EptsReportUtils.map(l, MAPPINGA));
+    cd.addSearch("AGE2", EptsReportUtils.map(major2, MAPPINGA));
 
     if (isDenominator) {
 
       if (level == 1) {
         cd.setName("Denominator: " + name1);
-        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J)  ");
+        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND AGE2 ");
       }
       if (level == 2) {
         cd.setName("Denominator: " + name2);
@@ -1283,7 +1284,7 @@ public class IntensiveMonitoringCohortQueries {
 
     if (level == 1) {
       cd.setName("Numerator: " + name1);
-      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J)  AND J");
+      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND J AND AGE2 ");
     }
     if (level == 2) {
       cd.setName("Numerator: " + name2);
@@ -1293,6 +1294,44 @@ public class IntensiveMonitoringCohortQueries {
       cd.setName("Numerator: " + name3);
       cd.setCompositionString("A AND J AND B2 AND I");
     }
+    return cd;
+  }
+
+  /**
+   * Age should be calculated on “Last Consultation Date” (Check A for the algorithm to define this
+   * date).
+   *
+   * @return
+   */
+  public CohortDefinition getAgeOnLastConsultationMoreThan2Years() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Get age  on last Consultation ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+
+    String sql =
+        "SELECT p.person_id "
+            + "FROM   person p "
+            + "    INNER JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) AS encounter_datetime "
+            + "                FROM  patient p "
+            + "                    INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                WHERE p.voided =0 "
+            + "                  AND  e.voided = 0 "
+            + "                  AND e.encounter_type = ${6} "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_datetime BETWEEN  :startDate AND :endDate "
+            + "                GROUP BY p.patient_id) "
+            + "        AS last_clinical ON last_clinical.patient_id = p.person_id "
+            + "WHERE p.voided = 0 "
+            + "    AND  TIMESTAMPDIFF(YEAR,p.birthdate,last_clinical.encounter_datetime) > 2 ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    String str = stringSubstitutor.replace(sql);
+    cd.setQuery(str);
     return cd;
   }
 }
