@@ -202,9 +202,9 @@ public class IntensiveMonitoringCohortQueries {
               "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}"));
     }
     cd.setCompositionString("MI11DEN");
-    return cd; 
+    return cd;
   }
-   * Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
+  /* Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}

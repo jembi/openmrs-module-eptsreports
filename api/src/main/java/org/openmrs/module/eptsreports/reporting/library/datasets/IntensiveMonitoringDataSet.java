@@ -659,11 +659,11 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             customCohortIndicator(
                 intensiveMonitoringCohortQueries.getMIC11NUM(7),
-              "revisionEndDate=${revisionEndDate},location=${location}"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "ageBasedOnArt43=childrenArt");
 
-     /**
+    /**
      * *********************************** CATEGORY 12 *******************************************
      * //* Part 1 Denominator **************
      */
