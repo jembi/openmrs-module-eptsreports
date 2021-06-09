@@ -1146,4 +1146,62 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+  /**
+   * I - Select all patients with the last Viral Load Result (concept id 856, value_numeric) < 1000
+   * (value_numeric) OR Viral Load QUALITATIVE (concept id 1305) with value coded not null
+   * registered on Ficha Clinica (encounter type 6) before “Last Consultation Date”
+   * (encounter_datetime from A) minus 12 months, as “Last VL Result <1000”, and filter all patients
+   * with at least one Viral Load Result (concept id 856, value_numeric not NULL) registered on
+   * Ficha Clinica (encounter type 6, encounter_datetime) between “Last VL Result <1000”+ 12 months
+   * and “Last VL Result <1000” + 18 months
+   */
+  public CohortDefinition getMI15I() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    String query =
+        "SELECT p.patient_id FROM patient p INNER JOIN encounter e on p.patient_id = e.patient_id INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
+            + " INNER JOIN (SELECT juncao.patient_id,juncao.encounter_date "
+            + " FROM ( "
+            + "         SELECT p.patient_id, e.encounter_datetime AS encounter_date "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e on p.patient_id = e.patient_id INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + "         WHERE p.voided = 0 AND e.voided = 0 AND e.location_id =:location AND e.encounter_type = ${6} "
+            + "         AND o.concept_id=${856} "
+            + "         UNION "
+            + "         SELECT p.patient_id, o.value_datetime AS encounter_date "
+            + "         FROM patient p "
+            + "            INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "            INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND e.location_id =:location "
+            + "           AND o.concept_id = ${1305} and o.value_coded is not null AND e.encounter_type = ${6} "
+            + "     ) juncao "
+            + " INNER JOIN( SELECT p.patient_id, MAX(e.encounter_datetime) AS last_consultation_date   "
+            + "            FROM  patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "            WHERE  p.voided = 0 AND e.voided = 0 AND e.location_id =:location AND e.encounter_type = ${6} "
+            + "            AND e.encounter_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id "
+            + "            )  "
+            + " as last_consultation on last_consultation.patient_id = juncao.patient_id "
+            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL 12 MONTH)) as lastVLResult "
+            + " ON lastVLResult.patient_id=p.patient_id "
+            + " WHERE "
+            + " o.concept_id=${856} AND o.value_numeric is not null AND e.encounter_type=${6} AND  "
+            + " e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL 12 MONTH)  "
+            + " AND DATE_ADD(lastVLResult.encounter_date,INTERVAL 18 MONTH)AND e.location_id=:location";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    String str = stringSubstitutor.replace(query);
+    System.out.println(str);
+    cd.setQuery(str);
+
+    return cd;
+  }
 }
