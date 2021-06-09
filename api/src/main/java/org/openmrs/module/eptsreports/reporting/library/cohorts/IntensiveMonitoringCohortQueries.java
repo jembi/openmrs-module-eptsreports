@@ -500,4 +500,67 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+
+
+  /**
+   *
+   *
+   * <ul>
+   *   <li>B1 – Select all patients with the earliest “Data de Início TARV” (concept_id 1190, not
+   *       Tnull, value_datetime) recorded in Ficha Resumo (encounter type 53) and “Last
+   *       Consultation Date” (encounter_datetime from A) minus “ Data de Início TARV” (concept id
+   *       1190 value_datetime) is greater than (>) 3 months.
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMI15B1() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients From Ficha Clinica");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+
+    String query =
+            "SELECT tabela.patient_id "
+                    + " FROM   (SELECT p.patient_id,"
+                    + "               Min(o.value_datetime) value_datetime "
+                    + "        FROM   patient p "
+                    + "               INNER JOIN encounter e "
+                    + "                       ON e.patient_id = p.patient_id "
+                    + "               INNER JOIN obs o "
+                    + "                       ON o.encounter_id = e.encounter_id "
+                    + "        WHERE  o.voided = 0 "
+                    + "               AND e.voided = 0 "
+                    + "               AND p.voided = 0 "
+                    + "               AND o.concept_id = ${1190} "
+                    + "               AND o.value_datetime IS NOT NULL "
+                    + "               AND e.encounter_type = ${53} "
+                    + "               AND e.location_id = :location "
+                    + "        GROUP  BY p.patient_id) tabela "
+                    + " WHERE  Timestampdiff(month, tabela.value_datetime, "
+                    + "       (SELECT Max(e.encounter_datetime) "
+                    + "        FROM   patient pp "
+                    + "       INNER JOIN "
+                    + "       encounter e "
+                    + "               ON e.patient_id = pp.patient_id "
+                    + " WHERE  pp.voided = 0 "
+                    + "             AND e.voided = 0 "
+                    + "             AND tabela.patient_id = pp.patient_id "
+                    + "             AND e.location_id = :location "
+                    + "             AND e.encounter_type = ${6}"
+                    + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate)) > 3 ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
