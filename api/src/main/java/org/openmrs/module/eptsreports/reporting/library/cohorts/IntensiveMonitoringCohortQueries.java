@@ -490,7 +490,7 @@ public class IntensiveMonitoringCohortQueries {
             + " WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_type = 6 "
+            + "       AND e.encounter_type = ${6} "
             + "       AND  e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "       GROUP BY p.patient_id ";
 
@@ -502,11 +502,12 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * B2 - Select all patients with the earliest “Data de Início TARV” (concept_id 1190, not null, value_datetime) recorded in Ficha Resumo 
-   * (encounter type 53, obs_datetime) and “Last Consultation Date” (encounter_datetime from A) minus “Data de Início TARV”  
-   * (concept id 1190 value_datetime) is greater than (>) 21 months
+   * B2 - Select all patients with the earliest “Data de Início TARV” (concept_id 1190, not null,
+   * value_datetime) recorded in Ficha Resumo (encounter type 53, obs_datetime) and “Last
+   * Consultation Date” (encounter_datetime from A) minus “Data de Início TARV” (concept id 1190
+   * value_datetime) is greater than (>) 21 months
    */
-  public CohortDefinition getMI15B2(){
+  public CohortDefinition getMI15B2() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("B2 Patients From Ficha Clinica");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -518,30 +519,234 @@ public class IntensiveMonitoringCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
 
+    String query =
+        "SELECT tabela.patient_id"
+            + " FROM"
+            + " (SELECT p.patient_id, min(o.value_datetime) value_datetime"
+            + " FROM patient p INNER JOIN encounter e on e.patient_id=p.patient_id"
+            + " INNER JOIN obs o ON o.encounter_id=e.encounter_id"
+            + " WHERE o.voided=0 AND e.voided=0 AND p.voided=0 AND"
+            + " o.concept_id=${1190} AND o.value_datetime is not NULL AND"
+            + " e.encounter_type=${53} AND"
+            + " e.location_id= :location"
+            + " GROUP by p.patient_id) tabela"
+            + "  WHERE timestampdiff(month,tabela.value_datetime,("
+            + " SELECT MAX(e.encounter_datetime)"
+            + " FROM   patient pp INNER JOIN encounter e"
+            + " ON e.patient_id = pp.patient_id"
+            + " WHERE  pp.voided = 0 AND e.voided = 0"
+            + " AND tabela.patient_id=pp.patient_id"
+            + " AND e.location_id = :location"
+            + " AND e.encounter_type = ${6}"
+            + " AND  e.encounter_datetime BETWEEN :startDate AND :endDate))>21";
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
-    String query = "
-    SELECT tabela.patient_id
-    FROM
-    (SELECT p.patient_id, min(o.value_datetime) value_datetime
-    FROM patient p INNER JOIN encounter e on e.patient_id=p.patient_id
-    INNER JOIN obs o ON o.encounter_id=e.encounter_id
-    WHERE
-    o.voided=0 AND e.voided=0 AND p.voided=0 AND
-    o.concept_id=1190 AND o.value_datetime is not NULL AND
-    e.encounter_type=53 AND
-    e.location_id= :location
-    GROUP by p.patient_id) tabela
-    
-    WHERE timestampdiff(month,tabela.value_datetime,(
-    SELECT MAX(e.encounter_datetime)
-    FROM   patient pp INNER JOIN encounter e
-      ON e.patient_id = pp.patient_id
-    WHERE  pp.voided = 0 AND e.voided = 0
-       AND tabela.patient_id=pp.patient_id
-      AND e.location_id = :location
-      AND e.encounter_type = 6
-      AND  e.encounter_datetime BETWEEN :startDate AND :endDate))>21    
-    ";
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * D - All female patients registered as “Breastfeeding” (concept_id 6332, value_coded equal to
+   * concept_id 1065) in Ficha Clínica (encounter type 6, encounter_datetime) occurred during the
+   * following period (encounter_datetime >= startDate and <= endDate)
+   *
+   * @return
+   */
+  public CohortDefinition getMI15D() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id FROM patient p  "
+            + " INNER JOIN encounter e ON e.patient_id=p.patient_id  "
+            + " INNER JOIN obs o ON o.person_id=p.patient_id "
+            + " WHERE p.voided = 0 AND e.voided=0 AND e.location_id=:location "
+            + " AND e.encounter_type= ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + " AND o.concept_id = ${6332} AND o.value_coded= ${1065} "
+            + " GROUP BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   *
+   *
+   * <ul>
+   *   <li>B1 – Select all patients with the earliest “Data de Início TARV” (concept_id 1190, not
+   *       Tnull, value_datetime) recorded in Ficha Resumo (encounter type 53) and “Last
+   *       Consultation Date” (encounter_datetime from A) minus “ Data de Início TARV” (concept id
+   *       1190 value_datetime) is greater than (>) 3 months.
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMI15B1() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT tabela.patient_id "
+            + " FROM   (SELECT p.patient_id,"
+            + "               Min(o.value_datetime) value_datetime "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON o.encounter_id = e.encounter_id "
+            + "        WHERE  o.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND p.voided = 0 "
+            + "               AND o.concept_id = ${1190} "
+            + "               AND o.value_datetime IS NOT NULL "
+            + "               AND e.encounter_type = ${53} "
+            + "               AND e.location_id = :location "
+            + "        GROUP  BY p.patient_id) tabela "
+            + " WHERE  Timestampdiff(month, tabela.value_datetime, "
+            + "       (SELECT Max(e.encounter_datetime) "
+            + "        FROM   patient pp "
+            + "       INNER JOIN "
+            + "       encounter e "
+            + "               ON e.patient_id = pp.patient_id "
+            + " WHERE  pp.voided = 0 "
+            + "             AND e.voided = 0 "
+            + "             AND tabela.patient_id = pp.patient_id "
+            + "             AND e.location_id = :location "
+            + "             AND e.encounter_type = ${6}"
+            + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate)) > 3 ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+  /**
+   *
+   *
+   * <ul>
+   *   <li>G - Select all patients with the last (Viral Load Result (concept id 856) )and the result
+   *       is >= 1000 (value_numeric) registered on Ficha Clinica (encounter type 6) before “Last
+   *       Consultation Date” (encounter_datetime from A).
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMI15G() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM   patient p "
+            + "       INNER JOIN encounter ee "
+            + "               ON ee.patient_id = p.patient_id "
+            + "       INNER JOIN obs oo"
+            + "               ON oo.encounter_id = ee.encounter_id "
+            + " WHERE  p.voided = 0 "
+            + "       AND ee.voided = 0 "
+            + "       AND oo.voided = 0 "
+            + "       AND ee.location_id = :location "
+            + "       AND ee.encounter_type = ${6} "
+            + "       AND oo.concept_id = ${856} "
+            + "       AND oo.value_numeric >= 1000 "
+            + "       AND ee.encounter_datetime <= (SELECT "
+            + "           Max(e.encounter_datetime) AS last_consultation_date "
+            + "                                     FROM   encounter e "
+            + "                                     WHERE  e.voided = 0 "
+            + "                                            AND e.location_id = :location "
+            + "                                            AND e.encounter_type = ${6} "
+            + "                                            AND e.patient_id = p.patient_id "
+            + "                                            AND e.encounter_datetime BETWEEN "
+            + "                                                :startDate AND :endDate "
+            + "                                     LIMIT  1)  ";
+    ;
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+  /**
+   *
+   *
+   * <ul>
+   *   <li>H - Select all patients with Viral Load result (concept id 856, value_numeric) >= 1000 on
+   *       registered in Ficha Clinica (encounter type 6) on “Last Consultation” (encounter_datetime
+   *       from A)
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMI15H() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter ee "
+            + "               ON ee.patient_id = p.patient_id "
+            + "       INNER JOIN obs oo "
+            + "               ON oo.encounter_id = ee.encounter_id "
+            + " WHERE  p.voided = 0 "
+            + "       AND ee.voided = 0 "
+            + "       AND oo.voided = 0 "
+            + "       AND ee.location_id = :location "
+            + "       AND ee.encounter_type = ${6} "
+            + "       AND oo.concept_id = ${856} "
+            + "       AND oo.value_numeric >= 1000 "
+            + "       AND ee.encounter_datetime = (SELECT "
+            + "           Max(e.encounter_datetime) AS last_consultation_date "
+            + "                                    FROM   patient p "
+            + "                                           INNER JOIN encounter e "
+            + "                                                   ON e.patient_id = "
+            + "                                                      p.patient_id "
+            + "                                    WHERE  p.voided = 0 "
+            + "                                           AND e.voided = 0 "
+            + "                                           AND e.location_id = :location "
+            + "                                           AND e.encounter_type = ${6} "
+            + "                                           AND e.encounter_datetime BETWEEN "
+            + "                                               :startDate AND :endDate "
+            + "                                    LIMIT  1)";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
