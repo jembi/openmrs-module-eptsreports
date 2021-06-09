@@ -15,6 +15,7 @@ import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,9 +25,11 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
   private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
-  private EptsCommonDimension eptsCommonDimension;
+  @Autowired
+  @Qualifier("commonAgeDimensionCohort")
+  private AgeDimensionCohortInterface ageDimensionCohort;
 
-  @Autowired private EptsCommonDimension eptsCommonDimension;
+  private EptsCommonDimension eptsCommonDimension;
 
   @Autowired
   public IntensiveMonitoringDataSet(
@@ -44,7 +47,6 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.setName("Intensive Monitoring DataSet");
     dataSetDefinition.addParameters(getParameters());
 
-
     /**
      * ******** DIMENSIONS will be added here based on individual indicators required
      * *****************************
@@ -59,7 +61,6 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${revisionEndDate-4m}"));
-
 
     // dimensions to be added here
     dataSetDefinition.addDimension(

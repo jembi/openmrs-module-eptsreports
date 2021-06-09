@@ -25,13 +25,11 @@ public class IntensiveMonitoringCohortQueries {
 
   private QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries;
 
-
   private final String MAPPING2 =
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
 
   private final String MAPPING =
       "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
-
 
   @Autowired
   public IntensiveMonitoringCohortQueries(
