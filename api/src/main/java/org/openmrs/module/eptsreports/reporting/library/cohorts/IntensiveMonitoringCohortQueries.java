@@ -1246,7 +1246,7 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition h = getMI15H();
     CohortDefinition i = getMI15I();
     CohortDefinition j = getMI15J();
-    // CohortDefinition K = getMI15K();
+    CohortDefinition k = getMI15K();
     CohortDefinition l = getMI15L();
     CohortDefinition major2 = getAgeOnLastConsultationMoreThan2Years();
     String MAPPINGA =
@@ -1267,6 +1267,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch("H", EptsReportUtils.map(h, MAPPINGA));
     cd.addSearch("I", EptsReportUtils.map(i, MAPPINGA));
     cd.addSearch("J", EptsReportUtils.map(j, MAPPINGA));
+    cd.addSearch("K", EptsReportUtils.map(k, MAPPINGA));
     cd.addSearch("L", EptsReportUtils.map(l, MAPPINGA));
     cd.addSearch("AGE2", EptsReportUtils.map(major2, MAPPINGA));
 
@@ -1289,7 +1290,7 @@ public class IntensiveMonitoringCohortQueries {
 
     if (level == 1) {
       cd.setName("Numerator: " + name1);
-      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND J AND AGE2 ");
+      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND K AND AGE2 ");
     }
     if (level == 2) {
       cd.setName("Numerator: " + name2);
