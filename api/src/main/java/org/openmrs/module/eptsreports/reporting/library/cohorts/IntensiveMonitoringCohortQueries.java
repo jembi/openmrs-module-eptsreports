@@ -1180,6 +1180,11 @@ public class IntensiveMonitoringCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setName("Patients From Ficha Clinica");
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
