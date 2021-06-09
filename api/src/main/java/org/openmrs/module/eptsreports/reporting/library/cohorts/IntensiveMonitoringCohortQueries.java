@@ -1146,4 +1146,76 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getCat15P1DenNum(boolean isDenominator, int level) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    String name1 = "15.1 - % de pacientes elegíveis a MDS, que foram inscritos em MDS";
+    String name2 =
+        "15.2 - % de inscritos em MDS que receberam CV acima de 1000 cópias que foram suspensos de MDS";
+    String name3 =
+        "15.3 - % de pacientes inscritos em MDS em TARV há mais de 21 meses, que conhecem o seu resultado de CV de seguimento";
+
+    // TODO Complete the definitions here
+    CohortDefinition a = null;
+    CohortDefinition b1 = null;
+    CohortDefinition b2 = null;
+    CohortDefinition c = null;
+    CohortDefinition d = null;
+    CohortDefinition e = getMI15EComplete();
+    CohortDefinition f = null;
+    CohortDefinition g = null;
+    CohortDefinition h = null;
+    CohortDefinition i = null;
+    CohortDefinition j = null;
+    CohortDefinition l = null;
+
+    // TODO complete the search here, put the correct string mappings
+    cd.addSearch("A", EptsReportUtils.map(a, ""));
+    cd.addSearch("B1", EptsReportUtils.map(b1, ""));
+    cd.addSearch("B2", EptsReportUtils.map(b2, ""));
+    cd.addSearch("C", EptsReportUtils.map(c, ""));
+    cd.addSearch("D", EptsReportUtils.map(d, ""));
+    cd.addSearch("E", EptsReportUtils.map(e, ""));
+    cd.addSearch("F", EptsReportUtils.map(f, ""));
+    cd.addSearch("G", EptsReportUtils.map(g, ""));
+    cd.addSearch("H", EptsReportUtils.map(h, ""));
+    cd.addSearch("I", EptsReportUtils.map(i, ""));
+    cd.addSearch("J", EptsReportUtils.map(j, ""));
+    cd.addSearch("L", EptsReportUtils.map(l, ""));
+
+    if (isDenominator) {
+
+      if (level == 1) {
+        cd.setName("Denominator: " + name1);
+        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND Age2+ ");
+      }
+      if (level == 2) {
+        cd.setName("Denominator: " + name2);
+        cd.setCompositionString("A AND J AND H ");
+      }
+      if (level == 3) {
+        cd.setName("Denominator: " + name3);
+        cd.setCompositionString("A AND J AND B2 ");
+      }
+    }
+
+    if (level == 1) {
+      cd.setName("Numerator: " + name1);
+      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND Age2+  AND J");
+    }
+    if (level == 2) {
+      cd.setName("Numerator: " + name2);
+      cd.setCompositionString("A AND J AND H AND L");
+    }
+    if (level == 3) {
+      cd.setName("Numerator: " + name3);
+      cd.setCompositionString("A AND J AND B2 AND I");
+    }
+
+    return cd;
+  }
 }
