@@ -1159,10 +1159,6 @@ public class IntensiveMonitoringCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients From Ficha Clinica");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
@@ -1201,7 +1197,82 @@ public class IntensiveMonitoringCohortQueries {
     String str = stringSubstitutor.replace(query);
     System.out.println(str);
     cd.setQuery(str);
+    return cd;
+  }
 
+  public CohortDefinition getCat15P1DenNum(boolean isDenominator, int level) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    String name1 = "15.1 - % de pacientes elegíveis a MDS, que foram inscritos em MDS";
+    String name2 =
+        "15.2 - % de inscritos em MDS que receberam CV acima de 1000 cópias que foram suspensos de MDS";
+    String name3 =
+        "15.3 - % de pacientes inscritos em MDS em TARV há mais de 21 meses, que conhecem o seu resultado de CV de seguimento";
+
+    CohortDefinition a = getMI15A();
+    CohortDefinition b1 = getMI15B1();
+    CohortDefinition b2 = getMI15B2();
+    CohortDefinition c = getMI15C();
+    CohortDefinition d = getMI15D();
+    CohortDefinition e = getMI15EComplete();
+    CohortDefinition f = getMI15F();
+    CohortDefinition g = getMI15G();
+    CohortDefinition h = getMI15H();
+    CohortDefinition i = getMI15I();
+    CohortDefinition j = getMI15J();
+    // CohortDefinition K = getMI15K();
+    CohortDefinition l = getMI15L();
+    String MAPPINGA =
+        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}";
+    String MAPPINGC =
+        "startDate=${revisionEndDate-11m+1d},endDate=${revisionEndDate-2m},location=${location}";
+    String MAPPINGD =
+        "startDate=${revisionEndDate-20m+1d},endDate=${revisionEndDate-2m},location=${location}";
+
+    cd.addSearch("A", EptsReportUtils.map(a, MAPPINGA));
+    cd.addSearch("B1", EptsReportUtils.map(b1, MAPPINGA));
+    cd.addSearch("B2", EptsReportUtils.map(b2, MAPPINGA));
+    cd.addSearch("C", EptsReportUtils.map(c, MAPPINGC));
+    cd.addSearch("D", EptsReportUtils.map(d, MAPPINGD));
+    cd.addSearch("E", EptsReportUtils.map(e, MAPPINGA));
+    cd.addSearch("F", EptsReportUtils.map(f, MAPPINGA));
+    cd.addSearch("G", EptsReportUtils.map(g, MAPPINGA));
+    cd.addSearch("H", EptsReportUtils.map(h, MAPPINGA));
+    cd.addSearch("I", EptsReportUtils.map(i, MAPPINGA));
+    cd.addSearch("J", EptsReportUtils.map(j, MAPPINGA));
+    cd.addSearch("L", EptsReportUtils.map(l, MAPPINGA));
+
+    if (isDenominator) {
+
+      if (level == 1) {
+        cd.setName("Denominator: " + name1);
+        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND Age2+ ");
+      }
+      if (level == 2) {
+        cd.setName("Denominator: " + name2);
+        cd.setCompositionString("A AND J AND H ");
+      }
+      if (level == 3) {
+        cd.setName("Denominator: " + name3);
+        cd.setCompositionString("A AND J AND B2 ");
+      }
+      return cd;
+    }
+
+    if (level == 1) {
+      cd.setName("Numerator: " + name1);
+      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND Age2+  AND J");
+    }
+    if (level == 2) {
+      cd.setName("Numerator: " + name2);
+      cd.setCompositionString("A AND J AND H AND L");
+    }
+    if (level == 3) {
+      cd.setName("Numerator: " + name3);
+      cd.setCompositionString("A AND J AND B2 AND I");
+    }
     return cd;
   }
 }
