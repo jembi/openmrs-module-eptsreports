@@ -2,9 +2,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.metadata.CommonMetadata;
-import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -22,10 +19,6 @@ public class IntensiveMonitoringCohortQueries {
 
   @Autowired
   public IntensiveMonitoringCohortQueries(
-      HivMetadata hivMetadata,
-      CommonMetadata commonMetadata,
-      CommonCohortQueries commonCohortQueries,
-      TbMetadata tbMetadata,
       QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries) {
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
   }
