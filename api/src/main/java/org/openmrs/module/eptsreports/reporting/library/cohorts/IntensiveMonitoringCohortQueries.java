@@ -596,4 +596,39 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+
+  /**
+   * C- All female patients registered as “Pregnant” (concept_id 1982, value_coded equal to
+   * concept_id 1065) in Ficha Clínica (encounter type 6, encounter_datetime) occurred during the
+   * following period (encounter_datetime >= startDate and <= endDate)
+   *
+   * @return
+   */
+  public CohortDefinition getMI15C() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id FROM patient p  "
+            + " INNER JOIN encounter e ON e.patient_id=p.patient_id  "
+            + " INNER JOIN obs o ON o.person_id=p.patient_id "
+            + " WHERE p.voided = 0 AND e.voided=0 AND e.location_id=:location "
+            + " AND e.encounter_type= ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + " AND o.concept_id = ${1982} AND o.value_coded= ${1065} "
+            + " GROUP BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
 }
