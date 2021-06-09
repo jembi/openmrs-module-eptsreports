@@ -596,4 +596,59 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+  /**
+   *
+   *
+   * <ul>
+   *   <li>G - Select all patients with the last (Viral Load Result (concept id 856) )and the result
+   *       is >= 1000 (value_numeric) registered on Ficha Clinica (encounter type 6) before “Last
+   *       Consultation Date” (encounter_datetime from A).
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMI15G() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+            " SELECT p.patient_id "
+                    + " FROM   patient p "
+                    + "       INNER JOIN encounter ee "
+                    + "               ON ee.patient_id = p.patient_id "
+                    + "       INNER JOIN obs oo"
+                    + "               ON oo.encounter_id = ee.encounter_id "
+                    + " WHERE  p.voided = 0 "
+                    + "       AND ee.voided = 0 "
+                    + "       AND oo.voided = 0 "
+                    + "       AND ee.location_id = :location "
+                    + "       AND ee.encounter_type = ${6} "
+                    + "       AND oo.concept_id = ${856} "
+                    + "       AND oo.value_numeric >= 1000 "
+                    + "       AND ee.encounter_datetime <= (SELECT "
+                    + "           Max(e.encounter_datetime) AS last_consultation_date "
+                    + "                                     FROM   encounter e "
+                    + "                                     WHERE  e.voided = 0 "
+                    + "                                            AND e.location_id = :location "
+                    + "                                            AND e.encounter_type = ${6} "
+                    + "                                            AND e.patient_id = p.patient_id "
+                    + "                                            AND e.encounter_datetime BETWEEN "
+                    + "                                                :startDate AND :endDate "
+                    + "                                     LIMIT  1)  ";
+    ;
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
 }
