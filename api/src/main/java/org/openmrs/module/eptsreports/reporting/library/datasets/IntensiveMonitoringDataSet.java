@@ -623,6 +623,63 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+    /* Category 15*/
+    // Den 15
+    dataSetDefinition.addColumn(
+        "MI15DEN1",
+        "MI CAT 15 DEN 1",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat15P1DenNum(true, 1),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    dataSetDefinition.addColumn(
+        "MI15DEN2",
+        "MI CAT 15 DEN 2",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat15P1DenNum(true, 2),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    dataSetDefinition.addColumn(
+        "MI15DEN3",
+        "MI CAT 15 DEN 3",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat15P1DenNum(true, 3),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    // NUM 15
+    dataSetDefinition.addColumn(
+        "MI15NUM1",
+        "MI CAT 15 NUM 1",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat15P1DenNum(false, 1),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    dataSetDefinition.addColumn(
+        "MI15NUM2",
+        "MI CAT 15 NUM 2",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat15P1DenNum(false, 2),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    dataSetDefinition.addColumn(
+        "MI15NUM3",
+        "MI CAT 15 NUM 3",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCat15P1DenNum(false, 3),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
 
     return dataSetDefinition;
   }

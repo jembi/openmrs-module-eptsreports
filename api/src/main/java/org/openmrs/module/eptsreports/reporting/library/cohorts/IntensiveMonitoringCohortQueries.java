@@ -1202,8 +1202,7 @@ public class IntensiveMonitoringCohortQueries {
 
   public CohortDefinition getCat15P1DenNum(boolean isDenominator, int level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
     String name1 = "15.1 - % de pacientes elegíveis a MDS, que foram inscritos em MDS";
     String name2 =
@@ -1248,7 +1247,7 @@ public class IntensiveMonitoringCohortQueries {
 
       if (level == 1) {
         cd.setName("Denominator: " + name1);
-        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND Age2+ ");
+        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J)  ");
       }
       if (level == 2) {
         cd.setName("Denominator: " + name2);
@@ -1263,7 +1262,7 @@ public class IntensiveMonitoringCohortQueries {
 
     if (level == 1) {
       cd.setName("Numerator: " + name1);
-      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND Age2+  AND J");
+      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J)  AND J");
     }
     if (level == 2) {
       cd.setName("Numerator: " + name2);
