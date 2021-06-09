@@ -1097,4 +1097,53 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+
+  /**
+   * E - Select all patients with the following Clinical Consultations or ARV Drugs Pick Ups: at
+   * least one Clinical Consultation (encounter type 6, encounter_datetime) or at least one ARV
+   * Pickup (encounter type 52, value_datetime(concept_id 23866)) between “Last Clinical
+   * Consultation” ( encounter_datetime from A) minus 30 days and “Last Clinical Consultation”
+   * (encounter_datetime from A) minus 1 day
+   *
+   * <p>AND
+   *
+   * <p>at least one Clinical Consultation (encounter type 6, encounter_datetime) or at least one
+   * ARV Pickup (encounter type 52, value_datetime(concept_id 23866)) between “Last Clinical
+   * Consultation” (encounter_datetime from A) minus 60 days and “Last Clinical Consultation” (
+   * encounter_datetime from A) minus 31 days AND
+   *
+   * <p>at least one Clinical Consultation (encounter type 6, encounter_datetime) or at least one
+   * ARV Pickup (encounter type 52, value_datetime(concept_id 23866)) between “Last Clinical
+   * Consultation” (encounter_datetime from A) minus 90 days and “Last Clinical Consultation”
+   * (encounter_datetime from A) minus 61 days
+   *
+   * @return
+   */
+  public CohortDefinition getMI15EComplete() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Select all patients with the following Clinical Consultations or ARV Drugs Pick Ups");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition a = getMI15E(30, 1);
+    CohortDefinition b = getMI15E(60, 31);
+    CohortDefinition c = getMI15E(90, 61);
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(a, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "B",
+        EptsReportUtils.map(b, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(c, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("A AND B AND C");
+
+    return cd;
+  }
 }
