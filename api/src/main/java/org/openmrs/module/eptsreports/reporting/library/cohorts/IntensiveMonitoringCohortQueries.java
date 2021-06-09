@@ -500,4 +500,53 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+
+  /**
+   * B2 - Select all patients with the earliest “Data de Início TARV” (concept_id 1190, not null, value_datetime) recorded in Ficha Resumo 
+   * (encounter type 53, obs_datetime) and “Last Consultation Date” (encounter_datetime from A) minus “Data de Início TARV”  
+   * (concept id 1190 value_datetime) is greater than (>) 21 months
+   */
+  public CohortDefinition getMI15B2(){
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("B2 Patients From Ficha Clinica");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+
+
+    String query = "
+    SELECT tabela.patient_id
+    FROM
+    (SELECT p.patient_id, min(o.value_datetime) value_datetime
+    FROM patient p INNER JOIN encounter e on e.patient_id=p.patient_id
+    INNER JOIN obs o ON o.encounter_id=e.encounter_id
+    WHERE
+    o.voided=0 AND e.voided=0 AND p.voided=0 AND
+    o.concept_id=1190 AND o.value_datetime is not NULL AND
+    e.encounter_type=53 AND
+    e.location_id= :location
+    GROUP by p.patient_id) tabela
+    
+    WHERE timestampdiff(month,tabela.value_datetime,(
+    SELECT MAX(e.encounter_datetime)
+    FROM   patient pp INNER JOIN encounter e
+      ON e.patient_id = pp.patient_id
+    WHERE  pp.voided = 0 AND e.voided = 0
+       AND tabela.patient_id=pp.patient_id
+      AND e.location_id = :location
+      AND e.encounter_type = 6
+      AND  e.encounter_datetime BETWEEN :startDate AND :endDate))>21    
+    ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
 }
