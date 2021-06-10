@@ -29,8 +29,10 @@ public class IntensiveMonitoringCohortQueries {
 
   @Autowired
   public IntensiveMonitoringCohortQueries(
-      QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries) {
+      QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries,
+      HivMetadata hivMetadata) {
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
+    this.hivMetadata = hivMetadata;
   }
 
   /**
