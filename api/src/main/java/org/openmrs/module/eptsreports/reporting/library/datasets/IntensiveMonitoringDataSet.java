@@ -592,7 +592,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(5),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt54=3-14"); // porque isto inclui intervalos
+        "ageBasedOnArt54=2-14"); // porque isto inclui intervalos
     // 11.6
     dataSetDefinition.addColumn(
         "MI11DEN6",
@@ -624,7 +624,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(1),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt135=adultsArt");
+        "ageBasedOnArt54=adultsArt");
     // 11.2
     dataSetDefinition.addColumn(
         "MI11NUM2",
@@ -634,7 +634,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(2),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=adultsArt");
+        "ageBasedOnArt43=adultsArt");
     // 11.3
     dataSetDefinition.addColumn(
         "MI11NUM3",
@@ -664,7 +664,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(5),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "ageBasedOnArt54=2-14");
     // 11.6
     dataSetDefinition.addColumn(
         "MI11NUM6",
@@ -674,7 +674,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "ageInMonths54=<9m");
     // 11.7
     dataSetDefinition.addColumn(
         "MI11NUM7",
