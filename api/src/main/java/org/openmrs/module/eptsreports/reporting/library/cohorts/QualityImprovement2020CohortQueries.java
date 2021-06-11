@@ -2486,7 +2486,7 @@ public class QualityImprovement2020CohortQueries {
             + "                    AND e.location_id = :location"
             + "                    AND o.location_id = :location"
             + "                    AND o.concept_id = ${856}"
-            + "                    AND o.value_numeric > 1000"
+            + "                    AND o.value_numeric >= 1000"
             + "                    AND (( e.encounter_type = ${6}"
             + "                    AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
             + "                    OR (e.encounter_type = ${53}"
@@ -2807,7 +2807,7 @@ public class QualityImprovement2020CohortQueries {
             + "                        AND e.encounter_datetime "
             + "                            BETWEEN :startDate AND :endDate "
             + "                        AND e.location_id = :location "
-            + "                        AND o.concept_id = ${856} AND o.value_numeric >  1000 "
+            + "                        AND o.concept_id = ${856} AND o.value_numeric >=  1000 "
             + "                    GROUP BY p.patient_id "
             + "                ) viral_load ON viral_load.patient_id = p.patient_id "
             + " WHERE p.voided = 0  "
@@ -3346,7 +3346,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtStatus().getConceptId());
     CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
     CohortDefinition i = getMQC11NI();
-    CohortDefinition babies = genericCohortQueries.getAgeInMonths(0, 8);
+    CohortDefinition babies = genericCohortQueries.getAgeInMonths(0, 9);
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING));
     compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
