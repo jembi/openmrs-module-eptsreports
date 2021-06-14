@@ -2211,10 +2211,11 @@ public class IntensiveMonitoringCohortQueries {
   }
 
   /**
-   * P- Select all patients with concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA VIRAL”
-   (Concept Id 856) registered in Ficha Clinica (encounter type 6) during the last 3 months from the “Last Consultation Date” 
-   (encounter_datetime from A), i.e, at least one “Pedido de Carga Viral” encounter_datetime >= “Last Consultation Date”-3months 
-    and < “Last Consultation Date”.  
+   * P- Select all patients with concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722)
+   * and value coded “HIV CARGA VIRAL” (Concept Id 856) registered in Ficha Clinica (encounter type
+   * 6) during the last 3 months from the “Last Consultation Date” (encounter_datetime from A), i.e,
+   * at least one “Pedido de Carga Viral” encounter_datetime >= “Last Consultation Date”-3months
+   * and < “Last Consultation Date”.
    */
   public CohortDefinition getMI15P() {
 
