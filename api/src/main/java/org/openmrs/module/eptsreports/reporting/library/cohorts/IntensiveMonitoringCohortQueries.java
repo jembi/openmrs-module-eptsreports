@@ -1634,13 +1634,13 @@ public class IntensiveMonitoringCohortQueries {
             + "       AND oo.value_numeric >= 1000 "
             + "       AND ee.encounter_datetime = (SELECT "
             + "           Max(e.encounter_datetime) AS last_consultation_date "
-            + "                                    FROM   patient p "
+            + "                                    FROM   patient pp "
             + "                                           INNER JOIN encounter e "
             + "                                                   ON e.patient_id = "
-            + "                                                      p.patient_id "
-            + "                                    WHERE  p.voided = 0 "
+            + "                                                      pp.patient_id "
+            + "                                    WHERE  pp.voided = 0 "
             + "                                           AND e.voided = 0 "
-            + "                                           AND e.location_id = :location "
+            + "                                           AND e.location_id = :location AND pp.patient_id=p.patient_id "
             + "                                           AND e.encounter_type = ${6} "
             + "                                           AND e.encounter_datetime BETWEEN "
             + "                                               :startDate AND :endDate "
@@ -2214,8 +2214,8 @@ public class IntensiveMonitoringCohortQueries {
    * P- Select all patients with concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722)
    * and value coded “HIV CARGA VIRAL” (Concept Id 856) registered in Ficha Clinica (encounter type
    * 6) during the last 3 months from the “Last Consultation Date” (encounter_datetime from A), i.e,
-   * at least one “Pedido de Carga Viral” encounter_datetime >= “Last Consultation Date”-3months
-   * and < “Last Consultation Date”.
+   * at least one “Pedido de Carga Viral” encounter_datetime >= “Last Consultation Date”-3months and
+   * < “Last Consultation Date”.
    */
   public CohortDefinition getMI15P() {
 
