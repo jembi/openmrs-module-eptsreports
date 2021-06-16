@@ -58,6 +58,12 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
 
     dataSetDefinition.addDimension(
+        "miAge112",
+        EptsReportUtils.map(
+            eptsCommonDimension.getPatientAgeBasedOnFirstViralLoadDate(),
+            "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}"));
+
+    dataSetDefinition.addDimension(
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${revisionEndDate-4m}"));
@@ -562,7 +568,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(2),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt43=adultsArt");
+        "miAge112=MqAdults");
     // 11.3
     dataSetDefinition.addColumn(
         "MI11DEN3",
@@ -634,7 +640,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(2),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt43=adultsArt");
+        "miAge112=MqAdults");
     // 11.3
     dataSetDefinition.addColumn(
         "MI11NUM3",
