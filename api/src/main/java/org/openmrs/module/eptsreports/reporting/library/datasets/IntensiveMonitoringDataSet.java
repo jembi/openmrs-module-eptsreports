@@ -568,7 +568,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(2),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge112=MqAdults");
+        "miAge11=MqAdults");
     // 11.3
     dataSetDefinition.addColumn(
         "MI11DEN3",
