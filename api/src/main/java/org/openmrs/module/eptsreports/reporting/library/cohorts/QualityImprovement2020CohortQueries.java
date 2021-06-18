@@ -60,6 +60,18 @@ public class QualityImprovement2020CohortQueries {
       "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}";
   private final String MAPPING3 =
       "startDate=${startDate},endDate=${revisionEndDate},location=${location}";
+  private final String MAPPING4 =
+      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
+  private final String MAPPING5 =
+      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING6 =
+      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate},location=${location}";
+  private final String MAPPING7 =
+      "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate},location=${location}";
+  private final String MAPPING9 =
+      "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING8 =
+      "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -1896,7 +1908,7 @@ public class QualityImprovement2020CohortQueries {
    * @return CohortDefinition
    * @params indicatorFlag A to G For inicator 11.1 to 11.7 respectively
    */
-  public CohortDefinition getMQC11DEN(int indicatorFlag) {
+  public CohortDefinition getMQC11DEN(int indicatorFlag, String reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     compositionCohortDefinition.setName(
@@ -1951,27 +1963,64 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
 
-    compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+    if (reportSource.equals("MQ")) {
+      compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+    } else if (reportSource.equals("MI")) {
+      if (indicatorFlag == 1 || indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
+        compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING4));
+      } else {
+        compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
+      }
+    }
 
-    compositionCohortDefinition.addSearch(
-        "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
+    if (reportSource.equals("MQ")) {
+      compositionCohortDefinition.addSearch(
+          "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
 
-    compositionCohortDefinition.addSearch(
-        "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING1));
+      compositionCohortDefinition.addSearch(
+          "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING1));
 
-    compositionCohortDefinition.addSearch(
-        "B4", EptsReportUtils.map(pregnantWithCargaViralHigherThan1000, MAPPING1));
+      compositionCohortDefinition.addSearch(
+          "B4", EptsReportUtils.map(pregnantWithCargaViralHigherThan1000, MAPPING1));
 
-    compositionCohortDefinition.addSearch(
-        "B5", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan1000, MAPPING1));
+      compositionCohortDefinition.addSearch(
+          "B5", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan1000, MAPPING1));
 
-    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+      compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+      compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
+    } else if (reportSource.equals("MI")) {
+      if (indicatorFlag == 1) {
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING5));
+      }
+      if (indicatorFlag == 1 || indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
+        compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING6));
+        compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING6));
+        compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING6));
+      }
+      if (indicatorFlag == 2 || indicatorFlag == 4 || indicatorFlag == 7) {
+        compositionCohortDefinition.addSearch(
+            "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING8));
 
-    compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+        compositionCohortDefinition.addSearch(
+            "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING8));
 
-    compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
+        compositionCohortDefinition.addSearch(
+            "B4", EptsReportUtils.map(pregnantWithCargaViralHigherThan1000, MAPPING8));
 
-    compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
+        compositionCohortDefinition.addSearch(
+            "B5", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan1000, MAPPING8));
+
+        compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
+        compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
+        compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING7));
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING9));
+      }
+      if (indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
+        compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING5));
+      }
+    }
 
     if (indicatorFlag == 1 || indicatorFlag == 5 || indicatorFlag == 6) {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
