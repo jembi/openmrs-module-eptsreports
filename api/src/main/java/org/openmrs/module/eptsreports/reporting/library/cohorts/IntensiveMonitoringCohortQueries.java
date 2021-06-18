@@ -33,7 +33,7 @@ public class IntensiveMonitoringCohortQueries {
   private TbMetadata tbMetadata;
 
   private final String MAPPING2 =
-      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
+      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
 
   private final String MAPPING3 =
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
