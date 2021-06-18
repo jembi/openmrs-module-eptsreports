@@ -3127,6 +3127,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING6));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING4));
     }
 
