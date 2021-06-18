@@ -68,10 +68,12 @@ public class QualityImprovement2020CohortQueries {
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate},location=${location}";
   private final String MAPPING7 =
       "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate},location=${location}";
-  private final String MAPPING9 =
-      "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}";
   private final String MAPPING8 =
       "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},location=${location}";
+  private final String MAPPING9 =
+      "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate},revisionEndDate=${revisionEndDate},location=${location}";
+  private final String MAPPING10 =
+      "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
 
   @Autowired
   public QualityImprovement2020CohortQueries(
@@ -3127,8 +3129,8 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
-      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING6));
-      compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING4));
+      compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
+      compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
     compositionCohortDefinition.setCompositionString(
@@ -3260,7 +3262,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
-      compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING4));
+      compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
     compositionCohortDefinition.setCompositionString("A AND C AND NOT D AND NOT E AND NOT F AND G");
@@ -3412,7 +3414,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
-      compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING4));
+      compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
     compositionCohortDefinition.setCompositionString(
@@ -3475,7 +3477,11 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING6));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING5));
-      compositionCohortDefinition.addSearch("I", EptsReportUtils.map(i, MAPPING4));
+      compositionCohortDefinition.addSearch(
+          "I",
+          EptsReportUtils.map(
+              i,
+              "onOrAfter=${revisionEndDate-5m+1d},onOrBefore=${revisionEndDate-4m},location=${location}"));
     }
 
     compositionCohortDefinition.addSearch(
