@@ -685,7 +685,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ11NUM1",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss(),
+                qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss("MQ"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ11NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -703,7 +703,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ11NUM2",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries
-                    .getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(),
+                    .getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss("MQ"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ11NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -720,7 +720,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ11NUM3",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG(),
+                qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG("MQ"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ11NUM3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -737,7 +737,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ11NUM4",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(),
+                qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH("MQ"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ11NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -754,7 +754,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ11NUM5",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren(),
+                qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren("MQ"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ11NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -771,8 +771,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ11NUM6",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries
-                    .getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(),
+                qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(
+                    "MQ"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ11NUM6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -789,7 +789,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ11NUM7",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(),
+                qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(
+                    "MQ"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ11NUM7.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));

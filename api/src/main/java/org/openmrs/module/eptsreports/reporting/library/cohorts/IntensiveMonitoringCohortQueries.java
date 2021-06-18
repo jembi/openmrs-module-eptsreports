@@ -1107,43 +1107,45 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss(),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss("MI"),
               MAPPING));
     } else if (indicatorFlag == 2) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries
-                  .getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(
+                  "MI"),
               MAPPING1));
     } else if (indicatorFlag == 3) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG(), MAPPING));
+              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG("MI"),
+              MAPPING));
     } else if (indicatorFlag == 4) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH("MI"),
               MAPPING1));
     } else if (indicatorFlag == 5) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren(),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren("MI"),
               MAPPING));
     } else if (indicatorFlag == 6) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(
+                  "MI"),
               MAPPING));
     } else if (indicatorFlag == 7) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren("MI"),
               MAPPING1));
     }
     cd.setCompositionString("MI11NUM");
