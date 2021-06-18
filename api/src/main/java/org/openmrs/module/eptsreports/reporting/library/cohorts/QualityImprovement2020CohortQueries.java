@@ -1965,15 +1965,6 @@ public class QualityImprovement2020CohortQueries {
 
     if (reportSource.equals("MQ")) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
-    } else if (reportSource.equals("MI")) {
-      if (indicatorFlag == 1 || indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
-        compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING4));
-      } else {
-        compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
-      }
-    }
-
-    if (reportSource.equals("MQ")) {
       compositionCohortDefinition.addSearch(
           "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
 
@@ -1991,13 +1982,17 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     } else if (reportSource.equals("MI")) {
+
       if (indicatorFlag == 1) {
         compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING5));
       }
       if (indicatorFlag == 1 || indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
+        compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING4));
         compositionCohortDefinition.addSearch("C", EptsReportUtils.map(pregnant, MAPPING6));
         compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING6));
         compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING6));
+      } else {
+        compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
       }
       if (indicatorFlag == 2 || indicatorFlag == 4 || indicatorFlag == 7) {
         compositionCohortDefinition.addSearch(
