@@ -352,8 +352,7 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     if (den == 2 || den == 4) {
-      cd.setCompositionString(
-          "(A AND (B41 OR B42)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
+      cd.setCompositionString("(B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
     } else if (den == 6) {
       cd.setCompositionString(
           "(A AND (B41 OR B42) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
@@ -821,17 +820,21 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    if (indicatorFlag == 1 || indicatorFlag == 3 || indicatorFlag == 5 || indicatorFlag == 6) {
+    if (indicatorFlag == 1
+        || indicatorFlag == 2
+        || indicatorFlag == 3
+        || indicatorFlag == 5
+        || indicatorFlag == 6) {
       cd.addSearch(
           "MI11DEN",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag),
-              "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
-    } else if (indicatorFlag == 2 || indicatorFlag == 4 || indicatorFlag == 7) {
+              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag, "MI"),
+              "revisionEndDate=${revisionEndDate},location=${location}"));
+    } else if (indicatorFlag == 4 || indicatorFlag == 7) {
       cd.addSearch(
           "MI11DEN",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag),
+              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag, "MI"),
               "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
     cd.setCompositionString("MI11DEN");
@@ -1106,43 +1109,45 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss(),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss("MI"),
               MAPPING));
     } else if (indicatorFlag == 2) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries
-                  .getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(
+                  "MI"),
               MAPPING1));
     } else if (indicatorFlag == 3) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG(), MAPPING));
+              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG("MI"),
+              MAPPING));
     } else if (indicatorFlag == 4) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH("MI"),
               MAPPING1));
     } else if (indicatorFlag == 5) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren(),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren("MI"),
               MAPPING));
     } else if (indicatorFlag == 6) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(
+                  "MI"),
               MAPPING));
     } else if (indicatorFlag == 7) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren("MI"),
               MAPPING1));
     }
     cd.setCompositionString("MI11NUM");
@@ -1305,7 +1310,7 @@ public class IntensiveMonitoringCohortQueries {
             + " INNER JOIN obs o ON o.encounter_id=e.encounter_id "
             + " WHERE p.voided = 0 AND e.voided=0 AND e.location_id=:location "
             + " AND e.encounter_type= ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
-            + " AND o.concept_id = ${6332} AND o.value_coded= ${1065} "
+            + " AND o.concept_id = ${6332} AND o.value_coded= ${1065} AND o.voided=0 "
             + " GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1451,7 +1456,7 @@ public class IntensiveMonitoringCohortQueries {
             + " INNER JOIN obs o ON o.encounter_id=e.encounter_id "
             + " WHERE p.voided = 0 AND e.voided=0 AND e.location_id=:location "
             + " AND e.encounter_type= ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
-            + " AND o.concept_id = ${1982} AND o.value_coded= ${1065} "
+            + " AND o.concept_id = ${1982} AND o.value_coded= ${1065} AND o.voided=0 "
             + " GROUP BY p.patient_id ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2009,7 +2014,8 @@ public class IntensiveMonitoringCohortQueries {
 
       if (level == 1) {
         cd.setName("Denominator: " + name1);
-        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND AGE2 ");
+        // cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND AGE2 ");
+        cd.setCompositionString("D");
       }
       if (level == 2) {
         cd.setName("Denominator: " + name2);
