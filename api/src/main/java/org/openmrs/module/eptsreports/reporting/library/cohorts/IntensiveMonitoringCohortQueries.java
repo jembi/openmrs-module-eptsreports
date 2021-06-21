@@ -2221,7 +2221,7 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addSearch(
         "B3E",
         EptsReportUtils.map(
-            B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+            B3E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B4E",
