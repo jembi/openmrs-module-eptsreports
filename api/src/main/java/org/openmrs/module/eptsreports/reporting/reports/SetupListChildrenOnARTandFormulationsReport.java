@@ -12,18 +12,21 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Deprecated
+@Component
 public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportManager {
 
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
-  @Autowired protected GenericCohortQueries genericCohortQueries;
+  protected GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public SetupListChildrenOnARTandFormulationsReport(
+          GenericCohortQueries genericCohortQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   @Override
