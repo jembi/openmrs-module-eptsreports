@@ -378,26 +378,10 @@ public class GenericCohortQueries {
     return cd;
   }
 
-  /*  public CohortDefinition getAgeOnMOHArtStartDate(
-      Integer minAge, Integer maxAge, boolean considerPatientThatStartedBeforeWasBorn) {
-    CalculationCohortDefinition cd =
-        new CalculationCohortDefinition(
-            Context.getRegisteredComponents(AgeOnMOHArtStartDateCalculation.class).get(0));
-    cd.setName("Age on MOH ART start date");
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addCalculationParameter("minAge", minAge);
-    cd.addCalculationParameter("maxAge", maxAge);
-    cd.addCalculationParameter(
-        "considerPatientThatStartedBeforeWasBorn", considerPatientThatStartedBeforeWasBorn);
-    return cd;
-  }*/
-
   public CohortDefinition getAgeOnMOHArtStartDate(
       Integer minAge, Integer maxAge, boolean considerPatientThatStartedBeforeWasBorn) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients Age at Last Ficha Clinica");
+    sqlCohortDefinition.setName("Age on MOH ART start date");
     sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
