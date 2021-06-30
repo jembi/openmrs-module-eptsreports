@@ -310,7 +310,7 @@ public class CommonCohortQueries {
   public CohortDefinition getTranferredOutPatients() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients From Ficha Clinica");
+    sqlCohortDefinition.setName("All patients registered in encounter “Ficha Resumo-MasterCard”");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
