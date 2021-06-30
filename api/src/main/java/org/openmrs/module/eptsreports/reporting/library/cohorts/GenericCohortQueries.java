@@ -31,7 +31,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.AgeInMonthsOnArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.AgeOnArtStartDateCalculation;
-import org.openmrs.module.eptsreports.reporting.calculation.generic.AgeOnMOHArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.AgeOnPreArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.AgeOnReportEndDateDateCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.ArtDateMinusDiagnosisDateCalculation;
@@ -379,7 +378,7 @@ public class GenericCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getAgeOnMOHArtStartDate(
+  /*  public CohortDefinition getAgeOnMOHArtStartDate(
       Integer minAge, Integer maxAge, boolean considerPatientThatStartedBeforeWasBorn) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
@@ -393,6 +392,49 @@ public class GenericCohortQueries {
     cd.addCalculationParameter(
         "considerPatientThatStartedBeforeWasBorn", considerPatientThatStartedBeforeWasBorn);
     return cd;
+  }*/
+
+  public CohortDefinition getAgeOnMOHArtStartDate(
+      Integer minAge, Integer maxAge, boolean considerPatientThatStartedBeforeWasBorn) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients Age at Last Ficha Clinica");
+    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+    String query =
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + "           SELECT pp.patient_id, MIN(o.value_datetime) as first_start_drugs "
+            + "           FROM patient pp "
+            + "                INNER JOIN encounter e ON e.patient_id = pp.patient_id "
+            + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "           WHERE pp.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "             AND e.encounter_type = ${53} and o.concept_id = ${1190} "
+            + "             AND e.location_id = :location "
+            + "             AND o.value_datetime <= :onOrBefore "
+            + "           GROUP BY pp.patient_id ) AS A1 ON p.person_id = A1.patient_id "
+            + "WHERE A1.first_start_drugs >= :onOrAfter "
+            + "  AND A1.first_start_drugs <= :onOrBefore "
+            + "  AND ";
+    if (minAge != null && maxAge != null) {
+      query +=
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) <= ${maxAge}; ";
+    } else if (minAge == null && maxAge != null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) <= ${maxAge}; ";
+    } else if (minAge != null && maxAge == null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) >= ${minAge};  ";
+    }
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
   }
 
   public CohortDefinition getStartedArtOnPeriod(
