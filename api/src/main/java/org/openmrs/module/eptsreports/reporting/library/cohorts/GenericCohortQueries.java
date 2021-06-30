@@ -384,7 +384,7 @@ public class GenericCohortQueries {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(AgeOnMOHArtStartDateCalculation.class).get(0));
-    cd.setName("Age on ART start date");
+    cd.setName("Age on MOH ART start date");
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -633,7 +633,7 @@ public class GenericCohortQueries {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(AgeOnReportEndDateDateCalculation.class).get(0));
-    cd.setName("Age on ART start date");
+    cd.setName("Age on Report end date");
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
