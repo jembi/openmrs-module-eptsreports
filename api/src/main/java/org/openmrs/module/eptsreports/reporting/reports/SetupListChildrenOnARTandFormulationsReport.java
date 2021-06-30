@@ -23,7 +23,7 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
 
   @Autowired
   public SetupListChildrenOnARTandFormulationsReport(
-          GenericCohortQueries genericCohortQueries,
+      GenericCohortQueries genericCohortQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
     this.genericCohortQueries = genericCohortQueries;
