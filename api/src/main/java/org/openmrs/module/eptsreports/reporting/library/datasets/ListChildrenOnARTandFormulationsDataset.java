@@ -1,10 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
@@ -33,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
   @Autowired private HivMetadata hivMetadata;
 
-  public DataSetDefinition constructDataset(List<Parameter> parameterList) {
+  public DataSetDefinition constructDataset() {
 
     PatientDataSetDefinition patientDataSetDefinition = new PatientDataSetDefinition();
 
@@ -111,8 +107,6 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         "onOrBefore=${endDate},location=${location}",
         new EncounterDatetimeConverter());
 
-    patientDataSetDefinition.addParameters(parameterList);
-
     return patientDataSetDefinition;
   }
 
@@ -150,7 +144,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("1088", hivMetadata.getRegimeConcept().getConceptId());
 
     String sql =
-        " SELECT max_encounter.patient_id as patient_id, max_encounter.encounter_datetime FROM  "
+        " SELECT max_encounter.patient_id as patient_id, max_encounter.encounter_datetime FROM"
             + " (SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime "
             + " FROM   patient p  "
             + "  INNER JOIN encounter e  "
@@ -296,7 +290,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("1087", hivMetadata.getPreviousARVUsedForTreatmentConcept().getConceptId()); 
+    valuesMap.put("1087", hivMetadata.getPreviousARVUsedForTreatmentConcept().getConceptId());
     String sql =
         " SELECT p.patient_id, MAX(e.encounter_datetime) "
             + " FROM   patient p  "
@@ -333,7 +327,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("5089", hivMetadata.getWeightConcept().getConceptId()); 
+    valuesMap.put("5089", hivMetadata.getWeightConcept().getConceptId());
 
     String sql =
         " SELECT p.patient_id, MAX(e.encounter_datetime) "

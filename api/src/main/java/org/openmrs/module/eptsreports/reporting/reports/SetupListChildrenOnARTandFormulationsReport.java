@@ -19,7 +19,7 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
 
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
-  protected GenericCohortQueries genericCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public SetupListChildrenOnARTandFormulationsReport(
@@ -58,8 +58,7 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
     rd.addParameters(getParameters());
     rd.addDataSetDefinition(
         "ALL",
-        Mapped.mapStraightThrough(
-            listChildrenOnARTandFormulationsDataset.constructDataset(getParameters())));
+        Mapped.mapStraightThrough(listChildrenOnARTandFormulationsDataset.constructDataset()));
     return rd;
   }
 
@@ -75,7 +74,7 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_ListChildrenonARTandFormulations Specification_v1.0.xlsx",
+              "Template_ListChildrenonARTandFormulations Specification_v1.0.xls",
               "List of Children on ART and Formulations",
               getExcelDesignUuid(),
               null);
