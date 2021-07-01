@@ -296,7 +296,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("1087", hivMetadata.getPreviousARVUsedForTreatmentConcept().getConceptId()); 
+    valuesMap.put("1087", hivMetadata.getPreviousARVUsedForTreatmentConcept().getConceptId());
     String sql =
         " SELECT p.patient_id, MAX(e.encounter_datetime) "
             + " FROM   patient p  "
@@ -333,7 +333,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("5089", hivMetadata.getWeightConcept().getConceptId()); 
+    valuesMap.put("5089", hivMetadata.getWeightConcept().getConceptId());
 
     String sql =
         " SELECT p.patient_id, MAX(e.encounter_datetime) "

@@ -4064,22 +4064,24 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-
   /**
    * <b>concept_id = 1087</b>
    *
    * <p><b>Name:</b>PREVIOUS ANTIRETROVIRAL DRUGS USED FOR TREATMENT concept
    *
-   * <p><b>Description:Question on encounter forms: Is the patient currently taking, 
-   * or has the patient ever taken, any of the following retroviral medications? Reason for use? This particular concept stores a history of previous use of the associated antiretroviral medications for HIV treatment. </b>
+   * <p><b>Description:Question on encounter forms: Is the patient currently taking, or has the
+   * patient ever taken, any of the following retroviral medications? Reason for use? This
+   * particular concept stores a history of previous use of the associated antiretroviral
+   * medications for HIV treatment. </b>
+   *
    * @return
    */
   public Concept getPreviousARVUsedForTreatmentConcept() {
     String uuid =
-        Context.getAdministrationService().getGlobalProperty("eptsreports.previousARVUsedForTreatmentConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.previousARVUsedForTreatmentConceptUuid");
     return getConcept(uuid);
   }
-
 
   /**
    * <b>concept_id = 5089</b>
@@ -4087,6 +4089,7 @@ public class HivMetadata extends ProgramsMetadata {
    * <p><b>Name:</b>WEIGHT (KG) concept
    *
    * <p><b>Patient's weight in kilograms.</b>
+   *
    * @return
    */
   public Concept getWeightConcept() {
@@ -4095,18 +4098,19 @@ public class HivMetadata extends ProgramsMetadata {
     return getConcept(uuid);
   }
 
-
   /**
    * <b>concept_id = 1410</b>
    *
    * <p><b>Name:</b>RETURN VISIT DATE concept
    *
    * <p><b>Patient is to return on this date</b>
+   *
    * @return
    */
   public Concept getReturnVisitDateConcept() {
     String uuid =
-        Context.getAdministrationService().getGlobalProperty("eptsreports.returnVisitDateConceptConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.returnVisitDateConceptConceptUuid");
     return getConcept(uuid);
   }
 }
