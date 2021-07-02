@@ -6,6 +6,7 @@ import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.EncounterDatetimeConverter;
@@ -27,7 +28,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
+
   @Autowired private HivMetadata hivMetadata;
+
+  @Autowired private TbMetadata tbMetadata;
 
   public DataSetDefinition constructDataset() {
 
@@ -40,14 +44,18 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         Context.getPatientService()
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
     DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
+
     DataDefinition identifierDef =
         new ConvertedPatientDataDefinition(
             "identifier",
             new PatientIdentifierDataDefinition(identifierType.getName(), identifierType),
             identifierFormatter);
+
     DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
+
     DataDefinition nameDef =
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
+
     patientDataSetDefinition.setParameters(getParameters());
 
     patientDataSetDefinition.addColumn("id", new PersonIdDataDefinition(), "");
@@ -58,15 +66,23 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         getArtStartDate(),
         "onOrBefore=${endDate},location=${location}",
         new CalculationResultConverter());
+
     patientDataSetDefinition.addColumn(
         "gender", new GenderDataDefinition(), "", new GenderConverter());
     patientDataSetDefinition.addColumn("age", new AgeDataDefinition(), "", null);
-    // Missing On TB Treatment
+
+    patientDataSetDefinition.addColumn(
+        "ontbtreatment",
+        this.getPatientsActiveOnTB(),
+        "endDate=${endDate},location=${location}",
+        new EncounterDatetimeConverter());
+
     patientDataSetDefinition.addColumn(
         "lastpickupdate",
-        getLastDrugPickupDate(),
-        "onOrBefore=${endDate},location=${location}",
+        this.getLastDrugPickupDate(),
+        "endDate=${endDate},location=${location}",
         new EncounterDatetimeConverter());
+
     patientDataSetDefinition.addColumn(
         "lastregimewithdrawal",
         getLastARVRegimen(),
@@ -78,35 +94,41 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         getNextDrugPickupDate(),
         "onOrBefore=${endDate},location=${location}",
         new EncounterDatetimeConverter());
+
     patientDataSetDefinition.addColumn(
         "lastconsultationdate",
-        getLastFollowupConsultationDate(),
-        "onOrBefore=${endDate},location=${location}",
+        this.getLastFollowupConsultationDate(),
+        "endDate=${endDate},location=${location}",
         new EncounterDatetimeConverter());
+
     patientDataSetDefinition.addColumn(
         "lastregimeconsultation",
-        getARVRegimenLastConsultationDate(),
-        "onOrBefore=${endDate},location=${location}",
+        this.getARVRegimenLastConsultationDate(),
+        "endDate=${endDate},location=${location}",
         new EncounterDatetimeConverter());
+
     patientDataSetDefinition.addColumn(
         "weight",
-        getWeightLossLastConsultationDate(),
-        "onOrBefore=${endDate},location=${location}",
+        this.getWeightLossLastConsultationDate(),
+        "endDate=${endDate},location=${location}",
         new EncounterDatetimeConverter());
+
     patientDataSetDefinition.addColumn(
         "familyapproachlastconsultation",
-        getAbordagemFamiliarOnLastConsultationDate(),
-        "onOrBefore=${endDate},location=${location}",
+        this.getAbordagemFamiliarOnLastConsultationDate(),
+        "endDate=${endDate},location=${location}",
         new EncounterDatetimeConverter());
+
     patientDataSetDefinition.addColumn(
         "quartelydismissallastconsultation",
-        get3MonthsDispensationOnLastConsultationDate(),
-        "onOrBefore=${endDate},location=${location}",
+        this.get3MonthsDispensationOnLastConsultationDate(),
+        "endDate=${endDate},location=${location}",
         new EncounterDatetimeConverter());
+
     patientDataSetDefinition.addColumn(
         "nextconsultationdate",
-        getNextFollowUpConsultationDate(),
-        "onOrBefore=${endDate},location=${location}",
+        this.getNextFollowUpConsultationDate(),
+        "endDate=${endDate},location=${location}",
         new EncounterDatetimeConverter());
 
     return patientDataSetDefinition;
@@ -130,6 +152,114 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     return cd;
   }
 
+  /** 6 */
+  private DataDefinition getPatientsActiveOnTB() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Last ARV Regimen (FILA)");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    valuesMap.put("1113", hivMetadata.getTBDrugStartDateConcept().getConceptId());
+    valuesMap.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    valuesMap.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+    valuesMap.put("6269", hivMetadata.getActiveOnProgramConcept().getConceptId());
+    valuesMap.put("5", hivMetadata.getTBProgram().getProgramId());
+    valuesMap.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
+    valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+
+    String sql =
+        " SELECT p.patient_id "
+            + " FROM patient p "
+            + "    INNER JOIN ( "
+            + "                SELECT p.patient_id "
+            + "                FROM patient p "
+            + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type = ${6} "
+            + "                  AND ( "
+            + "                        (o.concept_id = ${1268} AND o.value_coded = 1256) "
+            + "                        OR "
+            + "                        (o.concept_id = ${1113} AND o.obs_datetime "
+            + "                            BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate) "
+            + "                    ) "
+            + "                  AND e.encounter_datetime <= :endDate "
+            + "               ) first_criteria ON first_criteria.patient_id =p.patient_id "
+            + "    INNER JOIN ( "
+            + "                SELECT p.patient_id "
+            + "                FROM patient p "
+            + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type IN (${6},${9}) "
+            + "                  AND o.concept_id = ${1113} "
+            + "                  AND o.value_datetime "
+            + "                            BETWEEN DATE_SUB( :endDate, INTERVAL 210 DAY ) AND :endDate "
+            + "                  AND e.encounter_datetime <= :endDate "
+            + "               ) second_criteria ON second_criteria.patient_id = p.patient_id "
+            + "    INNER JOIN ( "
+            + "                SELECT p.patient_id "
+            + "                FROM patient p "
+            + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND o.concept_id = ${1406} "
+            + "                  AND o.value_coded = ${42} "
+            + "                  AND o.obs_datetime "
+            + "                    BETWEEN DATE_SUB ( :endDate, INTERVAL 210 DAY ) AND :endDate "
+            + "                ) third_criteria ON p.patient_id =third_criteria.patient_id "
+            + "    INNER JOIN ( "
+            + "                SELECT p.patient_id "
+            + "                FROM patient p "
+            + "                         INNER JOIN patient_program pp ON p.patient_id = pp.patient_id "
+            + "                         INNER JOIN program pgr ON pp.program_id = pgr.program_id "
+            + "                         INNER JOIN patient_state ps on pp.patient_program_id = ps.patient_program_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND pp.voided = 0 "
+            + "                  AND ps.voided = 0 "
+            + "                  AND ps.state = ${6269} "
+            + "                  AND pgr.program_id = ${5} "
+            + "                  AND ps.start_date >= DATE_SUB(:endDate, INTERVAL 210 DAY) "
+            + "                  AND ps.end_date <= :endDate "
+            + "                ) fourth_criteria ON fourth_criteria.patient_id = p.patient_id "
+            + "    INNER JOIN ( "
+            + "                SELECT p.patient_id "
+            + "                FROM patient p "
+            + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${6} "
+            + "                  AND e.location_id = :location "
+            + "                  AND o.concept_id = ${23761} "
+            + "                  AND o.value_coded = ${1065} "
+            + "                  AND e.encounter_datetime "
+            + "                    BETWEEN DATE_SUB ( :endDate, INTERVAL 210 DAY ) AND :endDate "
+            + "                ) fifth_criteria ON fifth_criteria.patient_id = p.patient_id "
+            + " WHERE p.voided = 0";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
   /**
    * 8
    *
@@ -146,23 +276,30 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("1088", hivMetadata.getRegimeConcept().getConceptId());
 
     String sql =
-        " SELECT max_encounter.patient_id as patient_id, max_encounter.encounter_datetime FROM"
-            + " (SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime "
-            + " FROM   patient p  "
-            + "  INNER JOIN encounter e  "
-            + "  ON p.patient_id = e.patient_id "
-            + "  WHERE e.location_id = :location "
-            + " AND e.encounter_datetime <= :endDate "
-            + " GROUP BY p.patient_id "
-            + " ) max_encounter "
-            + " INNER JOIN encounter en ON max_encounter.patient_id= en.patient_id "
-            + " INNER JOIN obs ob ON en.encounter_id = ob.encounter_id "
-            + " WHERE max_encounter.encounter_datetime = en.encounter_datetime "
-            + " AND en.encounter_type = ${18} "
-            + " AND en.location_id = :location "
-            + " AND ob.concept_id = ${1088} "
-            + " AND ob.value_coded IS NOT NULL "
-            + " AND en.encounter_datetime <= :endDate ";
+        " SELECT p.patient_id, o.value_coded "
+            + " FROM patient p"
+            + "   INNER JOIN "
+            + "   ( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime "
+            + "     FROM  patient p  "
+            + "         INNER JOIN encounter e  ON p.patient_id = e.patient_id "
+            + "     WHERE p.voided = 0 "
+            + "         AND p.voided = 0  "
+            + "         AND e.location_id = :location "
+            + "         AND e.encounter_datetime <= :endDate "
+            + "         AND e.encounter_type = ${18}"
+            + "     GROUP BY p.patient_id "
+            + "   ) max_encounter ON p.patient_id=max_encounter.patient_id"
+            + "     INNER JOIN encounter e ON p.patient_id= e.patient_id "
+            + "     INNER JOIN obs ob ON e.encounter_id = o.encounter_id "
+            + " WHERE  p.voided = 0"
+            + "     AND e.voided = 0 "
+            + "     AND o.voided = 0"
+            + "     AND max_encounter.encounter_datetime = e.encounter_datetime "
+            + "     AND e.encounter_type = ${18} "
+            + "     AND e.location_id = :location "
+            + "     AND o.concept_id = ${1088} "
+            + "     AND o.value_coded IS NOT NULL "
+            + "     AND e.encounter_datetime <= :endDate ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -218,23 +355,36 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
 
     String sql =
-        " SELECT "
-            + "         p.patient_id, "
-            + "         MAX(e.encounter_datetime) "
-            + " FROM "
-            + "         patient p "
-            + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "         WHERE "
-            + "         p.voided = 0 "
-            + "         AND e.voided = 0 "
-            + "         AND o.voided = 0 "
-            + "         AND e.location_id = :location "
-            + "         AND e.encounter_type = ${18} "
-            + "         AND o.concept_id = ${5096} "
-            + "         AND e.encounter_datetime <= :endDate "
-            + " GROUP BY "
-            + "         p.patient_id ";
+        ""
+            + "  SELECT p.patient_id, o.value_datetime "
+            + " FROM   patient p  "
+            + "     INNER JOIN encounter e  "
+            + "         ON p.patient_id = e.patient_id  "
+            + "     INNER JOIN obs o  "
+            + "         ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN ("
+            + "             SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type IN (${18}) "
+            + "                 AND e.encounter_datetime <= :endDate "
+            + "             GROUP BY p.patient_id "
+            + "                   ) most_recent  ON p.patient_id = most_recent.patient_id   "
+            + " WHERE  p.voided = 0  "
+            + "     AND e.voided = 0  "
+            + "     AND o.voided = 0  "
+            + "     AND e.location_id = :location "
+            + "     AND e.encounter_type IN (${18}) "
+            + "     AND e.encounter_datetime <= :endDate "
+            + "     AND e.encounter_datetime = most_recent.e_datetime "
+            + "     AND o.concept_id = ${5096} ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -294,21 +444,36 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("1087", hivMetadata.getPreviousARVUsedForTreatmentConcept().getConceptId());
     String sql =
-        " SELECT p.patient_id, MAX(e.encounter_datetime) "
+        ""
+            + "  SELECT p.patient_id, o.value_coded "
             + " FROM   patient p  "
-            + "         INNER JOIN encounter e  "
-            + "                         ON p.patient_id = e.patient_id  "
-            + "         INNER JOIN obs o  "
-            + "                         ON e.encounter_id = o.encounter_id  "
-            + "WHERE  p.voided = 0  "
-            + "         AND e.voided = 0  "
-            + "         AND o.voided = 0  "
-            + "         AND e.location_id = :location "
-            + "        AND e.encounter_type IN (${6}, ${9}) "
-            + "         AND o.concept_id = ${1087}  "
-            + "         AND e.encounter_datetime <= :endDate "
-            + "GROUP BY p.patient_id ";
-
+            + "     INNER JOIN encounter e  "
+            + "         ON p.patient_id = e.patient_id  "
+            + "     INNER JOIN obs o  "
+            + "         ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN ("
+            + "             SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type IN (${6}, ${9}) "
+            + "                 AND e.encounter_datetime <= :endDate "
+            + "             GROUP BY p.patient_id "
+            + "                   ) most_recent  ON p.patient_id = most_recent.patient_id   "
+            + " WHERE  p.voided = 0  "
+            + "     AND e.voided = 0  "
+            + "     AND o.voided = 0  "
+            + "     AND e.location_id = :location "
+            + "     AND e.encounter_type IN (${6}, ${9}) "
+            + "     AND e.encounter_datetime <= :endDate "
+            + "     AND e.encounter_datetime = most_recent.e_datetime "
+            + "     AND o.concept_id = ${1087} ";
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
     spdd.setQuery(substitutor.replace(sql));
@@ -332,20 +497,36 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("5089", hivMetadata.getWeightConcept().getConceptId());
 
     String sql =
-        " SELECT p.patient_id, MAX(e.encounter_datetime) "
+        ""
+            + "  SELECT p.patient_id, o.value_numeric "
             + " FROM   patient p  "
-            + "         INNER JOIN encounter e  "
-            + "                         ON p.patient_id = e.patient_id  "
-            + "         INNER JOIN obs o  "
-            + "                        ON e.encounter_id = o.encounter_id  "
-            + "WHERE  p.voided = 0  "
-            + "         AND e.voided = 0  "
-            + "        AND o.voided = 0  "
-            + "        AND e.location_id = :location "
-            + "        AND e.encounter_type IN (${6}, ${9}) "
-            + "         AND o.concept_id = ${5089}  "
-            + "         AND e.encounter_datetime <= :endDate "
-            + "GROUP BY p.patient_id ";
+            + "     INNER JOIN encounter e  "
+            + "         ON p.patient_id = e.patient_id  "
+            + "     INNER JOIN obs o  "
+            + "         ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN ("
+            + "             SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type IN (${6}, ${9}) "
+            + "                 AND e.encounter_datetime <= :endDate "
+            + "             GROUP BY p.patient_id "
+            + "                   ) most_recent  ON p.patient_id = most_recent.patient_id   "
+            + " WHERE  p.voided = 0  "
+            + "     AND e.voided = 0  "
+            + "     AND o.voided = 0  "
+            + "     AND e.location_id = :location "
+            + "     AND e.encounter_type IN (${6}, ${9}) "
+            + "     AND e.encounter_datetime <= :endDate "
+            + "     AND e.encounter_datetime = most_recent.e_datetime "
+            + "     AND o.concept_id = ${5089} ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -370,20 +551,36 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23725", hivMetadata.getFamilyApproach().getConceptId());
 
     String sql =
-        " SELECT p.patient_id, MAX(e.encounter_datetime) "
+        ""
+            + "  SELECT p.patient_id, o.value_coded "
             + " FROM   patient p  "
-            + "          INNER JOIN encounter e  "
-            + "                          ON p.patient_id = e.patient_id  "
-            + "          INNER JOIN obs o  "
-            + "                          ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN encounter e  "
+            + "         ON p.patient_id = e.patient_id  "
+            + "     INNER JOIN obs o  "
+            + "         ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN ("
+            + "             SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type IN (${6}, ${9}) "
+            + "                 AND e.encounter_datetime <= :endDate "
+            + "             GROUP BY p.patient_id "
+            + "                   ) most_recent  ON p.patient_id = most_recent.patient_id   "
             + " WHERE  p.voided = 0  "
-            + "         AND e.voided = 0  "
-            + "         AND o.voided = 0  "
-            + "         AND e.location_id = :location "
-            + "         AND e.encounter_type IN (${6}, ${9}) "
-            + "         AND o.concept_id = ${23725}  "
-            + "          AND e.encounter_datetime <= :endDate "
-            + " GROUP BY p.patient_id ";
+            + "     AND e.voided = 0  "
+            + "     AND o.voided = 0  "
+            + "     AND e.location_id = :location "
+            + "     AND e.encounter_type IN (${6}, ${9}) "
+            + "     AND e.encounter_datetime <= :endDate "
+            + "     AND e.encounter_datetime = most_recent.e_datetime "
+            + "     AND o.concept_id = ${23725} ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -409,21 +606,37 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
 
     String sql =
-        " SELECT p.patient_id, MAX(e.encounter_datetime) "
+        ""
+            + "  SELECT p.patient_id, CASE WHEN e.encounter_datetime IS NOT NULL THEN Sim WHEN e.encounter_datetime IS NULL THEN NAO "
             + " FROM   patient p  "
-            + "          INNER JOIN encounter e  "
-            + "                          ON p.patient_id = e.patient_id  "
-            + "          INNER JOIN obs o  "
-            + "                          ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN encounter e  "
+            + "         ON p.patient_id = e.patient_id  "
+            + "     INNER JOIN obs o  "
+            + "         ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN ("
+            + "             SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type IN (${6}, ${9}) "
+            + "                 AND e.encounter_datetime <= :endDate "
+            + "             GROUP BY p.patient_id "
+            + "                   ) most_recent  ON p.patient_id = most_recent.patient_id   "
             + " WHERE  p.voided = 0  "
-            + "          AND e.voided = 0  "
-            + "          AND o.voided = 0  "
-            + "          AND e.location_id = :location "
-            + "          AND e.encounter_type IN (${6}, ${9}) "
-            + "          AND o.concept_id = ${23739}  "
-            + "      AND o.value_coded = ${23720} "
-            + "         AND e.encounter_datetime <= :endDate "
-            + " GROUP BY p.patient_id  ";
+            + "     AND e.voided = 0  "
+            + "     AND o.voided = 0  "
+            + "     AND e.location_id = :location "
+            + "     AND e.encounter_type IN (${6}, ${9}) "
+            + "     AND e.encounter_datetime <= :endDate "
+            + "     AND e.encounter_datetime = most_recent.e_datetime "
+            + "     AND o.concept_id = ${23739} "
+            + "     AND o.value_coded = ${23720} ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -448,7 +661,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
 
     String sql =
-        " SELECT p.patient_id, MAX(e.encounter_datetime) "
+        " SELECT p.patient_id, MAX(o.value_datetime) "
             + " FROM   patient p  "
             + "         INNER JOIN encounter e  "
             + "                         ON p.patient_id = e.patient_id  "
