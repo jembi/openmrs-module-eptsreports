@@ -173,10 +173,10 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
 
     String sql =
-        " SELECT p.patient_id "
-            + " FROM patient p "
-            + "    INNER JOIN ( "
-            + "                SELECT p.patient_id "
+        " SELECT final_query.patient_id, CASE WHEN final_query.result_Value IS NOT NULL THEN 'ACTIVE' WHEN final_query.result_Value IS NULL THEN 'INACTIVE' "
+            + " FROM "
+            + "( "
+            + "                SELECT p.patient_id, o.value_coded  AS result_Value"
             + "                FROM patient p "
             + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -192,9 +192,8 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                            BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate) "
             + "                    ) "
             + "                  AND e.encounter_datetime <= :endDate "
-            + "               ) first_criteria ON first_criteria.patient_id =p.patient_id "
-            + "    INNER JOIN ( "
-            + "                SELECT p.patient_id "
+            + "                UNION  "
+            + "                SELECT p.patient_id, o.value_datetime AS result_Value"
             + "                FROM patient p "
             + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -207,9 +206,8 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                  AND o.value_datetime "
             + "                            BETWEEN DATE_SUB( :endDate, INTERVAL 210 DAY ) AND :endDate "
             + "                  AND e.encounter_datetime <= :endDate "
-            + "               ) second_criteria ON second_criteria.patient_id = p.patient_id "
-            + "    INNER JOIN ( "
-            + "                SELECT p.patient_id "
+            + "                UNION  "
+            + "                SELECT p.patient_id, o.value_coded AS result_Value "
             + "                FROM patient p "
             + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -222,23 +220,24 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                  AND o.value_coded = ${42} "
             + "                  AND o.obs_datetime "
             + "                    BETWEEN DATE_SUB ( :endDate, INTERVAL 210 DAY ) AND :endDate "
-            + "                ) third_criteria ON p.patient_id =third_criteria.patient_id "
-            + "    INNER JOIN ( "
-            + "                SELECT p.patient_id "
+            + "                UNION  "
+            + "                SELECT p.patient_id , cn.name AS result_Value "
             + "                FROM patient p "
             + "                         INNER JOIN patient_program pp ON p.patient_id = pp.patient_id "
             + "                         INNER JOIN program pgr ON pp.program_id = pgr.program_id "
             + "                         INNER JOIN patient_state ps on pp.patient_program_id = ps.patient_program_id "
+            + "                         INNER JOIN program_workflow_state pws  on ps.state = pws.program_workflow_state_id          "
+            + "                         INNER JOIN concept_name cn  on pws.concept_id = cn.concept_id          "
             + "                WHERE p.voided = 0 "
             + "                  AND pp.voided = 0 "
             + "                  AND ps.voided = 0 "
             + "                  AND ps.state = ${6269} "
             + "                  AND pgr.program_id = ${5} "
+            + "                  AND cn.locale = 'pt' "
             + "                  AND ps.start_date >= DATE_SUB(:endDate, INTERVAL 210 DAY) "
             + "                  AND ps.end_date <= :endDate "
-            + "                ) fourth_criteria ON fourth_criteria.patient_id = p.patient_id "
-            + "    INNER JOIN ( "
-            + "                SELECT p.patient_id "
+            + "               UNION  "
+            + "                SELECT p.patient_id, o.value_coded  AS result_Value"
             + "                FROM patient p "
             + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -250,8 +249,8 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                  AND o.concept_id = ${23761} "
             + "                  AND o.value_coded = ${1065} "
             + "                  AND e.encounter_datetime "
-            + "                    BETWEEN DATE_SUB ( :endDate, INTERVAL 210 DAY ) AND :endDate "
-            + "                ) fifth_criteria ON fifth_criteria.patient_id = p.patient_id "
+            + "                    BETWEEN DATE_SUB ( :endDate, INTERVAL 210 DAY ) AND :endDate" +
+                ") AS final_query "
             + " WHERE p.voided = 0";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
@@ -681,4 +680,6 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     spdd.setQuery(substitutor.replace(sql));
     return spdd;
   }
+
+
 }
