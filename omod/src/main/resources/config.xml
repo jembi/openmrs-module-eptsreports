@@ -2980,6 +2980,21 @@
 			TDF/FTC concept
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.artDrugFormulation</property>
+		<defaultValue>e1e2e826-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+		   ART drug Formulation
+		</description>
+	 </globalProperty>
+	 <globalProperty>
+		<property>eptsreports.drugAndQuantity</property>
+		<defaultValue>5ad593a4-bea2-4eef-ac88-11654e79d9da</defaultValue>
+		<description>
+		   Drug and Quantity
+		</description>
+	 </globalProperty>
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 
