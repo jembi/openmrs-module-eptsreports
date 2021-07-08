@@ -712,7 +712,9 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
   private DataDefinition getFormulations(Integer column) {
 
     CalculationDataDefinition calculationDataDefinition =
-        Context.getRegisteredComponents(ListOfPatientsFormulationCalculation.class).get(0);
+        new CalculationDataDefinition(
+            "formulation",
+            Context.getRegisteredComponents(ListOfPatientsFormulationCalculation.class).get(0));
     calculationDataDefinition.setName("Formulation Queries");
     calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     calculationDataDefinition.addParameter(new Parameter("endDate", "endDate", Location.class));
