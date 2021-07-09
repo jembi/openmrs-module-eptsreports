@@ -10,6 +10,7 @@ import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfPatientsFormulationCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.SimpleResultsConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.reporting.ReportingConstants;
@@ -66,30 +67,30 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         "onOrBefore=${endDate},location=${location}",
         new CalculationResultConverter());
 
-    // patientDataSetDefinition.addColumn(
-    //     "gender", new GenderDataDefinition(), "", new GenderConverter());
-    // patientDataSetDefinition.addColumn("age", new AgeDataDefinition(), "", null);
-    // /** Query 6 Patients active on TB Treatment - Sheet 1: Column F */
-    // patientDataSetDefinition.addColumn(
-    //     "ontbtreatment",
-    //     this.getPatientsActiveOnTB(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
+    patientDataSetDefinition.addColumn(
+        "gender", new GenderDataDefinition(), "", new GenderConverter());
+    patientDataSetDefinition.addColumn("age", new AgeDataDefinition(), "", null);
+    /** Query 6 Patients active on TB Treatment - Sheet 1: Column F */
+    patientDataSetDefinition.addColumn(
+        "ontbtreatment",
+        this.getPatientsActiveOnTB(),
+        "endDate=${endDate},location=${location}",
+        null);
 
-    // /** Query 7 Last Drug Pick-up date (FILA) information - Sheet 1: Column G */
-    // patientDataSetDefinition.addColumn(
-    //     "lastpickupdate",
-    //     this.getLastDrugPickupDate(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
+    /** Query 7 Last Drug Pick-up date (FILA) information - Sheet 1: Column G */
+    patientDataSetDefinition.addColumn(
+        "lastpickupdate",
+        this.getLastDrugPickupDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
-    // /** Query 8 Last ARV Regimen (FILA) information - Sheet 1: Column H */
-    // patientDataSetDefinition.addColumn(
-    //     "lastregimewithdrawal",
-    //     getLastARVRegimen(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
-    // // Formulations
+    /** Query 8 Last ARV Regimen (FILA) information - Sheet 1: Column H */
+    patientDataSetDefinition.addColumn(
+        "lastregimewithdrawal",
+        getLastARVRegimen(),
+        "endDate=${endDate},location=${location}",
+        null);
+    // Formulations
 
     /** Query 9 Formulation 1 - Sheet 1: Column I */
     patientDataSetDefinition.addColumn(
@@ -119,52 +120,51 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         "onOrBefore=${endDate},location=${location}",
         new SimpleResultsConverter());
 
-    // /** Query 13 Next Drug pick-up Date - Sheet 1: Column M */
-    // patientDataSetDefinition.addColumn(
-    //     "nextpickupdate", getNextDrugPickupDate(), "endDate=${endDate},location=${location}",
-    // null);
+    /** Query 13 Next Drug pick-up Date - Sheet 1: Column M */
+    patientDataSetDefinition.addColumn(
+        "nextpickupdate", getNextDrugPickupDate(), "endDate=${endDate},location=${location}", null);
 
-    // /** Query 14 Last Follow up Consultation Date - Sheet 1: Column N */
-    // patientDataSetDefinition.addColumn(
-    //     "lastconsultationdate",
-    //     this.getLastFollowupConsultationDate(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
+    /** Query 14 Last Follow up Consultation Date - Sheet 1: Column N */
+    patientDataSetDefinition.addColumn(
+        "lastconsultationdate",
+        this.getLastFollowupConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
-    // /** Query 15 ARV Regimen on Last Consultation - Sheet 1: Column O */
-    // patientDataSetDefinition.addColumn(
-    //     "lastregimeconsultation",
-    //     this.getARVRegimenLastConsultationDate(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
+    /** Query 15 ARV Regimen on Last Consultation - Sheet 1: Column O */
+    patientDataSetDefinition.addColumn(
+        "lastregimeconsultation",
+        this.getARVRegimenLastConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
-    // /** Query 16 Weight on Last Consultation - Sheet 1: Column P */
-    // patientDataSetDefinition.addColumn(
-    //     "weight",
-    //     this.getWeightLossLastConsultationDate(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
+    /** Query 16 Weight on Last Consultation - Sheet 1: Column P */
+    patientDataSetDefinition.addColumn(
+        "weight",
+        this.getWeightLossLastConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
-    // /** Query 17 Abordagem Familiar on Last Consultation - Sheet 1: Column Q */
-    // patientDataSetDefinition.addColumn(
-    //     "familyapproachlastconsultation",
-    //     this.getAbordagemFamiliarOnLastConsultationDate(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
+    /** Query 17 Abordagem Familiar on Last Consultation - Sheet 1: Column Q */
+    patientDataSetDefinition.addColumn(
+        "familyapproachlastconsultation",
+        this.getAbordagemFamiliarOnLastConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
-    // /** Query 17 3 month Dispensation on Last consultation? - Sheet 1: Column R */
-    // patientDataSetDefinition.addColumn(
-    //     "quartelydismissallastconsultation",
-    //     this.get3MonthsDispensationOnLastConsultationDate(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
+    /** Query 17 3 month Dispensation on Last consultation? - Sheet 1: Column R */
+    patientDataSetDefinition.addColumn(
+        "quartelydismissallastconsultation",
+        this.get3MonthsDispensationOnLastConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
-    // /** Query 18 Next Follow up Consultation Date - Sheet 1: Column S */
-    // patientDataSetDefinition.addColumn(
-    //     "nextconsultationdate",
-    //     this.getNextFollowUpConsultationDate(),
-    //     "endDate=${endDate},location=${location}",
-    //     null);
+    /** Query 18 Next Follow up Consultation Date - Sheet 1: Column S */
+    patientDataSetDefinition.addColumn(
+        "nextconsultationdate",
+        this.getNextFollowUpConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
     return patientDataSetDefinition;
   }

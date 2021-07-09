@@ -32,16 +32,49 @@ public class ListOfPatientsFormulationCalculation extends AbstractPatientCalcula
         (List<CalculationDataDefinition>) parameterValues.get(FORMULATION_CALCULATION);
     HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
     CalculationResultMap formulation = getFormulationMap(cohort, context, hivMetadata);
-    Concept concept23784 = hivMetadata.getTdfAndFtcConcept();
-    Concept concept21167 = hivMetadata.getAztAnd3tcAndAbcConcept();
-    Concept concept21159 = hivMetadata.getAztAnd3tcAndNvpConcept();
-    Concept concept165244 = hivMetadata.getTdfAnd3tcAndEfvConceptUuid();
+    Concept concept23784 = hivMetadata.getTDFand3TCandDTGCConcept();
+    Concept concept21167 = hivMetadata.getLopinavirAndRitonavirConcept();
+    Concept concept21159 = hivMetadata.getAbacavirAndLamivudinaConcept();
+    Concept concept165244 = hivMetadata.getArtDrugFormulationConcept();
+    Concept concept165256 = hivMetadata.getTDFand3TCandDTGCConcept();
+    Concept concept165252 = hivMetadata.getDrugAndQuantityConcept();
+    Concept concept630 = hivMetadata.getZidovudineAndLamivudineConcept();
+    Concept concept21179 = hivMetadata.getTenofovirOrLamivudinaConcept();
+    Concept concept21161 = hivMetadata.getRaltegravirConcept();
+    Concept concept165245 = hivMetadata.getPatientKnowledgeOfEffectOfHIVConcept();
+    Concept concept631 = hivMetadata.getNevirapineConcept();
+    Concept concept797 = hivMetadata.getZidovudineConcept();
+    Concept concept814 = hivMetadata.getAbacavirConcept();
+    Concept concept21184 = hivMetadata.getEfavirenzConcept();
+    Concept concept21178 = hivMetadata.getLamivudinaConcept();
+    Concept concept21175 = hivMetadata.getTenofovirConcept();
+    Concept concept6324 = hivMetadata.getTdfAnd3tcAndEfvConceptUuid();
+    Concept concept1651 = hivMetadata.getAztAnd3tcAndNvpConcept();
+    Concept concept6116 = hivMetadata.getAztAnd3tcAndAbcConcept();
+    Concept concept165215 = hivMetadata.getTdfAndFtcConcept();
     List<Integer> formulationConceptIdList =
         Arrays.asList(
             concept23784.getConceptId(),
             concept21159.getConceptId(),
             concept21167.getConceptId(),
-            concept165244.getConceptId());
+            concept165244.getConceptId(),
+            concept165256.getConceptId(),
+            concept165252.getConceptId(),
+            concept630.getConceptId(),
+            concept21179.getConceptId(),
+            concept21161.getConceptId(),
+            concept165245.getConceptId(),
+            concept21167.getConceptId(),
+            concept631.getConceptId(),
+            concept797.getConceptId(),
+            concept814.getConceptId(),
+            concept21184.getConceptId(),
+            concept21178.getConceptId(),
+            concept21175.getConceptId(),
+            concept6324.getConceptId(),
+            concept1651.getConceptId(),
+            concept6116.getConceptId(),
+            concept165215.getConceptId());
 
     for (Integer patientId : cohort) {
       ListResult listResult = (ListResult) formulation.get(patientId);
