@@ -797,12 +797,17 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     String mapp =
         "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
-    cd.addSearch(
-        "MI13DEN",
-        EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13(true, level), mapp));
-    cd.addSearch(
-        "MI13NUM",
-        EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13(false, level), mapp));
+    if (level == 1 && type.equals("DEN")) {
+      cd.addSearch("MI13DEN", EptsReportUtils.map(this.getMI13DEN1(), mapp));
+    } else {
+      cd.addSearch(
+          "MI13DEN",
+          EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13(true, level), mapp));
+      cd.addSearch(
+          "MI13NUM",
+          EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13(false, level), mapp));
+    }
+
     if ("DEN".equals(type)) {
       cd.setCompositionString("MI13DEN");
     } else if ("NUM".equals(type)) {
@@ -1211,7 +1216,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15A() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All patients with Last Clinical Consultation ");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1246,7 +1251,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15B2() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("B2 Patients From Ficha Clinica");
+    cd.setName("B2 - All patients with the earliest “Data de Início TARV”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1295,7 +1300,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15D() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All female patients registered as “Breastfeeding”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1336,7 +1341,7 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15B1() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("B1 - All patients with the earliest “Data de Início TARV”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1391,7 +1396,7 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15G() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("G - All patients with the last Viral Load Result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1441,7 +1446,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15C() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All female patients registered as “Pregnant”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1479,7 +1484,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15H() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("Select all patients with Viral Load result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1537,7 +1542,8 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15J() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName(
+        "J - All patients with at least one of the following models registered in Ficha Clinica");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1602,7 +1608,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15F() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All patients with the last CD4 result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1652,7 +1658,8 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15K() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName(
+        "K - All patients with at least one of the following models registered in Ficha Clinica");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1720,7 +1727,8 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15L() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName(
+        "L - All patients with at least one of the following models registered in Ficha Clinica");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1801,7 +1809,7 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15E(int upper, int lower) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("E - All patients with the following Clinical Consultations or ARV Drugs Pick Ups");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1917,12 +1925,11 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15I() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("I - All patients with the last Viral Load Result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("Patients From Ficha Clinica");
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
@@ -2096,7 +2103,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All patients with concept “PEDIDO DE INVESTIGACOES LABORATORIAIS”");
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
@@ -2119,5 +2126,118 @@ public class IntensiveMonitoringCohortQueries {
     String str = stringSubstitutor.replace(query);
     cd.setQuery(str);
     return cd;
+  }
+
+  public CohortDefinition getMI13DEN1() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    compositionCohortDefinition.setName("MI CAT 13.1 Denominator");
+
+    CohortDefinition lastClinical = commonCohortQueries.getMOHPatientsLastClinicalConsultation();
+
+    CohortDefinition pregnant =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition brestfeeding =
+        commonCohortQueries.getNewMQPregnantORBreastfeeding(
+            hivMetadata.getBreastfeeding().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId());
+
+    CohortDefinition b2New =
+        commonCohortQueries.getPatientsWithFirstTherapeuticLineOnLastClinicalEncounterB2NEW();
+
+    CohortDefinition changeRegimen6Months =
+        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
+            true,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
+            Arrays.asList(
+                commonMetadata.getAlternativeFirstLineConcept(),
+                commonMetadata.getRegimeChangeConcept(),
+                hivMetadata.getNoConcept()));
+
+    CohortDefinition B3E =
+        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
+            true,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
+            Arrays.asList(
+                commonMetadata.getAlternativeFirstLineConcept(),
+                commonMetadata.getRegimeChangeConcept(),
+                hivMetadata.getNoConcept()),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getFirstLineConcept()));
+
+    CohortDefinition B4E =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            true, false, 12);
+
+    CohortDefinition B5E =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            false, true, -3);
+
+    compositionCohortDefinition.addSearch(
+        "age",
+        EptsReportUtils.map(
+            commonCohortQueries.getMOHPatientsAgeOnLastClinicalConsultationDate(15, null),
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            lastClinical,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B2NEW",
+        EptsReportUtils.map(
+            b2New,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "C",
+        EptsReportUtils.map(
+            pregnant, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "D",
+        EptsReportUtils.map(
+            brestfeeding,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B3",
+        EptsReportUtils.map(
+            changeRegimen6Months,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B3E",
+        EptsReportUtils.map(
+            B3E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B4E",
+        EptsReportUtils.map(
+            B4E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B5E",
+        EptsReportUtils.map(
+            B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+
+    return compositionCohortDefinition;
   }
 }
