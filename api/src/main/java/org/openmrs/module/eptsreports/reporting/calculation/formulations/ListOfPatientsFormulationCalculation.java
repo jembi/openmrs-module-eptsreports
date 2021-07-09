@@ -42,28 +42,17 @@ public class ListOfPatientsFormulationCalculation extends AbstractPatientCalcula
             concept21159.getConceptId(),
             concept21167.getConceptId(),
             concept165244.getConceptId());
+
     for (Integer patientId : cohort) {
       ListResult listResult = (ListResult) formulation.get(patientId);
       List<Integer> conceptIdListResult = EptsCalculationUtils.extractResultValues(listResult);
-      //   List<Integer> previousResults = ListOfPatientsFormulationCalculation.get(patientId);
-
-      List<Integer> formulation2ConceptIdList =
-          EptsCalculationUtils.extractResultValues(listResult);
-      List<Integer> formulation3ConceptIdList =
-          EptsCalculationUtils.extractResultValues(listResult);
-      List<Integer> formulation4ConceptIdList =
-          EptsCalculationUtils.extractResultValues(listResult);
 
       Integer conceptIdResult = null;
       for (Integer cid : conceptIdListResult) {
-        if (formulationConceptIdList.contains(cid) && column == 1) {
+        if (formulationConceptIdList.contains(cid)
+            && (column == 1 || column == 2 || column == 3 || column == 4)) {
           conceptIdResult = cid;
-        } else if (formulation2ConceptIdList.contains(cid) && column == 2) {
-          conceptIdResult = cid;
-        } else if (formulation3ConceptIdList.contains(cid) && column == 3) {
-          conceptIdResult = cid;
-        } else if (formulation4ConceptIdList.contains(cid) && column == 4) {
-          conceptIdResult = cid;
+          formulationConceptIdList.remove(cid);
         }
       }
       map.put(patientId, new SimpleResult(conceptIdResult, this));

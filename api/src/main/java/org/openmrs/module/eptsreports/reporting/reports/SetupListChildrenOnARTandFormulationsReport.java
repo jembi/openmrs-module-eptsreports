@@ -74,7 +74,7 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_ListChildrenonARTandFormulations Specification_v1.0.xls",
+              "List_Children_on_ART_and_Formulations.xls",
               "List of Children on ART and Formulations",
               getExcelDesignUuid(),
               null);
