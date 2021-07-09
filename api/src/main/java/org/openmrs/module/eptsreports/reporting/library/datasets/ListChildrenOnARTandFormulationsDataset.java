@@ -123,10 +123,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
 
     /** Query 13 Next Drug pick-up Date - Sheet 1: Column M */
     patientDataSetDefinition.addColumn(
-        "nextpickupdate",
-        getNextDrugPickupDate(),
-        "onOrBefore=${endDate},location=${location}",
-        null);
+        "nextpickupdate", getNextDrugPickupDate(), "endDate=${endDate},location=${location}", null);
 
     /** Query 14 Last Follow up Consultation Date - Sheet 1: Column N */
     patientDataSetDefinition.addColumn(
@@ -215,7 +212,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         " SELECT final_query.patient_id, CASE WHEN final_query.result_Value IS NOT NULL THEN 'ACTIVE' WHEN final_query.result_Value IS NULL THEN 'INACTIVE' ELSE '' END"
             + " FROM "
             + "( "
-            + "                SELECT p.patient_id, o.value_coded  AS result_Value"
+            + "                SELECT p.patient_id, o.value_coded  AS result_Value "
             + "                FROM patient p "
             + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -232,7 +229,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                    ) "
             + "                  AND e.encounter_datetime <= :endDate "
             + "                UNION  "
-            + "                SELECT p.patient_id, o.value_datetime AS result_Value"
+            + "                SELECT p.patient_id, o.value_datetime AS result_Value "
             + "                FROM patient p "
             + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -276,7 +273,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                  AND ps.start_date >= DATE_SUB(:endDate, INTERVAL 210 DAY) "
             + "                  AND ps.end_date <= :endDate "
             + "               UNION  "
-            + "                SELECT p.patient_id, o.value_coded  AS result_Value"
+            + "                SELECT p.patient_id, o.value_coded  AS result_Value "
             + "                FROM patient p "
             + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -288,7 +285,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                  AND o.concept_id = ${23761} "
             + "                  AND o.value_coded = ${1065} "
             + "                  AND e.encounter_datetime "
-            + "                    BETWEEN DATE_SUB( :endDate, INTERVAL 210 DAY ) AND :endDate"
+            + "                    BETWEEN DATE_SUB( :endDate, INTERVAL 210 DAY ) AND :endDate "
             + ") AS final_query";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
@@ -313,7 +310,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("1088", hivMetadata.getRegimeConcept().getConceptId());
 
     String sql =
-        " SELECT p.patient_id, o.value_coded "
+        " SELECT p.patient_id, ob.value_coded "
             + " FROM patient p"
             + "   INNER JOIN "
             + "   ( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime "
@@ -327,17 +324,17 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "     GROUP BY p.patient_id "
             + "   ) max_encounter ON p.patient_id=max_encounter.patient_id"
             + "     INNER JOIN encounter e ON p.patient_id= e.patient_id "
-            + "     INNER JOIN obs ob ON e.encounter_id = o.encounter_id "
+            + "     INNER JOIN obs ob ON e.encounter_id = ob.encounter_id "
             + "     INNER JOIN concept_name cn on ob.concept_id=cn.concept_id "
             + " WHERE  p.voided = 0"
             + "     AND e.voided = 0 "
-            + "     AND o.voided = 0"
+            + "     AND ob.voided = 0"
             + "     AND cn.locale='pt'"
             + "     AND max_encounter.encounter_datetime = e.encounter_datetime "
             + "     AND e.encounter_type = ${18} "
             + "     AND e.location_id = :location "
-            + "     AND o.concept_id = ${1088} "
-            + "     AND o.value_coded IS NOT NULL "
+            + "     AND ob.concept_id = ${1088} "
+            + "     AND ob.value_coded IS NOT NULL "
             + "     AND e.encounter_datetime <= :endDate ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
