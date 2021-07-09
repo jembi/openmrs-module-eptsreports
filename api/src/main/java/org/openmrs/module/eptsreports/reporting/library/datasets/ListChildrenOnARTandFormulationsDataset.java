@@ -199,7 +199,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
 
     String sql =
-        " SELECT final_query.patient_id, CASE WHEN final_query.result_Value IS NOT NULL THEN 'ACTIVE' WHEN final_query.result_Value IS NULL THEN 'INACTIVE' "
+        " SELECT final_query.patient_id, CASE WHEN final_query.result_Value IS NOT NULL THEN 'ACTIVE' WHEN final_query.result_Value IS NULL THEN 'INACTIVE' ELSE '' END"
             + " FROM "
             + "( "
             + "                SELECT p.patient_id, o.value_coded  AS result_Value"
@@ -245,7 +245,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                  AND o.concept_id = ${1406} "
             + "                  AND o.value_coded = ${42} "
             + "                  AND o.obs_datetime "
-            + "                    BETWEEN DATE_SUB ( :endDate, INTERVAL 210 DAY ) AND :endDate "
+            + "                    BETWEEN DATE_SUB( :endDate, INTERVAL 210 DAY ) AND :endDate "
             + "                UNION  "
             + "                SELECT p.patient_id , cn.name AS result_Value "
             + "                FROM patient p "
@@ -275,9 +275,8 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                  AND o.concept_id = ${23761} "
             + "                  AND o.value_coded = ${1065} "
             + "                  AND e.encounter_datetime "
-            + "                    BETWEEN DATE_SUB ( :endDate, INTERVAL 210 DAY ) AND :endDate"
-            + ") AS final_query "
-            + " WHERE p.voided = 0";
+            + "                    BETWEEN DATE_SUB( :endDate, INTERVAL 210 DAY ) AND :endDate"
+            + ") AS final_query";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 

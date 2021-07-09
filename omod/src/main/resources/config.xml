@@ -473,7 +473,7 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>@MODULE_ID@.returnVisitDateConceptUuid</property>
+		<property>@MODULE_ID@.returnVisitDateConceptConceptUuid</property>
 		<defaultValue>e1dae630-1d5f-11e0-b929-000c29ad1d07</defaultValue>
 		<description>
 			UUID for the DATA DE PROXIMA CONSULTA concept

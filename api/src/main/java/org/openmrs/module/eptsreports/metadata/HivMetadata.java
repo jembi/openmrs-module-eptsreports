@@ -4112,7 +4112,7 @@ public class HivMetadata extends ProgramsMetadata {
   public Concept getReturnVisitDateConcept() {
     String uuid =
         Context.getAdministrationService()
-            .getGlobalProperty("eptsreports.returnVisitDateConceptUuid");
+            .getGlobalProperty("eptsreports.returnVisitDateConceptConceptUuid");
     return getConcept(uuid);
   }
 
