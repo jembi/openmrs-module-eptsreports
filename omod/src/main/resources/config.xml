@@ -2836,7 +2836,7 @@
 			WEIGHT (KG) concept
 		</description>
 	</globalProperty>
-	
+
 	<globalProperty>
 		<property>eptsreports.TDFand3TCandDTGConceptUuid</property>
 		<defaultValue>e3f6bb60-e2cf-46cb-a9da-27d634ba8607</defaultValue>
@@ -2983,7 +2983,7 @@
 
 	<globalProperty>
 		<property>eptsreports.artDrugFormulation</property>
-		<defaultValue>e1e2e826-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>7956cd89-2ef6-4d25-90f9-f8940507eee8</defaultValue>
 		<description>
 		   ART drug Formulation
 		</description>

@@ -34,8 +34,8 @@ public class ListOfPatientsFormulationCalculation extends AbstractPatientCalcula
     CalculationResultMap formulation = getFormulationMap(cohort, context, hivMetadata);
     Concept concept23784 = hivMetadata.getTdfAndFtcConcept();
     Concept concept21167 = hivMetadata.getAztAnd3tcAndAbcConcept();
-    Concept concept21159 = hivMetadata.getAzt3tcAbcEfvConcept();
-    Concept concept165244 = hivMetadata.getAzt3tcAbcLpvConcept();
+    Concept concept21159 = hivMetadata.getAztAnd3tcAndNvpConcept();
+    Concept concept165244 = hivMetadata.getTdfAnd3tcAndEfvConceptUuid();
     List<Integer> formulationConceptIdList =
         Arrays.asList(
             concept23784.getConceptId(),

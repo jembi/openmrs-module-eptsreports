@@ -382,8 +382,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
 
     String sql =
-        ""
-            + "  SELECT p.patient_id, o.value_datetime "
+        "  SELECT p.patient_id, o.value_datetime "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
@@ -471,8 +470,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("1087", hivMetadata.getPreviousARVUsedForTreatmentConcept().getConceptId());
     String sql =
-        ""
-            + "  SELECT p.patient_id, o.value_coded "
+        "  SELECT p.patient_id, o.value_coded "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
@@ -524,8 +522,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("5089", hivMetadata.getWeightConcept().getConceptId());
 
     String sql =
-        ""
-            + "  SELECT p.patient_id, o.value_numeric "
+        "  SELECT p.patient_id, o.value_numeric "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
@@ -578,8 +575,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23725", hivMetadata.getFamilyApproach().getConceptId());
 
     String sql =
-        ""
-            + "  SELECT p.patient_id, o.value_coded "
+        "  SELECT p.patient_id, o.value_coded "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
@@ -633,8 +629,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
 
     String sql =
-        ""
-            + "  SELECT p.patient_id, CASE WHEN e.encounter_datetime IS NOT NULL THEN Sim WHEN e.encounter_datetime IS NULL THEN NAO "
+        "  SELECT p.patient_id, CASE WHEN e.encounter_datetime IS NOT NULL THEN Sim WHEN e.encounter_datetime IS NULL THEN NAO "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
