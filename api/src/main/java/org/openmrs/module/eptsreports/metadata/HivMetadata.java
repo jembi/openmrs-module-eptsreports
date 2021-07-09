@@ -4375,7 +4375,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    * <b>concept_id =165215 </b>
    *
-   * <p><b>Name:</b>TDF/FTC concept
+   * <p><b>Name:</b>TDF/FTC concept/
    *
    * @return
    */

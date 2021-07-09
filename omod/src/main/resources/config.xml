@@ -2836,7 +2836,7 @@
 			WEIGHT (KG) concept
 		</description>
 	</globalProperty>
-***********************************
+	
 	<globalProperty>
 		<property>eptsreports.TDFand3TCandDTGConceptUuid</property>
 		<defaultValue>e3f6bb60-e2cf-46cb-a9da-27d634ba8607</defaultValue>
