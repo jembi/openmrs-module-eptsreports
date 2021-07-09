@@ -73,7 +73,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "Category 3 Denominator",
         EptsReportUtils.map(
             MQC3D1, "startDate=${startDate},endDate=${endDate},location=${location}"),
-        getDisagregateAdultsAndChildrenSColumn());
+        getDisagsForAdultsAndChildrenBasedOnArtStartDateColumn());
 
     // Category 3 Numerator
     CohortIndicator MQC3N1 =
@@ -2455,5 +2455,13 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(cd.getName(), EptsReportUtils.map(cd, mapping));
     cohortIndicator.addParameter(new Parameter("revisionEndDate", "Revision Date", Date.class));
     return cohortIndicator;
+  }
+
+  private List<ColumnParameters> getDisagsForAdultsAndChildrenBasedOnArtStartDateColumn() {
+    ColumnParameters adults =
+        new ColumnParameters("ADULTOS", "Adultos", "ageBasedOnArt=adultsArt", "ADULTOS");
+    ColumnParameters children =
+        new ColumnParameters("CRIANCAS", "Criancas", "ageBasedOnArt=childrenArt", "CRIANCAS");
+    return Arrays.asList(adults, children);
   }
 }
