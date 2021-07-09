@@ -10,7 +10,6 @@ import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfPatientsFormulationCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.EncounterDatetimeConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.SimpleResultsConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
@@ -72,90 +71,104 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     patientDataSetDefinition.addColumn(
         "gender", new GenderDataDefinition(), "", new GenderConverter());
     patientDataSetDefinition.addColumn("age", new AgeDataDefinition(), "", null);
-
+    /** Query 6 Patients active on TB Treatment - Sheet 1: Column F */
     patientDataSetDefinition.addColumn(
         "ontbtreatment",
         this.getPatientsActiveOnTB(),
         "endDate=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
+    /** Query 7 Last Drug Pick-up date (FILA) information - Sheet 1: Column G */
     patientDataSetDefinition.addColumn(
         "lastpickupdate",
         this.getLastDrugPickupDate(),
         "endDate=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
+    /** Query 8 Last ARV Regimen (FILA) information - Sheet 1: Column H */
     patientDataSetDefinition.addColumn(
         "lastregimewithdrawal",
         getLastARVRegimen(),
-        "onOrBefore=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        "endDate=${endDate},location=${location}",
+        null);
     // Formulations
+
+    /** Query 9 Formulation 1 - Sheet 1: Column I */
     patientDataSetDefinition.addColumn(
         "formulation1",
         getFormulations(1),
         "onOrBefore=${endDate},location=${location}",
         new SimpleResultsConverter());
 
+    /** Query 10 Formulation 2 - Sheet 1: Column J */
     patientDataSetDefinition.addColumn(
         "formulation2",
         getFormulations(2),
         "onOrBefore=${endDate},location=${location}",
         new SimpleResultsConverter());
 
+    /** Query 11 Formulation 3 - Sheet 1: Column K */
     patientDataSetDefinition.addColumn(
         "formulation3",
         getFormulations(3),
         "onOrBefore=${endDate},location=${location}",
         new SimpleResultsConverter());
 
+    /** Query 12 Formulation 4 - Sheet 1: Column L */
     patientDataSetDefinition.addColumn(
         "formulation4",
         getFormulations(4),
         "onOrBefore=${endDate},location=${location}",
         new SimpleResultsConverter());
 
+    /** Query 13 Next Drug pick-up Date - Sheet 1: Column M */
     patientDataSetDefinition.addColumn(
         "nextpickupdate",
         getNextDrugPickupDate(),
         "onOrBefore=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
+    /** Query 14 Last Follow up Consultation Date - Sheet 1: Column N */
     patientDataSetDefinition.addColumn(
         "lastconsultationdate",
         this.getLastFollowupConsultationDate(),
         "endDate=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
+    /** Query 15 ARV Regimen on Last Consultation - Sheet 1: Column O */
     patientDataSetDefinition.addColumn(
         "lastregimeconsultation",
         this.getARVRegimenLastConsultationDate(),
         "endDate=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
+    /** Query 16 Weight on Last Consultation - Sheet 1: Column P */
     patientDataSetDefinition.addColumn(
         "weight",
         this.getWeightLossLastConsultationDate(),
         "endDate=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
+    /** Query 17 Abordagem Familiar on Last Consultation - Sheet 1: Column Q */
     patientDataSetDefinition.addColumn(
         "familyapproachlastconsultation",
         this.getAbordagemFamiliarOnLastConsultationDate(),
         "endDate=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
+    /** Query 17 3 month Dispensation on Last consultation? - Sheet 1: Column R */
     patientDataSetDefinition.addColumn(
         "quartelydismissallastconsultation",
         this.get3MonthsDispensationOnLastConsultationDate(),
         "endDate=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
+    /** Query 18 Next Follow up Consultation Date - Sheet 1: Column S */
     patientDataSetDefinition.addColumn(
         "nextconsultationdate",
         this.getNextFollowUpConsultationDate(),
         "endDate=${endDate},location=${location}",
-        new EncounterDatetimeConverter());
+        null);
 
     return patientDataSetDefinition;
   }
@@ -711,7 +724,8 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             Context.getRegisteredComponents(ListOfPatientsFormulationCalculation.class).get(0));
     calculationDataDefinition.setName("Formulation Queries");
     calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-    calculationDataDefinition.addParameter(new Parameter("endDate", "endDate", Location.class));
+    calculationDataDefinition.addParameter(
+        new Parameter("onOrBefore", "onOrBefore", Location.class));
 
     calculationDataDefinition.addCalculationParameter("column", column);
 
