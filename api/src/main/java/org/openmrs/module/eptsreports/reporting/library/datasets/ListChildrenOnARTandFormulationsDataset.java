@@ -40,7 +40,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
 
     PatientDataSetDefinition patientDataSetDefinition = new PatientDataSetDefinition();
 
-    patientDataSetDefinition.setName("Formulations");
+    patientDataSetDefinition.setName("ALL");
     patientDataSetDefinition.addParameters(getParameters());
 
     PatientIdentifierType identifierType =

@@ -2,7 +2,6 @@ package org.openmrs.module.eptsreports.reporting.calculation.formulations;
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -28,7 +27,6 @@ public class ListOfChildrenOnARTFormulation1Calculation extends AbstractPatientC
 
     HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
     CalculationResultMap formulation1 = getFormulationMap(cohort, context, hivMetadata);
-
     for (Integer patientId : cohort) {
       ListResult listResult = (ListResult) formulation1.get(patientId);
       List<Integer> conceptIdListResult = EptsCalculationUtils.extractResultValues(listResult);

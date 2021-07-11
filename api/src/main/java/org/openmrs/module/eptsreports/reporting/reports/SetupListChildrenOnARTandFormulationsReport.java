@@ -3,9 +3,10 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import java.io.IOException;
 import java.util.*;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.ListChildrenOnARTandFormulationsCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListChildrenOnARTandFormulationsDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -19,24 +20,26 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
 
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
-  private GenericCohortQueries genericCohortQueries;
+  private ListChildrenOnARTandFormulationsCohortQueries
+      listChildrenOnARTandFormulationsCohortQueries;
 
   @Autowired
   public SetupListChildrenOnARTandFormulationsReport(
-      GenericCohortQueries genericCohortQueries,
+      ListChildrenOnARTandFormulationsCohortQueries listChildrenOnARTandFormulationsCohortQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
-    this.genericCohortQueries = genericCohortQueries;
+    this.listChildrenOnARTandFormulationsCohortQueries =
+        listChildrenOnARTandFormulationsCohortQueries;
   }
 
   @Override
   public String getExcelDesignUuid() {
-    return "5e17f214-af0f-11eb-852c-ef10820bc4bd";
+    return "9a832386-e290-11eb-a73e-4f4bdad3d8fd";
   }
 
   @Override
   public String getUuid() {
-    return "6ee04286-af0f-11eb-afea-e3389adce11f";
+    return "ac5ed794-e290-11eb-8648-c3783d587203";
   }
 
   @Override
@@ -56,6 +59,11 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
+    rd.setBaseCohortDefinition(
+        EptsReportUtils.map(
+            listChildrenOnARTandFormulationsCohortQueries.getBaseCohort(),
+            "endDate=${endDate},location=${location}"));
+
     rd.addDataSetDefinition(
         "ALL",
         Mapped.mapStraightThrough(listChildrenOnARTandFormulationsDataset.constructDataset()));
@@ -74,11 +82,12 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "List_Children_on_ART_and_Formulations.xls",
+              "list_children_art_formulation.xls",
               "List of Children on ART and Formulations",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
+      props.put("repeatingSections", "sheet:1,row:7,dataset:ALL");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
