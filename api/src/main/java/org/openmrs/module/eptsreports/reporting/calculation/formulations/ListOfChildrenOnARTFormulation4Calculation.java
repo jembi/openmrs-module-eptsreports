@@ -2,7 +2,6 @@ package org.openmrs.module.eptsreports.reporting.calculation.formulations;
 
 import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -11,15 +10,13 @@ import org.openmrs.calculation.result.ListResult;
 import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
-import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ListOfPatientsFormulationCalculation extends AbstractPatientCalculation {
-  private String FORMULATION_CALCULATION = "previousResults";
+public class ListOfChildrenOnARTFormulation4Calculation extends AbstractPatientCalculation {
 
   @Override
   public CalculationResultMap evaluate(
@@ -27,68 +24,55 @@ public class ListOfPatientsFormulationCalculation extends AbstractPatientCalcula
       Map<String, Object> parameterValues,
       PatientCalculationContext context) {
     CalculationResultMap map = new CalculationResultMap();
-    Integer column = (Integer) parameterValues.get("column");
-    List<CalculationDataDefinition> calculationDataDefinitions =
-        (List<CalculationDataDefinition>) parameterValues.get(FORMULATION_CALCULATION);
-    HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
-    CalculationResultMap formulation = getFormulationMap(cohort, context, hivMetadata);
-    Concept concept23784 = hivMetadata.getTDFand3TCandDTGCConcept();
-    Concept concept21167 = hivMetadata.getLopinavirAndRitonavirConcept();
-    Concept concept21159 = hivMetadata.getAbacavirAndLamivudinaConcept();
-    Concept concept165244 = hivMetadata.getArtDrugFormulationConcept();
-    Concept concept165256 = hivMetadata.getTDFand3TCandDTGCConcept();
-    Concept concept165252 = hivMetadata.getDrugAndQuantityConcept();
-    Concept concept630 = hivMetadata.getZidovudineAndLamivudineConcept();
-    Concept concept21179 = hivMetadata.getTenofovirOrLamivudinaConcept();
-    Concept concept21161 = hivMetadata.getRaltegravirConcept();
-    Concept concept165245 = hivMetadata.getPatientKnowledgeOfEffectOfHIVConcept();
-    Concept concept631 = hivMetadata.getNevirapineConcept();
-    Concept concept797 = hivMetadata.getZidovudineConcept();
-    Concept concept814 = hivMetadata.getAbacavirConcept();
-    Concept concept21184 = hivMetadata.getEfavirenzConcept();
-    Concept concept21178 = hivMetadata.getLamivudinaConcept();
-    Concept concept21175 = hivMetadata.getTenofovirConcept();
-    Concept concept6324 = hivMetadata.getTdfAnd3tcAndEfvConceptUuid();
-    Concept concept1651 = hivMetadata.getAztAnd3tcAndNvpConcept();
-    Concept concept6116 = hivMetadata.getAztAnd3tcAndAbcConcept();
-    Concept concept165215 = hivMetadata.getTdfAndFtcConcept();
-    List<Integer> formulationConceptIdList =
-        Arrays.asList(
-            concept23784.getConceptId(),
-            concept21159.getConceptId(),
-            concept21167.getConceptId(),
-            concept165244.getConceptId(),
-            concept165256.getConceptId(),
-            concept165252.getConceptId(),
-            concept630.getConceptId(),
-            concept21179.getConceptId(),
-            concept21161.getConceptId(),
-            concept165245.getConceptId(),
-            concept21167.getConceptId(),
-            concept631.getConceptId(),
-            concept797.getConceptId(),
-            concept814.getConceptId(),
-            concept21184.getConceptId(),
-            concept21178.getConceptId(),
-            concept21175.getConceptId(),
-            concept6324.getConceptId(),
-            concept1651.getConceptId(),
-            concept6116.getConceptId(),
-            concept165215.getConceptId());
 
+    HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
+
+    CalculationResultMap formulation4 = getFormulationMap(cohort, context, hivMetadata);
+
+    CalculationResultMap formulation1 =
+        calculate(
+            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation1Calculation.class)
+                .get(0),
+            cohort,
+            context);
+
+    CalculationResultMap formulation2 =
+        calculate(
+            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation2Calculation.class)
+                .get(0),
+            cohort,
+            context);
+
+    CalculationResultMap formulation3 =
+        calculate(
+            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation3Calculation.class)
+                .get(0),
+            cohort,
+            context);
     for (Integer patientId : cohort) {
-      ListResult listResult = (ListResult) formulation.get(patientId);
+      ListResult listResult = (ListResult) formulation4.get(patientId);
       List<Integer> conceptIdListResult = EptsCalculationUtils.extractResultValues(listResult);
 
-      Integer conceptIdResult = null;
-      for (Integer cid : conceptIdListResult) {
-        if (formulationConceptIdList.contains(cid)
-            && (column == 1 || column == 2 || column == 3 || column == 4)) {
-          conceptIdResult = cid;
-          formulationConceptIdList.remove(cid);
+      Integer formulation1Result = EptsCalculationUtils.resultForPatient(formulation1, patientId);
+
+      Integer formulation2Result = EptsCalculationUtils.resultForPatient(formulation2, patientId);
+
+      Integer formulation3Result = EptsCalculationUtils.resultForPatient(formulation3, patientId);
+
+      if (conceptIdListResult != null
+          && !conceptIdListResult.isEmpty()
+          && formulation1Result != null
+          && formulation2Result != null
+          && formulation3Result != null) {
+        for (Integer result : conceptIdListResult) {
+          if (result != formulation1Result
+              && result != formulation2Result
+              && result != formulation3Result) {
+            map.put(patientId, new SimpleResult(result, this));
+            break;
+          }
         }
       }
-      map.put(patientId, new SimpleResult(conceptIdResult, this));
     }
     return map;
   }

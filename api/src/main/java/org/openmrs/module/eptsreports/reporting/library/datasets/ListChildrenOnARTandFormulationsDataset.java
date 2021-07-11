@@ -7,11 +7,13 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfPatientsFormulationCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfChildrenOnARTFormulation1Calculation;
+import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfChildrenOnARTFormulation2Calculation;
+import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfChildrenOnARTFormulation3Calculation;
+import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfChildrenOnARTFormulation4Calculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.SimpleResultsConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -94,31 +96,19 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
 
     /** Query 9 Formulation 1 - Sheet 1: Column I */
     patientDataSetDefinition.addColumn(
-        "formulation1",
-        getFormulations(1),
-        "onOrBefore=${endDate},location=${location}",
-        new SimpleResultsConverter());
+        "formulation1", getFormulation1(), "onOrBefore=${endDate},location=${location}", null);
 
     /** Query 10 Formulation 2 - Sheet 1: Column J */
     patientDataSetDefinition.addColumn(
-        "formulation2",
-        getFormulations(2),
-        "onOrBefore=${endDate},location=${location}",
-        new SimpleResultsConverter());
+        "formulation2", getFormulation2(), "onOrBefore=${endDate},location=${location}", null);
 
     /** Query 11 Formulation 3 - Sheet 1: Column K */
     patientDataSetDefinition.addColumn(
-        "formulation3",
-        getFormulations(3),
-        "onOrBefore=${endDate},location=${location}",
-        new SimpleResultsConverter());
+        "formulation3", getFormulation3(), "onOrBefore=${endDate},location=${location}", null);
 
     /** Query 12 Formulation 4 - Sheet 1: Column L */
     patientDataSetDefinition.addColumn(
-        "formulation4",
-        getFormulations(4),
-        "onOrBefore=${endDate},location=${location}",
-        new SimpleResultsConverter());
+        "formulation4", getFormulation4(), "onOrBefore=${endDate},location=${location}", null);
 
     /** Query 13 Next Drug pick-up Date - Sheet 1: Column M */
     patientDataSetDefinition.addColumn(
@@ -712,18 +702,82 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     return spdd;
   }
 
-  private DataDefinition getFormulations(Integer column) {
+  /**
+   * 9
+   *
+   * @return
+   */
+  private DataDefinition getFormulation1() {
 
     CalculationDataDefinition calculationDataDefinition =
         new CalculationDataDefinition(
-            "formulation",
-            Context.getRegisteredComponents(ListOfPatientsFormulationCalculation.class).get(0));
-    calculationDataDefinition.setName("Formulation Queries");
+            "formulation1",
+            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation1Calculation.class)
+                .get(0));
+    calculationDataDefinition.setName("formulation1");
     calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     calculationDataDefinition.addParameter(
         new Parameter("onOrBefore", "onOrBefore", Location.class));
 
-    calculationDataDefinition.addCalculationParameter("column", column);
+    return calculationDataDefinition;
+  }
+
+  /**
+   * 10
+   *
+   * @return
+   */
+  private DataDefinition getFormulation2() {
+
+    CalculationDataDefinition calculationDataDefinition =
+        new CalculationDataDefinition(
+            "formulation2",
+            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation2Calculation.class)
+                .get(0));
+    calculationDataDefinition.setName("formulation2");
+    calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    calculationDataDefinition.addParameter(
+        new Parameter("onOrBefore", "onOrBefore", Location.class));
+
+    return calculationDataDefinition;
+  }
+
+  /**
+   * 11
+   *
+   * @return
+   */
+  private DataDefinition getFormulation3() {
+
+    CalculationDataDefinition calculationDataDefinition =
+        new CalculationDataDefinition(
+            "formulation3",
+            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation3Calculation.class)
+                .get(0));
+    calculationDataDefinition.setName("formulation3");
+    calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    calculationDataDefinition.addParameter(
+        new Parameter("onOrBefore", "onOrBefore", Location.class));
+
+    return calculationDataDefinition;
+  }
+
+  /**
+   * 12
+   *
+   * @return
+   */
+  private DataDefinition getFormulation4() {
+
+    CalculationDataDefinition calculationDataDefinition =
+        new CalculationDataDefinition(
+            "formulation4",
+            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation4Calculation.class)
+                .get(0));
+    calculationDataDefinition.setName("formulation4");
+    calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    calculationDataDefinition.addParameter(
+        new Parameter("onOrBefore", "onOrBefore", Location.class));
 
     return calculationDataDefinition;
   }
