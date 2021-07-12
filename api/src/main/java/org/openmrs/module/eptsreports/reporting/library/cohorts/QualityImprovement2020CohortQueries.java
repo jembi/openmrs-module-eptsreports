@@ -244,12 +244,13 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     compositionCohortDefinition.addSearch(
         "CAT3DEN", EptsReportUtils.map(this.getMQC3D1(), MAPPING));
 
-    compositionCohortDefinition.addSearch("C", EptsReportUtils.map(this.getCFromMQC3N1(), MAPPING));
+    compositionCohortDefinition.addSearch(
+        "C", EptsReportUtils.map(this.getCFromMQC3N1(), "location=${location}"));
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(this.getDFromMQC3N1(), MAPPING));
 
     compositionCohortDefinition.setCompositionString("CAT3DEN AND (C OR D)");
@@ -262,7 +263,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     compositionCohortDefinition.setName(
-        "Melhoria de Qualidade Category 3 Numerator C part compposition");
+        "Melhoria de Qualidade Category 3 Numerator C part composition");
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -270,13 +271,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch(
         "C", EptsReportUtils.map(getCqueryFromCat3(), "location=${location}"));
-    compositionCohortDefinition.addSearch(
-        "ADULTS",
-        EptsReportUtils.map(
-            this.ageCohortQueries.createXtoYAgeCohort("adults", 15, 200),
-            "effectiveDate=${endDate}"));
 
-    compositionCohortDefinition.setCompositionString("C AND ADULTS");
+    compositionCohortDefinition.setCompositionString("C");
 
     return compositionCohortDefinition;
   }
@@ -290,23 +286,18 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(getDqueryFromCat3(), MAPPING));
-    compositionCohortDefinition.addSearch(
-        "CHILDREN",
-        EptsReportUtils.map(
-            this.ageCohortQueries.createXtoYAgeCohort("children", 0, 14),
-            "effectiveDate=${endDate}"));
 
-    compositionCohortDefinition.setCompositionString("D AND CHILDREN");
+    compositionCohortDefinition.setCompositionString("D");
 
     return compositionCohortDefinition;
   }
 
   private CohortDefinition getCqueryFromCat3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -343,10 +334,8 @@ public class QualityImprovement2020CohortQueries {
             + "                ) diagnostico ON diagnostico.patient_id = p.patient_id  "
             + "                 "
             + " WHERE p.voided = 0 "
-            + "    AND  first_consultation.encounterdatetime >= diagnostico.data_diagnostico  "
-            + "    AND first_consultation.encounterdatetime  "
-            + "        BETWEEN  diagnostico.data_diagnostico  AND   "
-            + "                        DATE_ADD(diagnostico.data_diagnostico, INTERVAL 7 DAY) ";
+            + "    AND  first_consultation.encounterdatetime BETWEEN diagnostico.data_diagnostico "
+            + "     AND DATE_ADD(diagnostico.data_diagnostico, INTERVAL 7 DAY) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
