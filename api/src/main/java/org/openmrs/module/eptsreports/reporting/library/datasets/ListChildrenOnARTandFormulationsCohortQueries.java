@@ -28,13 +28,13 @@ public class ListChildrenOnARTandFormulationsCohortQueries {
   public CohortDefinition getBaseCohort() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("A from  CXCA SCRN");
+    cd.setName("base cohort");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition txcurr = this.txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true);
 
-    CohortDefinition adults = this.ageCohortQueries.createXtoYAgeCohort("adullts", 0, 15);
+    CohortDefinition adults = this.ageCohortQueries.createXtoYAgeCohort("adullts", 0, 14);
 
     cd.addSearch(
         "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${endDate},location=${location}"));
