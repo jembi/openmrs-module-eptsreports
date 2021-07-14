@@ -34,12 +34,12 @@ public class ListChildrenOnARTandFormulationsCohortQueries {
 
     CohortDefinition txcurr = this.txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true);
 
-    CohortDefinition adults = this.ageCohortQueries.createXtoYAgeCohort("adullts", 0, 14);
+    CohortDefinition children = this.ageCohortQueries.createXtoYAgeCohort("adullts", 0, 14);
 
     cd.addSearch(
         "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${endDate},location=${location}"));
 
-    cd.addSearch("children", EptsReportUtils.map(adults, ""));
+    cd.addSearch("children", EptsReportUtils.map(children, ""));
 
     cd.setCompositionString("txcurr  AND children");
 

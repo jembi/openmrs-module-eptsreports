@@ -1,6 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.calculation.formulations;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -65,7 +69,7 @@ public class ListOfChildrenOnARTFormulation2Calculation extends AbstractPatientC
     map.put("165256", hivMetadata.getArtDrugFormulationConcept().getConceptId());
     map.put("165252", hivMetadata.getDrugAndQuantityConcept().getConceptId());
     String sql =
-        "SELECT p.patient_id, c.concept_id "
+        "SELECT p.patient_id, cn.name "
             + "FROM patient p "
             + "         INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -89,6 +93,7 @@ public class ListOfChildrenOnARTFormulation2Calculation extends AbstractPatientC
             + "    AND  e.voided = 0 "
             + "    AND  o.voided  = 0 "
             + "    AND  cn.voided  = 0 "
+            + "    AND  cn.locale  = 'pt' "
             + "    AND o.concept_id =  ${165256} "
             + "    AND e.encounter_type = ${18} "
             + "    AND e.encounter_datetime <= :onOrBefore "

@@ -96,19 +96,31 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
 
     /** Query 9 Formulation 1 - Sheet 1: Column I */
     patientDataSetDefinition.addColumn(
-        "formulation1", getFormulation1(), "onOrBefore=${endDate},location=${location}", null);
+        "formulation1",
+        getFormulation(Formulation.FORMULATION1),
+        "onOrBefore=${endDate},location=${location}",
+        null);
 
     /** Query 10 Formulation 2 - Sheet 1: Column J */
     patientDataSetDefinition.addColumn(
-        "formulation2", getFormulation2(), "onOrBefore=${endDate},location=${location}", null);
+        "formulation2",
+        getFormulation(Formulation.FORMULATION2),
+        "onOrBefore=${endDate},location=${location}",
+        null);
 
     /** Query 11 Formulation 3 - Sheet 1: Column K */
     patientDataSetDefinition.addColumn(
-        "formulation3", getFormulation3(), "onOrBefore=${endDate},location=${location}", null);
+        "formulation3",
+        getFormulation(Formulation.FORMULATION3),
+        "onOrBefore=${endDate},location=${location}",
+        null);
 
     /** Query 12 Formulation 4 - Sheet 1: Column L */
     patientDataSetDefinition.addColumn(
-        "formulation4", getFormulation4(), "onOrBefore=${endDate},location=${location}", null);
+        "formulation4",
+        getFormulation(Formulation.FORMULATION4),
+        "onOrBefore=${endDate},location=${location}",
+        null);
 
     /** Query 13 Next Drug pick-up Date - Sheet 1: Column M */
     patientDataSetDefinition.addColumn(
@@ -299,7 +311,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("1088", hivMetadata.getRegimeConcept().getConceptId());
 
     String sql =
-        " SELECT p.patient_id, ob.value_coded "
+        " SELECT p.patient_id, cn.name "
             + " FROM patient p"
             + "   INNER JOIN "
             + "   ( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime "
@@ -468,12 +480,14 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("1087", hivMetadata.getPreviousARVUsedForTreatmentConcept().getConceptId());
     String sql =
-        "  SELECT p.patient_id, o.value_coded "
+        "  SELECT p.patient_id, cn.name "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
             + "     INNER JOIN obs o  "
             + "         ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN concept_name cn  "
+            + "         ON cn.concept_id = o.value_coded  "
             + "     INNER JOIN ("
             + "             SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
             + "             FROM   patient p  "
@@ -492,6 +506,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + " WHERE  p.voided = 0  "
             + "     AND e.voided = 0  "
             + "     AND o.voided = 0  "
+            + "     AND cn.locale = 'pt'  "
             + "     AND e.location_id = :location "
             + "     AND e.encounter_type IN (${6}, ${9}) "
             + "     AND e.encounter_datetime <= :endDate "
@@ -573,12 +588,14 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23725", hivMetadata.getFamilyApproach().getConceptId());
 
     String sql =
-        "  SELECT p.patient_id, o.value_coded "
+        "  SELECT p.patient_id, cn.name "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
             + "     INNER JOIN obs o  "
             + "         ON e.encounter_id = o.encounter_id  "
+            + "     INNER JOIN concept_name cn  "
+            + "         ON cn.concept_id = o.value_coded  "
             + "     INNER JOIN ("
             + "             SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
             + "             FROM   patient p  "
@@ -597,6 +614,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + " WHERE  p.voided = 0  "
             + "     AND e.voided = 0  "
             + "     AND o.voided = 0  "
+            + "     AND cn.locale = 'pt' "
             + "     AND e.location_id = :location "
             + "     AND e.encounter_type IN (${6}, ${9}) "
             + "     AND e.encounter_datetime <= :endDate "
@@ -703,18 +721,55 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
   }
 
   /**
-   * 9
+   * 9, 10, 11 and 12
    *
    * @return
    */
-  private DataDefinition getFormulation1() {
+  private DataDefinition getFormulation(Formulation formulation) {
 
-    CalculationDataDefinition calculationDataDefinition =
-        new CalculationDataDefinition(
-            "formulation1",
-            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation1Calculation.class)
-                .get(0));
-    calculationDataDefinition.setName("formulation1");
+    CalculationDataDefinition calculationDataDefinition = null;
+
+    switch (formulation) {
+      case FORMULATION1:
+        calculationDataDefinition =
+            new CalculationDataDefinition(
+                "formulation" + 1,
+                Context.getRegisteredComponents(ListOfChildrenOnARTFormulation1Calculation.class)
+                    .get(0));
+        calculationDataDefinition.setName("formulation" + 1);
+
+        break;
+      case FORMULATION2:
+        calculationDataDefinition =
+            new CalculationDataDefinition(
+                "formulation" + 2,
+                Context.getRegisteredComponents(ListOfChildrenOnARTFormulation2Calculation.class)
+                    .get(0));
+        calculationDataDefinition.setName("formulation" + 2);
+
+        break;
+      case FORMULATION3:
+        calculationDataDefinition =
+            new CalculationDataDefinition(
+                "formulation" + 3,
+                Context.getRegisteredComponents(ListOfChildrenOnARTFormulation3Calculation.class)
+                    .get(0));
+        calculationDataDefinition.setName("formulation" + 3);
+
+        break;
+      case FORMULATION4:
+        calculationDataDefinition =
+            new CalculationDataDefinition(
+                "formulation" + 4,
+                Context.getRegisteredComponents(ListOfChildrenOnARTFormulation4Calculation.class)
+                    .get(0));
+        calculationDataDefinition.setName("formulation" + 4);
+
+        break;
+      default:
+        throw new IllegalArgumentException("invalid formulation");
+    }
+
     calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     calculationDataDefinition.addParameter(
         new Parameter("onOrBefore", "onOrBefore", Location.class));
@@ -722,63 +777,10 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     return calculationDataDefinition;
   }
 
-  /**
-   * 10
-   *
-   * @return
-   */
-  private DataDefinition getFormulation2() {
-
-    CalculationDataDefinition calculationDataDefinition =
-        new CalculationDataDefinition(
-            "formulation2",
-            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation2Calculation.class)
-                .get(0));
-    calculationDataDefinition.setName("formulation2");
-    calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-    calculationDataDefinition.addParameter(
-        new Parameter("onOrBefore", "onOrBefore", Location.class));
-
-    return calculationDataDefinition;
-  }
-
-  /**
-   * 11
-   *
-   * @return
-   */
-  private DataDefinition getFormulation3() {
-
-    CalculationDataDefinition calculationDataDefinition =
-        new CalculationDataDefinition(
-            "formulation3",
-            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation3Calculation.class)
-                .get(0));
-    calculationDataDefinition.setName("formulation3");
-    calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-    calculationDataDefinition.addParameter(
-        new Parameter("onOrBefore", "onOrBefore", Location.class));
-
-    return calculationDataDefinition;
-  }
-
-  /**
-   * 12
-   *
-   * @return
-   */
-  private DataDefinition getFormulation4() {
-
-    CalculationDataDefinition calculationDataDefinition =
-        new CalculationDataDefinition(
-            "formulation4",
-            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation4Calculation.class)
-                .get(0));
-    calculationDataDefinition.setName("formulation4");
-    calculationDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-    calculationDataDefinition.addParameter(
-        new Parameter("onOrBefore", "onOrBefore", Location.class));
-
-    return calculationDataDefinition;
+  enum Formulation {
+    FORMULATION1,
+    FORMULATION2,
+    FORMULATION3,
+    FORMULATION4
   }
 }
