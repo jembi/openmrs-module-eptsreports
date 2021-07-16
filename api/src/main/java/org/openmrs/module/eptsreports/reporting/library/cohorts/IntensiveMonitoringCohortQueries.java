@@ -791,14 +791,14 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
-  public CohortDefinition getCat13Den(Integer level, String type) {
+  public CohortDefinition getCat13Den(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("MI 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 numerator and denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     String mapp =
         "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
-    if (level == 1 && type.equals("DEN")) {
+    if (level == 1 && !type) {
       cd.addSearch("MI13DEN", EptsReportUtils.map(this.getMI13DEN1(), mapp));
     } else {
       cd.addSearch(
@@ -809,9 +809,9 @@ public class IntensiveMonitoringCohortQueries {
           EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13(false, level), mapp));
     }
 
-    if ("DEN".equals(type)) {
+    if (!type) {
       cd.setCompositionString("MI13DEN");
-    } else if ("NUM".equals(type)) {
+    } else if (type) {
       cd.setCompositionString("MI13NUM");
     }
     return cd;
@@ -854,7 +854,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
-  public CohortDefinition getCat12P1DenNum(Integer level, String type) {
+  public CohortDefinition getCat12P1DenNum(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("MI 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 numerator and denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -872,9 +872,9 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "MI12P1NUM",
         EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ12NUM(level), MAPPING));
-    if ("DEN".equals(type)) {
+    if (!type) {
       cd.setCompositionString("MI12P1DEN");
-    } else if ("NUM".equals(type)) {
+    } else if (type) {
       cd.setCompositionString("MI12P1NUM");
     }
     return cd;
@@ -1195,7 +1195,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
-  public CohortDefinition getMICat13Part4(Integer level, String type) {
+  public CohortDefinition getMICat13Part4(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("MI 13.3, 13.12 AND 13.18 Numerator AND Denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1209,9 +1209,9 @@ public class IntensiveMonitoringCohortQueries {
         "MI13NUM",
         EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13P4(false, level), MAPPING2));
 
-    if ("DEN".equals(type)) {
+    if (!type) {
       cd.setCompositionString("MI13DEN");
-    } else if ("NUM".equals(type)) {
+    } else if (type) {
       cd.setCompositionString("MI13NUM");
     }
     return cd;
