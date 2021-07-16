@@ -11,6 +11,7 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -834,13 +835,15 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "MI11DEN",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag, "MI"),
+              qualityImprovement2020CohortQueries.getMQC11DEN(
+                  indicatorFlag, EptsReportConstants.MIMQ.MI),
               "revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (indicatorFlag == 4 || indicatorFlag == 7) {
       cd.addSearch(
           "MI11DEN",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag, "MI"),
+              qualityImprovement2020CohortQueries.getMQC11DEN(
+                  indicatorFlag, EptsReportConstants.MIMQ.MI),
               "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
     cd.setCompositionString("MI11DEN");
@@ -1115,45 +1118,50 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING));
     } else if (indicatorFlag == 2) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(
-                  "MI"),
+                  EptsReportConstants.MIMQ.MI),
               MAPPING1));
     } else if (indicatorFlag == 3) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING));
     } else if (indicatorFlag == 4) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING1));
     } else if (indicatorFlag == 5) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING));
     } else if (indicatorFlag == 6) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(
-                  "MI"),
+                  EptsReportConstants.MIMQ.MI),
               MAPPING));
     } else if (indicatorFlag == 7) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING1));
     }
     cd.setCompositionString("MI11NUM");
