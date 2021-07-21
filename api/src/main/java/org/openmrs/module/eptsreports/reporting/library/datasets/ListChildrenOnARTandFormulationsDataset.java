@@ -210,7 +210,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
 
     String sql =
-        " SELECT final_query.patient_id, CASE WHEN final_query.result_Value IS NOT NULL THEN 'ACTIVE' WHEN final_query.result_Value IS NULL THEN 'INACTIVE' ELSE '' END"
+        " SELECT final_query.patient_id, CASE WHEN final_query.result_Value IS NOT NULL THEN 'S' WHEN final_query.result_Value IS NULL THEN 'INACTIVE' ELSE '' END"
             + " FROM "
             + "( "
             + "                SELECT p.patient_id, o.value_coded  AS result_Value "
@@ -645,7 +645,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
 
     String sql =
-        "  SELECT p.patient_id, CASE WHEN e.encounter_datetime IS NOT NULL THEN 'Sim' WHEN e.encounter_datetime IS NULL THEN 'NAO' ELSE '' END"
+        "  SELECT p.patient_id, CASE WHEN e.encounter_datetime IS NOT NULL THEN 'Sim' WHEN e.encounter_datetime IS NULL THEN 'Não' ELSE 'Não' END"
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
