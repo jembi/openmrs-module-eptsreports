@@ -645,7 +645,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
 
     String sql =
-        "  SELECT p.patient_id, CASE WHEN e.encounter_datetime IS NOT NULL THEN 'Sim' WHEN e.encounter_datetime IS NULL THEN 'Não' ELSE 'Não' END"
+        "  SELECT p.patient_id, IF(e.encounter_datetime IS NOT NULL, 'Sim', 'Não')"
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
