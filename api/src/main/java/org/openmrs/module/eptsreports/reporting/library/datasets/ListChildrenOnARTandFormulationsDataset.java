@@ -13,6 +13,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfC
 import org.openmrs.module.eptsreports.reporting.calculation.formulations.ListOfChildrenOnARTFormulation4Calculation;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.ChildrenListConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.reporting.ReportingConstants;
@@ -61,6 +62,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
 
     patientDataSetDefinition.setParameters(getParameters());
 
+    patientDataSetDefinition.addColumn("pid", new PersonIdDataDefinition(), "");
     patientDataSetDefinition.addColumn("nid", identifierDef, "");
     patientDataSetDefinition.addColumn("name", nameDef, "");
     patientDataSetDefinition.addColumn(
@@ -159,7 +161,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         "quartelydismissallastconsultation",
         this.get3MonthsDispensationOnLastConsultationDate(),
         "endDate=${endDate},location=${location}",
-        null);
+        new ChildrenListConverter());
 
     /** Query 18 Next Follow up Consultation Date - Sheet 1: Column S */
     patientDataSetDefinition.addColumn(
@@ -645,7 +647,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
 
     String sql =
-        "  SELECT p.patient_id, IF(e.encounter_datetime IS NOT NULL, 'Sim', 'Não')"
+        "  SELECT p.patient_id,e.encounter_datetime "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
