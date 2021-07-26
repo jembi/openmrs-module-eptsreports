@@ -978,6 +978,13 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * All patients registered in Ficha Resumo (Encounter Type Id= 53) and marked as Transferred-in
+   * (“Transfer from other facility” concept Id 1369 = “Yes” concept id 1065) in TARV (“Type of
+   * Patient Transferred from” concept id 6300 = “ART” concept id 6276)
+   *
+   * @return SqlCohortDefinition
+   */
   public static CohortDefinition getTransferredInPatients(
       int masterCardEncounterType,
       int transferFromOtherFacilityConcept,
