@@ -266,7 +266,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.setName(
         "Melhoria de Qualidade Category 3 Numerator C part composition");
 
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     compositionCohortDefinition.addSearch(
         "C", EptsReportUtils.map(getCqueryFromCat3(), "location=${location}"));
