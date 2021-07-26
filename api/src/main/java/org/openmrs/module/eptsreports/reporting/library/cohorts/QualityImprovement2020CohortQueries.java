@@ -1131,7 +1131,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName(" All patients that started ART during inclusion period ");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -6304,7 +6304,7 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("startDate", "startDate", Date.class));
     comp.addParameter(new Parameter("endDate", "endDate", Date.class));
     comp.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    comp.addParameter(new Parameter("location", "location", Date.class));
+    comp.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition queryA1 =
         QualityImprovement2020Queries.getMQ15DenA1(
