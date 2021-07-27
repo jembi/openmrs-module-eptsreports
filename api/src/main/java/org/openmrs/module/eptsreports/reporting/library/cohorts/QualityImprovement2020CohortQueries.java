@@ -306,7 +306,7 @@ public class QualityImprovement2020CohortQueries {
    *
    *     <ul>
    *       <li>all patients who have the first consultation registered in “Ficha Clinica” (encounter
-   *           type 6) after “Data Diagnostico” as following:</li>
+   *           type 6) after “Data Diagnostico” as following:
    *           <ul>
    *             <li>
    *                 <p>Select the oldest date between “Data Diagnóstico” (concept_id 23807 obs
@@ -315,14 +315,12 @@ public class QualityImprovement2020CohortQueries {
    *                 <p>(Note: if “Data Diagnóstico” is empty then consider “Data Diagnóstico
    *                 Presuntivo” if it exists. If “Data Diagnostico” is empty then consider “Data
    *                 Diagnostico Presuntivo” if it exists).
-   *             </li>
-   *           <ul>
-   *             <li>
-   *                 <p>And the first consultation [encounter type 6] “Data da consulta” (encounter datetime)
-   *                 >= [encounter type 53] the oldest “Data Diagnóstico” minus the oldest “Data Diagnóstico”
-   *                 is >=0 and <=7 days
-   *             </li>
-   *           </ul>
+   *                 <ul>
+   *                   <li>
+   *                       <p>And the first consultation [encounter type 6] “Data da consulta”
+   *                       (encounter datetime) >= [encounter type 53] the oldest “Data Diagnóstico”
+   *                       minus the oldest “Data Diagnóstico” is >=0 and <=7 days
+   *                 </ul>
    *           </ul>
    *       <li>
    *     </ul>
@@ -650,15 +648,16 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   *
+   * <b>MQ4NUN1</b>: Melhoria de Qualidade Category 4 Numerador 1 <br>
+   * <i> Denominador and E </i> <br>
    * <li>Select all patients from Categoria 4 Denominador
    *
    *     <ul>
    *       <li>E: Filter all patients who on their last clinical consultation registered in “Ficha
    *           Clinica” (encounter type 6) during the revision period (encounter datetime>=
-   *           startDateInclusionRevision and <=EndDateRevisionendDateInclusion), have
-   *           “CLASSIFICAÇÃO DE DESNUTRIÇÃO” (concept_id 6336) value coded “Normal/Ligeira/DAM/
-   *           DAG”(concept_ids 1115, 6335, 68, 1844).
+   *           startDateInclusion and <=EndDateRevision), have “CLASSIFICAÇÃO DE DESNUTRIÇÃO”
+   *           (concept_id 6336) value coded “Normal/Ligeira/DAM/ DAG”(concept_ids 1115, 6335, 68,
+   *           1844).
    *     </ul>
    *
    * @return SqlCohortDefinition
@@ -686,6 +685,21 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   * <b>MQ4NUN2</b>: Melhoria de Qualidade Category 4 Numerador 2 <br>
+   * <i> Denominador and E </i> <br>
+   * <li>Select all patients from Categoria 4 Denominador
+   *
+   *     <ul>
+   *       <li>E: Filter all patients who on their last clinical consultation registered in “Ficha
+   *           Clinica” (encounter type 6) during the revision period (encounter datetime>=
+   *           startDateInclusion and <=EndDateRevision), have “CLASSIFICAÇÃO DE DESNUTRIÇÃO”
+   *           (concept_id 6336) value coded “Normal/Ligeira/DAM/ DAG”(concept_ids 1115, 6335, 68,
+   *           1844).
+   *     </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   public CohortDefinition getMQC4N2() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -790,15 +804,29 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-  /*
+  /**
    *
-   * All  patients the first clinical consultation with nutricional state equal
-   * to “DAM” or “DAG” occurred during the revision period and
-   * “Apoio/Educação Nutricional” = “ATPU” or “SOJA” in
-   * the same clinical consultation
    *
+   * <ul>
+   *   <li>F - Filter all patients with “Apoio/Educação Nutricional” equals to “ATPU” or “SOJA” in
+   *       the same clinical consultation where“Grau da Avaliação Nutricional” equals to “DAM” or
+   *       “DAG” during the revision period, clinical consultation >= startDateRevision and
+   *       <=endDateRevision :
+   *       <ul>
+   *         <li>
+   *             <p>All patients registered in Ficha Clinica (encounter type=6) with “Apoio/Educação
+   *             Nutricional” (concept_id = 2152) and value_coded equal to “ATPU” (concept_id =
+   *             6143) or equal to “SOJA” (concept_id = 2151) during the encounter_datetime >=
+   *             startDateRevision and <=endDateInclusion
+   *             <p>Note: the clinical consultation with “Apoio/Educação Nutricional” = “ATPU” or
+   *             “SOJA” must be the same clinical consultation where “Grau da Avaliação Nutricional”
+   *             equals to “DAM” or “DAG”. The first consultation with “Grau da Avaliação
+   *             Nutricional” equals to “DAM” or “DAG” should be considered.
+   *       </ul>
+   * </ul>
+   *
+   * @return SqlCohortDefinition
    */
-
   public CohortDefinition getPatientsWithNutritionalStateAndNutritionalSupport() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients with Nutritional Calssification");
@@ -848,23 +876,20 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-  /*
+  /**
+   * All patients ll patients with a clinical consultation(encounter type 6) during the Revision
+   * period with the following conditions:
    *
-   * All  patients ll patients with a clinical consultation(encounter type 6) during
-   * the Revision period with the following conditions:
-   *
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
+   * <p>“PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
    * Encounter_datetime between startDateRevision and endDateRevision and:
    *
-   *  - Encounter_datetime(from the last colinical consultation with
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267))
-   * MINUS
-   * - Encounter_datetime (from the colinical consultation with
-   * “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267))
-   * between 6 months and 9 months
+   * <p>- Encounter_datetime(from the last colinical consultation with “PROFILAXIA COM
+   * ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)) MINUS - Encounter_datetime
+   * (from the colinical consultation with “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded
+   * “Fim” (concept_id 1267)) between 6 months and 9 months
    *
+   * @return SqlCohortDefinition
    */
-
   public CohortDefinition getPatientsWithProphylaxyDuringRevisionPeriod() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients with Prophylaxy Treatment within Revision Period");
@@ -1014,8 +1039,8 @@ public class QualityImprovement2020CohortQueries {
    * All patients ll patients with a clinical consultation(encounter type 6) during the Revision
    * period with the following conditions:
    *
-   * <p>- “TEM SINTOMAS DE TB” (concept_id 23758) value coded “SIM” or “NÃO”(concept_id IN [1065,
-   * 1066]) and Encounter_datetime between:
+   * <p>- “TEM SINTOMAS DE TB” (concept_id 23758) value coded “SIM” (concept_id IN [1065]) and
+   * Encounter_datetime between:
    *
    * <p>- Encounter_datetime (from the last colinical consultation with “PROFILAXIA COM
    * ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) AND - Encounter_datetime
@@ -1092,8 +1117,8 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * All patients ll patients with a clinical consultation(encounter type 6) during the Revision
-   * period with the following conditions:
+   * All patients patients with a clinical consultation(encounter type 6) during the Revision period
+   * with the following conditions:
    *
    * <p>- “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or
    * “Fim”(concept_id IN [1256, 1257, 1267]) “Data Tratamento TB” (obs datetime 1268) between:
@@ -1266,6 +1291,9 @@ public class QualityImprovement2020CohortQueries {
    * DESNUTRIÇÃO” (concept_id = 6336) and value_coded equal to “DAG” (concept_id = 1844) or equal to
    * “DAM” (concept_id = 68) during the encounter_datetime >= startDateRevision and
    * <=endDateRevision
+   *
+   * <p>Note: consider the first clinical consultation with nutritional state equal to “DAM” or
+   * “DAG” occurred during the revision period.
    *
    * @return SqlCohortDefinition
    */
@@ -2611,10 +2639,10 @@ public class QualityImprovement2020CohortQueries {
    * <b>MQC11B2</b>: Melhoria de Qualidade Category 13 Deniminator B2 <br>
    *
    * <ul>
-   *   <li>B2- Select all patients from Ficha Clinica (encounter type 6) with “Carga Viral” (Concept
-   *       id 856) registered with numeric value > 1000 during the Inclusion period
-   *       (startDateInclusion and endDateInclusion). Note: if there is more than one record with
-   *       value_numeric > 1000 than consider the first occurrence during the inclusion period.
+   *   <li>B2- Select all patients from Ficha Clinica or Ficha Resumo(encounter type 6 or 53) with
+   *       “Carga Viral” (Concept id 856) registered with numeric value >= 1000 during the Inclusion
+   *       period (startDateInclusion and endDateInclusion). Note: if there is more than one record
+   *       with value_numeric > 1000 than consider the first occurrence during the inclusion period.
    * </ul>
    *
    * @return CohortDefinition
@@ -2886,7 +2914,7 @@ public class QualityImprovement2020CohortQueries {
    * Starting ART(The oldest date from A) as following the conditions:
    *
    * <ul>
-   *   <li>G1 - FIRST consultation (Encounter_datetime (from encounter type 35)) > “ART Start Date”
+   *   <li>G1 - FIRST consultation (Encounter_datetime (from encounter type 35)) >= “ART Start Date”
    *       (oldest date from A)+20days and <= “ART Start Date” (oldest date from A)+33days AND
    *   <li>G2 - At least one consultation (Encounter_datetime (from encounter type 35)) registered
    *       during the period between “1st Consultation Date(from G1)+20days” and “1st Consultation
@@ -2944,6 +2972,10 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   * H1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date when the Viral Load with >=1000 result was recorded (oldest date from B2)
+   * @return
+   */
   public CohortDefinition getMQC11NH1() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
@@ -2991,6 +3023,10 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st consultation” (oldest date from H1)+20 days and  <=“1st consultation” (oldest date from H1)+33days
+   * @return
+   */
   public CohortDefinition getMQC11NH2() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
@@ -3050,6 +3086,10 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd consultation” (oldest date from H2)+20 days and  <=“2nd consultation” (oldest date from H2)+33days
+   * @return
+   */
   public CohortDefinition getMQC11NH3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
@@ -3127,7 +3167,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * <ul>
    *   <li>H1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date when
-   *       the Viral Load with >1000 result was recorded (oldest date from B2) AND
+   *       the Viral Load with >= 1000 result was recorded (oldest date from B2) AND
    *   <li>H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st
    *       consultation” (oldest date from H1)+20 days and <=“1st consultation” (oldest date from
    *       H1)+33days AND
@@ -7382,6 +7422,23 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>B4_2 - Filter all patients with a “’Ultima Profilaxia Isoniazida (Data Início)” (concept
+   *       id 6128) in Ficha Resumo (encounter type 53) during the Inclusion period as following:
+   *       <ul>
+   *         <li>
+   *             <p>Encounter Type 53 “Última Profilaxia Isoniazida Data Início” (concept_id 6128)
+   *             value_datetime between startDateInclusion and endDateInclusion
+   *             <p>Note: if there is more than one Ficha Resumo consider the most recent date
+   *             during the inclusion period.
+   *       </ul>
+   * </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   public CohortDefinition getB4And2() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("B4_2");
@@ -7417,6 +7474,23 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>B4_1 - Filter all patients with a clinical consultation(encounter type 6) during the
+   *       Inclusion period with the following conditions:
+   *       <ul>
+   *         <li>
+   *             <p>“PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id
+   *             1256) Encounter_datetime between startDateInclusion and endDateInclusion
+   *             <p>Note: if there is more than one Ficha Clinica falling in the above criteria
+   *             consider the most recent one during the inclusion period.
+   *       </ul>
+   * </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   public CohortDefinition getB4And1() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("B4_1");
@@ -7454,6 +7528,28 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>G_New: Filter all patients with the most recent date as “TPT end Date” between the
+   *       following::
+   *       <ul>
+   *         <li>
+   *             <p>the most recent clinical consultation(encounter type 6)during the revision
+   *             period(encounter_datetime >= startDateRevision and <= endDateRevision) with
+   *             “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
+   *         <li>
+   *             <p>the most recent “Última Profilaxia Isoniazida (Data Fim)” () registered in Ficha
+   *             Resumo (encounter type 53) occurred during the revision period (value_datetime >=
+   *             startDateRevision and <= endDateRevision)
+   *             <p>and “TPT Start Date” (the most recent date from B4_1 and B4_2) minus “TPT End
+   *             Date” is between 170 days and 297 days
+   *       </ul>
+   * </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   public CohortDefinition getGNew() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();

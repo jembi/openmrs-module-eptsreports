@@ -378,6 +378,12 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * Age should be calculated on Patient ART Start Date (Check Section A for the algorithm to define
+   * this date).
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAgeOnMOHArtStartDate(
       Integer minAge, Integer maxAge, boolean considerPatientThatStartedBeforeWasBorn) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();

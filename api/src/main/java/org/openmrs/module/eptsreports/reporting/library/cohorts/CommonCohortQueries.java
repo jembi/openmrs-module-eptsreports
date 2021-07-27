@@ -175,15 +175,33 @@ public class CommonCohortQueries {
   }
 
   /**
-   * <b>Description: 18 and 19 -</b> MOH MQ Females on Condition
    *
-   * <p><b>Technical Specs</b>
+   * <li>Filter all patients with the last clinical consultation(encounter type 6) with “Diagnótico
+   *     TB activo” (concept id 23761) and value coded “SIM”(concept id 1065) and Encounter_datetime
+   *     between startDateInclusion and endDateRevision
+   * <li>Filter all patients with a clinical consultation(encounter type 6) during the Inclusion
+   *     period with the following conditions:
    *
-   * <blockquote>
+   *     <ul>
+   *       “TEM SINTOMAS DE TB” (concept_id 23758) value coded “SIM” (concept_id 1065) and
+   *       Encounter_datetime between startDateInclusion and endDateInclusion
+   * </ul>
    *
-   * Get all female patients in: Pregnant or Breastfeeding
+   * <li>Filter all patients with a clinical consultation(encounter type 6) during the Inclusion
+   *     period with the following conditions:
    *
-   * </blockquote>
+   *     <ul>
+   *       “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or
+   *       obs_datetime between startDateInclusion and endDateInclusion
+   * </ul>
+   *
+   * <li>Filter all patients with a clinical consultation(encounter type 6) during the Inclusion
+   *     period with the following conditions:
+   *
+   *     <ul>
+   *       “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)
+   *       Encounter_datetime between startDateInclusion and endDateInclusion
+   * </ul>
    *
    * @return {@link CohortDefinition}
    */

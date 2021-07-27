@@ -1230,11 +1230,11 @@ public class QualityImprovement2020Queries {
 
   /**
    * B4 - Select all patients from Ficha Clinica (encounter type 6 or 53) with “Carga Viral”
-   * (Concept id 856) registered with numeric value > 1000 during the Inclusion period
-   * (startDateInclusion and endDateInclusion) and filter all female patients registered with
-   * concept “GESTANTE”(Concept Id 1982) with value coded ‘SIM’ (Concept Id 1065) on the same
-   * encounter. (Note: consider the oldest encounter in case of more than one encounter “Carga
-   * Viral” with numeric value > 1000)
+   * (Concept id 856, encounter_datetime for Ficha Clinica and obs_datetime for Ficha Resumo)
+   * registered with numeric value >= 1000 during the Inclusion period (startDateInclusion and
+   * endDateInclusion) and filter all female patients registered with concept “GESTANTE”(Concept Id
+   * 1982) with value coded ‘SIM’ (Concept Id 1065) on the same encounter. (Note: consider the
+   * oldest encounter in case of more than one encounter “Carga Viral” with numeric value > 1000)
    *
    * </blockquote>
    *
@@ -1432,11 +1432,11 @@ public class QualityImprovement2020Queries {
 
   /**
    * B5 - Select all patients from Ficha Clinica (encounter type 6 or 53) with “Carga Viral”
-   * (Concept id 856) registered with numeric value > 1000 during the Inclusion period
-   * (startDateInclusion and endDateInclusion) and filter all female patients registered with
-   * concept “LACTANTE”(Concept Id 6332) with value coded ‘SIM’ (Concept Id 1065) on the same
-   * encounter. (Note: consider the oldest encounter in case of more than one encounter “Carga
-   * Viral” with numeric value > 1000)
+   * (Concept id 856, encounter_datetime for Ficha Clinica and obs_datetime for Ficha Resumo)
+   * registered with numeric value > 1000 during the Inclusion period (startDateInclusion and
+   * endDateInclusion) and filter all female patients registered with concept “LACTANTE”(Concept Id
+   * 6332) with value coded ‘SIM’ (Concept Id 1065) on the same encounter. (Note: consider the
+   * oldest encounter in case of more than one encounter “Carga Viral” with numeric value > 1000)
    *
    * </blockquote>
    *
