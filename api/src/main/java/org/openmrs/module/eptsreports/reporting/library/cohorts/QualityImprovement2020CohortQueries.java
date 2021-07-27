@@ -259,6 +259,29 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   * /**
+   * <li>D: Filter all child patients who have the first clinical consultation between Diagnosis
+   *     Date and Diagnosis Date+7days as following:
+   *
+   *     <ul>
+   *       <li>all patients who have: Filter all adults patients who have the first clinical
+   *           consultation between Diagnosis Date and Diagnosis Date+7days as following:ve who have
+   *           the first consultation registered in “Ficha Clinica” (encounter type 6) after “Data
+   *           Diagnostico” with the following conditions:
+   *           <ul>
+   *             <li>
+   *                 <p>[encounter type 6] “Data da consulta” (encounter datetime) >= [encounter
+   *                 type 53] “Data Diagnóstico” (concept_id 22772 obs datetime) and <= [encounter
+   *                 type 53] “Data Diagnóstico” (concept_id 22772 obs datetime) + 7 days
+   *           </ul>
+   *       <li>And the first consultation [encounter type 6] “Data da consulta” (encounter datetime)
+   *           >= [encounter type 53] the oldest “Data Diagnóstico” minus the oldest “Data
+   *           Diagnóstico” is >=0 and <=7 days
+   *     </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   private CohortDefinition getCFromMQC3N1() {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -276,6 +299,30 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   *
+   * <li>D: Filter all child patients who have the first clinical consultation between Diagnosis
+   *     Date and Diagnosis Date+7days as following:
+   *
+   *     <ul>
+   *       <li>all patients who have the first consultation registered in “Ficha Clinica” (encounter
+   *           type 6) after “Data Diagnostico” as following:
+   *           <ul>
+   *             <li>
+   *                 <p>Select the oldest date between “Data Diagnóstico” (concept_id 23807 obs
+   *                 datetime, encounter type 53) and “Data Diagnóstico Presuntivo” (concept_id
+   *                 22772 obs datetime, encounter type 53)
+   *                 <p>(Note: if “Data Diagnóstico” is empty then consider “Data Diagnóstico
+   *                 Presuntivo” if it exists. If “Data Diagnostico” is empty then consider “Data
+   *                 Diagnostico Presuntivo” if it exists).
+   *           </ul>
+   *       <li>And the first consultation [encounter type 6] “Data da consulta” (encounter datetime)
+   *           >= [encounter type 53] the oldest “Data Diagnóstico” minus the oldest “Data
+   *           Diagnóstico” is >=0 and <=7 days
+   *     </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   private CohortDefinition getDFromMQC3N1() {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -293,6 +340,29 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   * /**
+   * <li>D: Filter all child patients who have the first clinical consultation between Diagnosis
+   *     Date and Diagnosis Date+7days as following:
+   *
+   *     <ul>
+   *       <li>all patients who have: Filter all adults patients who have the first clinical
+   *           consultation between Diagnosis Date and Diagnosis Date+7days as following:ve who have
+   *           the first consultation registered in “Ficha Clinica” (encounter type 6) after “Data
+   *           Diagnostico” with the following conditions:
+   *           <ul>
+   *             <li>
+   *                 <p>[encounter type 6] “Data da consulta” (encounter datetime) >= [encounter
+   *                 type 53] “Data Diagnóstico” (concept_id 22772 obs datetime) and <= [encounter
+   *                 type 53] “Data Diagnóstico” (concept_id 22772 obs datetime) + 7 days
+   *           </ul>
+   *       <li>And the first consultation [encounter type 6] “Data da consulta” (encounter datetime)
+   *           >= [encounter type 53] the oldest “Data Diagnóstico” minus the oldest “Data
+   *           Diagnóstico” is >=0 and <=7 days
+   *     </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   private CohortDefinition getCqueryFromCat3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -341,6 +411,30 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   *
+   * <li>D: Filter all child patients who have the first clinical consultation between Diagnosis
+   *     Date and Diagnosis Date+7days as following:
+   *
+   *     <ul>
+   *       <li>all patients who have the first consultation registered in “Ficha Clinica” (encounter
+   *           type 6) after “Data Diagnostico” as following:
+   *           <ul>
+   *             <li>
+   *                 <p>Select the oldest date between “Data Diagnóstico” (concept_id 23807 obs
+   *                 datetime, encounter type 53) and “Data Diagnóstico Presuntivo” (concept_id
+   *                 22772 obs datetime, encounter type 53)
+   *                 <p>(Note: if “Data Diagnóstico” is empty then consider “Data Diagnóstico
+   *                 Presuntivo” if it exists. If “Data Diagnostico” is empty then consider “Data
+   *                 Diagnostico Presuntivo” if it exists).
+   *           </ul>
+   *       <li>And the first consultation [encounter type 6] “Data da consulta” (encounter datetime)
+   *           >= [encounter type 53] the oldest “Data Diagnóstico” minus the oldest “Data
+   *           Diagnóstico” is >=0 and <=7 days
+   *     </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   public CohortDefinition getDqueryFromCat3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -501,6 +595,26 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>Select all female patients who are pregnant as following:
+   *       <ul>
+   *         <li>All patients registered in Ficha Clínica (encounter type=53) with
+   *             “Gestante”(concept_id 1982) value coded equal to “Yes” (concept_id 1065) and
+   *             encounter datetime >= startDateRevision and <=endDateInclusion and sex=Female
+   *       </ul>
+   *   <li>Select all female patients who are breastfeeding as following:
+   *       <ul>
+   *         <li>all patients registered in Ficha Clinica (encounter type=53) with
+   *             “Lactante”(concept_id 6332) value coded equal to “Yes” (concept_id 1065) and
+   *             encounter datetime >= startDateRevision and <=endDateInclusion and sex=Female
+   *       </ul>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   private CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
     Map<String, Integer> map = new HashMap<>();
     map.put("conceptIdQn", conceptIdQn);
@@ -532,6 +646,20 @@ public class QualityImprovement2020CohortQueries {
         "Pregnant or breastfeeding females", stringSubstitutor.replace(query));
   }
 
+  /**
+   *
+   * <li>Select all patients from Categoria 4 Denominador
+   *
+   *     <ul>
+   *       <li>E: Filter all patients who on their last clinical consultation registered in “Ficha
+   *           Clinica” (encounter type 6) during the revision period (encounter datetime>=
+   *           startDateInclusionRevision and <=EndDateRevisionendDateInclusion), have
+   *           “CLASSIFICAÇÃO DE DESNUTRIÇÃO” (concept_id 6336) value coded “Normal/Ligeira/DAM/
+   *           DAG”(concept_ids 1115, 6335, 68, 1844).
+   *     </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   public CohortDefinition getMQC4N1() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -578,6 +706,19 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>E: Filter all patients who on their last clinical consultation registered in “Ficha
+   *       Clinica” (encounter type 6) during the revision period (encounter datetime>=
+   *       startDateInclusionRevision and <=EndDateRevisionendDateInclusion), have “CLASSIFICAÇÃO DE
+   *       DESNUTRIÇÃO” (concept_id 6336) value coded “Normal/Ligeira/DAM/ DAG”(concept_ids 1115,
+   *       6335, 68, 1844).
+   * </ul>
+   *
+   * @return SqlCohortDefinition
+   */
   private CohortDefinition getLastClinicalConsultationClassficacaoDesnutricao() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
