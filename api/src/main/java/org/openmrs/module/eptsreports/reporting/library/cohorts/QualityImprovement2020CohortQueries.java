@@ -306,7 +306,7 @@ public class QualityImprovement2020CohortQueries {
    *
    *     <ul>
    *       <li>all patients who have the first consultation registered in “Ficha Clinica” (encounter
-   *           type 6) after “Data Diagnostico” as following:
+   *           type 6) after “Data Diagnostico” as following:</li>
    *           <ul>
    *             <li>
    *                 <p>Select the oldest date between “Data Diagnóstico” (concept_id 23807 obs
@@ -315,10 +315,16 @@ public class QualityImprovement2020CohortQueries {
    *                 <p>(Note: if “Data Diagnóstico” is empty then consider “Data Diagnóstico
    *                 Presuntivo” if it exists. If “Data Diagnostico” is empty then consider “Data
    *                 Diagnostico Presuntivo” if it exists).
+   *             </li>
+   *           <ul>
+   *             <li>
+   *                 <p>And the first consultation [encounter type 6] “Data da consulta” (encounter datetime)
+   *                 >= [encounter type 53] the oldest “Data Diagnóstico” minus the oldest “Data Diagnóstico”
+   *                 is >=0 and <=7 days
+   *             </li>
    *           </ul>
-   *       <li>And the first consultation [encounter type 6] “Data da consulta” (encounter datetime)
-   *           >= [encounter type 53] the oldest “Data Diagnóstico” minus the oldest “Data
-   *           Diagnóstico” is >=0 and <=7 days
+   *           </ul>
+   *       <li>
    *     </ul>
    *
    * @return SqlCohortDefinition
@@ -356,9 +362,6 @@ public class QualityImprovement2020CohortQueries {
    *                 type 53] “Data Diagnóstico” (concept_id 22772 obs datetime) and <= [encounter
    *                 type 53] “Data Diagnóstico” (concept_id 22772 obs datetime) + 7 days
    *           </ul>
-   *       <li>And the first consultation [encounter type 6] “Data da consulta” (encounter datetime)
-   *           >= [encounter type 53] the oldest “Data Diagnóstico” minus the oldest “Data
-   *           Diagnóstico” is >=0 and <=7 days
    *     </ul>
    *
    * @return SqlCohortDefinition
