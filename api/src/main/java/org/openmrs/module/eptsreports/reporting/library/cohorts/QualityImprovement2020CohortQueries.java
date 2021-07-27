@@ -2577,6 +2577,21 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>B1E- Select all patients from Ficha Clinica (encounter type 6) who have “LINHA
+   *       TERAPEUTICA”(Concept id 21151) with value coded DIFFERENT THAN “PRIMEIRA LINHA”(Concept
+   *       id 21150) registered in the LAST consultation (encounter type 6) by endDateRevision
+   *   <li>B2E- Select all patients from Ficha Clinica (encounter type 6) who have “LINHA
+   *       TERAPEUTICA”(Concept id 21151) with value coded DIFFERENT THAN “SEGUNDA LINHA”(Concept id
+   *       21148) registered in the LAST consultation (encounter type 6) by endDateRevision
+   * </ul>
+   *
+   * @param b1e
+   * @return
+   */
   public CohortDefinition getPatientsFromFichaClinicaDenominatorB1EOrB2E(boolean b1e) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -2762,6 +2777,14 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * B2- Select all patients from Ficha Clinica (encounter type 6) who have THE LAST “LINHA
+   * TERAPEUTICA”(Concept id 21151) during the Inclusion period (startDateInclusion =
+   * endDateRevision - 14 months and endDateInclusion = endDateRevision - 11 months) and the value
+   * coded is “SEGUNDA LINHA”(Concept id 21148)
+   *
+   * @return
+   */
   public CohortDefinition getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsSecondLine_B2() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -2973,7 +2996,9 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * H1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date when the Viral Load with >=1000 result was recorded (oldest date from B2)
+   * H1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date when the
+   * Viral Load with >=1000 result was recorded (oldest date from B2)
+   *
    * @return
    */
   public CohortDefinition getMQC11NH1() {
@@ -3024,7 +3049,9 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st consultation” (oldest date from H1)+20 days and  <=“1st consultation” (oldest date from H1)+33days
+   * H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st consultation”
+   * (oldest date from H1)+20 days and <=“1st consultation” (oldest date from H1)+33days
+   *
    * @return
    */
   public CohortDefinition getMQC11NH2() {
@@ -3087,7 +3114,9 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd consultation” (oldest date from H2)+20 days and  <=“2nd consultation” (oldest date from H2)+33days
+   * H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd consultation”
+   * (oldest date from H2)+20 days and <=“2nd consultation” (oldest date from H2)+33days
+   *
    * @return
    */
   public CohortDefinition getMQC11NH3() {
@@ -5101,14 +5130,14 @@ public class QualityImprovement2020CohortQueries {
    * <ul>
    *   <li>G - Select all patients who have 3 APSS&PP (encounter type 35) consultations in 99 days
    *       after Viral Load Result (the oldest date from B2) following the conditions:
-   *       <p>G1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date
-   *       when the Viral Load with >1000 result was recorded (the oldest date from B2) AND G2 -
-   *       Another consultation (Encounter_datetime (from encounter type 35) > “Viral Load Date”
+   *        <li><p>G1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date
+   *       when the Viral Load with >=1000 result was recorded (the oldest date from B2) AND
+   *        <li><p>G2 -Another consultation (Encounter_datetime (from encounter type 35) > “Viral Load Date”
    *       (the oldest date from B2)+20dias and <=“Viral Load Date” (the oldest date from
-   *       B2)+33days. AND G3 - Another consultation (Encounter_datetime (from encounter type 35)) >
+   *       B2)+33days. AND
+   *        <li><p>G3 - Another consultation (Encounter_datetime (from encounter type 35)) >
    *       “Second Date” (date from G2, the oldest from G2)+20days and <=“Second Date” (date from
    *       G2, the oldest one)+33days.
-   *   <li>
    * </ul>
    *
    * @return CohortDefinition
@@ -5217,7 +5246,6 @@ public class QualityImprovement2020CohortQueries {
    *       INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA VIRAL”
    *       (Concept Id 856) on Encounter_datetime between “Viral Load Date” (the oldest date from
    *       B2)+80 days and “Viral Load Date” (the oldest date from B2)+130 days.
-   *   <li>
    * </ul>
    *
    * @return CohortDefinition
@@ -6931,6 +6959,15 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * <b>MQ9Den: M&Q Report - Categoria 9 Denominador</b><br>
+   * <ul>
+   *   <li>9.1.  % de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição
+   *   <li>9.2. % de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMQ9Den(int flag) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -7096,7 +7133,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * <ul>
    *   <li>B: Filter all patients with CD4 (concept id 1695) result registered in Ficha Clinica
-   *       (encounter type 6) withinunder 33 days from the first clinical consultation (encounter
+   *       (encounter type 6) within 33 days from the first clinical consultation (encounter
    *       type 6) that occurred by endDateRevision, as following:
    *       <ul>
    *         <li>who have a clinical consultation (encounter type 6) with CD4 (concept id 1695)
@@ -7167,6 +7204,15 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * <b>MQ9Num: M&Q Report - Categoria 9 Numerador</b><br>
+   * <ul>
+   *   <li>9.1.  % de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição
+   *   <li>9.2. % de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMQ9Num(int flag) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
