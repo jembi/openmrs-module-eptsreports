@@ -785,7 +785,7 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
-  /* Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
+  /** Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period Section (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
@@ -846,7 +846,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.setCompositionString("MI11DEN");
     return cd;
   }
-  /* Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
+  /** Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
@@ -1160,7 +1160,7 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
-  /*
+  /**
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.14 Numerator (endDateRevision)
    *
@@ -2128,6 +2128,10 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
+  /**
+   * Get CAT 13.1 Denominator
+   * @return
+   */
   public CohortDefinition getMI13DEN1() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
