@@ -1970,6 +1970,21 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>MI15DenNum: Melhoria de Qualidade Category 15 Denominador e Numerator</b><br>
+   * <br>
+   * <i> DENOMINADOR 1: A and B1 and E and NOT (C or D or F or G or J) and Age >= 2  </i> <br>
+   * <i> NUMERATOR 1: A and B1 and E and NOT (C or D or F or G or J) and K and Age >= 2  </i> <br>
+   * <br>
+   * <i> DENOMINADOR 2: A and J and H and Age >= 2 </i>
+   * <i> NUMERATOR 2: A and J and H and L and Age >= 2 </i><br>
+   * <br>
+   * <i> DENOMINADOR 3: A and J and B2 and NOT P and Age >= 2 </i>
+   * <i> NUMERATOR 3: A and J and B2 and NOT P and I and Age >= 2 </i><br>
+   * <br>
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getCat15P1DenNum(boolean isDenominator, int level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
