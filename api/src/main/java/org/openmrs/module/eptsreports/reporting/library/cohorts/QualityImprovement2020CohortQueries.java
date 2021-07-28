@@ -7041,6 +7041,15 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * <b>MQ10Den: M&Q Report - Categoria 10 Denominador</b><br>
+   * <ul>
+   *   <li>10.1. % de adultos (15/+anos) que iniciaram o TARV dentro de 15 dias após diagnóstico
+   *   <li>10.3. % de crianças (0-14 anos) HIV+ que iniciaram TARV dentro de 15 dias após diagnóstico
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMQ10Den(boolean adults) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
