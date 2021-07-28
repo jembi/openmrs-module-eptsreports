@@ -165,7 +165,6 @@ public class QualityImprovement2020CohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
 
     String query =
@@ -2333,7 +2332,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
     map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
     map.put("21148", hivMetadata.getSecondLineConcept().getConceptId());
-    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     StringBuilder query = new StringBuilder();
     query.append(" SELECT p.patient_id ");
@@ -3199,7 +3197,6 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtStatus().getConceptId());
     CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
     CohortDefinition g = getMQC11NG();
-    CohortDefinition children = genericCohortQueries.getAgeOnMOHArtStartDate(2, 14, true);
 
     if (reportSource.equals("MQ")) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING));
@@ -6131,10 +6128,8 @@ public class QualityImprovement2020CohortQueries {
         QualityImprovement2020Queries.getMQ15DenA1(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getQuarterlyConcept().getConceptId(),
             hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            hivMetadata.getTypeOfDispensationConcept().getConceptId());
+            hivMetadata.getQuarterlyDispensation().getConceptId());
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
@@ -6293,10 +6288,8 @@ public class QualityImprovement2020CohortQueries {
         QualityImprovement2020Queries.getMQ15DenA1(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getQuarterlyConcept().getConceptId(),
             hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            hivMetadata.getTypeOfDispensationConcept().getConceptId());
+            hivMetadata.getQuarterlyDispensation().getConceptId());
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
