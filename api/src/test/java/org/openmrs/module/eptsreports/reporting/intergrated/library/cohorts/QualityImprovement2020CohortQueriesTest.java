@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -172,17 +173,168 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
+  /** ADDED UNIT TESTS */
+  @Test
+  public void getMQC4D1ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC4D1();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+  }
+
+  @Test
+  public void getMQC4D2ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT4 DEN2...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC4D2();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+  }
+
+  @Test
+  public void getMQC4N1ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT4 NUM1...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC4N1();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    // assertEquals(1, evaluatedCohort.getMemberIds().size());
+    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+  }
+
+  // CAT 6 NUMERATOR AND DENOMINATOR
+  @Test
+  public void getMQ6AShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT6 DEN...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6A(1);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1011));
+    // assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+  }
+
+  @Test
+  public void getMQ6ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT6 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6NUM(1);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    // assertEquals(1, evaluatedCohort.getMemberIds().size());
+    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+  }
+
+  
+
+   @Test
+  public void getMQ7AShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT7 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(1);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    // assertEquals(1, evaluatedCohort.getMemberIds().size());
+    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
+    // assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+  }
+
+
   private Date getrevisionEndDate() {
-    return DateUtil.getDateTime(2019, 5, 27);
+    return DateUtil.getDateTime(2021, 1, 20);
   }
 
   @Override
   public Date getStartDate() {
-    return DateUtil.getDateTime(2010, 5, 10);
+    return DateUtil.getDateTime(2020, 01, 21);
   }
 
   @Override
   public Date getEndDate() {
-    return DateUtil.getDateTime(2019, 5, 26);
+    return DateUtil.getDateTime(2020, 4, 20);
   }
 }
