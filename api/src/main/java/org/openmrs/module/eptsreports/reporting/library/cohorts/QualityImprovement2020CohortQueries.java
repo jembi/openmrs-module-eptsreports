@@ -614,6 +614,8 @@ public class QualityImprovement2020CohortQueries {
    *       </ul>
    * </ul>
    *
+   * @param conceptIdQn
+   * @param conceptIdAns
    * @return CohortDefinition
    */
   private CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
@@ -965,6 +967,8 @@ public class QualityImprovement2020CohortQueries {
    * ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) AND - Encounter_datetime
    * (from the last colinical consultation with “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value
    * coded “Inicio” (concept_id 1256)) PLUS 9 MONTHS
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithTBDiagActive() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -1046,6 +1050,8 @@ public class QualityImprovement2020CohortQueries {
    * ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) AND - Encounter_datetime
    * (from the last colinical consultation with “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value
    * coded “Inicio” (concept_id 1256)) PLUS 9 MONTHS
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithTBSymtoms() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -1365,6 +1371,7 @@ public class QualityImprovement2020CohortQueries {
    *       <=endDateRevision
    * </ul>
    *
+   * @param den
    * @return CohortDefinition
    */
   public CohortDefinition getMQ5B(Boolean den) {
@@ -1452,6 +1459,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>E - All transferred IN patients during the inclusion period
    * </ul>
    *
+   * @param den
    * @return CohortDefinition
    */
   public CohortDefinition getMQ6A(Integer den) {
@@ -1558,6 +1566,7 @@ public class QualityImprovement2020CohortQueries {
    *       period)
    * </ul>
    *
+   * @param num
    * @return CohortDefinition
    */
   public CohortDefinition getMQ6NUM(Integer num) {
@@ -1690,6 +1699,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>
    * </ul>
    *
+   * @param den
    * @return CohortDefinition
    */
   public CohortDefinition getMQ7A(Integer den) {
@@ -1873,6 +1883,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>
    * </ul>
    *
+   * @param num
    * @return CohortDefinition
    */
   public CohortDefinition getMQ7B(Integer num) {
@@ -2054,6 +2065,8 @@ public class QualityImprovement2020CohortQueries {
    *   <li>F - All Transferred Out patients
    * </ul>
    *
+   * @param indicatorFlag
+   * @param reportSource
    * @return CohortDefinition
    * @params indicatorFlag A to G For inicator 11.1 to 11.7 respectively
    */
@@ -2215,7 +2228,7 @@ public class QualityImprovement2020CohortQueries {
    * </ul>
    *
    * @return CohortDefinition
-   * @params indicatorFlag
+   * @param indicatorFlag
    */
   public CohortDefinition getMQC12P2DEN(Integer indicatorFlag) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -2354,6 +2367,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>F - All Transferred Out patients
    * </ul>
    *
+   * @param indicator
    * @return CohortDefinition
    * @params indicatorFlag A to F For inicator 13.2 to 13.14 accordingly to the specs
    */
@@ -3113,6 +3127,9 @@ public class QualityImprovement2020CohortQueries {
    * APSS/PP nos primeiros 3 meses após início do TARV (Line 56 in the template) Numerador (Column D
    * in the Template) as following: <code>
    * A and NOT C and NOT D and NOT E and NOT F  AND G and Age > 14*</code>
+   *
+   * @param reportResource
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumAnotCnotDnotEnotFandGAdultss(MIMQ reportResource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -3175,6 +3192,9 @@ public class QualityImprovement2020CohortQueries {
    * APSS/PP mensais consecutivas para reforço de adesão (Line 57 in the template) Numerador (Column
    * D in the Template) as following: <code>
    * B1 and B2 and NOT C and NOT B5 and NOT E and NOT F AND H and  Age > 14*</code>
+   *
+   * @param reportSource
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(MIMQ reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -3245,6 +3265,9 @@ public class QualityImprovement2020CohortQueries {
    * 11.3.% de MG em TARV com o mínimo de 3 consultas de seguimento de adesão na FM-ficha de APSS/PP
    * nos primeiros 3 meses após início do TARV (Line 58 in the template) Numerador (Column D in the
    * Template) as following: <code> A  and  C and NOT D and NOT E and NOT F  AND G </code>
+   *
+   * @param reportSource
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumAnB3nCnotDnotEnotEnotFnG(MIMQ reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -3306,6 +3329,9 @@ public class QualityImprovement2020CohortQueries {
    * APSS/PP mensais consecutivas para reforço de adesão (Line 59 in the template) Numerador (Column
    * D in the Template) as following: <code>
    *  B1 and B2 and B5 and NOT E and NOT F AND H </code>
+   *
+   * @param reportSource
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(MIMQ reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -3381,6 +3407,9 @@ public class QualityImprovement2020CohortQueries {
    * ficha de APSS/PP nos primeiros 99 dias de TARV (Line 60 in the template) Numerador (Column D in
    * the Template) as following: <code>
    * A and NOT C and NOT D and NOT E and NOT F  AND G and Age BETWEEN 2 AND 14*</code>
+   *
+   * @param reportSource
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumAnotCnotDnotEnotFnotGnChildren(MIMQ reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -3438,6 +3467,9 @@ public class QualityImprovement2020CohortQueries {
    * ficha de APSS/PP no primeiro ano de TARV (Line 61 in the template) Numerador (Column D in the
    * Template) as following: <code>
    *  A and NOT C and NOT D and NOT E and NOT F AND I  AND Age  <= 9 MONTHS</code>
+   *
+   * @param reportSource
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(MIMQ reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -3509,6 +3541,9 @@ public class QualityImprovement2020CohortQueries {
    * consultas mensais consecutivas de APSS/PP para reforço de adesão(Line 62 in the template)
    * Numerador (Column D in the Template) as following: <code>
    *  B1 and B2 and  NOT C and NOT B5 and NOT E and NOT F  And H and  Age < 15**</code>
+   *
+   * @param reportSource
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumB1nB2notCnotDnotEnotFnHChildren(MIMQ reportSource) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -3603,6 +3638,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>F - All transferred OUT patients within the revision period
    * </ul>
    *
+   * @param den
    * @return CohortDefinition
    */
   public CohortDefinition getMQ12DEN(Integer den) {
@@ -4075,6 +4111,7 @@ public class QualityImprovement2020CohortQueries {
    *       I2)+33days
    * </ul>
    *
+   * @param den
    * @return CohortDefinition
    */
   public CohortDefinition getMQ12NUM(Integer den) {
@@ -4320,6 +4357,8 @@ public class QualityImprovement2020CohortQueries {
    * B5E) AND C </i> <br>
    * </ul>
    *
+   * @param den
+   * @param line
    * @return CohortDefinition
    */
   public CohortDefinition getMQ13(Boolean den, Integer line) {
@@ -4522,7 +4561,7 @@ public class QualityImprovement2020CohortQueries {
    * <p>All age disaggreagtions should be based on the ART start date
    *
    * @param indicator
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P3NUM(int indicator) {
 
@@ -4661,6 +4700,15 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * Select all patients with a clinical consultation (encounter type 6) with concept “Carga Viral”
+   * (Concept id 856) with value_numeric not null OR concept “Carga Viral Qualitative” (Concept id
+   * 1305) with value_coded not null and Encounter_datetime between “Patient ART Start Date” (the
+   * oldest date from A)+6months and “Patient ART Start Date” (the oldest date from query
+   * A)+9months.
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMQC13P3NUM_G() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
@@ -4728,6 +4776,15 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * H - Select all patients with a clinical consultation (encounter type 6) with concept “Carga
+   * Viral” (Concept id 856) with value_numeric not null OR concept “Carga Viral Qualitative”
+   * (Concept id 1305) with value_coded not null and Encounter_datetime between “ALTERNATIVA A LINHA
+   * - 1a LINHA Date” (the most recent date from B1)+6months and “ALTERNATIVA A LINHA - 1a LINHA
+   * Date” (the most recent date from B1)+9months.
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMQC13P3NUM_H() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
@@ -4809,6 +4866,15 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * I - Select all patients with a clinical consultation (encounter type 6) with concept “Carga
+   * Viral” (Concept id 856) with value_numeric not null OR concept “Carga Viral Qualitative”
+   * (Concept id 1305) with value_coded not null and Encounter_datetime between “Segunda Linha Date”
+   * (the most recent date from B2New)+6months and “Segunda Linha Date” (the most recent date from
+   * B2New)+9months.
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMQC13P3NUM_I() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
@@ -4885,14 +4951,17 @@ public class QualityImprovement2020CohortQueries {
    * <ul>
    *   <li>G - Select all patients who have 3 APSS&PP (encounter type 35) consultations in 99 days
    *       after Viral Load Result (the oldest date from B2) following the conditions:
-   *        <li><p>G1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date
+   *   <li>
+   *       <p>G1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date
    *       when the Viral Load with >=1000 result was recorded (the oldest date from B2) AND
-   *        <li><p>G2 -Another consultation (Encounter_datetime (from encounter type 35) > “Viral Load Date”
-   *       (the oldest date from B2)+20dias and <=“Viral Load Date” (the oldest date from
+   *   <li>
+   *       <p>G2 -Another consultation (Encounter_datetime (from encounter type 35) > “Viral Load
+   *       Date” (the oldest date from B2)+20dias and <=“Viral Load Date” (the oldest date from
    *       B2)+33days. AND
-   *        <li><p>G3 - Another consultation (Encounter_datetime (from encounter type 35)) >
-   *       “Second Date” (date from G2, the oldest from G2)+20days and <=“Second Date” (date from
-   *       G2, the oldest one)+33days.
+   *   <li>
+   *       <p>G3 - Another consultation (Encounter_datetime (from encounter type 35)) > “Second
+   *       Date” (date from G2, the oldest from G2)+20days and <=“Second Date” (date from G2, the
+   *       oldest one)+33days.
    * </ul>
    *
    * @return CohortDefinition
@@ -5212,7 +5281,7 @@ public class QualityImprovement2020CohortQueries {
    * <=endDateInclusion) and (2) after the start of ART (encounter_datetime > “Patient ART Start
    * Date”)
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P2DenB2() {
 
@@ -5268,7 +5337,7 @@ public class QualityImprovement2020CohortQueries {
    * query A)+80days and “Patient ART Start Date” (the oldest from query A)+130days. Note: if more
    * than one encounter exists that satisfies these conditions, select the oldest one.
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P2DenB3() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -5347,7 +5416,7 @@ public class QualityImprovement2020CohortQueries {
    * value coded “SIM” ( Concept Id 1065) encounter_datetime during the inclusion period
    * (encounter_datetime from B2)
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getgetMQC13P2DenB4() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -5411,6 +5480,8 @@ public class QualityImprovement2020CohortQueries {
    * TARV na CPN) Denominator: # de MG com registo de início do TARV na CPN dentro do período de
    * inclusão. (Line 90,Column F in the Template) as following: <code>
    * (A and B1) and NOT (D or F) and Age >= 15*</code>
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getgetMQC13P2DenMGInIncluisionPeriod() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -5468,6 +5539,8 @@ public class QualityImprovement2020CohortQueries {
    * (MG que entraram em TARV na CPN) Denominator:# de MG que tiveram a primeira CPN no período de
    * inclusão, e que já estavam em TARV há mais de 3 meses (Line 91,Column F in the Template) as
    * following: <code>B2 and NOT (D or E or F) and Age >= 15*</code>
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getgetMQC13P2DenMGInIncluisionPeriod33Month() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -5488,6 +5561,8 @@ public class QualityImprovement2020CohortQueries {
    * Denominator: # de MG com registo de pedido de CV no período de revisão (Line 92,Column F in the
    * Template) as following: <code>
    * ((A and B1 and B3) or (B2 and B4)) and NOT (D or E or F) and Age >= 15*</code>
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P2DenMGInIncluisionPeriod33Days() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -5738,7 +5813,7 @@ public class QualityImprovement2020CohortQueries {
    * value_coded not null) and Encounter_datetime > “Data de Pedido de Carga Viral”(the date from
    * B4) and Encounter_datetime <= “Data de Pedido de Carga Viral”(the date from B4)+33days
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P2NumL() {
 
@@ -5944,7 +6019,7 @@ public class QualityImprovement2020CohortQueries {
    * 856, value_numeric not null) and obs_datetime >= “Data de Pedido de Carga Viral”(the date from
    * B4) and obs_datetime <= “Data de Pedido de Carga Viral”(the date from B4)+33days
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P2NumN() {
 
@@ -6049,6 +6124,8 @@ public class QualityImprovement2020CohortQueries {
    * 13.15. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico (MG que iniciaram
    * TARV na CPN) (Line 90 in the template) Numerator (Column E in the Template) as following:
    * <code>(A and B1 and H) and NOT (D or F) and Age >= 15*</code>
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P2Num1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -6102,6 +6179,8 @@ public class QualityImprovement2020CohortQueries {
    * 13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN
    * (MG que entraram em TARV na CPN) (Line 91 in the template) Numerator (Column E in the Template)
    * as following: <code>(B2 and J) and NOT (D or E or F) and Age >= 15*</code>
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P2Num2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -6122,6 +6201,8 @@ public class QualityImprovement2020CohortQueries {
    * 13.17. % de MG que receberam o resultado da Carga Viral dentro de 33 dias após pedido (Line 92
    * in the template) Numerator (Column E in the Template) as following: <code>
    * ((A and B1 and B3 and K) or (B2 and B4 and L)) and NOT (D or E or F) and Age >= 15*</code>
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC13P2Num3() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -6212,6 +6293,7 @@ public class QualityImprovement2020CohortQueries {
    * <i> DENOMINATOR 12: (A2 or A3) and NOT B1 and NOT C and NOT D and NOT F and Age between 10 and
    * 14 </i> <br>
    *
+   * @param den
    * @return CohortDefinition
    */
   public CohortDefinition getMQ15DEN(Integer den) {
@@ -6372,6 +6454,7 @@ public class QualityImprovement2020CohortQueries {
    * <i> NUMERATOR 12: (A2 or A3) and NOT B1 and NOT C and NOT D and NOT F and Age between 10 and 14
    * </i> <br>
    *
+   * @param num
    * @return CohortDefinition
    */
   public CohortDefinition getMQ15NUM(Integer num) {
@@ -6597,6 +6680,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>14.4. % de ML em TARV com supressão viral - A and NOT A1 and A2
    * </ul>
    *
+   * @param flag
    * @return CohortDefinition
    */
   public CohortDefinition getMQ14DEN(Integer flag) {
@@ -6661,6 +6745,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>14.4. % de ML em TARV com supressão viral - B and NOT B1 and B2
    * </ul>
    *
+   * @param flag
    * @return CohortDefinition
    */
   public CohortDefinition getMQ14NUM(Integer flag) {
@@ -6712,11 +6797,15 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQ9Den: M&Q Report - Categoria 9 Denominador</b><br>
+   *
    * <ul>
-   *   <li>9.1.  % de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição
-   *   <li>9.2. % de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição
+   *   <li>9.1. % de adultos HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4
+   *       dentro de 33 dias após a inscrição
+   *   <li>9.2. % de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4
+   *       dentro de 33 dias após a inscrição
    * </ul>
    *
+   * @param flag
    * @return CohortDefinition
    */
   public CohortDefinition getMQ9Den(int flag) {
@@ -6794,11 +6883,14 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQ10Den: M&Q Report - Categoria 10 Denominador</b><br>
+   *
    * <ul>
    *   <li>10.1. % de adultos (15/+anos) que iniciaram o TARV dentro de 15 dias após diagnóstico
-   *   <li>10.3. % de crianças (0-14 anos) HIV+ que iniciaram TARV dentro de 15 dias após diagnóstico
+   *   <li>10.3. % de crianças (0-14 anos) HIV+ que iniciaram TARV dentro de 15 dias após
+   *       diagnóstico
    * </ul>
    *
+   * @param adults
    * @return CohortDefinition
    */
   public CohortDefinition getMQ10Den(boolean adults) {
@@ -6893,8 +6985,8 @@ public class QualityImprovement2020CohortQueries {
    *
    * <ul>
    *   <li>B: Filter all patients with CD4 (concept id 1695) result registered in Ficha Clinica
-   *       (encounter type 6) within 33 days from the first clinical consultation (encounter
-   *       type 6) that occurred by endDateRevision, as following:
+   *       (encounter type 6) within 33 days from the first clinical consultation (encounter type 6)
+   *       that occurred by endDateRevision, as following:
    *       <ul>
    *         <li>who have a clinical consultation (encounter type 6) with CD4 (concept id 1695)
    *             result (value numeric not null) and encounter_datetime > first clinical
@@ -6903,7 +6995,7 @@ public class QualityImprovement2020CohortQueries {
    *       </ul>
    * </ul>
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getBFromCategory9Numerator() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -6966,11 +7058,15 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * <b>MQ9Num: M&Q Report - Categoria 9 Numerador</b><br>
+   *
    * <ul>
-   *   <li>9.1.  % de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição
-   *   <li>9.2. % de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição
+   *   <li>9.1. % de adultos HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4
+   *       dentro de 33 dias após a inscrição
+   *   <li>9.2. % de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4
+   *       dentro de 33 dias após a inscrição
    * </ul>
    *
+   * @param flag
    * @return CohortDefinition
    */
   public CohortDefinition getMQ9Num(int flag) {
@@ -7063,6 +7159,9 @@ public class QualityImprovement2020CohortQueries {
    *   <li>10.3. % de crianças (0-14 anos) HIV+ que iniciaram TARV dentro de 15 dias após
    *       diagnóstico - A AND F AND NOT (C OR D OR E) AND CHILDREN
    * </ul>
+   *
+   * @param flag
+   * @return CohortDefinition
    */
   public CohortDefinition getMQ10NUM(int flag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -7175,6 +7274,8 @@ public class QualityImprovement2020CohortQueries {
   /**
    * Combined B13 for the CAT15 indicators Active patients excluding suspended, abandoned, dead and
    * transferout by end revision date
+   *
+   * * @return CohortDefinition
    */
   private CohortDefinition getCombinedB13ForCat15Indicators() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -7450,6 +7551,13 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * J - Select all patients from Ficha Resumo (encounter type 53) with “HIV Carga viral”(Concept id
+   * 856, value_numeric not null) and obs_datetime between “Patient ART Start Date” (the oldest date
+   * from A)+6months and “Patient ART Start Date” (the oldest date from query A)+9months.
+   *
+   * @return CohortDefinition
+   */
   private CohortDefinition getMQC13P3NUM_J() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -7512,6 +7620,14 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * K - Select all patients from Ficha Resumo (encounter type 53) with “HIV Carga viral”(Concept id
+   * 856, value_numeric not null) and obs_datetimebetween “ALTERNATIVA A LINHA - 1a LINHA Date” (the
+   * most recent date from B1)+6months and “ALTERNATIVA A LINHA - 1a LINHA Date” (the most recent
+   * date from B1)+9months.
+   *
+   * @return CohortDefinition
+   */
   private CohortDefinition getMQC13P3NUM_K() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -7607,6 +7723,13 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * L - Select all patients from Ficha Resumo (encounter type 53) with “HIV Carga viral”(Concept id
+   * 856, value_numeric not null) and obs_datetime between “Segunda Linha Date” (the most recent
+   * date from B2New)+6months and “Segunda Linha Date” (the most recent date from B2New)+9months.
+   *
+   * @return CohortDefinition
+   */
   private CohortDefinition getMQC13P3NUM_L() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();

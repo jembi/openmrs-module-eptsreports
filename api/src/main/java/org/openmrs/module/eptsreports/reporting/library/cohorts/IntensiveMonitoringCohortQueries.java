@@ -786,7 +786,8 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
-  /** Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
+  /**
+   * Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period Section (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
@@ -849,7 +850,8 @@ public class IntensiveMonitoringCohortQueries {
     cd.setCompositionString("MI11DEN");
     return cd;
   }
-  /** Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
+  /**
+   * Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period (endDateRevision)
    *
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
@@ -1981,14 +1983,14 @@ public class IntensiveMonitoringCohortQueries {
   /**
    * <b>MI15DenNum: Melhoria de Qualidade Category 15 Denominador e Numerator</b><br>
    * <br>
-   * <i> DENOMINADOR 1: A and B1 and E and NOT (C or D or F or G or J) and Age >= 2  </i> <br>
-   * <i> NUMERATOR 1: A and B1 and E and NOT (C or D or F or G or J) and K and Age >= 2  </i> <br>
+   * <i> DENOMINADOR 1: A and B1 and E and NOT (C or D or F or G or J) and Age >= 2 </i> <br>
+   * <i> NUMERATOR 1: A and B1 and E and NOT (C or D or F or G or J) and K and Age >= 2 </i> <br>
    * <br>
-   * <i> DENOMINADOR 2: A and J and H and Age >= 2 </i>
-   * <i> NUMERATOR 2: A and J and H and L and Age >= 2 </i><br>
+   * <i> DENOMINADOR 2: A and J and H and Age >= 2 </i> <i> NUMERATOR 2: A and J and H and L and Age
+   * >= 2 </i><br>
    * <br>
-   * <i> DENOMINADOR 3: A and J and B2 and NOT P and Age >= 2 </i>
-   * <i> NUMERATOR 3: A and J and B2 and NOT P and I and Age >= 2 </i><br>
+   * <i> DENOMINADOR 3: A and J and B2 and NOT P and Age >= 2 </i> <i> NUMERATOR 3: A and J and B2
+   * and NOT P and I and Age >= 2 </i><br>
    * <br>
    *
    * @return CohortDefinition
@@ -2153,6 +2155,7 @@ public class IntensiveMonitoringCohortQueries {
 
   /**
    * Get CAT 13.1 Denominator
+   *
    * @return
    */
   public CohortDefinition getMI13DEN1() {
