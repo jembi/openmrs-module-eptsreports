@@ -17,6 +17,15 @@ public class QualityImprovement2020Queries {
    * ARV (concept id 23865) = Sim (1065)) between 25 and 33 days after ART start date(Oldest date
    * From A).
    *
+   * @param lowerBound
+   * @param upperBound
+   * @param adultoSeguimentoEncounterType
+   * @param masterCardDrugPickupEncounterType
+   * @param masterCardEncounterType
+   * @param yesConcept
+   * @param historicalDrugStartDateConcept
+   * @param artPickupConcept
+   * @param artDatePickupMasterCard
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ12NumH(
@@ -134,6 +143,15 @@ public class QualityImprovement2020Queries {
    *       I2)+33days
    * </ul>
    *
+   * @param lowerBound
+   * @param upperBound
+   * @param adultoSeguimentoEncounterType
+   * @param masterCardDrugPickupEncounterType
+   * @param masterCardEncounterType
+   * @param yesConcept
+   * @param historicalDrugStartDateConcept
+   * @param artPickupConcept
+   * @param artDatePickupMasterCard
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ12NumI(
@@ -260,7 +278,11 @@ public class QualityImprovement2020Queries {
    *       = endDateRevision - 11 months)
    * </ul>
    *
-   * @return SqlCohortDefinition
+   * @param adultoSeguimentoEncounterType
+   * @param startDrugs
+   * @param gaac
+   * @param quarterlyDispensation
+   * @return @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA1(
       int adultoSeguimentoEncounterType, int startDrugs, int gaac, int quarterlyDispensation) {
@@ -311,6 +333,11 @@ public class QualityImprovement2020Queries {
    * <b>MQ15DEN A2 </b> - DISPENSA TRIMESTRAL (DT) (Concept Id 23730) = “INICIAR” (value_coded =
    * concept Id 1256)<br>
    *
+   * @param flag
+   * @param adultoSeguimentoEncounterType
+   * @param startDrugs
+   * @param gaac
+   * @param quarterlyDispensation
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA1orA2(
@@ -369,6 +396,9 @@ public class QualityImprovement2020Queries {
    * <b>MQ15DEN A2 </b> - DISPENSA TRIMESTRAL (DT) (​ Concept Id 23730​ ) = “INICIAR” (​ value_coded
    * = concept Id 1256​ )<br>
    *
+   * @param adultoSeguimentoEncounterType
+   * @param quarterlyConcept
+   * @param typeOfDispensationConcept
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA3(
@@ -439,6 +469,14 @@ public class QualityImprovement2020Queries {
    *       recent one) and during the revision period
    * </ul>
    *
+   * @param adultoSeguimentoEncounterType
+   * @param startDrugs
+   * @param quarterlyConcept
+   * @param gaac
+   * @param quarterlyDispensation
+   * @param typeOfDispensationConcept
+   * @param labReq
+   * @param viralLoad
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15NumH(
@@ -545,6 +583,16 @@ public class QualityImprovement2020Queries {
    *       H2) > encounter_datetime (From H1, the most recent one) and during the revision period
    * </ul>
    *
+   * @param adultoSeguimentoEncounterType
+   * @param startDrugs
+   * @param quarterlyConcept
+   * @param gaac
+   * @param quarterlyDispensation
+   * @param typeOfDispensationConcept
+   * @param labReq
+   * @param viralLoad
+   * @param viralLoadQualitative
+   * @param labEncounterType
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15NumH2(
@@ -682,6 +730,16 @@ public class QualityImprovement2020Queries {
    *       > encounter_datetime(From H1, the most recent one) and during the revision period
    * </ul>
    *
+   * @param adultoSeguimentoEncounterType
+   * @param startDrugs
+   * @param quarterlyConcept
+   * @param gaac
+   * @param quarterlyDispensation
+   * @param typeOfDispensationConcept
+   * @param labReq
+   * @param viralLoad
+   * @param viralLoadQualitative
+   * @param labEncounterType
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15NumI(
@@ -816,6 +874,11 @@ public class QualityImprovement2020Queries {
    * (“Transfer from other facility” concept Id 1369 = “Yes” concept id 1065) in TARV (“Type of
    * Patient Transferred from” concept id 6300 = “ART” concept id 6276)
    *
+   * @param masterCardEncounterType
+   * @param transferFromOtherFacilityConcept
+   * @param patientFoundYesConcept
+   * @param typeOfPatientTransferredFrom
+   * @param artStatus
    * @return SqlCohortDefinition
    */
   public static CohortDefinition getTransferredInPatients(
@@ -871,6 +934,12 @@ public class QualityImprovement2020Queries {
    *
    * <p>- Encounter_datetime between startDateRevision and endDateRevision (should be the last
    * encounter during the revision period)
+   *
+   * @param adultoSeguimentoEncounterType
+   * @param tbSymptomsConcept
+   * @param yesConcept
+   * @param noConcept
+   * @return CohortDefinition
    */
   public static CohortDefinition getPatientsWithTBSymptoms(
       int adultoSeguimentoEncounterType, int tbSymptomsConcept, int yesConcept, int noConcept) {
@@ -933,6 +1002,11 @@ public class QualityImprovement2020Queries {
    *
    * </blockquote>
    *
+   * @param adultoSeguimentoEncounterType
+   * @param masterCardEncounterType
+   * @param hivViralLoadConcept
+   * @param yesConcept
+   * @param pregnantConcept
    * @return {@link CohortDefinition}
    */
   public static CohortDefinition getMQ13DenB4_P4(
@@ -1001,7 +1075,11 @@ public class QualityImprovement2020Queries {
   /**
    * Revised B13 for the MQ 15 indicators
    *
-   * @return CohortDefinition
+   * @param encpounterType52
+   * @param encounterType18
+   * @param dateOfArtPickup
+   * @param returnVisitDateForArv
+   * @return SqlCohortDefinition
    */
   public static CohortDefinition getPatientsWithAtLeastAdrugPickup(
       int encpounterType52, int encounterType18, int dateOfArtPickup, int returnVisitDateForArv) {
@@ -1057,7 +1135,12 @@ public class QualityImprovement2020Queries {
    *
    * </blockquote>
    *
-   * @return {@link CohortDefinition}
+   * @param adultoSeguimentoEncounterType
+   * @param masterCardEncounterType
+   * @param hivViralLoadConcept
+   * @param yesConcept
+   * @param breastfeedingConcept
+   * @return SqlCohortDefinition
    */
   public static CohortDefinition getMQ13DenB5_P4(
       int adultoSeguimentoEncounterType,
