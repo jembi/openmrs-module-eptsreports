@@ -366,7 +366,7 @@ public class GenericCohortQueries {
    * @param minAge
    * @param maxAge
    * @param considerPatientThatStartedBeforeWasBorn
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getAgeOnArtStartDate(
       Integer minAge, Integer maxAge, boolean considerPatientThatStartedBeforeWasBorn) {
@@ -439,7 +439,7 @@ public class GenericCohortQueries {
   /**
    * @param considerTransferredIn
    * @param considerPharmacyEncounter
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getStartedArtOnPeriod(
       boolean considerTransferredIn, boolean considerPharmacyEncounter) {
@@ -457,7 +457,7 @@ public class GenericCohortQueries {
 
   /**
    * @param considerTransferredIn
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getStartedArtBeforeDate(boolean considerTransferredIn) {
     CalculationCohortDefinition cd =
@@ -472,7 +472,7 @@ public class GenericCohortQueries {
 
   /**
    * @param considerTransferredIn
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getStartedArtBeforeDateMOH(boolean considerTransferredIn) {
     CalculationCohortDefinition cd =
@@ -489,7 +489,7 @@ public class GenericCohortQueries {
 
   /**
    * @param isNewlyEnrolledOnArtSearch
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getNewlyOrPreviouslyEnrolledOnART(boolean isNewlyEnrolledOnArtSearch) {
     CalculationCohortDefinition cd =
@@ -512,7 +512,7 @@ public class GenericCohortQueries {
    * @param operator2
    * @param value2
    * @param encounterTypes
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition hasNumericObs(
       Concept question,
@@ -542,7 +542,7 @@ public class GenericCohortQueries {
 
   /**
    * @param numDays
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWhoToLostToFollowUp(int numDays) {
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
@@ -590,7 +590,7 @@ public class GenericCohortQueries {
    * @param encounterType
    * @param question
    * @param answers
-   * @return
+   * @return String
    */
   public String getPatientsWithObsBetweenDates(
       EncounterType encounterType, Concept question, List<Concept> answers) {
@@ -710,7 +710,7 @@ public class GenericCohortQueries {
   /**
    * @param minAge
    * @param maxAge
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getAgeOnReportEndDate(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
@@ -729,7 +729,7 @@ public class GenericCohortQueries {
   /**
    * @param minAge
    * @param maxAge
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getAgeOnPreArtDate(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
