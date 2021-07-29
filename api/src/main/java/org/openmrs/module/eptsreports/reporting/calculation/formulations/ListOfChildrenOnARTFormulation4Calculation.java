@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -57,11 +58,14 @@ public class ListOfChildrenOnARTFormulation4Calculation extends AbstractPatientC
       ListResult listResult = (ListResult) formulation4.get(patientId);
       List<Integer> conceptIdListResult = EptsCalculationUtils.extractResultValues(listResult);
 
-      Integer formulation1Result = EptsCalculationUtils.resultForPatient(formulation1, patientId);
+      SimpleResult formulation1Result =
+          EptsCalculationUtils.resultForPatient(formulation1, patientId);
 
-      Integer formulation2Result = EptsCalculationUtils.resultForPatient(formulation2, patientId);
+      SimpleResult formulation2Result =
+          EptsCalculationUtils.resultForPatient(formulation2, patientId);
 
-      Integer formulation3Result = EptsCalculationUtils.resultForPatient(formulation3, patientId);
+      SimpleResult formulation3Result =
+          EptsCalculationUtils.resultForPatient(formulation3, patientId);
 
       if (conceptIdListResult != null
           && !conceptIdListResult.isEmpty()
@@ -69,9 +73,13 @@ public class ListOfChildrenOnARTFormulation4Calculation extends AbstractPatientC
           && formulation2Result != null
           && formulation3Result != null) {
         for (Integer result : conceptIdListResult) {
-          if (result != formulation1Result
-              && result != formulation2Result
-              && result != formulation3Result) {
+          Concept conceptResults = Context.getConceptService().getConcept(result);
+
+          if (conceptResults != null
+              && conceptResults.getName() != null
+              && !(conceptResults.getName().getName().equals(formulation1Result.toString()))
+              && !(conceptResults.getName().getName().equals(formulation2Result.toString()))
+              && !(conceptResults.getName().getName().equals(formulation3Result.toString()))) {
             map.put(patientId, new SimpleResult(result, this));
             break;
           }

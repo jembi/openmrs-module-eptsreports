@@ -3,14 +3,12 @@ package org.openmrs.module.eptsreports.reporting.calculation.formulations;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
-import org.openmrs.calculation.result.ListResult;
 import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
@@ -32,11 +30,9 @@ public class ListOfChildrenOnARTFormulation1Calculation extends AbstractPatientC
     HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
     CalculationResultMap formulation1 = getFormulationMap(cohort, context, hivMetadata);
     for (Integer patientId : cohort) {
-      ListResult listResult = (ListResult) formulation1.get(patientId);
-      List<Integer> conceptIdListResult = EptsCalculationUtils.extractResultValues(listResult);
-
-      if (conceptIdListResult != null && !conceptIdListResult.isEmpty()) {
-        map.put(patientId, new SimpleResult(conceptIdListResult.get(0), this));
+      SimpleResult result = (SimpleResult) formulation1.get(patientId);
+      if (result != null) {
+        map.put(patientId, new SimpleResult(result, this));
       }
     }
     return map;
@@ -81,8 +77,7 @@ public class ListOfChildrenOnARTFormulation1Calculation extends AbstractPatientC
             + "    AND e.encounter_type = ${18} "
             + "    AND e.encounter_datetime <= :onOrBefore "
             + "    AND e.location_id = :location  "
-            + "  AND e.encounter_datetime = max_farmacia.e_encounter_date "
-            + "  AND o.obs_group_id = ${165252}";
+            + "  AND e.encounter_datetime = max_farmacia.e_encounter_date ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     def.setQuery(stringSubstitutor.replace(sql));
     Map<String, Object> params = new HashMap<>();

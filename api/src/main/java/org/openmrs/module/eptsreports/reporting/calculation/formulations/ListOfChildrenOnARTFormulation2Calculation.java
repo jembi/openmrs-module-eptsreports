@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -43,13 +44,18 @@ public class ListOfChildrenOnARTFormulation2Calculation extends AbstractPatientC
       ListResult listResult = (ListResult) formulation2.get(patientId);
       List<Integer> conceptIdListResult = EptsCalculationUtils.extractResultValues(listResult);
 
-      Integer formulation1Result = EptsCalculationUtils.resultForPatient(formulation1, patientId);
+      SimpleResult formulation1Result =
+          EptsCalculationUtils.resultForPatient(formulation1, patientId);
 
       if (conceptIdListResult != null
           && !conceptIdListResult.isEmpty()
           && formulation1Result != null) {
         for (Integer result : conceptIdListResult) {
-          if (result != formulation1Result) {
+          Concept conceptResults = Context.getConceptService().getConcept(result);
+
+          if (conceptResults != null
+              && conceptResults.getName() != null
+              && !(conceptResults.getName().getName().equals(formulation1Result.toString()))) {
             map.put(patientId, new SimpleResult(result, this));
             break;
           }
