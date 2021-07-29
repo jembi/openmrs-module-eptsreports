@@ -25,6 +25,12 @@ public class AgeCohortQueries {
 
   @Autowired private GenericCohortQueries genericCohortQueries;
 
+  /**
+   * @param name
+   * @param minAge
+   * @param maxAge
+   * @return CohortDefinition
+   */
   public CohortDefinition createXtoYAgeCohort(String name, Integer minAge, Integer maxAge) {
     AgeCohortDefinition xToYCohort = new AgeCohortDefinition();
     xToYCohort.setName(name);

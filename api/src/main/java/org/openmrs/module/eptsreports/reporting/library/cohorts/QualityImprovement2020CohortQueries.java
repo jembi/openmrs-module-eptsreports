@@ -1133,6 +1133,8 @@ public class QualityImprovement2020CohortQueries {
    * ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) AND - Encounter_datetime
    * (from the last colinical consultation with “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value
    * coded “Inicio” (concept_id 1256)) PLUS 9 MONTHS
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithTBTreatment() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -1229,6 +1231,7 @@ public class QualityImprovement2020CohortQueries {
    *       <=endDateRevision
    * </ul>
    *
+   * @param den
    * @return CohortDefinition
    */
   public CohortDefinition getMQ5A(Boolean den) {
@@ -2709,7 +2712,7 @@ public class QualityImprovement2020CohortQueries {
    * endDateRevision - 14 months and endDateInclusion = endDateRevision - 11 months) and the value
    * coded is “SEGUNDA LINHA”(Concept id 21148)
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsSecondLine_B2() {
 
@@ -5159,6 +5162,8 @@ public class QualityImprovement2020CohortQueries {
    *   <li>F - All Transferred Out patients
    * </ul>
    *
+   * @param den
+   * @param line
    * @return CohortDefinition
    */
   public CohortDefinition getMQ13P4(Boolean den, Integer line) {
@@ -5650,6 +5655,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * <p>Age should be calculated on Patient ART Start Date
    *
+   * @param flag
    * @return CohortDefinition
    */
   public CohortDefinition getMQ10NUMDEN103(String flag) {
@@ -7275,7 +7281,7 @@ public class QualityImprovement2020CohortQueries {
    * Combined B13 for the CAT15 indicators Active patients excluding suspended, abandoned, dead and
    * transferout by end revision date
    *
-   * * @return CohortDefinition
+   * <p>* @return CohortDefinition
    */
   private CohortDefinition getCombinedB13ForCat15Indicators() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();

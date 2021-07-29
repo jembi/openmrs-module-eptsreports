@@ -362,6 +362,12 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param minAge
+   * @param maxAge
+   * @param considerPatientThatStartedBeforeWasBorn
+   * @return
+   */
   public CohortDefinition getAgeOnArtStartDate(
       Integer minAge, Integer maxAge, boolean considerPatientThatStartedBeforeWasBorn) {
     CalculationCohortDefinition cd =
@@ -382,6 +388,9 @@ public class GenericCohortQueries {
    * Age should be calculated on Patient ART Start Date (Check Section A for the algorithm to define
    * this date).
    *
+   * @param minAge
+   * @param maxAge
+   * @param considerPatientThatStartedBeforeWasBorn
    * @return CohortDefinition
    */
   public CohortDefinition getAgeOnMOHArtStartDate(
@@ -427,6 +436,11 @@ public class GenericCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * @param considerTransferredIn
+   * @param considerPharmacyEncounter
+   * @return
+   */
   public CohortDefinition getStartedArtOnPeriod(
       boolean considerTransferredIn, boolean considerPharmacyEncounter) {
     CalculationCohortDefinition cd =
@@ -441,6 +455,10 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param considerTransferredIn
+   * @return
+   */
   public CohortDefinition getStartedArtBeforeDate(boolean considerTransferredIn) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
@@ -452,6 +470,10 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param considerTransferredIn
+   * @return
+   */
   public CohortDefinition getStartedArtBeforeDateMOH(boolean considerTransferredIn) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
@@ -465,6 +487,10 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param isNewlyEnrolledOnArtSearch
+   * @return
+   */
   public CohortDefinition getNewlyOrPreviouslyEnrolledOnART(boolean isNewlyEnrolledOnArtSearch) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
@@ -478,6 +504,16 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param question
+   * @param timeModifier
+   * @param operator1
+   * @param value1
+   * @param operator2
+   * @param value2
+   * @param encounterTypes
+   * @return
+   */
   public CohortDefinition hasNumericObs(
       Concept question,
       TimeModifier timeModifier,
@@ -504,6 +540,10 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param numDays
+   * @return
+   */
   public CohortDefinition getPatientsWhoToLostToFollowUp(int numDays) {
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
 
@@ -546,6 +586,12 @@ public class GenericCohortQueries {
     return stringSubstitutor.replace(query);
   }
 
+  /**
+   * @param encounterType
+   * @param question
+   * @param answers
+   * @return
+   */
   public String getPatientsWithObsBetweenDates(
       EncounterType encounterType, Concept question, List<Concept> answers) {
     List<Integer> answerIds = new ArrayList<>();
@@ -661,6 +707,11 @@ public class GenericCohortQueries {
     return sb.replace(query);
   }
 
+  /**
+   * @param minAge
+   * @param maxAge
+   * @return
+   */
   public CohortDefinition getAgeOnReportEndDate(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
@@ -675,6 +726,11 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param minAge
+   * @param maxAge
+   * @return
+   */
   public CohortDefinition getAgeOnPreArtDate(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
@@ -689,6 +745,11 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param minAge
+   * @param maxAge
+   * @return CohortDefinition
+   */
   public CohortDefinition getAgeInMonths(int minAge, int maxAge) {
     AgeCohortDefinition cd = new AgeCohortDefinition();
     cd.setName("Age in months");
@@ -700,6 +761,11 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param minAge
+   * @param maxAge
+   * @return CohortDefinition
+   */
   public CohortDefinition getAgeInMonthsOnArtStartDate(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
@@ -714,6 +780,7 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /** @return CohortDefinition */
   public CohortDefinition getArtDateMinusDiagnosisDate() {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
@@ -725,6 +792,11 @@ public class GenericCohortQueries {
     return cd;
   }
 
+  /**
+   * @param minAge
+   * @param maxAge
+   * @return CohortDefinition
+   */
   public CohortDefinition getPatientAgeBasedOnFirstViralLoadDate(int minAge, int maxAge) {
     return generalSql(
         "getPatientAgeBasedOnFirstViralLoadDate",

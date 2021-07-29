@@ -203,6 +203,14 @@ public class CommonCohortQueries {
    *       Encounter_datetime between startDateInclusion and endDateInclusion
    * </ul>
    *
+   * @param female
+   * @param transfIn
+   * @param occurType
+   * @param encounterType
+   * @param question
+   * @param answers
+   * @param question2
+   * @param answers2
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMohMQPatientsOnCondition(
@@ -487,6 +495,11 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
+   * @param masterCard
+   * @param lastClinicalEncounter
+   * @param treatmentEncounter
+   * @param treatmentConcept
+   * @param treatmentValueCoded
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsOnTreatmentFor6Months(
@@ -741,6 +754,14 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
+   * @param masterCard
+   * @param clinicalEncounter
+   * @param treatmentEncounter
+   * @param treatmentConcept
+   * @param treatmentValueCoded
+   * @param exclusionEncounter
+   * @param exclusionConcept
+   * @param exclusionValueCoded
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsToExcludeFromTreatmentIn6Months(
@@ -873,6 +894,8 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
+   * @param minAge
+   * @param maxAge
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsAgeOnLastClinicalConsultationDate(
@@ -947,6 +970,9 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
+   * @param b4e
+   * @param b5e
+   * @param period
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
