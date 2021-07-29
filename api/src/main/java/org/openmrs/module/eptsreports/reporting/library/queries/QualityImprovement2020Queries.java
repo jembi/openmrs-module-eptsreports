@@ -879,7 +879,7 @@ public class QualityImprovement2020Queries {
    * @param patientFoundYesConcept
    * @param typeOfPatientTransferredFrom
    * @param artStatus
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public static CohortDefinition getTransferredInPatients(
       int masterCardEncounterType,
@@ -1079,7 +1079,7 @@ public class QualityImprovement2020Queries {
    * @param encounterType18
    * @param dateOfArtPickup
    * @param returnVisitDateForArv
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public static CohortDefinition getPatientsWithAtLeastAdrugPickup(
       int encpounterType52, int encounterType18, int dateOfArtPickup, int returnVisitDateForArv) {
@@ -1140,7 +1140,7 @@ public class QualityImprovement2020Queries {
    * @param hivViralLoadConcept
    * @param yesConcept
    * @param breastfeedingConcept
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public static CohortDefinition getMQ13DenB5_P4(
       int adultoSeguimentoEncounterType,

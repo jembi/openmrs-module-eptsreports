@@ -280,7 +280,7 @@ public class QualityImprovement2020CohortQueries {
    *           Diagnóstico” is >=0 and <=7 days
    *     </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   private CohortDefinition getCFromMQC3N1() {
 
@@ -325,7 +325,7 @@ public class QualityImprovement2020CohortQueries {
    *       <li>
    *     </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   private CohortDefinition getDFromMQC3N1() {
 
@@ -362,7 +362,7 @@ public class QualityImprovement2020CohortQueries {
    *           </ul>
    *     </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   private CohortDefinition getCqueryFromCat3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -434,7 +434,7 @@ public class QualityImprovement2020CohortQueries {
    *           Diagnóstico” is >=0 and <=7 days
    *     </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getDqueryFromCat3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -662,7 +662,7 @@ public class QualityImprovement2020CohortQueries {
    *           1844).
    *     </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC4N1() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -700,7 +700,7 @@ public class QualityImprovement2020CohortQueries {
    *           1844).
    *     </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC4N2() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -736,7 +736,7 @@ public class QualityImprovement2020CohortQueries {
    *       6335, 68, 1844).
    * </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   private CohortDefinition getLastClinicalConsultationClassficacaoDesnutricao() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -827,7 +827,7 @@ public class QualityImprovement2020CohortQueries {
    *       </ul>
    * </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithNutritionalStateAndNutritionalSupport() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -890,7 +890,7 @@ public class QualityImprovement2020CohortQueries {
    * (from the colinical consultation with “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded
    * “Fim” (concept_id 1267)) between 6 months and 9 months
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithProphylaxyDuringRevisionPeriod() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -2520,7 +2520,7 @@ public class QualityImprovement2020CohortQueries {
    * </ul>
    *
    * @param b1e
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsFromFichaClinicaDenominatorB1EOrB2E(boolean b1e) {
 
@@ -2855,7 +2855,7 @@ public class QualityImprovement2020CohortQueries {
    * H1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date when the
    * Viral Load with >=1000 result was recorded (oldest date from B2)
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NH1() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -2908,7 +2908,7 @@ public class QualityImprovement2020CohortQueries {
    * H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st consultation”
    * (oldest date from H1)+20 days and <=“1st consultation” (oldest date from H1)+33days
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NH2() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -2973,7 +2973,7 @@ public class QualityImprovement2020CohortQueries {
    * H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd consultation”
    * (oldest date from H2)+20 days and <=“2nd consultation” (oldest date from H2)+33days
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMQC11NH3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -7350,7 +7350,7 @@ public class QualityImprovement2020CohortQueries {
    *       </ul>
    * </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getB4And2() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -7402,7 +7402,7 @@ public class QualityImprovement2020CohortQueries {
    *       </ul>
    * </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getB4And1() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -7461,7 +7461,7 @@ public class QualityImprovement2020CohortQueries {
    *       </ul>
    * </ul>
    *
-   * @return SqlCohortDefinition
+   * @return CohortDefinition
    */
   public CohortDefinition getGNew() {
 
