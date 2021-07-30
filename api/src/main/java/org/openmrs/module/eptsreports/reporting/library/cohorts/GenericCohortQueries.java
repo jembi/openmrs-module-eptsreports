@@ -363,9 +363,9 @@ public class GenericCohortQueries {
   }
 
   /**
-   * @param minAge
-   * @param maxAge
-   * @param considerPatientThatStartedBeforeWasBorn
+   * @param minAge minimum age of a patient based on Art Start Date
+   * @param maxAge maximum age of a patient based on Art Start Date
+   * @param considerPatientThatStartedBeforeWasBorn boolean parameter true for Patient That Started Before Was Born
    * @return CohortDefinition
    */
   public CohortDefinition getAgeOnArtStartDate(
@@ -388,8 +388,8 @@ public class GenericCohortQueries {
    * Age should be calculated on Patient ART Start Date (Check Section A for the algorithm to define
    * this date).
    *
-   * @param minAge
-   * @param maxAge
+   * @param minAge Minimum age of a patient based on ART Start Date
+   * @param maxAge Maximum age of a patient based on ART Start Date
    * @param considerPatientThatStartedBeforeWasBorn
    * @return CohortDefinition
    */
@@ -541,7 +541,7 @@ public class GenericCohortQueries {
   }
 
   /**
-   * @param numDays
+   * @param numDays number of days
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsWhoToLostToFollowUp(int numDays) {
@@ -708,8 +708,8 @@ public class GenericCohortQueries {
   }
 
   /**
-   * @param minAge
-   * @param maxAge
+   * @param minAge minimum age of a patient based on reporting end date
+   * @param maxAge maximum age of a patient based on reporting end date
    * @return CohortDefinition
    */
   public CohortDefinition getAgeOnReportEndDate(Integer minAge, Integer maxAge) {
@@ -727,8 +727,8 @@ public class GenericCohortQueries {
   }
 
   /**
-   * @param minAge
-   * @param maxAge
+   * @param minAge minimum age of a patient based on preArt start date
+   * @param maxAge maximum age of a patient based on preArt start date
    * @return CohortDefinition
    */
   public CohortDefinition getAgeOnPreArtDate(Integer minAge, Integer maxAge) {
@@ -746,8 +746,8 @@ public class GenericCohortQueries {
   }
 
   /**
-   * @param minAge
-   * @param maxAge
+   * @param minAge minimum age in months
+   * @param maxAge maximum age in months
    * @return CohortDefinition
    */
   public CohortDefinition getAgeInMonths(int minAge, int maxAge) {
@@ -762,8 +762,8 @@ public class GenericCohortQueries {
   }
 
   /**
-   * @param minAge
-   * @param maxAge
+   * @param minAge minimum age of a patients who initiated ART during the inclusion period
+   * @param maxAge maximum age of a patients who initiated ART during the inclusion period
    * @return CohortDefinition
    */
   public CohortDefinition getAgeInMonthsOnArtStartDate(Integer minAge, Integer maxAge) {
@@ -793,8 +793,8 @@ public class GenericCohortQueries {
   }
 
   /**
-   * @param minAge
-   * @param maxAge
+   * @param minAge minimum age of patient based on first viral load date
+   * @param maxAge minimum age of patient based on first viral load date
    * @return CohortDefinition
    */
   public CohortDefinition getPatientAgeBasedOnFirstViralLoadDate(int minAge, int maxAge) {

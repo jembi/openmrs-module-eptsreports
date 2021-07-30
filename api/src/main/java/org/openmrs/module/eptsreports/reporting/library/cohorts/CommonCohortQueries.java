@@ -203,14 +203,14 @@ public class CommonCohortQueries {
    *       Encounter_datetime between startDateInclusion and endDateInclusion
    * </ul>
    *
-   * @param female
-   * @param transfIn
-   * @param occurType
-   * @param encounterType
-   * @param question
-   * @param answers
-   * @param question2
-   * @param answers2
+   * @param female female
+   * @param transfIn transferred in
+   * @param occurType the occurrence type
+   * @param encounterType the encounter type
+   * @param question the first question concept
+   * @param answers the first value coded
+   * @param question2 the second question concept
+   * @param answers2 the second value coded
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMohMQPatientsOnCondition(
@@ -495,11 +495,11 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
-   * @param masterCard
-   * @param lastClinicalEncounter
-   * @param treatmentEncounter
-   * @param treatmentConcept
-   * @param treatmentValueCoded
+   * @param masterCard masterCard flag
+   * @param lastClinicalEncounter The Clinical Consultation encounter type 6
+   * @param treatmentEncounter The masterCard encounter type 53
+   * @param treatmentConcept “PRIMEIRA LINHA” concept id 21150
+   * @param treatmentValueCoded The concept list
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsOnTreatmentFor6Months(
@@ -754,14 +754,14 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
-   * @param masterCard
-   * @param clinicalEncounter
-   * @param treatmentEncounter
-   * @param treatmentConcept
-   * @param treatmentValueCoded
-   * @param exclusionEncounter
-   * @param exclusionConcept
-   * @param exclusionValueCoded
+   * @param masterCard masterCard flag
+   * @param treatmentEncounter The masterCard Encounter Type 53
+   * @param treatmentConcept “PRIMEIRA LINHA” Concept Id 21150
+   * @param treatmentValueCoded The Concept List
+   * @param clinicalEncounter The Clinical Consultation Encounter Type 6
+   * @param exclusionEncounter The Clinical Consultation Encounter Type 6
+   * @param exclusionConcept “LINHA TERAPEUTICA” Concept Id 21151
+   * @param exclusionValueCoded The Concept List
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsToExcludeFromTreatmentIn6Months(
@@ -894,8 +894,8 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
-   * @param minAge
-   * @param maxAge
+   * @param minAge minimum age of a patient based on  MOH Last Clinical Consultation
+   * @param maxAge maximum age of a patient based on  MOH Last Clinical Consultation
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsAgeOnLastClinicalConsultationDate(
@@ -970,9 +970,9 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
-   * @param b4e
-   * @param b5e
-   * @param period
+   * @param b4e Boolean parameter, true for b4e and false for b5e
+   * @param b5e Boolean parameter, true for b5e and false for b4e
+   * @param period The period in months
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
@@ -1063,8 +1063,8 @@ public class CommonCohortQueries {
    *     in Ficha Resumo (encounter type=53) with “Lactante”(concept_id 6332) value coded equal to
    *     “Yes” (concept_id 1065) and sex=Female
    *
-   * @param question
-   * @param answer
+   * @param question The question Concept Id
+   * @param answer The value coded Concept Id
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPregnantORBreastfeeding(int question, int answer) {

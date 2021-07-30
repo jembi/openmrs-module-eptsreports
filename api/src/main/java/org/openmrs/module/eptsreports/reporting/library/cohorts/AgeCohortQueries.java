@@ -26,9 +26,9 @@ public class AgeCohortQueries {
   @Autowired private GenericCohortQueries genericCohortQueries;
 
   /**
-   * @param name
-   * @param minAge
-   * @param maxAge
+   * @param name filter name
+   * @param minAge minimum age of a patient based on reporting end date
+   * @param maxAge maximum age of a patient based on reporting end date
    * @return CohortDefinition
    */
   public CohortDefinition createXtoYAgeCohort(String name, Integer minAge, Integer maxAge) {

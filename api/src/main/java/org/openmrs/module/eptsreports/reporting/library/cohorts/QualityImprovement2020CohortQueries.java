@@ -614,8 +614,8 @@ public class QualityImprovement2020CohortQueries {
    *       </ul>
    * </ul>
    *
-   * @param conceptIdQn
-   * @param conceptIdAns
+   * @param conceptIdQn The Obs quetion concept
+   * @param conceptIdAns The value coded answers concept
    * @return CohortDefinition
    */
   private CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
@@ -2519,7 +2519,7 @@ public class QualityImprovement2020CohortQueries {
    *       21148) registered in the LAST consultation (encounter type 6) by endDateRevision
    * </ul>
    *
-   * @param b1e
+   * @param b1e Boolean parameter, true for b1e and false for b2e
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsFromFichaClinicaDenominatorB1EOrB2E(boolean b1e) {
