@@ -1113,8 +1113,8 @@ public class CommonCohortQueries {
    *     occurred during the revision period (encounter_datetime >= startDateInclusion and <=
    *     endDateRevision)
    *
-   * @param question
-   * @param answer
+   * @param question The question Concept Id
+   * @param answer The value coded Concept Id
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getNewMQPregnantORBreastfeeding(int question, int answer) {

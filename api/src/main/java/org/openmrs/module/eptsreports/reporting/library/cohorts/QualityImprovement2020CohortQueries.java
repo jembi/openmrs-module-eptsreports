@@ -3131,7 +3131,7 @@ public class QualityImprovement2020CohortQueries {
    * in the Template) as following: <code>
    * A and NOT C and NOT D and NOT E and NOT F  AND G and Age > 14*</code>
    *
-   * @param reportResource
+   * @param reportResource report Resource (MQ or MI)
    * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumAnotCnotDnotEnotFandGAdultss(MIMQ reportResource) {
@@ -3196,7 +3196,7 @@ public class QualityImprovement2020CohortQueries {
    * D in the Template) as following: <code>
    * B1 and B2 and NOT C and NOT B5 and NOT E and NOT F AND H and  Age > 14*</code>
    *
-   * @param reportSource
+   * @param reportSource report Resource (MQ or MI)
    * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(MIMQ reportSource) {
@@ -3269,7 +3269,7 @@ public class QualityImprovement2020CohortQueries {
    * nos primeiros 3 meses após início do TARV (Line 58 in the template) Numerador (Column D in the
    * Template) as following: <code> A  and  C and NOT D and NOT E and NOT F  AND G </code>
    *
-   * @param reportSource
+   * @param reportSource report Resource (MQ or MI)
    * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumAnB3nCnotDnotEnotEnotFnG(MIMQ reportSource) {
@@ -3333,7 +3333,7 @@ public class QualityImprovement2020CohortQueries {
    * D in the Template) as following: <code>
    *  B1 and B2 and B5 and NOT E and NOT F AND H </code>
    *
-   * @param reportSource
+   * @param reportSource report Resource (MQ or MI)
    * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(MIMQ reportSource) {
@@ -3411,7 +3411,7 @@ public class QualityImprovement2020CohortQueries {
    * the Template) as following: <code>
    * A and NOT C and NOT D and NOT E and NOT F  AND G and Age BETWEEN 2 AND 14*</code>
    *
-   * @param reportSource
+   * @param reportSource report Resource (MQ or MI)
    * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumAnotCnotDnotEnotFnotGnChildren(MIMQ reportSource) {
@@ -3471,7 +3471,7 @@ public class QualityImprovement2020CohortQueries {
    * Template) as following: <code>
    *  A and NOT C and NOT D and NOT E and NOT F AND I  AND Age  <= 9 MONTHS</code>
    *
-   * @param reportSource
+   * @param reportSource report Resource (MQ or MI)
    * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(MIMQ reportSource) {
@@ -3545,7 +3545,7 @@ public class QualityImprovement2020CohortQueries {
    * Numerador (Column D in the Template) as following: <code>
    *  B1 and B2 and  NOT C and NOT B5 and NOT E and NOT F  And H and  Age < 15**</code>
    *
-   * @param reportSource
+   * @param reportSource report Resource (MQ or MI)
    * @return CohortDefinition
    */
   public CohortDefinition getMQC11NumB1nB2notCnotDnotEnotFnHChildren(MIMQ reportSource) {
