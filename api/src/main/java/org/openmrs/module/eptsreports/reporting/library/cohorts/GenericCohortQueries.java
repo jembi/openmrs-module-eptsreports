@@ -587,9 +587,9 @@ public class GenericCohortQueries {
   }
 
   /**
-   * @param encounterType
-   * @param question
-   * @param answers
+   * @param encounterType The encounter Type
+   * @param question The concept Id
+   * @param answers The value coded
    * @return String
    */
   public String getPatientsWithObsBetweenDates(
