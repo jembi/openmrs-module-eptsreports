@@ -74,6 +74,16 @@
 		  date_created="2006-01-01 00:00:00.0" voided="false"
 		uuid="70e5199e-ee1b-11eb-ab03-6bba37d92c79" />
 
+		<person person_id="1012" gender="M" creator="1"
+		birthdate="1990-02-17 00:00:00.0" birthdate_estimated="0" dead="false"
+		  date_created="2008-01-01 00:00:00.0" voided="false"
+		uuid="955453ce-f04d-11eb-90d9-0f06272ea069" />
+
+		<person person_id="1013" gender="F" creator="1"
+		birthdate="1991-02-17 00:00:00.0" birthdate_estimated="0" dead="false"
+		  date_created="2009-01-01 00:00:00.0" voided="false"
+		uuid="e0efa162-f05c-11eb-b5f1-ab624598c1e8" />
+
 
 	<!-- patient -->
 	<patient patient_id="1001"   creator="1"
@@ -119,6 +129,14 @@
 		<patient patient_id="1011"   creator="1"
 		date_created="2006-09-22 00:00:00.0"  
 		date_changed="2009-08-18 12:29:59.0" voided="0" void_reason="" />
+
+		<patient patient_id="1012"   creator="1"
+		date_created="2008-09-22 00:00:00.0"  
+		date_changed="2009-08-18 12:29:59.0" voided="0" void_reason="" />
+
+		<patient patient_id="1013"   creator="1"
+		date_created="2009-09-22 00:00:00.0"  
+		date_changed="2010-08-18 12:29:59.0" voided="0" void_reason="" />
 
 		<!-- global_property -->
 	<global_property
@@ -1402,30 +1420,26 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		date_created="2020-03-22 12:55:48" voided="0"
 		uuid="709125d6-eed5-11eb-99ed-f344a282ddd1" location_id="1" />
 
-		<!-- <encounter encounter_id="9022" encounter_type="6"
-		patient_id="1011" encounter_datetime="2020-03-19 00:00:00" creator="1"
-		date_created="2020-03-19 12:55:48" voided="0"
-		uuid="5603c0a4-ee1a-11eb-9489-f3d606d6a3cf" location_id="1" /> -->
+		<encounter encounter_id="9025" encounter_type="53"
+		patient_id="1012" encounter_datetime="2020-03-23 00:00:00" creator="1"
+		date_created="2020-03-23 12:55:48" voided="0"
+		uuid="0ff83b94-f04f-11eb-bc85-97dfcfd5a70b" location_id="1" />
 
-		<obs obs_id="119" person_id="1011" concept_id="6336"
-		encounter_id="9022" obs_datetime="2020-03-19 00:00:00"
-		value_coded="1115" creator="1" date_created="2020-03-19 12:55:48"
-		voided="0" uuid="61ef5770-ee1a-11eb-9dfa-7bfa68c22153" location_id="1" />
+		<encounter encounter_id="9026" encounter_type="6"
+		patient_id="1012" encounter_datetime="2020-03-23 00:00:00" creator="1"
+		date_created="2020-03-23 12:55:48" voided="0"
+		uuid="9c9d8cea-f057-11eb-abf5-d7ef84314230" location_id="1" />
 
-		<obs obs_id="120" person_id="1011" concept_id="6336"
-		encounter_id="9022" obs_datetime="2020-03-19 00:00:00"
-		value_coded="6335" creator="1" date_created="2020-03-19 12:55:48"
-		voided="0" uuid="6a080c86-ee1a-11eb-ab67-930e6762fc49" location_id="1" />
+		<encounter encounter_id="9027" encounter_type="53"
+		patient_id="1013" encounter_datetime="2020-03-21 00:00:00" creator="1"
+		date_created="2020-03-21 12:55:48" voided="0"
+		uuid="5603c0a4-ee1a-11eb-9489-f3d606d6a3cf" location_id="1" />
 
-		<obs obs_id="121" person_id="1011" concept_id="23758"
-		encounter_id="9024" obs_datetime="2020-03-19 00:00:00"
-		value_coded="1065" creator="1" date_created="2020-03-19 12:55:48"
-		voided="0" uuid="8e15141e-efa7-11eb-adac-a7737242d896" location_id="1" />
-
-		<obs obs_id="122" person_id="1011" concept_id="23758"
-		encounter_id="9024" obs_datetime="2020-03-19 00:00:00"
-		value_coded="1066" creator="1" date_created="2020-03-19 12:55:48"
-		voided="0" uuid="10e1536c-eed6-11eb-b7fe-03cb867ecfa6" location_id="1" />
+		<encounter encounter_id="9028" encounter_type="53"
+		patient_id="1013" encounter_datetime="2020-03-11 00:00:00" creator="1"
+		date_created="2020-03-21 12:55:48" voided="0"
+		uuid="a9f30328-f05e-11eb-86f3-67c1626a5aea" location_id="1" />
+	
 	<!-- obs -->
 	<obs obs_id="100" person_id="1001" concept_id="1255"
 		encounter_id="9001" obs_datetime="2013-06-17 00:00:00"
@@ -1537,7 +1551,45 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		date_created="2020-03-17 10:55:48" voided="0"
 		value_datetime="2020-03-17 10:55:48"
 		uuid="7ca16616-ee1b-11eb-90e1-770b00e1ab43" location_id="1" />
+
+		<obs obs_id="119" person_id="1011" concept_id="6336"
+		encounter_id="9022" obs_datetime="2020-03-19 00:00:00"
+		value_coded="1115" creator="1" date_created="2020-03-19 12:55:48"
+		voided="0" uuid="61ef5770-ee1a-11eb-9dfa-7bfa68c22153" location_id="1" />
+
+		<obs obs_id="120" person_id="1011" concept_id="6336"
+		encounter_id="9022" obs_datetime="2020-03-19 00:00:00"
+		value_coded="6335" creator="1" date_created="2020-03-19 12:55:48"
+		voided="0" uuid="6a080c86-ee1a-11eb-ab67-930e6762fc49" location_id="1" />
+
+		<obs obs_id="121" person_id="1011" concept_id="23758"
+		encounter_id="9024" obs_datetime="2020-03-19 00:00:00"
+		value_coded="1065" creator="1" date_created="2020-03-19 12:55:48"
+		voided="0" uuid="8e15141e-efa7-11eb-adac-a7737242d896" location_id="1" />
+
+		<obs obs_id="122" person_id="1011" concept_id="23758"
+		encounter_id="9024" obs_datetime="2020-03-19 00:00:00"
+		value_coded="1066" creator="1" date_created="2020-03-19 12:55:48"
+		voided="0" uuid="10e1536c-eed6-11eb-b7fe-03cb867ecfa6" location_id="1" />
+
+		<obs obs_id="123" person_id="1012" concept_id="1190"
+		encounter_id="9025" obs_datetime="2020-03-19 00:00:00"
+		value_coded="1066" value_datetime="2020-04-19 12:55:48" creator="1" date_created="2020-03-19 12:55:48"
+		voided="0" uuid="fb170cfe-f04f-11eb-96fd-f3e9bc1e7a92" location_id="1" />
 		
-		
+		<obs obs_id="124" person_id="1012" concept_id="6122"
+		encounter_id="9026" obs_datetime="2020-03-19 00:00:00"
+		value_coded="1256" value_datetime="2020-04-19 12:55:48" creator="1" date_created="2020-03-19 12:55:48"
+		voided="0" uuid="c63591d8-f057-11eb-8fd4-5b2b0eb4f249" location_id="1" />
+
+		<obs obs_id="125" person_id="1013" concept_id="1982"
+		encounter_id="9027" obs_datetime="2020-03-21 00:00:00"
+		value_coded="1065" value_datetime="2020-04-19 12:55:48" creator="1" date_created="2020-03-19 12:55:48"
+		voided="0" uuid="b7d9d6a2-f05d-11eb-9001-97d8811b50ac" location_id="1" />
+
+		<obs obs_id="126" person_id="1013" concept_id="1190"
+		encounter_id="9028" obs_datetime="2020-03-19 00:00:00"
+		value_coded="1066" value_datetime="2020-04-13 12:55:48" creator="1" date_created="2020-03-19 12:55:48"
+		voided="0" uuid="e715383e-f05e-11eb-8bb6-0f550452cc57" location_id="1" />
 		
 </dataset>
