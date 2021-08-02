@@ -365,7 +365,8 @@ public class GenericCohortQueries {
   /**
    * @param minAge minimum age of a patient based on Art Start Date
    * @param maxAge maximum age of a patient based on Art Start Date
-   * @param considerPatientThatStartedBeforeWasBorn boolean parameter true for Patient That Started Before Was Born
+   * @param considerPatientThatStartedBeforeWasBorn boolean parameter true for Patient That Started
+   *     Before Was Born
    * @return CohortDefinition
    */
   public CohortDefinition getAgeOnArtStartDate(

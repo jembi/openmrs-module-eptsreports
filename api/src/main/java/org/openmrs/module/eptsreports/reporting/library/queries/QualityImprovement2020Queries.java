@@ -338,7 +338,6 @@ public class QualityImprovement2020Queries {
    * @param startDrugs The start Drugs concept Id 1256
    * @param gaac GAAC (GA) Concept Id 23724 (DT) Concept Id 23730
    * @param quarterlyDispensation The quarterly Dispensation Concept Id 23730
-   *
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA1orA2(
@@ -469,6 +468,7 @@ public class QualityImprovement2020Queries {
    *       (Concept id 856) and encounter_datetime (From H1) > encounter_datetime (From A, the most
    *       recent one) and during the revision period
    * </ul>
+   *
    * @param adultoSeguimentoEncounterType The Clinical Consultation Encounter Type 6
    * @param startDrugs The start Drugs concept Id 1256
    * @param gaac GAAC (GA) Concept Id 23724 (DT) Concept Id 23730
@@ -729,7 +729,6 @@ public class QualityImprovement2020Queries {
    *       Qualitative” (Concept id 1305) with value_coded not null, and encounter_datetime(From I)
    *       > encounter_datetime(From H1, the most recent one) and during the revision period
    * </ul>
-   *
    *
    * @param adultoSeguimentoEncounterType The Clinical Consultation Encounter Type 6
    * @param startDrugs The start Drugs concept Id 1256

@@ -894,8 +894,8 @@ public class CommonCohortQueries {
    *
    * </blockquote>
    *
-   * @param minAge minimum age of a patient based on  MOH Last Clinical Consultation
-   * @param maxAge maximum age of a patient based on  MOH Last Clinical Consultation
+   * @param minAge minimum age of a patient based on MOH Last Clinical Consultation
+   * @param maxAge maximum age of a patient based on MOH Last Clinical Consultation
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getMOHPatientsAgeOnLastClinicalConsultationDate(
