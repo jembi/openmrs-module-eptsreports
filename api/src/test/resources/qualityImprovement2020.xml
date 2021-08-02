@@ -84,6 +84,15 @@
 		  date_created="2009-01-01 00:00:00.0" voided="false"
 		uuid="e0efa162-f05c-11eb-b5f1-ab624598c1e8" />
 
+	<person person_id="1014" gender="M" creator="1"
+			birthdate="1992-08-26 00:00:00.0" birthdate_estimated="0" dead="false"
+			date_created="2009-01-01 00:00:00.0" voided="false"
+			uuid="80af7af0-f388-11eb-af23-c7daeb2ad98f" />
+
+	<person person_id="1015" gender="F" creator="1"
+			birthdate="1993-08-26 00:00:00.0" birthdate_estimated="0" dead="false"
+			date_created="2009-01-01 00:00:00.0" voided="false"
+			uuid="43dd23be-f394-11eb-89f4-ab5c9a423757" />
 
 	<!-- patient -->
 	<patient patient_id="1001"   creator="1"
@@ -137,6 +146,14 @@
 		<patient patient_id="1013"   creator="1"
 		date_created="2009-09-22 00:00:00.0"  
 		date_changed="2010-08-18 12:29:59.0" voided="0" void_reason="" />
+
+	<patient patient_id="1014"   creator="1"
+			 date_created="2009-09-22 00:00:00.0"
+			 date_changed="2010-08-18 12:29:59.0" voided="0" void_reason="" />
+
+	<patient patient_id="1015"   creator="1"
+			 date_created="2009-09-22 00:00:00.0"
+			 date_changed="2010-08-18 12:29:59.0" voided="0" void_reason="" />
 
 		<!-- global_property -->
 	<global_property
@@ -611,6 +628,12 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 	description="UUID for the NORMAL concept" 
 	uuid="5d30bcd2-ee1b-11eb-ae66-cb09e73314ac" 
 	/>
+
+	<global_property property="eptsreports.regimenAlternativeToFirstLineConceptUuid"
+					 property_value="618650c6-90c3-4acd-ae4d-ffb2f6452a5b"
+					 description="UUID for REGIME ARV ALTERNATIVO A PRIMEIRA LINHA concept"
+					 uuid="30898c62-f3a3-11eb-946d-ab023efed7f0"
+	/>
 		
 		<!-- concept & concept_name -->
 
@@ -919,6 +942,18 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		date_created="2012-02-29 09:50:50" concept_name_id="2462" voided="0"
 		uuid="e249f6c4-1d5f-11e0-b929-000c29ad1d07"
 		locale_preferred="0" />
+
+	<!--1366-->
+	<concept concept_id="21190" retired="0"  creator="1"
+			 is_set="0"  class_id="11" datatype_id="4"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="618650c6-90c3-4acd-ae4d-ffb2f6452a5b" />
+
+	<concept_name concept_id="21190" creator="1"
+				  name="REGIME ARV ALTERNATIVO A PRIMEIRA LINHA" locale="en"
+				  date_created="2012-02-29 09:50:50" concept_name_id="2463" voided="0"
+				  uuid="618650c6-90c3-4acd-ae4d-ffb2f6452a5b"
+				  locale_preferred="0" />
 		
 	
 	<!-- 6128 -->
@@ -1458,6 +1493,51 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		patient_id="1013" encounter_datetime="2020-03-11 00:00:00" creator="1"
 		date_created="2020-03-21 12:55:48" voided="0"
 		uuid="a9f30328-f05e-11eb-86f3-67c1626a5aea" location_id="1" />
+
+	<encounter encounter_id="9029" encounter_type="52"
+			   patient_id="1013" encounter_datetime="2020-04-19 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="7b92121e-f381-11eb-a914-b3006b18566e" location_id="1" />
+
+	<encounter encounter_id="9030" encounter_type="6"
+			   patient_id="1014" encounter_datetime="2020-03-19 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="97d45cd6-f389-11eb-ac3c-ffa5b4ec959f" location_id="1" />
+
+	<encounter encounter_id="9031" encounter_type="6"
+			   patient_id="1014" encounter_datetime="2020-03-19 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="a5f86914-f38a-11eb-92a7-a7ecaa3dd9d8" location_id="1" />
+
+	<encounter encounter_id="9032" encounter_type="53"
+			   patient_id="1014" encounter_datetime="2020-02-19 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="6cc9290c-f38b-11eb-bf96-cbef7aaa5f92" location_id="1" />
+
+	<encounter encounter_id="9033" encounter_type="6"
+			   patient_id="1015" encounter_datetime="2020-02-22 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="8a6ad42a-f394-11eb-b8e6-a7d8109583b5" location_id="1" />
+
+	<encounter encounter_id="9034" encounter_type="6"
+			   patient_id="1015" encounter_datetime="2020-02-24 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="4cde4cca-f396-11eb-9ecc-d774decb3d95" location_id="1" />
+
+	<encounter encounter_id="9035" encounter_type="6"
+			   patient_id="1015" encounter_datetime="2020-02-24 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="c9acf606-f397-11eb-9266-1778fe0e912a" location_id="1" />
+
+	<encounter encounter_id="9036" encounter_type="53"
+			   patient_id="1015" encounter_datetime="2020-02-24 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="9f1b830c-f398-11eb-8e92-d3c633458b26" location_id="1" />
+
+	<encounter encounter_id="9037" encounter_type="53"
+			   patient_id="1015" encounter_datetime="2020-02-24 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="1c233424-f3a0-11eb-9552-d375d6542c5e" location_id="1" />
 	
 	<!-- obs -->
 	<obs obs_id="100" person_id="1001" concept_id="1255"
@@ -1610,5 +1690,40 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		encounter_id="9028" obs_datetime="2020-03-19 00:00:00"
 		value_coded="1066" value_datetime="2020-04-13 12:55:48" creator="1" date_created="2020-03-19 12:55:48"
 		voided="0" uuid="e715383e-f05e-11eb-8bb6-0f550452cc57" location_id="1" />
+
+	<obs obs_id="127" person_id="1013" concept_id="23865"
+		 encounter_id="9029" obs_datetime="2020-03-19 00:00:00"
+		 value_coded="1065" value_datetime="2020-04-13 12:55:48" creator="1" date_created="2020-03-19 12:55:48"
+		 voided="0" uuid="e7e0e582-f384-11eb-a646-5fc950115a88" location_id="1" />
+
+	<obs obs_id="128" person_id="1013" concept_id="23866"
+		 encounter_id="9029" obs_datetime="2020-03-19 00:00:00"
+		 value_datetime="2020-04-13 12:55:48" creator="1" date_created="2020-03-19 12:55:48"
+		 voided="0" uuid="c43a2558-f384-11eb-a5db-67379c313002" location_id="1" />
+
+	<obs obs_id="129" person_id="1014" concept_id="21151"
+		 encounter_id="9030" obs_datetime="2020-03-19 00:00:00"
+		  creator="1" date_created="2020-03-19 12:55:48"
+		 voided="0" uuid="2e43dc78-f38a-11eb-b84a-03085910475f" location_id="1" />
+
+	<obs obs_id="130" person_id="1014" concept_id="21151"
+		 encounter_id="9031" obs_datetime="2020-03-19 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48" value_coded="21150"
+		 voided="0" uuid="6ddf7280-f3a2-11eb-9369-eb84ef826850" location_id="1" />
+
+	<obs obs_id="131" person_id="1014" concept_id="856"
+		 encounter_id="9032" obs_datetime="2020-03-19 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48" value_numeric="1010"
+		 voided="0" uuid="b6306bdc-f38b-11eb-b7ca-bfe1c630def0" location_id="1" />
+
+	<obs obs_id="132" person_id="1015" concept_id="21151"
+		 encounter_id="9035" obs_datetime="2020-02-22 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48" value_coded="21150"
+		 voided="0" uuid="a2d9e3e4-f389-11eb-8333-0bd29dc1cb2e" location_id="1" />
+
+	<obs obs_id="133" person_id="1015" concept_id="21190"
+		 encounter_id="9036" obs_datetime="2019-08-22 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48" value_coded="21150"
+		 voided="0" uuid="288d8fac-f3a0-11eb-845a-731033cf0a98" location_id="1" />
 		
 </dataset>
