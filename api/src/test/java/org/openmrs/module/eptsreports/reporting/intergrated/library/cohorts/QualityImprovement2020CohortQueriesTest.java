@@ -27,11 +27,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     executeDataSet("qualityImprovement2020.xml");
   }
 
-  /**
-   * @throws EvaluationException <strong>Should</strong> Returns empty if there is no patient who
-   *     meets the conditions <strong>Should</strong> fetch patients in category 5 children of the
-   *     MQ report
-   */
   @Test
   public void getInfantPatientsEnrolledInTarv2020SampleShouldPass() throws EvaluationException {
 
@@ -50,11 +45,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
-  /**
-   * @throws EvaluationException <strong>Should</strong> Returns empty if there is no patient who
-   *     meets the conditions <strong>Should</strong> fetch patients in category 5 MG of the MQ
-   *     report
-   */
   @Test
   @Ignore("Same methods are already tested on MQ5Den1")
   public void getPregnantPatientEnrolledInTARV2020ServiceShouldPass() throws EvaluationException {
@@ -74,10 +64,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertTrue(evaluatedCohort.getMemberIds().contains(1003));
   }
 
-  /**
-   * @throws EvaluationException <strong>Should</strong> Returns empty if there is no patient who
-   *     meets the conditions <strong>Should</strong> fetch patients in category 6 of the MQ report
-   */
   @Test
   public void getMQ6patientsShouldPass() throws EvaluationException {
 
@@ -96,10 +82,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
-  /**
-   * @throws EvaluationException <strong>Should</strong> Returns empty if there is no patient who
-   *     meets the conditions <strong>Should</strong> fetch patients in category 7 of the MQ report
-   */
   @Test
   public void getMQ7patientsShouldPass() throws EvaluationException {
 
@@ -118,10 +100,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
-  /**
-   * @throws EvaluationException <strong>Should</strong> Returns empty if there is no patient who
-   *     meets the conditions <strong>Should</strong> fetch patients in category 7 of the MQ report
-   */
   public void getMQ7patientsShouldPass3() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(5);
@@ -139,11 +117,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
-  /**
-   * @throws EvaluationException <strong>Should</strong> Returns empty if there is no patient who
-   *     meets the conditions <strong>Should</strong> fetch patients in category 13 of the MQ report
-   *     denominator
-   */
   @Test
   public void getB2_13() throws EvaluationException {
 
@@ -162,11 +135,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
-  /**
-   * @throws EvaluationException <strong>Should</strong> Returns empty if there is no patient who
-   *     meets the conditions <strong>Should</strong> fetch patients in category 12 MG of the MQ
-   *     report denominator
-   */
   @Test
   public void getMQ12patientsShouldPass() throws EvaluationException {
 
@@ -185,11 +153,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
-  /**
-   * @throws EvaluationException <strong>Should</strong> Returns empty if there is no patient who
-   *     meets the conditions <strong>Should</strong> fetch patients in category 13 MG of the MQ
-   *     report
-   */
   @Test
   @Ignore("Functions used in queries not supported by H2")
   public void getMQ13patientsShouldPass() throws EvaluationException {

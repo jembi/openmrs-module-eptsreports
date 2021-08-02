@@ -155,6 +155,9 @@ public class QualityImprovement2020CohortQueries {
    * Start Date) is >= startDateRevision and <=endDateInclusion
    *
    * @return SqlCohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients who initiated ART during the inclusion
+   *         period
    */
   public SqlCohortDefinition getMOHArtStartDate() {
 
@@ -828,10 +831,12 @@ public class QualityImprovement2020CohortQueries {
    * </ul>
    *
    * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with F criteria
    */
   public CohortDefinition getPatientsWithNutritionalStateAndNutritionalSupport() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients with Nutritional Calssification");
+    sqlCohortDefinition.setName("Patients with Nutritional Classification");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -969,6 +974,8 @@ public class QualityImprovement2020CohortQueries {
    * coded “Inicio” (concept_id 1256)) PLUS 9 MONTHS
    *
    * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with TB Diagnosis Active
    */
   public CohortDefinition getPatientsWithTBDiagActive() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -1052,10 +1059,12 @@ public class QualityImprovement2020CohortQueries {
    * coded “Inicio” (concept_id 1256)) PLUS 9 MONTHS
    *
    * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with TB symptoms
    */
   public CohortDefinition getPatientsWithTBSymtoms() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients with TB Diagnosis Active");
+    sqlCohortDefinition.setName("Patients with TB Symptoms");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -1135,10 +1144,12 @@ public class QualityImprovement2020CohortQueries {
    * coded “Inicio” (concept_id 1256)) PLUS 9 MONTHS
    *
    * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with TB treatment
    */
   public CohortDefinition getPatientsWithTBTreatment() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients with TB Diagnosis Active");
+    sqlCohortDefinition.setName("Patients with TB Treatment");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -1231,7 +1242,7 @@ public class QualityImprovement2020CohortQueries {
    *       <=endDateRevision
    * </ul>
    *
-   * @param den
+   * @param den boolean parameter, true indicates denominator ,false indicates numerator
    * @return CohortDefinition
    */
   public CohortDefinition getMQ5A(Boolean den) {
@@ -1305,6 +1316,8 @@ public class QualityImprovement2020CohortQueries {
    * “DAG” occurred during the revision period.
    *
    * @return SqlCohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with B criteria
    */
   public SqlCohortDefinition getNutritionalBCat5() {
 
@@ -1374,7 +1387,7 @@ public class QualityImprovement2020CohortQueries {
    *       <=endDateRevision
    * </ul>
    *
-   * @param den
+   * @param den boolean parameter, true indicates denominator ,false indicates numerator
    * @return CohortDefinition
    */
   public CohortDefinition getMQ5B(Boolean den) {
@@ -1462,8 +1475,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>E - All transferred IN patients during the inclusion period
    * </ul>
    *
-   * @param den
-   * @return CohortDefinition
+   * @param den indicator number
    */
   public CohortDefinition getMQ6A(Integer den) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -1569,7 +1581,7 @@ public class QualityImprovement2020CohortQueries {
    *       period)
    * </ul>
    *
-   * @param num
+   * @param num indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ6NUM(Integer num) {
@@ -1702,8 +1714,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>
    * </ul>
    *
-   * @param den
-   * @return CohortDefinition
+   * @param den indicator number
    */
   public CohortDefinition getMQ7A(Integer den) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -1886,7 +1897,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>
    * </ul>
    *
-   * @param num
+   * @param num indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ7B(Integer num) {
@@ -2068,8 +2079,8 @@ public class QualityImprovement2020CohortQueries {
    *   <li>F - All Transferred Out patients
    * </ul>
    *
-   * @param indicatorFlag
-   * @param reportSource
+   * @param indicatorFlag indicator number
+   * @param reportSource report Source (MQ or MI)
    * @return CohortDefinition
    * @params indicatorFlag A to G For inicator 11.1 to 11.7 respectively
    */
@@ -2231,7 +2242,7 @@ public class QualityImprovement2020CohortQueries {
    * </ul>
    *
    * @return CohortDefinition
-   * @param indicatorFlag
+   * @param indicatorFlag indicator number
    */
   public CohortDefinition getMQC12P2DEN(Integer indicatorFlag) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -2370,7 +2381,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>F - All Transferred Out patients
    * </ul>
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return CohortDefinition
    * @params indicatorFlag A to F For inicator 13.2 to 13.14 accordingly to the specs
    */
@@ -2589,7 +2600,9 @@ public class QualityImprovement2020CohortQueries {
    *       with value_numeric > 1000 than consider the first occurrence during the inclusion period.
    * </ul>
    *
-   * @return CohortDefinition
+   * @return CohortDefinition <strong>Should</strong> <strong>Should</strong> Returns empty if there
+   *     is no patient who meets the conditions <strong>Should</strong> fetch all patients with B2
+   *     criteria
    */
   public CohortDefinition getB2_13() {
 
@@ -3641,8 +3654,10 @@ public class QualityImprovement2020CohortQueries {
    *   <li>F - All transferred OUT patients within the revision period
    * </ul>
    *
-   * @param den
-   * @return CohortDefinition
+   * @param den indicator number
+   * @return CohortDefinition <strong>Should</strong> Returns empty if there is no patient who meets
+   *     the conditions <strong>Should</strong> fetch patients in category 12 MG of the MQ report
+   *     denominator
    */
   public CohortDefinition getMQ12DEN(Integer den) {
     CompositionCohortDefinition comp = new CompositionCohortDefinition();
@@ -3972,8 +3987,8 @@ public class QualityImprovement2020CohortQueries {
    *
    * <p>All age disaggreagtions should be based on the ART start date
    *
-   * @param flag
-   * @return
+   * @param flag indicator number
+   * @return CohortDefinition
    */
   public CohortDefinition getMQ12NumeratorP2(int flag) {
 
@@ -4114,7 +4129,7 @@ public class QualityImprovement2020CohortQueries {
    *       I2)+33days
    * </ul>
    *
-   * @param den
+   * @param den indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ12NUM(Integer den) {
@@ -4360,9 +4375,10 @@ public class QualityImprovement2020CohortQueries {
    * B5E) AND C </i> <br>
    * </ul>
    *
-   * @param den
-   * @param line
-   * @return CohortDefinition
+   * @param den boolean parameter, true indicates denominator ,false indicates numerator
+   * @param line indicator number
+   * @return CohortDefinition <strong>Should</strong> Returns empty if there is no patient who meets
+   *     the conditions <strong>Should</strong> fetch patients in category 13 MG of the MQ report
    */
   public CohortDefinition getMQ13(Boolean den, Integer line) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
@@ -4563,7 +4579,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * <p>All age disaggreagtions should be based on the ART start date
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQC13P3NUM(int indicator) {
@@ -5162,8 +5178,8 @@ public class QualityImprovement2020CohortQueries {
    *   <li>F - All Transferred Out patients
    * </ul>
    *
-   * @param den
-   * @param line
+   * @param den boolean parameter, true indicates denominator ,false indicates numerator
+   * @param line indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ13P4(Boolean den, Integer line) {
@@ -5655,7 +5671,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * <p>Age should be calculated on Patient ART Start Date
    *
-   * @param flag
+   * @param flag report source
    * @return CohortDefinition
    */
   public CohortDefinition getMQ10NUMDEN103(String flag) {
@@ -6299,7 +6315,7 @@ public class QualityImprovement2020CohortQueries {
    * <i> DENOMINATOR 12: (A2 or A3) and NOT B1 and NOT C and NOT D and NOT F and Age between 10 and
    * 14 </i> <br>
    *
-   * @param den
+   * @param den indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ15DEN(Integer den) {
@@ -6460,7 +6476,7 @@ public class QualityImprovement2020CohortQueries {
    * <i> NUMERATOR 12: (A2 or A3) and NOT B1 and NOT C and NOT D and NOT F and Age between 10 and 14
    * </i> <br>
    *
-   * @param num
+   * @param num indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ15NUM(Integer num) {
@@ -6686,7 +6702,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>14.4. % de ML em TARV com supressão viral - A and NOT A1 and A2
    * </ul>
    *
-   * @param flag
+   * @param flag indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ14DEN(Integer flag) {
@@ -6751,7 +6767,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>14.4. % de ML em TARV com supressão viral - B and NOT B1 and B2
    * </ul>
    *
-   * @param flag
+   * @param flag indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ14NUM(Integer flag) {
@@ -6811,7 +6827,7 @@ public class QualityImprovement2020CohortQueries {
    *       dentro de 33 dias após a inscrição
    * </ul>
    *
-   * @param flag
+   * @param flag indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ9Den(int flag) {
@@ -6896,7 +6912,7 @@ public class QualityImprovement2020CohortQueries {
    *       diagnóstico
    * </ul>
    *
-   * @param adults
+   * @param adults indicators flag
    * @return CohortDefinition
    */
   public CohortDefinition getMQ10Den(boolean adults) {
@@ -7072,7 +7088,7 @@ public class QualityImprovement2020CohortQueries {
    *       dentro de 33 dias após a inscrição
    * </ul>
    *
-   * @param flag
+   * @param flag indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ9Num(int flag) {
@@ -7166,7 +7182,7 @@ public class QualityImprovement2020CohortQueries {
    *       diagnóstico - A AND F AND NOT (C OR D OR E) AND CHILDREN
    * </ul>
    *
-   * @param flag
+   * @param flag indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getMQ10NUM(int flag) {
@@ -7351,6 +7367,8 @@ public class QualityImprovement2020CohortQueries {
    * </ul>
    *
    * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with B4_2 criteria
    */
   public CohortDefinition getB4And2() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -7403,6 +7421,8 @@ public class QualityImprovement2020CohortQueries {
    * </ul>
    *
    * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with B4_1 criteria
    */
   public CohortDefinition getB4And1() {
     SqlCohortDefinition cd = new SqlCohortDefinition();

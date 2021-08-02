@@ -870,9 +870,17 @@ public class QualityImprovement2020Queries {
   }
 
   /**
+   * <b>Description:</b> MOH Transferred In Query
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
    * All patients registered in Ficha Resumo (Encounter Type Id= 53) and marked as Transferred-in
    * (“Transfer from other facility” concept Id 1369 = “Yes” concept id 1065) in TARV (“Type of
    * Patient Transferred from” concept id 6300 = “ART” concept id 6276)
+   *
+   * <blockquote>
    *
    * @param masterCardEncounterType The Encounter Type Id 53
    * @param transferFromOtherFacilityConcept The Transfer from other facility Concept Id 1369
@@ -880,6 +888,8 @@ public class QualityImprovement2020Queries {
    * @param typeOfPatientTransferredFrom The Type of Patient Transferred from Concept Id 6300
    * @param artStatus ART concept Id 6276
    * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients transfer from other facility
    */
   public static CohortDefinition getTransferredInPatients(
       int masterCardEncounterType,

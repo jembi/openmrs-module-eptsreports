@@ -212,6 +212,9 @@ public class CommonCohortQueries {
    * @param question2 the second question concept
    * @param answers2 the second value coded
    * @return {@link CohortDefinition}
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch for patients according to what is entered in the
+   *         parameters
    */
   public CohortDefinition getMohMQPatientsOnCondition(
       Boolean female,
@@ -332,6 +335,8 @@ public class CommonCohortQueries {
    * </blockquote>
    *
    * @return {@link CohortDefinition}
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients transfer out other facility
    */
   public CohortDefinition getTranferredOutPatients() {
 
@@ -1066,6 +1071,9 @@ public class CommonCohortQueries {
    * @param question The question Concept Id
    * @param answer The value coded Concept Id
    * @return {@link CohortDefinition}
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with B2 criteria with given concept id and
+   *         value coded
    */
   public CohortDefinition getMOHPregnantORBreastfeeding(int question, int answer) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
