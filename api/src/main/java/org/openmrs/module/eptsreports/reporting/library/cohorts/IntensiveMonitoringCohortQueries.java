@@ -59,7 +59,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 7.1, to 7.3 and 7.5 deno Monitoria Intensiva MQHIV 2021 for the selected location and
    * reporting period Section 7.1 (endDateRevision)
    *
-   * @param den
+   * @param den indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat7DenMI2021Part135Definition(Integer den) {
@@ -191,7 +191,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 7.2, to 7.4 and 7.6 deno Monitoria Intensiva MQHIV 2021 for the selected location and
    * reporting period Section 7.1 (endDateRevision)
    *
-   * @param den
+   * @param den indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat7DenMI2021Part246Definition(Integer den) {
@@ -368,7 +368,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 7.1, to 7.3 and 7.5 numerator Monitoria Intensiva MQHIV 2021 for the selected location
    * and reporting period Section 7 (endDateRevision)
    *
-   * @param num
+   * @param num indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat7NumMI2021Part135Definition(Integer num) {
@@ -527,7 +527,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 7.2, to 7.4 and 7.6 numerator Monitoria Intensiva MQHIV 2021 for the selected location
    * and reporting period Section 7 (endDateRevision)
    *
-   * @param num
+   * @param num indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat7NumMI2021Part246Definition(Integer num) {
@@ -731,8 +731,8 @@ public class IntensiveMonitoringCohortQueries {
    * Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
    * (endDateRevision)
    *
-   * @param level
-   * @param type
+   * @param level indicator number
+   * @param type indicator
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMICat13Part2(Integer level, String type) {
@@ -796,8 +796,8 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period Section (endDateRevision)
    *
-   * @param level
-   * @param type
+   * @param level indicator number
+   * @param type indicator flag
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat13Den(Integer level, Boolean type) {
@@ -830,7 +830,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get the indicators (denominators) from CATEGORY 11 from report named “Monitoria Intensiva de
    * HIV-2021” for the selected location and reporting month (endDateRevision)
    *
-   * @param indicatorFlag
+   * @param indicatorFlag indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMIC11DEN(int indicatorFlag) {
@@ -865,8 +865,8 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period (endDateRevision)
    *
-   * @param level
-   * @param type
+   * @param level indicator number
+   * @param type indicator flag
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat12P1DenNum(Integer level, Boolean type) {
@@ -899,7 +899,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.2 Denominator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN2(Integer indicator) {
@@ -920,7 +920,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.2 Numerator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM2(Integer indicator) {
@@ -941,7 +941,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.5 Denominator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN5(Integer indicator) {
@@ -962,7 +962,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.5 Numerator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM5(Integer indicator) {
@@ -983,7 +983,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.9 Denominator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN9(Integer indicator) {
@@ -1004,7 +1004,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.9 Numerator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM9(Integer indicator) {
@@ -1025,7 +1025,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.10 Denominator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN10(Integer indicator) {
@@ -1046,7 +1046,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.10 Numerator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM10(Integer indicator) {
@@ -1067,7 +1067,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.11 Denominator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN11(Integer indicator) {
@@ -1088,7 +1088,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.11 Numerator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM11(Integer indicator) {
@@ -1109,7 +1109,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.14 Denominator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN14(Integer indicator) {
@@ -1131,7 +1131,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get the indicators (numerators) from CATEGORY 11 from report named “Monitoria Intensiva de
    * HIV-2021” for the selected location and reporting month (endDateRevision)
    *
-   * @param indicatorFlag
+   * @param indicatorFlag indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMIC11NUM(int indicatorFlag) {
@@ -1201,7 +1201,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.14 Numerator (endDateRevision)
    *
-   * @param indicator
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM14(Integer indicator) {
@@ -1223,8 +1223,8 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 P4 NUMERATOR AND DENOMINATOR Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period (endDateRevision)
    *
-   * @param level
-   * @param type
+   * @param level indicator number
+   * @param type indicator flag
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMICat13Part4(Integer level, Boolean type) {
@@ -1854,6 +1854,8 @@ public class IntensiveMonitoringCohortQueries {
    *       (encounter_datetime from A) minus 61 days
    * </ul>
    *
+   * @param upper The upper limit in days
+   * @param lower The lower limit in days
    * @return CohortDefinition
    */
   public CohortDefinition getMI15E(int upper, int lower) {
@@ -2035,6 +2037,8 @@ public class IntensiveMonitoringCohortQueries {
    * and NOT P and I and Age >= 2 </i><br>
    * <br>
    *
+   * @param isDenominator indicator flag
+   * @param level indicator number
    * @return CohortDefinition
    */
   public CohortDefinition getCat15P1DenNum(boolean isDenominator, int level) {
