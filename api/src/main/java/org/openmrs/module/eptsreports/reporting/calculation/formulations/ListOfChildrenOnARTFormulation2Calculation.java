@@ -44,6 +44,8 @@ public class ListOfChildrenOnARTFormulation2Calculation extends AbstractPatientC
       ListResult listResult = (ListResult) formulation2.get(patientId);
       List<Integer> conceptIdListResult = EptsCalculationUtils.extractResultValues(listResult);
 
+      SimpleResult simpleResult = (SimpleResult) formulation2.get(patientId);
+
       SimpleResult formulation1Result =
           EptsCalculationUtils.resultForPatient(formulation1, patientId);
 
@@ -104,8 +106,7 @@ public class ListOfChildrenOnARTFormulation2Calculation extends AbstractPatientC
             + "    AND e.encounter_type = ${18} "
             + "    AND e.encounter_datetime <= :onOrBefore "
             + "    AND e.location_id = :location  "
-            + "  AND e.encounter_datetime = max_farmacia.e_encounter_date "
-            + "  AND o.obs_group_id = ${165252}";
+            + "  AND e.encounter_datetime = max_farmacia.e_encounter_date ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     def.setQuery(stringSubstitutor.replace(sql));
     Map<String, Object> params = new HashMap<>();

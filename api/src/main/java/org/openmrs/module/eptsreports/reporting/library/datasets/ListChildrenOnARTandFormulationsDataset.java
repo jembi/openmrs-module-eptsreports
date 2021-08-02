@@ -104,25 +104,25 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
         null);
 
     /** Query 10 Formulation 2 - Sheet 1: Column J */
-    patientDataSetDefinition.addColumn(
-        "formulation2",
-        getFormulation(Formulation.FORMULATION2),
-        "onOrBefore=${endDate},location=${location}",
-        null);
-
-    /** Query 11 Formulation 3 - Sheet 1: Column K */
-    patientDataSetDefinition.addColumn(
-        "formulation3",
-        getFormulation(Formulation.FORMULATION3),
-        "onOrBefore=${endDate},location=${location}",
-        null);
-
-    /** Query 12 Formulation 4 - Sheet 1: Column L */
-    patientDataSetDefinition.addColumn(
-        "formulation4",
-        getFormulation(Formulation.FORMULATION4),
-        "onOrBefore=${endDate},location=${location}",
-        null);
+    //    patientDataSetDefinition.addColumn(
+    //        "formulation2",
+    //        getFormulation(Formulation.FORMULATION2),
+    //        "onOrBefore=${endDate},location=${location}",
+    //        null);
+    //
+    //    /** Query 11 Formulation 3 - Sheet 1: Column K */
+    //    patientDataSetDefinition.addColumn(
+    //        "formulation3",
+    //        getFormulation(Formulation.FORMULATION3),
+    //        "onOrBefore=${endDate},location=${location}",
+    //        null);
+    //
+    //    /** Query 12 Formulation 4 - Sheet 1: Column L */
+    //    patientDataSetDefinition.addColumn(
+    //        "formulation4",
+    //        getFormulation(Formulation.FORMULATION4),
+    //        "onOrBefore=${endDate},location=${location}",
+    //        null);
 
     /** Query 13 Next Drug pick-up Date - Sheet 1: Column M */
     patientDataSetDefinition.addColumn(

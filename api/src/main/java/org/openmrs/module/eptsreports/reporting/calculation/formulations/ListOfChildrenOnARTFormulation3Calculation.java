@@ -116,8 +116,7 @@ public class ListOfChildrenOnARTFormulation3Calculation extends AbstractPatientC
             + "    AND e.encounter_type = ${18} "
             + "    AND e.encounter_datetime <= :onOrBefore "
             + "    AND e.location_id = :location  "
-            + "  AND e.encounter_datetime = max_farmacia.e_encounter_date "
-            + "  AND o.obs_group_id = ${165252}";
+            + "  AND e.encounter_datetime = max_farmacia.e_encounter_date ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     def.setQuery(stringSubstitutor.replace(sql));
     Map<String, Object> params = new HashMap<>();

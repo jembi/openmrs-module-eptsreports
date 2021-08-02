@@ -1,18 +1,19 @@
 package org.openmrs.module.eptsreports.reporting.calculation.formulations;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
+import org.openmrs.calculation.result.ListResult;
 import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
+import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.stereotype.Component;
@@ -29,9 +30,30 @@ public class ListOfChildrenOnARTFormulation1Calculation extends AbstractPatientC
 
     HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
     CalculationResultMap formulation1 = getFormulationMap(cohort, context, hivMetadata);
+    EPTSCalculationService ePTSCalculationService =
+        Context.getRegisteredComponents(EPTSCalculationService.class).get(0);
+    Location location = (Location) context.getFromCache("location");
+
+    CalculationResultMap calculationResultMap =
+        ePTSCalculationService.getObs(
+            hivMetadata.getArtDrugFormulationConcept(),
+            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()),
+            cohort,
+            Arrays.asList(location),
+            null,
+            TimeQualifier.ANY,
+            null,
+            context);
+
     for (Integer patientId : cohort) {
+      ListResult listResult = (ListResult) calculationResultMap.get(patientId);
+      List<Obs> obsList = EptsCalculationUtils.extractResultValues(listResult);
+
       SimpleResult result = (SimpleResult) formulation1.get(patientId);
+      System.out.println("Formulation for patient " + patientId + " is :" + obsList);
+
       if (result != null) {
+        System.out.println("Result Is: " + result + " for patient " + patientId);
         map.put(patientId, new SimpleResult(result, this));
       }
     }
