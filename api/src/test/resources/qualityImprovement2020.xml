@@ -525,10 +525,24 @@ description="UUID for the TUBERCULOSE ACTIVO concept" uuid="763a4102-1d49-47ae-b
 		uuid="448d0b8c-3a25-11eb-a98c-0242ac120002"
 	/>
 
+	<global_property
+			property="eptsreports.quarterlyConceptUuid"
+			property_value="f53848d5-3521-4cc8-ac72-d63adef281a1"
+			description="QUARTERLY concept"
+			uuid="ac5d752a-f398-11eb-b46f-4f5b78e3ea73"
+	/>
+
 	<global_property property="eptsreports.ATPUSupplememtConceptUuid"
 	property_value="014b76fb-c7ee-404c-b913-9795a108015e"
 			description="ATPU SUPPLEMENT concept"
 			uuid="4f4bf6dd-3a25-11eb-a98c-0242ac120002"
+	/>
+
+	<global_property
+			property="eptsreports.gaac"
+			property_value="f46bfb16-240d-4bd3-a497-d23afd377f4f"
+			description="Gaac (GA) concept"
+			uuid="3683a996-f424-11eb-a4a8-0f303217069c"
 	/>
 
 	<global_property
@@ -791,6 +805,18 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		date_created="2012-02-29 09:50:50" concept_name_id="3139" voided="0"
 		uuid="e24e2a8c-1d5f-11e0-b929-000c29ad1d07" creator="1" 
 		concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
+	<!--23720 -->
+	<concept concept_id="23720" retired="0"   creator="1"
+			 is_set="0"  class_id="11" datatype_id="4"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="f53848d5-3521-4cc8-ac72-d63adef281a1" />
+
+	<concept_name concept_id="23720"
+				  name="QUARTERLY" locale="en"
+				  date_created="2012-02-29 09:50:50" concept_name_id="33187" voided="0"
+				  uuid="1795a667-fb25-4b8d-8211-44651440a845" creator="1"
+				  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
 
 	<!--1369 -->
@@ -1087,6 +1113,18 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 	class_id="7" is_set="0" creator="1"
 	date_created="2008-10-13 23:14:01"
 	uuid="e1e204ec-1d5f-11e0-b929-000c29ad1d07" />
+
+	<!--23724 -->
+	<concept concept_id="23724" retired="0"   creator="1"
+			 is_set="0"  class_id="7" datatype_id="2"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="f46bfb16-240d-4bd3-a497-d23afd377f4f" />
+
+	<concept_name concept_id="23724"
+				  name="Gaac (GA)" locale="en"
+				  date_created="2012-02-29 09:50:50" concept_name_id="33201" voided="0"
+				  uuid="e9d901bb-ba6b-43a1-8979-1d3ffcec3330" creator="1"
+				  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
 	<concept concept_id="23758" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2008-10-13 23:14:01" uuid="2eab4e55-d0d0-4fa8-8d23-b40eaaee44c8" />
 
