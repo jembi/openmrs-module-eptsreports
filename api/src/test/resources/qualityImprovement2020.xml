@@ -627,6 +627,18 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 					 description="UUID for REGIME ARV ALTERNATIVO A PRIMEIRA LINHA concept"
 					 uuid="30898c62-f3a3-11eb-946d-ab023efed7f0"
 	/>
+
+	<global_property property="eptsreports.regArvSecondLineUuid"
+					 property_value="79c143ea-eeeb-4cdb-bfd7-fed8f029c15b"
+					 description="UUID for ARV REGIMEN 2nd LINE concept"
+					 uuid="b2d0ca26-f436-11eb-abf2-b7dedeaa57f0"
+	/>
+
+	<global_property property="eptsreports.viralLoadQualitativeConceptUuid"
+					 property_value="e1da2704-1d5f-11e0-b929-000c29ad1d07"
+					 description="UUID for the Viral load qualitative  concept"
+					 uuid="e068b61e-f437-11eb-9ecb-a79c52dcc960"
+	/>
 		
 		<!-- concept & concept_name -->
 
@@ -934,6 +946,30 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 				  name="REGIME ARV ALTERNATIVO A PRIMEIRA LINHA" locale="en"
 				  date_created="2012-02-29 09:50:50" concept_name_id="2463" voided="0"
 				  uuid="618650c6-90c3-4acd-ae4d-ffb2f6452a5b"
+				  locale_preferred="0" />
+
+	<!--21187-->
+	<concept concept_id="21187" retired="0"  creator="1"
+			 is_set="0"  class_id="11" datatype_id="4"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="79c143ea-eeeb-4cdb-bfd7-fed8f029c15b" />
+
+	<concept_name concept_id="21187" creator="1"
+				  name="ARV REGIMEN 2nd LINE" locale="en"
+				  date_created="2012-02-29 09:50:50" concept_name_id="2466" voided="0"
+				  uuid="79c143ea-eeeb-4cdb-bfd7-fed8f029c15b"
+				  locale_preferred="0" />
+
+<!--	1305-->
+	<concept concept_id="1305" retired="0"  creator="1"
+			 is_set="0"  class_id="11" datatype_id="4"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="e1da2704-1d5f-11e0-b929-000c29ad1d07" />
+
+	<concept_name concept_id="1305" creator="1"
+				  name="Viral load qualitative" locale="en"
+				  date_created="2012-02-29 09:50:50" concept_name_id="2467" voided="0"
+				  uuid="e1da2704-1d5f-11e0-b929-000c29ad1d07"
 				  locale_preferred="0" />
 		
 	

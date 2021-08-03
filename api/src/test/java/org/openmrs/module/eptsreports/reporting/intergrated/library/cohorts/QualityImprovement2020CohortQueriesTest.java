@@ -415,6 +415,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
    }
 
   @Test
+  @Ignore("Functions used in queries not supported by H2")
   public void getMQ13DENShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT13 DEN...............");
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ13(true, 1);
