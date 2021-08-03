@@ -539,6 +539,13 @@ description="UUID for the TUBERCULOSE ACTIVO concept" uuid="763a4102-1d49-47ae-b
 	/>
 
 	<global_property
+			property="eptsreports.gaac"
+			property_value="f46bfb16-240d-4bd3-a497-d23afd377f4f"
+			description="Gaac (GA) concept"
+			uuid="3683a996-f424-11eb-a4a8-0f303217069c"
+	/>
+
+	<global_property
 		property="eptsreports.sojaSupplememtConceptUuid"
 		property_value="e1e204ec-1d5f-11e0-b929-000c29ad1d07"
 		description="Soja SUPPLEMENT concept"
@@ -1070,6 +1077,18 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 	class_id="7" is_set="0" creator="1"
 	date_created="2008-10-13 23:14:01"
 	uuid="e1e204ec-1d5f-11e0-b929-000c29ad1d07" />
+
+	<!--23724 -->
+	<concept concept_id="23724" retired="0"   creator="1"
+			 is_set="0"  class_id="7" datatype_id="2"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="f46bfb16-240d-4bd3-a497-d23afd377f4f" />
+
+	<concept_name concept_id="23724"
+				  name="Gaac (GA)" locale="en"
+				  date_created="2012-02-29 09:50:50" concept_name_id="33201" voided="0"
+				  uuid="e9d901bb-ba6b-43a1-8979-1d3ffcec3330" creator="1"
+				  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
 	<concept concept_id="23758" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2008-10-13 23:14:01" uuid="2eab4e55-d0d0-4fa8-8d23-b40eaaee44c8" />
 
