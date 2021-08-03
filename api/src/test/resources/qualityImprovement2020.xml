@@ -559,6 +559,18 @@ description="UUID for the TUBERCULOSE ACTIVO concept" uuid="763a4102-1d49-47ae-b
 			uuid="e3c89e4a-f429-11eb-9c0f-d730221f6500"
 	/>
 	<global_property
+			property="eptsreports.suspendedTreatmentConceptUuid"
+			property_value="e1de1fee-1d5f-11e0-b929-000c29ad1d07"
+			description="UUID for the SUSPENDER TRATAMENTO concept"
+			uuid="2505e3d4-f42c-11eb-b6b0-036f5322e2f3"
+	/>
+	<global_property
+			property="eptsreports.patientHasDiedConceptUuid"
+			property_value="e1da766e-1d5f-11e0-b929-000c29ad1d07"
+			description="UUID for the OBITOU concept"
+			uuid="dcb989fe-f42c-11eb-afec-87d527e3fd3e"
+	/>
+	<global_property
 		property="eptsreports.sojaSupplememtConceptUuid"
 		property_value="e1e204ec-1d5f-11e0-b929-000c29ad1d07"
 		description="Soja SUPPLEMENT concept"
@@ -972,8 +984,8 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		<concept_name concept_id="1366" creator="1"
 		name="PATIENT HAS DIED" locale="en"   
 		date_created="2012-02-29 09:50:50" concept_name_id="2462" voided="0"
-		uuid="e249f6c4-1d5f-11e0-b929-000c29ad1d07"
-		locale_preferred="0" />
+		uuid="e249f6c4-1d5f-11e0-b929-000c29ad1d07" concept_name_type="FULLY_SPECIFIED"
+		locale_preferred="1" />
 
 	<!--1366-->
 	<concept concept_id="21190" retired="0"  creator="1"
@@ -984,7 +996,7 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 	<concept_name concept_id="21190" creator="1"
 				  name="REGIME ARV ALTERNATIVO A PRIMEIRA LINHA" locale="en"
 				  date_created="2012-02-29 09:50:50" concept_name_id="2463" voided="0"
-				  uuid="618650c6-90c3-4acd-ae4d-ffb2f6452a5b"
+				  uuid="0b1d533a-f431-11eb-8f29-0f2a3ec99f46"
 				  locale_preferred="0" />
 
 	<!--21187-->
