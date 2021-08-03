@@ -443,7 +443,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   @Test
   public void getMQ15DENShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT4 NUM1...............");
-    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ15DEN(2);
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ15DEN(1);
 
     Map<Parameter, Object> parameters = new HashMap<>();
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
@@ -455,8 +455,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    // assertEquals(1, evaluatedCohort.getMemberIds().size());
-    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1050));
     assertNotNull(evaluatedCohort.getMemberIds());
     Set<Integer> patients = evaluatedCohort.getMemberIds();
     for (Integer i : patients) {
