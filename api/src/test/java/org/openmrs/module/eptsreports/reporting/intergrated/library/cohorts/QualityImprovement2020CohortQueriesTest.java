@@ -355,8 +355,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
     parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
     parameters.put(
-            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
-            this.getrevisionEndDate());
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
@@ -371,48 +371,48 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     System.out.println("size:=> " + patients.size());
   }
 
-   @Test
-   @Ignore("Functions used in queries not supported by H2")
-   public void getMQ12NUMShouldPass() throws EvaluationException {
-     System.out.println("...............INITIATING TESTS - CAT12 NUM...............");
-     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ12NUM(1);
+  @Test
+  @Ignore("Functions used in queries not supported by H2")
+  public void getMQ12NUMShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT12 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ12NUM(1);
 
-     Map<Parameter, Object> parameters = new HashMap<>();
-     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
-     parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
-     parameters.put(
-         new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
-         this.getrevisionEndDate());
-     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
-     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
-     assertNotNull(evaluatedCohort.getMemberIds());
-   }
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
 
-   @Test
-   public void getMQ12DENShouldPass() throws EvaluationException {
-     System.out.println("...............INITIATING TESTS - CAT12 DEN...............");
-     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ12DEN(10);
+  @Test
+  public void getMQ12DENShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT12 DEN...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ12DEN(10);
 
-     Map<Parameter, Object> parameters = new HashMap<>();
-     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
-     parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
-     parameters.put(
-         new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
-         this.getrevisionEndDate());
-     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
-     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-     // assertEquals(1, evaluatedCohort.getMemberIds().size());
-     // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
-     assertNotNull(evaluatedCohort.getMemberIds());
-     Set<Integer> patients = evaluatedCohort.getMemberIds();
-     for (Integer i : patients) {
-       System.out.println(i);
-     }
-     System.out.println("size:=> " + patients.size());
-   }
+    // assertEquals(1, evaluatedCohort.getMemberIds().size());
+    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+  }
 
   @Test
   @Ignore("Functions used in queries not supported by H2")
@@ -424,8 +424,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
     parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
     parameters.put(
-            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
-            this.getrevisionEndDate());
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
@@ -449,8 +449,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
     parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
     parameters.put(
-            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
-            this.getrevisionEndDate());
+        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+        this.getrevisionEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
@@ -471,7 +471,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
   @Override
   public Date getStartDate() {
-    return DateUtil.getDateTime(2020,1, 21);
+    return DateUtil.getDateTime(2020, 1, 21);
   }
 
   @Override
