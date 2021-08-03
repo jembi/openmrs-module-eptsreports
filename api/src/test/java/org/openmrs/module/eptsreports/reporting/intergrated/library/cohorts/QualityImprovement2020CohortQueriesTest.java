@@ -190,11 +190,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
+
   }
 
   @Test
@@ -213,11 +209,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
+
   }
 
   @Test
@@ -235,14 +227,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    // assertEquals(1, evaluatedCohort.getMemberIds().size());
-    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
+
   }
 
   // CAT 6 NUMERATOR AND DENOMINATOR
@@ -261,14 +247,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(2, evaluatedCohort.getMemberIds().size());
-    assertTrue(evaluatedCohort.getMemberIds().contains(1011));
-    // assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
+     assertNotNull(evaluatedCohort.getMemberIds());
+
   }
 
   @Test
@@ -286,14 +266,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    // assertEquals(1, evaluatedCohort.getMemberIds().size());
-    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
   }
 
   @Test
@@ -311,14 +284,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    // assertEquals(1, evaluatedCohort.getMemberIds().size());
-    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
+
   }
 
   @Test
@@ -336,14 +303,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    // assertEquals(1, evaluatedCohort.getMemberIds().size());
-    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
+
   }
 
   @Test
@@ -361,14 +322,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    // assertEquals(1, evaluatedCohort.getMemberIds().size());
-    // assertTrue(evaluatedCohort.getMemberIds().contains(1014));
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
+
   }
 
   @Test
@@ -404,14 +359,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    // assertEquals(1, evaluatedCohort.getMemberIds().size());
-    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
+
   }
 
   @Test
@@ -429,15 +378,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
-
-    // assertEquals(1, evaluatedCohort.getMemberIds().size());
-    // assertTrue(evaluatedCohort.getMemberIds().contains(1011));
     assertNotNull(evaluatedCohort.getMemberIds());
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
   }
 
   @Test
