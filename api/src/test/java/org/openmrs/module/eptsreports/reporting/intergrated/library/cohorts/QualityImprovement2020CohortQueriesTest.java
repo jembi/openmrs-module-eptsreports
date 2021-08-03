@@ -384,7 +384,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   @Test
   public void getMQ15DENShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT4 NUM1...............");
-    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ15DEN(2);
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ15DEN(1);
 
     Map<Parameter, Object> parameters = new HashMap<>();
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
