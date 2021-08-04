@@ -47,7 +47,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  @Ignore("Same methods are already tested on MQ5Den1")
+//  @Ignore("Same methods are already tested on MQ5Den1")
   public void getPregnantPatientEnrolledInTARV2020ServiceShouldPass() throws EvaluationException {
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ5B(false);
 
@@ -101,6 +101,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
+  @Test
   public void getMQ7patientsShouldPass3() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(5);
@@ -380,10 +381,36 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
     assertNotNull(evaluatedCohort.getMemberIds());
   }
+  @Test
+  public void getMQ13P3DENShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT13P3 DEN...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC13P3DEN(2);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+
+  }
+
+
 
   @Test
+  @Ignore("Functions used in queries not supported by H2")
   public void getMQ15DENShouldPass() throws EvaluationException {
-    System.out.println("...............INITIATING TESTS - CAT4 NUM1...............");
+    System.out.println("...............INITIATING TESTS - CAT15 DEN...............");
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ15DEN(1);
 
     Map<Parameter, Object> parameters = new HashMap<>();
