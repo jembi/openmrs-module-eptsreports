@@ -106,30 +106,37 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         "Total Started ART",
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
         getColumnsForAdults());
-
-    dataSetDefinition.addColumn(
+    //Numero adultos que iniciaram TARV durante o trimestre PID
+    addRow(
+        dataSetDefinition,
         "STARTPID",
         "START: People who inject drugs",
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
-        "keypop=PID");
+            getColumnForPidStartedArt());
 
-    dataSetDefinition.addColumn(
-        "STARTMSM",
-        "START: Men who have sex with men",
-        EptsReportUtils.map(getPatientsInARTIndicator, mappings),
-        "keypop=MSM");
+    //Numero adultos que iniciaram TARV durante o trimestre MSM
+    addRow(
+            dataSetDefinition,
+            "STARTMSM",
+            "START: Men who have sex with men",
+            EptsReportUtils.map(getPatientsInARTIndicator, mappings),
+            getColumnForMSMStartedArt());
 
-    dataSetDefinition.addColumn(
-        "STARTCSW",
-        "START: Female sex workers",
-        EptsReportUtils.map(getPatientsInARTIndicator, mappings),
-        "keypop=CSW");
+    //Numero adultos que iniciaram TARV durante o trimestre CSW
+    addRow(
+            dataSetDefinition,
+            "STARTCSW",
+            "START: Female sex workers",
+            EptsReportUtils.map(getPatientsInARTIndicator, mappings),
+            getColumnForCSWStartedArt());
 
-    dataSetDefinition.addColumn(
-        "STARTPRI",
-        "START: People in prison and other closed settings",
-        EptsReportUtils.map(getPatientsInARTIndicator, mappings),
-        "keypop=PRI");
+    //Numero adultos que iniciaram TARV durante o trimestre PRI
+    addRow(
+            dataSetDefinition,
+            "STARTPRI",
+            "START: People in prison and other closed settings",
+            EptsReportUtils.map(getPatientsInARTIndicator, mappings),
+            getColumnForPRIStartedArt());
 
     // This returns total adult patients currently ART
     addRow(
@@ -299,5 +306,49 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         new ColumnParameters("fifteenPlus", "15 +", "age=15+", "adultos");
 
     return Arrays.asList(fifteenPlus);
+  }
+
+  private List<ColumnParameters> getColumnForPidStartedArt() {
+    ColumnParameters pidFifteenTo19 =
+            new ColumnParameters("pidFifteenTo19", "PID 15-19 years", "age=15-19|keypop=PID", "01");
+    ColumnParameters pidTwentyTo24 =
+            new ColumnParameters("pidTwentyTo24", "PID 20-24 years", "age=20-24|keypop=PID", "02");
+    ColumnParameters pidTwenty25Plus =
+            new ColumnParameters("pidTwenty25Plus", "PID 25 years+", "age=25+|keypop=PID", "03");
+
+    return Arrays.asList(pidFifteenTo19, pidTwentyTo24, pidTwenty25Plus);
+  }
+
+  private List<ColumnParameters> getColumnForMSMStartedArt() {
+    ColumnParameters msmFifteenTo19 =
+            new ColumnParameters("msmFifteenTo19", "MSM 15-19 years", "age=15-19|keypop=MSM", "01");
+    ColumnParameters msmTwentyTo24Art =
+            new ColumnParameters("msmTwentyTo24Art", "MSM 20-24 years", "age=20-24|keypop=MSM", "02");
+    ColumnParameters msmTwenty25Plus =
+            new ColumnParameters("msmTwenty25Plus", "MSM 25 years+", "age=25+|keypop=MSM", "03");
+
+    return Arrays.asList(msmFifteenTo19, msmTwentyTo24Art, msmTwenty25Plus);
+  }
+
+  private List<ColumnParameters> getColumnForCSWStartedArt() {
+    ColumnParameters cswFifteenTo19 =
+            new ColumnParameters("cswFifteenTo19", "CSW 15-19 years", "age=15-19|keypop=CSW", "01");
+    ColumnParameters cswTwentyTo24 =
+            new ColumnParameters("cswTwentyTo24", "CSW 20-24 years", "age=20-24|keypop=CSW", "02");
+    ColumnParameters cswTwenty25Plus =
+            new ColumnParameters("cswTwenty25Plus", "CSW 25 years+", "age=25+|keypop=CSW", "03");
+
+    return Arrays.asList(cswFifteenTo19, cswTwentyTo24, cswTwenty25Plus);
+  }
+
+  private List<ColumnParameters> getColumnForPRIStartedArt() {
+    ColumnParameters priFifteenTo19 =
+            new ColumnParameters("priFifteenTo19", "CSW 15-19 years", "age=15-19|keypop=PRI", "01");
+    ColumnParameters priTwentyTo24 =
+            new ColumnParameters("priTwentyTo24", "CSW 20-24 years", "age=20-24|keypop=PRI", "02");
+    ColumnParameters priTwenty25Plus =
+            new ColumnParameters("priTwenty25Plus", "CSW 25 years+", "age=25+|keypop=PRI", "03");
+
+    return Arrays.asList(priFifteenTo19, priTwentyTo24, priTwenty25Plus);
   }
 }
