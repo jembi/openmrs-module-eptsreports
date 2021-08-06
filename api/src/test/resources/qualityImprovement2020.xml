@@ -702,7 +702,13 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 					 description="UUID for JUSTIFICATION TO CHANGE ARV TREATMENT concept"
 					 uuid="57d80674-f504-11eb-b102-bbbabb7e41c7"
 	/>
-		
+
+	<global_property property="eptsreports.artSecondLineSwitchUuid"
+					 property_value="7f367983-9911-4f8c-bbfc-a85678801f64"
+					 description="UUID for the SECOND LINE concept"
+					 uuid="e8eb2dd0-f5db-11eb-b4b5-f7b22fbfe03d"
+	/>
+
 		<!-- concept & concept_name -->
 
 	<!--1255 -->
@@ -1034,6 +1040,17 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 				  date_created="2012-02-29 09:50:50" concept_name_id="2466" voided="0"
 				  uuid="79c143ea-eeeb-4cdb-bfd7-fed8f029c15b"
 				  locale_preferred="0" />
+<!--	21148-->
+	<concept concept_id="21148" retired="0"  creator="1"
+			 is_set="0"  class_id="11" datatype_id="4"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="7f367983-9911-4f8c-bbfc-a85678801f64" />
+
+	<concept_name concept_id="21148" creator="1"
+				  name="SECOND LINE" locale="en"
+				  date_created="2012-02-29 09:50:50" concept_name_id="2469" voided="0"
+				  uuid="7f367983-9911-4f8c-bbfc-a85678801f64"
+				  locale_preferred="0" />
 
 <!--	1305-->
 	<concept concept_id="1305" retired="0"  creator="1"
@@ -1054,7 +1071,7 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 
 	<concept_name concept_id="1792" creator="1"
 				  name="JUSTIFICATION TO CHANGE ARV TREATMENT" locale="en"
-				  date_created="2012-02-29 09:50:50" concept_name_id="2467" voided="0"
+				  date_created="2012-02-29 09:50:50" concept_name_id="2468" voided="0"
 				  uuid="e1de8862-1d5f-11e0-b929-000c29ad1d07"
 				  locale_preferred="0" />
 	
@@ -1685,6 +1702,26 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 			   date_created="2020-03-17 12:55:48" voided="0"
 			   uuid="e600be64-f504-11eb-bc3e-931b2306a97b" location_id="1" />
 
+	<encounter encounter_id="9040" encounter_type="6"
+			   patient_id="1014" encounter_datetime="2020-02-20 00:00:00" creator="1"
+			   date_created="2020-04-19 12:55:48" voided="0"
+			   uuid="1cbcb282-f5e6-11eb-a7ea-a332f2ce1f30" location_id="1" />
+
+	<encounter encounter_id="9041" encounter_type="35"
+			   patient_id="1014" encounter_datetime="2020-02-20 00:00:00" creator="1"
+			   date_created="2020-02-20 12:55:48" voided="0"
+			   uuid="56c6213e-f5e6-11eb-b636-0b74fbbe0068" location_id="1" />
+
+	<encounter encounter_id="9042" encounter_type="35"
+			   patient_id="1014" encounter_datetime="2020-03-12 00:00:00" creator="1"
+			   date_created="2020-03-12 12:55:48" voided="0"
+			   uuid="61291648-f5e8-11eb-aae4-1f9fe7739f7b" location_id="1" />
+
+	<encounter encounter_id="9043" encounter_type="35"
+			   patient_id="1014" encounter_datetime="2020-04-03 00:00:00" creator="1"
+			   date_created="2020-04-03 12:55:48" voided="0"
+			   uuid="9fa6dd2e-f5e8-11eb-b39d-7bd3f7f0c73e" location_id="1" />
+
 	<encounter encounter_id="9050" encounter_type="6"
 			   patient_id="1050" encounter_datetime="2020-01-22 00:00:00" creator="1"
 			   date_created="2020-04-19 12:55:48" voided="0"
@@ -1905,6 +1942,24 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		 date_created="2020-03-17 10:55:48" voided="0"
 		 value_datetime="2020-03-17 10:55:48"
 		 uuid="5690f042-f503-11eb-8d09-433ba5df450b" location_id="1" />
+
+	<obs obs_id="137" person_id="1014" concept_id="856"
+		 encounter_id="9041" obs_datetime="2020-02-20 10:55:48" creator="1"
+		 date_created="2020-03-17 10:55:48" voided="0"
+		 value_datetime="2020-02-20 10:55:48" value_numeric="1200"
+		 uuid="bc4bb56e-f5e6-11eb-bcd2-b7fb01d69a2f" location_id="1" />
+
+	<obs obs_id="138" person_id="1014" concept_id="856"
+		 encounter_id="9042" obs_datetime="2020-03-12 10:55:48" creator="1"
+		 date_created="2020-03-12 10:55:48" voided="0"
+		 value_datetime="2020-03-12 10:55:48" value_numeric="1201"
+		 uuid="b88ab004-f5e8-11eb-8f0e-5f95aebd611a" location_id="1" />
+
+	<obs obs_id="139" person_id="1014" concept_id="856"
+		 encounter_id="9043" obs_datetime="2020-04-03 10:55:48" creator="1"
+		 date_created="2020-04-03 10:55:48" voided="0"
+		 value_datetime="2020-04-03 10:55:48" value_numeric="1205"
+		 uuid="404ce74a-f5ea-11eb-8fbc-27c4897f353a" location_id="1" />
 
 	<obs obs_id="150" person_id="1050" concept_id="23724"
 		 encounter_id="9050" obs_datetime="2020-03-22 00:00:00"
