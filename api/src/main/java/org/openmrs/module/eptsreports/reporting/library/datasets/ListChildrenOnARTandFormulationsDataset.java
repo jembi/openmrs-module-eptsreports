@@ -16,6 +16,7 @@ import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResult
 import org.openmrs.module.eptsreports.reporting.data.converter.ChildrenListConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
+import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
@@ -36,6 +37,12 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
   @Autowired private HivMetadata hivMetadata;
 
   @Autowired private TbMetadata tbMetadata;
+
+  @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
+
+  @Autowired
+  private ListChildrenOnARTandFormulationsCohortQueries
+      listChildrenOnARTandFormulationsCohortQueries;
 
   public DataSetDefinition constructDataset() {
 
