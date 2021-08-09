@@ -385,6 +385,33 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  public void getMQC11NUN6ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT11 DEN...............");
+    CohortDefinition cohortDefinition =
+            qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month("MQ");
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+//   assertEquals(1, evaluatedCohort.getMemberIds().size());
+//   assertTrue(evaluatedCohort.getMemberIds().contains(1014));
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
   //  @Ignore("Functions used in queries not supported by H2")
   public void getMQ12NUMShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT12 NUM...............");
