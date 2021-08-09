@@ -29,6 +29,54 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  public void getMQC3D1patientsShouldPass() throws EvaluationException {
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC3D1();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+
+   assertEquals(3, evaluatedCohort.getMemberIds().size());
+   assertTrue(evaluatedCohort.getMemberIds().contains(1013));
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  @Ignore("Same methods are already tested on MQC3N1")
+  public void getMQC3N1patientsShouldPass() throws EvaluationException {
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC3N1();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+//    assertEquals(1, evaluatedCohort.getMemberIds().size());
+//    assertTrue(evaluatedCohort.getMemberIds().contains(1003));
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
   public void getInfantPatientsEnrolledInTarv2020SampleShouldPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ5A(true);

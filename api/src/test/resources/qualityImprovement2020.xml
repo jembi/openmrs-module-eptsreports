@@ -520,6 +520,16 @@
 		description="UUID for the MALNUTRITION concept" 
 		uuid="b35e3f22-0dc9-41d8-b53b-128e4ee69854" />
 
+		<global_property property="eptsreports.typeTestHIVConceptUuid"
+		property_value="c7ac119c-d59d-474d-8334-0c5bdd2e9863"
+		description="TYPE OF HIV TEST"
+		uuid="8335b22c-f8eb-11eb-8f1c-8f39e7cdb843" />
+
+		<global_property property="eptsreports.presumptiveDiagnosisInChildrenConceptUuid"
+		property_value="b792c72c-eaf4-4386-b4a5-8f79c9a83746"
+		description="PRESUMPTIVE DIAGNOSIS IN CHILDREN LESS THAN 18 MONTHS"
+		uuid="093ccdf4-f8ee-11eb-9cf0-2f307b3d2846" />
+
 		<global_property property="eptsreports.masterCardDrugPickupEncounterTypeUuid"
                      property_value="cce7b2ec-4fc0-4f9e-806d-b1c4ee9577db"
                      description="UUID for the LEVANTAMENTO DE ARV concept"
@@ -829,6 +839,28 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		  date_created="2012-02-29 09:50:50" concept_name_id="7187"
 		voided="0" uuid="33f1a883-ebd0-4e5b-bb6a-a254d573877c"
 		concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
+	<!--22772 -->
+	<concept concept_id="22772" retired="0"   creator="1"
+			 is_set="0"  class_id="7" datatype_id="2"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="c7ac119c-d59d-474d-8334-0c5bdd2e9863" />
+
+	<concept_name concept_id="22772" name="TYPE OF HIV TEST" locale="en" creator="1"
+				  date_created="2012-02-29 09:50:50" concept_name_id="31281"
+				  voided="0" uuid="46d0ad76-f8ed-11eb-9b02-33e01d2ee716"
+				  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
+	<!--23807 -->
+	<concept concept_id="23807" retired="0"   creator="1"
+			 is_set="0"  class_id="7" datatype_id="2"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="b792c72c-eaf4-4386-b4a5-8f79c9a83746" />
+
+	<concept_name concept_id="23807" name="TYPE OF HIV TEST" locale="en" creator="1"
+			 date_created="2012-02-29 09:50:50" concept_name_id="33486"
+			 voided="0" uuid="58cb6fa6-f8ee-11eb-8f1e-2300429a0cb8"
+			 concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
 
 	<!--6269 -->
