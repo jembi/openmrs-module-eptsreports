@@ -1740,17 +1740,17 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 			   uuid="1cbcb282-f5e6-11eb-a7ea-a332f2ce1f30" location_id="1" />
 
 	<encounter encounter_id="9041" encounter_type="35"
-			   patient_id="1014" encounter_datetime="2020-02-20 00:00:00" creator="1"
+			   patient_id="1014" encounter_datetime="2020-03-11 00:00:00" creator="1"
 			   date_created="2020-02-20 12:55:48" voided="0"
 			   uuid="56c6213e-f5e6-11eb-b636-0b74fbbe0068" location_id="1" />
 
 	<encounter encounter_id="9042" encounter_type="35"
-			   patient_id="1014" encounter_datetime="2020-03-12 00:00:00" creator="1"
+			   patient_id="1014" encounter_datetime="2020-04-07 00:00:00" creator="1"
 			   date_created="2020-03-12 12:55:48" voided="0"
 			   uuid="61291648-f5e8-11eb-aae4-1f9fe7739f7b" location_id="1" />
 
 	<encounter encounter_id="9043" encounter_type="35"
-			   patient_id="1014" encounter_datetime="2020-04-03 00:00:00" creator="1"
+			   patient_id="1014" encounter_datetime="2020-04-30 00:00:00" creator="1"
 			   date_created="2020-04-03 12:55:48" voided="0"
 			   uuid="9fa6dd2e-f5e8-11eb-b39d-7bd3f7f0c73e" location_id="1" />
 
@@ -1956,6 +1956,11 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		 encounter_id="9036" obs_datetime="2019-08-22 00:00:00"
 		 creator="1" date_created="2020-03-19 12:55:48" value_coded="21150"
 		 voided="0" uuid="288d8fac-f3a0-11eb-845a-731033cf0a98" location_id="1" />
+
+	<obs obs_id="160" person_id="1014" concept_id="1190"
+		 encounter_id="9032" obs_datetime="2020-02-19 00:00:00" value_datetime="2020-02-19 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48"
+		 voided="0" uuid="5e55e9cc-f8ff-11eb-b1ae-976b94b6510a" location_id="1" />
 
 	<obs obs_id="134" person_id="1016" concept_id="1190"
 		 encounter_id="9038" obs_datetime="2020-03-17 10:55:48" creator="1"
