@@ -400,8 +400,8 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-//   assertEquals(1, evaluatedCohort.getMemberIds().size());
-//   assertTrue(evaluatedCohort.getMemberIds().contains(1014));
+assertEquals(1, evaluatedCohort.getMemberIds().size());
+assertTrue(evaluatedCohort.getMemberIds().contains(1014));
     assertNotNull(evaluatedCohort.getMemberIds());
     Set<Integer> patients = evaluatedCohort.getMemberIds();
     for (Integer i : patients) {

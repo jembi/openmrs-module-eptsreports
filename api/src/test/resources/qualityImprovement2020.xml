@@ -1745,7 +1745,7 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 			   uuid="56c6213e-f5e6-11eb-b636-0b74fbbe0068" location_id="1" />
 
 	<encounter encounter_id="9042" encounter_type="35"
-			   patient_id="1014" encounter_datetime="2020-04-07 00:00:00" creator="1"
+			   patient_id="1014" encounter_datetime="2020-04-13 00:00:00" creator="1"
 			   date_created="2020-03-12 12:55:48" voided="0"
 			   uuid="61291648-f5e8-11eb-aae4-1f9fe7739f7b" location_id="1" />
 
