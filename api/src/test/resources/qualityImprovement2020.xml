@@ -2034,6 +2034,11 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		 creator="1" date_created="2020-03-19 12:55:48" value_coded="1706"
 		 voided="0" uuid="0e942e48-f446-11eb-81ea-1f43664a293a" location_id="1" />
 
+	<obs obs_id="155" person_id="1015" concept_id="23722"
+		 encounter_id="9035" obs_datetime="2019-08-22 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48" value_coded="856"
+		 voided="0" uuid="33e33c1a-fa8c-11eb-a22d-0faac194e500" location_id="1" />
+
 	<obs obs_id="154" person_id="1050" concept_id="23866"
 		 encounter_id="9054" obs_datetime="2020-08-22 00:00:00"
 		 creator="1" date_created="2020-03-19 12:55:48"
