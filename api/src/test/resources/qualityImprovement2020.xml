@@ -85,7 +85,7 @@
 		uuid="e0efa162-f05c-11eb-b5f1-ab624598c1e8" />
 
 	<person person_id="1014" gender="M" creator="1"
-			birthdate="2013-08-26 00:00:00.0" birthdate_estimated="0" dead="false"
+			birthdate="2019-08-26 00:00:00.0" birthdate_estimated="0" dead="false"
 			date_created="2009-01-01 00:00:00.0" voided="false"
 			uuid="80af7af0-f388-11eb-af23-c7daeb2ad98f" />
 
@@ -539,6 +539,11 @@
 		description="PRESUMPTIVE DIAGNOSIS IN CHILDREN LESS THAN 18 MONTHS"
 		uuid="093ccdf4-f8ee-11eb-9cf0-2f307b3d2846" />
 
+	<global_property property="eptsreports.hivPCRQualitativeConceptUuid"
+					 property_value="e1d7f61e-1d5f-11e0-b929-000c29ad1d07"
+					 description="HIV DNA POLYMERASE CHAIN REACTION, QUALITATIVE"
+					 uuid="f5f8edfa-fa86-11eb-845b-5bf5a6377514" />
+
 		<global_property property="eptsreports.masterCardDrugPickupEncounterTypeUuid"
                      property_value="cce7b2ec-4fc0-4f9e-806d-b1c4ee9577db"
                      description="UUID for the LEVANTAMENTO DE ARV concept"
@@ -808,6 +813,17 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		concept_name_id="3794" voided="0" creator="1" 
 		uuid="e2545858-1d5f-11e0-b929-000c29ad1d07"
 		concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
+	<!--1030 -->
+	<concept concept_id="1030" retired="0" class_id="1" datatype_id="2"
+			 is_set="0"   date_created="2012-02-27 11:30:21"  creator="1"
+			 uuid="e1d7f61e-1d5f-11e0-b929-000c29ad1d07" />
+
+	<concept_name concept_id="1030" name="HIV DNA POLYMERASE CHAIN REACTION, QUALITATIVE"
+				  locale="en"   date_created="2012-02-29 09:50:50"
+				  concept_name_id="1030" voided="0" creator="1"
+				  uuid="6d092e00-fa87-11eb-9999-e72c1ab6967d"
+				  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
 	<!--44 -->
 	<concept concept_id="44" retired="0" class_id="4" datatype_id="4"
@@ -1753,6 +1769,11 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 			   date_created="2020-02-20 12:55:48" voided="0"
 			   uuid="56c6213e-f5e6-11eb-b636-0b74fbbe0068" location_id="1" />
 
+	<encounter encounter_id="90455" encounter_type="35"
+			   patient_id="1015" encounter_datetime="2020-02-24 00:00:00" creator="1"
+			   date_created="2020-02-20 12:55:48" voided="0"
+			   uuid="836d1b0e-fa8f-11eb-aebd-13b6f26b3a01" location_id="1" />
+
 	<encounter encounter_id="9042" encounter_type="35"
 			   patient_id="1014" encounter_datetime="2020-04-13 00:00:00" creator="1"
 			   date_created="2020-03-12 12:55:48" voided="0"
@@ -2070,6 +2091,16 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		 encounter_id="9051" obs_datetime="2019-08-22 00:00:00"
 		 creator="1" date_created="2020-03-19 12:55:48" value_coded="1706"
 		 voided="0" uuid="0e942e48-f446-11eb-81ea-1f43664a293a" location_id="1" />
+
+	<obs obs_id="155" person_id="1015" concept_id="23722"
+		 encounter_id="9035" obs_datetime="2019-08-22 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48" value_coded="856"
+		 voided="0" uuid="33e33c1a-fa8c-11eb-a22d-0faac194e500" location_id="1" />
+
+	<obs obs_id="155" person_id="1015" concept_id="856"
+		 encounter_id="9035" obs_datetime="2019-08-22 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48" value_numeric="1200"
+		 voided="0" uuid="33e33c1a-fa8c-11eb-a22d-0faac194e500" location_id="1" />
 
 	<obs obs_id="154" person_id="1050" concept_id="23866"
 		 encounter_id="9054" obs_datetime="2020-08-22 00:00:00"
