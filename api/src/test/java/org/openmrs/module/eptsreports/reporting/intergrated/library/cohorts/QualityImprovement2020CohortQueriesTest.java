@@ -740,7 +740,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-//  @Ignore("Functions used in queries not supported by H2")
   public void getMQ13P4NUNShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT13 P4 DEN...............");
     CohortDefinition cohortDefinition =
@@ -756,7 +755,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertEquals(2, evaluatedCohort.getMemberIds().size());
     assertTrue(evaluatedCohort.getMemberIds().contains(1014));
     assertNotNull(evaluatedCohort.getMemberIds());
     Set<Integer> patients = evaluatedCohort.getMemberIds();
