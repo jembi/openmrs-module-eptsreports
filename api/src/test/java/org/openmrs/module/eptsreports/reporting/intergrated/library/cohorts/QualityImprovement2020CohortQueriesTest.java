@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTest;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.QualityImprovement2020CohortQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.common.DateUtil;
@@ -548,7 +549,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   @Test
   public void getMQ11DENShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT11 DEN...............");
-    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC11DEN(2, "MQ");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC11DEN(2, EptsReportConstants.MIMQ.MQ);
 
     Map<Parameter, Object> parameters = new HashMap<>();
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
@@ -567,7 +568,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   public void getMQ11DEN1ShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT11 DEN...............");
     CohortDefinition cohortDefinition =
-        qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss("MQ");
+        qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss(EptsReportConstants.MIMQ.MQ);
 
     Map<Parameter, Object> parameters = new HashMap<>();
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
@@ -588,7 +589,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   public void getMQC11NUN6ShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT11 DEN...............");
     CohortDefinition cohortDefinition =
-            qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month("MQ");
+            qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(EptsReportConstants.MIMQ.MQ);
 
     Map<Parameter, Object> parameters = new HashMap<>();
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
