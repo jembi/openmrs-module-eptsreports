@@ -109,6 +109,27 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  //  @Ignore("Same methods are already tested on MQ5Den1")
+  public void getMQ5BShouldPass() throws EvaluationException {
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ5B(true);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    //    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    //    assertTrue(evaluatedCohort.getMemberIds().contains(1003));
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
   public void getMQ6patientsShouldPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6A(1);
@@ -119,6 +140,42 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     parameters.put(
         new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
         this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ62patientsShouldPass() throws EvaluationException {
+
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6A(3);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ63patientsShouldPass() throws EvaluationException {
+
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6A(4);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
@@ -155,6 +212,42 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     parameters.put(
         new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
         this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ7Den2patientsShouldPass3() throws EvaluationException {
+
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(2);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ7Den6patientsShouldPass3() throws EvaluationException {
+
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(6);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
@@ -310,6 +403,59 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  public void getMQ6Num2ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT6 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6NUM(2);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ6Num3ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT6 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6NUM(3);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ6Num4ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT6 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6NUM(4);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+  @Test
   public void getMQ7AShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT7 DEN...............");
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(1);
@@ -338,6 +484,60 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     parameters.put(
         new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
         this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ7B2ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT7 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7B(2);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ7B5ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT7 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7B(5);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getMQ7B6ShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT7 NUM...............");
+    CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7B(6);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
