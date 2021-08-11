@@ -1760,6 +1760,11 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 			   date_created="2020-02-20 12:55:48" voided="0"
 			   uuid="56c6213e-f5e6-11eb-b636-0b74fbbe0068" location_id="1" />
 
+	<encounter encounter_id="90455" encounter_type="35"
+			   patient_id="1015" encounter_datetime="2020-02-24 00:00:00" creator="1"
+			   date_created="2020-02-20 12:55:48" voided="0"
+			   uuid="836d1b0e-fa8f-11eb-aebd-13b6f26b3a01" location_id="1" />
+
 	<encounter encounter_id="9042" encounter_type="35"
 			   patient_id="1014" encounter_datetime="2020-04-13 00:00:00" creator="1"
 			   date_created="2020-03-12 12:55:48" voided="0"
@@ -2037,6 +2042,11 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 	<obs obs_id="155" person_id="1015" concept_id="23722"
 		 encounter_id="9035" obs_datetime="2019-08-22 00:00:00"
 		 creator="1" date_created="2020-03-19 12:55:48" value_coded="856"
+		 voided="0" uuid="33e33c1a-fa8c-11eb-a22d-0faac194e500" location_id="1" />
+
+	<obs obs_id="155" person_id="1015" concept_id="856"
+		 encounter_id="9035" obs_datetime="2019-08-22 00:00:00"
+		 creator="1" date_created="2020-03-19 12:55:48" value_numeric="1200"
 		 voided="0" uuid="33e33c1a-fa8c-11eb-a22d-0faac194e500" location_id="1" />
 
 	<obs obs_id="154" person_id="1050" concept_id="23866"

@@ -839,6 +839,32 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     assertNotNull(evaluatedCohort.getMemberIds());
   }
 
+  @Test
+  public void getMQC11NH1() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT13 G...............");
+    CohortDefinition cohortDefinition =
+            qualityImprovement2020CohortQueries.getMQC11NH1();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+//  assertEquals(1, evaluatedCohort.getMemberIds().size());
+//  assertTrue(evaluatedCohort.getMemberIds().contains(1014));
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
   private Date getrevisionEndDate() {
     return DateUtil.getDateTime(2021, 1, 20);
   }
