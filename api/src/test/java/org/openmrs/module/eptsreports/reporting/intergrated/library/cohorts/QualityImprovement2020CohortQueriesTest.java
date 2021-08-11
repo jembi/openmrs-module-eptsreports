@@ -507,6 +507,33 @@ assertTrue(evaluatedCohort.getMemberIds().contains(1014));
   }
 
   @Test
+  public void getMQ13P4NUNShouldPass() throws EvaluationException {
+    System.out.println("...............INITIATING TESTS - CAT13 P4 DEN...............");
+    CohortDefinition cohortDefinition =
+            qualityImprovement2020CohortQueries.getMQ13P4(true, 3);
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(
+            new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
+            this.getrevisionEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
+
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1014));
+    assertNotNull(evaluatedCohort.getMemberIds());
+    Set<Integer> patients = evaluatedCohort.getMemberIds();
+    for (Integer i : patients) {
+      System.out.println(i);
+    }
+    System.out.println("size:=> " + patients.size());
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
   @Ignore("Functions used in queries not supported by H2")
   public void getMQ15DENShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT15 DEN...............");
