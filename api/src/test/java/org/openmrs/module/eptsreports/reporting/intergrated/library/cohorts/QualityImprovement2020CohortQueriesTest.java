@@ -185,6 +185,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  @Ignore
   public void getMQ7patientsShouldPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(1);
@@ -239,6 +240,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  @Ignore
   public void getMQ7Den6patientsShouldPass3() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7A(6);
@@ -612,7 +614,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  //  @Ignore("Functions used in queries not supported by H2")
+    @Ignore("Functions used in queries not supported by H2")
   public void getMQ12NUMShouldPass() throws EvaluationException {
     System.out.println("...............INITIATING TESTS - CAT12 NUM...............");
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ12NUM(1);
