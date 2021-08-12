@@ -112,7 +112,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         "STARTPID",
         "START: People who inject drugs",
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
-        getColumnForPidStartedArt());
+        getColumnForPID());
 
     // Numero adultos que iniciaram TARV durante o trimestre MSM
     addRow(
@@ -120,7 +120,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         "STARTMSM",
         "START: Men who have sex with men",
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
-        getColumnForMSMStartedArt());
+        getColumnForMSM());
 
     // Numero adultos que iniciaram TARV durante o trimestre CSW
     addRow(
@@ -128,7 +128,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         "STARTCSW",
         "START: Female sex workers",
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
-        getColumnForCSWStartedArt());
+        getColumnForCSW());
 
     // Numero adultos que iniciaram TARV durante o trimestre PRI
     addRow(
@@ -136,7 +136,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         "STARTPRI",
         "START: People in prison and other closed settings",
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
-        getColumnForPRIStartedArt());
+        getColumnForPRI());
 
     // This returns total adult patients currently ART
     addRow(
@@ -145,30 +145,35 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         "Total Current ART",
         EptsReportUtils.map(getPatientsCurrentlyInARTIndicator, mappings),
         getColumnsForAdults());
-
-    dataSetDefinition.addColumn(
+    // currently ART - PID age dissaggregations
+    addRow(
+        dataSetDefinition,
         "CURRARTPID",
         "CURRART: People who inject drugs",
         EptsReportUtils.map(getPatientsCurrentlyInARTIndicator, mappings),
-        "keypop=PID");
-
-    dataSetDefinition.addColumn(
+        getColumnForPID());
+    // currently ART - MSM age dissaggregations
+    addRow(
+        dataSetDefinition,
         "CURRARTMSM",
         "CURRART: Men who have sex with men",
         EptsReportUtils.map(getPatientsCurrentlyInARTIndicator, mappings),
-        "keypop=MSM");
+        getColumnForMSM());
 
-    dataSetDefinition.addColumn(
+    // currently ART - CSW age dissaggregations
+    addRow(
+        dataSetDefinition,
         "CURRARTCSW",
         "CURRART: Female sex workers",
         EptsReportUtils.map(getPatientsCurrentlyInARTIndicator, mappings),
-        "keypop=CSW");
-
-    dataSetDefinition.addColumn(
+        getColumnForCSW());
+    // currently ART - CSW age dissaggregations
+    addRow(
+        dataSetDefinition,
         "CURRARTPRI",
         "CURRART: People in prison and other closed settings",
         EptsReportUtils.map(getPatientsCurrentlyInARTIndicator, mappings),
-        "keypop=PRI");
+        getColumnForPRI());
 
     // This returns total adult patients with viral load test
     addRow(
@@ -178,29 +183,34 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsARTWithViralLoadTestIndicator, mappings),
         getColumnsForAdults());
 
-    dataSetDefinition.addColumn(
+    // Adults patients with viral load test PID
+    addRow(
+        dataSetDefinition,
         "VLPID",
         "VL: People who inject drugs",
         EptsReportUtils.map(getPatientsARTWithViralLoadTestIndicator, mappings),
-        "keypop=PID");
-
-    dataSetDefinition.addColumn(
+        getColumnForPID());
+    // Adults patients with viral load test MSM
+    addRow(
+        dataSetDefinition,
         "VLMSM",
         "VL: Men who have sex with men",
         EptsReportUtils.map(getPatientsARTWithViralLoadTestIndicator, mappings),
-        "keypop=MSM");
-
-    dataSetDefinition.addColumn(
+        getColumnForMSM());
+    // Adults patients with viral load test CSW
+    addRow(
+        dataSetDefinition,
         "VLCSW",
         "VL: Female sex workers",
         EptsReportUtils.map(getPatientsARTWithViralLoadTestIndicator, mappings),
-        "keypop=CSW");
-
-    dataSetDefinition.addColumn(
-        "VLPRI",
+        getColumnForCSW());
+    // Adults patients with viral load test PRI
+    addRow(
+        dataSetDefinition,
+        "VLCSW",
         "VL: People in prison and other closed settings",
         EptsReportUtils.map(getPatientsARTWithViralLoadTestIndicator, mappings),
-        "keypop=PRI");
+        getColumnForPRI());
 
     // This returns total adult patients with viral load supression
     addRow(
@@ -210,29 +220,35 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsARTWithVLSuppressionIndicator, mappings),
         getColumnsForAdults());
 
-    dataSetDefinition.addColumn(
+    // Adult patients with viral load supression - PID
+    addRow(
+        dataSetDefinition,
         "VLSUPPID",
         "VLSUP: People who inject drugs",
         EptsReportUtils.map(getPatientsARTWithVLSuppressionIndicator, mappings),
-        "keypop=PID");
-
-    dataSetDefinition.addColumn(
+        getColumnForPID());
+    // Adult patients with viral load supression - MSM
+    addRow(
+        dataSetDefinition,
         "VLSUPMSM",
         "VLSUP: Men who have sex with men",
         EptsReportUtils.map(getPatientsARTWithVLSuppressionIndicator, mappings),
-        "keypop=MSM");
-
-    dataSetDefinition.addColumn(
+        getColumnForMSM());
+    // Adult patients with viral load supression - CSW
+    addRow(
+        dataSetDefinition,
         "VLSUPCSW",
         "VLSUP: Female sex workers",
         EptsReportUtils.map(getPatientsARTWithVLSuppressionIndicator, mappings),
-        "keypop=CSW");
+        getColumnForMSM());
 
-    dataSetDefinition.addColumn(
+    // Adult patients with viral load supression - PRI
+    addRow(
+        dataSetDefinition,
         "VLSUPPRI",
         "VLSUP: People in prison and other closed settings",
         EptsReportUtils.map(getPatientsARTWithVLSuppressionIndicator, mappings),
-        "keypop=PRI");
+        getColumnForPRI());
 
     // This returns total adult patients started ART in last 12 Months
     addRow(
@@ -242,29 +258,34 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsStartedARTInLast12MonthsIndicator, mappings),
         getColumnsForAdults());
 
-    dataSetDefinition.addColumn(
+    // Adult patients started ART in last 12 Months - PID
+    addRow(
+        dataSetDefinition,
         "START12PID",
         "START12: People who inject drugs",
         EptsReportUtils.map(getPatientsStartedARTInLast12MonthsIndicator, mappings),
-        "keypop=PID");
-
-    dataSetDefinition.addColumn(
+        getColumnForPID());
+    // Adult patients started ART in last 12 Months - MSM
+    addRow(
+        dataSetDefinition,
         "START12MSM",
         "START12: Men who have sex with men",
         EptsReportUtils.map(getPatientsStartedARTInLast12MonthsIndicator, mappings),
-        "keypop=MSM");
-
-    dataSetDefinition.addColumn(
+        getColumnForMSM());
+    // Adult patients started ART in last 12 Months - CSW
+    addRow(
+        dataSetDefinition,
         "START12CSW",
         "START12: Female sex workers",
         EptsReportUtils.map(getPatientsStartedARTInLast12MonthsIndicator, mappings),
-        "keypop=CSW");
-
-    dataSetDefinition.addColumn(
+        getColumnForCSW());
+    // Adult patients started ART in last 12 Months - PRI
+    addRow(
+        dataSetDefinition,
         "START12PRI",
         "START12: People in prison and other closed settings",
         EptsReportUtils.map(getPatientsStartedARTInLast12MonthsIndicator, mappings),
-        "keypop=PRI");
+        getColumnForPRI());
 
     // This returns total adult patients on ART in last 12 Months
     addRow(
@@ -274,29 +295,35 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsOnARTInLast12MonthsIndicator, mappings),
         getColumnsForAdults());
 
-    dataSetDefinition.addColumn(
+    // Adult patients on ART in last 12 Months - PID
+    addRow(
+        dataSetDefinition,
         "ARTLAST12PID",
         "ARTLAST12: People who inject drugs",
         EptsReportUtils.map(getPatientsOnARTInLast12MonthsIndicator, mappings),
-        "keypop=PID");
+        getColumnForPID());
 
-    dataSetDefinition.addColumn(
+    // Adult patients on ART in last 12 Months - MSM
+    addRow(
+        dataSetDefinition,
         "ARTLAST12MSM",
         "ARTLAST12: Men who have sex with men",
         EptsReportUtils.map(getPatientsOnARTInLast12MonthsIndicator, mappings),
-        "keypop=MSM");
-
-    dataSetDefinition.addColumn(
+        getColumnForMSM());
+    // Adult patients on ART in last 12 Months - CSW
+    addRow(
+        dataSetDefinition,
         "ARTLAST12CSW",
         "ARTLAST12: Female sex workers",
         EptsReportUtils.map(getPatientsOnARTInLast12MonthsIndicator, mappings),
-        "keypop=CSW");
-
-    dataSetDefinition.addColumn(
+        getColumnForCSW());
+    // Adult patients on ART in last 12 Months - PRI
+    addRow(
+        dataSetDefinition,
         "ARTLAST12PRI",
         "ARTLAST12: People in prison and other closed settings",
         EptsReportUtils.map(getPatientsOnARTInLast12MonthsIndicator, mappings),
-        "keypop=PRI");
+        getColumnForPRI());
 
     return dataSetDefinition;
   }
@@ -308,7 +335,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
     return Arrays.asList(fifteenPlus);
   }
 
-  private List<ColumnParameters> getColumnForPidStartedArt() {
+  private List<ColumnParameters> getColumnForPID() {
     ColumnParameters pidFifteenTo19 =
         new ColumnParameters("pidFifteenTo19", "PID 15-19 years", "age=15-19|keypop=PID", "01");
     ColumnParameters pidTwentyTo24 =
@@ -319,7 +346,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
     return Arrays.asList(pidFifteenTo19, pidTwentyTo24, pidTwenty25Plus);
   }
 
-  private List<ColumnParameters> getColumnForMSMStartedArt() {
+  private List<ColumnParameters> getColumnForMSM() {
     ColumnParameters msmFifteenTo19 =
         new ColumnParameters("msmFifteenTo19", "MSM 15-19 years", "age=15-19|keypop=MSM", "01");
     ColumnParameters msmTwentyTo24Art =
@@ -330,7 +357,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
     return Arrays.asList(msmFifteenTo19, msmTwentyTo24Art, msmTwenty25Plus);
   }
 
-  private List<ColumnParameters> getColumnForCSWStartedArt() {
+  private List<ColumnParameters> getColumnForCSW() {
     ColumnParameters cswFifteenTo19 =
         new ColumnParameters("cswFifteenTo19", "CSW 15-19 years", "age=15-19|keypop=CSW", "01");
     ColumnParameters cswTwentyTo24 =
@@ -341,7 +368,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
     return Arrays.asList(cswFifteenTo19, cswTwentyTo24, cswTwenty25Plus);
   }
 
-  private List<ColumnParameters> getColumnForPRIStartedArt() {
+  private List<ColumnParameters> getColumnForPRI() {
     ColumnParameters priFifteenTo19 =
         new ColumnParameters("priFifteenTo19", "CSW 15-19 years", "age=15-19|keypop=PRI", "01");
     ColumnParameters priTwentyTo24 =
