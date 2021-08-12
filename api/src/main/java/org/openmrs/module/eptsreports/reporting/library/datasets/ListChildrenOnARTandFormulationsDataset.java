@@ -335,7 +335,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "   ) max_encounter ON p.patient_id=max_encounter.patient_id"
             + "     INNER JOIN encounter e ON p.patient_id= e.patient_id "
             + "     INNER JOIN obs ob ON e.encounter_id = ob.encounter_id "
-            + "     INNER JOIN concept_name cn on ob.concept_id=cn.concept_id "
+            + "     INNER JOIN concept_name cn on ob.value_coded=cn.concept_id "
             + " WHERE  p.voided = 0"
             + "     AND e.voided = 0 "
             + "     AND ob.voided = 0"
