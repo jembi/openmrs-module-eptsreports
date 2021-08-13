@@ -48,6 +48,8 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
 
     PatientDataSetDefinition patientDataSetDefinition = new PatientDataSetDefinition();
 
+    patientDataSetDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    patientDataSetDefinition.addParameter(new Parameter("location", "Location", Location.class));
     patientDataSetDefinition.setName("ALL");
     patientDataSetDefinition.addParameters(getParameters());
 
@@ -80,7 +82,8 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
 
     patientDataSetDefinition.addColumn(
         "gender", new GenderDataDefinition(), "", new GenderConverter());
-    patientDataSetDefinition.addColumn("age", new AgeDataDefinition(), "", null);
+    patientDataSetDefinition.addColumn("age", this.getAge(), "endDate=${endDate}", null);
+
     /** Query 6 Patients active on TB Treatment - Sheet 1: Column F */
     patientDataSetDefinition.addColumn(
         "ontbtreatment",
@@ -196,6 +199,22 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
     return cd;
+  }
+
+  private DataDefinition getAge() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patient Age at Reporting End Date");
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+
+    String sql =
+        " SELECT p.patient_id ,TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) AS age FROM patient p INNER JOIN person ps ON p.patient_id=ps.person_id WHERE p.voided=0 AND ps.voided=0";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
   }
 
   /** 6 */
@@ -516,6 +535,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "     AND e.voided = 0  "
             + "     AND o.voided = 0  "
             + "     AND cn.locale = 'pt'  "
+            + "        AND cn.concept_name_type = 'FULLY_SPECIFIED' "
             + "     AND e.location_id = :location "
             + "     AND e.encounter_type IN (${6}, ${9}) "
             + "     AND e.encounter_datetime <= :endDate "
