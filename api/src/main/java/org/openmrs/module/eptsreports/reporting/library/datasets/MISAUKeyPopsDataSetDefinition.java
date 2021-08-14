@@ -207,7 +207,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
     // Adults patients with viral load test PRI
     addRow(
         dataSetDefinition,
-        "VLCSW",
+        "VLPRI",
         "VL: People in prison and other closed settings",
         EptsReportUtils.map(getPatientsARTWithViralLoadTestIndicator, mappings),
         getColumnForPRI());
