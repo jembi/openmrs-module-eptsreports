@@ -22,6 +22,7 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.EriDSDCohortQuer
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenderCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.HivCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.MISAUKeyPopsCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TbPrevCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxNewCohortQueries;
@@ -37,27 +38,57 @@ import org.springframework.stereotype.Component;
 @Component
 public class EptsCommonDimension {
 
-  @Autowired private GenderCohortQueries genderCohortQueries;
+  private GenderCohortQueries genderCohortQueries;
 
-  @Autowired private TxNewCohortQueries txNewCohortQueries;
+  private TxNewCohortQueries txNewCohortQueries;
 
-  @Autowired private GenericCohortQueries genericCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
 
-  @Autowired private Eri4MonthsCohortQueries eri4MonthsCohortQueries;
+  private Eri4MonthsCohortQueries eri4MonthsCohortQueries;
 
-  @Autowired private Eri2MonthsCohortQueries eri2MonthsCohortQueries;
+  private Eri2MonthsCohortQueries eri2MonthsCohortQueries;
 
-  @Autowired private EriCohortQueries eriCohortQueries;
+  private EriCohortQueries eriCohortQueries;
 
-  @Autowired private TbPrevCohortQueries tbPrevCohortQueries;
+  private TbPrevCohortQueries tbPrevCohortQueries;
 
-  @Autowired private HivCohortQueries hivCohortQueries;
+  private HivCohortQueries hivCohortQueries;
 
-  @Autowired private TxPvlsCohortQueries txPvlsQueries;
+  private TxPvlsCohortQueries txPvlsQueries;
 
-  @Autowired private TxCurrCohortQueries txCurrCohortQueries;
+  private TxCurrCohortQueries txCurrCohortQueries;
 
-  @Autowired private EriDSDCohortQueries eriDSDCohortQueries;
+  private EriDSDCohortQueries eriDSDCohortQueries;
+
+  private MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries;
+
+  @Autowired
+  public EptsCommonDimension(
+      GenderCohortQueries genderCohortQueries,
+      TxNewCohortQueries txNewCohortQueries,
+      GenericCohortQueries genericCohortQueries,
+      Eri4MonthsCohortQueries eri4MonthsCohortQueries,
+      Eri2MonthsCohortQueries eri2MonthsCohortQueries,
+      EriCohortQueries eriCohortQueries,
+      TbPrevCohortQueries tbPrevCohortQueries,
+      HivCohortQueries hivCohortQueries,
+      TxPvlsCohortQueries txPvlsQueries,
+      TxCurrCohortQueries txCurrCohortQueries,
+      EriDSDCohortQueries eriDSDCohortQueries,
+      MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries) {
+    this.genderCohortQueries = genderCohortQueries;
+    this.txNewCohortQueries = txNewCohortQueries;
+    this.genericCohortQueries = genericCohortQueries;
+    this.eri4MonthsCohortQueries = eri4MonthsCohortQueries;
+    this.eri2MonthsCohortQueries = eri2MonthsCohortQueries;
+    this.eriCohortQueries = eriCohortQueries;
+    this.tbPrevCohortQueries = tbPrevCohortQueries;
+    this.hivCohortQueries = hivCohortQueries;
+    this.txPvlsQueries = txPvlsQueries;
+    this.txCurrCohortQueries = txCurrCohortQueries;
+    this.eriDSDCohortQueries = eriDSDCohortQueries;
+    this.misauKeyPopsCohortQueries = misauKeyPopsCohortQueries;
+  }
 
   /**
    * Gender dimension

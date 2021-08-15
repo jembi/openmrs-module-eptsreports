@@ -99,7 +99,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             EptsReportUtils.map(
                 mISAUKeyPopsCohortQueries.getPatientsOnARTInLast12Months(), mappings));
 
-    // This returns total adult patients Started ART
+    // This returns total adult patients Started ART B1
     addRow(
         dataSetDefinition,
         "START",
@@ -138,7 +138,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsInARTIndicator, mappings),
         getColumnForPRI());
 
-    // This returns total adult patients currently ART
+    // This returns total adult patients currently ART B13
     addRow(
         dataSetDefinition,
         "CURRART",
@@ -175,7 +175,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsCurrentlyInARTIndicator, mappings),
         getColumnForPRI());
 
-    // This returns total adult patients with viral load test
+    // This returns total adult patients with viral load test E2
     addRow(
         dataSetDefinition,
         "VL",
@@ -212,7 +212,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsARTWithViralLoadTestIndicator, mappings),
         getColumnForPRI());
 
-    // This returns total adult patients with viral load supression
+    // This returns total adult patients with viral load supression E3
     addRow(
         dataSetDefinition,
         "VLSUP",
@@ -325,6 +325,32 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         EptsReportUtils.map(getPatientsOnARTInLast12MonthsIndicator, mappings),
         getColumnForPRI());
 
+    // POP CHAVES PID- Coorte 6 meses - Totals
+    dataSetDefinition.addColumn(
+        "STARTPID6MT",
+        "Total Started ART in 6 months cohort",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "getPatientsInARTIndicator",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=PID");
+    // POP CHAVES PID- Coorte 6 meses - Totals split into agges
+    addRow(
+        dataSetDefinition,
+        "STARTPID6MD",
+        "Total Started ART in 6 months cohort disagg",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "getPatientsInARTIndicator",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForPID());
+
     return dataSetDefinition;
   }
 
@@ -377,5 +403,17 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         new ColumnParameters("priTwenty25Plus", "CSW 25 years+", "age=25+|keypop=PRI", "03");
 
     return Arrays.asList(priFifteenTo19, priTwentyTo24, priTwenty25Plus);
+  }
+
+  private List<ColumnParameters> getAgeColumnsForKp() {
+    ColumnParameters fifteenTo19 =
+        new ColumnParameters("fifteenTo19", "15-19 years", "age=15-19", "01");
+    ColumnParameters twentyTo24 =
+        new ColumnParameters("twentyTo24", "20-24 years", "age=20-24", "02");
+    ColumnParameters twenty25Plus =
+        new ColumnParameters("twenty25Plus", "25+ years", "age=25+", "03");
+    ColumnParameters total = new ColumnParameters("total", "All categories", "", "04");
+
+    return Arrays.asList(fifteenTo19, twentyTo24, twenty25Plus, total);
   }
 }
