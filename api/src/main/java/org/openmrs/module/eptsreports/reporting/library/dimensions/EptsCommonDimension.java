@@ -479,4 +479,44 @@ public class EptsCommonDimension {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
+
+  /**
+   * Dimension for returning KP patients in combined categories
+   *
+   * @return @{@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getKpPatientsInCombinedCategories() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Patients appearing in both KP categories");
+    dim.addCohortDefinition(
+        "PIDeHSH",
+        EptsReportUtils.map(
+            misauKeyPopsCohortQueries.getPidAndHsh(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "PIDeMTS",
+        EptsReportUtils.map(
+            misauKeyPopsCohortQueries.getPidAndMts(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "PIDeREC",
+        EptsReportUtils.map(
+            misauKeyPopsCohortQueries.getPidAndRec(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "HSHeREC",
+        EptsReportUtils.map(
+            misauKeyPopsCohortQueries.getHshAndRec(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "MTSeREC",
+        EptsReportUtils.map(
+            misauKeyPopsCohortQueries.getMtsAndRec(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    return dim;
+  }
 }

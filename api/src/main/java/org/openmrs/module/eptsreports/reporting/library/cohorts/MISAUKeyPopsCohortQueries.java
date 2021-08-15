@@ -366,7 +366,7 @@ public class MISAUKeyPopsCohortQueries {
   }
 
   /**
-   * <b>Name: PID e HSH</b>
+   * <b>Name: PID e MTS</b>
    *
    * <p>Intersection of PID and MTS
    *
@@ -393,7 +393,7 @@ public class MISAUKeyPopsCohortQueries {
   }
 
   /**
-   * <b>Name: PID e HSH</b>
+   * <b>Name: PID e REC</b>
    *
    * <p>Intersection of PID and REC
    *
@@ -420,7 +420,7 @@ public class MISAUKeyPopsCohortQueries {
   }
 
   /**
-   * <b>Name: PID e HSH</b>
+   * <b>Name: HSH e REC</b>
    *
    * <p>Intersection of HSH and REC
    *
@@ -447,7 +447,7 @@ public class MISAUKeyPopsCohortQueries {
   }
 
   /**
-   * <b>Name: PID e HSH</b>
+   * <b>Name: MTS e REC</b>
    *
    * <p>Intersection of MTS and REC
    *
