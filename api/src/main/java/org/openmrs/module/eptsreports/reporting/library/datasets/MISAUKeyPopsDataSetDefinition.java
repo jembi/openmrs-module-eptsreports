@@ -65,6 +65,10 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
     CohortDefinitionDimension keyPopsDimension = eptsCommonDimension.getKeyPopsDimension();
     dataSetDefinition.addDimension("keypop", EptsReportUtils.map(keyPopsDimension, keyPopMappings));
 
+    dataSetDefinition.addDimension(
+        "kp",
+        EptsReportUtils.map(eptsCommonDimension.getKpPatientsInCombinedCategories(), mappings));
+
     CohortIndicator getPatientsInARTIndicator =
         eptsGeneralIndicator.getIndicator(
             "getPatientsInARTIndicator",
@@ -405,15 +409,58 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
     return Arrays.asList(priFifteenTo19, priTwentyTo24, priTwenty25Plus);
   }
 
-  private List<ColumnParameters> getAgeColumnsForKp() {
-    ColumnParameters fifteenTo19 =
-        new ColumnParameters("fifteenTo19", "15-19 years", "age=15-19", "01");
-    ColumnParameters twentyTo24 =
-        new ColumnParameters("twentyTo24", "20-24 years", "age=20-24", "02");
-    ColumnParameters twenty25Plus =
-        new ColumnParameters("twenty25Plus", "25+ years", "age=25+", "03");
-    ColumnParameters total = new ColumnParameters("total", "All categories", "", "04");
+  private List<ColumnParameters> getPidHshAndAgeColumns() {
+    ColumnParameters pidHsh15To19 =
+        new ColumnParameters("pidHsh15To19", "15-19 years", "age=15-19|kp=PIDeHSH", "01");
+    ColumnParameters pidHsh20To24 =
+        new ColumnParameters("pidHsh20To24", "20-24 years", "age=20-24|kp=PIDeHSH", "02");
+    ColumnParameters pidHsh25Plus =
+        new ColumnParameters("pidHsh25Plus", "25+ years", "age=25+|kp=PIDeHSH", "03");
 
-    return Arrays.asList(fifteenTo19, twentyTo24, twenty25Plus, total);
+    return Arrays.asList(pidHsh15To19, pidHsh20To24, pidHsh25Plus);
+  }
+
+  private List<ColumnParameters> getPidMtsAndAgeColumns() {
+    ColumnParameters pidMts15To19 =
+        new ColumnParameters("pidMts15To19", "15-19 years", "age=15-19|kp=PIDeMTS", "01");
+    ColumnParameters pidMts20To24 =
+        new ColumnParameters("pidMts20To24", "20-24 years", "age=20-24|kp=PIDeMTS", "02");
+    ColumnParameters pidMts25Plus =
+        new ColumnParameters("pidMts25Plus", "25+ years", "age=25+|kp=PIDeMTS", "03");
+
+    return Arrays.asList(pidMts15To19, pidMts20To24, pidMts25Plus);
+  }
+
+  private List<ColumnParameters> getPidRecAndAgeColumns() {
+    ColumnParameters pidRec15To19 =
+        new ColumnParameters("pidRec15To19", "15-19 years", "age=15-19|kp=PIDeREC", "01");
+    ColumnParameters pidrec20To24 =
+        new ColumnParameters("pidrec20To24", "20-24 years", "age=20-24|kp=PIDeREC", "02");
+    ColumnParameters pidRec25Plus =
+        new ColumnParameters("pidRec25Plus", "25+ years", "age=25+|kp=PIDeREC", "03");
+
+    return Arrays.asList(pidRec15To19, pidrec20To24, pidRec25Plus);
+  }
+
+  private List<ColumnParameters> getHshRecAndAgeColumns() {
+    ColumnParameters hshRec15To19 =
+        new ColumnParameters("hshRec15To19", "15-19 years", "age=15-19|kp=HSHeREC", "01");
+    ColumnParameters hshrec20To24 =
+        new ColumnParameters("hshrec20To24", "20-24 years", "age=20-24|kp=HSHeREC", "02");
+    ColumnParameters hshRec25Plus =
+        new ColumnParameters("hshRec25Plus", "25+ years", "age=25+|kp=HSHeREC", "03");
+
+    return Arrays.asList(hshRec15To19, hshrec20To24, hshRec25Plus);
+  }
+
+  private List<ColumnParameters> getMtsRecAndAgeColumns() {
+    ColumnParameters mtsRec15To19 =
+        new ColumnParameters("mtsRec15To19", "15-19 years", "age=15-19|kp=MTSeREC", "01");
+    ColumnParameters mtsrec20To24 =
+        new ColumnParameters("mtsrec20To24", "20-24 years", "age=20-24|kp=MTSeREC", "02");
+    ColumnParameters mtsRec25Plus =
+        new ColumnParameters("mtsRec25Plus", "25+ years", "age=25+|kp=MTSeREC", "03");
+
+    return Arrays.asList(mtsRec15To19, mtsrec20To24, mtsRec25Plus);
   }
 }
