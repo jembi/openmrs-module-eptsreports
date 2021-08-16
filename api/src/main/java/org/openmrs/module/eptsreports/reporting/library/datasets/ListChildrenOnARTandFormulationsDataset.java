@@ -72,7 +72,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     patientDataSetDefinition.setParameters(getParameters());
 
     patientDataSetDefinition.addColumn("pid", new PersonIdDataDefinition(), "");
-    patientDataSetDefinition.addColumn("nid", identifierDef, "");
+    patientDataSetDefinition.addColumn("nid", this.getNID(), "");
     patientDataSetDefinition.addColumn("name", nameDef, "");
     patientDataSetDefinition.addColumn(
         "artstartdate",
@@ -210,6 +210,22 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
 
     String sql =
         " SELECT p.patient_id ,TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) AS age FROM patient p INNER JOIN person ps ON p.patient_id=ps.person_id WHERE p.voided=0 AND ps.voided=0";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
+  private DataDefinition getNID() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Patient NID");
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+
+    String sql =
+        " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
+            + "WHERE p.voided=0 AND pi.voided=0 GROUP BY p.patient_id;";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -472,19 +488,35 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
 
     String sql =
-        " SELECT p.patient_id, MAX(e.encounter_datetime) "
-            + " FROM   patient p  "
-            + "         INNER JOIN encounter e  "
-            + "                         ON p.patient_id = e.patient_id  "
-            + "         INNER JOIN obs o  "
-            + "                         ON e.encounter_id = o.encounter_id  "
-            + "WHERE  p.voided = 0  "
-            + "         AND e.voided = 0  "
-            + "         AND o.voided = 0  "
-            + "         AND e.location_id = :location "
-            + "         AND e.encounter_type IN (${6}, ${9}) "
-            + "         AND e.encounter_datetime <= :endDate "
-            + "GROUP BY p.patient_id ";
+        "  SELECT p.patient_id, e.encounter_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "                 INNER JOIN ( "
+            + "                         SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
+            + "                         FROM   patient p  "
+            + "                             INNER JOIN encounter e  "
+            + "                                 ON p.patient_id = e.patient_id  "
+            + "                             INNER JOIN obs o  "
+            + "                                 ON e.encounter_id = o.encounter_id  "
+            + "                         WHERE  p.voided = 0  "
+            + "                             AND e.voided = 0  "
+            + "                             AND o.voided = 0  "
+            + "                             AND e.location_id = :location "
+            + "                             AND e.encounter_type IN (${6}, ${9}) "
+            + "                             AND e.encounter_datetime <= :endDate "
+            + "                         GROUP BY p.patient_id "
+            + "                               ) most_recent  ON p.patient_id = most_recent.patient_id   "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type IN (${6}, ${9}) "
+            + "                 AND e.encounter_datetime <= :endDate "
+            + "                 AND e.encounter_datetime = most_recent.e_datetime "
+            + "                 GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
