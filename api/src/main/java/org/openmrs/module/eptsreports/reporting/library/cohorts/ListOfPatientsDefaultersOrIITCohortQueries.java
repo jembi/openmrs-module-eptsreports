@@ -22,14 +22,18 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
         cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
         cd.addParameter(new Parameter("location", "Location", Location.class));
 
-        CohortDefinition deathsInDemographics = txCurrCohortQueries.getDeadPatientsInDemographiscByReportingEndDate();
+        CohortDefinition e22 = txCurrCohortQueries.getDeadPatientsInDemographiscByReportingEndDate();
+        CohortDefinition e23 = txCurrCohortQueries.getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate();
+        CohortDefinition e24 = txCurrCohortQueries.getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate();
 
 
-        cd.addSearch("A", EptsReportUtils.map(deathsInDemographics, ""));
+        cd.addSearch("A", EptsReportUtils.map(e22, ""));
+        cd.addSearch("B", EptsReportUtils.map(e23, ""));
+        cd.addSearch("C", EptsReportUtils.map(e24, ""));
 
 
         cd.setCompositionString(
-                "(A)");
+                "(A OR B)");
 
         return cd;
     }
