@@ -252,6 +252,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
     valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String sql =
         " SELECT final_query.patient_id, CASE WHEN final_query.result_Value IS NOT NULL THEN 'S' WHEN final_query.result_Value IS NULL THEN 'INACTIVE' ELSE '' END"
@@ -266,12 +267,8 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "                  AND o.voided = 0 "
             + "                  AND e.location_id = :location "
             + "                  AND e.encounter_type = ${6} "
-            + "                  AND ( "
-            + "                        (o.concept_id = ${1268} AND o.value_coded = 1256) "
-            + "                        OR "
-            + "                        (o.concept_id = ${1113} AND o.obs_datetime "
-            + "                            BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate) "
-            + "                    ) "
+            + "                  AND o.concept_id = ${1268} AND o.value_coded = ${1256} "
+            + "                  AND o.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate "
             + "                  AND e.encounter_datetime <= :endDate "
             + "                UNION  "
             + "                SELECT p.patient_id, o.value_datetime AS result_Value "
