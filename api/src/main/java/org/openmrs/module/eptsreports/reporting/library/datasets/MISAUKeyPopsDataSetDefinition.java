@@ -829,6 +829,234 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             mappings),
         getHshRecAndAgeColumns());
 
+    // POP CHAVES MTS - Coorte 6 meses
+    // MTS totals with Start ART
+    dataSetDefinition.addColumn(
+        "STARTARTMTS6MT",
+        "Total with Start ART in 6 months cohort - MTS/CSW",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTMTS6MT",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=CSW");
+    // Totals split into ages - Start ART - MTS/CSW
+    addRow(
+        dataSetDefinition,
+        "STARTARTMTS6MTD",
+        "Total patients started ART in 6 months cohort disagg for MTS/CSW",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTMTS6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForCSW());
+
+    // Totals split into ages - MTS Start on ART - MTS e PID
+    addRow(
+        dataSetDefinition,
+        "STARTARTMTS6M",
+        "Total Start ART in 6 months cohort disagg for MTS/CSW - MTS e PID",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTMTS6M",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getPidMtsAndAgeColumns());
+
+    // Totals split into ages - Start ART - MTS e REC
+    addRow(
+        dataSetDefinition,
+        "STARTARTMTSREC",
+        "Total Start ART in 6 months cohort disagg for MTS e REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTMTSREC",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getMtsRecAndAgeColumns());
+
+    // POP CHAVES MTS - Coorte 6 meses
+    // MTS totals with Currently on ART
+    dataSetDefinition.addColumn(
+        "CURRMTS6MT",
+        "Total with Current on ART in 6 months cohort - MTS/CSW",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CURRMTS6MT",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=CSW");
+    // Totals split into ages - Currently - MTS
+    addRow(
+        dataSetDefinition,
+        "CURRMTS6MTD",
+        "Total patients Currently on ART in 6 months cohort disagg for MTS/CSW",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CURRMTS6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForCSW());
+
+    // Totals split into ages - MTS Current on ART - MTS e PID
+    addRow(
+        dataSetDefinition,
+        "CURRMTSPID6M",
+        "Total Current on ART in 6 months cohort disagg for MTS/CSW - MTS e PID",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CURRMTSPID6M",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getPidMtsAndAgeColumns());
+
+    // Totals split into ages - Current on ART - MTS e REC
+    addRow(
+        dataSetDefinition,
+        "CURRMTSREC",
+        "Total Current on ART in 6 months cohort disagg for MTS e REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CURRMTSREC",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getMtsRecAndAgeColumns());
+
+    // POP CHAVES MTS - Coorte 6 meses
+    // MTS totals with Viral load results
+    dataSetDefinition.addColumn(
+        "VLRMTS6MT",
+        "Total with VL results in 6 months cohort - MTS/CSW",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLRMTS6MT",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=CSW");
+    // Totals split into ages - VL results - MTS
+    addRow(
+        dataSetDefinition,
+        "VLRMTS6MTD",
+        "Total patients VL results on ART in 6 months cohort disagg for MTS/CSW",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLRMTS6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForCSW());
+
+    // Totals split into ages - MTS VL results - MTS e PID
+    addRow(
+        dataSetDefinition,
+        "VLRMTSPID6M",
+        "Total VL resultson ART in 6 months cohort disagg for MTS/CSW - MTS e PID",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLRMTSPID6M",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getPidMtsAndAgeColumns());
+
+    // Totals split into ages - VL results - MTS e REC
+    addRow(
+        dataSetDefinition,
+        "VLRMTSREC",
+        "Total VL results in 6 months cohort disagg for MTS e REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLRMTSREC",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getMtsRecAndAgeColumns());
+
+    // POP CHAVES MTS - Coorte 6 meses
+    // MTS totals with Viral load  suppresion
+    dataSetDefinition.addColumn(
+        "VLSMTS6MT",
+        "Total with VL suppression in 6 months cohort - MTS/CSW",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSMTS6MT",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=CSW");
+    // Totals split into ages - VL results - MTS
+    addRow(
+        dataSetDefinition,
+        "VLSMTS6MTD",
+        "Total patients VL suppression on ART in 6 months cohort disagg for MTS/CSW",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSMTS6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForCSW());
+
+    // Totals split into ages - MTS VL suppresion - MTS e PID
+    addRow(
+        dataSetDefinition,
+        "VLSMTSPID6M",
+        "Total VL suppression ART in 6 months cohort disagg for MTS/CSW - MTS e PID",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSMTSPID6M",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getPidMtsAndAgeColumns());
+
+    // Totals split into ages - VL suppression - MTS e REC
+    addRow(
+        dataSetDefinition,
+        "VLSMTSREC",
+        "Total VL suppression in 6 months cohort disagg for MTS e REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSMTSREC",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getMtsRecAndAgeColumns());
+
     return dataSetDefinition;
   }
 
