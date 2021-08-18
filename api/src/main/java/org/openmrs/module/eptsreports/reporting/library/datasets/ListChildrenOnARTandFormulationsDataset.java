@@ -758,20 +758,32 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
 
     String sql =
-        " SELECT p.patient_id, MAX(o.value_datetime) "
-            + " FROM   patient p  "
-            + "         INNER JOIN encounter e  "
-            + "                         ON p.patient_id = e.patient_id  "
-            + "         INNER JOIN obs o  "
-            + "                         ON e.encounter_id = o.encounter_id  "
-            + " WHERE  p.voided = 0  "
-            + "         AND e.voided = 0  "
-            + "         AND o.voided = 0  "
-            + "         AND e.location_id = :location "
-            + "         AND e.encounter_type IN (${6}, ${9}) "
-            + "         AND o.concept_id = ${1410}  "
-            + "         AND e.encounter_datetime <= :endDate "
-            + " GROUP BY p.patient_id ";
+        "  SELECT p.patient_id, o.value_datetime "
+            + "             FROM   patient p   "
+            + "                     INNER JOIN encounter e   "
+            + "                                     ON p.patient_id = e.patient_id   "
+            + "                     INNER JOIN obs o   "
+            + "                                     ON e.encounter_id = o.encounter_id   "
+            + "     INNER JOIN  "
+            + "       ( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime  "
+            + "      FROM  patient p   "
+            + "       INNER JOIN encounter e  ON p.patient_id = e.patient_id  "
+            + "      WHERE p.voided = 0  "
+            + "       AND e.voided = 0   "
+            + "       AND e.location_id = :location  "
+            + "       AND e.encounter_datetime <= :endDate  "
+            + "       AND e.encounter_type IN (${6}, ${9})  "
+            + "      GROUP BY p.patient_id  "
+            + "       )max_encounter ON p.patient_id=max_encounter.patient_id "
+            + "             WHERE  p.voided = 0   "
+            + "                     AND e.voided = 0   "
+            + "                     AND o.voided = 0   "
+            + "                     AND e.location_id = :location "
+            + "                     AND e.encounter_type IN (${6}, ${9})  "
+            + "                     AND o.concept_id = ${1410}   "
+            + "                     AND e.encounter_datetime <= :endDate  "
+            + "                     AND max_encounter.encounter_datetime = e.encounter_datetime  "
+            + "             GROUP BY p.patient_id ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
