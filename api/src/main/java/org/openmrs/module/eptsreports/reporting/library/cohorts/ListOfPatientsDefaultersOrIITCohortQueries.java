@@ -305,7 +305,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
               + "                    GROUP  BY pp.patient_id) AS tbl "
               + "                ON p.patient_id = tbl.patient_id "
               + " WHERE  p.voided = 0 "
-              + "        AND tbl.max_startdate <= :endDate  ";
+              + "        AND tbl.max_startdate <= curdate()  ";
     
               StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
               sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -353,7 +353,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
            + "            AND e.voided = 0 "
            + "            AND e.location_id = :location "
            + "            AND e.encounter_type = ${6} "
-           + "            AND e.encounter_datetime <= :endDate "
+           + "            AND e.encounter_datetime <= curdate() "
            + "            AND o.voided = 0 "
            + "            AND o.concept_id = ${6273} "
            + "            AND o.value_coded = ${1706} "
@@ -369,7 +369,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
            + "            AND e.voided = 0 "
            + "            AND e.location_id = :location "
            + "            AND e.encounter_type = ${53} "
-           + "            AND o.obs_datetime <= :endDate "
+           + "            AND o.obs_datetime <= curdate() "
            + "            AND o.voided = 0 "
            + "            AND o.concept_id = ${6272} "
            + "            AND o.value_coded = ${1706} "
@@ -446,7 +446,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
                + "                                    GROUP  BY pp.patient_id) AS tbl "
                + "                                ON p.patient_id = tbl.patient_id "
                + "                 WHERE  p.voided = 0 "
-               + "                        AND tbl.max_startdate <= :endDate "
+               + "                        AND tbl.max_startdate <= curdate() "
                + "                 UNION "
                + "                 SELECT p.patient_id, "
                + "                        Max(e.encounter_datetime) AS transferout_date "
@@ -459,7 +459,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
                + "                        AND e.voided = 0 "
                + "                        AND e.location_id = :location "
                + "                        AND e.encounter_type = ${6} "
-               + "                        AND e.encounter_datetime <= :endDate "
+               + "                        AND e.encounter_datetime <= curdate() "
                + "                        AND o.voided = 0 "
                + "                        AND o.concept_id = ${6273} "
                + "                        AND o.value_coded = ${1706} "
@@ -476,7 +476,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
                + "                        AND e.voided = 0 "
                + "                        AND e.location_id = :location "
                + "                        AND e.encounter_type = ${53} "
-               + "                        AND o.obs_datetime <= :endDate "
+               + "                        AND o.obs_datetime <= curdate() "
                + "                        AND o.voided = 0 "
                + "                        AND o.concept_id = ${6272} "
                + "                        AND o.value_coded = ${1706} "
@@ -495,7 +495,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
                + "                                                  AND "
                + "               e.encounter_datetime > transferout_date "
                + "                                                  AND "
-               + "               e.encounter_datetime <= :endDate "
+               + "               e.encounter_datetime <= curdate() "
                + "                                           UNION "
                + "                                           SELECT p.patient_id "
                + "                                           FROM   patient p "
@@ -513,7 +513,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
                + "                                                  AND o.value_datetime > "
                + "                                                      transferout_date "
                + "                                                  AND o.value_datetime <= "
-               + "                                                      :endDate)";
+               + "                                                      curdate())";
     
         StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     
