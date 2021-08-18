@@ -77,6 +77,34 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>E2</b> - exclude all patients who died by Report Generation date,
+   *
+   * <p><b>2.1</b> -
+   * All deaths registered in Patient Program State by reporting end date
+   * Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and
+   * Patient_State.state = 10 (Died)
+   * Patient_State.start_date <= Report Generation Date
+   * Patient_state.end_date is null
+   * <p><b>2.2</b> -
+   * All deaths registered in Patient Demographics by reporting end date
+   * Person.Dead=1 and death_date <= Report Generation Date
+   * <p><b>2.3</b> -
+   * All deaths registered in Last Home Visit Card by reporting end date
+   * Last Home Visit Card (Encounter Type 21, 36, 37)
+   * Reason of Not Finding (Concept ID 2031 or 23944 or 23945) = Died (Concept Id 1366) Last Encounter_datetime <= Report Generation Date
+   * <p><b>2.4</b> -
+   * All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end date
+   * Encounter Type ID= 6
+   * Estado de Permanencia (Concept Id 6273) = Dead (Concept ID 1366)
+   * Encounter_datetime <= Report Generation Date
+   * OR
+   * Encounter Type ID= 53
+   * Estado de Permanencia (Concept Id 6272) = Dead (Concept ID 1366)
+   * obs_datetime <= Report Generation Date
+   *
+   * @return sqlCohortDefinition
+   */
   public CohortDefinition getE2() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
@@ -102,6 +130,15 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return cd;
   }
 
+  /**
+   * <p><b>2.1</b> -
+   * All deaths registered in Patient Program State by reporting end date
+   * Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and
+   * Patient_State.state = 10 (Died)
+   * Patient_State.start_date <= Report Generation Date
+   * Patient_state.end_date is null
+   * @return
+   */
   public CohortDefinition getPatientsInArtCareWhoDied() {
     Program hivCareProgram = hivMetadata.getARTProgram();
     ProgramWorkflowState dead = hivMetadata.getArtDeadWorkflowState();
@@ -109,7 +146,19 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
         hivCareProgram.getProgramId(), dead.getProgramWorkflowStateId());
   }
 
+  /**
 
+   * <p><b>2.4</b> -
+   *  All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end date
+   * Encounter Type ID= 6
+   * Estado de Permanencia (Concept Id 6273) = Dead (Concept ID 1366)
+   * Encounter_datetime <= Report Generation Date
+   * OR
+   * Encounter Type ID= 53
+   * Estado de Permanencia (Concept Id 6272) = Dead (Concept ID 1366)
+   * obs_datetime <= Report Generation Date
+   * @return
+   */
   public SqlCohortDefinition getE15() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
