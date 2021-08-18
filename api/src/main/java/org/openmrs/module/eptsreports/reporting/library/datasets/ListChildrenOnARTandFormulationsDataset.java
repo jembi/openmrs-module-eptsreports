@@ -359,7 +359,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
             + "     FROM  patient p  "
             + "         INNER JOIN encounter e  ON p.patient_id = e.patient_id "
             + "     WHERE p.voided = 0 "
-            + "         AND p.voided = 0  "
+            + "         AND e.voided = 0  "
             + "         AND e.location_id = :location "
             + "         AND e.encounter_datetime <= :endDate "
             + "         AND e.encounter_type = ${18}"
@@ -647,7 +647,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     valuesMap.put("23725", hivMetadata.getFamilyApproach().getConceptId());
 
     String sql =
-        "  SELECT p.patient_id, cn.name "
+        "  SELECT p.patient_id, IF(cn.name ='CONTINUAR' ,'CONTINUA' ,cn.name) "
             + " FROM   patient p  "
             + "     INNER JOIN encounter e  "
             + "         ON p.patient_id = e.patient_id  "
