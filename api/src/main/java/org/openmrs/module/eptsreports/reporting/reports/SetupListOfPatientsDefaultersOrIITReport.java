@@ -84,7 +84,7 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:7,dataset:FATL");
+      props.put("repeatingSections", "sheet:1,row:8,dataset:FATL");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
