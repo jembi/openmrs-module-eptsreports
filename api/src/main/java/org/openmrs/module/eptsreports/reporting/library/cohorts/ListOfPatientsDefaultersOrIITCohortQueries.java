@@ -554,4 +554,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  
 }
