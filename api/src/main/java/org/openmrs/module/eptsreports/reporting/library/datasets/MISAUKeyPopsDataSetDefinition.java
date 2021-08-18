@@ -1057,6 +1057,292 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
             mappings),
         getMtsRecAndAgeColumns());
 
+    // POP CHAVES REC - Coorte 6 meses
+    // REC totals with Start ART
+    dataSetDefinition.addColumn(
+        "STARTARTREC6MT",
+        "Total with Start ART in 6 months cohort - REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTREC6MT",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=PRI");
+    // Totals split into ages - Start - REC
+    addRow(
+        dataSetDefinition,
+        "STARTARTREC6MTD",
+        "Total patients start on ART in 6 months cohort disagg for REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTREC6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForPRI());
+
+    // Totals split into ages - Start - REC e PID
+    addRow(
+        dataSetDefinition,
+        "STARTARTPIDREC6MTD",
+        "Total patients start on ART in 6 months cohort disagg for REC e PID",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTPIDREC6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getPidRecAndAgeColumns());
+
+    // Totals split into ages - Start - REC e HSH
+    addRow(
+        dataSetDefinition,
+        "STARTARTRECHSH6MTD",
+        "Total patients start on ART in 6 months cohort disagg for REC e HSH",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTRECHSH6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getHshRecAndAgeColumns());
+
+    // Totals split into ages - Start - REC e MTS
+    addRow(
+        dataSetDefinition,
+        "STARTARTRECMTS6MTD",
+        "Total patients start on ART in 6 months cohort disagg for REC e MTS",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTRECMTS6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getMtsRecAndAgeColumns());
+
+    // POP CHAVES REC - Coorte 6 meses
+    // REC totals with Currently on ART
+    dataSetDefinition.addColumn(
+        "CURRREC6MT",
+        "Total Patient currently on  ART in 6 months cohort - REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CURRREC6MT",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=PRI");
+    // Totals split into ages - Current on ART - REC
+    addRow(
+        dataSetDefinition,
+        "STARTARTREC6MTD",
+        "Total patients currently on ART in 6 months cohort disagg for REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "STARTARTREC6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForPRI());
+
+    // Totals split into ages - current on ART - REC e PID
+    addRow(
+        dataSetDefinition,
+        "CURRPIDREC6MTD",
+        "Total patients current on ART in 6 months cohort disagg for REC e PID",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CURRPIDREC6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getPidRecAndAgeColumns());
+
+    // Totals split into ages - current on  - REC e HSH
+    addRow(
+        dataSetDefinition,
+        "CURRRECHSH6MTD",
+        "Total patients current on ART in 6 months cohort disagg for REC e HSH",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CURRRECHSH6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getHshRecAndAgeColumns());
+
+    // Totals split into ages - current - REC e MTS
+    addRow(
+        dataSetDefinition,
+        "CURRECMTS6MTD",
+        "Total patients current on ART in 6 months cohort disagg for REC e MTS",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CURRECMTS6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getMtsRecAndAgeColumns());
+
+    // POP CHAVES REC - Coorte 6 meses
+    // REC totals with VL results
+    dataSetDefinition.addColumn(
+        "VLRREC6MT",
+        "Total Patient with VL results in 6 months cohort - REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLRREC6MT",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=PRI");
+    // Totals split into ages - VL results - REC
+    addRow(
+        dataSetDefinition,
+        "VLREC6MTD",
+        "Total patients VL results in 6 months cohort disagg for REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLREC6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForPRI());
+
+    // Totals split into ages - VL results - REC e PID
+    addRow(
+        dataSetDefinition,
+        "VLRPIDREC6MTD",
+        "Total patients with VL results in 6 months cohort disagg for REC e PID",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLRPIDREC6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getPidRecAndAgeColumns());
+
+    // Totals split into ages - VL results  - REC e HSH
+    addRow(
+        dataSetDefinition,
+        "VLRECHSH6MTD",
+        "Total patients with VL results in 6 months cohort disagg for REC e HSH",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLRECHSH6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getHshRecAndAgeColumns());
+
+    // Totals split into ages - Vl results - REC e MTS
+    addRow(
+        dataSetDefinition,
+        "VLRECMTS6MTD",
+        "Total patients with VL results in 6 months cohort disagg for REC e MTS",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLRECMTS6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getMtsRecAndAgeColumns());
+
+    // POP CHAVES REC - Coorte 6 meses
+    // REC totals with VL supression
+    dataSetDefinition.addColumn(
+        "VLSREC6MT",
+        "Total Patient with VL suppression in 6 months cohort - REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSREC6MT",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        "keypop=PRI");
+    // Totals split into ages - VL supression - REC
+    addRow(
+        dataSetDefinition,
+        "VLSEC6MTD",
+        "Total patients VL supression in 6 months cohort disagg for REC",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSEC6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getColumnForPRI());
+
+    // Totals split into ages - VL supression - REC e PID
+    addRow(
+        dataSetDefinition,
+        "VLSPIDREC6MTD",
+        "Total patients with VL supression in 6 months cohort disagg for REC e PID",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSPIDREC6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getPidRecAndAgeColumns());
+
+    // Totals split into ages - VL suppression  - REC e HSH
+    addRow(
+        dataSetDefinition,
+        "VLSECHSH6MTD",
+        "Total patients with VL supression in 6 months cohort disagg for REC e HSH",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSECHSH6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getHshRecAndAgeColumns());
+
+    // Totals split into ages - Vl suppression - REC e MTS
+    addRow(
+        dataSetDefinition,
+        "VLSRECMTS6MTD",
+        "Total patients with VL suppression in 6 months cohort disagg for REC e MTS",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "VLSRECMTS6MTD",
+                EptsReportUtils.map(
+                    mISAUKeyPopsCohortQueries
+                        .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
+                    mappings)),
+            mappings),
+        getMtsRecAndAgeColumns());
+
     return dataSetDefinition;
   }
 
