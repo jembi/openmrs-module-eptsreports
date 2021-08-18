@@ -454,6 +454,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
         map.put("2", hivMetadata.getARTProgram().getProgramId());
         map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
         map.put("7", hivMetadata.getTransferredOutToAnotherHealthFacilityWorkflowState().getProgramWorkflowStateId());
+        map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+        map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
         map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
         map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
         map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
