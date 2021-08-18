@@ -439,6 +439,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
         hivMetadata
             .getTransferredOutToAnotherHealthFacilityWorkflowState()
             .getProgramWorkflowStateId());
+            map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
@@ -555,5 +557,5 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlCohortDefinition;
   }
 
-  
+
 }
