@@ -616,7 +616,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
                     mISAUKeyPopsCohortQueries.getNumberOfAdultsWhoStartedArtInSixMonthsCohort(),
                     mappings)),
             mappings),
-        "keypop=HSH");
+        "keypop=MSM");
     // Totals split into ages - Start on ART - HSH
     addRow(
         dataSetDefinition,
@@ -670,7 +670,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
                     mISAUKeyPopsCohortQueries.getNumberOfAdultsCurrentlyOnArtInSixMonthsCohort(),
                     mappings)),
             mappings),
-        "keypop=HSH");
+        "keypop=MSM");
     // Totals split into ages - Current on ART - HSH
     addRow(
         dataSetDefinition,
@@ -725,7 +725,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
                         .getActiveAdultPatientsOnArtWithVlResultsInSixMonthsCohort(),
                     mappings)),
             mappings),
-        "keypop=HSH");
+        "keypop=MSM");
     // Totals split into ages - VL results - HSH
     addRow(
         dataSetDefinition,
@@ -783,7 +783,7 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
                         .getActiveAdultPatientOnArtWithVlSuppressionInSixMonthsCohort(),
                     mappings)),
             mappings),
-        "keypop=HSH");
+        "keypop=MSM");
     // Totals split into ages - VL results - HSH
     addRow(
         dataSetDefinition,
