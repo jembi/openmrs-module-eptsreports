@@ -191,7 +191,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     return parameters;
   }
 
-  private DataDefinition getArtStartDate() {
+  public DataDefinition getArtStartDate() {
     CalculationDataDefinition cd =
         new CalculationDataDefinition(
             "Art start date",

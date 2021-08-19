@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -42,10 +43,23 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
 
-    pdd.addColumn("id", new PersonIdDataDefinition(), "");
-    pdd.addColumn("name", nameDef, "");
+    /** 1 - NID - Sheet 1: Column A */
     pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
+
+    /** 2 - Name - Sheet 1: Column B */
+    pdd.addColumn("name", nameDef, "");
+
+    /** 3 - ART Start Date - Sheet 1: Column C */
+    pdd.addColumn(
+        "artstartdate",
+        listChildrenOnARTandFormulationsDataset.getArtStartDate(),
+        "onOrBefore=${endDate},location=${location}",
+        new CalculationResultConverter());
+
+    /** 4 - Sex - Sheet 1: Column D */
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
+
+    /** 5 - Age - Sheet 1: Column */
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
 
     /** 14 - Last Follow up Consultation Date - Sheet 1: Column N */
