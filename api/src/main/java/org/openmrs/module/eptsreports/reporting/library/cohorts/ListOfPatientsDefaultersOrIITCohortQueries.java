@@ -155,7 +155,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     cd.addSearch("e32", EptsReportUtils.map(e32, MAPPING));
     cd.addSearch("e33", EptsReportUtils.map(e33, MAPPING));
 
-    cd.setCompositionString("(e31 OR e32) AND e32");
+    cd.setCompositionString("(e31 OR e32) AND e33");
 
     return cd;
   }
