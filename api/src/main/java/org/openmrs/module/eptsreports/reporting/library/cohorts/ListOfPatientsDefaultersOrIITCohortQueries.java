@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.library.queries.TXCurrQueries;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -25,6 +25,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   @Autowired private GenericCohortQueries genericCohortQueries;
 
   @Autowired private HivMetadata hivMetadata;
+
+  @Autowired private TbMetadata tbMetadata;
 
   private final String MAPPING = "location=${location}";
 
@@ -103,10 +105,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     CohortDefinition e21 = getE21();
     CohortDefinition e22 = getE22();
-    CohortDefinition e23 =
-            getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate();
-    CohortDefinition e24 =
-            getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate();
+    CohortDefinition e23 = getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate();
+    CohortDefinition e24 = getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate();
     CohortDefinition e25 = getE25();
 
     cd.addSearch("e21", EptsReportUtils.map(e21, MAPPING));
@@ -121,19 +121,20 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /**
-   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting period, 
+   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting
+   * period,
    *
-   * <p><b>3.1</b> - All suspended registered in Patient Program State by reporting end date
-   * i.e LAST Transferred out state in program enrollment by end of period.
-   * Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 8
-   * (Suspended treatment) OR Patient_State.start_date <= ReportGenerationDate
-   * start_date by Report Generation Date. Patient_state.end_date is null
+   * <p><b>3.1</b> - All suspended registered in Patient Program State by reporting end date i.e
+   * LAST Transferred out state in program enrollment by end of period. Patient_program.program_id
+   * =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 8 (Suspended treatment) OR
+   * Patient_State.start_date <= ReportGenerationDate start_date by Report Generation Date.
+   * Patient_state.end_date is null
    *
-   * <p><b>2.2</b> - All suspensions registered in Ficha Resumo and Ficha Clinica of Master Card 
-   * by reporting end date Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) =
-   *  Suspended (Concept ID 1709) Encounter_datetime <= Report Generation Date OR Encounter
-   * Type ID= 53 Estado de Permanencia (Concept Id 6272) =  Suspended (Concept ID 1709)
-   * obs_datetime <= Report Generation Date
+   * <p><b>2.2</b> - All suspensions registered in Ficha Resumo and Ficha Clinica of Master Card by
+   * reporting end date Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) = Suspended
+   * (Concept ID 1709) Encounter_datetime <= Report Generation Date OR Encounter Type ID= 53 Estado
+   * de Permanencia (Concept Id 6272) = Suspended (Concept ID 1709) obs_datetime <= Report
+   * Generation Date
    *
    * <p><b>3.3</b> - Except all patients who after the most recent date from 3.1 to 3.2, have a
    * drugs pick up or Consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most
@@ -196,8 +197,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /**
-   * <b>2.2</b> - All deaths registered in Patient Demographics by reporting end date
-   *    * Person.Dead=1 and death_date <= Report Generation Date
+   * <b>2.2</b> - All deaths registered in Patient Demographics by reporting end date *
+   * Person.Dead=1 and death_date <= Report Generation Date
    *
    * @return
    */
@@ -211,13 +212,13 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     Map<String, Integer> map = new HashMap<>();
 
     String query =
-            "SELECT p.person_id   "
-                    + "                FROM person p  "
-                    + "                INNER JOIN patient_program pg ON p.person_id=pg.patient_id "
-                    + "                INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id "
-                    + "                WHERE p.dead=1  "
-                    + "                AND p.death_date <= CURRENT_DATE()  "
-                    + "                AND p.voided=0";
+        "SELECT p.person_id   "
+            + "                FROM person p  "
+            + "                INNER JOIN patient_program pg ON p.person_id=pg.patient_id "
+            + "                INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id "
+            + "                WHERE p.dead=1  "
+            + "                AND p.death_date <= CURRENT_DATE()  "
+            + "                AND p.voided=0";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -227,7 +228,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /**
-   * <p><b>2.3</b> - All deaths registered in Last Home Visit Card by reporting end date Last Home
+   * <b>2.3</b> - All deaths registered in Last Home Visit Card by reporting end date Last Home
    * Visit Card (Encounter Type 21, 36, 37) Reason of Not Finding (Concept ID 2031 or 23944 or
    * 23945) = Died (Concept Id 1366) Last Encounter_datetime <= Report Generation Date
    *
@@ -241,39 +242,39 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    * @return
    */
   public static String getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate(
-          int buscaActivaEncounterType,
-          int visitaApoioReintegracaoParteAEncounterType,
-          int visitaApoioReintegracaoParteBEncounterType,
-          int reasonPatientNotFound,
-          int reasonPatientNotFoundByActivist2ndVisit,
-          int reasonPatientNotFoundByActivist3rdVisit,
-          int patientIsDead) {
+      int buscaActivaEncounterType,
+      int visitaApoioReintegracaoParteAEncounterType,
+      int visitaApoioReintegracaoParteBEncounterType,
+      int reasonPatientNotFound,
+      int reasonPatientNotFoundByActivist2ndVisit,
+      int reasonPatientNotFoundByActivist3rdVisit,
+      int patientIsDead) {
     String query =
-            "  SELECT  max_date.patient_id FROM  "
-                    + "    (SELECT  "
-                    + "      p.patient_id,  "
-                    + "      MAX(e.encounter_datetime) last   "
-                    + "    FROM patient p "
-                    + "      INNER  JOIN encounter e ON e.patient_id=p.patient_id "
-                    + "     WHERE  "
-                    + "      e.encounter_datetime <= CURRENT_DATE() "
-                    + "      AND e.location_id = :location "
-                    + "      AND e.encounter_type  in( ${buscaActiva},${visitaApoioReintegracaoParteA},${visitaApoioReintegracaoParteB})  "
-                    + "      AND e.voided=0 "
-                    + "      AND p.voided = 0 "
-                    + "    GROUP BY  p.patient_id  ) max_date "
-                    + "    INNER  JOIN encounter ee "
-                    + "            ON ee.patient_id = max_date.patient_id "
-                    + "    INNER  JOIN obs o ON ee.encounter_id = o.encounter_id  "
-                    + "        WHERE  "
-                    + "        ( "
-                    + "            (o.concept_id = ${reasonPatientNotFound} AND o.value_coded = ${patientIsDead}) OR "
-                    + "            (o.concept_id = ${reasonPatientNotFoundByActivist2ndVisit} AND o.value_coded = ${patientIsDead}) OR "
-                    + "            (o.concept_id = ${reasonPatientNotFoundByActivist3rdVisit} AND o.value_coded = ${patientIsDead} ) "
-                    + "        )  "
-                    + "    AND o.voided=0 "
-                    + "    AND ee.voided = 0 "
-                    + "    GROUP BY  max_date.patient_id";
+        "  SELECT  max_date.patient_id FROM  "
+            + "    (SELECT  "
+            + "      p.patient_id,  "
+            + "      MAX(e.encounter_datetime) last   "
+            + "    FROM patient p "
+            + "      INNER  JOIN encounter e ON e.patient_id=p.patient_id "
+            + "     WHERE  "
+            + "      e.encounter_datetime <= CURRENT_DATE() "
+            + "      AND e.location_id = :location "
+            + "      AND e.encounter_type  in( ${buscaActiva},${visitaApoioReintegracaoParteA},${visitaApoioReintegracaoParteB})  "
+            + "      AND e.voided=0 "
+            + "      AND p.voided = 0 "
+            + "    GROUP BY  p.patient_id  ) max_date "
+            + "    INNER  JOIN encounter ee "
+            + "            ON ee.patient_id = max_date.patient_id "
+            + "    INNER  JOIN obs o ON ee.encounter_id = o.encounter_id  "
+            + "        WHERE  "
+            + "        ( "
+            + "            (o.concept_id = ${reasonPatientNotFound} AND o.value_coded = ${patientIsDead}) OR "
+            + "            (o.concept_id = ${reasonPatientNotFoundByActivist2ndVisit} AND o.value_coded = ${patientIsDead}) OR "
+            + "            (o.concept_id = ${reasonPatientNotFoundByActivist3rdVisit} AND o.value_coded = ${patientIsDead} ) "
+            + "        )  "
+            + "    AND o.voided=0 "
+            + "    AND ee.voided = 0 "
+            + "    GROUP BY  max_date.patient_id";
 
     Map<String, Integer> map = new HashMap<>();
     map.put("buscaActiva", buscaActivaEncounterType);
@@ -293,14 +294,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     definition.setName("patientDeathRegisteredInLastHomeVisitCardByReportingEndDate");
 
     definition.setQuery(
-            getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate(
-                    hivMetadata.getBuscaActivaEncounterType().getEncounterTypeId(),
-                    hivMetadata.getVisitaApoioReintegracaoParteAEncounterType().getEncounterTypeId(),
-                    hivMetadata.getVisitaApoioReintegracaoParteBEncounterType().getEncounterTypeId(),
-                    hivMetadata.getReasonPatientNotFound().getConceptId(),
-                    hivMetadata.getReasonPatientNotFoundByActivist2ndVisitConcept().getConceptId(),
-                    hivMetadata.getReasonPatientNotFoundByActivist3rdVisitConcept().getConceptId(),
-                    hivMetadata.getPatientHasDiedConcept().getConceptId()));
+        getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate(
+            hivMetadata.getBuscaActivaEncounterType().getEncounterTypeId(),
+            hivMetadata.getVisitaApoioReintegracaoParteAEncounterType().getEncounterTypeId(),
+            hivMetadata.getVisitaApoioReintegracaoParteBEncounterType().getEncounterTypeId(),
+            hivMetadata.getReasonPatientNotFound().getConceptId(),
+            hivMetadata.getReasonPatientNotFoundByActivist2ndVisitConcept().getConceptId(),
+            hivMetadata.getReasonPatientNotFoundByActivist3rdVisitConcept().getConceptId(),
+            hivMetadata.getPatientHasDiedConcept().getConceptId()));
 
     definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
@@ -309,7 +310,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /**
-   <p><b>2.4</b> - All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by
+   * <b>2.4</b> - All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by
    * reporting end date Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) = Dead (Concept
    * ID 1366) Encounter_datetime <= Report Generation Date OR Encounter Type ID= 53 Estado de
    * Permanencia (Concept Id 6272) = Dead (Concept ID 1366) obs_datetime <= Report Generation Date
@@ -322,11 +323,11 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    * @return
    */
   public static String getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(
-          int adultoSeguimentoEncounterType,
-          int masterCardEncounterType,
-          int stateOfStayPriorArtPatientConcept,
-          int stateOfStayOfArtPatient,
-          int patientHasDiedConcept) {
+      int adultoSeguimentoEncounterType,
+      int masterCardEncounterType,
+      int stateOfStayPriorArtPatientConcept,
+      int stateOfStayOfArtPatient,
+      int patientHasDiedConcept) {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("adultoSeguimentoEncounterType", adultoSeguimentoEncounterType);
@@ -336,37 +337,37 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("patientHasDiedConcept", patientHasDiedConcept);
 
     String query =
-            "SELECT  p.patient_id  "
-                    + "FROM patient p  "
-                    + "    INNER JOIN encounter e  "
-                    + "        ON e.patient_id=p.patient_id  "
-                    + "    INNER JOIN obs o  "
-                    + "        ON o.encounter_id=e.encounter_id  "
-                    + "WHERE e.encounter_type = ${adultoSeguimentoEncounterType} "
-                    + "    AND e.encounter_datetime <= CURRENT_DATE() "
-                    + "    AND o.concept_id = ${stateOfStayOfArtPatient} "
-                    + "    AND o.value_coded=${patientHasDiedConcept}  "
-                    + "    AND e.location_id = :location  "
-                    + "    AND p.voided=0   "
-                    + "    AND e.voided=0  "
-                    + "    AND o.voided=0  "
-                    + "GROUP BY p.patient_id "
-                    + "UNION "
-                    + "SELECT  p.patient_id  "
-                    + "FROM patient p  "
-                    + "    INNER JOIN encounter e  "
-                    + "        ON e.patient_id=p.patient_id  "
-                    + "    INNER JOIN obs o  "
-                    + "        ON o.encounter_id=e.encounter_id  "
-                    + "WHERE e.encounter_type = ${masterCardEncounterType}  "
-                    + "    AND o.obs_datetime <= CURRENT_DATE() "
-                    + "    AND o.concept_id = ${stateOfStayPriorArtPatientConcept} "
-                    + "    AND o.value_coded=${patientHasDiedConcept}  "
-                    + "    AND e.location_id = :location  "
-                    + "    AND p.voided=0   "
-                    + "    AND e.voided=0  "
-                    + "    AND o.voided=0  "
-                    + "GROUP BY p.patient_id ";
+        "SELECT  p.patient_id  "
+            + "FROM patient p  "
+            + "    INNER JOIN encounter e  "
+            + "        ON e.patient_id=p.patient_id  "
+            + "    INNER JOIN obs o  "
+            + "        ON o.encounter_id=e.encounter_id  "
+            + "WHERE e.encounter_type = ${adultoSeguimentoEncounterType} "
+            + "    AND e.encounter_datetime <= CURRENT_DATE() "
+            + "    AND o.concept_id = ${stateOfStayOfArtPatient} "
+            + "    AND o.value_coded=${patientHasDiedConcept}  "
+            + "    AND e.location_id = :location  "
+            + "    AND p.voided=0   "
+            + "    AND e.voided=0  "
+            + "    AND o.voided=0  "
+            + "GROUP BY p.patient_id "
+            + "UNION "
+            + "SELECT  p.patient_id  "
+            + "FROM patient p  "
+            + "    INNER JOIN encounter e  "
+            + "        ON e.patient_id=p.patient_id  "
+            + "    INNER JOIN obs o  "
+            + "        ON o.encounter_id=e.encounter_id  "
+            + "WHERE e.encounter_type = ${masterCardEncounterType}  "
+            + "    AND o.obs_datetime <= CURRENT_DATE() "
+            + "    AND o.concept_id = ${stateOfStayPriorArtPatientConcept} "
+            + "    AND o.value_coded=${patientHasDiedConcept}  "
+            + "    AND e.location_id = :location  "
+            + "    AND p.voided=0   "
+            + "    AND e.voided=0  "
+            + "    AND o.voided=0  "
+            + "GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -378,19 +379,18 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     definition.setName("deadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate");
 
     definition.setQuery(
-            getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(
-                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                    hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                    hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId(),
-                    hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
-                    hivMetadata.getPatientHasDiedConcept().getConceptId()));
+        getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getPatientHasDiedConcept().getConceptId()));
 
     definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
 
     return definition;
   }
-
 
   /**
    * <b>2.4</b> - All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by
@@ -818,52 +818,50 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlCohortDefinition;
   }
 
-/**
-   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting period, 
+  /**
+   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting
+   * period,
+   *
    * <p>3.1 - All suspended registered in Patient Program State by reporting end date
-   * Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and
-   * Patient_State.state = 8 (Suspended treatment) or
-   * Patient_State.start_date <= ReportGenerationDate
-   * Patient_state.end_date is null
-   * 
+   * Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 8 (Suspended
+   * treatment) or Patient_State.start_date <= ReportGenerationDate Patient_state.end_date is null
+   *
    * @return sqlCohortDefinition
    */
   public CohortDefinition getSuspendedOnPatientProgram() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All suspended registered in Patient Program State by reporting end date");
+    sqlCohortDefinition.setName(
+        "All suspended registered in Patient Program State by reporting end date");
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("2", hivMetadata.getARTProgram().getProgramId());
     map.put("8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
 
-    String query = 
-    " SELECT  p.patient_id FROM   patient p     "    
-         + "       INNER JOIN patient_program pg ON p.patient_id = pg.patient_id "
-         + "       INNER JOIN patient_state ps ON  pg.patient_program_id = ps.patient_program_id "
-         + "   WHERE pg.location_id = :location AND pg.program_id = ${2} "
-         + "       AND ps.state = ${8} OR (ps.start_date <= curdate() AND ps.end_date IS NULL) "
-         + " GROUP BY p.patient_id ";
+    String query =
+        " SELECT  p.patient_id FROM   patient p     "
+            + "       INNER JOIN patient_program pg ON p.patient_id = pg.patient_id "
+            + "       INNER JOIN patient_state ps ON  pg.patient_program_id = ps.patient_program_id "
+            + "   WHERE pg.location_id = :location AND pg.program_id = ${2} "
+            + "       AND ps.state = ${8} OR (ps.start_date <= curdate() AND ps.end_date IS NULL) "
+            + " GROUP BY p.patient_id ";
 
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
-         StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
-         sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-     
-         return sqlCohortDefinition;
+    return sqlCohortDefinition;
   }
 
-/**
-   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting period, 
+  /**
+   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting
+   * period,
    *
-   * <p><b>3.2</b> - All suspensions registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end date
-   * Encounter Type ID= 6
-   * Estado de Permanencia (Concept Id 6273) =  Suspended (Concept ID 1709)
-   * Encounter_datetime <= ReportGenerationDate
-   * OR
-   * Encounter Type ID= 53
-   * Estado de Permanencia (Concept Id 6272) =  Suspended (Concept ID 1709)
-   * obs_datetime <= ReportGenerationDate
+   * <p><b>3.2</b> - All suspensions registered in Ficha Resumo and Ficha Clinica of Master Card by
+   * reporting end date Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) = Suspended
+   * (Concept ID 1709) Encounter_datetime <= ReportGenerationDate OR Encounter Type ID= 53 Estado de
+   * Permanencia (Concept Id 6272) = Suspended (Concept ID 1709) obs_datetime <=
+   * ReportGenerationDate
    *
    * @return sqlCohortDefinition
    */
@@ -922,10 +920,11 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /**
-   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting period,
+   * <b>E3</b> - exclude all patients who stopped/suspended treatment by end of the reporting
+   * period,
    *
-   * <p><b>3.3</b> - Except all patients who after the most recent date from 3.1 to 3.2, have a drugs pick up or consultation:
-   * Encounter Type ID= 6, 9, 18 and encounter_datetime> the most
+   * <p><b>3.3</b> - Except all patients who after the most recent date from 3.1 to 3.2, have a
+   * drugs pick up or consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most
    * recent date and <= Report Generation Date or Encounter Type ID = 52 and “Data de Levantamento”
    * (Concept Id 23866 value_datetime) > the most recent date and <= Report Generation Date
    * Encounter Type ID= 6, 9, 18 and encounter_datetime> the most recent date and <= Report
@@ -937,7 +936,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   public CohortDefinition getPatientsConsultationAfterMostRecentE3() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("all patients who after the most recent date from 3.1 to 3.2, have a drugs pick up or consultation");
+    sqlCohortDefinition.setName(
+        "all patients who after the most recent date from 3.1 to 3.2, have a drugs pick up or consultation");
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -954,89 +954,89 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
-    " SELECT patient_id   "
-    + " FROM   (SELECT transferout.patient_id, "
-    + "               Max(transferout.transferout_date) transferout_date "
-    + "        FROM   (SELECT p.patient_id, "
-    + "                       Max(ps.start_date) AS transferout_date "
-    + "                FROM   patient p "
-    + "                       INNER JOIN patient_program pg "
-    + "                               ON p.patient_id = pg.patient_id "
-    + "                       INNER JOIN patient_state ps "
-    + "                               ON pg.patient_program_id = ps.patient_program_id "
-    + "                WHERE  pg.location_id = :location "
-    + "                       AND pg.program_id = ${2} "
-    + "                       AND ps.state = ${8} "
-    + "                        OR ( ps.start_date <= curdate() "
-    + "                             AND ps.end_date IS NULL ) "
-    + "                GROUP  BY p.patient_id "
-    + "                UNION "
-    + "                SELECT p.patient_id, "
-    + "                       Max(e.encounter_datetime) AS transferout_date "
-    + "                FROM   patient p "
-    + "                       JOIN encounter e "
-    + "                         ON p.patient_id = e.patient_id "
-    + "                       JOIN obs o "
-    + "                         ON e.encounter_id = o.encounter_id "
-    + "                WHERE  p.voided = 0 "
-    + "                       AND e.voided = 0 "
-    + "                       AND e.location_id = :location "
-    + "                       AND e.encounter_type = ${6} "
-    + "                       AND e.encounter_datetime <= curdate() "
-    + "                       AND o.voided = 0 "
-    + "                       AND o.concept_id = ${6273} "
-    + "                       AND o.value_coded = ${1709} "
-    + "                GROUP  BY p.patient_id "
-    + "                UNION "
-    + "                SELECT p.patient_id, "
-    + "                       Max(o.obs_datetime) AS transferout_date "
-    + "                FROM   patient p "
-    + "                       JOIN encounter e "
-    + "                         ON p.patient_id = e.patient_id "
-    + "                       JOIN obs o "
-    + "                         ON e.encounter_id = o.encounter_id "
-    + "                WHERE  p.voided = 0 "
-    + "                       AND e.voided = 0 "
-    + "                       AND e.location_id = :location "
-    + "                       AND e.encounter_type = ${53} "
-    + "                       AND o.obs_datetime <= curdate() "
-    + "                       AND o.voided = 0 "
-    + "                       AND o.concept_id = ${6272} "
-    + "                       AND o.value_coded = ${1709} "
-    + "                GROUP  BY p.patient_id) transferout "
-    + "        GROUP  BY transferout.patient_id) max_transferout "
-    + " WHERE  max_transferout.patient_id NOT IN (SELECT p.patient_id "
-    + "                                          FROM   patient p "
-    + "                                                 JOIN encounter e "
-    + "                                                   ON p.patient_id = "
-    + "                                                      e.patient_id "
-    + "                                          WHERE  p.voided = 0 "
-    + "                                                 AND e.voided = 0 "
-    + "                                                 AND e.encounter_type IN ( ${6}, ${9}, "
-    + "                                                     ${18} ) "
-    + "                                                 AND e.location_id = :location  "
-    + "                                                 AND "
-    + "              e.encounter_datetime > transferout_date "
-    + "                                                 AND e.encounter_datetime <= "
-    + "                                                     curdate() "
-    + "                                          UNION "
-    + "                                          SELECT p.patient_id "
-    + "                                          FROM   patient p "
-    + "                                                 JOIN encounter e "
-    + "                                                   ON p.patient_id = "
-    + "                                                      e.patient_id "
-    + "                                                 JOIN obs o "
-    + "                                                   ON e.encounter_id = "
-    + "                                                      o.encounter_id "
-    + "                                          WHERE  p.voided =  "
-    + "                                                 AND e.voided = 0 "
-    + "                                                 AND e.encounter_type = ${52} "
-    + "                                                 AND e.location_id = :location "
-    + "                                                 AND o.concept_id = ${23866} "
-    + "                                                 AND o.value_datetime > "
-    + "                                                     transferout_date "
-    + "                                                 AND o.value_datetime <= curdate "
-    + "                                                     ())  ";
+        " SELECT patient_id   "
+            + " FROM   (SELECT transferout.patient_id, "
+            + "               Max(transferout.transferout_date) transferout_date "
+            + "        FROM   (SELECT p.patient_id, "
+            + "                       Max(ps.start_date) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       INNER JOIN patient_program pg "
+            + "                               ON p.patient_id = pg.patient_id "
+            + "                       INNER JOIN patient_state ps "
+            + "                               ON pg.patient_program_id = ps.patient_program_id "
+            + "                WHERE  pg.location_id = :location "
+            + "                       AND pg.program_id = ${2} "
+            + "                       AND ps.state = ${8} "
+            + "                        OR ( ps.start_date <= curdate() "
+            + "                             AND ps.end_date IS NULL ) "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(e.encounter_datetime) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND e.encounter_datetime <= curdate() "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6273} "
+            + "                       AND o.value_coded = ${1709} "
+            + "                GROUP  BY p.patient_id "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       Max(o.obs_datetime) AS transferout_date "
+            + "                FROM   patient p "
+            + "                       JOIN encounter e "
+            + "                         ON p.patient_id = e.patient_id "
+            + "                       JOIN obs o "
+            + "                         ON e.encounter_id = o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${53} "
+            + "                       AND o.obs_datetime <= curdate() "
+            + "                       AND o.voided = 0 "
+            + "                       AND o.concept_id = ${6272} "
+            + "                       AND o.value_coded = ${1709} "
+            + "                GROUP  BY p.patient_id) transferout "
+            + "        GROUP  BY transferout.patient_id) max_transferout "
+            + " WHERE  max_transferout.patient_id NOT IN (SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                 JOIN encounter e "
+            + "                                                   ON p.patient_id = "
+            + "                                                      e.patient_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND e.encounter_type IN ( ${6}, ${9}, "
+            + "                                                     ${18} ) "
+            + "                                                 AND e.location_id = :location  "
+            + "                                                 AND "
+            + "              e.encounter_datetime > transferout_date "
+            + "                                                 AND e.encounter_datetime <= "
+            + "                                                     curdate() "
+            + "                                          UNION "
+            + "                                          SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                 JOIN encounter e "
+            + "                                                   ON p.patient_id = "
+            + "                                                      e.patient_id "
+            + "                                                 JOIN obs o "
+            + "                                                   ON e.encounter_id = "
+            + "                                                      o.encounter_id "
+            + "                                          WHERE  p.voided =  "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND e.encounter_type = ${52} "
+            + "                                                 AND e.location_id = :location "
+            + "                                                 AND o.concept_id = ${23866} "
+            + "                                                 AND o.value_datetime > "
+            + "                                                     transferout_date "
+            + "                                                 AND o.value_datetime <= curdate "
+            + "                                                     ())  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1045,4 +1045,242 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * Have Ficha clinica (encounter type 6) with “TRATAMENTO DE TUBERCULOSE” (concept_id 1268) value
+   * coded “Inicio” (concept_id IN 1256) or “Data início” (concept id 1113) and obs_datetime between
+   * (for encounter type 6) Report Generation Date - 7months (210 days) and Report Generation Date
+   * (obs_datetime >=reportGenerationDate – 7 months (210 days) and <=reportGenerationDate)
+   *
+   * @return sqlCohortDefinition
+   */
+  public CohortDefinition getTBTreatment() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("All with “TRATAMENTO DE TUBERCULOSE” on Ficha clinica");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1113", hivMetadata.getTBDrugStartDateConcept().getConceptId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+
+    String query =
+        " SELECT p.patient_id FROM patient p  "
+            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " WHERE e.encounter_type = ${6} "
+            + "    AND o.concept_id = ${1268} AND o.value_coded IN (${1256},${1113}) "
+            + "    AND e.location_id = :location "
+            + "    AND p.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.obs_datetime BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 210 DAY) AND CURRENT_DATE() ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Have Ficha clinica (encounter type 6 or 9) with “ DATA DE INICIO DO TRATAMENTO DE
+   * TB”(concept_id 1113, Value_datetime) between Report Generation Date - 7months (210 days) and
+   * Report Generation Date (obs_datetime >=reportGenerationDate – 7 months (210 days) and
+   * <=reportGenerationDate)
+   *
+   * @return sqlCohortDefinition
+   */
+  public CohortDefinition getStartTBTreatment() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("All with “DATA DE INICIO DO TRATAMENTO DE TB” on Ficha clinica");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1113", hivMetadata.getTBDrugStartDateConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id FROM patient p  "
+            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " WHERE e.encounter_type IN (${6},${9}) "
+            + "    AND o.concept_id = ${1113} "
+            + "    AND e.location_id = :location "
+            + "    AND p.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND o.value_datetime BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 210 DAY) AND CURRENT_DATE() ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * On Ficha Resumo (encounter type 53) have “Outros diagnósticos" (concept id 1406) with
+   * “Tuberculose” (concept id 42) marked and obs datetime between Report Generation Date - 7months
+   * (210 days) and Report Generation Date (obs_datetime >=reportGenerationDate – 7 months (210
+   * days) and <=reportGenerationDate)
+   *
+   * @return sqlCohortDefinition
+   */
+  public CohortDefinition getMasterCardDiagnosesTB() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("All with “Outros diagnósticos” on Ficha Resumo");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+
+    String query =
+        " SELECT p.patient_id FROM patient p  "
+            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE e.encounter_type = ${53} "
+            + "    AND o.concept_id = ${1406} AND o.value_coded = ${42} "
+            + "    AND e.location_id = :location "
+            + "    AND p.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND e.encounter_datetime BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 210 DAY) AND CURRENT_DATE()";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Enrolled on TB program (program id 5) patient state id = 6269 and start date >=
+   * reportGenerationDate - 7months (210 days) and Report Generation Date (obs_datetime
+   * >=reportGenerationDate – 7 months (210 days) and <=reportGenerationDate)
+   *
+   * @return sqlCohortDefinition
+   */
+  public CohortDefinition getEnrolledTBProgram() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("All Enrolled on TB program");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("5", hivMetadata.getTBProgram().getProgramId());
+    map.put("6269", hivMetadata.getActiveOnProgramConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id FROM patient p "
+            + "                        INNER JOIN patient_program pg ON p.patient_id=pg.patient_id "
+            + "                        INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id "
+            + "                    WHERE pg.voided=0  "
+            + "                        AND ps.voided=0  "
+            + "                        AND p.voided=0 "
+            + "                        AND pg.program_id= ${5}  "
+            + "                        AND ps.patient_state_id=${6269}  "
+            + "                        AND ps.start_date BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 210 DAY) AND CURRENT_DATE()";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Have Ficha clinica (encounter type 6) with “Diagnótico TB activo” (concept_id 23761) value
+   * coded “SIM”(concept id 1065): Encounter_datetime between reportGenerationDate - 7months (210
+   * days) and Report Generation Date (obs_datetime >=reportGenerationDate – 7 months (210 days) and
+   * <=reportGenerationDate)
+   *
+   * @return sqlCohortDefinition
+   */
+  public CohortDefinition getDiagnosesTBActive() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("All with “Diagnótico TB activo” on Ficha clinica");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id FROM patient p  "
+            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE e.encounter_type = ${6} "
+            + "    AND o.concept_id = ${23761} AND o.value_coded = ${1065} "
+            + "    AND e.location_id = :location "
+            + "    AND p.voided = 0 "
+            + "    AND o.voided = 0 "
+            + "    AND e.voided = 0 "
+            + "    AND e.encounter_datetime BETWEEN DATE_SUB(CURRENT_DATE(),INTERVAL 210 DAY) AND CURRENT_DATE()";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Have Ficha clinica (encounter type 6) with “TRATAMENTO DE TUBERCULOSE” (concept_id 1268) value
+   * coded “Inicio” (concept_id IN 1256) or “Data início” (concept id 1113) and obs_datetime between
+   * (for encounter type 6) Report Generation Date - 7months (210 days) and Report Generation Date
+   * (obs_datetime >=reportGenerationDate – 7 months (210 days) and <=reportGenerationDate)
+   *
+   * <p>OR
+   *
+   * <p>Have Ficha clinica (encounter type 6 or 9) with “ DATA DE INICIO DO TRATAMENTO DE
+   * TB”(concept_id 1113, Value_datetime) between Report Generation Date - 7months (210 days) and
+   * Report Generation Date (obs_datetime >=reportGenerationDate – 7 months (210 days) and
+   * <=reportGenerationDate)
+   *
+   * <p>OR
+   *
+   * <p>On Ficha Resumo (encounter type 53) have “Outros diagnósticos" (concept id 1406) with
+   * “Tuberculose” (concept id 42) marked and obs datetime between Report Generation Date - 7months
+   * (210 days) and Report Generation Date (obs_datetime >=reportGenerationDate – 7 months (210
+   * days) and <=reportGenerationDate)
+   *
+   * <p>OR
+   *
+   * <p>Enrolled on TB program (program id 5) patient state id = 6269 and start date >=
+   * reportGenerationDate - 7months (210 days) and Report Generation Date (obs_datetime
+   * >=reportGenerationDate – 7 months (210 days) and <=reportGenerationDate)
+   *
+   * <p>OR
+   *
+   * <p>Have Ficha clinica (encounter type 6) with “Diagnótico TB activo” (concept_id 23761) value
+   * coded “SIM”(concept id 1065): Encounter_datetime between reportGenerationDate - 7months (210
+   * days) and Report Generation Date (obs_datetime >=reportGenerationDate – 7 months (210 days) and
+   * <=reportGenerationDate)
+   *
+   * @return sqlCohortDefinition
+   */
+  public CohortDefinition getPatientsActiveOnTbTratment() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition A = getTBTreatment();
+    CohortDefinition B = getStartTBTreatment();
+    CohortDefinition C = getMasterCardDiagnosesTB();
+    CohortDefinition D = getEnrolledTBProgram();
+    CohortDefinition E = getDiagnosesTBActive();
+
+    cd.addSearch("A", EptsReportUtils.map(A, MAPPING));
+    cd.addSearch("B", EptsReportUtils.map(B, MAPPING));
+    cd.addSearch("C", EptsReportUtils.map(C, MAPPING));
+    cd.addSearch("D", EptsReportUtils.map(D, MAPPING));
+    cd.addSearch("E", EptsReportUtils.map(E, MAPPING));
+
+    cd.setCompositionString("(A OR B OR C OR D OR E)");
+
+    return cd;
+  }
 }
