@@ -11,6 +11,8 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.data.DataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -1224,6 +1226,63 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Print the Date (value_datetime) of the most recent “Recepcao Levantou ARV” (encounter type 52)
+   * with concept “Levantou ARV” (concept_id 23865) set to “SIM” (Concept id 1065) until report end
+   * date (encounter_datetime <= endDate)
+   *
+   * @return sqlCohortDefinition
+   */
+  public DataDefinition getLastDrugPickUpDate() {
+    SqlPatientDataDefinition sqlCohortDefinition = new SqlPatientDataDefinition();
+    sqlCohortDefinition.setName("All with “Diagnótico TB activo” on Ficha clinica");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id, o.value_datetime  "
+            + "             FROM   patient p   "
+            + "                 INNER JOIN encounter e   "
+            + "                     ON p.patient_id = e.patient_id   "
+            + "                 INNER JOIN obs o   "
+            + "                     ON e.encounter_id = o.encounter_id   "
+            + "                 INNER JOIN ( "
+            + "                         SELECT pp.patient_id, MAX(ee.encounter_datetime) as e_datetime  "
+            + "                         FROM   patient pp   "
+            + "                             INNER JOIN encounter ee   "
+            + "                                 ON pp.patient_id = ee.patient_id   "
+            + "                             INNER JOIN obs oo   "
+            + "                                 ON ee.encounter_id =oo.encounter_id   "
+            + "                         WHERE  pp.voided = 0   "
+            + "                             AND ee.voided = 0   "
+            + "                             AND oo.voided = 0   "
+            + "                             AND ee.location_id = :location  "
+            + "                             AND ee.encounter_type = ${52}  "
+            + "                             AND ee.encounter_datetime <= :endDate  "
+            + "                         GROUP BY pp.patient_id  "
+            + "                               ) most_recent  ON p.patient_id = most_recent.patient_id    "
+            + "             WHERE  p.voided = 0   "
+            + "                 AND e.voided = 0   "
+            + "                 AND o.voided = 0   "
+            + "                 AND e.location_id = :location  "
+            + "                 AND e.encounter_type = ${52}  "
+            + "                 AND e.encounter_datetime <= :endDate  "
+            + "                 AND e.encounter_datetime = most_recent.e_datetime  "
+            + "                 AND o.concept_id = ${23865} "
+            + "                 AND o.value_coded = ${1065} ;";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(substitutor.replace(query));
 
     return sqlCohortDefinition;
   }

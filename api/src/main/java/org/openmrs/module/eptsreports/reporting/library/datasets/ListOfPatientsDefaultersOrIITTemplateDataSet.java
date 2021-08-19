@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -11,10 +12,16 @@ import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDat
 import org.openmrs.module.reporting.data.person.definition.*;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
+
+  @Autowired
+  private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
+
+  @Autowired ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
   public DataSetDefinition constructDataSet() {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
@@ -40,6 +47,41 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn("nid", identifierDef, "");
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
+
+    /** 14 - Last Follow up Consultation Date - Sheet 1: Column N */
+    pdd.addColumn(
+        "lastpickupdate",
+        listChildrenOnARTandFormulationsDataset.getLastFollowupConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    /** 15 - Next Follow up Consultation Date - Sheet 1: Column O */
+    pdd.addColumn(
+        "lastpickupdate",
+        listChildrenOnARTandFormulationsDataset.getNextFollowUpConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    /** 16 - Last Drug Pick-up Date - Sheet 1: Column P */
+    pdd.addColumn(
+        "lastpickupdate",
+        listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    /** 17 - Last Drug Pick-up Date - Sheet 1: Column Q */
+    pdd.addColumn(
+        "lastpickupdate",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    /** 18 - Next Drug pick-up Date - Sheet 1: Column R */
+    pdd.addColumn(
+        "lastpickupdate",
+        listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
     return pdd;
   }

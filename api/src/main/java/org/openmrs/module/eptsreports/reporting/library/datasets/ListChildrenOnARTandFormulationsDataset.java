@@ -391,7 +391,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
    *
    * @return
    */
-  private DataDefinition getLastDrugPickupDate() {
+  public DataDefinition getLastDrugPickupDate() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Last Drug Pick Up Date");
     spdd.addParameter(new Parameter("location", "location", Location.class));
@@ -423,7 +423,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
    *
    * @return
    */
-  private DataDefinition getNextDrugPickupDate() {
+  public DataDefinition getNextDrugPickupDate() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Next Drug Pick Up Date");
     spdd.addParameter(new Parameter("location", "location", Location.class));
@@ -475,7 +475,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
    *
    * @return
    */
-  private DataDefinition getLastFollowupConsultationDate() {
+  public DataDefinition getLastFollowupConsultationDate() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Last Follow up Consultation Date");
     spdd.addParameter(new Parameter("location", "location", Location.class));
@@ -746,7 +746,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
    *
    * @return
    */
-  private DataDefinition getNextFollowUpConsultationDate() {
+  public DataDefinition getNextFollowUpConsultationDate() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Next Follow up Consultation Date");
     spdd.addParameter(new Parameter("location", "location", Location.class));
