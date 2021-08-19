@@ -217,7 +217,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     return spdd;
   }
 
-  private DataDefinition getNID() {
+  public DataDefinition getNID() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Patient NID");
 

@@ -44,7 +44,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
     pdd.addColumn("name", nameDef, "");
-    pdd.addColumn("nid", identifierDef, "");
+    pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
 
