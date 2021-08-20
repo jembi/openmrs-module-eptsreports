@@ -22,6 +22,8 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
   @Autowired
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
+  @Autowired TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
+
   @Autowired ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
   public DataSetDefinition constructDataSet() {
@@ -61,6 +63,9 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
     /** 5 - Age - Sheet 1: Column */
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
+
+    /** 6 - Pregnancy/Breastfeeding status (Grávida/Lactante) – Sheet 1: Column F */
+    pdd.addColumn("age", tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(), "", null);
 
     /** 14 - Last Follow up Consultation Date - Sheet 1: Column N */
     pdd.addColumn(
