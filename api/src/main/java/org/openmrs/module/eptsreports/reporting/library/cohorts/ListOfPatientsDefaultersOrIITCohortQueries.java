@@ -1356,13 +1356,13 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    *
    * @return
    */
-  private DataDefinition getLastARVRegimen() {
-    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
-    spdd.setName("Last ARV Regimen (FILA)");
-    spdd.addParameter(new Parameter("location", "location", Location.class));
-    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    spdd.addParameter(new Parameter("minDay", "minDay", Integer.class));
-    spdd.addParameter(new Parameter("maxDay", "maxDay", Integer.class));
+  private CohortDefinition getLastARVRegimen() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Last ARV Regimen (FILA)");
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("minDay", "minDay", Integer.class));
+    sqlCohortDefinition.addParameter(new Parameter("maxDay", "maxDay", Integer.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
@@ -1443,8 +1443,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
-    spdd.setQuery(substitutor.replace(sql));
-    return spdd;
+    sqlCohortDefinition.setQuery(substitutor.replace(sql));
+    return sqlCohortDefinition;
   }
 
   /** 6 */
