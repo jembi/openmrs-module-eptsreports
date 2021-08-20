@@ -1,68 +1,49 @@
-/*
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
- *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
- */
 package org.openmrs.module.eptsreports.reporting.reports;
-
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.MISAUKeyPopsDataSetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DQRForDuplicateFichaResumoDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SummaryDQRForDuplicateFichaResumoDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
+public class SetupDQRForDuplicateFichaResumoReport extends EptsDataExportManager {
 
-  private MISAUKeyPopsDataSetDefinition mISAUKeyPopsDataSetDefinition;
-
-  private GenericCohortQueries genericCohortQueries;
-
-  @Autowired
-  public SetupMISAUKeyPopsReport(
-      MISAUKeyPopsDataSetDefinition mISAUKeyPopsDataSetDefinition,
-      GenericCohortQueries genericCohortQueries) {
-    this.mISAUKeyPopsDataSetDefinition = mISAUKeyPopsDataSetDefinition;
-    this.genericCohortQueries = genericCohortQueries;
-  }
+  @Autowired protected GenericCohortQueries genericCohortQueries;
+  @Autowired DQRForDuplicateFichaResumoDataSet dqrForDuplicateFichaResumoDataSet;
+  @Autowired SummaryDQRForDuplicateFichaResumoDataSet summaryDQRForDuplicateFichaResumoDataSet;
 
   @Override
   public String getExcelDesignUuid() {
-    return "4e227c85-2270-11eb-b9a1-0242ac120002";
+    return "0a22031c-f5bd-11eb-a56b-17be2817584c";
   }
 
   @Override
   public String getUuid() {
-    return "55da64fe-2270-11eb-b9a1-0242ac120002";
+    return "fd077694-f5bc-11eb-ba44-3f9a8a6341a5";
   }
 
   @Override
   public String getName() {
-    return "Relatorio de Populacao Chave - MISAU";
+    return "DQR for Duplicate Ficha Resumo";
   }
 
   @Override
   public String getDescription() {
-    return "Relatorio de Populacao Chave - MISAU";
+    return "This a Data Quality Report to Identify Duplicate for Ficha Resumo";
   }
 
   @Override
@@ -71,13 +52,16 @@ public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
     rd.setUuid(getUuid());
     rd.setName(getName());
     rd.setDescription(getDescription());
-    rd.addParameters(mISAUKeyPopsDataSetDefinition.getParameters());
-    rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
-    rd.addDataSetDefinition(
-        "R", mapStraightThrough(mISAUKeyPopsDataSetDefinition.constructMISAUKeyPopsDataset()));
+    rd.addParameters(getParameters());
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+
+    rd.addDataSetDefinition(
+        "EC1", Mapped.mapStraightThrough(dqrForDuplicateFichaResumoDataSet.constructDataSet()));
+    rd.addDataSetDefinition(
+        "SEC1",
+        Mapped.mapStraightThrough(summaryDQRForDuplicateFichaResumoDataSet.constructDataSet()));
     return rd;
   }
 
@@ -93,11 +77,12 @@ public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Relatorio_de_Populacao_Chave_-_MISAU.xls",
-              "Relatorio de Populacao Chave - MISAU",
+              "Template_Data_Quality_Report_Duplicate_Ficha_Resumo_R.xls",
+              "DQR for Duplicate Ficha Resumo Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
+      props.put("repeatingSections", "sheet:2,row:7,dataset:EC1");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
@@ -105,5 +90,12 @@ public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
     }
 
     return Arrays.asList(reportDesign);
+  }
+
+  @Override
+  public List<Parameter> getParameters() {
+    return Arrays.asList(
+        new Parameter("endDate", "Report Generation Date", Date.class),
+        new Parameter("location", "Location", Location.class));
   }
 }
