@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -20,15 +21,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListOfPatientsDefaultersOrIITCohortQueries {
 
-  @Autowired private TxCurrCohortQueries txCurrCohortQueries;
-
-  @Autowired private CommonCohortQueries commonCohortQueries;
-
-  @Autowired private GenericCohortQueries genericCohortQueries;
-
   @Autowired private HivMetadata hivMetadata;
 
   @Autowired private TbMetadata tbMetadata;
+
+  @Autowired private CommonMetadata commonMetadata;
 
   private final String MAPPING = "location=${location}";
 
@@ -1609,5 +1606,242 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlPatientDataDefinition;
+  }
+
+
+  /**
+   * Days of Delay = Reporting End Date - Next Scheduled Pick Up Date
+  * Next Scheduled Pick Up Date should be defined as following:
+  * If (Last Drug Pick-up Date - Sheet 1: Column P >= Last Drug Pick-up Date - Sheet 1: Column Q)
+  * Return “Data do próximo levantamento” (concept id 5096, value_datetime) of the most recent FILA (encounter type 18) 
+  until report end date(encounter_datetime <= endDate)
+  * 
+  * If (Last Drug Pick-up Date - Sheet 1: Column P <  Last Drug Pick-up Date - Sheet 1: Column Q)
+  * Return the Date (value_datetime) +30 days of the most recent “Recepcao Levantou ARV” (encounter type 52) with concept “Levantou ARV” (concept_id 23865) 
+  set to “SIM” (Concept id 1065) by report end date (encounter_datetime <= endDate)
+
+  * @return sqlCohortDefinition
+  */
+  public CohortDefinition getNumberOfDaysOfDelay() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("THE NUMBER OF DAYS OF DELAY");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put(
+        "7",
+        hivMetadata
+            .getTransferredOutToAnotherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        " SELECT p.patient_id, "
+           + "     CASE "
+           + "       WHEN Timestampdiff(DAY, last_puDate_q.e_datetime, "
+           + "            last_puDate_p.last_pudate) "
+           + "            >= 0 THEN Timestampdiff(DAY, :endDate, "
+           + "                      recent_fila.result_value) "
+           + "       ELSE Timestampdiff(DAY, :endDate, next_scheduled.resultvalue) "
+           + "     END AS next_pickup_date "
+           + " FROM   patient p "
+           + "     LEFT JOIN(SELECT p.patient_id, "
+           + "                      Max(e.encounter_datetime) AS last_puDate "
+           + "               FROM   patient p "
+           + "                      INNER JOIN encounter e "
+           + "                              ON p.patient_id = e.patient_id "
+           + "               WHERE  p.voided = 0 "
+           + "                      AND e.voided = 0 "
+           + "                      AND e.location_id = :location "
+           + "                      AND e.encounter_type = ${18} "
+           + "                      AND e.encounter_datetime <= :endDate "
+           + "               GROUP  BY p.patient_id) last_puDate_p "
+           + "            ON last_puDate_p.patient_id = p.patient_id "
+           + "     LEFT JOIN(SELECT p.patient_id, "
+           + "                      o.value_datetime AS e_datetime "
+           + "               FROM   patient p "
+           + "                      INNER JOIN encounter e "
+           + "                              ON p.patient_id = e.patient_id "
+           + "                      INNER JOIN obs o "
+           + "                              ON e.encounter_id = o.encounter_id "
+           + "                      INNER JOIN(SELECT pp.patient_id, "
+           + "                                        Max(ee.encounter_datetime) AS "
+           + "                                        e_datetime "
+           + "                                 FROM   patient pp "
+           + "                                        INNER JOIN encounter ee "
+           + "                                                ON pp.patient_id = "
+           + "                                                   ee.patient_id "
+           + "                                        INNER JOIN obs oo "
+           + "                                                ON ee.encounter_id "
+           + "                                                   = oo.encounter_id "
+           + "                                 WHERE  pp.voided = 0 "
+           + "                                        AND ee.voided = 0 "
+           + "                                        AND oo.voided = 0 "
+           + "                                        AND ee.location_id = :location "
+           + "                                        AND ee.encounter_type = ${52} "
+           + "                                        AND ee.encounter_datetime <= "
+           + "                                            :endDate "
+           + "                                 GROUP  BY pp.patient_id) most_recent "
+           + "                              ON p.patient_id = most_recent.patient_id "
+           + "               WHERE  p.voided = 0 "
+           + "                      AND e.voided = 0 "
+           + "                      AND o.voided = 0 "
+           + "                      AND e.location_id = :location "
+           + "                      AND e.encounter_type = ${52} "
+           + "                      AND e.encounter_datetime <= :endDate "
+           + "                      AND e.encounter_datetime = most_recent.e_datetime "
+           + "                      AND o.concept_id = ${23865} "
+           + "                      AND o.value_coded = ${1065}) last_puDate_q "
+           + "            ON last_puDate_q.patient_id = p.patient_id "
+           + "     LEFT JOIN (SELECT p.patient_id, "
+           + "                       ( o.value_datetime ) AS result_Value "
+           + "                FROM   patient p "
+           + "                       INNER JOIN encounter e "
+           + "                               ON p.patient_id = e.patient_id "
+           + "                       INNER JOIN obs o "
+           + "                               ON e.encounter_id = o.encounter_id "
+           + "                       INNER JOIN (SELECT p.patient_id, "
+           + "                                          Max(e.encounter_datetime) AS "
+           + "                                          e_datetime "
+           + "                                   FROM   patient p "
+           + "                                          INNER JOIN encounter e "
+           + "                                                  ON p.patient_id = "
+           + "                                                     e.patient_id "
+           + "                                          INNER JOIN obs o "
+           + "                                                  ON e.encounter_id = "
+           + "                                                     o.encounter_id "
+           + "                                   WHERE  p.voided = 0 "
+           + "                                          AND e.voided = 0 "
+           + "                                          AND o.voided = 0 "
+           + "                                          AND e.location_id = :location "
+           + "                                          AND e.encounter_type = ${18} "
+           + "                                          AND e.encounter_datetime <= "
+           + "                                              :endDate "
+           + "                                   GROUP  BY p.patient_id) most_recent "
+           + "                               ON p.patient_id = most_recent.patient_id "
+           + "                WHERE  p.voided = 0 "
+           + "                       AND e.voided = 0 "
+           + "                       AND o.voided = 0 "
+           + "                       AND e.location_id = :location) recent_fila "
+           + "            ON recent_fila.patient_id = p.patient_id "
+           + "     LEFT JOIN(SELECT "
+           + "              p.patient_id, "
+           + "                      Date_add(o.value_datetime, interval 30 DAY "
+           + "              ) AS "
+           + "              resultValue "
+           + "               FROM   patient p "
+           + "                      INNER JOIN encounter e "
+           + "                              ON p.patient_id = e.patient_id "
+           + "                      INNER JOIN obs o "
+           + "                              ON e.encounter_id = o.encounter_id "
+           + "                      INNER JOIN (SELECT p.patient_id, "
+           + "                                         Max(o.value_datetime) AS "
+           + "                                         most_valuedatetime "
+           + "                                  FROM   patient p "
+           + "                                         INNER JOIN encounter e "
+           + "                                                 ON p.patient_id = "
+           + "                                                    e.patient_id "
+           + "                                         INNER JOIN obs o "
+           + "                                                 ON e.encounter_id = "
+           + "                                                    o.encounter_id "
+           + "                                  WHERE  p.voided = 0 "
+           + "                                         AND e.voided = 0 "
+           + "                                         AND o.voided = 0 "
+           + "                                         AND e.location_id = :location "
+           + "                                         AND e.encounter_type = ${52} "
+           + "                                         AND o.concept_id = ${23865} "
+           + "                                         AND o.value_coded = ${1065} "
+           + "                                         AND o.value_datetime <= :endDate "
+           + "                                  GROUP  BY p.patient_id) most_recent "
+           + "                              ON p.patient_id = most_recent.patient_id "
+           + "               WHERE  p.voided = 0 "
+           + "                      AND e.voided = 0 "
+           + "                      AND o.voided = 0 "
+           + "                      AND e.location_id = :location) AS next_scheduled "
+           + "            ON p.patient_id = next_scheduled.patient_id "
+           + " GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Days of Delay = Reporting End Date - Next Scheduled Pick Up Date
+  * Next Scheduled Pick Up Date should be defined as following:
+  * If (Last Drug Pick-up Date - Sheet 1: Column P >= Last Drug Pick-up Date - Sheet 1: Column Q)
+  * Return “Data do próximo levantamento” (concept id 5096, value_datetime) of the most recent FILA (encounter type 18) 
+  until report end date(encounter_datetime <= endDate)
+  * 
+  * If (Last Drug Pick-up Date - Sheet 1: Column P <  Last Drug Pick-up Date - Sheet 1: Column Q)
+  * Return the Date (value_datetime) +30 days of the most recent “Recepcao Levantou ARV” (encounter type 52) with concept “Levantou ARV” (concept_id 23865) 
+  set to “SIM” (Concept id 1065) by report end date (encounter_datetime <= endDate)
+
+  * @return sqlCohortDefinition
+  */
+  public CohortDefinition getPatientsTransferredInTarv() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("all patients who were transferred-in from another HF by end of reporting period");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());        
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("6276", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6300", hivMetadata.getArtStatus().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+
+    String query =
+   " SELECT     p.patient_id    "
+      + "  FROM       patient p "
+      + "  INNER JOIN encounter e "
+      + "  ON         p.patient_id = e.patient_id "
+      + "  INNER JOIN obs o "
+      + "  ON         e.encounter_id = o.encounter_id "
+      + "  INNER JOIN obs oo "
+      + "  ON         e.encounter_id = oo.encounter_id "
+      + "  INNER JOIN "
+      + "             (SELECT     p.patient_id, "
+      + "                            e.encounter_datetime "
+      + "                 FROM       patient p "
+      + "                 INNER JOIN encounter e "
+      + "                 ON         p.patient_id = e.patient_id "
+      + "                 INNER JOIN obs o "
+      + "                 ON         e.encounter_id = o.encounter_id "
+      + "                 WHERE    p.voided = 0 AND  e.voided = 0 "
+      + "  AND        o.voided = 0 and e.encounter_type = ${53} "
+      + "                 AND        o.concept_id = ${1369} "
+      + "                 AND        o.value_coded = ${1065} "
+      + "                 AND        o.obs_datetime <= :endDate) tbl "
+      + "  ON         tbl.patient_id = p.patient_id "
+      + "  WHERE      p.voided = 0 "
+      + "  AND        e.voided = 0 "
+      + "  AND        o.voided = 0 "
+      + "  AND        e.encounter_datetime = tbl.encounter_datetime "
+      + "  AND        ( "
+      + "                        oo.concept_id = ${6300} "
+      + "             AND        oo.value_coded = ${6276}) "
+      + "  AND        ( "
+      + "                        o.concept_id = ${23891} "
+      + "             AND        o.value_datetime = <= :endDate) ";
+        
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
