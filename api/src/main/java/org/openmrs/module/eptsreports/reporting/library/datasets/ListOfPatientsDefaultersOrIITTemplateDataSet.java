@@ -78,6 +78,13 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "location=${location}",
         null);
 
+    /** 8 -· Consentimento Informado – Sheet 1: Column H */
+    pdd.addColumn(
+        "lastpickupdate",
+        listOfPatientsDefaultersOrIITCohortQueries.getPatientsActiveOnTB(),
+        "location=${location}",
+        null);
+
     /** 14 - Last Follow up Consultation Date - Sheet 1: Column N */
     pdd.addColumn(
         "lastpickupdate",
