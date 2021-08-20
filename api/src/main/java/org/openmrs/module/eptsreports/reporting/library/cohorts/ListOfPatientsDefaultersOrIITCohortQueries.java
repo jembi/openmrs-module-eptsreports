@@ -1342,4 +1342,108 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     return cd;
   }
+
+  /**
+   * X - Filter all patients who are late for their last next scheduled pick-up within the period of
+   * days of delay as follow: select all patients with “Data do próximo levantamento” (concept id
+   * 5096, value_datetime) as “Last Next scheduled Pick-up Date” from the most recent FILA
+   * (encounter type 18) by report end date(encounter_datetime <= endDate) and endDate minus “Last
+   * Next scheduled Pick-up Date” >= minDays and <= maxDays OR select all patients with “Last Next
+   * scheduled Pick up Date” (concept_id 23866, value_datetime + 30 days) from the most recent
+   * “Recepcao Levantou ARV” (encounter type 52) with concept “Levantou ARV” (concept_id 23865) set
+   * to “SIM” (Concept id 1065) by report end date (value_datetime <= endDate) and endDate minus
+   * “Last Next scheduled Pick-up Date” >= minDays and <= maxDays
+   *
+   * @return
+   */
+  private DataDefinition getLastARVRegimen() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Last ARV Regimen (FILA)");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    spdd.addParameter(new Parameter("minDay", "minDay", Integer.class));
+    spdd.addParameter(new Parameter("maxDay", "maxDay", Integer.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
+    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String sql =
+        "  SELECT last_next_scheduled_pick_up.patient_id, CASE WHEN last_next_scheduled_pick_up.result_Value IS NOT NULL THEN 'S'  ELSE '' END  "
+            + "             FROM   "
+            + "            (  SELECT p.patient_id, (o.value_datetime) AS  result_Value "
+            + "             FROM   patient p   "
+            + "                 INNER JOIN encounter e   "
+            + "                     ON p.patient_id = e.patient_id   "
+            + "                 INNER JOIN obs o   "
+            + "                     ON e.encounter_id = o.encounter_id   "
+            + "                 INNER JOIN ( "
+            + "                         SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime  "
+            + "                         FROM   patient p   "
+            + "                             INNER JOIN encounter e   "
+            + "                                 ON p.patient_id = e.patient_id   "
+            + "                             INNER JOIN obs o   "
+            + "                                 ON e.encounter_id = o.encounter_id   "
+            + "                         WHERE  p.voided = 0   "
+            + "                             AND e.voided = 0   "
+            + "                             AND o.voided = 0   "
+            + "                             AND e.location_id = :location  "
+            + "                             AND e.encounter_type = ${18}   "
+            + "                             AND e.encounter_datetime <= :endDate  "
+            + "                         GROUP BY p.patient_id  "
+            + "                               ) most_recent  ON p.patient_id = most_recent.patient_id    "
+            + "             WHERE  p.voided = 0   "
+            + "                 AND e.voided = 0   "
+            + "                 AND o.voided = 0   "
+            + "                 AND e.location_id = :location  "
+            + "                 AND e.encounter_type = ${18}  "
+            + "                 AND o.concept_id =  ${5096}   "
+            + "                 AND TIMESTAMPDIFF(DAY,:endDate, most_recent.e_datetime) >= :minDay "
+            + "                 AND TIMESTAMPDIFF(DAY,:endDate,  most_recent.e_datetime) <= :maxDay "
+            + "             "
+            + "                UNION "
+            + "                 "
+            + "            SELECT p.patient_id,(o.value_datetime) AS  result_Value  "
+            + "             FROM   patient p   "
+            + "                 INNER JOIN encounter e   "
+            + "                     ON p.patient_id = e.patient_id   "
+            + "                 INNER JOIN obs o   "
+            + "                     ON e.encounter_id = o.encounter_id   "
+            + "                 INNER JOIN ( "
+            + "                         SELECT p.patient_id, MAX(o.value_datetime) as most_valuedatetime  "
+            + "                         FROM   patient p   "
+            + "                             INNER JOIN encounter e   "
+            + "                                 ON p.patient_id = e.patient_id   "
+            + "                             INNER JOIN obs o   "
+            + "                                 ON e.encounter_id = o.encounter_id   "
+            + "                         WHERE  p.voided = 0   "
+            + "                             AND e.voided = 0   "
+            + "                             AND o.voided = 0   "
+            + "                             AND e.location_id = :location  "
+            + "                             AND e.encounter_type = ${52} "
+            + "                             AND o.concept_id = ${23865} "
+            + "                             AND o.value_coded = ${1065} "
+            + "                             AND o.value_datetime <= :endDate  "
+            + "                         GROUP BY p.patient_id  "
+            + "                               ) most_recent  ON p.patient_id = most_recent.patient_id    "
+            + "             WHERE  p.voided = 0   "
+            + "                 AND e.voided = 0   "
+            + "                 AND o.voided = 0   "
+            + "                 AND e.location_id = :location  "
+            + "                 AND e.encounter_type = ${52} "
+            + "                 AND o.concept_id = ${23866}   "
+            + "                 AND o.value_datetime = most_recent.most_valuedatetime "
+            + "                 AND TIMESTAMPDIFF(DAY,:endDate, DATE_ADD(most_recent.most_valuedatetime, INTERVAL 30 DAY) ) >= :minDay "
+            + "                 AND TIMESTAMPDIFF(DAY,:endDate, DATE_ADD(most_recent.most_valuedatetime, INTERVAL 30 DAY)) <= :maxDay "
+            + "            ) AS last_next_scheduled_pick_up ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
 }
