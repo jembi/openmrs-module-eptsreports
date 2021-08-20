@@ -65,7 +65,11 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
 
     /** 6 - Pregnancy/Breastfeeding status (Grávida/Lactante) – Sheet 1: Column F */
-    pdd.addColumn("age", tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(), "location=${location}", null);
+    pdd.addColumn(
+        "age",
+        tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
+        "location=${location}",
+        null);
 
     /** 7 - Patients active on TB Treatment - Sheet 1: Column G */
     pdd.addColumn(
@@ -73,6 +77,13 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         listOfPatientsDefaultersOrIITCohortQueries.getPatientsActiveOnTB(),
         "location=${location}",
         null);
+
+    /** 8 -· Consentimento Informado –  Sheet 1: Column H  */
+    pdd.addColumn(
+            "lastpickupdate",
+            listOfPatientsDefaultersOrIITCohortQueries.getPatientsActiveOnTB(),
+            "location=${location}",
+            null);
 
     /** 14 - Last Follow up Consultation Date - Sheet 1: Column N */
     pdd.addColumn(
