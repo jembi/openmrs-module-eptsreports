@@ -1446,4 +1446,106 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     spdd.setQuery(substitutor.replace(sql));
     return spdd;
   }
+
+  /** 6 */
+  public DataDefinition getPatientsActiveOnTB() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Active on TB");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    valuesMap.put("1113", hivMetadata.getTBDrugStartDateConcept().getConceptId());
+    valuesMap.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    valuesMap.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+    valuesMap.put("6269", hivMetadata.getActiveOnProgramConcept().getConceptId());
+    valuesMap.put("5", hivMetadata.getTBProgram().getProgramId());
+    valuesMap.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
+    valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+
+    String sql =
+        " SELECT final_query.patient_id, CASE WHEN final_query.result_Value IS NOT NULL THEN 'S' WHEN final_query.result_Value IS NULL THEN 'INACTIVE' ELSE '' END"
+            + " FROM "
+            + "( "
+            + "                SELECT p.patient_id, o.value_coded  AS result_Value "
+            + "                FROM patient p "
+            + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type = ${6} "
+            + "                  AND o.concept_id = ${1268} AND o.value_coded = ${1256} "
+            + "                  AND o.obs_datetime BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 210 DAY) AND CURRENT_DATE() "
+            + "                  AND e.encounter_datetime <= CURRENT_DATE() "
+            + "                UNION  "
+            + "                SELECT p.patient_id, o.value_datetime AS result_Value "
+            + "                FROM patient p "
+            + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type IN (${6},${9}) "
+            + "                  AND o.concept_id = ${1113} "
+            + "                  AND o.value_datetime "
+            + "                            BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 210 DAY ) AND CURRENT_DATE() "
+            + "                  AND e.encounter_datetime <= CURRENT_DATE() "
+            + "                UNION  "
+            + "                SELECT p.patient_id, o.value_coded AS result_Value "
+            + "                FROM patient p "
+            + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.location_id = :location "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND o.concept_id = ${1406} "
+            + "                  AND o.value_coded = ${42} "
+            + "                  AND o.obs_datetime "
+            + "                    BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 210 DAY ) AND CURRENT_DATE() "
+            + "                UNION  "
+            + "                SELECT p.patient_id , cn.name AS result_Value "
+            + "                FROM patient p "
+            + "                         INNER JOIN patient_program pp ON p.patient_id = pp.patient_id "
+            + "                         INNER JOIN program pgr ON pp.program_id = pgr.program_id "
+            + "                         INNER JOIN patient_state ps on pp.patient_program_id = ps.patient_program_id "
+            + "                         INNER JOIN program_workflow_state pws  on ps.state = pws.program_workflow_state_id          "
+            + "                         INNER JOIN concept_name cn  on pws.concept_id = cn.concept_id          "
+            + "                WHERE p.voided = 0 "
+            + "                  AND pp.voided = 0 "
+            + "                  AND ps.voided = 0 "
+            + "                  AND ps.state = ${6269} "
+            + "                  AND pgr.program_id = ${5} "
+            + "                  AND cn.locale = 'pt' "
+            + "                  AND ps.start_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 210 DAY) "
+            + "                  AND ps.end_date <= CURRENT_DATE() "
+            + "               UNION  "
+            + "                SELECT p.patient_id, o.value_coded  AS result_Value "
+            + "                FROM patient p "
+            + "                         INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                WHERE p.voided = 0 "
+            + "                  AND e.voided = 0 "
+            + "                  AND o.voided = 0 "
+            + "                  AND e.encounter_type = ${6} "
+            + "                  AND e.location_id = :location "
+            + "                  AND o.concept_id = ${23761} "
+            + "                  AND o.value_coded = ${1065} "
+            + "                  AND e.encounter_datetime "
+            + "                    BETWEEN DATE_SUB( CURRENT_DATE(), INTERVAL 210 DAY ) AND CURRENT_DATE() "
+            + ") AS final_query";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
 }
