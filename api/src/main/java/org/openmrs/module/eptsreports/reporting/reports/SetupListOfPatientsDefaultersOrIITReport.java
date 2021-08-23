@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsDefaultersOrIITTemplateDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TotalListOfPatientsDefaultersOrIITTemplateDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
@@ -22,7 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportManager {
 
-  @Autowired protected GenericCohortQueries genericCohortQueries;
+  @Autowired
+  protected ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
   @Autowired private ListOfPatientsDefaultersOrIITTemplateDataSet initListOfPatDefIITDataSet;
 
@@ -58,7 +59,8 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
     rd.addParameters(getParameters());
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+            listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
+            "endDate=${endDate},location=${location}"));
 
     rd.addDataSetDefinition(
         "FATS", Mapped.mapStraightThrough(iniTotalLListOfPatDefIITDataSet.constructDataSet()));

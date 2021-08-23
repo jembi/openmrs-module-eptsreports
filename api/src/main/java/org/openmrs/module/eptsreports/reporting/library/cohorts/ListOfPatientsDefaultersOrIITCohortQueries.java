@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
+import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -1837,5 +1840,40 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getArtStartDate() {
+    CalculationCohortDefinition cd =
+        new CalculationCohortDefinition(
+            "Art start date",
+            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
+    return cd;
+  }
+
+  public CohortDefinition getBaseCohort() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition E1 = getE1();
+    CohortDefinition E2 = getE2();
+    CohortDefinition E3 = getPatientsActiveOnTbTratment();
+    CohortDefinition X = getLastARVRegimen();
+    CohortDefinition A = getArtStartDate();
+    CohortDefinition B1 = getPatientsTransferredInTarv();
+    CohortDefinition B2 = getPatientsTransferredInTarv();
+
+    cd.addSearch("E1", EptsReportUtils.map(E1, MAPPING));
+    cd.addSearch("E2", EptsReportUtils.map(E2, MAPPING));
+    cd.addSearch("E3", EptsReportUtils.map(E3, MAPPING));
+    cd.addSearch("X", EptsReportUtils.map(X, MAPPING));
+    cd.addSearch("A", EptsReportUtils.map(A, MAPPING));
+    cd.addSearch("B1", EptsReportUtils.map(B1, MAPPING));
+    cd.addSearch("B2", EptsReportUtils.map(B2, MAPPING));
+
+    cd.setCompositionString("(A OR (B1 OR B2) AND X AND E1 OR E2 OR E3)");
+
+    return cd;
   }
 }
