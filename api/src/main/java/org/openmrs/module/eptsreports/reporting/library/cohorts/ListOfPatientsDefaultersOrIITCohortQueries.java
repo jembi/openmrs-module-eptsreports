@@ -1356,7 +1356,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    *
    * @return
    */
-  private CohortDefinition getLastARVRegimen() {
+  public CohortDefinition getLastARVRegimen() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Last ARV Regimen (FILA)");
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -1373,7 +1373,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String sql =
-        "  SELECT last_next_scheduled_pick_up.patient_id, CASE WHEN last_next_scheduled_pick_up.result_Value IS NOT NULL THEN 'S'  ELSE '' END  "
+        "  SELECT last_next_scheduled_pick_up.patient_id "
             + "             FROM   "
             + "            (  SELECT p.patient_id, (o.value_datetime) AS  result_Value "
             + "             FROM   patient p   "
@@ -1810,9 +1810,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "  INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id  "
             + "  WHERE pg.voided=0 AND ps.voided=0 AND p.voided=0  "
             + "  AND pg.program_id=${2} AND ps.state=${29}  "
-            + "  AND ps.start_date <= curdate() AND location_id= :location "
+            + "  AND ps.start_date <= curdate() AND pg.location_id = :location "
             + "  UNION "
-            + " SELECT     p.patient_id    "
+            + "  SELECT     p.patient_id    "
             + "  FROM       patient p "
             + "  INNER JOIN encounter e "
             + "  ON         p.patient_id = e.patient_id "
@@ -1826,24 +1826,21 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                 FROM       patient p "
             + "                 INNER JOIN encounter e "
             + "                 ON         p.patient_id = e.patient_id "
-            + "                 INNER JOIN obs o "
-            + "                 ON         e.encounter_id = o.encounter_id "
+            + "                 INNER JOIN obs o1 "
+            + "                 ON         e.encounter_id = o1.encounter_id "
             + "                 WHERE    p.voided = 0 AND  e.voided = 0 "
-            + "  AND        o.voided = 0 and e.encounter_type = ${53} "
-            + "                 AND        o.concept_id = ${1369} "
-            + "                 AND        o.value_coded = ${1065} "
-            + "                 AND        o.obs_datetime <= :endDate) tbl "
+            + "  AND        o1.voided = 0 and e.encounter_type = ${53} "
+            + "                 AND        o1.concept_id = ${1369} AND e.location_id = :location "
+            + "                 AND        o1.value_coded = ${1065}) tbl "
             + "  ON         tbl.patient_id = p.patient_id "
             + "  WHERE      p.voided = 0 "
             + "  AND        e.voided = 0 "
-            + "  AND        o.voided = 0 "
+            + "  AND        o.voided = 0 AND e.location_id = :location "
             + "  AND        e.encounter_datetime = tbl.encounter_datetime "
             + "  AND        ( "
             + "                        oo.concept_id = ${6300} "
             + "             AND        oo.value_coded = ${6276}) "
-            + "  AND        ( "
-            + "                        o.concept_id = ${23891} "
-            + "             AND        o.value_datetime <= :endDate) GROUP BY p.patient_id ";
+            + "  AND        (  o.concept_id = ${23891}) GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -1870,18 +1867,16 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     CohortDefinition E3 = getPatientsActiveOnTbTratment();
     CohortDefinition X = getLastARVRegimen();
     CohortDefinition A = getArtStartDate();
-    CohortDefinition B1 = getPatientsTransferredInTarv();
-    CohortDefinition B2 = getPatientsTransferredInTarv();
+    CohortDefinition B = getPatientsTransferredInTarv();
 
     cd.addSearch("E1", EptsReportUtils.map(E1, MAPPING));
     cd.addSearch("E2", EptsReportUtils.map(E2, MAPPING));
     cd.addSearch("E3", EptsReportUtils.map(E3, MAPPING));
     cd.addSearch("X", EptsReportUtils.map(X, MAPPING));
-    cd.addSearch("A", EptsReportUtils.map(A, MAPPING));
-    cd.addSearch("B1", EptsReportUtils.map(B1, MAPPING));
-    cd.addSearch("B2", EptsReportUtils.map(B2, MAPPING));
+    cd.addSearch("A", EptsReportUtils.map(A, MAPPING2));
+    cd.addSearch("B", EptsReportUtils.map(B, MAPPING));
 
-    cd.setCompositionString("(A OR (B1 OR B2) AND X AND E1 OR E2 OR E3)");
+    cd.setCompositionString("((A OR B) AND X AND NOT(E1 OR E2 OR E3))");
 
     return cd;
   }
