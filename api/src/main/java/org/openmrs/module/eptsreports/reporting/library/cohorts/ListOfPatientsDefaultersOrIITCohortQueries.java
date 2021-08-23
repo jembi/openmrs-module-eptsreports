@@ -1795,6 +1795,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
@@ -1803,7 +1805,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
 
     String query =
-        " SELECT     p.patient_id    "
+        " SELECT pg.patient_id FROM patient p       "
+            + "  INNER JOIN patient_program pg ON p.patient_id=pg.patient_id  "
+            + "  INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id  "
+            + "  WHERE pg.voided=0 AND ps.voided=0 AND p.voided=0  "
+            + "  AND pg.program_id=${2} AND ps.state=${29}  "
+            + "  AND ps.start_date <= curdate() AND location_id= :location "
+            + "  UNION "
+            + " SELECT     p.patient_id    "
             + "  FROM       patient p "
             + "  INNER JOIN encounter e "
             + "  ON         p.patient_id = e.patient_id "
