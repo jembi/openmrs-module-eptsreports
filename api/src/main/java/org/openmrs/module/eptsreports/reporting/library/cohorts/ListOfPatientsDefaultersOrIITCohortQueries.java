@@ -34,7 +34,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
   private final String MAPPING2 = "onOrBefore=${endDate},location=${location}";
 
-  private final String MAPPING3 = "onOrBefore=${endDate}";
+  private final String MAPPING3 = "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}";
 
   /**
    * <b>E1</b> - exclude all patients who are transferred out by end of report generation date,
@@ -1402,8 +1402,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                 AND e.location_id = :location  "
             + "                 AND e.encounter_type = ${18}  "
             + "                 AND o.concept_id =  ${5096}   "
-            + "                 AND TIMESTAMPDIFF(DAY,:endDate, most_recent.e_datetime) >= :minDay "
-            + "                 AND TIMESTAMPDIFF(DAY,:endDate,  most_recent.e_datetime) <= :maxDay "
+            + "                 AND TIMESTAMPDIFF(DAY,most_recent.e_datetime, :endDate) >= :minDay "
+            + "                 AND TIMESTAMPDIFF(DAY,most_recent.e_datetime, :endDate) <= :maxDay "
             + "             "
             + "                UNION "
             + "                 "
@@ -1437,8 +1437,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                 AND e.encounter_type = ${52} "
             + "                 AND o.concept_id = ${23866}   "
             + "                 AND o.value_datetime = most_recent.most_valuedatetime "
-            + "                 AND TIMESTAMPDIFF(DAY,:endDate, DATE_ADD(most_recent.most_valuedatetime, INTERVAL 30 DAY) ) >= :minDay "
-            + "                 AND TIMESTAMPDIFF(DAY,:endDate, DATE_ADD(most_recent.most_valuedatetime, INTERVAL 30 DAY)) <= :maxDay "
+            + "                 AND TIMESTAMPDIFF(DAY,DATE_ADD(most_recent.most_valuedatetime, INTERVAL 30 DAY), :endDate) >= :minDay "
+            + "                 AND TIMESTAMPDIFF(DAY,DATE_ADD(most_recent.most_valuedatetime, INTERVAL 30 DAY), :endDate) <= :maxDay "
             + "            ) AS last_next_scheduled_pick_up ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
@@ -1872,7 +1872,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     cd.addSearch("E1", EptsReportUtils.map(E1, MAPPING));
     cd.addSearch("E2", EptsReportUtils.map(E2, MAPPING));
     cd.addSearch("E3", EptsReportUtils.map(E3, MAPPING));
-    cd.addSearch("X", EptsReportUtils.map(X, MAPPING));
+    cd.addSearch("X", EptsReportUtils.map(X, MAPPING3));
     cd.addSearch("A", EptsReportUtils.map(A, MAPPING2));
     cd.addSearch("B", EptsReportUtils.map(B, MAPPING));
 
