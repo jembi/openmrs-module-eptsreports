@@ -35,7 +35,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   private final String MAPPING2 = "onOrBefore=${endDate},location=${location}";
 
   private final String MAPPING3 =
-      "endDate=${endDate},location=${location},minDay=${minDays},maxDay=${maxDays}";
+      "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}";
 
   /**
    * <b>E1</b> - exclude all patients who are transferred out by end of report generation date,

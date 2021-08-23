@@ -60,7 +60,7 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
-            "endDate=${endDate},location=${location}"));
+            "endDate=${endDate},onOrBefore=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}"));
 
     rd.addDataSetDefinition(
         "FATS", Mapped.mapStraightThrough(iniTotalLListOfPatDefIITDataSet.constructDataSet()));
@@ -100,8 +100,8 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
   public List<Parameter> getParameters() {
     return Arrays.asList(
         new Parameter("endDate", "End date", Date.class),
-        new Parameter("minDays", "Minimum number of days", Location.class),
-        new Parameter("maxDays", "Maximum number of days", Integer.class),
-        new Parameter("location", "Location", Integer.class));
+        new Parameter("minDay", "Minimum number of days", Integer.class),
+        new Parameter("maxDay", "Maximum number of days", Integer.class),
+        new Parameter("location", "Location", Location.class));
   }
 }
