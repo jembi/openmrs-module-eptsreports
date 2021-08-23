@@ -100,6 +100,8 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
   public List<Parameter> getParameters() {
     return Arrays.asList(
         new Parameter("endDate", "End date", Date.class),
-        new Parameter("location", "Location", Location.class));
+        new Parameter("minDays", "Minimum number of days", Location.class),
+        new Parameter("maxDays", "Maximum number of days", Integer.class),
+        new Parameter("location", "Location", Integer.class));
   }
 }

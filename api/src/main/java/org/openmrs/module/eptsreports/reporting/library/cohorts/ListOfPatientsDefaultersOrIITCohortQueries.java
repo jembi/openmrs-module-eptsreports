@@ -34,7 +34,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
   private final String MAPPING2 = "onOrBefore=${endDate},location=${location}";
 
-  private final String MAPPING3 = "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}";
+  private final String MAPPING3 =
+      "endDate=${endDate},location=${location},minDay=${minDays},maxDay=${maxDays}";
 
   /**
    * <b>E1</b> - exclude all patients who are transferred out by end of report generation date,
@@ -1627,12 +1628,12 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    *
    * @return sqlCohortDefinition
    */
-  public CohortDefinition getNumberOfDaysOfDelay() {
+  public DataDefinition getNumberOfDaysOfDelay() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("THE NUMBER OF DAYS OF DELAY");
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("THE NUMBER OF DAYS OF DELAY");
+    spdd.addParameter(new Parameter("location", "Location", Location.class));
+    spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
@@ -1771,10 +1772,10 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "            ON p.patient_id = next_scheduled.patient_id "
             + " GROUP  BY p.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    StringSubstitutor substitutor = new StringSubstitutor(map);
 
-    return sqlCohortDefinition;
+    spdd.setQuery(substitutor.replace(query));
+    return spdd;
   }
 
   /**

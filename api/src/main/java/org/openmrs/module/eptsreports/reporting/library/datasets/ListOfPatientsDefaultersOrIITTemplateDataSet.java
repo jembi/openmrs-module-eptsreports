@@ -53,7 +53,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
     /** 3 - ART Start Date - Sheet 1: Column C */
     pdd.addColumn(
-        "artstartdate",
+        "inicio_tarv",
         listChildrenOnARTandFormulationsDataset.getArtStartDate(),
         "onOrBefore=${endDate},location=${location}",
         new CalculationResultConverter());
@@ -66,14 +66,14 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
     /** 6 - Pregnancy/Breastfeeding status (Grávida/Lactante) – Sheet 1: Column F */
     pdd.addColumn(
-        "age",
+        "pregnant_or_breastfeeding",
         tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
         "location=${location}",
         null);
 
     /** 7 - Patients active on TB Treatment - Sheet 1: Column G */
     pdd.addColumn(
-        "lastpickupdate",
+        "tb_treatment",
         listOfPatientsDefaultersOrIITCohortQueries.getPatientsActiveOnTB(),
         "location=${location}",
         null);
@@ -87,36 +87,50 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
     /** 14 - Last Follow up Consultation Date - Sheet 1: Column N */
     pdd.addColumn(
-        "lastpickupdate",
+        "last_consultation_date",
         listChildrenOnARTandFormulationsDataset.getLastFollowupConsultationDate(),
         "endDate=${endDate},location=${location}",
         null);
 
     /** 15 - Next Follow up Consultation Date - Sheet 1: Column O */
     pdd.addColumn(
-        "lastpickupdate",
+        "next_consultation_date",
         listChildrenOnARTandFormulationsDataset.getNextFollowUpConsultationDate(),
         "endDate=${endDate},location=${location}",
         null);
 
     /** 16 - Last Drug Pick-up Date - Sheet 1: Column P */
     pdd.addColumn(
-        "lastpickupdate",
+        "date_of_last_survey_fila",
         listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
         "endDate=${endDate},location=${location}",
         null);
 
     /** 17 - Last Drug Pick-up Date - Sheet 1: Column Q */
     pdd.addColumn(
-        "lastpickupdate",
+        "date_of_last_survey_reception_raised_ARV",
         listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
         "endDate=${endDate},location=${location}",
         null);
 
     /** 18 - Next Drug pick-up Date - Sheet 1: Column R */
     pdd.addColumn(
-        "lastpickupdate",
+        ".next_date_survey_fila",
         listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    /** 19 - Next Drug pick-up Date - Sheet 1: Column S */
+    pdd.addColumn(
+        "next_date_survey _reception_raised_ARV",
+        listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    /** 20 - Days of Delay - Sheet 1: Column T */
+    pdd.addColumn(
+        "days_of_absence_to_survey",
+        listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
         "endDate=${endDate},location=${location}",
         null);
 
