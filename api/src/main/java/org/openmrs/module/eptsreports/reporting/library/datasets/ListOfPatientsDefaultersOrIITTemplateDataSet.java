@@ -87,6 +87,13 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "location=${location}",
         null);
 
+    /** 10 -· Tipo de Dispensa – Sheet 1: Column J */
+    pdd.addColumn(
+        "type_of_dispensation",
+        listOfPatientsDefaultersOrIITCohortQueries.getTypeOfDispensation(),
+        "endDate=${endDate},location=${location}",
+        null);
+
     /** Contacto – Sheet 1: Column K */
     pdd.addColumn(
         "contact",
