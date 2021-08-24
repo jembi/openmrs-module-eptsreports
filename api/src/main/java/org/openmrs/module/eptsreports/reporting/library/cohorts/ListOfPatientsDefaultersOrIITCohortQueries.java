@@ -1622,7 +1622,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     Map<String, Integer> map = new HashMap<>();
 
     String query =
-        "SELECT p.patient_id, pa.county_district FROM patient p "
+        "SELECT p.patient_id, pa.address6 FROM patient p "
             + "    INNER JOIN person pr on p.patient_id = pr.person_id "
             + "    INNER JOIN person_address pa ON pa.person_id = pr.person_id "
             + " WHERE p.voided =0 AND pr.voided =0 ";
@@ -1665,7 +1665,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     Map<String, Integer> map = new HashMap<>();
 
     String query =
-        " SELECT p.patient_id, pa.city_village FROM patient p "
+        " SELECT p.patient_id, pa.address5 FROM patient p "
             + "    INNER JOIN person_address pa ON pa.person_id = p.patient_id "
             + "WHERE p.voided =0;";
 
@@ -1686,7 +1686,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     Map<String, Integer> map = new HashMap<>();
 
     String query =
-        " SELECT p.patient_id, pa.city_village FROM patient p "
+        " SELECT p.patient_id, pa.address2 FROM patient p "
             + "    INNER JOIN person_address pa ON pa.person_id = p.patient_id "
             + "WHERE p.voided =0;";
 
@@ -1721,7 +1721,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put("6306", hivMetadata.getAcceptContactConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
     map.put("6177", hivMetadata.getConfidentAcceptContact().getConceptId());
     map.put("23776", hivMetadata.getConfidentConsentDate().getConceptId());
 

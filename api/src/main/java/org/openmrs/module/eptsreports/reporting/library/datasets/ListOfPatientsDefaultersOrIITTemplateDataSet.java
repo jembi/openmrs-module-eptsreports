@@ -108,6 +108,13 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "location=${location}",
         null);
 
+    /** Address (Ponto de Referencia) – Sheet 1: Column N */
+    pdd.addColumn(
+        "reference_point",
+        listOfPatientsDefaultersOrIITCohortQueries.getReferencePoint(),
+        "location=${location}",
+        null);
+
     /** PRINT ‘N’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS: */
     pdd.addColumn(
         "confidant_informed_consent",
