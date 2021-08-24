@@ -45,6 +45,8 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
 
+    pdd.addColumn("id", new PersonIdDataDefinition(), "");
+
     /** 1 - NID - Sheet 1: Column A */
     pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
 
@@ -82,6 +84,13 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn(
         "patient_informed_consent",
         listOfPatientsDefaultersOrIITCohortQueries.getPatientsMarkedYes(),
+        "location=${location}",
+        null);
+
+    /** PRINT ‘N’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS: */
+    pdd.addColumn(
+        "confidant_informed_consent",
+        listOfPatientsDefaultersOrIITCohortQueries.getPatientsMarkedNo(),
         "location=${location}",
         null);
 

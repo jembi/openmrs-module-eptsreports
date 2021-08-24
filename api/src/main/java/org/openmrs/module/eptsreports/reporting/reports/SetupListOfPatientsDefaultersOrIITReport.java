@@ -60,7 +60,7 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
-            "endDate=${endDate},onOrBefore=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}"));
+            "endDate=${endDate},minDay=${minDay},maxDay=${maxDay},location=${location}"));
 
     rd.addDataSetDefinition(
         "FATS", Mapped.mapStraightThrough(iniTotalLListOfPatDefIITDataSet.constructDataSet()));
