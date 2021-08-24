@@ -1613,7 +1613,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /** @return sqlCohortDefinition */
-  public DataDefinition getStateProvince() {
+  public DataDefinition getLocation() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("All patients marked as: Sim");
@@ -1622,10 +1622,73 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     Map<String, Integer> map = new HashMap<>();
 
     String query =
-        "SELECT p.patient_id, pa.state_province FROM patient p "
+        "SELECT p.patient_id, pa.county_district FROM patient p "
             + "    INNER JOIN person pr on p.patient_id = pr.person_id "
             + "    INNER JOIN person_address pa ON pa.person_id = pr.person_id "
-            + " WHERE p.voided =0 AND pr.voided =0";
+            + " WHERE p.voided =0 AND pr.voided =0 ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /** @return sqlCohortDefinition */
+  public DataDefinition getContact() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients marked as: Sim");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+
+    String query =
+        " SELECT p.patient_id, pc.telemovel FROM patient p "
+            + "    INNER JOIN paciente_com_celular pc on p.patient_id = pc.patient_id "
+            + " WHERE p.voided =0 GROUP BY p.patient_id;";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /** @return sqlCohortDefinition */
+  public DataDefinition getNeighborhood() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients marked as: Sim");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+
+    String query =
+        " SELECT p.patient_id, pa.city_village FROM patient p "
+            + "    INNER JOIN person_address pa ON pa.person_id = p.patient_id "
+            + "WHERE p.voided =0;";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /** @return sqlCohortDefinition */
+  public DataDefinition getReferencePoint() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients marked as: Sim");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+
+    String query =
+        " SELECT p.patient_id, pa.city_village FROM patient p "
+            + "    INNER JOIN person_address pa ON pa.person_id = p.patient_id "
+            + "WHERE p.voided =0;";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

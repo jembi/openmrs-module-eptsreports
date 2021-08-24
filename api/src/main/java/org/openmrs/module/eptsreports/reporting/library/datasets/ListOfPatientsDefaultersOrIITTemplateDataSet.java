@@ -87,6 +87,27 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "location=${location}",
         null);
 
+    /** Contacto – Sheet 1: Column K */
+    pdd.addColumn(
+        "contact",
+        listOfPatientsDefaultersOrIITCohortQueries.getContact(),
+        "location=${location}",
+        null);
+
+    /** Address (Localidade) – Sheet 1: Column L */
+    pdd.addColumn(
+        "location",
+        listOfPatientsDefaultersOrIITCohortQueries.getLocation(),
+        "location=${location}",
+        null);
+
+    /** Address (Bairro) – Sheet 1: Column M */
+    pdd.addColumn(
+        "neighborhood",
+        listOfPatientsDefaultersOrIITCohortQueries.getNeighborhood(),
+        "location=${location}",
+        null);
+
     /** PRINT ‘N’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS: */
     pdd.addColumn(
         "confidant_informed_consent",
