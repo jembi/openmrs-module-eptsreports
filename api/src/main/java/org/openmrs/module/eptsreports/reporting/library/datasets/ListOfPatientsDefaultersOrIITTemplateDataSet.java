@@ -41,14 +41,15 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
             new PatientIdentifierDataDefinition(identifierType.getName(), identifierType),
             identifierFormatter);
     DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
-    DataDefinition nameDef =
-        new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
-    pdd.setParameters(getParameters());
 
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
 
     /** 1 - NID - Sheet 1: Column A */
     pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
+
+    DataDefinition nameDef =
+        new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
+    pdd.setParameters(getParameters());
 
     /** 2 - Name - Sheet 1: Column B */
     pdd.addColumn("name", nameDef, "");
@@ -60,11 +61,11 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "onOrBefore=${endDate},location=${location}",
         new CalculationResultConverter());
 
+    /** 5 - Age - Sheet 1: Column */
+    pdd.addColumn("age", new AgeDataDefinition(), "effectiveDate=${endDate}", null);
+
     /** 4 - Sex - Sheet 1: Column D */
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
-
-    /** 5 - Age - Sheet 1: Column */
-    pdd.addColumn("age", new AgeDataDefinition(), "", null);
 
     /** 6 - Pregnancy/Breastfeeding status (Grávida/Lactante) – Sheet 1: Column F */
     pdd.addColumn(
@@ -84,6 +85,13 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn(
         "patient_informed_consent",
         listOfPatientsDefaultersOrIITCohortQueries.getPatientsMarkedYes(),
+        "location=${location}",
+        null);
+
+    /** PRINT ‘N’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS: */
+    pdd.addColumn(
+        "confidant_informed_consent",
+        listOfPatientsDefaultersOrIITCohortQueries.getPatientsMarkedNo(),
         "location=${location}",
         null);
 
@@ -122,13 +130,6 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "location=${location}",
         null);
 
-    /** PRINT ‘N’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS: */
-    pdd.addColumn(
-        "confidant_informed_consent",
-        listOfPatientsDefaultersOrIITCohortQueries.getPatientsMarkedNo(),
-        "location=${location}",
-        null);
-
     /** 14 - Last Follow up Consultation Date - Sheet 1: Column N */
     pdd.addColumn(
         "last_consultation_date",
@@ -159,7 +160,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
     /** 18 - Next Drug pick-up Date - Sheet 1: Column R */
     pdd.addColumn(
-        ".next_date_survey_fila",
+        "next_date_survey_fila",
         listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
         "endDate=${endDate},location=${location}",
         null);
@@ -167,7 +168,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     /** 19 - Next Drug pick-up Date - Sheet 1: Column S */
     pdd.addColumn(
         "next_date_survey _reception_raised_ARV",
-        listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
+        listOfPatientsDefaultersOrIITCohortQueries.getNextDrugPickUpDateARV(),
         "endDate=${endDate},location=${location}",
         null);
 
