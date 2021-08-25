@@ -22,7 +22,7 @@ public class TotalListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataS
     dataSetDefinition.setName("Lista de Pacientes Faltosos ou Abandonos ao TARV");
     dataSetDefinition.addParameters(getParameters());
 
-    String mappings = "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}";
+    String mappings = "endDate=${endDate},minDay=${minDay},maxDay=${maxDay},location=${location}";
 
     CohortIndicator Total =
         eptsGeneralIndicator.getIndicator(

@@ -37,24 +37,24 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   private final String MAPPING3 =
       "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}";
 
-      /**
-       * <b> GET THE REPORT GENERATION DATE
-       * @return cd
-       */
-      public CohortDefinition getReportGenerationDate() {
-        SqlCohortDefinition cd = new SqlCohortDefinition();
-        cd.setName("Report Generation Date");
-    
-        Map<String, Integer> map = new HashMap<>();
-    
-        String sql =
-            " SELECT curdate();";
-    
-        StringSubstitutor substitutor = new StringSubstitutor(map);
-    
-        cd.setQuery(substitutor.replace(sql));
-        return cd;
-      }
+  /**
+   * <b> GET THE REPORT GENERATION DATE
+   *
+   * @return cd
+   */
+  public CohortDefinition getReportGenerationDate() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Report Generation Date");
+
+    Map<String, Integer> map = new HashMap<>();
+
+    String sql = " SELECT curdate();";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    cd.setQuery(substitutor.replace(sql));
+    return cd;
+  }
 
   /**
    * <b>E1</b> - exclude all patients who are transferred out by end of report generation date,
@@ -2074,66 +2074,63 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
   /**
    * <b>10: Tipo de Dispensa</b>
-   * <p>PRINT Dispensa Mensal/ Dispensa Trimestral/ Dispensa Semestral IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS:
-   * <p> Select the most recent from the following source:
-   * the most recent Drug Pick Pick up on Fila ( encounter type 18, max encounter_datetime<= endDate)
-   * the most recent Consultation on Ficha Clinica ( encounter type 6, max encounter_datetime<= endDate)
-   * 
-   * <p> If the most recent source is FILA then:
-   * Print Dispensa Mensal if  a minus b < 83 days where a is the most recent Drug Pick Up on FILA ( encounter type 18, max encounter_datetime<=endDate) and b is  “RETURN VISIT DATE FOR ARV DRUG” (concept_id 5096, value_datetime) from the most recent FILA ( encounter type 18, max encounter_datetime <= endDate)
-   * Encounter Type Id = 18
-   * MAXIMUM Encounter DATE (encounter.encounter_datetime <= endDate) = a
-   * RETURN VISIT DATE FOR ARV DRUG (Concept_id=5096) Value_datetime =b
-   * Difference between a and b is <83
-   * 
-   * 
-   *<p> Print Dispensa Trimestral if  a minus b >= 83 days and <= 173 days, where a is the most recent Drug Pick Up on FILA ( encounter type 18, max encounter_datetime <= endDate) and b is  “RETURN VISIT DATE FOR ARV DRUG” (concept_id 5096, value_datetime) from the most recent FILA ( encounter type 18, max encounter_datetime <= endDate)
-   * 
-   * Encounter Type Id = 18
-   * MAXIMUM Encounter DATE (encounter.encounter_datetime <= endDate) = a
-   * RETURN VISIT DATE FOR ARV DRUG (Concept_id=5096) Value_datetime =b
-   * Difference between a and b is >=83 and <=173 days
-   * 
-   * 
-   *<p> Print Dispensa Semestral if  a minus b > 173 days, where a is the most recent Drug Pick Up on FILA ( encounter type 18, max encounter_datetime <= endDate) and b is  “RETURN VISIT DATE FOR ARV DRUG” (concept_id 5096, value_datetime) from the most recent FILA ( encounter type 18, max encounter_datetime <= endDate)
-   * 
-   * Encounter Type Id = 18
-   * MAXIMUM Encounter DATE (encounter.encounter_datetime) <= endDate= a
-   * RETURN VISIT DATE FOR ARV DRUG (Concept_id=5096) Value_datetime =b
-   * Difference between a and b is >173 days
-   * 
-   * 
-   * <p>If the most recent source is FICHA CLINICA then:
-   * Print Dispensa Mensal if  “Tipo de Levantamento” (concept_id=23739) is marked as “DM”  (concept_id=1098) on the most recent consultation on FICHA CLINICA ( encounter type 6, max encounter_datetime <= endDate) 
-   * Encounter Type Id = 6
-   * Max encounter_datetime <= endDate
-   * Last TYPE OF DISPENSATION (id=23739)
-   * Value.coded = MONTHLY (id=1098)
-   * 
-   * <p> Print Dispensa Trimestral if  “Tipo de Levantamento” (concept_id=23739) is marked as “DT”  (concept_id=23720) on the most recent consultation on FICHA CLINICA ( encounter type 6, max encounter_datetime <= endDate) 
-   * Encounter Type Id = 6
-   * Max encounter_datetime <= endDate
-   * Last TYPE OF DISPENSATION (id=23739)
-   * Value.coded = QUARTERLY (id=23720)
-   * or 
-   * marked in last “Dispensa Trimestral (DT)” (concept_id=23720) as Iniciar (I) (concept_id=1256)  or Continuar (C) (concept_id=1257) in Ficha Clinica Mastercard ( encounter type 6, max encounter_datetime <= endDate) 
-   * Encounter Type Id = 6
-   * Max encounter_datetime <= endDate
-   * Last QUARTERLY DISPENSATION (DT) (id=23720)
-   * Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
-   * 
-   * <p> Print Dispensa Semestral if  “Tipo de Levantamento” (concept_id=23739) is marked as “DS”  (concept_id=23720) on the most recent consultation on FICHA CLINICA ( encounter type 6, max encounter_datetime <= endDate) 
-   * Encounter Type Id = 6
-   * Max encounter_datetime <= endDate
-   * Last TYPE OF DISPENSATION (id=23739)
-   * Value.coded = SEMESTRAL (id=23888)
-   * or 
-   * marked in last “Dispensa Semestral (DS)” (concept_id=23730) as Iniciar (I) (concept_id=1256)  or Continuar (C) (concept_id=1257) in Ficha Clinica Mastercard ( encounter type 6, max encounter_datetime <= endDate) 
-   * Encounter Type Id = 6
-   * Max encounter_datetime <= endDate
-   * Last SEMESTRAL DISPENSATION (DT) (id=23888)
-   * Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
-
+   *
+   * <p>PRINT Dispensa Mensal/ Dispensa Trimestral/ Dispensa Semestral IF THE PATIENT HAS ONE OF THE
+   * FOLLOWING OPTIONS:
+   *
+   * <p>Select the most recent from the following source: the most recent Drug Pick Pick up on Fila
+   * ( encounter type 18, max encounter_datetime<= endDate) the most recent Consultation on Ficha
+   * Clinica ( encounter type 6, max encounter_datetime<= endDate)
+   *
+   * <p>If the most recent source is FILA then: Print Dispensa Mensal if a minus b < 83 days where a
+   * is the most recent Drug Pick Up on FILA ( encounter type 18, max encounter_datetime<=endDate)
+   * and b is “RETURN VISIT DATE FOR ARV DRUG” (concept_id 5096, value_datetime) from the most
+   * recent FILA ( encounter type 18, max encounter_datetime <= endDate) Encounter Type Id = 18
+   * MAXIMUM Encounter DATE (encounter.encounter_datetime <= endDate) = a RETURN VISIT DATE FOR ARV
+   * DRUG (Concept_id=5096) Value_datetime =b Difference between a and b is <83
+   *
+   * <p>Print Dispensa Trimestral if a minus b >= 83 days and <= 173 days, where a is the most
+   * recent Drug Pick Up on FILA ( encounter type 18, max encounter_datetime <= endDate) and b is
+   * “RETURN VISIT DATE FOR ARV DRUG” (concept_id 5096, value_datetime) from the most recent FILA (
+   * encounter type 18, max encounter_datetime <= endDate)
+   *
+   * <p>Encounter Type Id = 18 MAXIMUM Encounter DATE (encounter.encounter_datetime <= endDate) = a
+   * RETURN VISIT DATE FOR ARV DRUG (Concept_id=5096) Value_datetime =b Difference between a and b
+   * is >=83 and <=173 days
+   *
+   * <p>Print Dispensa Semestral if a minus b > 173 days, where a is the most recent Drug Pick Up on
+   * FILA ( encounter type 18, max encounter_datetime <= endDate) and b is “RETURN VISIT DATE FOR
+   * ARV DRUG” (concept_id 5096, value_datetime) from the most recent FILA ( encounter type 18, max
+   * encounter_datetime <= endDate)
+   *
+   * <p>Encounter Type Id = 18 MAXIMUM Encounter DATE (encounter.encounter_datetime) <= endDate= a
+   * RETURN VISIT DATE FOR ARV DRUG (Concept_id=5096) Value_datetime =b Difference between a and b
+   * is >173 days
+   *
+   * <p>If the most recent source is FICHA CLINICA then: Print Dispensa Mensal if “Tipo de
+   * Levantamento” (concept_id=23739) is marked as “DM” (concept_id=1098) on the most recent
+   * consultation on FICHA CLINICA ( encounter type 6, max encounter_datetime <= endDate) Encounter
+   * Type Id = 6 Max encounter_datetime <= endDate Last TYPE OF DISPENSATION (id=23739) Value.coded
+   * = MONTHLY (id=1098)
+   *
+   * <p>Print Dispensa Trimestral if “Tipo de Levantamento” (concept_id=23739) is marked as “DT”
+   * (concept_id=23720) on the most recent consultation on FICHA CLINICA ( encounter type 6, max
+   * encounter_datetime <= endDate) Encounter Type Id = 6 Max encounter_datetime <= endDate Last
+   * TYPE OF DISPENSATION (id=23739) Value.coded = QUARTERLY (id=23720) or marked in last “Dispensa
+   * Trimestral (DT)” (concept_id=23720) as Iniciar (I) (concept_id=1256) or Continuar (C)
+   * (concept_id=1257) in Ficha Clinica Mastercard ( encounter type 6, max encounter_datetime <=
+   * endDate) Encounter Type Id = 6 Max encounter_datetime <= endDate Last QUARTERLY DISPENSATION
+   * (DT) (id=23720) Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
+   *
+   * <p>Print Dispensa Semestral if “Tipo de Levantamento” (concept_id=23739) is marked as “DS”
+   * (concept_id=23720) on the most recent consultation on FICHA CLINICA ( encounter type 6, max
+   * encounter_datetime <= endDate) Encounter Type Id = 6 Max encounter_datetime <= endDate Last
+   * TYPE OF DISPENSATION (id=23739) Value.coded = SEMESTRAL (id=23888) or marked in last “Dispensa
+   * Semestral (DS)” (concept_id=23730) as Iniciar (I) (concept_id=1256) or Continuar (C)
+   * (concept_id=1257) in Ficha Clinica Mastercard ( encounter type 6, max encounter_datetime <=
+   * endDate) Encounter Type Id = 6 Max encounter_datetime <= endDate Last SEMESTRAL DISPENSATION
+   * (DT) (id=23888) Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
+   *
    * @return sqlPatientDataDefinition
    */
   public DataDefinition getTypeOfDispensation() {
