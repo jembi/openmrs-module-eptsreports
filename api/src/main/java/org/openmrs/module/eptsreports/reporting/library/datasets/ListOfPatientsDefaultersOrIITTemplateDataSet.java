@@ -62,7 +62,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         new CalculationResultConverter());
 
     /** 5 - Age - Sheet 1: Column */
-    pdd.addColumn("age", new AgeDataDefinition(), "effectiveDate=${endDate}", null);
+    pdd.addColumn("age", new AgeDataDefinition(), "", null);
 
     /** 4 - Sex - Sheet 1: Column D */
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
