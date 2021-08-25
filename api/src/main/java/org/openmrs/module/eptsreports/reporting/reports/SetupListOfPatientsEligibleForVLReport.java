@@ -24,8 +24,9 @@ public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManage
   private TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet;
 
   @Autowired
-  public SetupListOfPatientsEligibleForVLReport(ListOfPatientsEligibleForVLDataset listOfPatientsEligibleForVLDataset,
-                                                TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet){
+  public SetupListOfPatientsEligibleForVLReport(
+      ListOfPatientsEligibleForVLDataset listOfPatientsEligibleForVLDataset,
+      TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet) {
 
     this.listOfPatientsEligibleForVLDataset = listOfPatientsEligibleForVLDataset;
     this.totalOfPatientsEligibleForVLDataSet = totalOfPatientsEligibleForVLDataSet;
