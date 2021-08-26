@@ -1,8 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.data.converter;
 
 import java.io.*;
-import java.util.Arrays;
-import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.util.OpenmrsClassLoader;
 
@@ -45,9 +43,7 @@ public class ConceptNameConverter implements DataConverter {
         String[] records = line.split(cvsSplitBy);
         name = records[1];
         concept = records[0];
-        System.out.println(Arrays.toString(records) + "==" + concept_id);
-        if (Integer.parseInt(String.valueOf(StringUtils.isNotEmpty(concept.trim())))
-            == concept_id) {
+        if (Integer.parseInt(concept.trim()) == concept_id) {
           valueReturned = name;
         }
       }
