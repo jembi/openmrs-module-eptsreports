@@ -1,10 +1,14 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.datasets.ListChildrenOnARTandFormulationsCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.ListChildrenOnARTandFormulationsDataset;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DQRForDuplicateFichaResumoDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SummaryDQRForDuplicateFichaResumoDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
@@ -16,40 +20,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportManager {
+public class SetupDQRForDuplicateFichaResumoReport extends EptsDataExportManager {
 
-  private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
-
-  private ListChildrenOnARTandFormulationsCohortQueries
-      listChildrenOnARTandFormulationsCohortQueries;
-
-  @Autowired
-  public SetupListChildrenOnARTandFormulationsReport(
-      ListChildrenOnARTandFormulationsCohortQueries listChildrenOnARTandFormulationsCohortQueries,
-      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
-    this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
-    this.listChildrenOnARTandFormulationsCohortQueries =
-        listChildrenOnARTandFormulationsCohortQueries;
-  }
+  @Autowired protected GenericCohortQueries genericCohortQueries;
+  @Autowired DQRForDuplicateFichaResumoDataSet dqrForDuplicateFichaResumoDataSet;
+  @Autowired SummaryDQRForDuplicateFichaResumoDataSet summaryDQRForDuplicateFichaResumoDataSet;
 
   @Override
   public String getExcelDesignUuid() {
-    return "9a832386-e290-11eb-a73e-4f4bdad3d8fd";
+    return "0a22031c-f5bd-11eb-a56b-17be2817584c";
   }
 
   @Override
   public String getUuid() {
-    return "ac5ed794-e290-11eb-8648-c3783d587203";
+    return "fd077694-f5bc-11eb-ba44-3f9a8a6341a5";
   }
 
   @Override
   public String getName() {
-    return "List of Children and ARV Formulations Report";
+    return "DQR for Duplicate Ficha Resumo";
   }
 
   @Override
   public String getDescription() {
-    return "This report provides a line listing of children and ARV Formulations";
+    return "This a Data Quality Report to Identify Duplicate for Ficha Resumo";
   }
 
   @Override
@@ -61,12 +55,13 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
     rd.addParameters(getParameters());
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
-            listChildrenOnARTandFormulationsCohortQueries.getBaseCohort(),
-            "endDate=${endDate},location=${location}"));
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     rd.addDataSetDefinition(
-        "ALL",
-        Mapped.mapStraightThrough(listChildrenOnARTandFormulationsDataset.constructDataset()));
+        "EC1", Mapped.mapStraightThrough(dqrForDuplicateFichaResumoDataSet.constructDataSet()));
+    rd.addDataSetDefinition(
+        "SEC1",
+        Mapped.mapStraightThrough(summaryDQRForDuplicateFichaResumoDataSet.constructDataSet()));
     return rd;
   }
 
@@ -82,12 +77,12 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "list_children_art_formulation.xls",
-              "List of Children on ART and Formulations",
+              "Template_Data_Quality_Report_Duplicate_Ficha_Resumo_R.xls",
+              "DQR for Duplicate Ficha Resumo Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:7,dataset:ALL");
+      props.put("repeatingSections", "sheet:2,row:7,dataset:EC1");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
@@ -100,7 +95,7 @@ public class SetupListChildrenOnARTandFormulationsReport extends EptsDataExportM
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("endDate", "End date", Date.class),
+        new Parameter("endDate", "Report Generation Date", Date.class),
         new Parameter("location", "Location", Location.class));
   }
 }

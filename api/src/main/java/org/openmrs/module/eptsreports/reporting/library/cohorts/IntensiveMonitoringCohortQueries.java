@@ -11,6 +11,7 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -58,6 +59,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 7.1, to 7.3 and 7.5 deno Monitoria Intensiva MQHIV 2021 for the selected location and
    * reporting period Section 7.1 (endDateRevision)
    *
+   * @param den indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat7DenMI2021Part135Definition(Integer den) {
@@ -189,6 +191,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 7.2, to 7.4 and 7.6 deno Monitoria Intensiva MQHIV 2021 for the selected location and
    * reporting period Section 7.1 (endDateRevision)
    *
+   * @param den indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat7DenMI2021Part246Definition(Integer den) {
@@ -352,7 +355,8 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     if (den == 2 || den == 4) {
-      cd.setCompositionString( "(A AND (B41 OR B42)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
+      cd.setCompositionString(
+          "(A AND (B41 OR B42)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
     } else if (den == 6) {
       cd.setCompositionString(
           "(A AND (B41 OR B42) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
@@ -364,6 +368,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 7.1, to 7.3 and 7.5 numerator Monitoria Intensiva MQHIV 2021 for the selected location
    * and reporting period Section 7 (endDateRevision)
    *
+   * @param num indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat7NumMI2021Part135Definition(Integer num) {
@@ -522,6 +527,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 7.2, to 7.4 and 7.6 numerator Monitoria Intensiva MQHIV 2021 for the selected location
    * and reporting period Section 7 (endDateRevision)
    *
+   * @param num indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getCat7NumMI2021Part246Definition(Integer num) {
@@ -725,6 +731,8 @@ public class IntensiveMonitoringCohortQueries {
    * Monitoria Intensiva MQHIV 2021 for the selected location and reporting period Section
    * (endDateRevision)
    *
+   * @param level indicator number
+   * @param type indicator
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMICat13Part2(Integer level, String type) {
@@ -784,19 +792,22 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
-  /* Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
+  /**
+   * Get CAT 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period Section (endDateRevision)
    *
+   * @param level indicator number
+   * @param type indicator flag
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
-  public CohortDefinition getCat13Den(Integer level, String type) {
+  public CohortDefinition getCat13Den(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("MI 13.1, 13.4, 13.6, 13.7, 13.8, 13.13 numerator and denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     String mapp =
         "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}";
-    if (level == 1 && type.equals("DEN")) {
+    if (level == 1 && !type) {
       cd.addSearch("MI13DEN", EptsReportUtils.map(this.getMI13DEN1(), mapp));
     } else {
       cd.addSearch(
@@ -807,9 +818,9 @@ public class IntensiveMonitoringCohortQueries {
           EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13(false, level), mapp));
     }
 
-    if ("DEN".equals(type)) {
+    if (!type) {
       cd.setCompositionString("MI13DEN");
-    } else if ("NUM".equals(type)) {
+    } else if (type) {
       cd.setCompositionString("MI13NUM");
     }
     return cd;
@@ -818,6 +829,9 @@ public class IntensiveMonitoringCohortQueries {
   /**
    * Get the indicators (denominators) from CATEGORY 11 from report named “Monitoria Intensiva de
    * HIV-2021” for the selected location and reporting month (endDateRevision)
+   *
+   * @param indicatorFlag indicator number
+   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMIC11DEN(int indicatorFlag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -833,24 +847,29 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "MI11DEN",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag, "MI"),
+              qualityImprovement2020CohortQueries.getMQC11DEN(
+                  indicatorFlag, EptsReportConstants.MIMQ.MI),
               "revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (indicatorFlag == 4 || indicatorFlag == 7) {
       cd.addSearch(
           "MI11DEN",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11DEN(indicatorFlag, "MI"),
+              qualityImprovement2020CohortQueries.getMQC11DEN(
+                  indicatorFlag, EptsReportConstants.MIMQ.MI),
               "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
     cd.setCompositionString("MI11DEN");
     return cd;
   }
-  /* Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
+  /**
+   * Get CAT 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period (endDateRevision)
    *
+   * @param level indicator number
+   * @param type indicator flag
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
-  public CohortDefinition getCat12P1DenNum(Integer level, String type) {
+  public CohortDefinition getCat12P1DenNum(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("MI 12.1, 12.2, 12.5, 12.6, 12.9, 12.10 numerator and denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -868,9 +887,9 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "MI12P1NUM",
         EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ12NUM(level), MAPPING));
-    if ("DEN".equals(type)) {
+    if (!type) {
       cd.setCompositionString("MI12P1DEN");
-    } else if ("NUM".equals(type)) {
+    } else if (type) {
       cd.setCompositionString("MI12P1NUM");
     }
     return cd;
@@ -880,6 +899,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.2 Denominator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN2(Integer indicator) {
@@ -900,6 +920,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.2 Numerator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM2(Integer indicator) {
@@ -920,6 +941,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.5 Denominator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN5(Integer indicator) {
@@ -940,6 +962,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.5 Numerator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM5(Integer indicator) {
@@ -960,6 +983,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.9 Denominator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN9(Integer indicator) {
@@ -980,6 +1004,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.9 Numerator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM9(Integer indicator) {
@@ -1000,6 +1025,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.10 Denominator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN10(Integer indicator) {
@@ -1020,6 +1046,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.10 Numerator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM10(Integer indicator) {
@@ -1040,6 +1067,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.11 Denominator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN11(Integer indicator) {
@@ -1060,6 +1088,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.11 Numerator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM11(Integer indicator) {
@@ -1080,6 +1109,7 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.14 Denominator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13DEN14(Integer indicator) {
@@ -1100,6 +1130,9 @@ public class IntensiveMonitoringCohortQueries {
   /**
    * Get the indicators (numerators) from CATEGORY 11 from report named “Monitoria Intensiva de
    * HIV-2021” for the selected location and reporting month (endDateRevision)
+   *
+   * @param indicatorFlag indicator number
+   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMIC11NUM(int indicatorFlag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1114,55 +1147,61 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING));
     } else if (indicatorFlag == 2) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotEnotFnHandAdultss(
-                  "MI"),
+                  EptsReportConstants.MIMQ.MI),
               MAPPING1));
     } else if (indicatorFlag == 3) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING));
     } else if (indicatorFlag == 4) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2nB3nCnotDnotEnotEnotFnH(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING1));
     } else if (indicatorFlag == 5) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING));
     } else if (indicatorFlag == 6) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
               qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(
-                  "MI"),
+                  EptsReportConstants.MIMQ.MI),
               MAPPING));
     } else if (indicatorFlag == 7) {
       cd.addSearch(
           "MI11NUM",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren("MI"),
+              qualityImprovement2020CohortQueries.getMQC11NumB1nB2notCnotDnotEnotFnHChildren(
+                  EptsReportConstants.MIMQ.MI),
               MAPPING1));
     }
     cd.setCompositionString("MI11NUM");
 
     return cd;
   }
-  /*
+  /**
    * Get CAT 13 Monitoria Intensiva MQHIV 2021 for the selected location and reporting period
    * Section 13.14 Numerator (endDateRevision)
    *
+   * @param indicator indicator number
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI13NUM14(Integer indicator) {
@@ -1184,9 +1223,11 @@ public class IntensiveMonitoringCohortQueries {
    * Get CAT 13 P4 NUMERATOR AND DENOMINATOR Monitoria Intensiva MQHIV 2021 for the selected
    * location and reporting period (endDateRevision)
    *
+   * @param level indicator number
+   * @param type indicator flag
    * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
-  public CohortDefinition getMICat13Part4(Integer level, String type) {
+  public CohortDefinition getMICat13Part4(Integer level, Boolean type) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("MI 13.3, 13.12 AND 13.18 Numerator AND Denominator");
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1200,9 +1241,9 @@ public class IntensiveMonitoringCohortQueries {
         "MI13NUM",
         EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQ13P4(false, level), MAPPING2));
 
-    if ("DEN".equals(type)) {
+    if (!type) {
       cd.setCompositionString("MI13DEN");
-    } else if ("NUM".equals(type)) {
+    } else if (type) {
       cd.setCompositionString("MI13NUM");
     }
     return cd;
@@ -1212,10 +1253,12 @@ public class IntensiveMonitoringCohortQueries {
    * A - Select all patients with Last Clinical Consultation (encounter type 6, encounter_datetime)
    * occurred during the inclusion period (encounter_datetime>= startDateInclusion and <=
    * endDateInclusion
+   *
+   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI15A() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All patients with Last Clinical Consultation ");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1250,7 +1293,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15B2() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("B2 Patients From Ficha Clinica");
+    cd.setName("B2 - All patients with the earliest “Data de Início TARV”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1295,11 +1338,11 @@ public class IntensiveMonitoringCohortQueries {
    * concept_id 1065) in Ficha Clínica (encounter type 6, encounter_datetime) occurred during the
    * following period (encounter_datetime >= startDate and <= endDate)
    *
-   * @return
+   * @return @{@link org.openmrs.module.reporting.cohort.definition.CohortDefinition}
    */
   public CohortDefinition getMI15D() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All female patients registered as “Breastfeeding”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1340,7 +1383,7 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15B1() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("B1 - All patients with the earliest “Data de Início TARV”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1395,7 +1438,7 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getMI15G() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("G - All patients with the last Viral Load Result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1441,11 +1484,11 @@ public class IntensiveMonitoringCohortQueries {
    * concept_id 1065) in Ficha Clínica (encounter type 6, encounter_datetime) occurred during the
    * following period (encounter_datetime >= startDate and <= endDate)
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMI15C() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All female patients registered as “Pregnant”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1483,7 +1526,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15H() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("Select all patients with Viral Load result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1536,12 +1579,15 @@ public class IntensiveMonitoringCohortQueries {
    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id 1257) Last record of FR
    * (concept id 23729) and the response is “ Iniciar” (value_coded, concept id 1256) or “Continua”
    * (value_coded, concept id 1257) Last record of DC (concept id 23731) and the response is
-   * “Iniciar” (value_coded, concept id 1256) or “Continua” (value_coded, concept id 1257)
+   * “Iniciar” (value_coded, concept id 1256) or “Continua” (value_coded, concept id 1257)*
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMI15J() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName(
+        "J - All patients with at least one of the following models registered in Ficha Clinica");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1603,10 +1649,12 @@ public class IntensiveMonitoringCohortQueries {
    * F - Select all patients with the last CD4 result (concept id 1695) and the result is <= 200
    * (value_numeric) registered on Ficha Clinica (encounter type 6) before “Last Consultation Date”
    * (encounter_datetime from A).
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMI15F() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All patients with the last CD4 result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1652,11 +1700,14 @@ public class IntensiveMonitoringCohortQueries {
    * “Iniciar” (value_coded, concept id 1256) DS (concept id 23888) = “Iniciar” (value_coded,
    * concept id 1256) FR (concept id 23729) = “Iniciar” (value_coded, concept id 1256) DC (concept
    * id 23731) = “Iniciar” (value_coded, concept id 1256)
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMI15K() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName(
+        "K - All patients with at least one of the following models registered in Ficha Clinica");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1720,11 +1771,14 @@ public class IntensiveMonitoringCohortQueries {
    * “Fim” (value_coded, concept id 1267) DS (concept id 23888) = “Fim” (value_coded, concept id
    * 1267) FR (concept id 23729) = “Fim” (value_coded, concept id 1267) DC (concept id 23731) =
    * “Fim” (value_coded, concept id 1267)
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMI15L() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName(
+        "L - All patients with at least one of the following models registered in Ficha Clinica");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1800,12 +1854,14 @@ public class IntensiveMonitoringCohortQueries {
    *       (encounter_datetime from A) minus 61 days
    * </ul>
    *
+   * @param upper The upper limit in days
+   * @param lower The lower limit in days
    * @return CohortDefinition
    */
   public CohortDefinition getMI15E(int upper, int lower) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("E - All patients with the following Clinical Consultations or ARV Drugs Pick Ups");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -1880,7 +1936,7 @@ public class IntensiveMonitoringCohortQueries {
    * Consultation” (encounter_datetime from A) minus 90 days and “Last Clinical Consultation”
    * (encounter_datetime from A) minus 61 days
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getMI15EComplete() {
 
@@ -1917,16 +1973,17 @@ public class IntensiveMonitoringCohortQueries {
    * with at least one Viral Load Result (concept id 856, value_numeric not NULL) registered on
    * Ficha Clinica (encounter type 6, encounter_datetime) between “Last VL Result <1000”+ 12 months
    * and “Last VL Result <1000” + 18 months
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMI15I() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("I - All patients with the last Viral Load Result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("Patients From Ficha Clinica");
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
@@ -1967,6 +2024,23 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>MI15DenNum: Melhoria de Qualidade Category 15 Denominador e Numerator</b><br>
+   * <br>
+   * <i> DENOMINADOR 1: A and B1 and E and NOT (C or D or F or G or J) and Age >= 2 </i> <br>
+   * <i> NUMERATOR 1: A and B1 and E and NOT (C or D or F or G or J) and K and Age >= 2 </i> <br>
+   * <br>
+   * <i> DENOMINADOR 2: A and J and H and Age >= 2 </i> <i> NUMERATOR 2: A and J and H and L and Age
+   * >= 2 </i><br>
+   * <br>
+   * <i> DENOMINADOR 3: A and J and B2 and NOT P and Age >= 2 </i> <i> NUMERATOR 3: A and J and B2
+   * and NOT P and I and Age >= 2 </i><br>
+   * <br>
+   *
+   * @param isDenominator indicator flag
+   * @param level indicator number
+   * @return CohortDefinition
+   */
   public CohortDefinition getCat15P1DenNum(boolean isDenominator, int level) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -2051,7 +2125,7 @@ public class IntensiveMonitoringCohortQueries {
    * Age should be calculated on “Last Consultation Date” (Check A for the algorithm to define this
    * date).
    *
-   * @return
+   * @return CohortDefinition
    */
   public CohortDefinition getAgeOnLastConsultationMoreThan2Years() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -2091,6 +2165,8 @@ public class IntensiveMonitoringCohortQueries {
    * 6) during the last 3 months from the “Last Consultation Date” (encounter_datetime from A), i.e,
    * at least one “Pedido de Carga Viral” encounter_datetime >= “Last Consultation Date”-3months and
    * < “Last Consultation Date”.
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getMI15P() {
 
@@ -2100,7 +2176,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("Patients From Ficha Clinica");
+    cd.setName("All patients with concept “PEDIDO DE INVESTIGACOES LABORATORIAIS”");
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
@@ -2125,6 +2201,11 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
+  /**
+   * Get CAT 13.1 Denominator
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getMI13DEN1() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
