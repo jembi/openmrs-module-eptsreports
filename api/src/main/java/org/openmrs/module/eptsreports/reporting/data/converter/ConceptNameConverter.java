@@ -31,12 +31,14 @@ public class ConceptNameConverter implements DataConverter {
 
     String line = "";
     String cvsSplitBy = ",";
+    String headLine = "";
     String name = "";
     String concept = "";
     String valueReturned = "";
 
     try {
       BufferedReader br = new BufferedReader(new InputStreamReader(conceptNames, "UTF-8"));
+      headLine = br.readLine();
       while ((line = br.readLine()) != null) {
         String[] records = line.split(cvsSplitBy);
         name = records[1];
