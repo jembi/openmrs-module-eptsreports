@@ -42,18 +42,20 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    *
    * @return cd
    */
-  public CohortDefinition getReportGenerationDate() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Report Generation Date");
+  public DataDefinition getReportGenerationDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Report Generation Date");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "EndDate", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
 
-    String sql = " SELECT curdate();";
+    String sql =
+        "SELECT CURDATE(), DATE_FORMAT(CURDATE(), '%d-%m-%Y') as period";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
-    cd.setQuery(substitutor.replace(sql));
-    return cd;
+    sqlPatientDataDefinition.setQuery(substitutor.replace(sql));
+    return sqlPatientDataDefinition;
   }
 
   /**
