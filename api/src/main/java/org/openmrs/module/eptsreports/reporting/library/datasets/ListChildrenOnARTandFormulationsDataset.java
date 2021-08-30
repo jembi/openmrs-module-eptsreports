@@ -201,7 +201,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
     return cd;
   }
 
-  private DataDefinition getAge() {
+  public DataDefinition getAge() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Patient Age at Reporting End Date");
     spdd.addParameter(new Parameter("endDate", "endDate", Date.class));

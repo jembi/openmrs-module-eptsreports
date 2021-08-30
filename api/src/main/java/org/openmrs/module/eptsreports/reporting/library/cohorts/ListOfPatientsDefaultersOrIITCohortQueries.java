@@ -1688,11 +1688,15 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  /** @return sqlCohortDefinition */
+  /**
+   * 12 - Address (Localidade) – Sheet 1: Column K
+   *
+   * @return sqlCohortDefinition
+   */
   public DataDefinition getLocation() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("All patients marked as: Sim");
+    sqlPatientDataDefinition.setName("Get Patient Location");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1710,11 +1714,15 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  /** @return sqlCohortDefinition */
+  /**
+   * 11 - Contacto – Sheet 1: Column K
+   *
+   * @return sqlCohortDefinition
+   */
   public DataDefinition getContact() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("All patients marked as: Sim");
+    sqlPatientDataDefinition.setName("Get Patient Contact");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1731,11 +1739,15 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  /** @return sqlCohortDefinition */
+  /**
+   * 13 - Address (Bairro) – Sheet 1: Column M
+   *
+   * @return sqlPatientDataDefinition
+   */
   public DataDefinition getNeighborhood() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("All patients marked as: Sim");
+    sqlPatientDataDefinition.setName("Get Patient Neighborhood");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1752,11 +1764,15 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  /** @return sqlCohortDefinition */
+  /**
+   * 14 - Address (Ponto de Referencia) – Sheet 1: Column N
+   *
+   * @return sqlPatientDataDefinition
+   */
   public DataDefinition getReferencePoint() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("All patients marked as: Sim");
+    sqlPatientDataDefinition.setName("Get Patient Reference Point");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1786,12 +1802,12 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    * and “Data de Consentimento” (concept_id 23776) is before report generation date (value_datetime
    * < Report Generation Date)
    *
-   * @return sqlCohortDefinition
+   * @return sqlPatientDataDefinition
    */
   public DataDefinition getPatientsMarkedNo() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("All patients marked as: Sim");
+    sqlPatientDataDefinition.setName("All patients marked as: No");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
