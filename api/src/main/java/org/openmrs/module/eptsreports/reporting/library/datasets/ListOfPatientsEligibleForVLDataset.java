@@ -23,7 +23,7 @@ public class ListOfPatientsEligibleForVLDataset extends BaseDataSet {
 
     PatientIdentifierType identifierType =
         Context.getPatientService()
-            .getPatientIdentifierTypeByUuid("770fb60a-0593-11ec-9731-fb80d683e325");
+            .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
     DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
     DataDefinition identifierDef =
         new ConvertedPatientDataDefinition(
