@@ -2176,7 +2176,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                      e.encounter_type =  ${18}  AND p.voided = 0 "
             + "                AND e.voided = 0 "
             + "                AND e.location_id = :location "
-            + "                AND DATE(e.encounter_datetime) <= :location "
+            + "                AND DATE(e.encounter_datetime) <= :endDate "
             + "              GROUP BY p.patient_id UNION SELECT "
             + "                                              e.patient_id, MAX(e.encounter_datetime) encounter_date "
             + "              FROM "
