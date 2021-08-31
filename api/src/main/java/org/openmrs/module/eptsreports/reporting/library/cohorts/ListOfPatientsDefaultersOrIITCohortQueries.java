@@ -1776,7 +1776,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                 AND o.value_datetime < current_date()  "
             + "              GROUP BY p.patient_id  "
             + "             ) AS max_apss ON p.patient_id = max_apss.patient_id  "
-            + "                WHERE e.encounter_type =  ${35    "
+            + "                WHERE e.encounter_type =  ${35}   "
             + "                  AND e.encounter_datetime = max_apss.most_recent   "
             + "                  AND e.location_id = :location  "
             + "                  AND o.concept_id = ${confidentConcent}                      "
