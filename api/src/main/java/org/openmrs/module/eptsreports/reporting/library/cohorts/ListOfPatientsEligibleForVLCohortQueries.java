@@ -467,14 +467,14 @@ public class ListOfPatientsEligibleForVLCohortQueries {
   }
 
   // 10
-  public CohortDefinition getPatientsAndMostRecentVLResultDate() {
+  public DataDefinition getPatientsAndMostRecentVLResultDate() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -517,20 +517,20 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 
   // 11
-  public CohortDefinition getPatientsAndMostRecentViralLoad() {
+  public DataDefinition getPatientsAndMostRecentViralLoad() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -571,19 +571,19 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 
-  public CohortDefinition getPatientsAndLastFollowUpConsultationDate() {
+  public DataDefinition getPatientsAndLastFollowUpConsultationDate() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -605,20 +605,20 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 
   // 13
-  public CohortDefinition getPatientsAndLastFollowUpNextConsultationDate() {
+  public DataDefinition getPatientsAndLastFollowUpNextConsultationDate() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -641,20 +641,20 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 
   // 14
-  public CohortDefinition getPatientsAndLastDrugPickUpDateOnFila() {
+  public DataDefinition getPatientsAndLastDrugPickUpDateOnFila() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -672,19 +672,19 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
   // 15
-  public CohortDefinition getPatientsAndLastDrugPickUpDateOnFichaMestre() {
+  public DataDefinition getPatientsAndLastDrugPickUpDateOnFichaMestre() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -713,20 +713,20 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 
   // 16
-  public CohortDefinition getPatientsAndNextDrugPickUpDateOnFila() {
+  public DataDefinition getPatientsAndNextDrugPickUpDateOnFila() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -750,19 +750,19 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 
-  public CohortDefinition getPatientsAndLastDrugPickUpOnFila() {
+  public SqlPatientDataDefinition getPatientsAndLastDrugPickUpOnFila() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -791,20 +791,20 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 
   // 17
-  public CohortDefinition getPatientsAndNextpickUpDateOnFichaMestre() {
+  public DataDefinition getPatientsAndNextpickUpDateOnFichaMestre() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -834,19 +834,19 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 
-  public CohortDefinition getPatientsAndNumberOfAPSSAndPPAfterHadVLGreaterThan1000() {
+  public DataDefinition getPatientsAndNumberOfAPSSAndPPAfterHadVLGreaterThan1000() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -909,8 +909,8 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    return sqlCohortDefinition;
+    return sqlPatientDataDefinition;
   }
 }

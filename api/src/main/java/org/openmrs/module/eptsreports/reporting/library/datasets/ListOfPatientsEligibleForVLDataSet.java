@@ -40,6 +40,7 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
     pdd.addColumn("nid", identifierDef, "");
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
+    pdd.addColumn("S1CJ", new AgeDataDefinition(), "", null);
 
     return pdd;
   }
