@@ -49,8 +49,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
 
-    String sql =
-        "SELECT CURDATE(), DATE_FORMAT(CURDATE(), '%d-%m-%Y') as report_generation_date";
+    String sql = "SELECT CURDATE(), DATE_FORMAT(CURDATE(), '%d-%m-%Y') as report_generation_date";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
