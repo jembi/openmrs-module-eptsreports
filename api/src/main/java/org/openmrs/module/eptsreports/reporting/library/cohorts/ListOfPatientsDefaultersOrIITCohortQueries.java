@@ -1653,7 +1653,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     return sqlPatientDataDefinition;
   }
-
   /**
    * 11 - Contacto – Sheet 1: Column K
    *
@@ -1958,14 +1957,16 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                                         INNER JOIN obs o "
             + "                                                 ON e.encounter_id = "
             + "                                                    o.encounter_id "
+            + "                                         INNER JOIN obs o2 "
+            + "                                                 ON e.encounter_id = "
+            + "                                                    o2.encounter_id "
             + "                                  WHERE  p.voided = 0 "
             + "                                         AND e.voided = 0 "
             + "                                         AND o.voided = 0 "
             + "                                         AND e.location_id = :location "
             + "                                         AND e.encounter_type = ${52} "
-            + "                                         AND o.concept_id = ${23865} "
-            + "                                         AND o.value_coded = ${1065} "
-            + "                                         AND o.value_datetime <= :endDate "
+            + "                                         AND (o.concept_id = ${23866} o.value_datetime <= :endDate)"
+            + "                                         AND (o2.concept_id = ${23865} AND o2.value_coded = ${1065}) "
             + "                                  GROUP  BY p.patient_id) most_recent "
             + "                              ON p.patient_id = most_recent.patient_id "
             + "               WHERE  p.voided = 0 "
