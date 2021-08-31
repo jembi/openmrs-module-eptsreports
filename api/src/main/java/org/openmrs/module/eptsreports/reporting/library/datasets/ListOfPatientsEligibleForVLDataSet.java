@@ -14,7 +14,7 @@ import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ListOfPatientsEligibleForVLDataset extends BaseDataSet {
+public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
 
   public DataSetDefinition constructDataSet() {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();

@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsEligibleForVLDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsEligibleForVLDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TotalOfPatientsEligibleForVLDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
@@ -20,12 +20,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManager {
 
-  private ListOfPatientsEligibleForVLDataset listOfPatientsEligibleForVLDataset;
+  private ListOfPatientsEligibleForVLDataSet listOfPatientsEligibleForVLDataset;
   private TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet;
 
   @Autowired
   public SetupListOfPatientsEligibleForVLReport(
-      ListOfPatientsEligibleForVLDataset listOfPatientsEligibleForVLDataset,
+      ListOfPatientsEligibleForVLDataSet listOfPatientsEligibleForVLDataset,
       TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet) {
 
     this.listOfPatientsEligibleForVLDataset = listOfPatientsEligibleForVLDataset;
