@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -1628,68 +1629,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
   }
 
   /**
-   * <b>PRINT ‘S’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS</b>
-   *
-   * <p>All patients marked as “Sim” (concept id 1065) on “O paciente/ cuidador concorda em ser
-   * contactado, se necessário?” (Concept Id 6306) on the most recent Ficha APSS e PP (Encounter
-   * Type 35) and “Data de Consentimento” (concept_id 23776) is before report generation date
-   * (value_datetime < Report Generation Date) <b>OR</b>
-   *
-   * <p>All patients marked as “Sim” (concept id 1065) on “O confidente concorda em ser contactado,
-   * se necessário?” (Concept Id 6306 6177) on the most recent Ficha APSS e PP (Encounter Type 35)
-   * and “Data de Consentimento” (concept_id 23776) is before report generation date (value_datetime
-   * < Report Generation Date)
-   *
-   * @return sqlCohortDefinition
-   */
-  public DataDefinition getPatientsMarkedYes() {
-
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("All patients marked as: Sim");
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6306", hivMetadata.getAcceptContactConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6177", hivMetadata.getConfidentAcceptContact().getConceptId());
-    map.put("23776", hivMetadata.getConfidentConsentDate().getConceptId());
-
-    String query =
-        "SELECT  p.patient_id , IF(p.patient_id IS NOT NULL, 'S','') AS answer  FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "   INNER JOIN obs o ON o.encounter_id = e.encounter_id INNER JOIN  "
-            + " (SELECT p.patient_id, MAX(e.encounter_datetime) most_recent  "
-            + "  FROM patient p "
-            + "   INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "   INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "    WHERE e.encounter_type = ${35} "
-            + "     AND o.concept_id = ${23776} "
-            + "     AND p.voided = 0 "
-            + "     AND e.voided = 0 "
-            + "     AND o.voided = 0 "
-            + "     AND e.location_id = :location "
-            + "     AND o.value_datetime < current_date() "
-            + "  GROUP BY p.patient_id "
-            + " ) AS max_apss ON p.patient_id = max_apss.patient_id "
-            + "    WHERE e.encounter_type = ${35}  "
-            + "         AND e.encounter_datetime = max_apss.most_recent  "
-            + "                        AND e.location_id = :location "
-            + "      AND o.concept_id  IN (${6177})                     "
-            + "      AND o.value_coded = ${1065}                    "
-            + "      AND p.voided = 0 "
-            + "      AND e.voided = 0 "
-            + "      AND o.voided = 0 "
-            + "      "
-            + "    ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
-
-  /**
    * 12 - Address (Localidade) – Sheet 1: Column K
    *
    * @return sqlCohortDefinition
@@ -1805,7 +1744,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    *
    * @return sqlPatientDataDefinition
    */
-  public DataDefinition getPatientsMarkedNo() {
+  public DataDefinition getPatientsConfidentConcent(Concept confidentConcent) {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("All patients marked as: No");
@@ -1813,37 +1752,61 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6306", hivMetadata.getAcceptContactConcept().getConceptId());
+    map.put("confidentConcent", confidentConcent.getConceptId());
     map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("6177", hivMetadata.getConfidentAcceptContact().getConceptId());
     map.put("23776", hivMetadata.getConfidentConsentDate().getConceptId());
 
     String query =
-        "SELECT  p.patient_id , IF(p.patient_id IS NOT NULL, 'N','') AS answer  FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "   INNER JOIN obs o ON o.encounter_id = e.encounter_id INNER JOIN  "
-            + " (SELECT p.patient_id, MAX(e.encounter_datetime) most_recent  "
-            + "  FROM patient p "
-            + "   INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "   INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "    WHERE e.encounter_type = ${35} "
-            + "     AND o.concept_id = ${23776} "
-            + "     AND p.voided = 0 "
-            + "     AND e.voided = 0 "
-            + "     AND o.voided = 0 "
-            + "     AND e.location_id = :location "
-            + "     AND o.value_datetime < current_date() "
-            + "  GROUP BY p.patient_id "
-            + " ) AS max_apss ON p.patient_id = max_apss.patient_id "
-            + "    WHERE e.encounter_type = ${35}  "
-            + "         AND e.encounter_datetime = max_apss.most_recent  "
-            + "                        AND e.location_id = :location "
-            + "      AND o.concept_id  IN (${6177})                     "
-            + "      AND o.value_coded = ${1066}                    "
-            + "      AND p.voided = 0 "
-            + "      AND e.voided = 0 "
-            + "      AND o.voided = 0 "
-            + "      "
-            + "    ";
+        "SELECT p.patient_id, CASE WHEN patient_yes.patient_id IS NOT NULL THEN 'S' WHEN patient_no.patient_id IS NOT NULL THEN 'N' ELSE ''  END  "
+            + " FROM   patient p  "
+            + "             LEFT JOIN (SELECT  p.patient_id  FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id INNER JOIN   "
+            + "             (SELECT p.patient_id, MAX(e.encounter_datetime) most_recent   "
+            + "              FROM patient p  "
+            + "               INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                WHERE e.encounter_type = ${35}   "
+            + "                 AND o.concept_id = ${23776}   "
+            + "                 AND p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location  "
+            + "                 AND o.value_datetime < current_date()  "
+            + "              GROUP BY p.patient_id  "
+            + "             ) AS max_apss ON p.patient_id = max_apss.patient_id  "
+            + "                WHERE e.encounter_type =  ${35    "
+            + "                  AND e.encounter_datetime = max_apss.most_recent   "
+            + "                  AND e.location_id = :location  "
+            + "                  AND o.concept_id = ${confidentConcent}                      "
+            + "                  AND o.value_coded =${1065}                      "
+            + "                  AND p.voided = 0  "
+            + "                  AND e.voided = 0  "
+            + "                  AND o.voided = 0) AS patient_yes  ON p.patient_id = patient_yes.patient_id"
+            + "            LEFT JOIN (SELECT  p.patient_id  FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id INNER JOIN   "
+            + "             (SELECT p.patient_id, MAX(e.encounter_datetime) most_recent   "
+            + "              FROM patient p  "
+            + "               INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                WHERE e.encounter_type =  ${35}   "
+            + "                 AND o.concept_id =  ${23776}   "
+            + "                 AND p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location  "
+            + "                 AND o.value_datetime < current_date()  "
+            + "              GROUP BY p.patient_id  "
+            + "             ) AS max_apss ON p.patient_id = max_apss.patient_id  "
+            + "                WHERE e.encounter_type =  ${35}    "
+            + "                  AND e.encounter_datetime = max_apss.most_recent   "
+            + "                  AND e.location_id = :location  "
+            + "                  AND o.concept_id = ${confidentConcent}                      "
+            + "                  AND o.value_coded =  ${1066}                      "
+            + "                  AND p.voided = 0  "
+            + "                  AND e.voided = 0  "
+            + "                  AND o.voided = 0) AS patient_no  ON p.patient_id = patient_no.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

@@ -4,6 +4,7 @@ import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
@@ -25,13 +26,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
-  @Autowired
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
-  @Autowired private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
+  private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
+
+  private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
+
+  private HivMetadata hivMetadata;
 
   @Autowired
-  private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
+  public ListOfPatientsDefaultersOrIITTemplateDataSet(
+      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
+      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
+      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
+      HivMetadata hivMetadata) {
+    this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
+    this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
+    this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
+    this.hivMetadata = hivMetadata;
+  }
 
   public DataSetDefinition constructDataSet() {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
@@ -102,14 +115,16 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     /** 8 -· Consentimento Informado – Sheet 1: Column H */
     pdd.addColumn(
         "patient_informed_consent",
-        listOfPatientsDefaultersOrIITCohortQueries.getPatientsMarkedYes(),
+        listOfPatientsDefaultersOrIITCohortQueries.getPatientsConfidentConcent(
+            hivMetadata.getAcceptContactConcept()),
         "location=${location}",
         null);
 
     /** PRINT ‘N’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS: */
     pdd.addColumn(
         "confidant_informed_consent",
-        listOfPatientsDefaultersOrIITCohortQueries.getPatientsMarkedNo(),
+        listOfPatientsDefaultersOrIITCohortQueries.getPatientsConfidentConcent(
+            hivMetadata.getConfidentAcceptContact()),
         "location=${location}",
         null);
 
