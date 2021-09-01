@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -11,10 +12,21 @@ import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDat
 import org.openmrs.module.reporting.data.person.definition.*;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
+
+  private ListOfPatientsEligibleForVLDataDefinitionQueries
+      patientsEligibleForVLDataDefinitionQueries;
+  private ListOfPatientsEligibleForVLDataSet patientsEligibleForVLDataSet;
+
+  @Autowired
+  public ListOfPatientsEligibleForVLDataSet(
+      ListOfPatientsEligibleForVLDataDefinitionQueries patientsEligibleForVLDataDefinitionQueries) {
+    this.patientsEligibleForVLDataDefinitionQueries = patientsEligibleForVLDataDefinitionQueries;
+  }
 
   public DataSetDefinition constructDataSet() {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
