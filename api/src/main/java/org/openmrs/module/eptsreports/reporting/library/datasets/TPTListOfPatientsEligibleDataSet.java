@@ -87,6 +87,8 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     pdd.addColumn(
         "pregnant_or_breastfeeding", pregnantBreasfeediDefinition(), "location=${location}", null);
 
+    // pdd.addColumn("report_generation_date", getReportGenerationDate(), "", null);
+
     return pdd;
   }
 
@@ -127,6 +129,28 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     obsForPersonDataDefinition.setWhich(TimeQualifier.LAST);
     return obsForPersonDataDefinition;
   }
+
+  // /**
+  //  * <b> GET THE REPORT GENERATION DATE
+  //  *
+  //  * @return cd
+  //  */
+  // public DataDefinition getReportGenerationDate() {
+  //   SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+  //   sqlPatientDataDefinition.setName("Report Generation Date");
+  //   sqlPatientDataDefinition.addParameter(new Parameter("endDate", "EndDate", Date.class));
+
+  //   Map<String, Integer> map = new HashMap<>();
+
+  //   String sql =
+  //       "SELECT p.patient_id, DATE_FORMAT(CURDATE(), '%d-%m-%Y') as report_generation_date from
+  // patient p limit 1";
+
+  //   StringSubstitutor substitutor = new StringSubstitutor(map);
+
+  //   sqlPatientDataDefinition.setQuery(substitutor.replace(sql));
+  //   return sqlPatientDataDefinition;
+  // }
 
   private DataDefinition pregnantBreasfeediDefinition() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
