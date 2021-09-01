@@ -59,10 +59,10 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addParameter(new Parameter("maxDay", "Maximum number of days", Integer.class));
     pdd.addParameter(new Parameter("location", "Location", Location.class));
     pdd.setName("FATL");
-    pdd.addRowFilter(
-        listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
-        "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}");
-    pdd.addParameters(setupListOfPatientsDefaultersOrIITReport.getParameters());
+    /*pdd.addRowFilter(
+    listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
+    "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}");*/
+    pdd.addParameters(getParameters());
     PatientIdentifierType identifierType =
         Context.getPatientService()
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
@@ -217,7 +217,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn(
         "days_of_absence_to_survey",
         listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
-        "endDate=${endDate},location=${location}",
+        "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}",
         null);
 
     return pdd;

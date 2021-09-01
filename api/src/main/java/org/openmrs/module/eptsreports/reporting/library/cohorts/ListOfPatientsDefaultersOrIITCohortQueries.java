@@ -1816,6 +1816,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     spdd.setName("THE NUMBER OF DAYS OF DELAY");
     spdd.addParameter(new Parameter("location", "Location", Location.class));
     spdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    spdd.addParameter(new Parameter("minDay", "minDay", Integer.class));
+    spdd.addParameter(new Parameter("maxDay", "maxDay", Integer.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
@@ -1832,7 +1834,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                     WHEN last_famacia.last_pickup >= last_mastercard_pick.last_pickup THEN  TIMESTAMPDIFF(DAY, last_farmacia_scheduled.last_scheduled,:endDate) "
             + "                     WHEN last_famacia.last_pickup  < last_mastercard_pick.last_pickup THEN  TIMESTAMPDIFF(DAY, last_mastercard_scheduled.last_scheduled,:endDate) "
             + "                     END "
-            + "FROM patient p "
+            + " FROM patient p "
             + "         INNER JOIN "
             + "     (SELECT p.patient_id, Max(e.encounter_datetime) AS last_pickup "
             + "      FROM   patient p "
@@ -1897,7 +1899,11 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "        AND (o.concept_id = ${23866}   AND o.value_datetime <= :endDate) "
             + "        AND (o2.concept_id = ${23865} AND o2.value_coded = ${1065}) "
             + "      GROUP  BY p.patient_id) AS last_mastercard_scheduled ON p.patient_id = last_mastercard_scheduled.patient_id "
-            + "WHERE p.voided = 0";
+            + " WHERE p.voided = 0 "
+            + " AND    TIMESTAMPDIFF(DAY, last_farmacia_scheduled.last_scheduled,:endDate) >= :minDay "
+            + " AND    TIMESTAMPDIFF(DAY, last_farmacia_scheduled.last_scheduled,:endDate) <= :maxDay "
+            + " AND    TIMESTAMPDIFF(DAY, last_mastercard_scheduled.last_scheduled,:endDate) >= :minDay "
+            + " AND    TIMESTAMPDIFF(DAY, last_mastercard_scheduled.last_scheduled,:endDate) <= :maxDay ";
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
     spdd.setQuery(substitutor.replace(query));
