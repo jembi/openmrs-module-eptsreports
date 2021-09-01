@@ -8,6 +8,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
+import org.openmrs.module.eptsreports.reporting.reports.SetupListOfPatientsDefaultersOrIITReport;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -32,17 +33,16 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
   private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
+  private SetupListOfPatientsDefaultersOrIITReport setupListOfPatientsDefaultersOrIITReport;
+
   private HivMetadata hivMetadata;
 
   @Autowired
-  public ListOfPatientsDefaultersOrIITTemplateDataSet(
-      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
-      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
-      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
-      HivMetadata hivMetadata) {
+  public ListOfPatientsDefaultersOrIITTemplateDataSet(ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset, TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet, ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries, SetupListOfPatientsDefaultersOrIITReport setupListOfPatientsDefaultersOrIITReport, HivMetadata hivMetadata) {
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
+    this.setupListOfPatientsDefaultersOrIITReport = setupListOfPatientsDefaultersOrIITReport;
     this.hivMetadata = hivMetadata;
   }
 
@@ -57,7 +57,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addRowFilter(
         listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
         "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}");
-    pdd.addParameters(getParameters());
+    pdd.addParameters(setupListOfPatientsDefaultersOrIITReport.getParameters());
     PatientIdentifierType identifierType =
         Context.getPatientService()
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
