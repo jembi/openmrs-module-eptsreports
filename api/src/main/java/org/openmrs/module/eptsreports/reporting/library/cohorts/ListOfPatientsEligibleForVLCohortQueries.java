@@ -44,12 +44,13 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     CohortDefinition chdX1 = getLastNextScheduledConsultationDate();
     CohortDefinition chdX2 = getLastNextScheduledPickUpDate();
     CohortDefinition chdX3 = getLastNextScheduledPickUpDateWithMostRecentDataLevantamento();
-    CohortDefinition chdVL1 = null;
+    CohortDefinition chdVL1 = getPatientsOnARTForMoreThan6Months();
     CohortDefinition chdVL2 = getPatientsWithVLLessThan1000();
     CohortDefinition chdVL3 = getPatientsWithMostRecentVLQuantitativeResult();
     CohortDefinition chdVL4 = getPatientsWhoHaveRegisteredVLLessThan1000ForMoreThan12Months();
     CohortDefinition chdVL5 = getPatientsWithRecentVLIgualOrGreaterThan1000();
-    CohortDefinition chdVL6 = getPatientsWhoHaveRegisteredVLIgualOrGreaterThan1000ForMoreThan3Months();
+    CohortDefinition chdVL6 =
+        getPatientsWhoHaveRegisteredVLIgualOrGreaterThan1000ForMoreThan3Months();
     CohortDefinition chdVL7 = getPatientsWhoDontHaveAnyViralLoad();
     CohortDefinition chdE1 = txNewCohortQueries.getTxNewBreastfeedingComposition(true);
     CohortDefinition chdE2 = txNewCohortQueries.getPatientsPregnantEnrolledOnART(true);
@@ -232,6 +233,219 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
+  // VL1
+
+  public CohortDefinition getPatientsOnARTForMoreThan6Months() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("All patients with most recent Data de Levantamento");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    valuesMap.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    valuesMap.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
+    valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+
+    String query =
+        "SELECT recentx.patient_id FROM ("
+            + "SELECT most_recentx.patient_id, MAX(most_recentx.recent_date) xdate FROM"
+            + "(SELECT p.patient_id, o.value_datetime AS recent_date"
+            + "FROM   patient p   "
+            + "INNER JOIN encounter e  ON p.patient_id = e.patient_id   "
+            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id   "
+            + "INNER JOIN  "
+            + "( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime  "
+            + "FROM  patient p   "
+            + "INNER JOIN encounter e  ON p.patient_id = e.patient_id  "
+            + "WHERE p.voided = 0  "
+            + "AND e.voided = 0   "
+            + "AND e.location_id = :location  "
+            + "AND e.encounter_datetime <= :endDate "
+            + "AND e.encounter_type IN (${6}, ${9})  "
+            + "GROUP BY p.patient_id"
+            + ") max_encounter ON p.patient_id = max_encounter.patient_id"
+            + "WHERE  p.voided = 0   "
+            + "AND e.voided = 0   "
+            + "AND o.voided = 0   "
+            + "AND e.location_id = :location "
+            + "AND e.encounter_type IN (${6}, ${9})  "
+            + "AND o.concept_id = ${1410}  "
+            + "AND o.value_datetime BETWEEN :startDate AND :endDate "
+            + "AND max_encounter.encounter_datetime = e.encounter_datetime  "
+            + "GROUP BY p.patient_id "
+            + "UNION"
+            + "SELECT p.patient_id, o.value_datetime AS recent_date"
+            + "FROM patient p"
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id"
+            + "        INNER JOIN obs o ON o.encounter_id = e.encounter_id"
+            + "        INNER JOIN ("
+            + "SELECT p.patient_id,e.encounter_id, MAX(e.encounter_datetime) most_recent"
+            + "FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id"
+            + "WHERE e.encounter_type = ${18}"
+            + "AND e.encounter_datetime <= :endDate"
+            + "                AND e.location_id = :location"
+            + "AND e.voided = 0"
+            + "AND p.voided = 0    "
+            + "GROUP BY p.patient_id) last_scheduled "
+            + "ON last_scheduled.patient_id = p.patient_id "
+            + "WHERE last_scheduled.most_recent = e.encounter_datetime                    "
+            + "                    AND e.voided = 0"
+            + "                    AND e.location_id = :location"
+            + "                    AND e.encounter_type = ${18}"
+            + "                    AND p.voided = 0"
+            + "                    AND o.voided = 0"
+            + "                    AND o.concept_id = ${5096}"
+            + "AND o.value_datetime BETWEEN :startDate AND :endDate"
+            + "GROUP BY p.patient_id"
+            + "UNION"
+            + "SELECT p.patient_id, most_recent.last_obs AS recent_date FROM patient p"
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id"
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id"
+            + "INNER JOIN"
+            + "(SELECT p.patient_id, MAX(o.value_datetime) AS last_obs, o.obs_datetime"
+            + "FROM encounter e INNER JOIN obs o ON o.encounter_id = e.encounter_id"
+            + "INNER JOIN patient p ON p.patient_id = e.patient_id"
+            + "WHERE e.encounter_type = ${52}"
+            + "AND o.concept_id = ${23866}"
+            + "        "
+            + "AND e.voided = 0"
+            + "AND e.location_id = :location"
+            + "        AND e.voided = 0 "
+            + "        AND p.voided = 0"
+            + "        AND o.voided = 0"
+            + "GROUP BY p.patient_id) most_recent"
+            + "ON most_recent.patient_id = e.patient_id"
+            + "WHERE p.voided = 0"
+            + "  AND e.encounter_type = ${52}"
+            + "  AND e.location_id = :location"
+            + "  AND o.concept_id = ${23865}"
+            + "  AND o.value_coded = ${1065}"
+            + "  AND o.obs_datetime = most_recent.obs_datetime"
+            + "  AND o.voided = 0"
+            + "  AND e.voided = 0"
+            + "  AND p.voided = 0"
+            + "  AND DATE_ADD(most_recent.last_obs, INTERVAL 30 DAY) BETWEEN :startDate AND :endDate"
+            + "  AND most_recent.last_obs <= :endDate"
+            + "GROUP BY p.patient_id) AS most_recentx"
+            + "GROUP BY most_recentx.patient_id"
+            + ") recentx"
+            + "INNER JOIN"
+            + "( "
+            + "SELECT art.patient_id, MIN(art.art_date) min_art_date FROM ("
+            + "SELECT p.patient_id, MIN(e.encounter_datetime) art_date FROM patient p"
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id"
+            + "WHERE e.encounter_type = ${18}"
+            + "AND e.encounter_datetime <= :endDate"
+            + "AND e.voided = 0"
+            + "AND p.voided = 0"
+            + "AND e.location_id = :location"
+            + "GROUP BY p.patient_id"
+            + ""
+            + "UNION"
+            + ""
+            + "SELECT p.patient_id, Min(e.encounter_datetime) art_date "
+            + "                                FROM patient p "
+            + "                          INNER JOIN encounter e "
+            + "                              ON p.patient_id = e.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                              ON e.encounter_id = o.encounter_id "
+            + "                      WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type IN (${6}, ${9}, ${18}) "
+            + "                          AND o.concept_id = ${1255} "
+            + "                          AND o.value_coded= ${1256} "
+            + "                          AND e.encounter_datetime <= :endDate "
+            + "                          AND e.location_id = :location "
+            + "                      GROUP  BY p.patient_id "
+            + "UNION"
+            + "SELECT p.patient_id, historical.min_date AS art_date FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id"
+            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id"
+            + "    INNER JOIN("
+            + "SELECT p.patient_id,e.encounter_id,  MIN(o.value_datetime) min_date FROM patient p"
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id"
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id"
+            + "WHERE e.encounter_type IN(${6},${9},${18},${53})"
+            + "AND o.concept_id = ${1190}"
+            + "AND e.location_id = :location"
+            + "                AND o.value_datetime <= :endDate"
+            + "AND e.voided = 0"
+            + "AND p.voided = 0"
+            + "GROUP BY p.patient_id"
+            + "                ) historical"
+            + "ON historical.patient_id = p.patient_id"
+            + "WHERE e.encounter_type IN(${6},${9},${18},${53})"
+            + "AND o.concept_id = ${1190}"
+            + "AND e.location_id = :location"
+            + "                AND o.value_datetime <= :endDate"
+            + "AND e.voided = 0"
+            + "AND p.voided = 0"
+            + "                AND historical.encounter_id = e.encounter_id"
+            + "                AND o.value_datetime = historical.min_date"
+            + "GROUP BY p.patient_id"
+            + "                "
+            + "UNION"
+            + ""
+            + "SELECT p.patient_id, ps.start_date AS art_date"
+            + "    FROM   patient p  "
+            + "          INNER JOIN patient_program pg "
+            + "               ON p.patient_id = pg.patient_id "
+            + "       INNER JOIN patient_state ps "
+            + "                  ON pg.patient_program_id = ps.patient_program_id "
+            + "    WHERE  pg.location_id = :location"
+            + "   AND pg.program_id = 2 and ps.start_date <= :endDate"
+            + "   "
+            + "   UNION"
+            + "   "
+            + "   SELECT p.patient_id,  MIN(o.value_datetime) AS art_date FROM patient p"
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id"
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id"
+            + "                        INNER JOIN obs oyes ON oyes.encounter_id = e.encounter_id "
+            + "                        AND o.person_id = oyes.person_id"
+            + "WHERE e.encounter_type = ${52}"
+            + "AND o.concept_id = ${23866}"
+            + "                AND o.value_datetime <= :endDate"
+            + "                AND o.voided = 0"
+            + "                AND oyes.concept_id = ${23865}"
+            + "                AND oyes.value_coded = ${1065}"
+            + "                AND oyes.voided = 0"
+            + "AND e.location_id = :location                "
+            + "AND e.voided = 0"
+            + "AND p.voided = 0"
+            + ""
+            + "GROUP BY p.patient_id"
+            + ") art "
+            + "GROUP BY art.patient_id"
+            + ") min_art"
+            + "ON recentx.patient_id = min_art.patient_id"
+            + "AND TIMESTAMPDIFF(MONTH, min_art.min_art_date, recentx.xdate) >= 6"
+            + "GROUP BY recentx.patient_id;";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   // VL2
   public CohortDefinition getPatientsWithVLLessThan1000() {
 
@@ -381,8 +595,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-      
-             "SELECT most_recentvl.patient_id"
+        "SELECT most_recentvl.patient_id"
             + "FROM("
             + "SELECT most_recent.patient_id AS patient_id, MAX(recent_datetime) AS recent_date   FROM("
             + "SELECT p.patient_id, MAX(e.encounter_datetime) recent_datetime"
