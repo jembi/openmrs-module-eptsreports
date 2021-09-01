@@ -38,7 +38,12 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
   private HivMetadata hivMetadata;
 
   @Autowired
-  public ListOfPatientsDefaultersOrIITTemplateDataSet(ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset, TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet, ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries, SetupListOfPatientsDefaultersOrIITReport setupListOfPatientsDefaultersOrIITReport, HivMetadata hivMetadata) {
+  public ListOfPatientsDefaultersOrIITTemplateDataSet(
+      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
+      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
+      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
+      SetupListOfPatientsDefaultersOrIITReport setupListOfPatientsDefaultersOrIITReport,
+      HivMetadata hivMetadata) {
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
