@@ -217,7 +217,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addColumn(
         "days_of_absence_to_survey",
         listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
-        "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}",
+        "endDate=${endDate},location=${location}",
         null);
 
     return pdd;
