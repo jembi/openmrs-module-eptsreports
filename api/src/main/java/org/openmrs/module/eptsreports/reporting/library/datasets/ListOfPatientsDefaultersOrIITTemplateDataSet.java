@@ -54,6 +54,9 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     pdd.addParameter(new Parameter("maxDay", "Maximum number of days", Integer.class));
     pdd.addParameter(new Parameter("location", "Location", Location.class));
     pdd.setName("FATL");
+    pdd.addRowFilter(
+        listOfPatientsDefaultersOrIITCohortQueries.getBaseCohort(),
+        "endDate=${endDate},location=${location},minDay=${minDay},maxDay=${maxDay}");
     pdd.addParameters(getParameters());
     PatientIdentifierType identifierType =
         Context.getPatientService()
