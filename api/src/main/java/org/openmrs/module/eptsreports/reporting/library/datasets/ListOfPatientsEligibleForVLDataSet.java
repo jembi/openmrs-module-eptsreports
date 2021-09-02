@@ -19,13 +19,19 @@ import org.springframework.stereotype.Component;
 public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
 
   private ListOfPatientsEligibleForVLDataDefinitionQueries
-      patientsEligibleForVLDataDefinitionQueries;
-  private ListOfPatientsEligibleForVLDataSet patientsEligibleForVLDataSet;
+      listOfpatientsEligibleForVLDataDefinitionQueries;
+
+  private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
   @Autowired
   public ListOfPatientsEligibleForVLDataSet(
-      ListOfPatientsEligibleForVLDataDefinitionQueries patientsEligibleForVLDataDefinitionQueries) {
-    this.patientsEligibleForVLDataDefinitionQueries = patientsEligibleForVLDataDefinitionQueries;
+      ListOfPatientsEligibleForVLDataDefinitionQueries
+          listOfpatientsEligibleForVLDataDefinitionQueries,
+      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
+
+    this.listOfpatientsEligibleForVLDataDefinitionQueries =
+        listOfpatientsEligibleForVLDataDefinitionQueries;
+    this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
   }
 
   public DataSetDefinition constructDataSet() {
@@ -47,12 +53,86 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
 
-    pdd.addColumn("id", new PersonIdDataDefinition(), "");
-    pdd.addColumn("name", nameDef, "");
+    // pdd.addColumn("id", new PersonIdDataDefinition(), "");
     pdd.addColumn("nid", identifierDef, "");
-    pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
+    pdd.addColumn("name", nameDef, "");
+    pdd.addColumn(
+        "birthdate",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientBirthdate(),
+        "",
+        null);
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
-    pdd.addColumn("S1CJ", new AgeDataDefinition(), "", null);
+    pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
+    pdd.addColumn(
+        "contact", listOfpatientsEligibleForVLDataDefinitionQueries.getContact(), "", null);
+    pdd.addColumn(
+        "art_start_date",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndARTStartDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+    pdd.addColumn(
+        "last_arv",
+        listChildrenOnARTandFormulationsDataset.getLastARVRegimen(),
+        "endDate=${endDate},location=${location}",
+        null);
+    pdd.addColumn(
+        "last_linha",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getLastTARVLinha(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    pdd.addColumn(
+        "last_vl_date",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndMostRecentVLResultDate(),
+        "startDate=${startDate},location=${location}",
+        null);
+    pdd.addColumn(
+        "recent_vl",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndMostRecentViralLoad(),
+        "startDate=${startDate},location=${location}",
+        null);
+
+    pdd.addColumn(
+        "last_followup",
+        listOfpatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndLastFollowUpConsultationDate(),
+        "startDate=${startDate},location=${location}",
+        null);
+    pdd.addColumn(
+        "next_consultation_date",
+        listOfpatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndNextFollowUpConsultationDate(),
+        "startDate=${startDate},location=${location}",
+        null);
+    pdd.addColumn(
+        "last_pickup",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndLastDrugPickUpDateOnFila(),
+        "startDate=${startDate},location=${location}",
+        null);
+    pdd.addColumn(
+        "next_drug_pickup",
+        listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndNextDrugPickUpDateOnFila(),
+        "startDate=${startDate},location=${location}",
+        null);
+    pdd.addColumn(
+        "last_drug_pickup",
+        listOfpatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndLastDrugPickUpDateOnFichaMestre(),
+        "startDate=${startDate},location=${location}",
+        null);
+
+    pdd.addColumn(
+        "next_pickup_mestre",
+        listOfpatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndNextpickUpDateOnFichaMestre(),
+        "startDate=${startDate},location=${location}",
+        null);
+    pdd.addColumn(
+        "apss_pp",
+        listOfpatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndNumberOfAPSSAndPPAfterHadVLGreaterThan1000(),
+        "startDate=${startDate},location=${location}",
+        null);
 
     return pdd;
   }

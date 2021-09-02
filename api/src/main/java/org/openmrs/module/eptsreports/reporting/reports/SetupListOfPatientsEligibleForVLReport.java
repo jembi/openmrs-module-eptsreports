@@ -6,9 +6,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsEligibleForVLDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TotalOfPatientsEligibleForVLDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -22,14 +24,17 @@ public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManage
 
   private ListOfPatientsEligibleForVLDataSet listOfPatientsEligibleForVLDataset;
   private TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet;
+  private ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries;
 
   @Autowired
   public SetupListOfPatientsEligibleForVLReport(
       ListOfPatientsEligibleForVLDataSet listOfPatientsEligibleForVLDataset,
-      TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet) {
+      TotalOfPatientsEligibleForVLDataSet totalOfPatientsEligibleForVLDataSet,
+      ListOfPatientsEligibleForVLCohortQueries listOfPatientsEligibleForVLCohortQueries) {
 
     this.listOfPatientsEligibleForVLDataset = listOfPatientsEligibleForVLDataset;
     this.totalOfPatientsEligibleForVLDataSet = totalOfPatientsEligibleForVLDataSet;
+    this.listOfPatientsEligibleForVLCohortQueries = listOfPatientsEligibleForVLCohortQueries;
   }
 
   @Override
@@ -59,10 +64,11 @@ public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManage
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
-    /* rd.setBaseCohortDefinition(
-                    EptsReportUtils.map(
-                            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
-    */
+    rd.setBaseCohortDefinition(
+        EptsReportUtils.map(
+            listOfPatientsEligibleForVLCohortQueries.getBaseCohort(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     rd.addDataSetDefinition(
         "TPEVL", Mapped.mapStraightThrough(totalOfPatientsEligibleForVLDataSet.constructDataSet()));
 
@@ -89,7 +95,7 @@ public class SetupListOfPatientsEligibleForVLReport extends EptsDataExportManage
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:7,dataset:ALL");
+      props.put("repeatingSections", "sheet:1,row:7,dataset:LPEVL");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
