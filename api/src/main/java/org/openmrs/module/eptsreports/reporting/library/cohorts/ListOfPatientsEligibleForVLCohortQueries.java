@@ -262,6 +262,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
         "SELECT recentx.patient_id FROM ("
