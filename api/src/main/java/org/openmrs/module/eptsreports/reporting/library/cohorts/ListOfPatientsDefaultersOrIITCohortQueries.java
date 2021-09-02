@@ -1897,11 +1897,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "        AND (o.concept_id = ${23866}   AND o.value_datetime <= :endDate) "
             + "        AND (o2.concept_id = ${23865} AND o2.value_coded = ${1065}) "
             + "      GROUP  BY p.patient_id) AS last_mastercard_scheduled ON p.patient_id = last_mastercard_scheduled.patient_id "
-            + " WHERE p.voided = 0 "
-            + " AND    TIMESTAMPDIFF(DAY, last_farmacia_scheduled.last_scheduled,:endDate) >= 5 "
-            + " AND    TIMESTAMPDIFF(DAY, last_farmacia_scheduled.last_scheduled,:endDate) <= 59 "
-            + " AND    TIMESTAMPDIFF(DAY, last_mastercard_scheduled.last_scheduled,:endDate) >= 5 "
-            + " AND    TIMESTAMPDIFF(DAY, last_mastercard_scheduled.last_scheduled,:endDate) <= 59 ";
+            + " WHERE p.voided = 0 ";
     StringSubstitutor substitutor = new StringSubstitutor(map);
 
     spdd.setQuery(substitutor.replace(query));
