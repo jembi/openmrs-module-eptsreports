@@ -550,7 +550,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
     valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        "  SELECT p.patient_id, DATE_ADD(MAX(obs_value.value_datetime), INTERVAL 30 DAY) return_date    FROM patient p "
+        "  SELECT p.patient_id, DATE_ADD(obs_value.value_datetime, INTERVAL 30 DAY) return_date    FROM patient p "
             + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "            INNER JOIN obs obs_value ON e.encounter_id = obs_value.encounter_id "
