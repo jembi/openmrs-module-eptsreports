@@ -54,7 +54,7 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
     pdd.setParameters(getParameters());
 
     // pdd.addColumn("id", new PersonIdDataDefinition(), "");
-    pdd.addColumn("nid", identifierDef, "");
+    pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
     pdd.addColumn("name", nameDef, "");
     pdd.addColumn(
         "birthdate",

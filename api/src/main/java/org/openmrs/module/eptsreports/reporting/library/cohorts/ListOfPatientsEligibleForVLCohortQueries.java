@@ -98,7 +98,21 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     return cd;
   }
-  // X1
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>X1- select all patients with “Data da próxima consulta” (concept id 1410, value_datetime) as
+   * “Last Next scheduled Consultation Date” from the most recent FICHA CLÍNICA (encounter type 6,9)
+   * by report end date (encounter_datetime <= endDate) and “Last Next scheduled Consultation Date”
+   * >= startDate and <= endDate
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getLastNextScheduledConsultationDate() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -145,7 +159,21 @@ public class ListOfPatientsEligibleForVLCohortQueries {
 
     return sqlCohortDefinition;
   }
-  // X2
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>X2- select all patients with “Data do próximo levantamento” (concept id 5096,
+   * value_datetime) as “Last Next scheduled Pick-up Date” from the most recent FILA (encounter type
+   * 18) by report end date (encounter_datetime <= endDate) and “Last Next scheduled Pick-up Date”
+   * >= startDate and <= endDate
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getLastNextScheduledPickUpDate() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -196,7 +224,21 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // X3
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>X3- select all patients with most recent “Data de Levantamento” (concept_id 23866,
+   * value_datetime + 30 days) “Last Next scheduled Pick up Date” from “Recepcao Levantou ARV”
+   * (encounter type 52) with concept “Levantou ARV” (concept_id 23865) set to “SIM” (Concept id
+   * 1065) by report end date (value_datetime <= endDate) and “Last Next scheduled Pick-up Date” >=
+   * startDate and <= endDate
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getLastNextScheduledPickUpDateWithMostRecentDataLevantamento() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -248,8 +290,19 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // VL1
-
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>VL1- select all patients on ART for more than 6 months on their Last Scheduled Consultation
+   * or Drug Pick-up that occurred during the reporting period ( ScheduledDate minus ArtStartDate >=
+   * 6 months)
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsOnARTForMoreThan6Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -461,7 +514,22 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // VL2
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>select all patients with the most recent VL Numeric Result (concept Id 856) documented in
+   * the Laboratory Form (encounter type 13, encounter_datetime) or Ficha de Seguimento Adulto or
+   * Pediatria (encounter type 6,9, encounter_datetime) or Ficha Clinica (encounter type 6,
+   * encounter_datetime) or Ficha Resumo (encounter type 53, obs_datetime ) or FSR form (encounter
+   * type 51, encounter_datetime) by start of reporting period (<=startDate) and the Result is <
+   * 1000 copias/ml (concept 856 value_numeric < 1000)
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWithVLLessThan1000() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -522,7 +590,22 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // VL3
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>VL3- select all patients with the most recent VL Qualitative Result (concept Id 1305)
+   * documented in the Laboratory Form (encounter type 13, encounter_datetime) or Ficha de
+   * Seguimento Adulto or Pediatria (encounter type 6,9, encounter_datetime) or Ficha Clinica
+   * (encounter type 6, encounter_datetime) or Ficha Resumo (encounter type 53, obs_datetime ) or
+   * FSR form (encounter type 51, encounter_datetime) by start of reporting period (<=startDate) and
+   * the Result is not Null (concept 1305 value_coded NOT Null)
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWithMostRecentVLQuantitativeResult() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -574,8 +657,18 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // VL4
-
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Select all patients who have registered the most recent VL <1000 copies/ml for more than 12
+   * months before “ScheduledDate”, i.e. “ScheduledDate” minus “Most Recent VL Date” >= 12months
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoHaveRegisteredVLLessThan1000ForMoreThan12Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -765,7 +858,22 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // VL5
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>VL5- select all patients with the most recent VL Numeric Result (concept Id 856) documented
+   * in the Laboratory Form (encounter type 13, encounter_datetime) or Ficha de Seguimento Adulto or
+   * Pediatria (encounter type 6,9, encounter_datetime) or Ficha Clinica (encounter type 6,
+   * encounter_datetime) or Ficha Resumo (encounter type 53, obs_datetime ) or FSR form (encounter
+   * type 51, encounter_datetime) by start of reporting period (<=startDate) and the Result is >=
+   * 1000 copias/ml (concept 856 value_numeric >= 1000)
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWithRecentVLIgualOrGreaterThan1000() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
