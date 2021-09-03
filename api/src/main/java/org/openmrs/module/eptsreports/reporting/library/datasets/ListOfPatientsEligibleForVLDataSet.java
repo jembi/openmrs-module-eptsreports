@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.ConceptNameConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -53,7 +54,7 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
 
-    // pdd.addColumn("id", new PersonIdDataDefinition(), "");
+    pdd.addColumn("pid", new PersonIdDataDefinition(), "");
     pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
     pdd.addColumn("name", nameDef, "");
     pdd.addColumn(
@@ -61,7 +62,8 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         listOfpatientsEligibleForVLDataDefinitionQueries.getPatientBirthdate(),
         "",
         null);
-    pdd.addColumn("age", new AgeDataDefinition(), "", null);
+    pdd.addColumn(
+        "age", listChildrenOnARTandFormulationsDataset.getAge(), "endDate=${endDate}", null);
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
     pdd.addColumn(
         "contact", listOfpatientsEligibleForVLDataDefinitionQueries.getContact(), "", null);
@@ -74,7 +76,7 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         "last_arv",
         listChildrenOnARTandFormulationsDataset.getLastARVRegimen(),
         "endDate=${endDate},location=${location}",
-        null);
+        new ConceptNameConverter());
     pdd.addColumn(
         "last_linha",
         listOfpatientsEligibleForVLDataDefinitionQueries.getLastTARVLinha(),
@@ -109,11 +111,13 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndLastDrugPickUpDateOnFila(),
         "startDate=${startDate},location=${location}",
         null);
+
     pdd.addColumn(
         "next_drug_pickup",
         listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndNextDrugPickUpDateOnFila(),
         "startDate=${startDate},location=${location}",
         null);
+
     pdd.addColumn(
         "last_drug_pickup",
         listOfpatientsEligibleForVLDataDefinitionQueries
