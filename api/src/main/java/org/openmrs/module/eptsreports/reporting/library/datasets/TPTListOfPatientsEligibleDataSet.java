@@ -44,6 +44,9 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
   @Autowired private TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries;
   @Autowired private HivMetadata hivMetadata;
 
+  @Autowired
+  private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
+
   public DataSetDefinition constructDataset() throws EvaluationException {
 
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
@@ -66,7 +69,7 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
 
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
     pdd.addColumn("name", nameDef, "");
-    pdd.addColumn("nid", identifierDef, "");
+    pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
     pdd.addColumn(
