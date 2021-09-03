@@ -53,7 +53,9 @@ public class TPT_InitiationQueries {
       int dataFinalizacaoProfilaxiaIsoniazidaConcept,
       int arvPediatriaInitialEncounterType,
       int dateOfMasterCardFileOpeningConcept,
-      int hivCareProgram) {
+      int hivCareProgram,
+      int restartConcept,
+      int treatmentFollowUp) {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", clinicalEncounter);
@@ -98,6 +100,8 @@ public class TPT_InitiationQueries {
     valuesMap.put("7", arvPediatriaInitialEncounterType);
     valuesMap.put("23891", dateOfMasterCardFileOpeningConcept);
     valuesMap.put("1", hivCareProgram);
+    valuesMap.put("1705", restartConcept);
+    valuesMap.put("23987", treatmentFollowUp);
 
     String query =
         "         SELECT p.person_id, nid.nid AS NID , p.gender, last_person_name.nome AS name,   "
@@ -418,8 +422,8 @@ public class TPT_InitiationQueries {
             + "                     AND historical_date.voided=0 AND historical_date.concept_id=  ${1190} "
             + "                     AND historical_date.value_datetime IS NOT NULL "
             + "                     AND e.encounter_type = ${53} "
-            + "                 AND historical_date.value_datetime between :startDate AND curdate() AND e.location_id=:location AND pe.gender='F' GROUP BY p.patient_id     "
-            + "      UNION"
+            + "                     AND historical_date.value_datetime between :startDate AND curdate() AND e.location_id=:location AND pe.gender='F' GROUP BY p.patient_id     "
+            + "                     UNION "
             + "                     SELECT p.patient_id,  MAX(e.encounter_datetime) as pregnancy_date "
             + "                     FROM patient p "
             + "                     INNER JOIN person pe ON p.patient_id=pe.person_id  "
@@ -428,7 +432,7 @@ public class TPT_InitiationQueries {
             + "                     WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id= ${1279}    "
             + "                     and  e.encounter_type in (${5},${6}) AND e.encounter_datetime between :startDate AND curdate() AND e.location_id=:location  AND pe.gender='F' GROUP BY p.patient_id     "
             + "                     UNION "
-            + "      SELECT p.patient_id,  MAX(e.encounter_datetime) as pregnancy_date "
+            + "                     SELECT p.patient_id,  MAX(e.encounter_datetime) as pregnancy_date "
             + "                     FROM patient p "
             + "                     INNER JOIN person pe ON p.patient_id=pe.person_id  "
             + "                     INNER JOIN encounter e ON p.patient_id=e.patient_id  "
@@ -436,7 +440,7 @@ public class TPT_InitiationQueries {
             + "                     WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id=  ${1600}    "
             + "                     and  e.encounter_type in (${5},${6}) AND e.encounter_datetime between :startDate AND curdate() AND e.location_id=:location AND pe.gender='F' GROUP BY p.patient_id     "
             + "                     UNION  "
-            + "                     Select p.patient_id, MAX(e.encounter_datetime) as pregnancy_date     "
+            + "                     SELECT p.patient_id, MAX(e.encounter_datetime) as pregnancy_date     "
             + "                     FROM patient p  "
             + "                     INNER JOIN person pe ON p.patient_id=pe.person_id     "
             + "                     INNER JOIN encounter e ON p.patient_id=e.patient_id     "
@@ -481,7 +485,7 @@ public class TPT_InitiationQueries {
             + "        AND e.encounter_datetime BETWEEN :startDate AND curdate() "
             + "           AND e.location_id=:location AND pe.gender='F'     "
             + "       GROUP BY p.patient_id    "
-            + "       UNION"
+            + "       UNION "
             + "       SELECT p.patient_id, MAX(e.encounter_datetime) AS last_date     "
             + "       FROM patient p     "
             + "       INNER JOIN person pe ON p.patient_id=pe.person_id     "
@@ -565,7 +569,7 @@ public class TPT_InitiationQueries {
             + "         ps.start_date BETWEEN :startDate AND curdate() "
             + "           AND pp.location_id=:location AND pe.gender='F' "
             + "       GROUP BY pp.patient_id"
-            + "                     UNION"
+            + "                     UNION "
             + "       SELECT p.patient_id, MAX(hist.value_datetime) AS last_date "
             + "       FROM patient p "
             + "       INNER JOIN person pe ON p.patient_id=pe.person_id "
@@ -575,7 +579,7 @@ public class TPT_InitiationQueries {
             + "        WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND o.concept_id=  ${6332} "
             + "       AND o.value_coded=  ${1065} "
             + "       AND e.encounter_type = ${53} "
-            + "       AND hist.concept_id=   ${1190 "
+            + "       AND hist.concept_id=   ${1190} "
             + "       AND pe.gender='F' AND hist.value_datetime IS NOT NULL "
             + "        AND hist.value_datetime BETWEEN :startDate AND curdate() GROUP BY p.patient_id "
             + "       ) AS breastfeeding "
@@ -611,21 +615,24 @@ public class TPT_InitiationQueries {
             + "                     WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id= ${1279}    "
             + "                     and     "
             + "                     e.encounter_type in (${5},${6}) AND e.encounter_datetime between :startDate AND curdate() AND e.location_id=:location  AND pe.gender='F' GROUP BY p.patient_id     "
-            + "                     Select p.patient_id,  MAX(e.encounter_datetime) as pregnancy_date     "
+            + "                     UNION "
+            + "                     SELECT p.patient_id,  MAX(e.encounter_datetime) as pregnancy_date     "
             + "                     FROM patient p     "
             + "                     INNER JOIN person pe ON p.patient_id=pe.person_id     "
             + "                     INNER JOIN encounter e ON p.patient_id=e.patient_id     "
             + "                     INNER JOIN obs o ON e.encounter_id=o.encounter_id     "
             + "                     WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id=  ${1600}    "
-            + "                     and  e.encounter_type in (${5},${6}) AND e.encounter_datetime between :startDate AND curdate() AND e.location_id=:location AND pe.gender='F' GROUP BY p.patient_id     "
-            + "                     Select p.patient_id, MAX(e.encounter_datetime) as pregnancy_date     "
+            + "                     and  e.encounter_type in (${5},${6}) AND e.encounter_datetime between :startDate AND curdate() AND e.location_id=:location AND pe.gender='F' GROUP BY p.patient_id    "
+            + "                     UNION "
+            + "                     SELECT p.patient_id, MAX(e.encounter_datetime) as pregnancy_date     "
             + "                     FROM patient p     "
             + "                     INNER JOIN person pe ON p.patient_id=pe.person_id     "
             + "                     INNER JOIN encounter e ON p.patient_id=e.patient_id     "
             + "                     INNER JOIN obs o ON e.encounter_id=o.encounter_id     "
             + "                     WHERE p.voided=0 AND pe.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id= ${6334}    "
             + "                     AND value_coded=  ${6331}    "
-            + "                     AND e.encounter_type in (${5},${6}) AND e.encounter_datetime between :startDate AND curdate() AND e.location_id=:location AND pe.gender='F' GROUP BY p.patient_id     "
+            + "                     AND e.encounter_type in (${5},${6}) AND e.encounter_datetime between :startDate AND curdate() AND e.location_id=:location AND pe.gender='F' GROUP BY p.patient_id    "
+            + " UNION "
             + "                     select pp.patient_id,  MAX(pp.date_enrolled) as pregnancy_date     "
             + "                     FROM patient_program pp     "
             + "                     INNER JOIN person pe ON pp.patient_id=pe.person_id     "
@@ -698,16 +705,16 @@ public class TPT_InitiationQueries {
             + "                 AND e.voided = 0 AND p.voided = 0   "
             + "                 AND e.encounter_datetime < curdate()   "
             + "                 GROUP BY p.patient_id ) last_fu_consultation ON last_fu_consultation.patient_id = p.patient_id   "
-            + "                WHERE  e.encounter_datetime = last_fu_consultation.followup_date= "
-            + "                AND e.encounter_type = ${6}  AND e.voided = 0= "
+            + "                WHERE  e.encounter_datetime = last_fu_consultation.followup_date"
+            + "                AND e.encounter_type = ${6}  AND e.voided = 0"
             + "                AND o.concept_id = ${6128}  AND o.voided = 0   "
             + "                AND e.encounter_datetime < curdate()   "
             + "                ) AS received_TPT ON received_TPT.patient_id = p.person_id   "
             + "                LEFT JOIN ( SELECT  p.patient_id, MAX(e.encounter_datetime) AS encounter_datetime   "
             + "                FROM   patient p   "
-            + "         INNER JOIN  encounter e ON p.patient_id = e.patient_id= "
-            + "         INNER JOIN  obs o ON e.encounter_id = o.encounter_id= "
-            + "                WHERE   p.voided = 0 AND e.voided = 0= "
+            + "         INNER JOIN  encounter e ON p.patient_id = e.patient_id "
+            + "         INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
+            + "                WHERE   p.voided = 0 AND e.voided = 0 "
             + "         AND o.voided = 0   "
             + "         AND e.encounter_type = ${60}  "
             + "         AND e.location_id = :location "
@@ -1051,7 +1058,9 @@ public class TPT_InitiationQueries {
       int dataFinalizacaoProfilaxiaIsoniazidaConcept,
       int arvPediatriaInitialEncounterType,
       int dateOfMasterCardFileOpeningConcept,
-      int hivCareProgram) {
+      int hivCareProgram,
+      int restartConcept,
+      int treatmentFollowUp) {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", clinicalEncounter);
@@ -1096,6 +1105,8 @@ public class TPT_InitiationQueries {
     valuesMap.put("7", arvPediatriaInitialEncounterType);
     valuesMap.put("23891", dateOfMasterCardFileOpeningConcept);
     valuesMap.put("1", hivCareProgram);
+    valuesMap.put("1705", restartConcept);
+    valuesMap.put("23987", treatmentFollowUp);
 
     String query =
         " SELECT (SELECT name FROM location WHERE location_id = 398) AS location, COUNT(TPT.person_id) AS total, CONCAT(DATE_FORMAT(:startDate, '%d-%m-%Y'),' Até ',DATE_FORMAT(:endDate, '%d-%m-%Y')) AS period   "
