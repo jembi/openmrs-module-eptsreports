@@ -930,7 +930,18 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // VL6
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p> VL6- Select all patients who have registered the most recent VL >=1000 copies/ml for more than 3 months before
+   * “ScheduledDate”, i.e. “ScheduledDate” minus “Most Recent VL Date 3” >= 3months</p>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoHaveRegisteredVLIgualOrGreaterThan1000ForMoreThan3Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -1081,7 +1092,22 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  // VL7
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p> VL7- select all patients who DO NOT have any Viral Load Result
+   * (concept Id 856 - value_numeric, or concept id 1305 value_coded not null ) documented in the Laboratory Form
+   * (encounter type 13, encounter_datetime) or Ficha de Seguimento Adulto or Pediatria
+   * (encounter type 6,9, encounter_datetime) or Ficha Clinica (encounter type 6, encounter_datetime) or
+   * Ficha Resumo (encounter type 53, obs_datetime ) or FSR form (encounter type 51, encounter_datetime)
+   * by start of reporting period (<=startDate)</p>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientsWhoDontHaveAnyViralLoad() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
