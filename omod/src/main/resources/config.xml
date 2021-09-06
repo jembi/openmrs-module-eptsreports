@@ -513,7 +513,7 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>eptsreports.treatmentFollowUpUuid</property>
+		<property>@MODULE_ID@.treatmentFollowUpUuid</property>
 		<defaultValue>93603742-1cae-4970-9077-e2b27e46bd7e</defaultValue>
 		<description>
 			UUID for the Seguimento de tratamento TPT concept
