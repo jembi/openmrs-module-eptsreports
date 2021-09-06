@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -28,7 +27,8 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>Patient ART Start Date is the oldest date from the set of criterias defined in the common query: </p>
+   * <p>Patient ART Start Date is the oldest date from the set of criterias defined in the common
+   * query:
    *
    * </blockquote>
    *
@@ -164,7 +164,8 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>The last Linha TARV(concept id 21151) registered on FICHA CLINICA (encounter_type 6) by reporting startDate </p>
+   * <p>The last Linha TARV(concept id 21151) registered on FICHA CLINICA (encounter_type 6) by
+   * reporting startDate
    *
    * </blockquote>
    *
@@ -222,11 +223,12 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>The Most Recent Viral Load Result Date (concept Id 856 - value_numeric > 0 OR  concept Id 1305 - value_coded not null)
-   * registered in the Laboratory or Ficha de Seguimento (Adulto or Pediatria) or Ficha Clinica or Ficha Resumo or
-   * FSR (   encounter_type 6, 9, 13, 51 - encounter_datetime, encounter_type 53 - obs_datetime)
-   * form by start end of reporting period (  <= startDate). Note: the most recent record date
-   * should be listed ( encounter_datetime for encounter_type 6,9,13,51, obs_datetime for encounter_type 53)  </p>
+   * <p>The Most Recent Viral Load Result Date (concept Id 856 - value_numeric > 0 OR concept Id
+   * 1305 - value_coded not null) registered in the Laboratory or Ficha de Seguimento (Adulto or
+   * Pediatria) or Ficha Clinica or Ficha Resumo or FSR ( encounter_type 6, 9, 13, 51 -
+   * encounter_datetime, encounter_type 53 - obs_datetime) form by start end of reporting period (
+   * <= startDate). Note: the most recent record date should be listed ( encounter_datetime for
+   * encounter_type 6,9,13,51, obs_datetime for encounter_type 53)
    *
    * </blockquote>
    *
@@ -289,14 +291,12 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *     The <b> Most Recent Viral Load Result</b> (concept Id 856 - value_numeric > 0
-   *     OR  concept Id 1305 - value_coded not null) registered in the Laboratory or Ficha de Seguimento
-   *     (Adulto or Pediatria) or Ficha Clinica or Ficha Resumo or FSR
-   *     (   encounter_type 6, 9, 13, 51 - encounter_datetime, encounter_type 53 - obs_datetime)
-   *     form by start end of reporting period (  <= startDate). Note: the most recent record result should be listed
-   *     ( value_numeric for concept_id 856 or value_coded for concept id 1305)
-   * </p>
+   * <p>The <b> Most Recent Viral Load Result</b> (concept Id 856 - value_numeric > 0 OR concept Id
+   * 1305 - value_coded not null) registered in the Laboratory or Ficha de Seguimento (Adulto or
+   * Pediatria) or Ficha Clinica or Ficha Resumo or FSR ( encounter_type 6, 9, 13, 51 -
+   * encounter_datetime, encounter_type 53 - obs_datetime) form by start end of reporting period (
+   * <= startDate). Note: the most recent record result should be listed ( value_numeric for
+   * concept_id 856 or value_coded for concept id 1305)
    *
    * </blockquote>
    *
@@ -357,11 +357,9 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *     Print the Date (encounter_datetime) of the most recent clinical consultation registered on
-   *     Ficha Clínica – MasterCard or Ficha de Seguimento (encounter type 6 or 9) by report start
-   *     date (encounter_datetime <= startDate)
-   * </p>
+   * <p>Print the Date (encounter_datetime) of the most recent clinical consultation registered on
+   * Ficha Clínica – MasterCard or Ficha de Seguimento (encounter type 6 or 9) by report start date
+   * (encounter_datetime <= startDate)
    *
    * </blockquote>
    *
@@ -403,11 +401,9 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *     Print the “Data da próxima consulta” (concept id 1410, value_datetime)
-   *     of the most recent clinical consultation registered on Ficha Clínica – MasterCard or Ficha de Seguimento
-   *     (encounter type 6 or 9) until report start date  (encounter_datetime <= startDate)
-   * </p>
+   * <p>Print the “Data da próxima consulta” (concept id 1410, value_datetime) of the most recent
+   * clinical consultation registered on Ficha Clínica – MasterCard or Ficha de Seguimento
+   * (encounter type 6 or 9) until report start date (encounter_datetime <= startDate)
    *
    * </blockquote>
    *
@@ -450,10 +446,8 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *     Print the Date (encounter_datetime) of the most recent drugs pick up registered on
-   *     FILA (encounter type 18) until report start date (encounter_datetime <= startDate)
-   * </p>
+   * <p>Print the Date (encounter_datetime) of the most recent drugs pick up registered on FILA
+   * (encounter type 18) until report start date (encounter_datetime <= startDate)
    *
    * </blockquote>
    *
@@ -491,11 +485,9 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *     Print the Date (concept id 23866, value_datetime) of the most recent “Recepcao Levantou ARV”
-   *     (encounter type 52) with concept “Levantou ARV” (concept_id 23865) set to “SIM”
-   *     (Concept id 1065) until report start date (concept id 23866,  value_datetime<= startDate)
-   * </p>
+   * <p>Print the Date (concept id 23866, value_datetime) of the most recent “Recepcao Levantou ARV”
+   * (encounter type 52) with concept “Levantou ARV” (concept_id 23865) set to “SIM” (Concept id
+   * 1065) until report start date (concept id 23866, value_datetime<= startDate)
    *
    * </blockquote>
    *
@@ -561,10 +553,8 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *     Print the “Data do próximo levantamento” (concept id 5096, value_datetime) of the most recent
-   *     FILA (encounter type 18) until report start date(encounter_datetime <= startDate)
-   * </p>
+   * <p>Print the “Data do próximo levantamento” (concept id 5096, value_datetime) of the most
+   * recent FILA (encounter type 18) until report start date(encounter_datetime <= startDate)
    *
    * </blockquote>
    *
@@ -662,12 +652,9 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *    Return the Date (concept id 23866, value_datetime) +30 days of the most recent
-   *    “Recepcao Levantou ARV” (encounter type 52) with concept “Levantou
-   *    ARV” (concept_id 23865) set to “SIM” (Concept id 1065) by report
-   *    start date ( concept id 23866, value_datetime<= startDate)
-   * </p>
+   * <p>Return the Date (concept id 23866, value_datetime) +30 days of the most recent “Recepcao
+   * Levantou ARV” (encounter type 52) with concept “Levantou ARV” (concept_id 23865) set to “SIM”
+   * (Concept id 1065) by report start date ( concept id 23866, value_datetime<= startDate)
    *
    * </blockquote>
    *
@@ -728,18 +715,15 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
-
   /**
    * <b>Technical Specs</b>
    *
    * <blockquote>
    *
-   * <p>
-   *    Count and print the Number of APSS and PP consultations, registered in Ficha APSS/PP
-   *    (encounter_type 35), the patient had between the <b>Date of most recent VL with Result >=1000 copies/ml</b>
-   *    by report start date and the report start date
-   * Note: “Date of most recent VL with Result >=1000 copies/ml” = “Most Recent VL Date 3” defined in VL5 (see above)
-   * </p>
+   * <p>Count and print the Number of APSS and PP consultations, registered in Ficha APSS/PP
+   * (encounter_type 35), the patient had between the <b>Date of most recent VL with Result >=1000
+   * copies/ml</b> by report start date and the report start date Note: “Date of most recent VL with
+   * Result >=1000 copies/ml” = “Most Recent VL Date 3” defined in VL5 (see above)
    *
    * </blockquote>
    *
@@ -822,9 +806,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *    Patient Contact from Demographics
-   * </p>
+   * <p>Patient Contact from Demographics
    *
    * </blockquote>
    *
@@ -854,9 +836,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>
-   *    Patient Birthdate from Demographics
-   * </p>
+   * <p>Patient Birthdate from Demographics
    *
    * </blockquote>
    *
