@@ -159,6 +159,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
 
     return sqlPatientDataDefinition;
   }
+
   /**
    * <b>Technical Specs</b>
    *

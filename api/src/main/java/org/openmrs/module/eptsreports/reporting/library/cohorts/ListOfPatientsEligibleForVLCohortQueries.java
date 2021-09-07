@@ -150,6 +150,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "                     AND e.encounter_type IN (${6}, ${9})  "
             + "                     AND o.concept_id = ${1410}   "
             + "                     AND e.encounter_datetime <= :endDate  "
+            + "                     AND o.value_datetime BETWEEN :startDate AND :endDate "
             + "                     AND max_encounter.encounter_datetime = e.encounter_datetime  "
             + "             GROUP BY p.patient_id ";
 
