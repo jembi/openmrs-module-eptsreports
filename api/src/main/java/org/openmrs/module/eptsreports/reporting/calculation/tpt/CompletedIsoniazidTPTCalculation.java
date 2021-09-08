@@ -80,8 +80,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
       Concept c23954 = tbMetadata.get3HPConcept();
       Concept c23984 = tbMetadata.get3HPPiridoxinaConcept();
       Concept c6129 = hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept();
-      Concept c23987 = hivMetadata.getSeguimentoDeTratamentoTPTConcept();
-      Concept c1705 = hivMetadata.getRestartConcept();
 
       /** ----- all patients who started IPT ---- */
       // A1
@@ -299,34 +297,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
-      // C1 other3HPPrescription e60
-      CalculationResultMap other3HPPrescriptionE60Map =
-          ePTSCalculationService.getObs(
-              c23985,
-              e60,
-              cohort,
-              location,
-              Arrays.asList(c23954, c23984),
-              TimeQualifier.ANY,
-              null,
-              onOrBefore,
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
-
-      // C1 other3HPPrescription e6
-      CalculationResultMap other3HPPrescriptionE6Map =
-          ePTSCalculationService.getObs(
-              c23985,
-              e6,
-              cohort,
-              location,
-              Arrays.asList(c23954, c23984),
-              TimeQualifier.ANY,
-              null,
-              onOrBefore,
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
-
       // C2
       CalculationResultMap regimeTPTStart3HPMap =
           ePTSCalculationService.getObs(
@@ -340,22 +310,6 @@ public class CompletedIsoniazidTPTCalculation extends AbstractPatientCalculation
               onOrBefore,
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
-
-      // C2 Seguimento de tratamento TPT
-      CalculationResultMap seguimentoTPTStart3HPMap =
-          ePTSCalculationService.getObs(
-              c23987,
-              e60,
-              cohort,
-              location,
-              Arrays.asList(c1256, c1705),
-              TimeQualifier.ANY,
-              null,
-              onOrBefore,
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
-
-      // C3
 
       for (Integer patientId : cohort) {
 
