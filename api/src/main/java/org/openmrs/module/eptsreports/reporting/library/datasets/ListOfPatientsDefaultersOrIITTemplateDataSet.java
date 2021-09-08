@@ -76,12 +76,6 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
 
-    pdd.addColumn(
-        "report_generation_date",
-        listOfPatientsDefaultersOrIITCohortQueries.getReportGenerationDate(),
-        "",
-        null);
-
     /** 1 - NID - Sheet 1: Column A */
     pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
 
