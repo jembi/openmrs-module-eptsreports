@@ -255,34 +255,37 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id FROM patient p "
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "INNER JOIN "
-            + "(SELECT p.patient_id, MAX(o.value_datetime) AS last_obs, o.obs_datetime "
-            + "FROM encounter e INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "INNER JOIN patient p ON p.patient_id = e.patient_id "
-            + "WHERE e.encounter_type = ${52} "
-            + "AND o.concept_id = ${23866} "
-            + "AND e.voided = 0 "
-            + "AND e.location_id = :location "
-            + "        AND e.voided = 0 "
-            + "        AND p.voided = 0 "
-            + "        AND o.voided = 0 "
-            + "GROUP BY p.patient_id) most_recent "
-            + "ON most_recent.patient_id = e.patient_id "
-            + "WHERE p.voided = 0 "
-            + "  AND e.encounter_type = ${52} "
-            + "  AND e.location_id = :location "
-            + "  AND o.concept_id = ${23865} "
-            + "  AND o.value_coded = ${1065} "
-            + "  AND o.obs_datetime = most_recent.obs_datetime "
-            + "  AND o.voided = 0 "
-            + "  AND e.voided = 0 "
-            + "  AND p.voided = 0 "
-            + "  AND DATE_ADD(most_recent.last_obs, INTERVAL 30 DAY) BETWEEN :startDate AND :endDate "
-            + "  AND most_recent.last_obs <= :endDate "
-            + "GROUP BY p.patient_id ";
+        "  SELECT p.patient_id "
+            + " FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs oyes ON oyes.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs ovalue ON ovalue.encounter_id = e.encounter_id "
+            + "         INNER JOIN "
+            + "     (SELECT  p.patient_id, MAX(o.value_datetime) AS last_obs "
+            + "     FROM patient p "
+            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "     WHERE   e.encounter_type = ${52} "
+            + "             AND o.concept_id = ${23866} "
+            + "             AND o.value_datetime <= :endDate "
+            + "             AND e.voided = 0 "
+            + "             AND e.location_id = :location "
+            + "             AND e.voided = 0 "
+            + "             AND p.voided = 0 "
+            + "             AND o.voided = 0 "
+            + "     GROUP BY p.patient_id) most_recent ON most_recent.patient_id = e.patient_id "
+            + " WHERE "
+            + "     e.encounter_type = ${52} "
+            + "         AND e.location_id = :location "
+            + "         AND oyes.concept_id = ${23865} "
+            + "         AND oyes.value_coded = ${1065} "
+            + "         AND ovalue.value_datetime = most_recent.last_obs "
+            + "         AND p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND oyes.voided = 0 "
+            + "         AND ovalue.voided = 0 "
+            + "         AND DATE_ADD(most_recent.last_obs, INTERVAL 30 DAY) BETWEEN :startDate AND :endDate "
+            + " GROUP BY p.patient_id  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -506,7 +509,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + " ) min_art "
             + " ON recentx.patient_id = min_art.patient_id "
             + " AND TIMESTAMPDIFF(MONTH, min_art.min_art_date, recentx.xdate) >= 6 "
-            + " GROUP BY recentx.patient_id; ";
+            + " GROUP BY recentx.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
