@@ -503,4 +503,254 @@ public class TbPrevCohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  public CohortDefinition getPatientWhoHaveTpt() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        " SELECT p.patient_id "
+            + "FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND o2.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${60} "
+            + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982})) "
+            + "  AND (o2.concept_id =${23987} AND o2.value_coded IN (${1256}, ${1705})) "
+            + "  AND e.encounter_datetime >= :startDate AND encounter_datetime <= :endDate ";
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientWhoHaveRegimeTpt() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        " SELECT DISTINCT p.patient_id "
+            + " FROM  patient p "
+            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "          INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date "
+            + "                      FROM    patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                      WHERE   p.voided = 0 "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.voided = 0 "
+            + "                        AND o2.voided = 0 "
+            + "                        AND e.location_id = :location "
+            + "                        AND e.encounter_type = ${60} "
+            + "                        AND (o.concept_id = ${23985} AND o.value_coded IN (${656},${23982})) "
+            + "                        AND ((o2.concept_id =${23987} AND o2.value_coded IN (${1256})) OR o2.concept_id IS NULL) "
+            + "                        AND e.encounter_datetime >= :endDate "
+            + "                        AND e.encounter_datetime <= :startDate "
+            + "                      GROUP BY p.patient_id "
+            + "                      UNION "
+            + "                      SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date "
+            + "                      FROM    patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                      WHERE   p.voided = 0 "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.voided = 0 "
+            + "                        AND o2.voided = 0 "
+            + "                        AND e.location_id = :location "
+            + "                        AND e.encounter_type = ${60} "
+            + "                        AND (o.concept_id = ${23985} AND o.value_coded IN (${656},${23982})) "
+            + "                        AND (o2.concept_id NOT IN (SELECT o.concept_id FROM encounter e "
+            + "                                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                                   WHERE e.patient_id = p.patient_id AND e.encounter_type = ${60} AND  o.concept_id = ${23987})) "
+            + "                        AND e.encounter_datetime >= :endDate "
+            + "                        AND e.encounter_datetime <= :startDate "
+            + "                      GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
+            + " WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND p.patient_id NOT IN ( SELECT patient_id "
+            + "                            FROM patient p "
+            + "                            WHERE    p.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.location_id = :location "
+            + "                              AND e.encounter_type = ${60} "
+            + "                              AND o.concept_id = ${23985} "
+            + "                              AND o.value_coded IN (${656},${23982}) "
+            + "                              AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 7  MONTH) "
+            + "                              AND e.encounter_datetime < inh.first_pickup_date "
+            + "                            UNION "
+            + "                            SELECT p.patient_id FROM patient p "
+            + "                                JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                            WHERE e.encounter_type IN (${6},${9},${53})   AND o.concept_id =  ${6128} "
+            + "                              AND o.voided = 0 AND e.voided = 0 "
+            + "                              AND p.voided = 0 AND e.location_id = :location "
+            + "                              AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 7  MONTH) "
+            + "                              AND e.encounter_datetime < inh.first_pickup_date "
+            + "                              UNION "
+            + "                            SELECT p.patient_id FROM patient p "
+            + "                                JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                            WHERE e.encounter_type =   ${6}   AND o.concept_id =   ${6122} "
+            + "                              AND o.voided = 0 AND e.voided = 0 "
+            + "                              AND p.voided = 0 AND e.location_id = :location "
+            + "                              AND o.value_coded =   ${1256} "
+            + "                              AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 7  MONTH) "
+            + "                              AND e.encounter_datetime < inh.first_pickup_date ) ";
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientWhoHaveOutrasPrescricoes() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        " SELECT distinct p.patient_id   "
+            + "             FROM  patient p    "
+            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id    "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id    "
+            + "             INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date   "
+            + "                         FROM    patient p    "
+            + "                         INNER JOIN encounter e ON e.patient_id = p.patient_id   "
+            + "                         INNER JOIN obs o ON o.encounter_id = e.encounter_id    "
+            + "                         WHERE   p.voided = 0    "
+            + "                             AND e.voided = 0    "
+            + "                             AND o.voided = 0    "
+            + "                             AND e.location_id = :location   "
+            + "                             AND e.encounter_type = ${6}   "
+            + "                             AND o.concept_id = ${1719}   "
+            + "                             AND o.value_coded IN (${23954})   "
+            + "                             AND e.encounter_datetime >= :startDate   "
+            + "                             AND e.encounter_datetime <= :endDate   "
+            + "                         GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id   "
+            + "             WHERE p.voided = 0   "
+            + "                and e.voided = 0   "
+            + "                and o.voided = 0   "
+            + "                and p.patient_id NOT IN ( SELECT patient_id    "
+            + "                                            FROM patient p   "
+            + "                                            WHERE    p.voided = 0    "
+            + "                                                  AND e.voided = 0    "
+            + "                                                  AND o.voided = 0    "
+            + "                                                  AND e.location_id = :location   "
+            + "                                                  AND e.encounter_type = ${6}   "
+            + "                                                  AND o.concept_id = ${1719}   "
+            + "                                                  AND o.value_coded IN (${23954})   "
+            + "                                                  AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL  4 MONTH)    "
+            + "                                                  AND e.encounter_datetime < inh.first_pickup_date "
+            + "                                               "
+            + "                                              UNION "
+            + "                                               "
+            + "                                            SELECT patient_id "
+            + "                                                FROM patient p "
+            + "                                                WHERE    p.voided = 0 "
+            + "                                                  AND e.voided = 0 "
+            + "                                                  AND o.voided = 0 "
+            + "                                                  AND e.location_id = :location "
+            + "                                                  AND e.encounter_type = ${60} "
+            + "                                                  AND o.concept_id = ${23985} "
+            + "                                                  AND o.value_coded IN (${23954},${23984}) "
+            + "                                                  AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL  4 MONTH)    "
+            + "                                                    AND e.encounter_datetime < inh.first_pickup_date) ";
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientWhoHaveRegimeTpt3HP() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        " SELECT p.patient_id "
+            + " FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + " WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND o2.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${60} "
+            + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${23954}, ${23984})) "
+            + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256}, ${1705})) "
+            + "  AND e.encounter_datetime >= :startDate AND encounter_datetime <= :endDate ";
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientWhoHaveRegimeTpt3HPor3HP() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        " SELECT DISTINCT p.patient_id "
+            + " FROM  patient p "
+            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "          INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date "
+            + "                      FROM    patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                      WHERE   p.voided = 0 "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.voided = 0 "
+            + "                        AND e.location_id = :location "
+            + "                        AND e.encounter_type = ${60} "
+            + "                        AND o.concept_id = ${23985} "
+            + "                        AND o.value_coded IN (${23954},${23984}) "
+            + "                        AND e.encounter_datetime >= :startDate "
+            + "                        AND e.encounter_datetime <= :endDate "
+            + "                      GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
+            + " WHERE p.voided = 0 "
+            + "  and e.voided = 0 "
+            + "  and o.voided = 0 "
+            + "  and p.patient_id NOT IN (SELECT patient_id "
+            + "                           FROM patient p "
+            + "                           WHERE     p.voided = 0 "
+            + "                             AND e.voided = 0 "
+            + "                             AND o.voided = 0 "
+            + "                             AND e.location_id = :location "
+            + "                             AND e.encounter_type = ${60} "
+            + "                             AND o.concept_id = ${23985} "
+            + "                             AND o.value_coded IN (${23954},${23984}) "
+            + "                             AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 4 MONTH) "
+            + "                             AND e.encounter_datetime < inh.first_pickup_date "
+            + "                           UNION "
+            + "                           SELECT patient_id "
+            + "                           FROM patient p "
+            + "                           WHERE     p.voided = 0 "
+            + "                             AND e.voided = 0 "
+            + "                             AND o.voided = 0 "
+            + "                             AND e.location_id = :location "
+            + "                             AND e.encounter_type = ${6} "
+            + "                             AND o.concept_id = ${1719} "
+            + "                             AND o.value_coded IN (${23954}) "
+            + "                             AND e.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 4 MONTH) "
+            + "                             AND e.encounter_datetime < inh.first_pickup_date) ";
+
+    return cd;
+  }
 }
