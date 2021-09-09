@@ -29,6 +29,7 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
   private HivMetadata hivMetadata;
 
+  @Autowired
   public ListOfPatientsDefaultersOrIITTemplateDataSet(
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
