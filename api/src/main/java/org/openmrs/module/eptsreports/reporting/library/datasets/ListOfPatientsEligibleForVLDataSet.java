@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.ConceptNameConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
@@ -43,7 +44,9 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
     PatientIdentifierType identifierType =
         Context.getPatientService()
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
+
     DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
+
     DataDefinition identifierDef =
         new ConvertedPatientDataDefinition(
             "identifier",
@@ -54,6 +57,16 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
 
+    PersonAttributeType contactAttributeType =
+        Context.getPersonService()
+            .getPersonAttributeTypeByUuid("e2e3fd64-1d5f-11e0-b929-000c29ad1d07");
+    DataDefinition conctactDef =
+        new ConvertedPersonDataDefinition(
+            "contact",
+            new PersonAttributeDataDefinition(contactAttributeType.getName(), contactAttributeType),
+            null);
+
+
     pdd.addColumn("nid", listChildrenOnARTandFormulationsDataset.getNID(), "");
 
     pdd.addColumn("name", nameDef, "");
@@ -62,11 +75,11 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         listOfpatientsEligibleForVLDataDefinitionQueries.getPatientBirthdate(),
         "",
         null);
+
     pdd.addColumn(
         "age", listChildrenOnARTandFormulationsDataset.getAge(), "endDate=${endDate}", null);
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
-    pdd.addColumn(
-        "contact", listOfpatientsEligibleForVLDataDefinitionQueries.getContact(), "", null);
+    pdd.addColumn("contact", conctactDef, "");
     pdd.addColumn(
         "art_start_date",
         listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndARTStartDate(),

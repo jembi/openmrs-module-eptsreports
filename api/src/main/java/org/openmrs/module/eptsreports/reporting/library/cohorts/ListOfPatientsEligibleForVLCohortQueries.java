@@ -49,7 +49,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     CohortDefinition chdVL2 = getPatientsWithVLLessThan1000();
     CohortDefinition chdVL3 = getPatientsWithMostRecentVLQuantitativeResult();
     CohortDefinition chdVL4 = getPatientsWhoHaveRegisteredVLLessThan1000ForMoreThan12Months();
-    CohortDefinition chdVL5 = getPatientsWithRecentVLIgualOrGreaterThan1000();
+    CohortDefinition chdVL5 = getPatientsWithVLIgualOrGreaterThan1000();
     CohortDefinition chdVL6 =
         getPatientsWhoHaveRegisteredVLIgualOrGreaterThan1000ForMoreThan3Months();
     CohortDefinition chdVL7 = getPatientsWhoDontHaveAnyViralLoad();
@@ -536,8 +536,8 @@ public class ListOfPatientsEligibleForVLCohortQueries {
    *
    * <blockquote>
    *
-   * <p>select all patients with the most recent VL Numeric Result (concept Id 856) documented in
-   * the Laboratory Form (encounter type 13, encounter_datetime) or Ficha de Seguimento Adulto or
+   * <p>VL2 - select all patients with the most recent VL Numeric Result (concept Id 856) documented
+   * in the Laboratory Form (encounter type 13, encounter_datetime) or Ficha de Seguimento Adulto or
    * Pediatria (encounter type 6,9, encounter_datetime) or Ficha Clinica (encounter type 6,
    * encounter_datetime) or Ficha Resumo (encounter type 53, obs_datetime ) or FSR form (encounter
    * type 51, encounter_datetime) by start of reporting period (<=startDate) and the Result is <
@@ -554,55 +554,9 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    String query = mostRecentVLNumericResultQuery(Sentence.LessThan, 1000);
 
-    String query =
-        "      SELECT patient_id FROM( "
-            + " SELECT most_recent.patient_id, MAX(recent_datetime) FROM( "
-            + " SELECT p.patient_id, MAX(e.encounter_datetime) recent_datetime "
-            + " FROM patient p "
-            + "                 INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                 WHERE e.encounter_type IN (${13},${6},${9},${51}) "
-            + "                 AND e.encounter_datetime <= :startDate "
-            + "                 AND o.concept_id = ${856} "
-            + "                 AND o.value_numeric < 1000 "
-            + "                 AND e.location_id = :location "
-            + "                 AND e.voided = 0 "
-            + "                 AND o.voided = 0 "
-            + "                 AND p.voided = 0 "
-            + "                 GROUP BY p.patient_id "
-            + "                  "
-            + "                 UNION "
-            + "                  "
-            + "                SELECT p.patient_id, MAX(o.obs_datetime) recent_datetime "
-            + "                 FROM patient p  "
-            + "                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                 WHERE e.encounter_type = ${53} "
-            + "                 AND o.concept_id = ${856} "
-            + "                 AND o.obs_datetime <= :startDate "
-            + "                 AND e.location_id = :location "
-            + "                 AND e.voided = 0 "
-            + "                 AND p.voided = 0 "
-            + "                 AND o.voided = 0    "
-            + "                 GROUP BY p.patient_id "
-            + "                  "
-            + " ) AS most_recent GROUP BY most_recent.patient_id "
-            + "              "
-            + "              "
-            + " ) AS recent_vl "
-            + "     GROUP BY recent_vl.patient_id ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
   }
@@ -891,58 +845,16 @@ public class ListOfPatientsEligibleForVLCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithRecentVLIgualOrGreaterThan1000() {
+  public CohortDefinition getPatientsWithVLIgualOrGreaterThan1000() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("All patients with the most recent VL Numeric Result");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    String query = mostRecentVLNumericResultQuery(Sentence.EqualOrGreaterThan, 1000);
 
-    String query =
-        " SELECT patient_id  FROM( "
-            + " SELECT patient_id, MAX(recent_date) FROM( "
-            + " SELECT p.patient_id, MAX(o.obs_datetime) recent_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " WHERE e.encounter_type = ${53} "
-            + " AND o.concept_id = ${856} "
-            + " AND o.value_numeric >= 1000 "
-            + " AND o.obs_datetime <= :startDate "
-            + " AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
-            + " GROUP BY patient_id "
-            + "  "
-            + " UNION "
-            + "  "
-            + " SELECT p.patient_id, MAX(e.encounter_datetime) recent_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " WHERE e.encounter_type IN(${13}, ${6},${9}, ${51}) "
-            + " AND o.concept_id = ${856} "
-            + " AND o.value_numeric >= 1000 "
-            + " AND e.encounter_datetime <= :startDate "
-            + " AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id "
-            + " ) AS most_recent_vl  "
-            + " GROUP BY patient_id "
-            + " )patients_vl5 ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
   }
@@ -1179,5 +1091,79 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  private String mostRecentVLNumericResultQuery(Sentence sentence, Integer value) {
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        "      SELECT patient_id FROM( "
+            + " SELECT most_recent.patient_id, MAX(recent_datetime) FROM( "
+            + " SELECT p.patient_id, MAX(e.encounter_datetime) recent_datetime "
+            + " FROM patient p "
+            + "                 INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                 WHERE e.encounter_type IN (${13},${6},${9},${51}) "
+            + "                 AND e.encounter_datetime <= :startDate "
+            + "                 AND o.concept_id = ${856} "
+            + "                 AND o.value_numeric %s %d "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.voided = 0 "
+            + "                 AND o.voided = 0 "
+            + "                 AND p.voided = 0 "
+            + "                 GROUP BY p.patient_id "
+            + "                  "
+            + "                 UNION "
+            + "                  "
+            + "                SELECT p.patient_id, MAX(o.obs_datetime) recent_datetime "
+            + "                 FROM patient p  "
+            + "                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                 WHERE e.encounter_type = ${53} "
+            + "                 AND o.concept_id = ${856} "
+            + "                 AND o.value_numeric %s %d "
+            + "                 AND o.obs_datetime <= :startDate "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.voided = 0 "
+            + "                 AND p.voided = 0 "
+            + "                 AND o.voided = 0    "
+            + "                 GROUP BY p.patient_id "
+            + "                  "
+            + " ) AS most_recent GROUP BY most_recent.patient_id "
+            + "              "
+            + "              "
+            + " ) AS recent_vl "
+            + "     GROUP BY recent_vl.patient_id ";
+
+    String sql = String.format(query, sentence.getSentence(), value, sentence.getSentence(), value);
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    return stringSubstitutor.replace(sql);
+  }
+
+  enum Sentence {
+    GreaterThan(">"),
+    EqualOrGreaterThan(">="),
+    LessThan("<"),
+    EqualOrLessThan("<="),
+    Different("<>");
+
+    private final String sentence;
+
+    Sentence(String sentence) {
+      this.sentence = sentence;
+    }
+
+    public String getSentence() {
+      return this.sentence;
+    }
   }
 }

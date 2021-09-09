@@ -802,35 +802,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
-  /**
-   * <b>Technical Specs</b>
-   *
-   * <blockquote>
-   *
-   * <p>Patient Contact from Demographics
-   *
-   * </blockquote>
-   *
-   * @return {@link DataDefinition}
-   */
-  public DataDefinition getContact() {
 
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Get Patient Contact");
-
-    Map<String, Integer> map = new HashMap<>();
-
-    String query =
-        "  SELECT p.patient_id, pc.telemovel FROM patient p  "
-            + "     INNER JOIN paciente_com_celular pc on p.patient_id = pc.patient_id  "
-            + "  WHERE p.voided =0 GROUP BY p.patient_id; ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
 
   /**
    * <b>Technical Specs</b>
