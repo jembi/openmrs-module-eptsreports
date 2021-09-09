@@ -128,7 +128,15 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                tbMetadata.getTreatmentFollowUpTPTConcept().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -748,7 +756,15 @@ public class TPTCompletionCohortQueries {
       int regimeTPTEncounterType,
       int regimeTPTConcept,
       int isoniazidConcept,
-      int isoniazidePiridoxinaConcept) {
+      int isoniazidePiridoxinaConcept,
+      int seguimentoTPTConcept,
+      int continuaConcept,
+      int dataInicioConcept,
+      int fichaResumoEncounterType,
+      int profilaxiaConcept,
+      int inicioConcept,
+      int fichaClinicaEncounterType,
+      int adultoseguimentoEncounterType) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Regime de TPT");
@@ -760,23 +776,119 @@ public class TPTCompletionCohortQueries {
     map.put("23985", regimeTPTConcept);
     map.put("656", isoniazidConcept);
     map.put("23982", isoniazidePiridoxinaConcept);
+    map.put("23987", seguimentoTPTConcept);
+    map.put("1257", continuaConcept);
+    map.put("6128", dataInicioConcept);
+    map.put("53", fichaResumoEncounterType);
+    map.put("6122", profilaxiaConcept);
+    map.put("1256", inicioConcept);
+    map.put("6", fichaClinicaEncounterType);
+    map.put("9", adultoseguimentoEncounterType);
 
     String query =
-        " SELECT"
-            + " p.patient_id"
-            + " FROM"
-            + " patient p"
-            + "    INNER JOIN"
-            + "  encounter e ON p.patient_id = e.patient_id"
-            + "    INNER JOIN"
-            + " obs o ON e.encounter_id = o.encounter_id"
-            + " WHERE"
-            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
-            + "     AND e.encounter_type = ${60}"
-            + "     AND o.concept_id = ${23985}"
-            + "    AND o.value_coded IN (${656} , ${23982})"
-            + "     AND e.encounter_datetime < :endDate"
-            + "        AND e.location_id = :location";
+        " SELECT p.patient_id FROM patient p    "
+            + " INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + " INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + " INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
+            + " WHERE e.encounter_type = ${60}    "
+            + " AND (o.concept_id = ${23985} AND o.value_coded IN(${656}, ${23982}))   "
+            + " AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1257} , null))   "
+            + " AND e.location_id = :location   "
+            + " AND e.encounter_datetime < :endDate   "
+            + " AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + " AND p.patient_id NOT IN (   "
+            + "    SELECT p.patient_id FROM patient p    "
+            + "    INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "    INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "    INNER JOIN (   "
+            + "        SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "        INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
+            + "        WHERE e.encounter_type = ${60    "
+            + "        AND (o.concept_id = ${23985} AND o.value_coded IN(${656}, ${23982}))   "
+            + "        AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1257} , null))   "
+            + "        AND e.location_id = :location   "
+            + "        AND e.encounter_datetime < :endDate   "
+            + "        AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "    ) AS filt    "
+            + "    ON filt.patient_id = p.patient_id   "
+            + "    WHERE e.encounter_type = ${60}    "
+            + "    AND o.concept_id = ${23985} AND o.value_coded IN(${656}, ${23982})   "
+            + "    AND e.location_id = :location   "
+            + "    AND e.encounter_datetime BETWEEN DATE_SUB(filt.encounter_datetime, INTERVAL 7 MONTH) AND filt.encounter_datetime   "
+            + "    AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + " )   "
+            + " AND p.patient_id NOT IN (   "
+            + "    SELECT p.patient_id FROM patient p    "
+            + "    INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "    INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "    INNER JOIN (   "
+            + "        SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "        INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
+            + "        WHERE e.encounter_type = ${60}    "
+            + "        AND (o.concept_id = ${23985} AND o.value_coded IN(${656}, ${23982}))   "
+            + "        AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1257} , null))           "
+            + "        AND e.location_id = :location   "
+            + "        AND e.encounter_datetime < :endDate   "
+            + "        AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "    ) AS fichaResumo    "
+            + "    ON fichaResumo.patient_id = p.patient_id   "
+            + "    WHERE e.encounter_type = ${53}   "
+            + "    AND o.concept_id = ${6128}    "
+            + "    AND e.location_id = :location   "
+            + "    AND e.encounter_datetime BETWEEN DATE_SUB(fichaResumo.encounter_datetime, INTERVAL 7 MONTH) AND fichaResumo.encounter_datetime   "
+            + "    AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + " )   "
+            + " AND p.patient_id NOT IN (   "
+            + "    SELECT p.patient_id FROM patient p    "
+            + "    INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "    INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "    INNER JOIN (   "
+            + "        SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "        INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
+            + "        WHERE e.encounter_type = 60    "
+            + "        AND (o.concept_id = ${23985} AND o.value_coded IN(${656}, ${23982}))   "
+            + "        AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1257} , null))           "
+            + "        AND e.location_id = :location   "
+            + "        AND e.encounter_datetime < :endDate   "
+            + "        AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "    ) AS fichaClinica    "
+            + "    ON fichaClinica.patient_id = p.patient_id   "
+            + "    WHERE e.encounter_type = ${6}   "
+            + "    AND o.concept_id = ${6122}    "
+            + "    AND o.value_coded = ${1256}   "
+            + "    AND e.location_id = :location   "
+            + "    AND e.encounter_datetime BETWEEN DATE_SUB(fichaClinica.encounter_datetime, INTERVAL 7 MONTH) AND fichaClinica.encounter_datetime   "
+            + "    AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + " )   "
+            + " AND p.patient_id NOT IN (   "
+            + "    SELECT p.patient_id FROM patient p    "
+            + "    INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "    INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "    INNER JOIN (   "
+            + "        SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "        INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
+            + "        WHERE e.encounter_type = ${60}    "
+            + "        AND (o.concept_id = ${23985} AND o.value_coded IN(${656}, ${23982}))   "
+            + "        AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1257} , null))           "
+            + "        AND e.location_id = :location   "
+            + "        AND e.encounter_datetime < :endDate   "
+            + "        AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "    ) AS seguimento    "
+            + "    ON seguimento.patient_id = p.patient_id   "
+            + "    WHERE e.encounter_type IN(${6},${9})   "
+            + "    AND o.concept_id = ${6128}    "
+            + "    AND e.location_id = :location   "
+            + "    AND e.encounter_datetime BETWEEN DATE_SUB(seguimento.encounter_datetime, INTERVAL 7 MONTH) AND seguimento.encounter_datetime   "
+            + "    AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + " ) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
