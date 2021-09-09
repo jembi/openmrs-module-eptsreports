@@ -801,40 +801,4 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
 
     return sqlPatientDataDefinition;
   }
-
-
-
-  /**
-   * <b>Technical Specs</b>
-   *
-   * <blockquote>
-   *
-   * <p>Patient Birthdate from Demographics
-   *
-   * </blockquote>
-   *
-   * @return {@link DataDefinition}
-   */
-  public DataDefinition getPatientBirthdate() {
-
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Patient Birthdate from Demographics");
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-
-    String query =
-        " SELECT p.patient_id, "
-            + "        person.birthdate "
-            + " FROM   patient p "
-            + "        INNER JOIN person person "
-            + "                ON p.patient_id = person_id AND p.voided = 0  "
-            + " GROUP  BY p.patient_id  ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
 }
