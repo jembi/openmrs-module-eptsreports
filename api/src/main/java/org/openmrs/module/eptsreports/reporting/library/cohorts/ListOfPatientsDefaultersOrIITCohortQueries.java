@@ -1361,7 +1361,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                 AND e.location_id = :location  "
             + "                 AND e.encounter_type = ${52}  "
             + "                 AND o.concept_id = ${23866} "
-            + "                 AND e.encounter_datetime <= :endDate  "
+            + "                 AND o.value_datetime <= :endDate  "
             + "                 AND e.encounter_datetime = most_recent.e_datetime ;";
 
     StringSubstitutor substitutor = new StringSubstitutor(map);
