@@ -41,7 +41,6 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
     this.hivMetadata = hivMetadata;
   }
 
-  @Autowired
   public DataSetDefinition constructDataSet() {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
 
