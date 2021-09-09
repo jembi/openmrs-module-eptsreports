@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.IntensiveMonitoringDataSet;
-import org.openmrs.module.eptsreports.reporting.library.datasets.QualityImprovement2020DataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -21,10 +20,15 @@ public class SetupViralLoadIntensiveMonitoringReport extends EptsDataExportManag
 
     private GenericCohortQueries genericCohortQueries;
 
+    private IntensiveMonitoringDataSet intensiveMonitoringDataSet;
+
     @Autowired
     public SetupViralLoadIntensiveMonitoringReport(
+            IntensiveMonitoringDataSet intensiveMonitoringDataSet,
             GenericCohortQueries genericCohortQueries) {
         this.genericCohortQueries = genericCohortQueries;
+        this.intensiveMonitoringDataSet = intensiveMonitoringDataSet;
+
 
     }
 
@@ -50,7 +54,7 @@ public class SetupViralLoadIntensiveMonitoringReport extends EptsDataExportManag
 
     @Override
     public String getVersion() {
-        return null;
+        return "1.0-SNAPSHOT";
     }
 
     @Override
@@ -61,6 +65,9 @@ public class SetupViralLoadIntensiveMonitoringReport extends EptsDataExportManag
         rd.setName(getName());
         rd.setDescription(getDescription());
         rd.setParameters(getParameters());
+        rd.addDataSetDefinition("VLIM",
+                EptsReportUtils.map(this.intensiveMonitoringDataSet.constructIntensiveMonitoringDataSet(),
+                        "revisionEndDate=${endDate},localtion=${localtion}"));
 
         rd.setBaseCohortDefinition(
                 EptsReportUtils.map(
