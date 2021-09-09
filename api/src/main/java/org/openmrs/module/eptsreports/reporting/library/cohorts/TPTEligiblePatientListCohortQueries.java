@@ -450,7 +450,7 @@ public class TPTEligiblePatientListCohortQueries {
             + " AND o.value_datetime IS NOT NULL"
             + " AND o.concept_id = ${6128}"
             + " AND e.location_id = :location"
-            + " AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
+            + " AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
