@@ -1329,6 +1329,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
         "SELECT p.patient_id, DATE_ADD(o.value_datetime, INTERVAL 30 DAY)  "
@@ -1359,6 +1360,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                 AND o.voided = 0   "
             + "                 AND e.location_id = :location  "
             + "                 AND e.encounter_type = ${52}  "
+            + "                 AND o.concept_id = ${23866} "
             + "                 AND e.encounter_datetime <= :endDate  "
             + "                 AND e.encounter_datetime = most_recent.e_datetime ;";
 
