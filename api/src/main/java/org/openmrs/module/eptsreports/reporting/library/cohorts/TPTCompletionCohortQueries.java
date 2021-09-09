@@ -33,6 +33,8 @@ public class TPTCompletionCohortQueries {
 
   private GenericCohortQueries genericCohortQueries;
 
+  private TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries;
+
   @Autowired
   public TPTCompletionCohortQueries(
       HivMetadata hivMetadata,
@@ -130,6 +132,164 @@ public class TPTCompletionCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
+        "A6",
+        EptsReportUtils.map(
+            getINHStartA6(
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                hivMetadata.getSeguimentoDeTratamentoTPTConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getRestartConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB1(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getCompletedConcept().getConceptId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B2",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB2(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getCompletedConcept().getConceptId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B3",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB3(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B4",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB4(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B5Part1",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB5Part1(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B5Part2",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB5Part2(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                tbMetadata.getDtINHConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B5Part3",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB5Part3(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                tbMetadata.getDtINHConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B6Part1",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB6Part1(
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                hivMetadata.getMonthlyConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B6Part2",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB6Part2(
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                hivMetadata.getQuarterlyConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "B6Part3",
+        EptsReportUtils.map(
+            tptEligiblePatientListCohortQueries.getIPTB6Part3(
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
+                hivMetadata.getMonthlyConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                hivMetadata.getQuarterlyConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
         "C1",
         EptsReportUtils.map(
             get3HPStartC1(
@@ -153,8 +313,8 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(getPatientsThatCompletedIsoniazidProphylacticTreatment(), mapping2));
 
     compositionCohortDefinition.setCompositionString(
-        // "txcurr AND ((A1 OR A2 OR A3 OR A4 OR A5 OR C1 OR C2) AND completedAll)");
-        "txcurr AND completedAll");
+        "txcurr AND ((A1 OR A2 OR A3 OR A4 OR A5 OR C1 OR C2) AND completedAll)");
+    //        "txcurr AND completedAll");
 
     return compositionCohortDefinition;
   }
@@ -599,6 +759,67 @@ public class TPTCompletionCohortQueries {
             + "    AND o.value_coded IN (${656} , ${23982})"
             + "     AND e.encounter_datetime < :endDate"
             + "        AND e.location_id = :location";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>A6: Select all patients with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’
+   *       or ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Seguimento de tratamento
+   *       TPT”(concept ID 23987) value coded “inicio” or “re-inicio” (concept ID in [1256, 1705])
+   *       marked on FILT (encounter type 60) and encounter datetime before end date Note: RegimeTPT
+   *       and Seguimento de Tratamento TPT should be on the same encounter.
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getINHStartA6(
+      int regimeTPTEncounterType,
+      int regimeTPTConcept,
+      int isoniazidConcept,
+      int isoniazidePiridoxinaConcept,
+      int seguimentoTPTConcept,
+      int inicioConcept,
+      int reinicioConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName("all patients with Regime de TPT and Seguimento de tratamento TPT");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("60", regimeTPTEncounterType);
+    map.put("23985", regimeTPTConcept);
+    map.put("656", isoniazidConcept);
+    map.put("23982", isoniazidePiridoxinaConcept);
+    map.put("23987", seguimentoTPTConcept);
+    map.put("1256", inicioConcept);
+    map.put("1705", reinicioConcept);
+
+    String query =
+        " SELECT "
+            + "  p.patient_id "
+            + "  FROM "
+            + "  patient p "
+            + "  INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id  "
+            + "  WHERE "
+            + "  p.voided = 0  "
+            + "  AND e.voided = 0  "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${60} "
+            + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${656} , ${23982})) "
+            + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705})) "
+            + "  AND e.encounter_datetime < :endDate  "
+            + "  AND e.location_id = :location";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
