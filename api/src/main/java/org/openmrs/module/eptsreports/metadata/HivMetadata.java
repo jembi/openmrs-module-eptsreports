@@ -3686,6 +3686,21 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
+   * <b>concept_id = 23987</b>
+   *
+   * <p><b>Name:</b>
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPatientTreatmentFollowUp() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.treatmentFollowUpUuid");
+    return getConcept(uuid);
+  }
+
+  /**
    * <b>concept_id = 23993</b>
    *
    * <p><b>Name:</b> REINTEGRATION
@@ -4398,6 +4413,34 @@ public class HivMetadata extends ProgramsMetadata {
   public Concept getTdfAndFtcConcept() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.tdfAndFtcConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id =6177 </b>
+   *
+   * <p><b>Name:</b>WE CAN CONTACT THE CONFIDANT IF YOU ARE UNABLE
+   *
+   * @return
+   */
+  public Concept getConfidentAcceptContact() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.confidentAcceptContactUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id =23776 </b>
+   *
+   * <p><b>Name:</b>CONFIDENT CONSENT DATE
+   *
+   * @return
+   */
+  public Concept getConfidentConsentDate() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.confidentConsentDateUuid");
     return getConcept(uuid);
   }
 }
