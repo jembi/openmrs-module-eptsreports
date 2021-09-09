@@ -2995,15 +2995,15 @@
 		<description>
 		   ART drug Formulation
 		</description>
-	 </globalProperty>
-	 <globalProperty>
+	</globalProperty>
+
+	<globalProperty>
 		<property>eptsreports.drugAndQuantity</property>
 		<defaultValue>5ad593a4-bea2-4eef-ac88-11654e79d9da</defaultValue>
 		<description>
 		   Drug and Quantity
 		</description>
-
-	 </globalProperty>
+	</globalProperty>
 
 	 <globalProperty>
 		<property>eptsreports.treatmentFollowUpTPTConceptUuid</property>
@@ -3012,7 +3012,6 @@
 		   UUID FOR Seguimento de tratamento TPT
 		</description>
 	 </globalProperty>
-
 
   <globalProperty>
 		<property>eptsreports.confidentAcceptContactUuid</property>
