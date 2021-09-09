@@ -295,7 +295,10 @@ public class TPTCompletionCohortQueries {
             get3HPStartC1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.get3HPConcept().getConceptId()),
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -305,6 +308,21 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                hivMetadata.getPatientTreatmentFollowUp().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getRestartConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "C3",
+        EptsReportUtils.map(
+            get3HPStartC3(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
             mapping));
 
@@ -840,7 +858,12 @@ public class TPTCompletionCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition get3HPStartC1(
-      int encounterType, int treatmentPrescribedConcept, int threeHPConcept) {
+      int encounterType,
+      int treatmentPrescribedConcept,
+      int threeHPConcept,
+      int filtEncounterType,
+      int regimedeTPConcept,
+      int threeHPPiridoxinaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Ficha Clinica Master Card ");
@@ -852,16 +875,61 @@ public class TPTCompletionCohortQueries {
     map.put("6", encounterType);
     map.put("1719", treatmentPrescribedConcept);
     map.put("23954", threeHPConcept);
+    map.put("60", filtEncounterType);
+    map.put("23985", regimedeTPConcept);
+    map.put("23984", threeHPPiridoxinaConcept);
 
     String query =
-        "SELECT p.patient_id FROM patient p "
-            + "INNER JOIN encounter e ON p.patient_id  = e.patient_id "
-            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "WHERE e.encounter_type = ${6} "
-            + "AND o.concept_id = ${1719} AND o.value_coded = ${23954} "
-            + "AND e.location_id = :location "
-            + "AND e.encounter_datetime < :endDate "
-            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
+        " SELECT p.patient_id FROM patient p    "
+            + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "WHERE e.encounter_type = ${6}    "
+            + "AND o.concept_id = ${1719} AND o.value_coded = ${23954}    "
+            + "AND e.location_id = :location    "
+            + "AND e.encounter_datetime < :endDate   "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "AND p.patient_id NOT IN (   "
+            + "   SELECT p.patient_id FROM patient p    "
+            + "   INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "   INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "   INNER JOIN (   "
+            + "      SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "      INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "      WHERE e.encounter_type = ${6}    "
+            + "      AND o.concept_id = ${1719} AND o.value_coded = ${23954}    "
+            + "      AND e.location_id = :location    "
+            + "      AND e.encounter_datetime < :endDate   "
+            + "      AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "   ) AS fichaClinica    "
+            + "   ON fichaClinica.patient_id = p.patient_id   "
+            + "   WHERE e.encounter_type = ${6}    "
+            + "   AND o.concept_id = ${1719} AND o.value_coded = ${23954}    "
+            + "   AND e.location_id = :location    "
+            + "   AND e.encounter_datetime BETWEEN DATE_SUB(fichaClinica.encounter_datetime, INTERVAL 4 MONTH) AND fichaClinica.encounter_datetime   "
+            + "   AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + ")   "
+            + "AND p.patient_id NOT IN (   "
+            + "   SELECT p.patient_id FROM patient p    "
+            + "   INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "   INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "   INNER JOIN (   "
+            + "      SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "      INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "      WHERE e.encounter_type = ${6}    "
+            + "      AND o.concept_id = ${1719} AND o.value_coded = ${23954}    "
+            + "      AND e.location_id = :location    "
+            + "      AND e.encounter_datetime < :endDate   "
+            + "      AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "   ) AS regimeTPT    "
+            + "   ON regimeTPT.patient_id = p.patient_id   "
+            + "   WHERE e.encounter_type = ${60}    "
+            + "   AND o.concept_id = ${23985} AND o.value_coded IN(${23954},${23984})   "
+            + "   AND e.location_id = :location   "
+            + "   AND e.encounter_datetime BETWEEN DATE_SUB(regimeTPT.encounter_datetime, INTERVAL 4 MONTH) AND regimeTPT.encounter_datetime   "
+            + "   AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + ") ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -874,15 +942,23 @@ public class TPTCompletionCohortQueries {
    * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
-   *   <li>C2: Select all patients with FILT (encounter type 6) with “Regime de TPT” (concept id
-   *       23985) value coded “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and
-   *       encounter datetime before end date;
+   *   <li>C2: Select all patients with FILT (encounter type 60) with “Regime de TPT” (concept id
+   *       23985) value coded “3HP” or “3HP+Piridoxina” (concept id in [23954, 23984]) and
+   *       “Seguimento de tratamento TPT”(concept ID 23987) value coded “inicio” or
+   *       “re-inicio”(concept ID in [1256, 1705]) and encounter datetime before end date; Note:
+   *       RegimeTPT and Seguimento de Tratamento TPT should be on the same encounter.
    *   <li>
    *
    * @return CohortDefinition
    */
   public CohortDefinition get3HPStartC2(
-      int fILT, int regimeTPTConcept, int hPConcept, int hPPiridoxinaConcept) {
+      int fILT,
+      int regimeTPTConcept,
+      int hPConcept,
+      int hPPiridoxinaConcept,
+      int seguimentoTPTConcept,
+      int inicioConcept,
+      int reinicioConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with FILT ");
@@ -894,22 +970,120 @@ public class TPTCompletionCohortQueries {
     map.put("23985", regimeTPTConcept);
     map.put("23954", hPConcept);
     map.put("23984", hPPiridoxinaConcept);
+    map.put("23987", seguimentoTPTConcept);
+    map.put("1256", inicioConcept);
+    map.put("1705", reinicioConcept);
 
     String query =
-        " SELECT  "
-            + "  p.patient_id "
-            + " 	FROM "
-            + "     	patient p "
-            + " 	INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " 	INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + " 	WHERE "
-            + "    	e.encounter_type = ${60} AND p.voided = 0 "
-            + "         	AND e.voided = 0 "
-            + "         	AND o.voided = 0 "
-            + "         	AND o.concept_id = ${23985} "
-            + "         	AND o.value_coded in (${23954},${23984}) "
-            + "         	AND e.location_id = :location "
-            + "         	AND e.encounter_datetime < :endDate ";
+        " SELECT  p.patient_id FROM patient p   "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id   "
+            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id   "
+            + "INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id   "
+            + "WHERE   "
+            + "  e.encounter_type = 60 AND p.voided = 0   "
+            + "  AND e.voided = 0   "
+            + "  AND o.voided = 0   "
+            + "  AND ( o.concept_id = ${23985} AND o.value_coded in (${23954},${23984}) )  "
+            + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705}))  "
+            + "  AND e.location_id = :location  "
+            + "  AND e.encounter_datetime < :endDate ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>C3: Select all patients with FILT (encounter type 60) with “Regime de TPT” (concept id
+   *       23985) value coded “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and
+   *       encounter_datetime before end date as “3HP Start Date” no other 3HP prescriptions
+   *       [“Outras prescricoes” (concept id 1719) with value coded equal to “3HP” (concept id
+   *       23954)] marked on Ficha-Clínica in the 4 months prior to the 3HP Start Date and no
+   *       “Regime de TPT” (concept id 23985) with value coded “3HP” or ” 3HP+Piridoxina” (concept
+   *       id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the 3HP
+   *       Start Date;
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition get3HPStartC3(
+      int encounterType,
+      int treatmentPrescribedConcept,
+      int threeHPConcept,
+      int filtEncounterType,
+      int regimedeTPConcept,
+      int threeHPPiridoxinaConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(" all patients with Ficha Clinica Master Card ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", encounterType);
+    map.put("1719", treatmentPrescribedConcept);
+    map.put("23954", threeHPConcept);
+    map.put("60", filtEncounterType);
+    map.put("23985", regimedeTPConcept);
+    map.put("23984", threeHPPiridoxinaConcept);
+
+    String query =
+        " SELECT p.patient_id FROM patient p    "
+            + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "WHERE e.encounter_type = ${60}    "
+            + "AND o.concept_id = ${23985} AND o.value_coded IN(${23954}, ${23984})   "
+            + "AND e.location_id = :location    "
+            + "AND e.encounter_datetime < :endDate   "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "AND p.patient_id NOT IN (   "
+            + "   SELECT p.patient_id FROM patient p    "
+            + "   INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "   INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "   INNER JOIN (   "
+            + "      SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "      INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + " WHERE e.encounter_type = ${60}    "
+            + " AND o.concept_id = ${23985} AND o.value_coded IN(${23954}, ${23984})   "
+            + "      AND e.location_id = :location    "
+            + "      AND e.encounter_datetime < :endDate   "
+            + "      AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "   ) AS fichaClinica    "
+            + "   ON fichaClinica.patient_id = p.patient_id   "
+            + "   WHERE e.encounter_type = ${6}    "
+            + "   AND o.concept_id = ${1719} AND o.value_coded = ${23954}    "
+            + "   AND e.location_id = :location    "
+            + "   AND e.encounter_datetime BETWEEN DATE_SUB(fichaClinica.encounter_datetime, INTERVAL 4 MONTH) AND fichaClinica.encounter_datetime   "
+            + "   AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + ")   "
+            + "AND p.patient_id NOT IN (   "
+            + "   SELECT p.patient_id FROM patient p    "
+            + "   INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "   INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "   INNER JOIN (   "
+            + "      SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "      INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + " WHERE e.encounter_type = ${60}    "
+            + " AND o.concept_id = ${23985} AND o.value_coded IN(${23954}, ${23984})   "
+            + "      AND e.location_id = :location    "
+            + "      AND e.encounter_datetime < :endDate   "
+            + "      AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "   ) AS regimeTPT    "
+            + "   ON regimeTPT.patient_id = p.patient_id   "
+            + "   WHERE e.encounter_type = ${60}    "
+            + "   AND o.concept_id = ${23985} AND o.value_coded IN(${23954},${23984})   "
+            + "   AND e.location_id = :location   "
+            + "   AND e.encounter_datetime BETWEEN DATE_SUB(regimeTPT.encounter_datetime, INTERVAL 4 MONTH) AND regimeTPT.encounter_datetime   "
+            + "   AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + ") ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
