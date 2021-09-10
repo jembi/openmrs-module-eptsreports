@@ -42,13 +42,15 @@ public class TPTCompletionCohortQueries {
       TbPrevCohortQueries tbPrevCohortQueries,
       TxCurrCohortQueries txCurrCohortQueries,
       TXTBCohortQueries txTbCohortQueries,
-      GenericCohortQueries genericCohortQueries) {
+      GenericCohortQueries genericCohortQueries,
+      TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.tbPrevCohortQueries = tbPrevCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
     this.txTbCohortQueries = txTbCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
+    this.tptEligiblePatientListCohortQueries = tptEligiblePatientListCohortQueries;
   }
 
   private final String mapping = "endDate=${endDate},location=${location}";
