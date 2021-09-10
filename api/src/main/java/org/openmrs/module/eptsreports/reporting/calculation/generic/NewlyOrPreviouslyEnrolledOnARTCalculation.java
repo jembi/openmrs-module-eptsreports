@@ -135,6 +135,49 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             endDate,
             EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
             context);
+
+    /*CalculationResultMap anyIsoniazidaPiridoxina =
+            ePTSCalculationService.getObs(
+                    tbMetadata.getRegimeTPTConcept(),
+                    tbMetadata.getRegimeTPTEncounterType(),
+                    cohort,
+                    location,
+                    Arrays.asList(
+                            tbMetadata.getIsoniazidConcept(), tbMetadata.getIsoniazidePiridoxinaConcept()),
+                    TimeQualifier.ANY,
+                    startDate,
+                    endDate,
+                    EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+                    context);
+
+    CalculationResultMap anyIsoniazidaPiridoxina2 =
+            ePTSCalculationService.getObs(
+                    tbMetadata.getRegimeTPTConcept(),
+                    tbMetadata.getRegimeTPTEncounterType(),
+                    cohort,
+                    location,
+                    Arrays.asList(
+                            tbMetadata.getIsoniazidConcept(), tbMetadata.getIsoniazidePiridoxinaConcept()),
+                    TimeQualifier.ANY,
+                    startDate,
+                    endDate,
+                    EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+                    context);
+
+
+    CalculationResultMap firstINHDateMap2 =
+            ePTSCalculationService.getObs(
+                    hivMetadata.getPatientTreatmentFollowUp(),
+                    tbMetadata.getRegimeTPTEncounterType(),
+                    cohort,
+                    location,
+                    Arrays.asList(
+                            hivMetadata.getContinueRegimenConcept()),
+                    TimeQualifier.FIRST,
+                    startDate,
+                    endDate,
+                    EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+                    context);*/
     CalculationResultMap notInINHDateMap =
         ePTSCalculationService.getObs(
             tbMetadata.getRegimeTPTConcept(),
@@ -206,6 +249,8 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         Obs fichaClinicaMasterCardStartDrugsObs =
             EptsCalculationUtils.resultForPatient(startDrugsObservations, patientId);
         Obs firstINHDateObs = EptsCalculationUtils.obsResultForPatient(firstINHDateMap, patientId);
+        // Obs firstINHDateObs2 = EptsCalculationUtils.obsResultForPatient(firstINHDateMap2,
+        // patientId);
         List<Obs> notInINHDateObs = getObsListFromResultMap(notInINHDateMap, patientId);
         Obs first3HPDateObs = EptsCalculationUtils.obsResultForPatient(first3HPDateMap, patientId);
         List<Obs> notIn3HPDateObs = getObsListFromResultMap(notIn3HPDateMap, patientId);
@@ -217,6 +262,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         if ((seguimentoOrFichaResumo == null
                 && fichaClinicaMasterCardStartDrugsObs == null
                 && firstINHDateObs == null
+                // && firstINHDateObs2 == null
                 && first3HPDateObs == null
                 && first3HPOr3HPPlusPiridoxinaDateObs == null)
             || artStartDate == null) {
@@ -232,6 +278,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
                             fichaClinicaMasterCardStartDrugsObs,
                             this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs, -7),
                             this.getObsNotInMonthsPriorTo(first3HPDateObs, notIn3HPDateObs, -4),
+                            // this.getObsNotInMonthsPriorTo(firstINHDateObs2, notInINHDateObs, -7),
                             this.getObsNotInMonthsPriorTo(
                                 first3HPOr3HPPlusPiridoxinaDateObs,
                                 notIn3HPOr3HPPlusPiridoxinaDateObs,
@@ -251,6 +298,9 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             && isNewlyEnrolledOnArtSearch == false) {
           map.put(patientId, new BooleanResult(true, this));
         }
+        /*if (firstINHDateObs.getPersonId().equals(firstINHDateObs2.getPersonId())){
+          map.put(patientId, new BooleanResult(true, this));
+        }*/
       }
       return map;
     } else {
