@@ -174,25 +174,34 @@ public class TbPrevCohortQueries {
     definition.addSearch(
         "regime-tpt-isoniazid",
         EptsReportUtils.map(
-            getPatientsWhoHaveRegimeTPTWithINHMarkedOnFirstPickUpDateOnFILT(),
+            getPatientWhoHaveRegimeTptIsoniazid(),
             "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "outras-prescricoes-3hp",
         EptsReportUtils.map(
-            getPatientsWhoHaveOutrasPrescricoesWith3HPMarkedOnFichaClinica(),
+            getPatientWhoHaveOutrasPrescricoes(),
             "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "regime-tpt-3hp",
         EptsReportUtils.map(
-            getPatientsWhoHaveRegimeTPTWith3HPMarkedOnFirstPickUpDateOnFILT(),
+            getPatientWhoHaveRegimeTpt3HPor3HP(),
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+    definition.addSearch(
+        "regime-tpt-INH",
+        EptsReportUtils.map(
+            getPatientWhoHaveRegimeTptINH(),
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+
+    definition.addSearch(
+        "regime_tpt_3hpOrPiridoxina",
+        EptsReportUtils.map(
+            getPatientWhoHaveRegimeTpt3HP(),
             "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.setCompositionString(
-        "started-by-end-previous-reporting-period "
-            + " AND ("
-            + "            (started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid) "
-            + "         OR (outras-prescricoes-3hp OR regime-tpt-3hp) "
-            + "    AND NOT (transferred-out AND NOT completed-isoniazid)"
-            + "     ) ");
+        "started-by-end-previous-reporting-period  AND "
+            + "((started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid OR getPatientWhoHaveRegimeTptINH)"
+            + " OR (outras-prescricoes-3hp OR regime-tpt-3hp OR getPatientWhoHaveRegimeTpt3HP) "
+            + " AND NOT (transferred-out AND NOT completed-isoniazid)) ");
 
     return definition;
   }
@@ -504,7 +513,7 @@ public class TbPrevCohortQueries {
     return sqlCohortDefinition;
   }
 
-  public CohortDefinition getPatientWhoHaveTpt() {
+  public CohortDefinition getPatientWhoHaveRegimeTptINH() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patient states based on end of reporting period");
@@ -543,7 +552,7 @@ public class TbPrevCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatientWhoHaveRegimeTpt() {
+  public CohortDefinition getPatientWhoHaveRegimeTptIsoniazid() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patient states based on end of reporting period");
     cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
@@ -740,7 +749,6 @@ public class TbPrevCohortQueries {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
-    ;
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
     valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
