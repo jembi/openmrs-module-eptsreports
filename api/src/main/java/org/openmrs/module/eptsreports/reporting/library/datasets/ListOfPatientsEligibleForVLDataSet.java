@@ -148,6 +148,8 @@ public class ListOfPatientsEligibleForVLDataSet extends BaseDataSet {
         "startDate=${startDate},location=${location}",
         null);
 
+    pdd.addColumn("pid", new PersonIdDataDefinition(), "");
+
     return pdd;
   }
 }
