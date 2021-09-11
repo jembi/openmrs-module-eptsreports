@@ -175,32 +175,32 @@ public class TbPrevCohortQueries {
         "regime-tpt-isoniazid",
         EptsReportUtils.map(
             getPatientWhoHaveRegimeTptIsoniazid(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "outras-prescricoes-3hp",
         EptsReportUtils.map(
             getPatientWhoHaveOutrasPrescricoes(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "regime-tpt-3hp",
         EptsReportUtils.map(
             getPatientWhoHaveRegimeTpt3HPor3HP(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "regime-tpt-INH",
         EptsReportUtils.map(
             getPatientWhoHaveRegimeTptINH(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
 
     definition.addSearch(
-        "regime_tpt_3hpOrPiridoxina",
+        "regime-tpt-3hpOrPiridoxina",
         EptsReportUtils.map(
             getPatientWhoHaveRegimeTpt3HP(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
     definition.setCompositionString(
         "started-by-end-previous-reporting-period  AND "
-            + "((started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid OR getPatientWhoHaveRegimeTptINH)"
-            + " OR (outras-prescricoes-3hp OR regime-tpt-3hp OR getPatientWhoHaveRegimeTpt3HP) "
+            + "((started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid OR regime-tpt-INH)"
+            + " OR (outras-prescricoes-3hp OR regime-tpt-3hp OR regime-tpt-3hpOrPiridoxina) "
             + " AND NOT (transferred-out AND NOT completed-isoniazid)) ");
 
     return definition;
@@ -544,7 +544,7 @@ public class TbPrevCohortQueries {
             + "  AND e.encounter_type = ${60} "
             + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982})) "
             + "  AND (o2.concept_id =${23987} AND o2.value_coded IN (${1256}, ${1705})) "
-            + "  AND e.encounter_datetime >= :startDate AND encounter_datetime <= :endDate ";
+            + "  AND e.encounter_datetime >= :onOrAfter AND encounter_datetime <= :onOrBefore ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -595,8 +595,8 @@ public class TbPrevCohortQueries {
             + "                        AND e.encounter_type = ${60} "
             + "                        AND (o.concept_id = ${23985} AND o.value_coded IN (${656},${23982})) "
             + "                        AND ((o2.concept_id =${23987} AND o2.value_coded IN (${1256})) OR o2.concept_id IS NULL) "
-            + "                        AND e.encounter_datetime >= :endDate "
-            + "                        AND e.encounter_datetime <= :startDate "
+            + "                        AND e.encounter_datetime >= :onOrAfter "
+            + "                        AND e.encounter_datetime <= :onOrBefore "
             + "                      GROUP BY p.patient_id "
             + "                      UNION "
             + "                      SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date "
@@ -614,8 +614,8 @@ public class TbPrevCohortQueries {
             + "                        AND (o2.concept_id NOT IN (SELECT o.concept_id FROM encounter e "
             + "                                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                                                   WHERE e.patient_id = p.patient_id AND e.encounter_type = ${60} AND  o.concept_id = ${23987})) "
-            + "                        AND e.encounter_datetime >= :endDate "
-            + "                        AND e.encounter_datetime <= :startDate "
+            + "                        AND e.encounter_datetime >= :onOrAfter "
+            + "                        AND e.encounter_datetime <= :onOrBefore "
             + "                      GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
             + " WHERE p.voided = 0 "
             + "  AND e.voided = 0 "
@@ -697,8 +697,8 @@ public class TbPrevCohortQueries {
             + "                             AND e.encounter_type = ${6}   "
             + "                             AND o.concept_id = ${1719}   "
             + "                             AND o.value_coded IN (${23954})   "
-            + "                             AND e.encounter_datetime >= :startDate   "
-            + "                             AND e.encounter_datetime <= :endDate   "
+            + "                             AND e.encounter_datetime >= :onOrAfter   "
+            + "                             AND e.encounter_datetime <= :onOrBefore   "
             + "                         GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id   "
             + "             WHERE p.voided = 0   "
             + "                and e.voided = 0   "
@@ -756,6 +756,7 @@ public class TbPrevCohortQueries {
     valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
     valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
         " SELECT p.patient_id "
@@ -771,7 +772,7 @@ public class TbPrevCohortQueries {
             + "  AND e.encounter_type = ${60} "
             + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${23954}, ${23984})) "
             + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256}, ${1705})) "
-            + "  AND e.encounter_datetime >= :startDate AND encounter_datetime <= :endDate ";
+            + "  AND e.encounter_datetime >= :onOrAfter AND encounter_datetime <= :onOrBefore ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -813,8 +814,8 @@ public class TbPrevCohortQueries {
             + "                        AND e.encounter_type = ${60} "
             + "                        AND o.concept_id = ${23985} "
             + "                        AND o.value_coded IN (${23954},${23984}) "
-            + "                        AND e.encounter_datetime >= :startDate "
-            + "                        AND e.encounter_datetime <= :endDate "
+            + "                        AND e.encounter_datetime >= :onOrAfter "
+            + "                        AND e.encounter_datetime <= :onOrBefore "
             + "                      GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
             + " WHERE p.voided = 0 "
             + "  and e.voided = 0 "
