@@ -450,7 +450,7 @@ public class TPTEligiblePatientListCohortQueries {
             + " AND o.value_datetime IS NOT NULL"
             + " AND o.concept_id = ${6128}"
             + " AND e.location_id = :location"
-            + " AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
+            + " AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -2894,22 +2894,21 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1113", tBDrugTreatmentStartDate);
 
     String query =
-        " SELECT p.patient_id   "
-            + "   FROM   patient p   "
-            + "          inner join encounter e  "
-            + "                  ON e.patient_id = p.patient_id  "
-            + "          inner join obs o    "
-            + "                  ON o.encounter_id = e.encounter_id  "
-            + "   WHERE  p.voided = 0    "
-            + "          AND o.voided = 0    "
-            + "          AND e.voided = 0    "
-            + "          AND e.location_id = :location "
-            + "          AND e.encounter_type IN ( ${6}, ${9} )    "
-            + "          AND ((o.concept_id = ${1268} "
-            + "          AND o.value_coded IN ( ${1256}, ${1113})) OR ( "
-            + "          o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) AND "
-            + "                                     :endDate)) "
-            + "   GROUP  BY p.patient_id ";
+    "   SELECT p.patient_id                                                                 "
+          + "  FROM   patient p     "
+          + "         inner join encounter e    "
+          + "                 ON e.patient_id = p.patient_id    "
+          + "         inner join obs o      "
+          + "                 ON o.encounter_id = e.encounter_id    "
+          + "  WHERE  p.voided = 0      "
+          + "         AND o.voided = 0      "
+          + "         AND e.voided = 0  "
+          + "         AND e.location_id = :location   "
+          + "         AND e.encounter_type IN (${6},${9})     "
+          + "         AND o.concept_id = ${1113}   "
+          + "         o.value_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) "
+          + "         AND :endDate  "
+          + "    GROUP by p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -3003,7 +3002,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND ps.patient_state_id = ${6269}  "
             + "          AND pp.location_id = :location    "
             + "          AND pp.date_enrolled >= Date_sub(:endDate, INTERVAL 210 DAY)    "
-            + "          AND pp.date_completed <= Date_sub(:endDate, INTERVAL 210 DAY)   "
+            + "          AND pp.date_completed <= :endDate "
             + "   GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
