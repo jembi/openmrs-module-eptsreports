@@ -510,7 +510,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    String query = mostRecentVLNumericResultQuery(Sentence.LessThan, 1000);
+    String query = mostRecentVLNumericResultQuery(Sentence.LessThan, 1000, false);
 
     sqlCohortDefinition.setQuery(query);
 
@@ -540,13 +540,13 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-
-  String query =  getPatientsWithMostRecentVLQuantitativeResult(false);
+    String query = getPatientsWithMostRecentVLQuantitativeResult(false);
     sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
   }
-  private String getPatientsWithMostRecentVLQuantitativeResult(boolean selectDatetime){
+
+  private String getPatientsWithMostRecentVLQuantitativeResult(boolean selectDatetime) {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -557,25 +557,28 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-            "   FROM ( "
-                    + "         SELECT  p.patient_id, MAX(e.encounter_datetime) AS max_vl FROM patient p "
-                    + "             INNER JOIN encounter e on e.patient_id = p.patient_id "
-                    + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-                    + "         WHERE p.voided =0 "
-                    + "             AND e.voided =0 "
-                    + "             AND o.voided = 0 "
-                    + "             AND e.location_id = :location "
-                    + "             AND o.concept_id = ${1305} "
-                    + "             AND e.encounter_type IN (${13},${6},${9},${51}) "
-                    + "             AND e.encounter_datetime <= :startDate "
-                    + "             AND o.value_coded IS NOT NULL "
-                    + "         GROUP BY p.patient_id "
-                    + " ) AS recent_vl GROUP BY recent_vl.patient_id ";
-    String sql = selectDatetime? "SELECT recent_vl.patient_id, recent_vl.max_vl AS recent_datetime ".concat(query): "SELECT recent_vl.patient_id ".concat(query);
+        "   FROM ( "
+            + "         SELECT  p.patient_id, MAX(e.encounter_datetime) AS max_vl FROM patient p "
+            + "             INNER JOIN encounter e on e.patient_id = p.patient_id "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         WHERE p.voided =0 "
+            + "             AND e.voided =0 "
+            + "             AND o.voided = 0 "
+            + "             AND e.location_id = :location "
+            + "             AND o.concept_id = ${1305} "
+            + "             AND e.encounter_type IN (${13},${6},${9},${51}) "
+            + "             AND e.encounter_datetime <= :startDate "
+            + "             AND o.value_coded IS NOT NULL "
+            + "         GROUP BY p.patient_id "
+            + " ) AS recent_vl GROUP BY recent_vl.patient_id ";
+    String sql =
+        selectDatetime
+            ? "SELECT recent_vl.patient_id, recent_vl.max_vl AS recent_datetime ".concat(query)
+            : "SELECT recent_vl.patient_id ".concat(query);
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    return stringSubstitutor.replace(query);
+    return stringSubstitutor.replace(sql);
   }
 
   /**
@@ -583,8 +586,8 @@ public class ListOfPatientsEligibleForVLCohortQueries {
    *
    * <blockquote>
    *
-   * <p>Select all patients who have registered the most recent VL <1000 copies/ml for more than 12
-   * months before “ScheduledDate”, i.e. “ScheduledDate” minus “Most Recent VL Date” >= 12months
+   * <p>VL4-Select all patients who have registered the most recent VL <1000 copies/ml for more than
+   * 12 months before “ScheduledDate”, i.e. “ScheduledDate” minus “Most Recent VL Date” >= 12months
    *
    * </blockquote>
    *
@@ -599,182 +602,36 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
+    String X1 = getLastScheduledConsultationDate(true);
+    String X2 = getLastNextScheduledPickUpDate(true);
+    String X3 = getLastNextScheduledPickUpDateWithMostRecentDataLevantamento(true);
 
-    valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
-    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    String VL2 = mostRecentVLNumericResultQuery(Sentence.LessThan, 1000, true);
+
+    String VL3 = getPatientsWithMostRecentVLQuantitativeResult(true);
 
     String query =
         " SELECT most_recentvl.patient_id "
             + " FROM( "
-            + " SELECT most_recent.patient_id AS patient_id, MAX(recent_datetime) AS recent_date   FROM( "
-            + " SELECT p.patient_id, MAX(e.encounter_datetime) recent_datetime "
-            + " FROM patient p "
-            + "                 INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                 WHERE e.encounter_type IN (${13},${6},${9},${51}) "
-            + "                 AND e.encounter_datetime <= :startDate "
-            + "                 AND o.concept_id = ${856} "
-            + "                 AND o.value_numeric < 1000 "
-            + "                 AND e.location_id = :location "
-            + "                 AND e.voided = 0 "
-            + "                 AND o.voided = 0 "
-            + "                 AND p.voided = 0 "
-            + "                 GROUP BY p.patient_id "
-            + "                  "
-            + "                 UNION "
-            + "                  "
-            + "                SELECT p.patient_id, MAX(o.obs_datetime) recent_datetime "
-            + "                 FROM patient p  "
-            + "                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                 WHERE e.encounter_type = ${53} "
-            + "                 AND o.concept_id = ${856} "
-            + "                 AND o.obs_datetime <= :startDate "
-            + "                 AND e.location_id = :location "
-            + "                 AND e.voided = 0 "
-            + "                 AND p.voided = 0 "
-            + "                 AND o.voided = 0    "
-            + "                 GROUP BY p.patient_id "
-            + "                  "
-            + " ) AS most_recent GROUP BY most_recent.patient_id "
-            + "              "
-            + "             UNION "
-            + "              "
-            + "              SELECT max_val_result.patient_id AS patient_id, MAX(max_val_result.max_vl) AS recent_date FROM ( "
-            + "         SELECT  p.patient_id, MAX(e.encounter_datetime) AS max_vl FROM patient p "
-            + "             INNER JOIN encounter e on p.patient_id = e.patient_id "
-            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "         WHERE p.voided =0 "
-            + "             AND e.voided =0 "
-            + "             AND e.location_id = :location "
-            + "             AND o.voided = 0 "
-            + "             AND o.concept_id = ${1305} "
-            + "             AND e.encounter_type IN (${13},${6},${9},${51}) "
-            + "             AND e.encounter_datetime <= :endDate "
-            + "             AND o.value_coded IS NOT NULL "
-            + "         GROUP BY p.patient_id "
-            + "         UNION "
-            + "         SELECT  p.patient_id, MAX(o.obs_datetime) AS max_vl FROM patient p "
-            + "             INNER JOIN encounter e on p.patient_id = e.patient_id "
-            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "         WHERE p.voided =0 "
-            + "             AND e.voided =0 "
-            + "             AND e.location_id = :location "
-            + "             AND o.voided = 0 "
-            + "             AND o.concept_id = ${1305} "
-            + "             AND e.encounter_type = ${53} "
-            + "             AND o.obs_datetime <= :endDate "
-            + "             AND o.value_coded IS NOT NULL "
-            + "         GROUP BY p.patient_id) AS max_val_result GROUP BY max_val_result.patient_id "
-            + "         ) AS most_recentvl        "
-            + " INNER JOIN  "
-            + "  (        "
-            + " SELECT xpatient.patient_id, xpatient.xdate recentx_date FROM ( "
-            + " SELECT most_recentx.patient_id, MAX(most_recentx.recent_date) xdate FROM "
-            + " (SELECT p.patient_id, o.value_datetime AS recent_date "
-            + " FROM   patient p    "
-            + " INNER JOIN encounter e  ON p.patient_id = e.patient_id    "
-            + " INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
-            + " INNER JOIN   "
-            + " ( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime   "
-            + " FROM  patient p    "
-            + " INNER JOIN encounter e  ON p.patient_id = e.patient_id   "
-            + " WHERE p.voided = 0   "
-            + " AND e.voided = 0    "
-            + " AND e.location_id = :location   "
-            + " AND e.encounter_datetime <= :endDate  "
-            + " AND e.encounter_type IN (${6}, ${9})   "
-            + " GROUP BY p.patient_id "
-            + " ) max_encounter ON p.patient_id = max_encounter.patient_id "
-            + " WHERE  p.voided = 0    "
-            + " AND e.voided = 0    "
-            + " AND o.voided = 0    "
-            + " AND e.location_id = :location  "
-            + " AND e.encounter_type IN (${6}, ${9})   "
-            + " AND o.concept_id = ${1410}   "
-            + " AND o.value_datetime BETWEEN :startDate AND :endDate  "
-            + " AND max_encounter.encounter_datetime = e.encounter_datetime   "
-            + " GROUP BY p.patient_id  "
-            + "  "
+            + " SELECT most_recent.patient_id AS patient_id, MAX(recent_datetime) AS recent_datetime   FROM( "
+            + VL3
             + " UNION "
-            + "  "
-            + " SELECT p.patient_id, o.value_datetime AS recent_date "
-            + " FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "         INNER JOIN ( "
-            + " SELECT p.patient_id,e.encounter_id, MAX(e.encounter_datetime) most_recent "
-            + " FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + " WHERE e.encounter_type = ${18} "
-            + " AND e.encounter_datetime <= :endDate "
-            + "                 AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0     "
-            + " GROUP BY p.patient_id) last_scheduled  "
-            + " ON last_scheduled.patient_id = p.patient_id  "
-            + " WHERE last_scheduled.most_recent = e.encounter_datetime                     "
-            + "                     AND e.voided = 0 "
-            + "                     AND e.location_id = :location "
-            + "                     AND e.encounter_type = ${18} "
-            + "                     AND p.voided = 0 "
-            + "                     AND o.voided = 0 "
-            + "                     AND o.concept_id = ${5096} "
-            + " AND o.value_datetime BETWEEN :startDate AND :endDate "
-            + " GROUP BY p.patient_id "
-            + "                      "
+            + VL2
+            + "         ) AS most_recent  GROUP BY most_recent.patient_id ) most_recentvl       "
+            + " INNER JOIN ( "
+            + " SELECT most_recentx.patient_id, MAX(most_recentx.recent_datetime) recent_datetime FROM ("
+            + X1
             + " UNION "
-            + "  "
-            + " SELECT p.patient_id, most_recent.last_obs AS recent_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " INNER JOIN "
-            + " (SELECT p.patient_id, MAX(o.value_datetime) AS last_obs, o.obs_datetime "
-            + " FROM encounter e INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " INNER JOIN patient p ON p.patient_id = e.patient_id "
-            + " WHERE e.encounter_type = ${52} "
-            + " AND o.concept_id = ${23866} "
-            + "          "
-            + " AND e.voided = 0 "
-            + " AND e.location_id = :location "
-            + "         AND e.voided = 0  "
-            + "         AND p.voided = 0 "
-            + "         AND o.voided = 0 "
-            + " GROUP BY p.patient_id) most_recent "
-            + " ON most_recent.patient_id = e.patient_id "
-            + " WHERE p.voided = 0 "
-            + "   AND e.encounter_type = ${52} "
-            + "   AND e.location_id = :location "
-            + "   AND o.concept_id = ${23865} "
-            + "   AND o.value_coded = ${1065} "
-            + "   AND o.obs_datetime = most_recent.obs_datetime "
-            + "   AND o.voided = 0 "
-            + "   AND e.voided = 0 "
-            + "   AND p.voided = 0 "
-            + "   AND DATE_ADD(most_recent.last_obs, INTERVAL 30 DAY) BETWEEN :startDate AND :endDate "
-            + "   AND most_recent.last_obs <= :endDate "
-            + " GROUP BY p.patient_id) AS most_recentx "
+            + X2
+            + " UNION "
+            + X3
+            + ") AS most_recentx "
             + " GROUP BY most_recentx.patient_id "
-            + " ) AS xpatient "
-            + " ) x ON x.patient_id = most_recentvl.patient_id "
-            + " AND TIMESTAMPDIFF(MONTH,  most_recentvl.recent_date,x.recentx_date) >= 12 "
-            + " GROUP BY x.patient_id ";
+            + " ) AS xpatient ON xpatient.patient_id = most_recentvl.patient_id"
+            + " AND TIMESTAMPDIFF(MONTH,  most_recentvl.recent_datetime,xpatient.recent_datetime) >= 12 "
+            + " GROUP BY xpatient.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
   }
@@ -802,7 +659,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    String query = mostRecentVLNumericResultQuery(Sentence.EqualOrGreaterThan, 1000);
+    String query = mostRecentVLNumericResultQuery(Sentence.EqualOrGreaterThan, 1000, false);
 
     sqlCohortDefinition.setQuery(query);
 
@@ -831,143 +688,31 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
+    String VL5 = mostRecentVLNumericResultQuery(Sentence.EqualOrGreaterThan, 1000, true);
 
-    valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
-    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
-    valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    String X1 = getLastScheduledConsultationDate(true);
+    String X2 = getLastNextScheduledPickUpDate(true);
+    String X3 = getLastNextScheduledPickUpDateWithMostRecentDataLevantamento(true);
 
     String query =
         " SELECT vl5.patient_id FROM( "
-            + " SELECT patient_id, MAX(recent_date) vl5_date FROM( "
-            + " SELECT p.patient_id, MAX(o.obs_datetime) recent_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " WHERE e.encounter_type = ${53} "
-            + " AND o.concept_id = ${856} "
-            + " AND o.value_numeric >= 1000 "
-            + " AND o.obs_datetime <= :startDate "
-            + " AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
-            + " GROUP BY patient_id "
-            + " UNION "
-            + " SELECT p.patient_id, MAX(e.encounter_datetime) recent_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " WHERE e.encounter_type IN(${13}, ${6},${9}, ${51}) "
-            + " AND o.concept_id = ${856} "
-            + " AND o.value_numeric >= 1000 "
-            + " AND e.encounter_datetime <= :startDate "
-            + " AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
-            + " GROUP BY p.patient_id "
-            + " ) AS most_recent_vl  "
-            + " GROUP BY patient_id "
-            + " )vl5 "
+            + VL5
+            + " ) vl5 "
             + " INNER JOIN "
             + " ( "
-            + " SELECT most_recentx.patient_id, MAX(most_recentx.recent_date) AS recentx_date FROM "
-            + " (SELECT p.patient_id, o.value_datetime AS recent_date "
-            + " FROM   patient p    "
-            + " INNER JOIN encounter e  ON p.patient_id = e.patient_id    "
-            + " INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
-            + " INNER JOIN   "
-            + " ( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime   "
-            + " FROM  patient p    "
-            + " INNER JOIN encounter e  ON p.patient_id = e.patient_id   "
-            + " WHERE p.voided = 0   "
-            + " AND e.voided = 0    "
-            + " AND e.location_id = :location   "
-            + " AND e.encounter_datetime <= :endDate  "
-            + " AND e.encounter_type IN (${6}, ${9})   "
-            + " GROUP BY p.patient_id "
-            + " ) max_encounter ON p.patient_id = max_encounter.patient_id "
-            + " WHERE  p.voided = 0    "
-            + " AND e.voided = 0    "
-            + " AND o.voided = 0    "
-            + " AND e.location_id = :location "
-            + " AND e.encounter_type IN (${6}, ${9})   "
-            + " AND o.concept_id = ${1410}   "
-            + " AND o.value_datetime BETWEEN :startDate AND :endDate  "
-            + " AND max_encounter.encounter_datetime = e.encounter_datetime   "
-            + " GROUP BY p.patient_id  "
+            + " SELECT most_recentx.patient_id, MAX(most_recentx.recent_datetime) AS recentx_date FROM ( "
+            + X1
             + " UNION "
-            + " SELECT p.patient_id, o.value_datetime AS recent_date "
-            + " FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "         INNER JOIN ( "
-            + " SELECT p.patient_id,e.encounter_id, MAX(e.encounter_datetime) most_recent "
-            + " FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + " WHERE e.encounter_type = ${18} "
-            + " AND e.encounter_datetime <= :endDate "
-            + "                 AND e.location_id = :location "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0     "
-            + " GROUP BY p.patient_id) last_scheduled  "
-            + " ON last_scheduled.patient_id = p.patient_id  "
-            + " WHERE last_scheduled.most_recent = e.encounter_datetime                     "
-            + "                     AND e.voided = 0 "
-            + "                     AND e.location_id = :location "
-            + "                     AND e.encounter_type = ${18} "
-            + "                     AND p.voided = 0 "
-            + "                     AND o.voided = 0 "
-            + "                     AND o.concept_id = ${5096} "
-            + " AND o.value_datetime BETWEEN :startDate AND :endDate "
-            + " GROUP BY p.patient_id "
+            + X2
             + " UNION "
-            + " SELECT p.patient_id, most_recent.last_obs AS recent_date FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " INNER JOIN "
-            + " (SELECT p.patient_id, MAX(o.value_datetime) AS last_obs, o.obs_datetime "
-            + " FROM encounter e INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + " INNER JOIN patient p ON p.patient_id = e.patient_id "
-            + " WHERE e.encounter_type = ${52} "
-            + " AND o.concept_id = ${23866} "
-            + "          "
-            + " AND e.voided = 0 "
-            + " AND e.location_id = :location "
-            + "         AND e.voided = 0  "
-            + "         AND p.voided = 0 "
-            + "         AND o.voided = 0 "
-            + " GROUP BY p.patient_id) most_recent "
-            + " ON most_recent.patient_id = e.patient_id "
-            + " WHERE p.voided = 0 "
-            + "   AND e.encounter_type = ${52} "
-            + "   AND e.location_id = :location "
-            + "   AND o.concept_id = ${23865} "
-            + "   AND o.value_coded = ${1065} "
-            + "   AND o.obs_datetime = most_recent.obs_datetime "
-            + "   AND o.voided = 0 "
-            + "   AND e.voided = 0 "
-            + "   AND p.voided = 0 "
-            + "   AND DATE_ADD(most_recent.last_obs, INTERVAL 30 DAY) BETWEEN :startDate AND :endDate "
-            + "   AND most_recent.last_obs <= :endDate "
-            + " GROUP BY p.patient_id) AS most_recentx "
+            + X3
+            + ") AS most_recentx "
             + " GROUP BY most_recentx.patient_id "
             + " ) recentx "
             + " ON vl5.patient_id = recentx.patient_id "
-            + " AND TIMESTAMPDIFF(MONTH,  vl5.vl5_date,recentx.recentx_date) >= 3 ";
+            + " AND TIMESTAMPDIFF(MONTH,  vl5.recent_datetime,recentx.recentx_date) >= 3 ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
   }
@@ -1043,7 +788,8 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     return sqlCohortDefinition;
   }
 
-  private String mostRecentVLNumericResultQuery(Sentence sentence, Integer value) {
+  private String mostRecentVLNumericResultQuery(
+      Sentence sentence, Integer value, boolean selectDatetime) {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -1054,9 +800,9 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     String query =
-        "      SELECT patient_id FROM( "
-            + " SELECT most_recent.patient_id, MAX(recent_datetime) FROM( "
-            + " SELECT p.patient_id, MAX(e.encounter_datetime) recent_datetime "
+        "      FROM( "
+            + " SELECT most_recent.patient_id, MAX(recent_date) AS recent_datetime FROM( "
+            + " SELECT p.patient_id, MAX(e.encounter_datetime) recent_date "
             + " FROM patient p "
             + "                 INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1072,7 +818,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "                  "
             + "                 UNION "
             + "                  "
-            + "                SELECT p.patient_id, MAX(o.obs_datetime) recent_datetime "
+            + "                SELECT p.patient_id, MAX(o.obs_datetime) recent_date "
             + "                 FROM patient p  "
             + "                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1092,11 +838,16 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + " ) AS recent_vl "
             + "     GROUP BY recent_vl.patient_id ";
 
-    String sql = String.format(query, sentence.getSentence(), value, sentence.getSentence(), value);
+    String fromSQL =
+        String.format(query, sentence.getSentence(), value, sentence.getSentence(), value);
+    String selectSQL =
+        selectDatetime
+            ? "SELECT recent_vl.patient_id, recent_vl.recent_datetime ".concat(fromSQL)
+            : "SELECT recent_vl.patient_id ".concat(fromSQL);
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    return stringSubstitutor.replace(sql);
+    return stringSubstitutor.replace(selectSQL);
   }
 
   enum Sentence {
