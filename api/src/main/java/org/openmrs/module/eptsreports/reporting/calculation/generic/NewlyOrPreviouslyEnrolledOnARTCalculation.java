@@ -349,6 +349,8 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
                         Arrays.asList(
                             seguimentoOrFichaResumo,
                             fichaClinicaMasterCardStartDrugsObs,
+                            anyIsoniazida,
+                            anyIsoniazida2,
                             this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs, -7),
                             this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs2, -7),
                             this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs3, -7),
@@ -382,13 +384,16 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         }
         if (firstINHDateObs != null
             && firstINHDateObs2 != null
-            && firstINHDateObs.getPersonId().equals(firstINHDateObs2.getPersonId())) {
+            && firstINHDateObs.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6)) <= 0
+            && firstINHDateObs.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6))
+                <= 0) {
           map.put(patientId, new BooleanResult(true, this));
         }
 
         if (anyIsoniazida != null
             && anyIsoniazida2 != null
-            && anyIsoniazida.getPersonId().equals(anyIsoniazida2.getPersonId())) {
+            && anyIsoniazida.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6)) <= 0
+            && anyIsoniazida.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6)) <= 0) {
           map.put(patientId, new BooleanResult(true, this));
         }
       }
