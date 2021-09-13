@@ -459,7 +459,8 @@ public class TPTEligiblePatientListCohortQueries {
             + " AND o.value_datetime IS NOT NULL"
             + " AND o.concept_id = ${6128}"
             + " AND e.location_id = :location"
-            + " AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
+            + " AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate"
+            + " GROUP BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -495,8 +496,8 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         " SELECT p.patient_id FROM patient p  "
-            + "          JOIN encounter e ON e.patient_id = p.patient_id "
-            + "          JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "          WHERE e.encounter_type = ${6} AND o.concept_id = ${6122} "
             + "          AND o.voided = 0 AND e.voided = 0  "
             + "          AND p.voided = 0 AND e.location_id = :location "
@@ -538,8 +539,8 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         "SELECT p.patient_id FROM patient p  "
-            + "          JOIN encounter e ON e.patient_id = p.patient_id "
-            + "          JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "          WHERE e.encounter_type IN (${6}, ${9}) AND o.concept_id = ${6128} "
             + "          AND o.voided = 0 AND e.voided = 0  "
             + "          AND p.voided = 0 AND e.location_id = :location "
@@ -1599,7 +1600,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                             oo.encounter_id ="
             + "                                             ee.encounter_id WHERE"
             + "               ee.encounter_type ="
-            + "               6"
+            + "               ${6}"
             + "                                                 AND oo.concept_id = ${6122}"
             + "                                                                          AND"
             + "                                             oo.voided = 0 AND ee.voided = 0 AND"
@@ -2762,7 +2763,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                           AND EXISTS (SELECT o.person_id  "
             + "                                       FROM   obs o    "
             + "                                       WHERE  o.encounter_id = ee.encounter_id "
-            + "                                              AND o.concept_id = ${23720} "
+            + "                                              AND o.concept_id = ${23986} "
             + "                                              AND o.value_coded IN ( ${23720} )) )    "
             + "                     AND ee.encounter_datetime BETWEEN "
             + "                         tabela.encounter_datetime AND "
@@ -3105,8 +3106,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${6}    "
             + "       AND o.concept_id = ${23761}    "
             + "       AND o.value_coded = ${1065}    "
-            + "       AND e.encounter_datetime BETWEEN :endDate "
-            + "       AND  Date_sub(:endDate, INTERVAL 210 DAY)   "
+            + "       AND e.encounter_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) "
+            + "       AND  :endDate  "
             + "   GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
