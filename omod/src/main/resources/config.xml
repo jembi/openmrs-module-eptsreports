@@ -2997,18 +2997,17 @@
 		<description>
 		   Drug and Quantity
 		</description>
-
 	</globalProperty>
 
-	<globalProperty>
+	 <globalProperty>
 		<property>eptsreports.treatmentFollowUpTPTConceptUuid</property>
 		<defaultValue>93603742-1cae-4970-9077-e2b27e46bd7e</defaultValue>
 		<description>
 		   UUID FOR Seguimento de tratamento TPT
 		</description>
-	</globalProperty>
+	 </globalProperty>
 
-	<globalProperty>
+  <globalProperty>
 		<property>eptsreports.confidentAcceptContactUuid</property>
 		<defaultValue>bfb7acfa-8bd9-41b3-b3e1-d0add5be701b</defaultValue>
 		<description>
