@@ -521,4 +521,466 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
     return compositionCohortDefinition;
   }
+
+  public CohortDefinition getFirstApss() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String sql =
+        " SELECT p.patient_id FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN ((SELECT result.patient_id, MIN(result.vl_date) AS vl_dateP  FROM( "
+            + "           SELECT p.patient_id, e.encounter_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime >= :evaluationPeriodStartDate "
+            + "                          AND e.encounter_datetime <= :evaluationPeriodEndDate "
+            + " "
+            + "                   UNION "
+            + " "
+            + "                   SELECT p.patient_id, o.obs_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND o.obs_datetime >= :evaluationPeriodStartDate "
+            + "                          AND o.obs_datetime <= :evaluationPeriodEndDate) AS result  "
+            + "                          GROUP BY result.patient_id))AS result_vl "
+            + "               ON result_vl.patient_id = p.patient_id "
+            + "        WHERE  e.encounter_type = ${35} "
+            + "            AND e.voided = 0 "
+            + "            AND p.voided = 0 "
+            + "            AND e.encounter_datetime = result_vl.vl_dateP "
+            + "            GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getSecondApss() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String sql =
+        " SELECT p.patient_id FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN ((SELECT result.patient_id, MIN(result.vl_date) AS vl_dateP  FROM( "
+            + "           SELECT p.patient_id, e.encounter_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime >= :evaluationPeriodStartDate "
+            + "                          AND e.encounter_datetime <= :evaluationPeriodEndDate "
+            + " "
+            + "                   UNION "
+            + " "
+            + "                   SELECT p.patient_id, o.obs_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND o.obs_datetime >= :evaluationPeriodStartDate "
+            + "                          AND o.obs_datetime <= :evaluationPeriodEndDate) AS result  "
+            + "                          GROUP BY result.patient_id))AS result_vl "
+            + "               ON result_vl.patient_id = p.patient_id "
+            + "        WHERE  e.encounter_type = ${35} "
+            + "            AND e.voided = 0 "
+            + "            AND p.voided = 0 "
+            + "            AND e.encounter_datetime >=  DATE_ADD(result_vl.vl_dateP, INTERVAL 22 DAY ) "
+            + "            AND e.encounter_datetime <= DATE_ADD(result_vl.vl_dateP, INTERVAL 33 DAY ) "
+            + "            GROUP BY p.patient_id  ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getThirdApss() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String sql =
+        " SELECT p.patient_id FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN (SELECT p.patient_id, MIN(e.encounter_datetime) AS secund_apss FROM   patient p "
+            + "                        INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                        INNER JOIN ((SELECT result.patient_id, MIN(result.vl_date) AS vl_dateP  FROM( "
+            + "                            SELECT p.patient_id, e.encounter_datetime AS vl_date "
+            + "                                    FROM   patient p "
+            + "                                            INNER JOIN encounter e "
+            + "                                                    ON e.patient_id = p.patient_id "
+            + "                                            INNER JOIN obs o "
+            + "                                                    ON o.encounter_id = e.encounter_id "
+            + "                                    WHERE  p.voided = 0 "
+            + "                                            AND e.voided = 0 "
+            + "                                            AND o.voided = 0 "
+            + "                                            AND e.encounter_type = ${6} "
+            + "                                            AND o.concept_id = ${856} "
+            + "                                            AND o.value_numeric >= 1000 "
+            + "                                            AND e.location_id = :location "
+            + "                                            AND e.encounter_datetime >= :evaluationPeriodStartDate "
+            + "                                            AND e.encounter_datetime <= :evaluationPeriodEndDate "
+            + " "
+            + "                                    UNION "
+            + " "
+            + "                                    SELECT p.patient_id, o.obs_datetime AS vl_date "
+            + "                                    FROM   patient p "
+            + "                                            INNER JOIN encounter e "
+            + "                                                    ON e.patient_id = p.patient_id "
+            + "                                            INNER JOIN obs o "
+            + "                                                    ON o.encounter_id = e.encounter_id "
+            + "                                    WHERE  p.voided = 0 "
+            + "                                            AND e.voided = 0 "
+            + "                                            AND o.voided = 0 "
+            + "                                            AND e.encounter_type = ${53} "
+            + "                                            AND o.concept_id = ${856} "
+            + "                                            AND o.value_numeric >= 1000 "
+            + "                                            AND e.location_id = :location "
+            + "                                            AND o.obs_datetime >= :evaluationPeriodStartDate "
+            + "                                            AND o.obs_datetime <= :evaluationPeriodEndDate ) AS result  "
+            + "                                            GROUP BY result.patient_id))AS result_vl "
+            + "                                ON result_vl.patient_id = p.patient_id "
+            + "                            WHERE  e.encounter_type = ${35} "
+            + "                                AND e.voided = 0 "
+            + "                                AND p.voided = 0 "
+            + "                                AND e.encounter_datetime >=  DATE_ADD(result_vl.vl_dateP, INTERVAL 22 DAY ) "
+            + "                                AND e.encounter_datetime <= DATE_ADD(result_vl.vl_dateP, INTERVAL 33 DAY ) "
+            + "                                GROUP BY p.patient_id) AS secund_quey ON secund_quey.patient_id = p.patient_id  "
+            + "            WHERE  e.encounter_type = ${35} "
+            + "            AND e.voided = 0 "
+            + "            AND p.voided = 0 "
+            + "            AND e.encounter_datetime >=  DATE_ADD(secund_quey.secund_apss, INTERVAL 22 DAY ) "
+            + "            AND e.encounter_datetime <= DATE_ADD(secund_quey.secund_apss, INTERVAL 33 DAY ) "
+            + "            GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getViralLoadRequest() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+
+    String sql =
+        "  SELECT p.patient_id FROM patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ((SELECT result.patient_id, MIN(result.vl_date) AS vl_dateP  FROM( "
+            + "           SELECT p.patient_id, e.encounter_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime >= :evaluationPeriodStartDate "
+            + "                          AND e.encounter_datetime <= :evaluationPeriodEndDate "
+            + "                           "
+            + "                   UNION "
+            + " "
+            + "                   SELECT p.patient_id, o.obs_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND o.obs_datetime >= :evaluationPeriodStartDate "
+            + "                          AND o.obs_datetime <= :evaluationPeriodEndDate) AS result  "
+            + "                          GROUP BY result.patient_id))AS result_vl "
+            + "               ON result_vl.patient_id = p.patient_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "            AND e.voided = 0 "
+            + "            AND o.concept_id = ${23722} "
+            + "            AND o.value_coded = ${856} "
+            + "            AND p.voided = 0 "
+            + "            AND e.encounter_datetime >=  DATE_ADD(result_vl.vl_dateP, INTERVAL 80 DAY ) "
+            + "            AND e.encounter_datetime <= DATE_ADD(result_vl.vl_dateP, INTERVAL 130 DAY ) "
+            + "            GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getRecordSecondVL() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+
+    String sql =
+        " SELECT p.patient_id FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ((SELECT result.patient_id, MIN(result.vl_date) AS vl_dateP  FROM( "
+            + "           SELECT p.patient_id, e.encounter_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime >= :evaluationPeriodStartDate "
+            + "                          AND e.encounter_datetime <= :evaluationPeriodEndDate "
+            + " "
+            + "                   UNION "
+            + " "
+            + "                   SELECT p.patient_id, o.obs_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND o.obs_datetime >= :evaluationPeriodStartDate "
+            + "                          AND o.obs_datetime <= :evaluationPeriodEndDate) AS result  "
+            + "                          GROUP BY result.patient_id))AS result_vl "
+            + "               ON result_vl.patient_id = p.patient_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "            AND e.voided = 0 "
+            + "            AND p.voided = 0 "
+            + "            AND o.concept_id = ${856} "
+            + "            AND o.value_numeric >= 1000 "
+            + "            AND e.encounter_datetime >=  DATE_ADD(result_vl.vl_dateP, INTERVAL 110 DAY ) "
+            + "            AND e.encounter_datetime <= DATE_ADD(result_vl.vl_dateP, INTERVAL 160 DAY ) "
+            + "            GROUP BY p.patient_id  ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getViralLoadResultMasterCard() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+
+    String sql =
+        " SELECT p.patient_id FROM patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ((SELECT result.patient_id, MIN(result.vl_date) AS vl_dateP  FROM( "
+            + "           SELECT p.patient_id, e.encounter_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime >= :evaluationPeriodStartDate "
+            + "                          AND e.encounter_datetime <= :evaluationPeriodEndDate "
+            + "                           "
+            + "                   UNION "
+            + " "
+            + "                   SELECT p.patient_id, o.obs_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND o.concept_id = ${856} "
+            + "                          AND o.value_numeric >= 1000 "
+            + "                          AND e.location_id = :location "
+            + "                          AND o.obs_datetime >= :evaluationPeriodStartDate "
+            + "                          AND o.obs_datetime <= :evaluationPeriodEndDate) AS result  "
+            + "                          GROUP BY result.patient_id))AS result_vl "
+            + "               ON result_vl.patient_id = p.patient_id "
+            + "        WHERE  e.encounter_type = ${53} "
+            + "            AND e.voided = 0 "
+            + "            AND o.concept_id = ${856} "
+            + "            AND o.value_numeric >= 1000 "
+            + "            AND p.voided = 0 "
+            + "            AND e.encounter_datetime >=  DATE_ADD(result_vl.vl_dateP, INTERVAL 110 DAY ) "
+            + "            AND e.encounter_datetime <= DATE_ADD(result_vl.vl_dateP, INTERVAL 160 DAY ) "
+            + "            GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getNumberOfPregnantWomenOnFirstLineDenominator(Boolean den) {
+    String MAPPING =
+        "evaluationPeriodStartDate=${evaluationPeriodStartDate},evaluationPeriodEndDate=${evaluationPeriodEndDate},location=${location}";
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    if (den) {
+      compositionCohortDefinition.setName(
+          "Number of pregnant women on 1st Line ART Regimen who received 3 consecutive sessions of APSS/PP after first VL result above 1000 copies 7 months ago and with a request for a second VL registered");
+    } else {
+      compositionCohortDefinition.setName(
+          "Number of pregnant women in the 1st Line ART Regimen who received 3 consecutive sessions of APSS/PP after first VL result above 1000 copies 7 months ago, with a request registered for a second VL test and with result of second VL above 1000");
+    }
+    compositionCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "firstApss", EptsReportUtils.map(getFirstApss(), MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "secondApss", EptsReportUtils.map(getSecondApss(), MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "thirdApss", EptsReportUtils.map(getThirdApss(), MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "viralLoadRequest", EptsReportUtils.map(getViralLoadRequest(), MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "recordSecondVL", EptsReportUtils.map(getRecordSecondVL(), MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "viralLoadResultMasterCard", EptsReportUtils.map(getViralLoadResultMasterCard(), MAPPING));
+
+    if (den) {
+      compositionCohortDefinition.setCompositionString(
+          "firstApss AND secondApss AND thirdApss AND viralLoadRequest");
+    } else {
+      compositionCohortDefinition.setCompositionString(
+          "firstApss AND secondApss AND thirdApss AND viralLoadRequest AND recordSecondVL AND viralLoadResultMasterCard");
+    }
+
+    return compositionCohortDefinition;
+  }
 }
