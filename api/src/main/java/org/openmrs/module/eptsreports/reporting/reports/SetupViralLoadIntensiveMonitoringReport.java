@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.IntensiveMonitoringDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.ViralLoadIntensiveMonitoringDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -22,12 +23,16 @@ public class SetupViralLoadIntensiveMonitoringReport extends EptsDataExportManag
 
     private IntensiveMonitoringDataSet intensiveMonitoringDataSet;
 
+    private ViralLoadIntensiveMonitoringDataSet viralLoadIntensiveMonitoringDataSet;
+
     @Autowired
     public SetupViralLoadIntensiveMonitoringReport(
             IntensiveMonitoringDataSet intensiveMonitoringDataSet,
-            GenericCohortQueries genericCohortQueries) {
+            GenericCohortQueries genericCohortQueries,
+            ViralLoadIntensiveMonitoringDataSet viralLoadIntensiveMonitoringDataSet) {
         this.genericCohortQueries = genericCohortQueries;
         this.intensiveMonitoringDataSet = intensiveMonitoringDataSet;
+        this.viralLoadIntensiveMonitoringDataSet = viralLoadIntensiveMonitoringDataSet;
 
 
     }
@@ -68,6 +73,9 @@ public class SetupViralLoadIntensiveMonitoringReport extends EptsDataExportManag
         rd.addDataSetDefinition("VLIM",
                 EptsReportUtils.map(this.intensiveMonitoringDataSet.constructIntensiveMonitoringDataSet(),
                         "revisionEndDate=${endDate},localtion=${localtion}"));
+        rd.addDataSetDefinition("TOTAL",
+                EptsReportUtils.map(this.viralLoadIntensiveMonitoringDataSet.constructViralLoadIntensiveMonitoringDataSet(),
+                        "endDate=${endDate},localtion=${localtion}"));
 
         rd.setBaseCohortDefinition(
                 EptsReportUtils.map(
