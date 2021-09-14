@@ -939,7 +939,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   public CohortDefinition getNumberOfPregnantWomenOnFirstLineDenominator(Boolean den) {
     String MAPPING =
-        "evaluationPeriodStartDate=${evaluationPeriodStartDate},evaluationPeriodEndDate=${evaluationPeriodEndDate},location=${location}";
+        "evaluationPeriodStartDate=${evaluationPeriodStartDate-5m+1},evaluationPeriodEndDate=${evaluationPeriodEndDate-4m},location=${location}";
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (den) {
