@@ -522,7 +522,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     return compositionCohortDefinition;
   }
 
-  public CohortDefinition getFirstAPSSInTheDayOfXQyery() {
+  public CohortDefinition getFirstAPSSInTheSameDayOfXQuery() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(
         new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
@@ -612,5 +612,341 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(sql));
     return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getAPSSInIn20To33DaysAfterXQuery() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String sql =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "    INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "    INNER JOIN  (  "
+            + " SELECT p.patient_id, final_min.final_min_date "
+            + "FROM patient p "
+            + "INNER JOIN ( "
+            + "SELECT min_vl.patient_id , MIN(min_datetime) final_min_date "
+            + "FROM ( "
+            + "         SELECT p.patient_id, MIN(e.encounter_datetime) AS min_datetime "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "         WHERE p.voided = 0 "
+            + "           AND o.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND e.encounter_type = ${6} "
+            + "           AND o.concept_id = ${856} "
+            + "           AND o.value_numeric >= 1000 "
+            + "           AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate  "
+            + "           AND e.location_id = :location"
+            + "         GROUP BY p.patient_id "
+            + "         UNION "
+            + "         SELECT p.patient_id, MIN(o.obs_datetime) AS min_datetime "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "         WHERE p.voided = 0 "
+            + "           AND o.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND e.encounter_type = ${53} "
+            + "           AND o.concept_id = ${856} "
+            + "           AND o.value_numeric >= 1000 "
+            + "           AND o.obs_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
+            + "           AND e.location_id = :location "
+            + "        GROUP BY p.patient_id "
+            + "     )min_vl "
+            + "GROUP BY min_vl.patient_id) final_min ON final_min.patient_id = p.patient_id "
+            + "WHERE p.patient_id NOT IN ( "
+            + "                            SELECT p.patient_id "
+            + "                            FROM patient p "
+            + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                            WHERE p.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND e.encounter_type = ${53} "
+            + "                              AND o.concept_id IN (${1982},${6332}) "
+            + "                              AND o.value_coded = ${1065} "
+            + "                              AND o.obs_datetime = final_min.final_min_date "
+            + "                            UNION "
+            + "                            SELECT p.patient_id "
+            + "                            FROM patient p "
+            + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                            WHERE p.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND e.encounter_type = ${6} "
+            + "                              AND o.concept_id IN (${1982},${6332}) "
+            + "                              AND o.value_coded = ${1065} "
+            + "                              AND e.encounter_datetime = final_min.final_min_date)"
+            + " ) AS xquery ON xquery.patient_id=p.patient_id "
+            + " WHERE p.voided = 0 "
+            + "   AND e.voided = 0"
+            + "   AND e.encounter_type = ${35} "
+            + "   AND TIMESTAMPDIFF(DAY, xquery.final_min_date, e.encounter_datetime) BETWEEN 20 AND 33 "
+            + "   AND e.location_id = :location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getAPSSIn20To33DaysAfter2ndAPSSConsultation() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String sql =
+        "SELECT p.patient_id"
+            + "FROM patient p "
+            + "    INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "    INNER JOIN  ("
+            + "SELECT p.patient_id, MIN(e.encounter_datetime) min_apss "
+            + "FROM patient p "
+            + "    INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "    INNER JOIN  (  "
+            + " SELECT p.patient_id, final_min.final_min_date "
+            + "FROM patient p "
+            + "INNER JOIN ( "
+            + "SELECT min_vl.patient_id , MIN(min_datetime) final_min_date "
+            + "FROM ( "
+            + "         SELECT p.patient_id, MIN(e.encounter_datetime) AS min_datetime "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "         WHERE p.voided = 0 "
+            + "           AND o.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND e.encounter_type = ${6} "
+            + "           AND o.concept_id = ${856} "
+            + "           AND o.value_numeric >= 1000 "
+            + "           AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate  "
+            + "           AND e.location_id = :location"
+            + "         GROUP BY p.patient_id "
+            + "         UNION "
+            + "         SELECT p.patient_id, MIN(o.obs_datetime) AS min_datetime "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "         WHERE p.voided = 0 "
+            + "           AND o.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND e.encounter_type = ${53} "
+            + "           AND o.concept_id = ${856} "
+            + "           AND o.value_numeric >= 1000 "
+            + "           AND o.obs_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
+            + "           AND e.location_id = :location "
+            + "        GROUP BY p.patient_id "
+            + "     )min_vl "
+            + "GROUP BY min_vl.patient_id) final_min ON final_min.patient_id = p.patient_id "
+            + "WHERE p.patient_id NOT IN ( "
+            + "                            SELECT p.patient_id "
+            + "                            FROM patient p "
+            + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                            WHERE p.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND e.encounter_type = ${53} "
+            + "                              AND o.concept_id IN (${1982},${6332}) "
+            + "                              AND o.value_coded = ${1065} "
+            + "                              AND o.obs_datetime = final_min.final_min_date "
+            + "                            UNION "
+            + "                            SELECT p.patient_id "
+            + "                            FROM patient p "
+            + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                            WHERE p.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND e.encounter_type = ${6} "
+            + "                              AND o.concept_id IN (${1982},${6332}) "
+            + "                              AND o.value_coded = ${1065} "
+            + "                              AND e.encounter_datetime = final_min.final_min_date)"
+            + " ) AS xquery ON xquery.patient_id=p.patient_id "
+            + " WHERE p.voided = 0 "
+            + "   AND e.voided = 0"
+            + "   AND e.encounter_type = ${35} "
+            + "   AND TIMESTAMPDIFF(DAY, xquery.final_min_date, e.encounter_datetime) BETWEEN 20 AND 33 "
+            + "   AND e.location_id = :location "
+            + " GROUP BY p.patient_id) AS second_apss on second_apss.patient_id= p.patient_id"
+            + "  WHERE p.voided = 0 "
+            + "                    +   AND e.voided = 0"
+            + "                    +   AND e.encounter_type = ${35} "
+            + "                    +    AND TIMESTAMPDIFF(DAY, second_apss.min_apss, e.encounter_datetime) BETWEEN 20 AND 33 "
+            + "                    +    AND e.location_id = :location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPedidoCargaViralBetween80To110DaysOfXQuery() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+
+    String sql =
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "    INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "    INNER JOIN  (  "
+            + " SELECT p.patient_id, final_min.final_min_date "
+            + "FROM patient p "
+            + "INNER JOIN ( "
+            + "SELECT min_vl.patient_id , MIN(min_datetime) final_min_date "
+            + "FROM ( "
+            + "         SELECT p.patient_id, MIN(e.encounter_datetime) AS min_datetime "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "         WHERE p.voided = 0 "
+            + "           AND o.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND e.encounter_type = ${6} "
+            + "           AND o.concept_id = ${856} "
+            + "           AND o.value_numeric >= 1000 "
+            + "           AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate  "
+            + "           AND e.location_id = :location"
+            + "         GROUP BY p.patient_id "
+            + "         UNION "
+            + "         SELECT p.patient_id, MIN(o.obs_datetime) AS min_datetime "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "         WHERE p.voided = 0 "
+            + "           AND o.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND e.encounter_type = ${53} "
+            + "           AND o.concept_id = ${856} "
+            + "           AND o.value_numeric >= 1000 "
+            + "           AND o.obs_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
+            + "           AND e.location_id = :location "
+            + "        GROUP BY p.patient_id "
+            + "     )min_vl "
+            + "GROUP BY min_vl.patient_id) final_min ON final_min.patient_id = p.patient_id "
+            + "WHERE p.patient_id NOT IN ( "
+            + "                            SELECT p.patient_id "
+            + "                            FROM patient p "
+            + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                            WHERE p.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND e.encounter_type = ${53} "
+            + "                              AND o.concept_id IN (${1982},${6332}) "
+            + "                              AND o.value_coded = ${1065} "
+            + "                              AND o.obs_datetime = final_min.final_min_date "
+            + "                            UNION "
+            + "                            SELECT p.patient_id "
+            + "                            FROM patient p "
+            + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                            WHERE p.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND e.encounter_type = ${6} "
+            + "                              AND o.concept_id IN (${1982},${6332}) "
+            + "                              AND o.value_coded = ${1065} "
+            + "                              AND e.encounter_datetime = final_min.final_min_date)"
+            + " ) AS xquery ON xquery.patient_id=p.patient_id "
+            + " WHERE p.voided = 0 "
+            + "   AND e.voided = 0 "
+            + "   AND o.concept_id =  ${23722}   "
+            + "   AND o.value_coded =  ${856}   "
+            + "   AND e.encounter_type = ${6} "
+            + "   AND e.encounter_datetime BETWEEN DATE_ADD(xquery.final_min_date, INTERVAL 80 DAY) AND DATE_ADD(xquery.final_min_date, INTERVAL 130 DAY)"
+            + "   AND e.location_id = :location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(sql));
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getDenominator10() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String mappings =
+        "evaluationPeriodStartDate=${evaluationPeriodStartDate},evaluationPeriodEndDate=${evaluationPeriodEndDate},location=${location}";
+
+    compositionCohortDefinition.addSearch(
+        "A", EptsReportUtils.map(this.getFirstAPSSInTheSameDayOfXQuery(), mappings));
+
+    compositionCohortDefinition.addSearch(
+        "B", EptsReportUtils.map(this.getAPSSInIn20To33DaysAfterXQuery(), mappings));
+
+    compositionCohortDefinition.addSearch(
+        "C", EptsReportUtils.map(this.getAPSSIn20To33DaysAfter2ndAPSSConsultation(), mappings));
+
+    compositionCohortDefinition.addSearch(
+        "D", EptsReportUtils.map(this.getPedidoCargaViralBetween80To110DaysOfXQuery(), mappings));
+    ;
+    compositionCohortDefinition.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            this.commonCohortQueries.getMohTransferredInPatients(),
+            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(
+            this.commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod(),
+            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "dead",
+        EptsReportUtils.map(
+            this.getDeadPatients(),
+            "evaluationPeriodEndDate=${evaluationPeriodEndDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "(A AND B AND C AND D) AND NOT (transferredIn OR transferredOut OR dead) ");
+
+    return compositionCohortDefinition;
   }
 }
