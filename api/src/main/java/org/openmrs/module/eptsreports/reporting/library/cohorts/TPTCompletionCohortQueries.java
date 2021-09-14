@@ -357,7 +357,10 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getQuarterlyConcept().getConceptId()),
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                hivMetadata.getPatientTreatmentFollowUp().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getRestartConcept().getConceptId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -1243,7 +1246,7 @@ public class TPTCompletionCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>IMER1</b>:User Story TPT Completion Patient List <br>
    *
    * <ul>
    *   <li>D1: The date from C is registered on Ficha Clinica - Master Card (encounter type 6) and:
@@ -1368,7 +1371,7 @@ public class TPTCompletionCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>IMER1</b>:User Story TPT Completion Patient List <br>
    *
    * <ul>
    *   <li>D2: The patient has at least 1 drug pick-up on FILT (encounter type 60) with “Regime de
@@ -1385,7 +1388,10 @@ public class TPTCompletionCohortQueries {
       int regimeTPTConcept,
       int hPPiridoxinaConcept,
       int typeDispensationTPTConceptUuid,
-      int quarterlyConcept) {
+      int quarterlyConcept,
+      int seguimentoTPTConcept,
+      int inicioConcept,
+      int reinicioConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT D2");
@@ -1399,6 +1405,9 @@ public class TPTCompletionCohortQueries {
     map.put("23984", hPPiridoxinaConcept);
     map.put("23986", typeDispensationTPTConceptUuid);
     map.put("23720", quarterlyConcept);
+    map.put("23987", seguimentoTPTConcept);
+    map.put("1256", inicioConcept);
+    map.put("1705", reinicioConcept);
 
     String query =
         " SELECT p.patient_id   "
@@ -1414,15 +1423,15 @@ public class TPTCompletionCohortQueries {
             + "                                  ON e.patient_id = p.patient_id   "
             + "                          inner join obs o "
             + "                                  ON o.encounter_id = e.encounter_id   "
-            + " INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id   "
+            + "                          INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id   "
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
             + "                          AND e.location_id = :location  "
-            + "                          AND e.encounter_type = ${60}    "
-            + "  AND ( o.concept_id = ${23985} AND o.value_coded in (${23954},${23984}) )  "
-            + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705}))  "
-            + "                          AND e.encounter_datetime <= :endDate) AS tabela  "
+            + "                          AND e.encounter_type = ${60} "
+            + "                          AND ( o.concept_id = ${23985} AND o.value_coded IN (${23954},${23984}) ) "
+            + "                          AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256},${1705})) "
+            + "                          AND e.encounter_datetime <= :endDate) AS tabela "
             + "               ON tabela.patient_id = p.patient_id "
             + " WHERE  p.voided = 0    "
             + "       AND e.voided = 0    "
