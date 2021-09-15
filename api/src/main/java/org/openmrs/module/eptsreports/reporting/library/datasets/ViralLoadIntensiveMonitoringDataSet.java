@@ -43,61 +43,71 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
         this.eptsGeneralIndicator.getIndicator(
             "DEN1TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator1Den(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator1Den(),
+    MAPPINGS));
 
     CohortIndicator indicatorNUm1Total =
         this.eptsGeneralIndicator.getIndicator(
             "NUM1TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator1Num(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator1Num(),
+    MAPPINGS));
 
     CohortIndicator indicatorDen2Total =
         this.eptsGeneralIndicator.getIndicator(
             "DEN2TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator2Den(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator2Den(),
+    MAPPINGS));
 
     CohortIndicator indicatorNUm2Total =
         this.eptsGeneralIndicator.getIndicator(
             "NUM2TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator2Num(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator2Num(),
+    MAPPINGS));
 
     CohortIndicator indicatorDen3Total =
         this.eptsGeneralIndicator.getIndicator(
             "DEN3TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator3Den(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator3Den(),
+    MAPPINGS));
 
     CohortIndicator indicatorNUm3Total =
         this.eptsGeneralIndicator.getIndicator(
             "NUM3TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator3Num(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator3Num(),
+    MAPPINGS));
 
     CohortIndicator indicatorDen4Total =
         this.eptsGeneralIndicator.getIndicator(
             "DEN4TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator4Den(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator4Den(),
+    MAPPINGS));
 
     CohortIndicator indicatorNUm4Total =
         this.eptsGeneralIndicator.getIndicator(
             "NUM4TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator4Num(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator4Num(),
+    MAPPINGS));
 
     CohortIndicator indicatorDen5Total =
         this.eptsGeneralIndicator.getIndicator(
             "DEN5TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator5Den(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator5Den(),
+    MAPPINGS));
 
     CohortIndicator indicatorNUm5Total =
         this.eptsGeneralIndicator.getIndicator(
             "NUM5TOTAL",
             EptsReportUtils.map(
-                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator5Num(), MAPPINGS));
+                this.viralLoadIntensiveMonitoringCohortQueries.getTotalIndicator5Num(),
+    MAPPINGS));
 
     CohortIndicator indicatorDen6Total =
         this.eptsGeneralIndicator.getIndicator(
@@ -155,13 +165,43 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
                 this.intensiveMonitoringCohortQueries.getMICat13Part4(18, true),
                 "revisionEndDate=${endDate},location=${location}"));
 
+    CohortIndicator indicatorDen12 =
+        this.eptsGeneralIndicator.getIndicator(
+            "DEN12TOTAL",
+            EptsReportUtils.map(
+                this.viralLoadIntensiveMonitoringCohortQueries.getNumDen12Indicators(true),
+                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+
+    CohortIndicator indicatorNUm12 =
+        this.eptsGeneralIndicator.getIndicator(
+            "NUM12TOTAL",
+            EptsReportUtils.map(
+                this.viralLoadIntensiveMonitoringCohortQueries.getNumDen12Indicators(false),
+                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+
+    CohortIndicator indicatorDen14 =
+        this.eptsGeneralIndicator.getIndicator(
+            "DEN14TOTAL",
+            EptsReportUtils.map(
+                this.viralLoadIntensiveMonitoringCohortQueries
+                    .getNumberOfPregnantWomenOnFirstLineDenominator(true),
+                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+
+    CohortIndicator indicatorNUm14 =
+        this.eptsGeneralIndicator.getIndicator(
+            "NUM14TOTAL",
+            EptsReportUtils.map(
+                this.viralLoadIntensiveMonitoringCohortQueries.getNum14Indicator(),
+                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+
     CohortIndicator indicatorDen13Total =
         this.eptsGeneralIndicator.getIndicator(
             "DEN13TOTAL",
             EptsReportUtils.map(
                 this.viralLoadIntensiveMonitoringCohortQueries
                     .getNumberOfPregnantWomenOnFirstLineDenominator(true),
-                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+    
+    "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
 
     CohortIndicator indicatorNUm13Total =
         this.eptsGeneralIndicator.getIndicator(
@@ -169,7 +209,8 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
             EptsReportUtils.map(
                 this.viralLoadIntensiveMonitoringCohortQueries
                     .getNumberOfPregnantWomenOnFirstLineDenominator(false),
-                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+    
+    "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
 
     CohortIndicator indicatorDen15Total =
         this.eptsGeneralIndicator.getIndicator(
@@ -177,7 +218,8 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
             EptsReportUtils.map(
                 this.viralLoadIntensiveMonitoringCohortQueries
                     .getNumberOfPregnantWomenOnFirstLineArtRegimen(true),
-                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+    
+    "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
 
     CohortIndicator indicatorNUm15Total =
         this.eptsGeneralIndicator.getIndicator(
@@ -185,7 +227,7 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
             EptsReportUtils.map(
                 this.viralLoadIntensiveMonitoringCohortQueries
                     .getNumberOfPregnantWomenOnFirstLineArtRegimen(false),
-                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+    "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
 
     // column mapping
     cohortIndicatorDataSetDefinition.addColumn(
@@ -241,6 +283,24 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
 
     cohortIndicatorDataSetDefinition.addColumn(
         "NUM9TOTAL", "Description", EptsReportUtils.map(indicatorNUm9Total, MAPPINGS), "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+        "DEN12TOTAL",
+        "Number of patients in the 1st Line ART Regimen who received 3 consecutive sessions of APSS/PP after first VL result above 1000 copies 9 months ago, with a request registered for a second VL test and with result of second VL above 1000",
+        EptsReportUtils.map(indicatorDen12, MAPPINGS),
+        "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+        "NUM12TOTAL",
+        "Number of patients in the 1st Line ART Regimen who received 3 consecutive sessions of APSS/PP after first VL result above 1000 copies 9 months ago, with result of second VL above 1000 and who changed to 2nd Line ART",
+        EptsReportUtils.map(indicatorNUm12, MAPPINGS),
+        "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+        "DEN14TOTAL", "Description", EptsReportUtils.map(indicatorDen14, MAPPINGS), "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+        "NUM14TOTAL", "Description", EptsReportUtils.map(indicatorNUm14, MAPPINGS), "");
 
     cohortIndicatorDataSetDefinition.addColumn(
         "DEN13TOTAL", "Description", EptsReportUtils.map(indicatorDen13Total, MAPPINGS), "");
