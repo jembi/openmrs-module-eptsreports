@@ -57,7 +57,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     CohortDefinition chdE2 = txNewCohortQueries.getPatientsPregnantEnrolledOnART(true);
 
     cd.addSearch(
-        "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${endDate},location=${location}"));
+        "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${startDate},location=${location}"));
 
     cd.addSearch(
         "X1",
@@ -97,7 +97,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             chdE2, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "txcurr AND (X1 OR X2 OR X3) AND VL1 and (( (VL2 OR VL3) AND VL4) OR (VL5 AND VL6) OR VL7) AND NOT (E1 OR E2)");
+        "txcurr AND (X1 OR X2 OR X3) AND VL1 and ( ((VL2 OR VL3) AND VL4) OR (VL5 AND VL6) OR VL7) AND NOT (E1 OR E2)");
 
     return cd;
   }
@@ -224,6 +224,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     valuesMap.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
 
     String X1 = getLastScheduledConsultationDate(true);
     String X2 = getLastNextScheduledPickUpDate(true);
@@ -270,34 +271,17 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "                           AND e.location_id = :location  "
             + "                       GROUP  BY p.patient_id  "
             + " UNION "
-            + " SELECT p.patient_id, historical.min_date AS art_date FROM patient p  "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "     INNER JOIN( "
-            + " SELECT p.patient_id,e.encounter_id,  MIN(o.value_datetime) min_date FROM patient p "
+            + " SELECT p.patient_id,  MIN(o.value_datetime) min_date FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + " WHERE e.encounter_type IN(${6},${9},${18},${53}) "
             + " AND o.concept_id = ${1190} "
             + " AND e.location_id = :location "
-            + "                 AND o.value_datetime <= :startDate "
+            + " AND o.value_datetime <= :startDate "
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
             + " GROUP BY p.patient_id "
-            + "                 ) historical "
-            + " ON historical.patient_id = p.patient_id "
-            + " WHERE e.encounter_type IN(${6},${9},${18},${53}) "
-            + " AND o.concept_id = ${1190} "
-            + " AND e.location_id = :location "
-            + "                 AND o.value_datetime <= :startDate "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + "                 AND historical.encounter_id = e.encounter_id "
-            + "                 AND o.value_datetime = historical.min_date "
-            + " GROUP BY p.patient_id "
-            + "                  "
             + " UNION "
-            + "  "
             + " SELECT p.patient_id, ps.start_date AS art_date "
             + "     FROM   patient p   "
             + "           INNER JOIN patient_program pg  "
@@ -305,32 +289,31 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "        INNER JOIN patient_state ps  "
             + "                   ON pg.patient_program_id = ps.patient_program_id  "
             + "     WHERE  pg.location_id = :location "
-            + "    AND pg.program_id = 2 and ps.start_date <= :startDate "
+            + "    AND pg.program_id = ${2} and ps.start_date <= :startDate "
             + "     "
             + "    UNION "
             + "     "
-            + "    SELECT p.patient_id,  MIN(o.value_datetime) AS art_date FROM patient p "
+            + " SELECT p.patient_id,  MIN(o.value_datetime) AS art_date FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                         INNER JOIN obs oyes ON oyes.encounter_id = e.encounter_id  "
-            + "                         AND o.person_id = oyes.person_id "
-            + " WHERE e.encounter_type = ${52} "
-            + " AND o.concept_id = ${23866} "
-            + "                 AND o.value_datetime <= :startDate "
-            + "                 AND o.voided = 0 "
+            + " INNER JOIN obs oyes ON oyes.encounter_id = e.encounter_id  "
+            + "   AND o.person_id = oyes.person_id "
+            + "   WHERE e.encounter_type = ${52} "
+            + "   AND o.concept_id = ${23866} "
+            + "   AND o.value_datetime <= :startDate "
+            + "   AND o.voided = 0 "
             + "                 AND oyes.concept_id = ${23865} "
             + "                 AND oyes.value_coded = ${1065} "
             + "                 AND oyes.voided = 0 "
-            + " AND e.location_id = :location                 "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + "  "
+            + "   AND e.location_id = :location                 "
+            + "   AND e.voided = 0 "
+            + "   AND p.voided = 0 "
             + " GROUP BY p.patient_id "
             + " ) art  "
             + " GROUP BY art.patient_id "
             + " ) min_art "
             + " ON recentx.patient_id = min_art.patient_id "
-            + " AND TIMESTAMPDIFF(MONTH, min_art.min_art_date, recentx.xdate) >= 6 "
+            + " WHERE TIMESTAMPDIFF(MONTH, min_art.min_art_date, recentx.xdate) >= 6 "
             + " GROUP BY recentx.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -446,7 +429,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + ") AS most_recentx "
             + " GROUP BY most_recentx.patient_id "
             + " ) AS xpatient ON xpatient.patient_id = most_recentvl.patient_id"
-            + " AND TIMESTAMPDIFF(MONTH,  most_recentvl.recent_datetime,xpatient.recent_datetime) >= 12 "
+            + " WHERE TIMESTAMPDIFF(MONTH,  most_recentvl.recent_datetime,xpatient.recent_datetime) >= 12 "
             + " GROUP BY xpatient.patient_id ";
 
     sqlCohortDefinition.setQuery(query);
@@ -568,61 +551,52 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        " SELECT donot_have.patient_id "
-            + "FROM    (SELECT p.patient_id "
+        " SELECT  "
+            + "    p.patient_id "
             + "FROM "
-            + "        patient p "
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "    patient p "
+            + "        INNER JOIN "
+            + "    encounter e ON e.patient_id = p.patient_id "
             + "WHERE "
-            + "e.encounter_type = ${53} "
-            + "AND e.location_id = :location "
-            + "AND e.voided = 0 "
-            + "AND p.voided = 0 "
-            + "AND o.voided = 0 "
-            + "AND p.patient_id NOT IN (SELECT "
-            + "pp.patient_id "
-            + "FROM "
-            + "patient pp "
-            + "INNER JOIN encounter ee ON ee.patient_id = pp.patient_id "
-            + "INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id "
-            + "WHERE "
-            + "ee.encounter_type = ${53} "
-            + "AND oo.concept_id IN (${856} , ${1305}) "
-            + "AND oo.obs_datetime <= :startDate "
-            + "AND ee.location_id = :location "
-            + "AND ee.voided = 0 "
-            + "AND pp.voided = 0 "
-            + "AND oo.voided = 0) "
-            + "                        "
-            + "                        UNION "
-            + "                        "
-            + "                        SELECT p.patient_id "
-            + "    FROM "
-            + "        patient p "
-            + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "    WHERE "
-            + "        e.encounter_type IN (${13} , ${6}, ${9}, ${51}) "
-            + "            AND e.location_id = :location "
-            + "            AND e.voided = 0 "
-            + "            AND p.voided = 0 "
-            + "            AND o.voided = 0 "
-            + "            AND p.patient_id NOT IN (SELECT "
-            + "                pp.patient_id "
-            + "            FROM "
-            + "                patient pp "
-            + "            INNER JOIN encounter ee ON ee.patient_id = pp.patient_id "
-            + "            INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id "
-            + "            WHERE "
-            + "                ee.encounter_type IN (${13} , ${6}, ${9}, ${51}) "
-            + "                    AND ee.encounter_datetime <= :startDate "
-            + "                    AND oo.concept_id IN (${856} , ${1305}) "
-            + "                    AND ee.location_id = :location "
-            + "                    AND ee.voided = 0 "
-            + "                    AND pp.voided = 0 "
-            + "                    AND oo.voided = 0)) donot_have "
-            + "GROUP BY donot_have.patient_id ";
+            + "    e.encounter_type IN (${13} , ${6}, ${9}, ${51}, ${53}) "
+            + "        AND e.location_id = :location "
+            + "        AND e.voided = 0 "
+            + "        AND p.voided = 0 "
+            + "        AND p.patient_id NOT IN (SELECT  "
+            + "            pp.patient_id "
+            + "        FROM "
+            + "            patient pp "
+            + "                INNER JOIN "
+            + "            encounter ee ON ee.patient_id = pp.patient_id "
+            + "                INNER JOIN "
+            + "            obs oo ON oo.encounter_id = ee.encounter_id "
+            + "        WHERE "
+            + "            ee.encounter_type = ${53} "
+            + "                AND oo.concept_id IN (${856} , ${1305}) "
+            + "                AND oo.obs_datetime <= :startDate "
+            + "                AND ee.location_id = :location "
+            + "                AND ee.voided = 0 "
+            + "                AND pp.voided = 0 "
+            + "                AND oo.voided = 0  "
+            + "                GROUP BY pp.patient_id "
+            + "                UNION SELECT  "
+            + "            pp.patient_id "
+            + "        FROM "
+            + "            patient pp "
+            + "                INNER JOIN "
+            + "            encounter ee ON ee.patient_id = pp.patient_id "
+            + "                INNER JOIN "
+            + "            obs oo ON oo.encounter_id = ee.encounter_id "
+            + "        WHERE "
+            + "            ee.encounter_type IN (${13} , ${6}, ${9}, ${51}) "
+            + "                AND ee.encounter_datetime <= :startDate "
+            + "                AND oo.concept_id IN (${856} , ${1305}) "
+            + "                AND ee.location_id = :location "
+            + "                AND ee.voided = 0 "
+            + "                AND pp.voided = 0 "
+            + "                AND oo.voided = 0 "
+            + "                GROUP BY pp.patient_id)  "
+            + "                GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
