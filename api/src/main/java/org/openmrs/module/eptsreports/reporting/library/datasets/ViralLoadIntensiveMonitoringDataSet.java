@@ -155,6 +155,38 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
                 this.intensiveMonitoringCohortQueries.getMICat13Part4(18, true),
                 "revisionEndDate=${endDate},location=${location}"));
 
+    CohortIndicator indicatorDen13Total =
+        this.eptsGeneralIndicator.getIndicator(
+            "DEN13TOTAL",
+            EptsReportUtils.map(
+                this.viralLoadIntensiveMonitoringCohortQueries
+                    .getNumberOfPregnantWomenOnFirstLineDenominator(true),
+                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+
+    CohortIndicator indicatorNUm13Total =
+        this.eptsGeneralIndicator.getIndicator(
+            "NUM13TOTAL",
+            EptsReportUtils.map(
+                this.viralLoadIntensiveMonitoringCohortQueries
+                    .getNumberOfPregnantWomenOnFirstLineDenominator(false),
+                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+
+    CohortIndicator indicatorDen15Total =
+        this.eptsGeneralIndicator.getIndicator(
+            "DEN15TOTAL",
+            EptsReportUtils.map(
+                this.viralLoadIntensiveMonitoringCohortQueries
+                    .getNumberOfPregnantWomenOnFirstLineArtRegimen(true),
+                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+
+    CohortIndicator indicatorNUm15Total =
+        this.eptsGeneralIndicator.getIndicator(
+            "NUM15TOTAL",
+            EptsReportUtils.map(
+                this.viralLoadIntensiveMonitoringCohortQueries
+                    .getNumberOfPregnantWomenOnFirstLineArtRegimen(false),
+                "evaluationPeriodStartDate=${endDate},evaluationPeriodEndDate=${endDate},location=${location}"));
+
     // column mapping
     cohortIndicatorDataSetDefinition.addColumn(
         "DEN1TOTAL", "Description", EptsReportUtils.map(indicatorDen1Total, MAPPINGS), "");
@@ -209,6 +241,17 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
 
     cohortIndicatorDataSetDefinition.addColumn(
         "NUM9TOTAL", "Description", EptsReportUtils.map(indicatorNUm9Total, MAPPINGS), "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+        "DEN13TOTAL", "Description", EptsReportUtils.map(indicatorDen13Total, MAPPINGS), "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+        "NUM13TOTAL", "Description", EptsReportUtils.map(indicatorNUm13Total, MAPPINGS), "");
+    cohortIndicatorDataSetDefinition.addColumn(
+        "DEN15TOTAL", "Description", EptsReportUtils.map(indicatorDen15Total, MAPPINGS), "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+        "NUM15TOTAL", "Description", EptsReportUtils.map(indicatorNUm15Total, MAPPINGS), "");
 
     return cohortIndicatorDataSetDefinition;
   }
