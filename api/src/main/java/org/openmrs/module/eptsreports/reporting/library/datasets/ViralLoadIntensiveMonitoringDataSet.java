@@ -1,14 +1,20 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.IntensiveMonitoringCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ViralLoadIntensiveMonitoringCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
@@ -155,6 +161,36 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
                 this.intensiveMonitoringCohortQueries.getMICat13Part4(18, true),
                 "revisionEndDate=${endDate},location=${location}"));
 
+
+    CohortIndicator indicatorDen10Total =
+            this.eptsGeneralIndicator.getIndicator(
+                    "DEN10TOTAL",
+                    EptsReportUtils.map(
+                            this.viralLoadIntensiveMonitoringCohortQueries.getDenominator10(),
+                            "startDate=${endDate-5m-1d},endDate=${endDate-4m},location=${location}"));
+
+    CohortIndicator indicatorNUm10Total =
+            this.eptsGeneralIndicator.getIndicator(
+                    "NUM10TOTAL",
+                    EptsReportUtils.map(
+                            this.viralLoadIntensiveMonitoringCohortQueries.getNumerator10(),
+                            "startDate=${endDate-5m-1d},endDate=${endDate-4m},location=${location}"));
+
+    CohortIndicator indicatorDen11Total =
+            this.eptsGeneralIndicator.getIndicator(
+                    "DEN11TOTAL",
+                    EptsReportUtils.map(
+                            this.viralLoadIntensiveMonitoringCohortQueries.getDenominator11(),
+                            "startDate=${endDate-12m-1d},endDate=${endDate-11m},location=${location}"));
+
+    CohortIndicator indicatorNUm11Total =
+            this.eptsGeneralIndicator.getIndicator(
+                    "NUM11TOTAL",
+                    EptsReportUtils.map(
+                            this.viralLoadIntensiveMonitoringCohortQueries.getNumerator11(),
+                            "startDate=${endDate-12m-1d},endDate=${endDate-11m},location=${location}"));
+
+
     // column mapping
     cohortIndicatorDataSetDefinition.addColumn(
         "DEN1TOTAL", "Description", EptsReportUtils.map(indicatorDen1Total, MAPPINGS), "");
@@ -210,6 +246,26 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
     cohortIndicatorDataSetDefinition.addColumn(
         "NUM9TOTAL", "Description", EptsReportUtils.map(indicatorNUm9Total, MAPPINGS), "");
 
+
+    cohortIndicatorDataSetDefinition.addColumn(
+            "DEN10TOTAL", "Description", EptsReportUtils.map(indicatorDen10Total, "startDate=${endDate-5m-1d},endDate=${endDate-4m},location=${location}"), "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+            "NUM10TOTAL", "Description", EptsReportUtils.map(indicatorNUm10Total, "startDate=${endDate-5m-1d},endDate=${endDate-4m},location=${location}"), "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+            "DEN11TOTAL", "Description", EptsReportUtils.map(indicatorDen11Total, "startDate=${endDate-12m-1d},endDate=${endDate-11m},location=${location}"), "");
+
+    cohortIndicatorDataSetDefinition.addColumn(
+            "NUM11TOTAL", "Description", EptsReportUtils.map(indicatorNUm11Total, "startDate=${endDate-12m-1d},endDate=${endDate-11m},location=${location}"), "");
+
     return cohortIndicatorDataSetDefinition;
+  }
+
+  @Override
+  public List<Parameter> getParameters() {
+    return Arrays.asList(
+            new Parameter("endDate", "endDate", Date.class),
+            new Parameter("location", "Location", Location.class));
   }
 }

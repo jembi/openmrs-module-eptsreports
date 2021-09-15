@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -11,6 +13,7 @@ import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.openmrs.module.reporting.evaluation.parameter.Parameterizable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +31,8 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
   private CommonCohortQueries commonCohortQueries;
 
   private TxCurrCohortQueries txCurrCohortQueries;
+
+  private final int  VIRAL_LOAD_1000_COPIES = 1000;
 
   @Autowired
   public ViralLoadIntensiveMonitoringCohortQueries(
@@ -318,10 +323,8 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   public CohortDefinition getPartOneOfXQuery() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -348,7 +351,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "           AND e.encounter_type = ${6} "
             + "           AND o.concept_id = ${856} "
             + "           AND o.value_numeric >= 1000 "
-            + "           AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate  "
+            + "           AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "           AND e.location_id = :location"
             + "         GROUP BY p.patient_id "
             + "         UNION "
@@ -362,7 +365,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "           AND e.encounter_type = ${53} "
             + "           AND o.concept_id = ${856} "
             + "           AND o.value_numeric >= 1000 "
-            + "           AND o.obs_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
+            + "           AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "           AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
             + "     )min_vl "
@@ -399,10 +402,9 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   public CohortDefinition getFirstLineArt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.setName("Linha Terapeutica");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -411,20 +413,20 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
 
     String sql =
-        "SELECT patient_id  "
-            + "FROM ( "
-            + "SELECT p.patient_id, MAX(encounter_datetime) AS last_date "
-            + "FROM patient p "
+        " SELECT p.patient_id  "
+            + " FROM patient p INNER  JOIN ("
+            + " SELECT p.patient_id , MAX(encounter_datetime) AS last_date "
+            + " FROM patient p "
             + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "WHERE p.voided = 0 "
+            + " WHERE p.voided = 0 "
             + "  AND o.voided = 0 "
             + "  AND e.voided = 0 "
             + "  AND e.encounter_type = ${6} "
             + "  AND o.concept_id = ${21151} "
             + "  AND o.value_coded = ${21150} "
-            + "  AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
-            + "  AND e.location_id = :location) ";
+            + "  AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "  AND e.location_id = :location )  ultima ON ultima.patient_id = p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(sql));
@@ -434,41 +436,37 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   public CohortDefinition getComposedXQuery() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-    compositionCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     compositionCohortDefinition.addSearch(
         "1",
         EptsReportUtils.map(
             this.getPartOneOfXQuery(),
-            "evaluationPeriodStartDate=${evaluationPeriodStartDate-7m},evaluationPeriodEndDate=${evaluationPeriodEndDate-7m},location=${location}"));
+            "startDate=${startDate-7m},endDate=${endDate-7m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "2",
         EptsReportUtils.map(
             this.getFirstLineArt(),
-            "evaluationPeriodStartDate=${evaluationPeriodStartDate-7m},evaluationPeriodEndDate=${evaluationPeriodEndDate-7m},location=${location}"));
+            "startDate=${startDate-7m},endDate=${endDate-7m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "transferredIn",
         EptsReportUtils.map(
             this.commonCohortQueries.getMohTransferredInPatients(),
-            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "transferredOut",
         EptsReportUtils.map(
             this.commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod(),
-            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "dead",
-        EptsReportUtils.map(
-            this.getDeadPatients(),
-            "evaluationPeriodEndDate=${evaluationPeriodEndDate},location=${location}"));
+        EptsReportUtils.map(this.getDeadPatients(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
         "(1 AND 2) AND NOT ( transferredIn OR transferredOut OR dead)");
@@ -476,11 +474,10 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     return compositionCohortDefinition;
   }
 
-  private CohortDefinition getDeadPatients() {
+  public CohortDefinition getDeadPatients() {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-    compositionCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     compositionCohortDefinition.addSearch(
@@ -488,34 +485,34 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
         EptsReportUtils.map(
             this.txCurrCohortQueries
                 .getPatientsDeadTransferredOutSuspensionsInProgramStateByReportingEndDate(),
-            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "2",
         EptsReportUtils.map(
             this.txCurrCohortQueries.getDeadPatientsInDemographiscByReportingEndDate(),
-            "onOrBefore=${onOrBefore},location=${location}"));
+            "onOrBefore=${endDate}"));
 
     compositionCohortDefinition.addSearch(
         "3",
         EptsReportUtils.map(
             this.txCurrCohortQueries
                 .getPatientDeathRegisteredInLastHomeVisitCardByReportingEndDate(),
-            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "4",
         EptsReportUtils.map(
             this.txCurrCohortQueries
                 .getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(),
-            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "5",
         EptsReportUtils.map(
             this.txCurrCohortQueries
                 .getTransferredOutPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(),
-            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("1 OR 2 OR 3 OR 4 OR 5");
 
@@ -524,10 +521,8 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   public CohortDefinition getFirstAPSSInTheSameDayOfXQuery() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -559,7 +554,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "           AND e.encounter_type = ${6} "
             + "           AND o.concept_id = ${856} "
             + "           AND o.value_numeric >= 1000 "
-            + "           AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate  "
+            + "           AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "           AND e.location_id = :location"
             + "         GROUP BY p.patient_id "
             + "         UNION "
@@ -573,7 +568,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "           AND e.encounter_type = ${53} "
             + "           AND o.concept_id = ${856} "
             + "           AND o.value_numeric >= 1000 "
-            + "           AND o.obs_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
+            + "           AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "           AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
             + "     )min_vl "
@@ -616,10 +611,8 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   public CohortDefinition getAPSSInIn20To33DaysAfterXQuery() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -651,7 +644,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "           AND e.encounter_type = ${6} "
             + "           AND o.concept_id = ${856} "
             + "           AND o.value_numeric >= 1000 "
-            + "           AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate  "
+            + "           AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "           AND e.location_id = :location"
             + "         GROUP BY p.patient_id "
             + "         UNION "
@@ -665,7 +658,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "           AND e.encounter_type = ${53} "
             + "           AND o.concept_id = ${856} "
             + "           AND o.value_numeric >= 1000 "
-            + "           AND o.obs_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
+            + "           AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "           AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
             + "     )min_vl "
@@ -708,10 +701,8 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   public CohortDefinition getAPSSIn20To33DaysAfter2ndAPSSConsultation() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -724,19 +715,19 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String sql =
-        "SELECT p.patient_id"
-            + "FROM patient p "
+        " SELECT p.patient_id"
+            + " FROM patient p "
             + "    INNER JOIN encounter e on p.patient_id = e.patient_id "
-            + "    INNER JOIN  ("
-            + "SELECT p.patient_id, MIN(e.encounter_datetime) min_apss "
-            + "FROM patient p "
+            + "    INNER JOIN  ( "
+            + " SELECT p.patient_id, MIN(e.encounter_datetime) min_apss "
+            + " FROM patient p "
             + "    INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "    INNER JOIN  (  "
             + " SELECT p.patient_id, final_min.final_min_date "
-            + "FROM patient p "
-            + "INNER JOIN ( "
-            + "SELECT min_vl.patient_id , MIN(min_datetime) final_min_date "
-            + "FROM ( "
+            + " FROM patient p "
+            + " INNER JOIN ( "
+            + " SELECT min_vl.patient_id , MIN(min_datetime) final_min_date "
+            + " FROM ( "
             + "         SELECT p.patient_id, MIN(e.encounter_datetime) AS min_datetime "
             + "         FROM patient p "
             + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -747,7 +738,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "           AND e.encounter_type = ${6} "
             + "           AND o.concept_id = ${856} "
             + "           AND o.value_numeric >= 1000 "
-            + "           AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate  "
+            + "           AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "           AND e.location_id = :location"
             + "         GROUP BY p.patient_id "
             + "         UNION "
@@ -761,12 +752,12 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "           AND e.encounter_type = ${53} "
             + "           AND o.concept_id = ${856} "
             + "           AND o.value_numeric >= 1000 "
-            + "           AND o.obs_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
+            + "           AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "           AND e.location_id = :location "
             + "        GROUP BY p.patient_id "
             + "     )min_vl "
-            + "GROUP BY min_vl.patient_id) final_min ON final_min.patient_id = p.patient_id "
-            + "WHERE p.patient_id NOT IN ( "
+            + " GROUP BY min_vl.patient_id) final_min ON final_min.patient_id = p.patient_id "
+            + " WHERE p.patient_id NOT IN ( "
             + "                            SELECT p.patient_id "
             + "                            FROM patient p "
             + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -798,22 +789,27 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "   AND e.location_id = :location "
             + " GROUP BY p.patient_id) AS second_apss on second_apss.patient_id= p.patient_id"
             + "  WHERE p.voided = 0 "
-            + "                    +   AND e.voided = 0"
-            + "                    +   AND e.encounter_type = ${35} "
-            + "                    +    AND TIMESTAMPDIFF(DAY, second_apss.min_apss, e.encounter_datetime) BETWEEN 20 AND 33 "
-            + "                    +    AND e.location_id = :location ";
+            + "                      AND e.voided = 0"
+            + "                       AND e.encounter_type = ${35} "
+            + "                        AND TIMESTAMPDIFF(DAY, second_apss.min_apss, e.encounter_datetime) BETWEEN 20 AND 33 "
+            + "                        AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(sql));
     return sqlCohortDefinition;
   }
 
-  public CohortDefinition getPedidoCargaViralBetween80To110DaysOfXQuery() {
+  public CohortDefinition getPedidoCargaViralBetweenLowerBoundAnduppperBoundXQuery(
+      int lowerBound,
+      int upperBound,
+      EncounterType encounterType,
+      int value,
+      Concept concept,
+      ValueType valueType,
+      boolean additional) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -824,79 +820,110 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("value", value);
+    map.put("encounterType", encounterType.getEncounterTypeId());
+    map.put("question", concept.getConceptId());
+    map.put("lowerBound", lowerBound);
+    map.put("upperBound", upperBound);
 
-    String sql =
-        "SELECT p.patient_id "
-            + "FROM patient p "
-            + "    INNER JOIN encounter e on p.patient_id = e.patient_id "
-            + "    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "    INNER JOIN  (  "
-            + " SELECT p.patient_id, final_min.final_min_date "
-            + "FROM patient p "
-            + "INNER JOIN ( "
-            + "SELECT min_vl.patient_id , MIN(min_datetime) final_min_date "
-            + "FROM ( "
-            + "         SELECT p.patient_id, MIN(e.encounter_datetime) AS min_datetime "
-            + "         FROM patient p "
-            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "         WHERE p.voided = 0 "
-            + "           AND o.voided = 0 "
-            + "           AND e.voided = 0 "
-            + "           AND e.encounter_type = ${6} "
-            + "           AND o.concept_id = ${856} "
-            + "           AND o.value_numeric >= 1000 "
-            + "           AND e.encounter_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate  "
-            + "           AND e.location_id = :location"
-            + "         GROUP BY p.patient_id "
-            + "         UNION "
-            + "         SELECT p.patient_id, MIN(o.obs_datetime) AS min_datetime "
-            + "         FROM patient p "
-            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "         WHERE p.voided = 0 "
-            + "           AND o.voided = 0 "
-            + "           AND e.voided = 0 "
-            + "           AND e.encounter_type = ${53} "
-            + "           AND o.concept_id = ${856} "
-            + "           AND o.value_numeric >= 1000 "
-            + "           AND o.obs_datetime BETWEEN :evaluationPeriodStartDate AND :evaluationPeriodEndDate "
-            + "           AND e.location_id = :location "
-            + "        GROUP BY p.patient_id "
-            + "     )min_vl "
-            + "GROUP BY min_vl.patient_id) final_min ON final_min.patient_id = p.patient_id "
-            + "WHERE p.patient_id NOT IN ( "
-            + "                            SELECT p.patient_id "
-            + "                            FROM patient p "
-            + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                            WHERE p.voided = 0 "
-            + "                              AND o.voided = 0 "
-            + "                              AND e.voided = 0 "
-            + "                              AND e.encounter_type = ${53} "
-            + "                              AND o.concept_id IN (${1982},${6332}) "
-            + "                              AND o.value_coded = ${1065} "
-            + "                              AND o.obs_datetime = final_min.final_min_date "
-            + "                            UNION "
-            + "                            SELECT p.patient_id "
-            + "                            FROM patient p "
-            + "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                            WHERE p.voided = 0 "
-            + "                              AND o.voided = 0 "
-            + "                              AND e.voided = 0 "
-            + "                              AND e.encounter_type = ${6} "
-            + "                              AND o.concept_id IN (${1982},${6332}) "
-            + "                              AND o.value_coded = ${1065} "
-            + "                              AND e.encounter_datetime = final_min.final_min_date)"
-            + " ) AS xquery ON xquery.patient_id=p.patient_id "
-            + " WHERE p.voided = 0 "
-            + "   AND e.voided = 0 "
-            + "   AND o.concept_id =  ${23722}   "
-            + "   AND o.value_coded =  ${856}   "
-            + "   AND e.encounter_type = ${6} "
-            + "   AND e.encounter_datetime BETWEEN DATE_ADD(xquery.final_min_date, INTERVAL 80 DAY) AND DATE_ADD(xquery.final_min_date, INTERVAL 130 DAY)"
-            + "   AND e.location_id = :location ";
+    StringBuilder sql = new StringBuilder();
+    sql.append(" SELECT p.patient_id ");
+    sql.append(" FROM patient p ");
+    sql.append("    INNER JOIN encounter e on p.patient_id = e.patient_id ");
+    sql.append("    INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+    if(additional){
+      sql.append("    INNER JOIN obs o1 ON e.encounter_id = o1.encounter_id ");
+    }
+    sql.append("    INNER JOIN  (  ");
+    sql.append(" SELECT p.patient_id, final_min.final_min_date ");
+    sql.append(" FROM patient p ");
+    sql.append(" INNER JOIN ( ");
+    sql.append(" SELECT min_vl.patient_id , MIN(min_datetime) final_min_date ");
+    sql.append(" FROM ( ");
+    sql.append("         SELECT p.patient_id, MIN(e.encounter_datetime) AS min_datetime ");
+    sql.append("         FROM patient p ");
+    sql.append("                  INNER JOIN encounter e ON e.patient_id = p.patient_id ");
+    sql.append("                  INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+    sql.append("         WHERE p.voided = 0 ");
+    sql.append("           AND o.voided = 0 ");
+    sql.append("           AND e.voided = 0 ");
+    sql.append("           AND e.encounter_type = ${6} ");
+    sql.append("           AND o.concept_id = ${856} ");
+    sql.append("           AND o.value_numeric >= 1000 ");
+    sql.append("           AND e.encounter_datetime BETWEEN :startDate AND :endDate  ");
+    sql.append("           AND e.location_id = :location");
+    sql.append("         GROUP BY p.patient_id ");
+    sql.append("         UNION ");
+    sql.append("         SELECT p.patient_id, MIN(o.obs_datetime) AS min_datetime ");
+    sql.append("         FROM patient p ");
+    sql.append("                  INNER JOIN encounter e ON e.patient_id = p.patient_id ");
+    sql.append("                  INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+    sql.append("         WHERE p.voided = 0 ");
+    sql.append("           AND o.voided = 0 ");
+    sql.append("           AND e.voided = 0 ");
+    sql.append("           AND e.encounter_type = ${53} ");
+    sql.append("           AND o.concept_id = ${856} ");
+    sql.append("           AND o.value_numeric >= 1000 ");
+    sql.append("           AND o.obs_datetime BETWEEN :startDate AND :endDate ");
+    sql.append("           AND e.location_id = :location ");
+    sql.append("        GROUP BY p.patient_id ");
+    sql.append("     )min_vl ");
+    sql.append(" GROUP BY min_vl.patient_id) final_min ON final_min.patient_id = p.patient_id ");
+    sql.append(" WHERE p.patient_id NOT IN ( ");
+    sql.append("                            SELECT p.patient_id ");
+    sql.append("                            FROM patient p ");
+    sql.append(
+        "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id ");
+    sql.append(
+        "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+    sql.append("                            WHERE p.voided = 0 ");
+    sql.append("                              AND o.voided = 0 ");
+    sql.append("                              AND e.voided = 0 ");
+    sql.append("                              AND e.encounter_type = ${53} ");
+    sql.append("                              AND o.concept_id IN (${1982},${6332}) ");
+    sql.append("                              AND o.value_coded = ${1065} ");
+    sql.append("                              AND o.obs_datetime = final_min.final_min_date ");
+    sql.append("                            UNION ");
+    sql.append("                            SELECT p.patient_id ");
+    sql.append("                            FROM patient p ");
+    sql.append(
+        "                                     INNER JOIN encounter e ON e.patient_id = p.patient_id ");
+    sql.append(
+        "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id ");
+    sql.append("                            WHERE p.voided = 0 ");
+    sql.append("                              AND o.voided = 0 ");
+    sql.append("                              AND e.voided = 0 ");
+    sql.append("                              AND e.encounter_type = ${6} ");
+    sql.append("                              AND o.concept_id IN (${1982},${6332}) ");
+    sql.append("                              AND o.value_coded = ${1065} ");
+    sql.append(
+        "                              AND e.encounter_datetime = final_min.final_min_date)");
+    sql.append(" ) AS xquery ON xquery.patient_id=p.patient_id ");
+    sql.append(" WHERE p.voided = 0 ");
+    sql.append("   AND e.voided = 0 ");
+    if (additional){
+      sql.append("   AND o1.voided = 0 ");
+      sql.append("   AND o1.concept_id = ${1305} ");
+      sql.append("   AND o1.value_coded IS NOT NULL ");
+    }
+    sql.append("   AND o.concept_id =  ${question}   ");
+    if (valueType == ValueType.VALUE_CODED) {
+      sql.append("   AND o.value_coded =  ${value}   ");
+    }
+    if (valueType == ValueType.VALUE_NUMERIC) {
+      sql.append("   AND o.value_numeric >=  ${value}   ");
+    }
+    if (encounterType.equals(hivMetadata.getAdultoSeguimentoEncounterType())) {
+      sql.append(
+          "   AND e.encounter_datetime BETWEEN DATE_ADD(xquery.final_min_date, INTERVAL ${lowerBound} DAY) AND DATE_ADD(xquery.final_min_date, INTERVAL ${upperBound} DAY)");
+    }
+    if (encounterType.equals(hivMetadata.getMasterCardEncounterType())) {
+      sql.append(
+          "   AND o.obs_datetime BETWEEN DATE_ADD(xquery.final_min_date, INTERVAL ${lowerBound} DAY) AND DATE_ADD(xquery.final_min_date, INTERVAL ${upperBound} DAY)");
+    }
+    sql.append("   AND e.encounter_type = ${encounterType} ");
+    sql.append("   AND e.location_id = :location ");
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(sql));
@@ -905,14 +932,11 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   public CohortDefinition getDenominator10() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-    compositionCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodStartDate", "evaluationPeriodStartDate", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("evaluationPeriodEndDate", "evaluationPeriodEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    String mappings =
-        "evaluationPeriodStartDate=${evaluationPeriodStartDate},evaluationPeriodEndDate=${evaluationPeriodEndDate},location=${location}";
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     compositionCohortDefinition.addSearch(
         "A", EptsReportUtils.map(this.getFirstAPSSInTheSameDayOfXQuery(), mappings));
@@ -924,29 +948,155 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
         "C", EptsReportUtils.map(this.getAPSSIn20To33DaysAfter2ndAPSSConsultation(), mappings));
 
     compositionCohortDefinition.addSearch(
-        "D", EptsReportUtils.map(this.getPedidoCargaViralBetween80To110DaysOfXQuery(), mappings));
+        "D",
+        EptsReportUtils.map(
+            this.getPedidoCargaViralBetweenLowerBoundAnduppperBoundXQuery(
+                80,
+                130,
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getHivViralLoadConcept().getConceptId(),
+                hivMetadata.getApplicationForLaboratoryResearch(),
+                ValueType.VALUE_CODED,false),
+            mappings));
     ;
     compositionCohortDefinition.addSearch(
         "transferredIn",
         EptsReportUtils.map(
             this.commonCohortQueries.getMohTransferredInPatients(),
-            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "transferredOut",
         EptsReportUtils.map(
             this.commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod(),
-            "onOrBefore=${evaluationPeriodEndDate},location=${location}"));
+            "onOrBefore=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "dead",
-        EptsReportUtils.map(
-            this.getDeadPatients(),
-            "evaluationPeriodEndDate=${evaluationPeriodEndDate},location=${location}"));
+        EptsReportUtils.map(this.getDeadPatients(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
         "(A AND B AND C AND D) AND NOT (transferredIn OR transferredOut OR dead) ");
 
     return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getNumerator10() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "denominator10",
+        EptsReportUtils.map(
+            getDenominator10(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "A",
+        EptsReportUtils.map(
+            this.getPedidoCargaViralBetweenLowerBoundAnduppperBoundXQuery(
+                110,
+                160,
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                    VIRAL_LOAD_1000_COPIES,
+                hivMetadata.getHivViralLoadConcept(),
+                ValueType.VALUE_CODED,false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B",
+        EptsReportUtils.map(
+            this.getPedidoCargaViralBetweenLowerBoundAnduppperBoundXQuery(
+                110,
+                160,
+                hivMetadata.getMasterCardEncounterType(),
+                    VIRAL_LOAD_1000_COPIES,
+                hivMetadata.getHivViralLoadConcept(),
+                ValueType.VALUE_CODED,false),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("denominator10 AND A AND B");
+
+    return compositionCohortDefinition;
+  }
+
+
+  public CohortDefinition getNumerator11() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+            "A",
+            EptsReportUtils.map(
+                    this.getPedidoCargaViralBetweenLowerBoundAnduppperBoundXQuery(
+                            110,
+                            160,
+                            hivMetadata.getAdultoSeguimentoEncounterType(),
+                            VIRAL_LOAD_1000_COPIES,
+                            hivMetadata.getHivViralLoadConcept(),
+                            ValueType.VALUE_CODED,
+                            true),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+            "B",
+            EptsReportUtils.map(
+                    this.getPedidoCargaViralBetweenLowerBoundAnduppperBoundXQuery(
+                            110,
+                            160,
+                            hivMetadata.getMasterCardEncounterType(),
+                            VIRAL_LOAD_1000_COPIES,
+                            hivMetadata.getHivViralLoadConcept(),
+                            ValueType.VALUE_CODED,false),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.setCompositionString("A AND B ");
+
+    compositionCohortDefinition.addSearch(
+            "D",
+            EptsReportUtils.map(
+                    this.getPedidoCargaViralBetweenLowerBoundAnduppperBoundXQuery(
+                            80,
+                            130,
+                            hivMetadata.getAdultoSeguimentoEncounterType(),
+                            hivMetadata.getHivViralLoadConcept().getConceptId(),
+                            hivMetadata.getApplicationForLaboratoryResearch(),
+                            ValueType.VALUE_CODED,false),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+            "denominator10",
+            EptsReportUtils.map(
+                    getDenominator10(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+
+    compositionCohortDefinition.setCompositionString("A AND B AND D AND denominator10 ");
+
+    return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getDenominator11() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+            "denominator10",
+            EptsReportUtils.map(
+                    getDenominator10(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("denominator10");
+
+    return compositionCohortDefinition;
+  }
+
+  enum ValueType {
+    VALUE_NUMERIC,
+    VALUE_CODED
   }
 }
