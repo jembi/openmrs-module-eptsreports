@@ -33,9 +33,6 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
   private final int VIRAL_LOAD_1000_COPIES = 1000;
 
-  private String MAPPING =
-      "evaluationPeriodStartDate=${endDate-12m+1d}, evaluationPeriodEndDate=${endDate-11m},location=${location}";
-
   @Autowired
   public ViralLoadIntensiveMonitoringCohortQueries(
       IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries,
@@ -323,6 +320,28 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>X</b> - Patients in the 1st line of ART with a First VL result above 1000 copies in the 7
+   * months back evaluation period:
+   *
+   * <p>
+   *
+   * <ul>
+   *   Select all patients with the first VL Numeric Result (concept Id 856) documented in Ficha
+   *   Clinica (encounter type 6, encounter_datetime) or Ficha Resumo (encounter type 53,
+   *   obs_datetime ) between the evaluation period (<=startDate) and the Result is >= 1000
+   *   copias/ml (concept 856 value_numeric >= 1000) except:
+   *   <li>Patients marked as pregnant (concept_id 1982) value coded equal to “Yes” (concept_id
+   *       1065) or breastfeeding (concept_id 6332) value coded equal to “Yes” (concept_id 1065) on
+   *       the same consultation ov VL >=1000
+   * </ul>
+   *
+   * <br>
+   * <b>Note:</b> in case there is more than one Viral Load record with a result >= 1000 copies, the
+   * first record that occurred during the evaluation period must be considered
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPartOneOfXQuery() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -402,6 +421,15 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * <b>Filter all patients who are in the first line of ART in the evaluation period as:</b>
+   *
+   * <p>“LINHA TERAPEUTICA” (Concept Id 21151) equal to “PRIMEIRA LINHA” (concept id 21150) recorded
+   * in the Last Clinical Consultation (encounter type 6, encounter_datetime) occurred during the
+   * evaluation period.
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getFirstLineArt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Linha Terapeutica");
@@ -417,7 +445,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     String sql =
         " SELECT p.patient_id  "
             + " FROM patient p INNER  JOIN ("
-            + " SELECT p.patient_id , MAX(encounter_datetime) AS last_date "
+            + " SELECT p.patient_id , MIN(encounter_datetime) AS last_date "
             + " FROM patient p "
             + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -521,6 +549,18 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   All patients with 3 APSS/PP consultations (encounter type 35) within 99 days of first VL date
+   *   >= 1000 (check Y section: if VL is from encounter type 6 use encounter datetime, if VL is
+   *   from encounter type 53 use obs datetime) as VL dateP as follows:
+   *   <li>One APSS/PP (encounter type 35) in the same day as VL dateP
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getFirstApss() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(
@@ -587,16 +627,16 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
   }
 
   /**
-   * All patients with 3 APSS/PP consultations (encounter type 35) within 99 days of first VL date
-   * >= 1000 (check Y section: if VL is from encounter type 6 use encounter datetime, if VL is from
-   * encounter type 53 use obs datetime) as VL dateP as follows: One APSS/PP (encounter type 35) in
-   * the same day as VL dateP Another APSS/PP (encounter type 35) occurred between 20 to 33 days
-   * after the First VL Date>=1000 as VL dateP ( encounter datetime[2nd apss/pp] >= VL dateP + 20
-   * days and <= VL dateP + 33 days ) and Note: if there is more than one APSS/PP session in the
-   * period between 20 and 33 days after the “First VL Date>=1000”, consider the first occurrence in
-   * this period as the 2nd “APSS/PP Session Date”. Another APSS/PP (encounter type 35) occurred
-   * between 20 to 33 days after the 2nd apss/pp ( encounter datetime[3rd apss/pp] >= 2nd apss/pp +
-   * 20 days and <= 2nd apss/pp + 33 days
+   *
+   *
+   * <ul>
+   *   Another APSS/PP (encounter type 35) occurred between 20 to 33 days after the First VL
+   *   Date>=1000 as VL dateP ( encounter datetime[2nd apss/pp] >= VL dateP + 20 days and <= VL
+   *   dateP + 33 days ) and
+   *   <li>Note: if there is more than one APSS/PP session in the period between 20 and 33 days
+   *       after the “First VL Date>=1000”, consider the first occurrence in this period as the 2nd
+   *       “APSS/PP Session Date”.
+   * </ul>
    *
    * @return
    */
@@ -667,18 +707,10 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
   }
 
   /**
-   * All patients with 3 APSS/PP consultations (encounter type 35) within 99 days of first VL date
-   * >= 1000 (check Y section: if VL is from encounter type 6 use encounter datetime, if VL is from
-   * encounter type 53 use obs datetime) as VL dateP as follows: One APSS/PP (encounter type 35) in
-   * the same day as VL dateP Another APSS/PP (encounter type 35) occurred between 20 to 33 days
-   * after the First VL Date>=1000 as VL dateP ( encounter datetime[2nd apss/pp] >= VL dateP + 20
-   * days and <= VL dateP + 33 days ) and Note: if there is more than one APSS/PP session in the
-   * period between 20 and 33 days after the “First VL Date>=1000”, consider the first occurrence in
-   * this period as the 2nd “APSS/PP Session Date”. Another APSS/PP (encounter type 35) occurred
-   * between 20 to 33 days after the 2nd apss/pp ( encounter datetime[3rd apss/pp] >= 2nd apss/pp +
-   * 20 days and <= 2nd apss/pp + 33 days
+   * Another APSS/PP (encounter type 35) occurred between 20 to 33 days after the 2nd apss/pp (
+   * encounter datetime[3rd apss/pp] >= 2nd apss/pp + 20 days and <= 2nd apss/pp + 33 days ) and
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
   public CohortDefinition getThirdApss() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -2099,6 +2131,16 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     return compositionCohortDefinition;
   }
 
+  /**
+   * Patients with 3 APSS/PP sessions registered within 99 days of CV result above 1000 copies as
+   * follows:
+   *
+   * <p>One APSS/PP (encounter type 35) in the same day as the high VL date "First VL Date>=1000"
+   * (check X section: if VL is from encounter type 6 use encounter datetime, if VL is from
+   * encounter type 53 use obs datetime)
+   *
+   * @return
+   */
   public CohortDefinition getFirstAPSSInTheSameDayOfXQuery() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -2189,6 +2231,17 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * Another APSS/PP (encounter type 35) occurred between 20 to 33 days after the First VL
+   * Date>=1000 as VL date ( encounter datetime[2nd apss/pp] >= VL date + 20 days and <= VL date +
+   * 33 days ) and
+   *
+   * <p>Note: if there is more than one APSS/PP session in the period between 20 and 33 days after
+   * the “First VL Date>=1000”, consider the first occurrence in this period as the 2nd “APSS/PP
+   * Session Date”.
+   *
+   * @return
+   */
   public CohortDefinition getAPSSInIn20To33DaysAfterXQuery() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -2279,6 +2332,12 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * Another APSS/PP (encounter type 35) occurred between 20 to 33 days after the 2nd apss/pp (
+   * encounter datetime[3rd apss/pp] >= 2nd apss/pp + 20 days and <= 2nd apss/pp + 33 days ) and
+   *
+   * @return
+   */
   public CohortDefinition getAPSSIn20To33DaysAfter2ndAPSSConsultation() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
