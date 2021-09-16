@@ -172,14 +172,18 @@ public class MISAUKeyPopsCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition patientsStartedARTInLast12Months = resumoTrimestralCohortQueries.getA();
+    CohortDefinition getB = resumoTrimestralCohortQueries.getB();
+    CohortDefinition getC = resumoTrimestralCohortQueries.getC();
 
     cd.addSearch(
-        "patientsStartedARTInLast12Months",
+        "A",
         EptsReportUtils.map(
             patientsStartedARTInLast12Months,
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch("B", EptsReportUtils.map(getB, ""));
+    cd.addSearch("C", EptsReportUtils.map(getC, ""));
 
-    cd.setCompositionString("patientsStartedARTInLast12Months");
+    cd.setCompositionString("((A OR B) AND NOT C)");
     return cd;
   }
 
