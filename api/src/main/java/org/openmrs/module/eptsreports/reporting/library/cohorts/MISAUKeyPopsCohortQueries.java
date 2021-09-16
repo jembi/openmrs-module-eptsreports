@@ -159,7 +159,7 @@ public class MISAUKeyPopsCohortQueries {
   /**
    * <b>Name: Número de adultos na coorte 12 meses - inicio de TARV</b>
    *
-   * <p><b>Description:</b> Resumo Trimestral A AND age >= 15years
+   * <p><b>Description:</b> Resumo Trimestral A OR B NOT C AND age >= 15years
    * </ul>
    *
    * @return {@link CohortDefinition}
