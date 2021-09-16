@@ -129,8 +129,7 @@ public class TPT_InitiationQueries {
             + "                IPT_completion_mastercard.encounter_datetime AS IPT_mastercard_end_date,   "
             + "                IPT_expected_completion.expected_date AS IPT_expected_end_date,   "
             + "                expected_registered_date_difference.result AS expected_registered_date_difference   "
-            + "                 FROM person p  JOIN person_name pn ON p.person_id = pn.person_id   "
-            + "                 JOIN patient_identifier pi ON pi.patient_id = p.person_id   "
+            + "                 FROM person p  "
             + "        JOIN (SELECT p.patient_id FROM patient p JOIN encounter e ON e.patient_id=p.patient_id   "
             + "                WHERE e.voided=0 AND p.voided=0 AND  e.encounter_type IN ( ${5} , ${7} )   "
             + "                AND e.encounter_datetime <=  :endDate   "
@@ -1003,9 +1002,7 @@ public class TPT_InitiationQueries {
             + "                    GROUP BY patient_id) tbl_21   "
             + "                    ON tbl_21.patient_id = p.patient_id) AS expected_registered_date_difference   "
             + "                 ON expected_registered_date_difference.patient_id = p.person_id   "
-            + "                 WHERE p.voided=0 AND pn.voided=0   "
-            + "                 AND pi.voided=0   "
-            + "                 AND pi.preferred=1 AND pn.preferred = 1 ;";
+            + "                 WHERE p.voided=0 ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
     return substitutor.replace(query);
@@ -1109,13 +1106,9 @@ public class TPT_InitiationQueries {
     valuesMap.put("23987", treatmentFollowUp);
 
     String query =
-        " SELECT (SELECT name FROM location WHERE location_id = 398) AS location, COUNT(TPT.person_id) AS total, CONCAT(DATE_FORMAT(:startDate, '%d-%m-%Y'),' Até ',DATE_FORMAT(:endDate, '%d-%m-%Y')) AS period   "
-            + "               FROM (  "
-            + "               SELECT p.person_id  "
-            + "                        FROM person p   "
-            + "                        JOIN person_name pn ON p.person_id = pn.person_id   "
-            + "                        JOIN patient_identifier pi ON pi.patient_id = p.person_id   "
-            + "              JOIN (   "
+        " SELECT (SELECT name FROM location WHERE location_id = 398) AS location, COUNT(p.person_id) AS total, CONCAT(DATE_FORMAT(:startDate, '%d-%m-%Y'),' Até ',DATE_FORMAT(:endDate, '%d-%m-%Y')) AS period   "
+            + "               FROM person p   "
+            + "               JOIN (   "
             + "              SELECT p.patient_id FROM patient p JOIN encounter e ON e.patient_id=p.patient_id   "
             + "                       WHERE e.voided=0 AND p.voided=0 AND   "
             + "                       e.encounter_type IN ( ${5} , ${7} )   "
@@ -1340,7 +1333,7 @@ public class TPT_InitiationQueries {
             + "                            AND (o2.concept_id= ${23987}  AND o2.value_coded IN (${1256},${1705})) "
             + "                            AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "                            GROUP BY p.patient_id    "
-            + "                        ) TPT ON TPT.patient_id = p.person_id WHERE p.voided=0 and pn.voided=0 AND pi.preferred=1 AND pn.preferred = 1) TPT ; ";
+            + "                        ) TPT ON TPT.patient_id = p.person_id WHERE p.voided=0 ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
     return substitutor.replace(query);
