@@ -313,8 +313,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             EptsCalculationUtils.obsResultForPatient(firstINHDateMap2, patientId);
         Obs anyIsoniazida =
             EptsCalculationUtils.obsResultForPatient(anyIsoniazidaPiridoxina, patientId);
-        Obs anyIsoniazida2 =
-            EptsCalculationUtils.obsResultForPatient(anyIsoniazidaPiridoxina2, patientId);
+        List<Obs> anyIsoniazida2 = getObsListFromResultMap(anyIsoniazidaPiridoxina2, patientId);
         Obs in3HPor3HPPiridoxina =
             EptsCalculationUtils.obsResultForPatient(in3HPor3HPPiridoxinaMap, patientId);
         List<Obs> notInINHDateObs = getObsListFromResultMap(notInINHDateMap, patientId);
@@ -334,12 +333,17 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
                 && firstINHDateObs == null
                 && anyIsoniazida == null
                 && anyIsoniazida2 == null
+                && !anyIsoniazida2.isEmpty()
                 && firstINHDateObs2 == null
                 && first3HPDateObs == null
                 && in3HPor3HPPiridoxina == null
                 && first3HPOr3HPPlusPiridoxinaDateObs == null)
             || artStartDate == null) {
           continue;
+        }
+        Obs anyIsoniazida2a = null;
+        if (anyIsoniazida2 != null && !anyIsoniazida2.isEmpty() && anyIsoniazida2.size() > 0) {
+          anyIsoniazida2a = anyIsoniazida2.get(0);
         }
 
         DateTime artStartDateTime = new DateTime(artStartDate.getTime());
@@ -350,7 +354,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
                             seguimentoOrFichaResumo,
                             fichaClinicaMasterCardStartDrugsObs,
                             anyIsoniazida,
-                            anyIsoniazida2,
+                            anyIsoniazida2a,
                             this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs, -7),
                             this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs2, -7),
                             this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs3, -7),
@@ -392,6 +396,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
 
         if (anyIsoniazida != null
             && anyIsoniazida2 != null
+            && !anyIsoniazida2.isEmpty()
             && anyIsoniazida.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6)) <= 0
             && anyIsoniazida.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6)) <= 0) {
           map.put(patientId, new BooleanResult(true, this));
