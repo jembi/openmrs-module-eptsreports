@@ -736,7 +736,7 @@ public class TPT_InitiationQueries {
             + "                )AS initiation_on_clinical_sheet    "
             + "                ON initiation_on_clinical_sheet.patient_id = p.person_id   "
             + "                LEFT JOIN   "
-            + "                (  SELECT  p.patient_id,  MAX(e.encounter_id) AS encounter_datetime   "
+            + "                (  SELECT  p.patient_id,  MAX(e.encounter_datetime) AS encounter_datetime   "
             + "                FROM  patient p   "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id   "
             + "         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
