@@ -327,9 +327,7 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
         cohortIndicatorDataSetDefinition,
         "DEN10TOTAL",
         "Description",
-        EptsReportUtils.map(
-            indicatorDen10Total,
-            "startDate=${endDate-5m-1d},endDate=${endDate-4m},location=${location}"),
+        EptsReportUtils.map(indicatorDen10Total, MAPPINGS),
         getColumnsForAge());
 
     cohortIndicatorDataSetDefinition.addColumn(
@@ -338,9 +336,7 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
         cohortIndicatorDataSetDefinition,
         "NUM10TOTAL",
         "Description",
-        EptsReportUtils.map(
-            indicatorNUm10Total,
-            "startDate=${endDate-5m-1d},endDate=${endDate-4m},location=${location}"),
+        EptsReportUtils.map(indicatorNUm10Total, MAPPINGS),
         getColumnsForAge());
 
     cohortIndicatorDataSetDefinition.addColumn(
@@ -350,9 +346,7 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
         cohortIndicatorDataSetDefinition,
         "DEN11TOTAL",
         "Description",
-        EptsReportUtils.map(
-            indicatorDen11Total,
-            "startDate=${endDate-12m-1d},endDate=${endDate-11m},location=${location}"),
+        EptsReportUtils.map(indicatorDen11Total, MAPPINGS),
         getColumnsForAge());
 
     cohortIndicatorDataSetDefinition.addColumn(
@@ -362,9 +356,7 @@ public class ViralLoadIntensiveMonitoringDataSet extends BaseDataSet {
         cohortIndicatorDataSetDefinition,
         "NUM11TOTAL",
         "Description",
-        EptsReportUtils.map(
-            indicatorNUm11Total,
-            "startDate=${endDate-12m-1d},endDate=${endDate-11m},location=${location}"),
+        EptsReportUtils.map(indicatorNUm11Total, MAPPINGS),
         getColumnsForAge());
 
     cohortIndicatorDataSetDefinition.addColumn(
