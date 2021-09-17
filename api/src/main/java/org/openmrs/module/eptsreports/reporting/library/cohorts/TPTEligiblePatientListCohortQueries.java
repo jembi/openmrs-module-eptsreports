@@ -364,7 +364,7 @@ public class TPTEligiblePatientListCohortQueries {
         EptsReportUtils.map(
             getTBTreatmentPart3(
                 hivMetadata.getTBProgram().getProgramId(),
-                hivMetadata.getActiveOnProgramConcept().getConceptId()),
+                hivMetadata.getPatientActiveOnTBProgramWorkflowState().getProgramWorkflowStateId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -417,7 +417,7 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR A5 OR threeHPA1 OR threeHPA2 OR threeHPA3 OR IPTB1 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR threeHPC1 OR threeHPC2 OR threeHPC3 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR TBTreatmentPart4 OR E1 OR F)");
+        "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR A5 OR threeHPA1 OR threeHPA2 OR threeHPA3 OR IPTB1 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR TBTreatmentPart4 OR E1 OR F)");
     return compositionCohortDefinition;
   }
 
@@ -2038,51 +2038,51 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1065", yesConcept);
 
     String query =
-        "   SELECT result.patient_id "
-            + "         FROM (SELECT p.patient_id,tabela.encounter_datetime   "
-            + "            FROM   patient p   "
-            + "            INNER JOIN encounter e "
-            + "                    ON e.patient_id = p.patient_id "
-            + "            INNER JOIN obs o   "
-            + "                    ON o.encounter_id = e.encounter_id "
-            + "            INNER JOIN(SELECT p.patient_id,    "
-            + "                              e.encounter_datetime "
-            + "                       FROM   patient p    "
-            + "                              INNER JOIN encounter e   "
-            + "                                      ON e.patient_id = p.patient_id   "
-            + "                              INNER JOIN obs o "
-            + "                                      ON o.encounter_id = e.encounter_id   "
-            + "                       WHERE  p.voided = 0 "
-            + "                              AND e.voided = 0 "
-            + "                              AND o.voided = 0 "
-            + "                              AND e.location_id = :location   "
-            + "                              AND e.encounter_type = ${6} "
-            + "                              AND ( ( o.concept_id = ${6122}  "
-            + "                                      AND o.value_coded = ${1256} )   "
-            + "                                     OR ( o.concept_id = ${6128}  "
-            + "                                          AND o.value_datetime IS NOT NULL ) ) "
-            + "                              AND e.encounter_datetime <= :endDate GROUP by p.patient_id) AS tabela    "
-            + "                    ON tabela.patient_id = p.patient_id    "
-            + "                    WHERE e.location_id= :location AND e.encounter_type= ${6} AND e.voided= 0 AND o.voided= 0   "
-            + "                    GROUP BY p.patient_id) result  "
-            + "      WHERE   (( (SELECT Count(ee.patient_id)  "
-            + "                     FROM   encounter ee   "
-            + "                            INNER JOIN obs oo  "
-            + "                                    ON oo.encounter_id = ee.encounter_id   "
-            + "                     WHERE  ee.voided = 0  "
-            + "                            AND result.patient_id = ee.patient_id  "
-            + "                            AND oo.voided = 0  "
-            + "                            AND ee.location_id = :location   "
-            + "                            AND oo.concept_id = ${6122}   "
-            + "                            AND ee.encounter_datetime BETWEEN  "
-            + "                                result.encounter_datetime AND  "
-            + "                    Date_add(result.encounter_datetime,    "
-            + "                    INTERVAL 210 DAY)  "
-            + "                    AND ( ( ee.encounter_type = ${6}  "
-            + "                    AND oo.value_coded IN ( ${1256}, ${1257} ) ) "
-            + "                    OR ( ee.encounter_type = ${9} "
-            + "                    AND oo.value_coded = ${1065} ) )) >= 5 )) "
-            + "      GROUP  BY result.patient_id ";
+        " SELECT result.patient_id                                                                                                                                     "
+            + "      FROM (SELECT p.patient_id, tabela.encounter_datetime      "
+            + "         FROM   patient p       "
+            + "         INNER JOIN encounter e     "
+            + "                 ON e.patient_id = p.patient_id     "
+            + "         INNER JOIN obs o       "
+            + "                 ON o.encounter_id = e.encounter_id     "
+            + "         INNER JOIN(SELECT p.patient_id,        "
+            + "                           e.encounter_datetime "
+            + "                    FROM   patient p        "
+            + "                           INNER JOIN encounter e       "
+            + "                                   ON e.patient_id = p.patient_id       "
+            + "                           INNER JOIN obs o     "
+            + "                                   ON o.encounter_id = e.encounter_id       "
+            + "                    WHERE  p.voided = 0     "
+            + "                           AND e.voided = 0     "
+            + "                           AND o.voided = 0     "
+            + "                           AND e.location_id = :location      "
+            + "                           AND ( (e.encounter_type = ${6} AND o.concept_id = ${6122}  "
+            + "                                   AND o.value_coded = ${1256} AND e.encounter_datetime <= :endDate)       "
+            + "                                  OR ( e.encounter_type IN(${6},${9}) AND  o.concept_id = ${6128}    "
+            + "                                       AND o.value_datetime IS NOT NULL AND o.value_datetime <= :endDate ) )    "
+            + "                           GROUP by p.patient_id) AS tabela     "
+            + "                 ON tabela.patient_id = p.patient_id        "
+            + "                 WHERE e.location_id= :location AND e.encounter_type= ${6} AND e.voided= 0 AND o.voided= 0       "
+            + "                 GROUP BY p.patient_id) result      "
+            + "   WHERE   (( (SELECT Count(ee.encounter_id)    "
+            + "                  FROM   encounter ee       "
+            + "                         INNER JOIN obs oo      "
+            + "                                 ON oo.encounter_id = ee.encounter_id       "
+            + "                  WHERE  ee.voided = 0      "
+            + "                         AND  ee.patient_id = result.patient_id     "
+            + "                         AND oo.voided = 0      "
+            + "                         AND ee.location_id = :location      "
+            + "                         AND oo.concept_id = ${6122}       "
+            + "                         AND ee.encounter_datetime >    "
+            + "                             result.encounter_datetime AND ee.encounter_datetime <=     "
+            + "                 Date_add(result.encounter_datetime,        "
+            + "                              INTERVAL 210 DAY)     "
+            + "                              AND ( ( ee.encounter_type = ${6}     "
+            + "                              AND oo.value_coded IN ( ${1256}, ${1257} ) )    "
+            + "                              OR ( ee.encounter_type IN (${6},${9})   "
+            + "                              AND oo.value_coded = ${1065} ) )) >= 5   "
+            + "                              ) )     "
+            + "                GROUP  BY result.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -2996,7 +2996,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("5", tbProgramConcept);
-    map.put("6269", activeOnProgramConcept);
+    map.put("16", activeOnProgramConcept);
 
     String query =
         " SELECT p.patient_id  "
@@ -3009,10 +3009,10 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND ps.voided = 0   "
             + "          AND pp.voided = 0   "
             + "          AND pp.program_id = ${5}   "
-            + "          AND ps.patient_state_id = ${6269}  "
+            + "          AND ps.state= ${16}  "
             + "          AND pp.location_id = :location    "
             + "          AND pp.date_enrolled >= Date_sub(:endDate, INTERVAL 210 DAY)    "
-            + "          AND pp.date_completed <= :endDate "
+            + "          AND pp.date_enrolled <= :endDate "
             + "   GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
