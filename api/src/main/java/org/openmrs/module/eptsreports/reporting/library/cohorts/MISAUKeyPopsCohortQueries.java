@@ -180,8 +180,14 @@ public class MISAUKeyPopsCohortQueries {
         EptsReportUtils.map(
             patientsStartedARTInLast12Months,
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.addSearch("B", EptsReportUtils.map(getB, ""));
-    cd.addSearch("C", EptsReportUtils.map(getC, ""));
+    cd.addSearch(
+        "B",
+        EptsReportUtils.map(
+            getB, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            getC, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("((A OR B) AND NOT C)");
     return cd;
