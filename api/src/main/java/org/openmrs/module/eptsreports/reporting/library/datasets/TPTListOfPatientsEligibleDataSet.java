@@ -42,9 +42,14 @@ import org.springframework.stereotype.Component;
 public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
   private HivMetadata hivMetadata;
 
+  private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
+
   @Autowired
-  public TPTListOfPatientsEligibleDataSet(HivMetadata hivMetadata) {
+  public TPTListOfPatientsEligibleDataSet(
+      HivMetadata hivMetadata,
+      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
     this.hivMetadata = hivMetadata;
+    this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
   }
 
   public DataSetDefinition constructDataset() throws EvaluationException {
@@ -79,17 +84,19 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
         new CalculationResultConverter());
     pdd.addColumn(
         "date_next_consultation",
-        getObsForPersonData("e1e2efd8-1d5f-11e0-b929-000c29ad1d07"),
-        "onOrBefore=${endDate},locationList=${location}",
+        listChildrenOnARTandFormulationsDataset.getNextFollowUpConsultationDate(),
+        "endDate=${endDate},locationList=${location}",
         new ObsValueConverter());
     pdd.addColumn(
         "date_last_segment",
-        getLastEncounterDate(),
-        "onOrBefore=${endDate},locationList=${location}",
+        listChildrenOnARTandFormulationsDataset.getLastFollowupConsultationDate(),
+        "endDate=${endDate},locationList=${location}",
         new EncounterDatetimeConverter());
     pdd.addColumn(
         "pregnant_or_breastfeeding", pregnantBreasfeediDefinition(), "location=${location}", null);
 
+    // listChildrenOnARTandFormulationsDataset.getLastFollowupConsultationDate(),
+    // listChildrenOnARTandFormulationsDataset.getNextFollowUpConsultationDate()
     return pdd;
   }
 
