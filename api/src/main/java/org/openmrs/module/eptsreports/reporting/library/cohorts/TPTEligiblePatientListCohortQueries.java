@@ -418,6 +418,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     compositionCohortDefinition.setCompositionString(
         "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR A5 OR threeHPA1 OR threeHPA2 OR threeHPA3 OR IPTB1 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR threeHPC1 OR threeHPC2 OR threeHPC3 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR TBTreatmentPart4 OR E1 OR F)");
+
     return compositionCohortDefinition;
   }
 
