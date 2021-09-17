@@ -248,7 +248,7 @@ public class MISAUKeyPopsCohortQueries {
         "B1SIXMONTHS",
         EptsReportUtils.map(
             getPatientsInART(),
-            "startDate=${startDate-7m},endDate=${startDate-4},location=${location}"));
+            "startDate=${startDate-7m},endDate=${startDate-4m},location=${location}"));
     cd.addSearch(
         "ADULTS",
         EptsReportUtils.map(
