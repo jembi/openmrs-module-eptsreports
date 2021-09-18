@@ -1048,6 +1048,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${6129}   "
             + "       AND o.value_datetime IS NOT NULL  "
+            + "                AND o.value_datetime < :endDate "
             + "       AND o.value_datetime BETWEEN DATE_ADD(DATE(dateY.value_datetime), interval 173 day)   "
             + "       AND DATE_ADD(DATE(dateY.value_datetime), interval 365 day) GROUP BY p.patient_id  "
             + "UNION    "
@@ -1070,6 +1071,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${6129}   "
             + "       AND o.value_datetime IS NOT NULL  "
+            + "                AND o.value_datetime < :endDate "
             + "       AND o.value_datetime BETWEEN DATE_ADD(DATE(dateY.encounter_datetime), interval 173 day)   "
             + "       AND DATE_ADD(DATE(dateY.encounter_datetime), interval 365 day) GROUP BY p.patient_id      "
             + "UNION    "
@@ -1090,6 +1092,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${6129}   "
             + "       AND o.value_datetime IS NOT NULL  "
+            + "                AND o.value_datetime < :endDate "
             + "       AND o.value_datetime BETWEEN DATE_ADD(DATE(dateY.value_datetime), interval 173 day)   "
             + "       AND DATE_ADD(DATE(dateY.value_datetime), interval 365 day) GROUP BY p.patient_id  "
             + "UNION    "
@@ -1112,6 +1115,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${6129}   "
             + "       AND o.value_datetime IS NOT NULL  "
+            + "                AND o.value_datetime < :endDate "
             + "       AND o.value_datetime BETWEEN DATE_ADD(DATE(dateY.encounter_datetime), interval 173 day)   "
             + "       AND DATE_ADD(DATE(dateY.encounter_datetime), interval 365 day) GROUP BY p.patient_id  ";
 
