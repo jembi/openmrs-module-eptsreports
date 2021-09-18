@@ -40,14 +40,11 @@ import org.springframework.stereotype.Component;
 public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
   private HivMetadata hivMetadata;
 
-  private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
-
   @Autowired
   public TPTListOfPatientsEligibleDataSet(
       HivMetadata hivMetadata,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
     this.hivMetadata = hivMetadata;
-    this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
   }
 
   public DataSetDefinition constructDataset() throws EvaluationException {
@@ -82,19 +79,14 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
         new CalculationResultConverter());
     pdd.addColumn(
         "date_next_consultation",
-        listChildrenOnARTandFormulationsDataset.getNextFollowUpConsultationDate(),
-        "endDate=${endDate},location=${location}",
+        this.getNextFollowUpConsultationDate(),
+        "location=${location}",
         null);
     pdd.addColumn(
-        "date_last_segment",
-        listChildrenOnARTandFormulationsDataset.getLastFollowupConsultationDate(),
-        "endDate=${endDate},location=${location}",
-        null);
+        "date_last_segment", this.getLastFollowupConsultationDate(), "location=${location}", null);
     pdd.addColumn(
         "pregnant_or_breastfeeding", pregnantBreasfeediDefinition(), "location=${location}", null);
 
-    // listChildrenOnARTandFormulationsDataset.getLastFollowupConsultationDate(),
-    // listChildrenOnARTandFormulationsDataset.getNextFollowUpConsultationDate()
     return pdd;
   }
 
@@ -147,6 +139,109 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
             + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
             + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
             + identifierType;
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
+  /**
+   * Date (encounter_datetime) of the most recent clinical consultation registered on Ficha Clínica
+   * – MasterCard or Ficha de Seguimento (encounter type 6) until report generation date
+   *
+   * @return
+   */
+  public DataDefinition getLastFollowupConsultationDate() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Last Follow up Consultation Date");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+
+    String sql =
+        "  SELECT p.patient_id, e.encounter_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "                 INNER JOIN ( "
+            + "                         SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
+            + "                         FROM   patient p  "
+            + "                             INNER JOIN encounter e  "
+            + "                                 ON p.patient_id = e.patient_id  "
+            + "                             INNER JOIN obs o  "
+            + "                                 ON e.encounter_id = o.encounter_id  "
+            + "                         WHERE  p.voided = 0  "
+            + "                             AND e.voided = 0  "
+            + "                             AND o.voided = 0  "
+            + "                             AND e.location_id = :location "
+            + "                             AND e.encounter_type IN (${6}, ${9}) "
+            + "                             AND e.encounter_datetime <= CURRENT_DATE() "
+            + "                         GROUP BY p.patient_id "
+            + "                               ) most_recent  ON p.patient_id = most_recent.patient_id   "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type IN (${6}, ${9}) "
+            + "                 AND e.encounter_datetime <= CURRENT_DATE() "
+            + "                 AND e.encounter_datetime = most_recent.e_datetime "
+            + "                 GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
+  /**
+   * “Data d próxima consulta” (concept id 1410) of the most recent clinical consultation registered
+   * on Ficha Clínica – MasterCard or Ficha de Seguimento (encounter type 6) until report generation
+   * date.
+   *
+   * @return
+   */
+  public DataDefinition getNextFollowUpConsultationDate() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Next Follow up Consultation Date");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
+
+    String sql =
+        "  SELECT p.patient_id, o.value_datetime "
+            + "             FROM   patient p   "
+            + "                     INNER JOIN encounter e   "
+            + "                                     ON p.patient_id = e.patient_id   "
+            + "                     INNER JOIN obs o   "
+            + "                                     ON e.encounter_id = o.encounter_id   "
+            + "     INNER JOIN  "
+            + "       ( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime  "
+            + "      FROM  patient p   "
+            + "       INNER JOIN encounter e  ON p.patient_id = e.patient_id  "
+            + "      WHERE p.voided = 0  "
+            + "       AND e.voided = 0   "
+            + "       AND e.location_id = :location  "
+            + "       AND e.encounter_datetime <= CURRENT_DATE() "
+            + "       AND e.encounter_type IN (${6}, ${9})  "
+            + "      GROUP BY p.patient_id  "
+            + "       )max_encounter ON p.patient_id=max_encounter.patient_id "
+            + "             WHERE  p.voided = 0   "
+            + "                     AND e.voided = 0   "
+            + "                     AND o.voided = 0   "
+            + "                     AND e.location_id = :location "
+            + "                     AND e.encounter_type IN (${6}, ${9})  "
+            + "                     AND o.concept_id = ${1410}   "
+            + "                     AND e.encounter_datetime <= CURRENT_DATE()  "
+            + "                     AND max_encounter.encounter_datetime = e.encounter_datetime  "
+            + "             GROUP BY p.patient_id ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
