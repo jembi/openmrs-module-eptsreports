@@ -342,7 +342,10 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
       CalculationResultMap isoniazidUsageObservationsList =
           ePTSCalculationService.allObservations(
               hivMetadata.getIsoniazidUsageConcept(),
-              Arrays.asList(hivMetadata.getYesConcept(), hivMetadata.getContinueRegimenConcept()),
+              Arrays.asList(
+                  hivMetadata.getYesConcept(),
+                  hivMetadata.getStartDrugs(),
+                  hivMetadata.getContinueRegimenConcept()),
               consultationEncounterTypes,
               location,
               cohort,
