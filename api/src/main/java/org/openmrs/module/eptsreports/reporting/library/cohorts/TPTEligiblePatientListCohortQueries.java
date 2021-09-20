@@ -367,10 +367,7 @@ public class TPTEligiblePatientListCohortQueries {
     compositionCohortDefinition.addSearch(
         "TBTreatmentPart3",
         EptsReportUtils.map(
-            getTBTreatmentPart3(
-                hivMetadata.getTBProgram().getProgramId(),
-                hivMetadata.getPatientActiveOnTBProgramWorkflowState().getProgramWorkflowStateId()),
-            mapping));
+            getTBTreatmentPart3(hivMetadata.getTBProgram().getProgramId()), mapping));
 
     compositionCohortDefinition.addSearch(
         "TBTreatmentPart4",
@@ -2606,14 +2603,14 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>D: Enrolled on TB program (program id 5) patient state id = 6269 and start date(Date
-   *       enrolled) >= EndDate - 7months (210 DAYs) and endDate(date Completed) <= reporting
+   *   <li>D: Enrolled on TB program (program id 5) and start date(Date
+   *       enrolled) >= EndDate - 7months (210 DAYs) and Date enrolled <= reporting
    *       endDate
    * </ul>
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getTBTreatmentPart3(int tbProgramConcept, int activeOnProgramConcept) {
+  public CohortDefinition getTBTreatmentPart3(int tbProgramConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with TRATAMENTO DE TUBERCULOSE D3");
@@ -2622,24 +2619,18 @@ public class TPTEligiblePatientListCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("5", tbProgramConcept);
-    map.put("16", activeOnProgramConcept);
 
     String query =
-        " SELECT p.patient_id  "
-            + "   FROM   patient p   "
-            + "          inner join patient_program pp   "
-            + "                  ON pp.patient_id = p.patient_id "
-            + "          inner join patient_state ps "
-            + "                  ON ps.patient_program_id = pp.patient_program_id    "
-            + "   WHERE  p.voided = 0    "
-            + "          AND ps.voided = 0   "
-            + "          AND pp.voided = 0   "
-            + "          AND pp.program_id = ${5}   "
-            + "          AND ps.state= ${16}  "
-            + "          AND pp.location_id = :location    "
-            + "          AND pp.date_enrolled >= Date_sub(:endDate, INTERVAL 210 DAY)    "
-            + "          AND pp.date_enrolled <= :endDate "
-            + "   GROUP  BY p.patient_id ";
+        " SELECT p.patient_id "
+            + " FROM   patient p "
+            + "        INNER JOIN patient_program pp "
+            + "             ON pp.patient_id = p.patient_id "
+            + " WHERE  p.voided = 0    "
+            + "        AND pp.voided = 0 "
+            + "        AND pp.program_id = ${5}  "
+            + "        AND pp.location_id = :location  "
+            + "        AND pp.date_enrolled >= Date_sub(:endDate, INTERVAL 210 DAY) "
+            + "        AND pp.date_enrolled <= :endDate ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
