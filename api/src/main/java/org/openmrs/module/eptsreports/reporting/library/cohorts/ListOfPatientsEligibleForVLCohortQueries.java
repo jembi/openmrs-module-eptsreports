@@ -841,7 +841,7 @@ public class ListOfPatientsEligibleForVLCohortQueries {
             + "        (e.encounter_type = ${53}                             "
             + "          AND o.concept_id = ${856}    "
             + "          AND o.value_numeric %s %s "
-            + "        AND  o.value_datetime = recent_vl.recent_datetime ) "
+            + "        AND  o.obs_datetime = recent_vl.recent_datetime ) "
             + "                              ) ";
 
     String fromSQL =
