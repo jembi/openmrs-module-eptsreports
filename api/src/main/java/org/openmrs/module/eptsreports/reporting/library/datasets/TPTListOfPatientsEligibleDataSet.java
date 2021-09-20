@@ -12,7 +12,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.EncounterDatetimeConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.reporting.ReportingConstants;
@@ -20,7 +19,6 @@ import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.converter.ObsValueConverter;
 import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.EncountersForPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
@@ -43,7 +41,9 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
   private HivMetadata hivMetadata;
 
   @Autowired
-  public TPTListOfPatientsEligibleDataSet(HivMetadata hivMetadata) {
+  public TPTListOfPatientsEligibleDataSet(
+      HivMetadata hivMetadata,
+      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
     this.hivMetadata = hivMetadata;
   }
 
@@ -79,14 +79,11 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
         new CalculationResultConverter());
     pdd.addColumn(
         "date_next_consultation",
-        getObsForPersonData("e1e2efd8-1d5f-11e0-b929-000c29ad1d07"),
-        "onOrBefore=${endDate},locationList=${location}",
-        new ObsValueConverter());
+        this.getNextFollowUpConsultationDate(),
+        "location=${location}",
+        null);
     pdd.addColumn(
-        "date_last_segment",
-        getLastEncounterDate(),
-        "onOrBefore=${endDate},locationList=${location}",
-        new EncounterDatetimeConverter());
+        "date_last_segment", this.getLastFollowupConsultationDate(), "location=${location}", null);
     pdd.addColumn(
         "pregnant_or_breastfeeding", pregnantBreasfeediDefinition(), "location=${location}", null);
 
@@ -149,6 +146,109 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     return spdd;
   }
 
+  /**
+   * Date (encounter_datetime) of the most recent clinical consultation registered on Ficha Clínica
+   * – MasterCard or Ficha de Seguimento (encounter type 6) until report generation date
+   *
+   * @return
+   */
+  public DataDefinition getLastFollowupConsultationDate() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Last Follow up Consultation Date");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+
+    String sql =
+        "  SELECT p.patient_id, e.encounter_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "                 INNER JOIN ( "
+            + "                         SELECT p.patient_id, MAX(e.encounter_datetime) as e_datetime "
+            + "                         FROM   patient p  "
+            + "                             INNER JOIN encounter e  "
+            + "                                 ON p.patient_id = e.patient_id  "
+            + "                             INNER JOIN obs o  "
+            + "                                 ON e.encounter_id = o.encounter_id  "
+            + "                         WHERE  p.voided = 0  "
+            + "                             AND e.voided = 0  "
+            + "                             AND o.voided = 0  "
+            + "                             AND e.location_id = :location "
+            + "                             AND e.encounter_type IN (${6}, ${9}) "
+            + "                             AND e.encounter_datetime <= CURRENT_DATE() "
+            + "                         GROUP BY p.patient_id "
+            + "                               ) most_recent  ON p.patient_id = most_recent.patient_id   "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type IN (${6}, ${9}) "
+            + "                 AND e.encounter_datetime <= CURRENT_DATE() "
+            + "                 AND e.encounter_datetime = most_recent.e_datetime "
+            + "                 GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
+  /**
+   * “Data d próxima consulta” (concept id 1410) of the most recent clinical consultation registered
+   * on Ficha Clínica – MasterCard or Ficha de Seguimento (encounter type 6) until report generation
+   * date.
+   *
+   * @return
+   */
+  public DataDefinition getNextFollowUpConsultationDate() {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("Next Follow up Consultation Date");
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
+
+    String sql =
+        "  SELECT p.patient_id, o.value_datetime "
+            + "             FROM   patient p   "
+            + "                     INNER JOIN encounter e   "
+            + "                                     ON p.patient_id = e.patient_id   "
+            + "                     INNER JOIN obs o   "
+            + "                                     ON e.encounter_id = o.encounter_id   "
+            + "     INNER JOIN  "
+            + "       ( SELECT p.patient_id, MAX(e.encounter_datetime) as encounter_datetime  "
+            + "      FROM  patient p   "
+            + "       INNER JOIN encounter e  ON p.patient_id = e.patient_id  "
+            + "      WHERE p.voided = 0  "
+            + "       AND e.voided = 0   "
+            + "       AND e.location_id = :location  "
+            + "       AND e.encounter_datetime <= CURRENT_DATE() "
+            + "       AND e.encounter_type IN (${6}, ${9})  "
+            + "      GROUP BY p.patient_id  "
+            + "       )max_encounter ON p.patient_id=max_encounter.patient_id "
+            + "             WHERE  p.voided = 0   "
+            + "                     AND e.voided = 0   "
+            + "                     AND o.voided = 0   "
+            + "                     AND e.location_id = :location "
+            + "                     AND e.encounter_type IN (${6}, ${9})  "
+            + "                     AND o.concept_id = ${1410}   "
+            + "                     AND e.encounter_datetime <= CURRENT_DATE()  "
+            + "                     AND max_encounter.encounter_datetime = e.encounter_datetime  "
+            + "             GROUP BY p.patient_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
   public DataDefinition pregnantBreasfeediDefinition() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Nome da definition");
@@ -173,7 +273,7 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
 
     String sql =
         "SELECT p.patient_id, CASE "
-            + "                       WHEN (pregnancy_date IS NULL AND breastfeeding_date IS NULL) THEN 'N/A' "
+            + "                       WHEN (pregnancy_date IS NULL AND breastfeeding_date IS NULL) THEN '' "
             + "                       WHEN pregnancy_date IS NOT NULL THEN 'Grávida' "
             + "                       WHEN breastfeeding_date IS NOT NULL THEN 'Lactante' "
             + "                       END AS pregnance_state"

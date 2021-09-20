@@ -233,7 +233,8 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
-                hivMetadata.getYesConcept().getConceptId()),
+                hivMetadata.getYesConcept().getConceptId(),
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -246,7 +247,9 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getDtINHConcept().getConceptId()),
+                tbMetadata.getDtINHConcept().getConceptId(),
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -259,7 +262,9 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getDtINHConcept().getConceptId()),
+                tbMetadata.getDtINHConcept().getConceptId(),
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
