@@ -910,7 +910,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                     exclisionRegimeTPT1stPickUpPreviousPeriod,
                     -7));
 
-        obss.addAll(anyIsoniazida);
+        for (Obs o:anyIsoniazida){obss.add(o);}
 
         Date iptStartDate = getMinOrMaxObsDate(obss, Priority.MIN, true);
 
