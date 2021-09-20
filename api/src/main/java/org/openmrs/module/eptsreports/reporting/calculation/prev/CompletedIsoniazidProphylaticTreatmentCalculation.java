@@ -1075,7 +1075,9 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
           if (anyIsoniazida != null
               && anyIsoniazida2 != null
               && !anyIsoniazida.isEmpty()
+              && anyIsoniazida != null
               && anyIsoniazida.size() > 0
+              && anyIsoniazida.get(0).getValueDatetime() != null
               && anyIsoniazida
                       .get(0)
                       .getValueDatetime()
