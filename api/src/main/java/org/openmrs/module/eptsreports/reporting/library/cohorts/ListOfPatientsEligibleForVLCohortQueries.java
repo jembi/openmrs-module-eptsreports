@@ -53,8 +53,8 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     CohortDefinition chdVL6 =
         getPatientsWhoHaveRegisteredVLIgualOrGreaterThan1000ForMoreThan3Months();
     CohortDefinition chdVL7 = getPatientsWhoDontHaveAnyViralLoad();
-    CohortDefinition chdE1 = txNewCohortQueries.getTxNewBreastfeedingComposition(true);
-    CohortDefinition chdE2 = txNewCohortQueries.getPatientsPregnantEnrolledOnART(true);
+    CohortDefinition chdE1 = txNewCohortQueries.getTxNewBreastfeedingComposition(false);
+    CohortDefinition chdE2 = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
 
     cd.addSearch(
         "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${startDate},location=${location}"));
@@ -90,11 +90,11 @@ public class ListOfPatientsEligibleForVLCohortQueries {
     cd.addSearch(
         "E1",
         EptsReportUtils.map(
-            chdE1, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            chdE1, "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "E2",
         EptsReportUtils.map(
-            chdE2, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            chdE2, "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "txcurr AND (X1 OR X2 OR X3) AND VL1 AND ( ((VL2 OR VL3) AND VL4) OR (VL5 AND VL6) OR VL7) AND NOT (E1 OR E2)");
