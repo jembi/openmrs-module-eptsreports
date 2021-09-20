@@ -874,8 +874,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
 
         // ipt end date section regimeTPT1stPickUpPreviousPeriodMap2
         List<Obs> anyIsoniazida = getObsListFromResultMap(anyIsoniazidaPiridoxina, patientId);
-        Obs anyIsoniazida2 =
-            EptsCalculationUtils.obsResultForPatient(anyIsoniazidaPiridoxina2, patientId);
+        List<Obs> anyIsoniazida2 = getObsListFromResultMap(anyIsoniazidaPiridoxina2, patientId);
 
         List<Obs> notInINHDateObs2 = getObsListFromResultMap(notInINHDateMap2, patientId);
         List<Obs> notInINHDateObs3 = getObsListFromResultMap(notInINHDateMap3, patientId);
@@ -894,7 +893,8 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
             Arrays.asList(
                 startProfilaxiaObs,
                 startDrugsObs,
-                anyIsoniazida2,
+                anyIsoniazida != null && anyIsoniazida.size() > 0 ? anyIsoniazida.get(0) : null,
+                anyIsoniazida2 != null && anyIsoniazida.size() > 0 ? anyIsoniazida.get(0) : null,
                 this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs2, -7),
                 this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs3, -7),
                 this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs4, -7),
@@ -909,8 +909,6 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                     regimeTPT1stPickUpPreviousPeriod,
                     exclisionRegimeTPT1stPickUpPreviousPeriod,
                     -7));
-
-        for (Obs o:anyIsoniazida){obss.add(o);}
 
         Date iptStartDate = getMinOrMaxObsDate(obss, Priority.MIN, true);
 
