@@ -894,7 +894,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                 startProfilaxiaObs,
                 startDrugsObs,
                 anyIsoniazida != null && anyIsoniazida.size() > 0 ? anyIsoniazida.get(0) : null,
-                anyIsoniazida2 != null && anyIsoniazida.size() > 0 ? anyIsoniazida.get(0) : null,
+                anyIsoniazida2 != null && anyIsoniazida2.size() > 0 ? anyIsoniazida2.get(0) : null,
                 this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs2, -7),
                 this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs3, -7),
                 this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs4, -7),
