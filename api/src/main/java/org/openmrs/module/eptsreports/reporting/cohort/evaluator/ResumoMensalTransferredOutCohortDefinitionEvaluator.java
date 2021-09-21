@@ -148,6 +148,7 @@ public class ResumoMensalTransferredOutCohortDefinitionEvaluator
     q.append("                           AND e.encounter_type = :mcDrugPickup ");
     q.append("                           AND e.location_id = :location ");
     q.append("                           AND o.concept_id = :drugPickup ");
+    q.append("                           AND o.voided = 0 ");
     q.append("                           AND o.value_datetime ");
     q.append("                             > transferout_date ");
     q.append("                           AND o.value_datetime ");
