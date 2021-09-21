@@ -992,7 +992,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>B1: Select all patients with Ficha Resumo (encounter type 53) with “Ultima profilaxia
    *       Isoniazida (Data Fim)” (concept id 6129) value datetime not null and between (date from
-   *       Y+ 173 DAYs) and (date from Y + 365 DAYs)
+   *       Y+ 173 DAYs) and (date from Y + 365 DAYs)and <= end date
    *   <li>
    * </ul>
    *
@@ -1134,7 +1134,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>B2: Select all patients with Ficha clinica - Master Card (encounter type 6) with
    *       “Profilaxia INH” (concept id 6122) with value code “Fim” (concept id 1267) and encounter
-   *       datetime between (date from Y + 173 DAYs) and (date from Y + 365 DAYs)
+   *       datetime between (date from Y + 173 DAYs) and (date from Y + 365 DAYs)and <= end date
    *   <li>
    * </ul>
    *
@@ -1274,7 +1274,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>B3: Select all patients with Ficha de Seguimento - Adulto (encounter type 6) with
    *       “Profilaxia com INH” (concept id 6129) value datetime between (date from Y + 173 DAYs)
-   *       and (date from Y + 365 DAYs)
+   *       and (date from Y + 365 DAYs)and <= end date
    *   <li>
    * </ul>
    *
@@ -1414,7 +1414,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>B4: Select all patients with Ficha de Seguimento - Pediatrico (encounter type 9) with
    *       “Profilaxia com INH” (concept id 6129) value datetime between (date from Y+173 DAYs) and
-   *       (date from Y + 365 DAYs)
+   *       (date from Y + 365 DAYs)and <= end date
    *   <li>
    * </ul>
    *
@@ -1574,7 +1574,7 @@ public class TPTEligiblePatientListCohortQueries {
    *   <li>At least 5 consultations (((encounter type 6) with (profilaxia INH (6122)= inicio(I) or
    *       Continua(C) (concept id in [1256, 1257])) or ((encounter type 9) “Profilaxia com INH-TPI”
    *       (concept id 6122) with value coded “YES” (concept id 1065))) during 210 DAYs from the
-   *       date Y2,3 or
+   *       date Y1,Y2,3 or
    *   <li>
    *   <li>
    * </ul>
@@ -1683,7 +1683,7 @@ public class TPTEligiblePatientListCohortQueries {
    *   <li>B5: At least 2 consultations (encounter type 6) (with profilaxia INH (concept id 6122) =
    *       inicio(I) or Continua(C) (concept id in [1256, 1257]) and has “Outras prescricoes”
    *       (concept id 1719) with value coded equal to “DT-INH” (concept id 23955) )during 150 DAYs
-   *       from the date from Y2,3 or
+   *       from the date from Y1,Y2,3 or
    *   <li>
    * </ul>
    *
@@ -1799,7 +1799,7 @@ public class TPTEligiblePatientListCohortQueries {
    *   <li>B5: ((At least 3 consultations registered on Ficha Clínica (encounter type 6) with INH =
    *       Iniício or Continua (concept ID 6122, value_coded in [1257, 1256]) ) AND ( at least 1
    *       consultation registered on Ficha Clínica (encounter type 6) with DT-INH (concept ID 1719,
-   *       value_coded =23955) ) )until a 7-month (210 DAYs) period from the date from Y2,3. OR
+   *       value_coded =23955) ) )until a 7-month (210 DAYs) period from the date from Y1,Y2,3. OR
    *   <li>
    * </ul>
    *
@@ -2603,9 +2603,8 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>D: Enrolled on TB program (program id 5) and start date(Date
-   *       enrolled) >= EndDate - 7months (210 DAYs) and Date enrolled <= reporting
-   *       endDate
+   *   <li>D: Enrolled on TB program (program id 5) and start date(Date enrolled) >= EndDate -
+   *       7months (210 DAYs) and Date enrolled <= reporting endDate
    * </ul>
    *
    * @return CohortDefinition
