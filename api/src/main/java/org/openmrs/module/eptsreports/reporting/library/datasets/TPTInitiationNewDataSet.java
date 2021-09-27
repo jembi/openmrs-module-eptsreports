@@ -62,12 +62,22 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
         pdd.addColumn("Name", nameDef, "");
 
 
-        pdd.addColumn(
-                "Age", tPTInitiationDataDefinitionQueries.getPatientsAndTheirAges(), "endDate=${endDate}", null);
+        pdd.addColumn("Age", tPTInitiationDataDefinitionQueries.getPatientsAndTheirAges(), "endDate=${endDate}", null);
+
+        pdd.addColumn("ARTStartDate", tPTInitiationDataDefinitionQueries.getPatientsAndARTStartDate(), "endDate=${endDate},startDate=${startDate},location=${location}", null);
+
         pdd.addColumn("Sex", new GenderDataDefinition(), "", null);
 
 
+      //  pdd.addColumn("PregnantAndBreastfeeding", tPTInitiationDataDefinitionQueries.getPrenantAndBreastfeeding(), "endDate=${endDate},startDate=${startDate},location=${location}", null);
+
+        pdd.addColumn("LastFollowUpConsultationDate", tPTInitiationDataDefinitionQueries.getPatientsAndLastFollowUpConsultationDate(), "location=${location}", null);
+
+        pdd.addColumn("ReceivedTPTInLastFollowupConsulttarion", tPTInitiationDataDefinitionQueries.getPatientsReceivedTPTInTheLastFollowUpConsultation(), "location=${location}", null);
+
+
         pdd.addColumn("pid", new PersonIdDataDefinition(), "");
+
 
         return pdd;
     }
