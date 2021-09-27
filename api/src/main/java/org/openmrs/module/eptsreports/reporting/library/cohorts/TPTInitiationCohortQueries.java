@@ -91,8 +91,8 @@ public class TPTInitiationCohortQueries {
     CohortDefinition BIPT1 = getPatientsIPTStart1WithUltimaProxilaxiaIsonazida();
     CohortDefinition BIPT2 = getPatientsIPTStart2WithProfilaxiaINH();
     CohortDefinition BIPT3 = getPatientsIPTStart3WithFichaClinicaOrFichaPediatrica();
-    CohortDefinition BIPT4 = getPatientsIPTStart4WithFirstFILTandRegimeDeTPT();
-    CohortDefinition BIPT5 = getPatientsIPTStart5WithTPTandMarkedFILT();
+    CohortDefinition BIPT4 = getPatientsIPTStart4WithFirstFILTAndRegimeDeTPT();
+    CohortDefinition BIPT5 = getPatientsIPTStart5WithTPTAndMarkedFILT();
 
     cd.addSearch(
         "BIPT1",
@@ -121,6 +121,8 @@ public class TPTInitiationCohortQueries {
 
     return cd;
   }
+
+
 
   /**
    * <b>Technical Specs</b>
@@ -471,7 +473,7 @@ public class TPTInitiationCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsIPTStart4WithFirstFILTandRegimeDeTPT() {
+  public CohortDefinition getPatientsIPTStart4WithFirstFILTAndRegimeDeTPT() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("IPT start 4 - select patients with first FILT and Regime de TPT");
@@ -572,18 +574,18 @@ public class TPTInitiationCohortQueries {
    *
    * <blockquote>
    *
-   * <p>Select all patients with Ficha clinica or Ficha Pediatrica (encounter type 6,9) with
-   * “Profilaxia com INH” (concept id 6128) and value datetime is not null and between start date
-   * and end date
+   * <p>Select all patients with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or ‘Isoniazid + piridoxina’
+   * (concept id in [656, 23982]) and  “Seguimento de tratamento TPT”(concept ID 23987) value coded “inicio”
+   * or “re-inicio”(concept ID in [1256, 1705]) marked on FILT (encounter type 60) and encounter datetime between start date and end date
    *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsIPTStart5WithTPTandMarkedFILT() {
+  public CohortDefinition getPatientsIPTStart5WithTPTAndMarkedFILT() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("IPT start 5 -select patients with Regime TPT and marked FILT");
+    sqlCohortDefinition.setName("IPT start 5 -select patients with Regime TPT and marked on FILT");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
