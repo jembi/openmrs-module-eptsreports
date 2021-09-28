@@ -131,52 +131,17 @@
 			description="UUID for the Master Card - Ficha Resumo encounter type"
 			uuid="9455436d-e87c-4393-ad9c-551046a4afa4" />
 
-	<!--<global_property
-			property="eptsreports.DataInicioProfilaxiaIsoniazidaConceptUuid"
-			property_value="c8d191ea-fc18-11eb-9174-a7bf18cf9248"
-			description="Data de inicio de profilaxia com Isoniazida"
-			uuid="e0f3d78c-b3d1-4589-bea6-ede9cfaf02a5" /> -->
-
-	<!--<global_property
-			property="eptsreports.isoniazidUseConceptUuid"
-			property_value="940add7a-fc29-11eb-9213-97502ff87b52"
-			description="Uso de Isoniazida"
-			uuid="b6acf5fc-fc29-11eb-bf49-77e10c7ffddd" />-->
-
 	<global_property
 			property="@MODULE_ID@.startDrugsConceptUuid"
 			property_value="e1d9ef28-1d5f-11e0-b929-000c29ad1d07"
 			description="UUID for the INICIAR concept"
 			uuid="7f143bf0-ff26-11eb-a18a-df6dd24cb829" />
-	<!--
-        <global_property
-                property="eptsreports.monthlyConceptUuid"
-                property_value="53b38d0c-ff27-11eb-843c-8359672c50dd"
-                description="UUID for the MONTHLY concept"
-                uuid="89cfbd52-ff27-11eb-b2ac-5b832f52241a" />
-
-        <global_property
-                property="eptsreports.continueRegimen"
-                property_value="1f1ef828-ff28-11eb-aa5d-e3820e678acf"
-                description="UUID for the CONTINUE REGIMEN concept"
-                uuid="411e95b4-ff28-11eb-afb5-0ff99e6c745c" />
-
-        <global_property
-                property="eptsreports.quarterlyConceptUuid"
-                property_value="c639a89c-ff28-11eb-bdec-bbed1d3b42cd"
-                description="UUID for the TRIMESTRAL concept"
-                uuid="35c3f9e2-ff29-11eb-8744-b326bdfb52f9" /> -->
 
 	<global_property
 			property="eptsreports.DataFimProfilaxiaIsoniazidaConceptUuid"
 			property_value="74535e3c-ff29-11eb-8524-bb8de33b09a4"
 			description="Data de finalizacao de profilaxia com Isoniazida"
 			uuid="c027a6ec-ff29-11eb-be75-73ac678fe2fb" />
-
-	<!--    <global_property property="eptsreports.yesConceptUuid"
-                         property_value="e1d81b62-1d5f-11e0-b929-000c29ad1d07"
-                         description="UUID for the SIM concept"
-                         uuid="37e751e2-0170-4d39-808c-6706a8b5f889" /> -->
 
 	<concept concept_id="23985" datatype_id="2"
 			 class_id="7" creator="1"
@@ -263,12 +228,6 @@
 			 uuid="93603742-1cae-4970-9077-e2b27e46bd7e"
 			 retired="0" is_set="0"/>
 
-	<!-- 6128 -->
-	<!--<concept concept_id="6128" retired="0"
-			 is_set="0"  class_id="7" datatype_id="6"
-			 date_created="2012-02-27 11:30:21" creator="1"
-			 uuid="c8d191ea-fc18-11eb-9174-a7bf18cf9248" /> -->
-
 	<!-- 6122 -->
 	<concept concept_id="6122" retired="0"
 			 is_set="0"  class_id="7" datatype_id="2"
@@ -281,35 +240,12 @@
 			 date_created="2012-02-27 11:30:21" creator="1"
 			 uuid="e1d9ef28-1d5f-11e0-b929-000c29ad1d07" />
 
-	<!-- 1098 -->
-	<!--<concept concept_id="1098" retired="0"
-                 is_set="0"  class_id="11" datatype_id="4"
-                 date_created="2012-02-27 11:30:21" creator="1"
-                 uuid="53b38d0c-ff27-11eb-843c-8359672c50dd" /> -->
-
-	<!-- 1257 -->
-	<!--<concept concept_id="1257" retired="0"
-			 is_set="0"  class_id="15" datatype_id="4"
-			 date_created="2012-02-27 11:30:21" creator="1"
-			 uuid="1f1ef828-ff28-11eb-aa5d-e3820e678acf" /> -->
-
-	<!-- 23720 -->
-	<!--	<concept concept_id="23720" retired="0"
-                 is_set="0"  class_id="11" datatype_id="4"
-                 date_created="2012-02-27 11:30:21" creator="1"
-                 uuid="c639a89c-ff28-11eb-bdec-bbed1d3b42cd" /> -->
 
 	<!-- 6129 -->
 	<concept concept_id="6129" retired="0"
 			 is_set="0"  class_id="7" datatype_id="6"
 			 date_created="2012-02-27 11:30:21" creator="1"
 			 uuid="74535e3c-ff29-11eb-8524-bb8de33b09a4" />
-
-	<!-- 1065 -->
-	<!-- <concept concept_id="1065" retired="0"
-			 is_set="0"  class_id="11" datatype_id="4"
-			 date_created="2012-02-27 11:30:21" creator="1"
-			 uuid="e1d81b62-1d5f-11e0-b929-000c29ad1d07" /> -->
 
 	<encounter encounter_id="2777001" encounter_type="6"
 			   patient_id="92" location_id="1" form_id="1"
