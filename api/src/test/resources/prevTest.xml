@@ -119,7 +119,7 @@
 			description="UUID for the Seguimento de tratamento TPT concept"
 			uuid="d2f5a5da-1f77-11ec-bc76-e7240ca5ed74" />
 
-	<!--<global_property
+	<global_property
 			property="eptsreports.sTarvPediatriaSeguimentoEncounterTypeUuid"
 			property_value="e278fce4-1d5f-11e0-b929-000c29ad1d07"
 			description="UUID for the S.TARV: PEDIATRIA SEGUIMENTO encounter type"
@@ -131,7 +131,7 @@
 			description="UUID for the Master Card - Ficha Resumo encounter type"
 			uuid="9455436d-e87c-4393-ad9c-551046a4afa4" />
 
-	<global_property
+	<!--<global_property
 			property="eptsreports.DataInicioProfilaxiaIsoniazidaConceptUuid"
 			property_value="c8d191ea-fc18-11eb-9174-a7bf18cf9248"
 			description="Data de inicio de profilaxia com Isoniazida"
@@ -377,6 +377,27 @@
 			   date_created="2019-6-26 14:09:05.0" voided="false"
 			   uuid="edf1352c-ff2c-11eb-9963-57b38b9fd0f2" />
 
+	<!--For encounter 6 -->
+	<encounter encounter_id="101023" encounter_type="6"
+			   patient_id="1007" location_id="1" form_id="1"
+			   encounter_datetime="2020-01-19 00:00:00" creator="1"
+			   date_created="2019-6-26 14:09:05.0" voided="false"
+			   uuid="5f0b1eae-203d-11ec-b210-2ff38b30cb2e" />
+
+	<!--For encounter 9 -->
+	<encounter encounter_id="101021" encounter_type="9"
+			   patient_id="1007" location_id="1" form_id="1"
+			   encounter_datetime="2020-01-21 00:00:00.0" creator="1"
+			   date_created="2019-6-26 14:09:05.0" voided="false"
+			   uuid="b80eaa62-2037-11ec-98d5-9fec552f6c04" />
+
+	<!--For encounter 53 -->
+	<encounter encounter_id="101025" encounter_type="53"
+			   patient_id="1007" location_id="1" form_id="1"
+			   encounter_datetime="2020-01-21 00:00:00.0" creator="1"
+			   date_created="2019-6-26 14:09:05.0" voided="false"
+			   uuid="8a6d04ae-2042-11ec-814a-e3a323bd37b8" />
+
 	<obs obs_id="201010" person_id="1007" concept_id="6129"
 		 encounter_id="101012" obs_datetime="2020-01-09 00:00:00"
 		 value_datetime="2020-01-09 00:00:00"
@@ -391,6 +412,7 @@
 		 date_created="2019-06-24 14:11:13.0" voided="false"
 		 uuid="7d405eba-fc17-11eb-a00f-f307f5792690" />
 
+	<!--For Completed Drugs Observations -->
 	<obs obs_id="201020" person_id="1007" concept_id="6122"
 		 encounter_id="101020" obs_datetime="2020-01-21 00:00:00.0"
 		 value_datetime="2020-01-21 00:00:00.0"
@@ -425,5 +447,29 @@
 		 location_id="1" value_coded="23954" comments="" creator="1"
 		 date_created="2019-06-24 14:11:13.0" voided="false"
 		 uuid="a4b7aa4e-ff2c-11eb-a9eb-9b8f77a41fd9" />
+
+	<!--For encounter 6 -->
+	<obs obs_id="201021" person_id="1007" concept_id="6129"
+		 encounter_id="101023" obs_datetime="2020-01-21 00:00:00"
+		 value_datetime="2020-01-21 00:00:00"
+		 location_id="1" comments="" creator="1"
+		 date_created="2019-06-24 14:11:13.0" voided="false"
+		 uuid="91583fa4-2038-11ec-b5ff-27a1c251b6a5" />
+
+	<!--For encounter 9 -->
+	<obs obs_id="201022" person_id="1007" concept_id="6129"
+		 encounter_id="101021" obs_datetime="2020-01-21 00:00:00"
+		 value_datetime="2020-01-21 00:00:00"
+		 location_id="1" comments="" creator="1"
+		 date_created="2019-06-24 14:11:13.0" voided="false"
+		 uuid="b2c04910-203e-11ec-bd1e-57c841871e53" />
+
+	<!--For encounter 53 -->
+	<obs obs_id="201023" person_id="1007" concept_id="6129"
+		 encounter_id="101025" obs_datetime="2020-01-21 00:00:00"
+		 value_datetime="2020-01-21 00:00:00"
+		 location_id="1" comments="" creator="1"
+		 date_created="2019-06-24 14:11:13.0" voided="false"
+		 uuid="d4912c04-2042-11ec-8fd6-23fcb10cfcb0" />
 
 </dataset>
