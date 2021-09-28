@@ -20,11 +20,14 @@ public class TPTInitiationCohortQueries {
 
   private HivMetadata hivMetadata;
   private TbMetadata tbMetadata;
+  private GenericCohortQueries genericCohortQueries;
 
   @Autowired
-  public TPTInitiationCohortQueries(HivMetadata hivMetadata, TbMetadata tbMetadata) {
+  public TPTInitiationCohortQueries(
+      HivMetadata hivMetadata, TbMetadata tbMetadata, GenericCohortQueries genericCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   public CohortDefinition getBaseCohort() {
@@ -35,8 +38,13 @@ public class TPTInitiationCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
+    CohortDefinition baseCohort = genericCohortQueries.getBaseCohort();
     CohortDefinition A = get3HPStartCohort();
     CohortDefinition B = getIPTStartCohort();
+    cd.addSearch(
+        "basecohort",
+        EptsReportUtils.map(
+            baseCohort, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "A",
@@ -45,7 +53,7 @@ public class TPTInitiationCohortQueries {
         "B",
         EptsReportUtils.map(B, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(A OR B)");
+    cd.setCompositionString("basecohort AND (A OR B)");
 
     return cd;
   }
@@ -121,8 +129,6 @@ public class TPTInitiationCohortQueries {
 
     return cd;
   }
-
-
 
   /**
    * <b>Technical Specs</b>
@@ -574,9 +580,10 @@ public class TPTInitiationCohortQueries {
    *
    * <blockquote>
    *
-   * <p>Select all patients with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or ‘Isoniazid + piridoxina’
-   * (concept id in [656, 23982]) and  “Seguimento de tratamento TPT”(concept ID 23987) value coded “inicio”
-   * or “re-inicio”(concept ID in [1256, 1705]) marked on FILT (encounter type 60) and encounter datetime between start date and end date
+   * <p>Select all patients with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
+   * ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Seguimento de tratamento
+   * TPT”(concept ID 23987) value coded “inicio” or “re-inicio”(concept ID in [1256, 1705]) marked
+   * on FILT (encounter type 60) and encounter datetime between start date and end date
    *
    * </blockquote>
    *
