@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.DispensationTypeConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.EmptyToNaoAndAnyToSimConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationCohortQueries;
@@ -62,130 +63,124 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
 
     pdd.addColumn("NID", listChildrenOnARTandFormulationsDataset.getNID(), "");
 
-    pdd.addColumn("Name", nameDef, "");
+    pdd.addColumn("name", nameDef, "");
 
     pdd.addColumn(
-        "ARTStartDate",
+        "tarv_date",
         tPTInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "endDate=${endDate},startDate=${startDate},location=${location}",
         null);
 
     pdd.addColumn(
-        "Age",
+        "age",
         tPTInitiationDataDefinitionQueries.getPatientsAndTheirAges(),
         "endDate=${endDate}",
         null);
 
-    pdd.addColumn("Sex", new GenderDataDefinition(), "", null);
+    pdd.addColumn("gender", new GenderDataDefinition(), "", null);
 
     pdd.addColumn(
-        "PregnantAndBreastfeeding",
+        "pregnant_breastfeeding",
         tPTInitiationDataDefinitionQueries.getPatientsThatArePregnantOrBreastfeeding(),
         "endDate=${endDate},startDate=${startDate},location=${location}",
         new NotApplicableIfNullConverter());
 
     pdd.addColumn(
-        "LastFollowUpConsultationDate",
+        "followup_date",
         tPTInitiationDataDefinitionQueries.getPatientsAndLastFollowUpConsultationDate(),
         "location=${location}",
         null);
 
     pdd.addColumn(
-        "ReceivedTPTInLastFollowupConsulttarion",
+        "received_TPT",
         tPTInitiationDataDefinitionQueries.getPatientsReceivedTPTInTheLastFollowUpConsultation(),
         "location=${location}",
         new EmptyToNaoAndAnyToSimConverter());
 
     pdd.addColumn(
-        "InitiationDateOnFILT",
+        "3HP_FILT_start_date",
         tPTInitiationDataDefinitionQueries.getPatientAnd3HPInitiationDateOnFILT(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     pdd.addColumn(
-        "InitiationDateOnFichaClinica",
+        "3HP_clinical_start_date",
         tPTInitiationDataDefinitionQueries.getPatientAnd3HPInitiationDateOnFichaClinica(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     pdd.addColumn(
-        "FILTwith3HPDispensation",
+        "FILT_3HP_dispensation_date",
         tPTInitiationDataDefinitionQueries.getPatientsAnd3HPDispensationDate(),
         "location=${location}",
         null);
 
     pdd.addColumn(
-        "lastFILTwith3HPDispensation",
-        tPTInitiationDataDefinitionQueries.getPatientsAnd3HPDispensationDate(),
-        "location=${location}",
-        null);
-
-    pdd.addColumn(
-        "lastFILTTypeDispensation",
+        "FILT_3HP_dispensation_type",
         tPTInitiationDataDefinitionQueries.getPatientsAndLast3HPTypeOfDispensation(),
         "location=${location}",
-        null);
+        new DispensationTypeConverter());
 
     pdd.addColumn(
-        "IPTInitiationDateOnFILT",
+        "IPT_FILT_start_date",
         tPTInitiationDataDefinitionQueries.getPatientsAndIPTInitiationDateOnFilt(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     pdd.addColumn(
-        "iptInitiationDateOnFichaClinicaOrFichaSeguimento",
+        "IPT_clinical_seg_start_date",
         tPTInitiationDataDefinitionQueries
             .getPatientsAndIPTInitiationDateOnFichaClinicaOrFichaSeguimento(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     pdd.addColumn(
-        "IPTInitiationDateOnFichaResumo",
+        "IPT_mastercard_start_date",
         tPTInitiationDataDefinitionQueries.getPatientsAndIPTInitiationDateOnFichaResumo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     pdd.addColumn(
-        "LastFILTDispensationWithIPTDate",
+        "FILT_with_IPT_dispensation_date",
         tPTInitiationDataDefinitionQueries.getPatientsAndDateOfLastFILTDispensationWithIPT(),
         "location=${location}",
         null);
 
     pdd.addColumn(
-        "LastFILTDispensationwitIPTTypeOfDispensation",
+        "FILT_with_IPT_dispensation_type",
         tPTInitiationDataDefinitionQueries
             .getPatientsAndTypeOfDispensationInLastFILTDispensationWithIPT(),
         "location=${location}",
-        null);
+        new DispensationTypeConverter());
 
     pdd.addColumn(
-        "IPTCompletionDateOnFichaClinicaOrSeguimento",
+        "IPT_end_date",
         tPTInitiationDataDefinitionQueries
             .getPatientsAndIPTCompletioDateOnFichaClinicaOrFichaSeguimento(),
         "location=${location}",
         null);
 
     pdd.addColumn(
-        "IPTCompetionDateOnFichaResumo",
+        "TPT.IPT_mastercard_end_date",
         tPTInitiationDataDefinitionQueries.getPatientsAndIPTCompetionDateOnFichaResumo(),
         "location=${location}",
         null);
 
     pdd.addColumn(
-        "IPTExpectedPlus173Days",
+        "IPT_expected_end_date",
         tPTInitiationDataDefinitionQueries
             .getPatientsAndIPTCompletionDateAndIPTStartDatePlus173Days(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     pdd.addColumn(
-        "DifferenceBetweenRegistedCompletionDate",
+        "expected_registered_date_difference",
         tPTInitiationDataDefinitionQueries
             .getPatientAndDifferenceBetweenRegisteredCompletionDateAndExpectedCompletionDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
-    pdd.addColumn("pid", new PersonIdDataDefinition(), "");
+    pdd.addColumn("person_id", new PersonIdDataDefinition(), "");
 
     return pdd;
   }
