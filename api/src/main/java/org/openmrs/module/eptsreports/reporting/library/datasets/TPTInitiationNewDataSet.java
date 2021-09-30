@@ -76,9 +76,11 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
 
     pdd.addColumn("Sex", new GenderDataDefinition(), "", null);
 
-    //  pdd.addColumn("PregnantAndBreastfeeding",
-    // tPTInitiationDataDefinitionQueries.getPrenantAndBreastfeeding(),
-    // "endDate=${endDate},startDate=${startDate},location=${location}", null);
+    pdd.addColumn(
+        "PregnantAndBreastfeeding",
+        tPTInitiationDataDefinitionQueries.getPatientsThatArePregnantOrBreastfeeding(),
+        "endDate=${endDate},startDate=${startDate},location=${location}",
+        null);
 
     pdd.addColumn(
         "LastFollowUpConsultationDate",
