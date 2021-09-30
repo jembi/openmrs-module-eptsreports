@@ -452,12 +452,12 @@ public class TPTInitiationDataDefinitionQueries {
     String sql =
         " select patient_id, CASE WHEN (pregnancy_date IS NOT NULL) THEN 'Grávida' END AS pregnant_breastfeeding_value "
             + " FROM ( "
-                      + pregnantWomen
+            + pregnantWomen
             + "    ) AS pregnant  "
             + " UNION   "
             + " select patient_id, CASE WHEN (breastfeeding_date IS NOT NULL) THEN 'Lactante' END AS pregnant_breastfeeding_value "
             + " FROM ( "
-                    + breastfeedingWomen
+            + breastfeedingWomen
             + "  ) breastfeeding ";
 
     return sql;

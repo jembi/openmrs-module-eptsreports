@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationDataDefinitionQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -63,15 +64,15 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
     pdd.addColumn("Name", nameDef, "");
 
     pdd.addColumn(
-        "Age",
-        tPTInitiationDataDefinitionQueries.getPatientsAndTheirAges(),
-        "endDate=${endDate}",
-        null);
-
-    pdd.addColumn(
         "ARTStartDate",
         tPTInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "endDate=${endDate},startDate=${startDate},location=${location}",
+        null);
+
+    pdd.addColumn(
+        "Age",
+        tPTInitiationDataDefinitionQueries.getPatientsAndTheirAges(),
+        "endDate=${endDate}",
         null);
 
     pdd.addColumn("Sex", new GenderDataDefinition(), "", null);
@@ -80,7 +81,7 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
         "PregnantAndBreastfeeding",
         tPTInitiationDataDefinitionQueries.getPatientsThatArePregnantOrBreastfeeding(),
         "endDate=${endDate},startDate=${startDate},location=${location}",
-        null);
+        new NotApplicableIfNullConverter());
 
     pdd.addColumn(
         "LastFollowUpConsultationDate",
