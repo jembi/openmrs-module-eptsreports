@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.EmptyToNaoAndAnyToSimConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationDataDefinitionQueries;
@@ -93,7 +94,7 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
         "ReceivedTPTInLastFollowupConsulttarion",
         tPTInitiationDataDefinitionQueries.getPatientsReceivedTPTInTheLastFollowUpConsultation(),
         "location=${location}",
-        null);
+        new EmptyToNaoAndAnyToSimConverter());
 
     pdd.addColumn(
         "InitiationDateOnFILT",
