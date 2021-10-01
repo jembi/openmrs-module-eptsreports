@@ -161,7 +161,7 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
         null);
 
     pdd.addColumn(
-        "TPT.IPT_mastercard_end_date",
+        "IPT_mastercard_end_date",
         tPTInitiationDataDefinitionQueries.getPatientsAndIPTCompetionDateOnFichaResumo(),
         "location=${location}",
         null);
