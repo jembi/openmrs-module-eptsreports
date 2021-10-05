@@ -1029,34 +1029,6 @@ public class TPTInitiationDataDefinitionQueries {
     return sqlPatientDataDefinition;
   }
 
-  public DataDefinition getPatientsAndARTStartDate() {
-
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("3 - ART Start Date  ");
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Location.class));
-
-    String query = getARTStartDate();
-    sqlPatientDataDefinition.setQuery(query);
-
-    return sqlPatientDataDefinition;
-  }
-
-  public String getARTStartDate() {
-    return getARTStartDate(
-        hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-        hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-        hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
-        hivMetadata.getStartDrugs().getConceptId(),
-        hivMetadata.getARVPlanConcept().getConceptId(),
-        hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-        hivMetadata.getARVStartDateConcept().getConceptId(),
-        hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-        hivMetadata.getArtDatePickupMasterCard().getConceptId(),
-        hivMetadata.getARTProgram().getProgramId());
-  }
-
   /**
    * <b>Technical Specs</b>
    *
@@ -1070,87 +1042,17 @@ public class TPTInitiationDataDefinitionQueries {
    *
    * @return {@link DataDefinition}
    */
-  public String getARTStartDate(
-      int adultoSeguimentoEncounterType,
-      int pediatriaSeguimentoEncounterType,
-      int aRVPharmaciaEncounterType,
-      int startDrugs,
-      int aRVPlanConcept,
-      int masterCardEncounterType,
-      int aRVStartDateConcept,
-      int masterCardDrugPickupEncounterType,
-      int artDatePickupMasterCard,
-      int aRTProgram) {
+  public DataDefinition getPatientsAndARTStartDate() {
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", adultoSeguimentoEncounterType);
-    valuesMap.put("9", pediatriaSeguimentoEncounterType);
-    valuesMap.put("18", aRVPharmaciaEncounterType);
-    valuesMap.put("1256", startDrugs);
-    valuesMap.put("1255", aRVPlanConcept);
-    valuesMap.put("53", masterCardEncounterType);
-    valuesMap.put("1190", aRVStartDateConcept);
-    valuesMap.put("52", masterCardDrugPickupEncounterType);
-    valuesMap.put("23866", artDatePickupMasterCard);
-    valuesMap.put("2", aRTProgram);
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("3 - ART Start Date  ");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Location.class));
 
-    String sql =
-        " SELECT union_tbl.patient_id , MIN(union_tbl.first_pickup) first_pickup FROM   "
-            + "       (SELECT p.patient_id, first_pickup FROM patient p   "
-            + "       JOIN   "
-            + "       patient_program pp ON pp.patient_id = p.patient_id   "
-            + "       JOIN   "
-            + "       (SELECT p.patient_id, MIN(e.encounter_datetime) first_pickup FROM patient  p   "
-            + "       JOIN encounter e ON e.patient_id = p.patient_id   "
-            + "       JOIN obs o ON o.encounter_id = e.encounter_id   "
-            + "       WHERE e.encounter_type =  ${18}    "
-            + "       AND e.voided = 0 AND p.voided = 0   "
-            + "       AND o.voided = 0 AND e.location_id = :location   "
-            + "       GROUP BY p.patient_id) first_pickup   "
-            + "       ON first_pickup.patient_id = p.patient_id   "
-            + "       JOIN   "
-            + "       (SELECT p.patient_id FROM patient p   "
-            + "       JOIN encounter e ON e.patient_id = p.patient_id   "
-            + "       JOIN obs o ON o.encounter_id = e.encounter_id   "
-            + "       WHERE e.encounter_type IN ( ${6} , ${9} , ${18} )   "
-            + "       AND o.concept_id =  ${1255}  AND o.value_coded = ${1256}    "
-            + "       AND e.voided = 0 AND p.voided = 0   "
-            + "       AND o.voided = 0 AND e.location_id = :location    "
-            + "       AND e.encounter_datetime <= :startDate) arv_plan    "
-            + "       ON arv_plan.patient_id = p.patient_id   "
-            + "       GROUP BY p.patient_id   "
-            + "       UNION   "
-            + "       SELECT p.patient_id, MIN(o.obs_datetime) AS first_pickup FROM patient p   "
-            + "       JOIN encounter e ON e.patient_id = p.patient_id   "
-            + "       JOIN obs o ON o.encounter_id = e.encounter_id   "
-            + "       WHERE e.encounter_type IN ( ${6} , ${9} , ${18} , ${53} )   "
-            + "       AND o.concept_id =  ${1190}     "
-            + "       AND e.voided = 0 AND p.voided = 0   "
-            + "       AND o.voided = 0 AND e.location_id = :location    "
-            + "       AND o.obs_datetime <= :startDate   "
-            + "       GROUP BY p.patient_id   "
-            + "       UNION   "
-            + "       SELECT p.patient_id, MIN(o.value_datetime) first_pickup FROM patient p    "
-            + "           JOIN encounter e ON e.patient_id = p.patient_id   "
-            + "           JOIN obs o ON o.encounter_id = e.encounter_id   "
-            + "           JOIN obs oo ON oo.encounter_id = e.encounter_id   "
-            + "           WHERE e.encounter_type =  ${52}  AND e.location_id = :location   "
-            + "           AND e.voided = 0 AND p.voided = 0   "
-            + "           AND o.concept_id =   ${23866}  AND o.voided =0   "
-            + "           AND o.value_datetime <= :endDate   "
-            + "           GROUP BY p.patient_id   "
-            + "       UNION   "
-            + "       SELECT p.patient_id, pp.date_enrolled AS first_pickup FROM patient p   "
-            + "       JOIN   "
-            + "       patient_program pp ON pp.patient_id = p.patient_id   "
-            + "       WHERE pp.program_id =  ${2}    "
-            + "       AND pp.date_enrolled <= :endDate   "
-            + "       AND p.voided = 0   "
-            + "       GROUP BY p.patient_id) union_tbl "
-            + "       GROUP BY union_tbl.patient_id ";
+    String query = commonQueries.getARTStartDate();
+    sqlPatientDataDefinition.setQuery(query);
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    return stringSubstitutor.replace(sql);
+    return sqlPatientDataDefinition;
   }
 }
