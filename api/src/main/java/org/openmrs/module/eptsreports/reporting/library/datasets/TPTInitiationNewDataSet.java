@@ -56,7 +56,7 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
             "identifier",
             new PatientIdentifierDataDefinition(identifierType.getName(), identifierType),
             identifierFormatter);
-    DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
+    DataConverter formatter = new ObjectFormatter("{givenName} {familyName}");
     DataDefinition nameDef =
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
