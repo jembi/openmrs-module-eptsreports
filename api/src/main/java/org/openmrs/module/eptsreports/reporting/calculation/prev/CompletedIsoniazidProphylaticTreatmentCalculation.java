@@ -268,7 +268,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -7),
               onOrBefore,
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+              EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
               context);
 
       /** ------ who completed IPT treatment during the reporting period--- */
