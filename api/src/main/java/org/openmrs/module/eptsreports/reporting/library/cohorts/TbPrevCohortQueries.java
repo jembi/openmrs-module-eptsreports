@@ -82,7 +82,7 @@ public class TbPrevCohortQueries {
         "select distinct obs.person_id from obs "
             + "join encounter on encounter.encounter_id = obs.encounter_id "
             + "where obs.concept_id = %s and obs.voided = false "
-            + "  and obs.value_datetime between :onOrAfter and :onOrBefore "
+            + "  and obs.value_datetime >= :onOrAfter and obs.value_datetime < :onOrBefore "
             + "  and obs.location_id = :location and encounter.encounter_type in (%s) "
             + "  and encounter.voided = false ";
     cd.setQuery(String.format(query, treatmentStartConcept.getConceptId(), encounterTypesList));
@@ -198,10 +198,14 @@ public class TbPrevCohortQueries {
             getPatientWhoHaveRegimeTpt3HP(),
             "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
     definition.setCompositionString(
-        "started-by-end-previous-reporting-period  AND "
-            + "((started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid OR regime-tpt-INH)"
-            + " OR (outras-prescricoes-3hp OR regime-tpt-3hp OR regime-tpt-3hpOrPiridoxina) "
-            + " AND NOT (transferred-out AND NOT completed-isoniazid)) ");
+        "started-by-end-previous-reporting-period");
+
+    //     definition.setCompositionString(
+    // "started-by-end-previous-reporting-period  AND "
+    //     + "((started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid OR
+    // regime-tpt-INH)"
+    //     + " OR (outras-prescricoes-3hp OR regime-tpt-3hp OR regime-tpt-3hpOrPiridoxina) "
+    //     + " AND NOT (transferred-out AND NOT completed-isoniazid)) ");
 
     return definition;
   }
@@ -513,6 +517,18 @@ public class TbPrevCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”) and
+   * “Seguimento de tratamento TPT” = (‘Inicio’ or ‘Re-Inicio’) marked on Ficha de Levantamento de
+   * TPT (FILT) during the previous reporting period (INH Start Date) or
+   *
+   * <p>Encounter type = 60 RegimeTPT (Concept 23985) = Isoniazida (Concept 656) or Isoniazida +
+   * Piridoxina (Concept 23982) and Seguimento de tratamento TPT (concept ID 23987) =  “inicio” or
+   * “re-inicio”(concept ID in [1256, 1705]) and Encounter datetime(First3HPDate) >= startdate – 6
+   * months and <= enddate – 6 months
+   *
+   * @return
+   */
   public CohortDefinition getPatientWhoHaveRegimeTptINH() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -594,7 +610,7 @@ public class TbPrevCohortQueries {
             + "                        AND e.location_id = :location "
             + "                        AND e.encounter_type = ${60} "
             + "                        AND (o.concept_id = ${23985} AND o.value_coded IN (${656},${23982})) "
-            + "                        AND ((o2.concept_id =${23987} AND o2.value_coded IN (${1256})) OR o2.concept_id IS NULL) "
+            + "                        AND ((o2.concept_id =${23987} AND o2.value_coded IN (${1257})) OR o2.concept_id IS NULL) "
             + "                        AND e.encounter_datetime >= :onOrAfter "
             + "                        AND e.encounter_datetime <= :onOrBefore "
             + "                      GROUP BY p.patient_id "

@@ -268,7 +268,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               TimeQualifier.ANY,
               DateUtils.addMonths(onOrAfter, -7),
               onOrBefore,
-              EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
+              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
       /** ------ who completed IPT treatment during the reporting period--- */
@@ -889,26 +889,29 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
         Obs endDrugsObs =
             EptsCalculationUtils.obsResultForPatient(completedDrugsObservations, patientId);
 
-        List<Obs> obss =
-            Arrays.asList(
-                startProfilaxiaObs,
-                startDrugsObs,
-                anyIsoniazida != null && anyIsoniazida.size() > 0 ? anyIsoniazida.get(0) : null,
-                anyIsoniazida2 != null && anyIsoniazida2.size() > 0 ? anyIsoniazida2.get(0) : null,
-                this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs2, -7),
-                this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs3, -7),
-                this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs4, -7),
-                this.exclude(regimeTPT1stPickUpPreviousPeriod2, notInINHDateObs2, -7),
-                this.exclude(regimeTPT1stPickUpPreviousPeriod2, notInINHDateObs3, -7),
-                this.exclude(regimeTPT1stPickUpPreviousPeriod2, notInINHDateObs4, -7),
-                this.exclude(
-                    regimeTPT1stPickUpPreviousPeriod2,
-                    exclisionRegimeTPT1stPickUpPreviousPeriod,
-                    -7),
-                this.exclude(
-                    regimeTPT1stPickUpPreviousPeriod,
-                    exclisionRegimeTPT1stPickUpPreviousPeriod,
-                    -7));
+        List<Obs> obss = new ArrayList<>();
+        if ((regimeTPT1stPickUpPreviousPeriod != null && regimeTPT1stPickUpPreviousPeriod2 != null)) {
+          obss =
+                  Arrays.asList(
+                          startProfilaxiaObs,
+                          startDrugsObs,
+                          anyIsoniazida != null && anyIsoniazida.size() > 0 ? anyIsoniazida.get(0) : null,
+                          anyIsoniazida2 != null && anyIsoniazida2.size() > 0 ? anyIsoniazida2.get(0) : null,
+                          this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs2, -7),
+                          this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs3, -7),
+                          this.exclude(regimeTPT1stPickUpPreviousPeriod, notInINHDateObs4, -7),
+                          this.exclude(regimeTPT1stPickUpPreviousPeriod2, notInINHDateObs2, -7),
+                          this.exclude(regimeTPT1stPickUpPreviousPeriod2, notInINHDateObs3, -7),
+                          this.exclude(regimeTPT1stPickUpPreviousPeriod2, notInINHDateObs4, -7),
+                          this.exclude(
+                                  regimeTPT1stPickUpPreviousPeriod2,
+                                  exclisionRegimeTPT1stPickUpPreviousPeriod,
+                                  -7),
+                          this.exclude(
+                                  regimeTPT1stPickUpPreviousPeriod,
+                                  exclisionRegimeTPT1stPickUpPreviousPeriod,
+                                  -7));
+        }
 
         Date iptStartDate = getMinOrMaxObsDate(obss, Priority.MIN, true);
 
