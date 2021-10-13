@@ -169,8 +169,6 @@ public class TxCurrDataset extends BaseDataSet {
   }
 
   private List<ColumnParameters> getColumnsForAdults() {
-    ColumnParameters unknownM =
-        new ColumnParameters("unknownM", "Unknown age male", "gender=M|age=UK", "UNKM");
     ColumnParameters tenTo14M =
         new ColumnParameters("tenTo14M", "10 - 14 male", "gender=M|age=10-14", "M4");
     ColumnParameters fifteenTo19M =
@@ -190,8 +188,6 @@ public class TxCurrDataset extends BaseDataSet {
     ColumnParameters above50M =
         new ColumnParameters("above50M", "50+ male", "gender=M|age=50+", "M12");
 
-    ColumnParameters unknownF =
-        new ColumnParameters("unknownF", "Unknown age female", "gender=F|age=UK", "UNKF");
     ColumnParameters tenTo14F =
         new ColumnParameters("tenTo14F", "10 - 14 female", "gender=F|age=10-14", "F4");
     ColumnParameters fifteenTo19F =
@@ -213,7 +209,6 @@ public class TxCurrDataset extends BaseDataSet {
     ColumnParameters unknown = new ColumnParameters("unknown", "Unknown age", "age=UK", "UNK");
 
     return Arrays.asList(
-        unknownM,
         tenTo14M,
         fifteenTo19M,
         twentyTo24M,
@@ -223,7 +218,6 @@ public class TxCurrDataset extends BaseDataSet {
         foutyTo44M,
         fouty5To49M,
         above50M,
-        unknownF,
         tenTo14F,
         fifteenTo19F,
         twentyTo24F,
