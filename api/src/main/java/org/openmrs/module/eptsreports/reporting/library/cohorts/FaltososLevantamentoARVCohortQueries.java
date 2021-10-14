@@ -58,13 +58,17 @@ public class FaltososLevantamentoARVCohortQueries {
     addParameters(cd);
 
     CohortDefinition chdDenominator = getDenominator();
-    CohortDefinition chdMoreThan7Days = getPatientsWithMoreThan7DaysBetweenPickupDateAndLastNextScheduled();
+    CohortDefinition chdMoreThan7Days =
+        getPatientsWithMoreThan7DaysBetweenPickupDateAndLastNextScheduled();
 
     cd.addSearch(
-            "denominator",
-            EptsReportUtils.map(chdDenominator, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("moreThan7Days",
-            EptsReportUtils.map(chdMoreThan7Days, "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "denominator",
+        EptsReportUtils.map(
+            chdDenominator, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "moreThan7Days",
+        EptsReportUtils.map(
+            chdMoreThan7Days, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("denominator AND moreThan7Days");
 
@@ -101,7 +105,8 @@ public class FaltososLevantamentoARVCohortQueries {
   public CohortDefinition getB() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("E1- exclude all patients who are transferred OR E2- exclude all patients who died ");
+    cd.setName(
+        "E1- exclude all patients who are transferred OR E2- exclude all patients who died ");
     addParameters(cd);
 
     CohortDefinition chdRegisteredInProgramState =
@@ -132,7 +137,6 @@ public class FaltososLevantamentoARVCohortQueries {
     cd.setCompositionString("((E11 OR E12) AND (E13)) OR E20");
     return cd;
   }
-
 
   /**
    * <b>Technical Specs</b>
@@ -607,14 +611,20 @@ public class FaltososLevantamentoARVCohortQueries {
 
   /**
    * <b>Technical Specs</b>
+   *
    * <blockquote>
-   * <p>Select all patients from the A (Denominator) and filter</p>
+   *
+   * <p>Select all patients from the A (Denominator) and filter
+   *
    * <ul>
-   *   <li>All patients with more than 7 days between</li>
-   *   <li>The last pick up between Fila  (encounter type 18, encounter datetime) and Master card Levantou ARV
-   *   (encounter type 52,(concept_id 23866, value_datetime) ) by report enddate  as <b>data de levantamento</b> minus “Last Next Scheduled Pick Up” should be > 7 </li>
+   *   <li>All patients with more than 7 days between
+   *   <li>The last pick up between Fila (encounter type 18, encounter datetime) and Master card
+   *       Levantou ARV (encounter type 52,(concept_id 23866, value_datetime) ) by report enddate as
+   *       <b>data de levantamento</b> minus “Last Next Scheduled Pick Up” should be > 7
    * </ul>
+   *
    * </blockquote>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithMoreThan7DaysBetweenPickupDateAndLastNextScheduled() {
@@ -629,28 +639,26 @@ public class FaltososLevantamentoARVCohortQueries {
 
     String lastPickupBetweenFilaAndMasterCard =
         getPatientsAndLastPickupDateBetweenFilaAndMasterCard();
-    String query = 
-            " SELECT more_days.patient_id FROM( " +
-                    " " +
-                    "                SELECT schedule.patient_id,    MAX(recent_datetime) scheduled_date " +
-                    "                FROM( " +
-                                              mostRecentDataLevantamento +
-                    "                        UNION " +
-                                              mostRecentDateFromFila +
-                    "                    ) AS schedule " +
-                    "                GROUP BY " +
-                    "                schedule.patient_id " +
-                    "                 " +
-                    "                ) more_days " +
-                    "                 " +
-                    "                INNER JOIN ( " +
-                                              lastPickupBetweenFilaAndMasterCard +
-
-                    "                            ) last_pickup ON last_pickup.patient_id = more_days.patient_id " +
-                    "                WHERE TIMESTAMPDIFF(DAY ,more_days.scheduled_date, last_pickup.pickup_date) > 7 " +
-                    "                 " +
-                    "GROUP BY more_days.patient_id ";
-        
+    String query =
+        " SELECT more_days.patient_id FROM( "
+            + " "
+            + "                SELECT schedule.patient_id,    MAX(recent_datetime) scheduled_date "
+            + "                FROM( "
+            + mostRecentDataLevantamento
+            + "                        UNION "
+            + mostRecentDateFromFila
+            + "                    ) AS schedule "
+            + "                GROUP BY "
+            + "                schedule.patient_id "
+            + "                 "
+            + "                ) more_days "
+            + "                 "
+            + "                INNER JOIN ( "
+            + lastPickupBetweenFilaAndMasterCard
+            + "                            ) last_pickup ON last_pickup.patient_id = more_days.patient_id "
+            + "                WHERE TIMESTAMPDIFF(DAY ,more_days.scheduled_date, last_pickup.pickup_date) > 7 "
+            + "                 "
+            + "GROUP BY more_days.patient_id ";
 
     sqlCohortDefinition.setQuery(query);
     return sqlCohortDefinition;
