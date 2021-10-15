@@ -9,6 +9,7 @@ import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIn
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
+import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,9 @@ public class TxMlDataset25 extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
+    String keyPopMappings = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+    CohortDefinitionDimension keyPopsDimension = eptsCommonDimension.getKeyPopsDimension();
+    dsd.addDimension("keypop", EptsReportUtils.map(keyPopsDimension, keyPopMappings));
     // start building the datasets
     // get the column for the totals
     dsd.addColumn(
@@ -70,6 +74,57 @@ public class TxMlDataset25 extends BaseDataSet {
                     mappings)),
             mappings),
         getColumnsForAgeAndGender());
+    dsd.addColumn(
+        "PID",
+        "TX_ML: People who inject drugs",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "PID",
+                EptsReportUtils.map(
+                    txMlCohortQueries
+                        .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+                    mappings)),
+            mappings),
+        "keypop=PID");
+
+    dsd.addColumn(
+        "MSM",
+        "TX_ML: Men who have sex with men",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "MSM",
+                EptsReportUtils.map(
+                    txMlCohortQueries
+                        .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+                    mappings)),
+            mappings),
+        "keypop=MSM");
+
+    dsd.addColumn(
+        "CSW",
+        "TX_ML: Female sex workers",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CSW",
+                EptsReportUtils.map(
+                    txMlCohortQueries
+                        .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+                    mappings)),
+            mappings),
+        "keypop=CSW");
+
+    dsd.addColumn(
+        "PRI",
+        "TX_ML: People in prison and other closed settings",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "PRI",
+                EptsReportUtils.map(
+                    txMlCohortQueries
+                        .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+                    mappings)),
+            mappings),
+        "keypop=PRI");
     // Missed appointment and dead
     addRow(
         dsd,
