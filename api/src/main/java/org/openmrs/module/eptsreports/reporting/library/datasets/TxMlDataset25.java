@@ -9,7 +9,6 @@ import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIn
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
-import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -43,9 +42,6 @@ public class TxMlDataset25 extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
-    String keyPopMappings = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
-    CohortDefinitionDimension keyPopsDimension = eptsCommonDimension.getKeyPopsDimension();
-    dsd.addDimension("keypop", EptsReportUtils.map(keyPopsDimension, keyPopMappings));
     // start building the datasets
     // get the column for the totals
     dsd.addColumn(
@@ -73,58 +69,8 @@ public class TxMlDataset25 extends BaseDataSet {
                         .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
                     mappings)),
             mappings),
-        getColumnsForAgeAndGender());
-    dsd.addColumn(
-        "PID",
-        "TX_ML: People who inject drugs",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "PID",
-                EptsReportUtils.map(
-                    txMlCohortQueries
-                        .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
-                    mappings)),
-            mappings),
-        "keypop=PID");
+        getColumnsForAgeAndGenderAndKeyPop());
 
-    dsd.addColumn(
-        "MSM",
-        "TX_ML: Men who have sex with men",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MSM",
-                EptsReportUtils.map(
-                    txMlCohortQueries
-                        .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
-                    mappings)),
-            mappings),
-        "keypop=MSM");
-
-    dsd.addColumn(
-        "CSW",
-        "TX_ML: Female sex workers",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "CSW",
-                EptsReportUtils.map(
-                    txMlCohortQueries
-                        .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
-                    mappings)),
-            mappings),
-        "keypop=CSW");
-
-    dsd.addColumn(
-        "PRI",
-        "TX_ML: People in prison and other closed settings",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "PRI",
-                EptsReportUtils.map(
-                    txMlCohortQueries
-                        .getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
-                    mappings)),
-            mappings),
-        "keypop=PRI");
     // Missed appointment and dead
     addRow(
         dsd,
@@ -138,7 +84,7 @@ public class TxMlDataset25 extends BaseDataSet {
                         .getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
                     mappings)),
             mappings),
-        getColumnsForAgeAndGender());
+        getColumnsForAgeAndGenderAndKeyPop());
     // LTFU Less Than 90 days
     addRow(
         dsd,
@@ -150,7 +96,7 @@ public class TxMlDataset25 extends BaseDataSet {
                 EptsReportUtils.map(
                     txMlCohortQueries.getPatientsIITLessThan90DaysComposition(), mappings)),
             mappings),
-        getColumnsForAgeAndGender());
+        getColumnsForAgeAndGenderAndKeyPop());
     // Transferred Out
     addRow(
         dsd,
@@ -163,7 +109,7 @@ public class TxMlDataset25 extends BaseDataSet {
                     txMlCohortQueries.getPatientsWhoMissedNextAppointmentAndTransferredOut(),
                     mappings)),
             mappings),
-        getColumnsForAgeAndGender());
+        getColumnsForAgeAndGenderAndKeyPop());
     // Refused Or Stopped Treatment
     addRow(
         dsd,
@@ -177,7 +123,7 @@ public class TxMlDataset25 extends BaseDataSet {
                         .getPatientsWhoMissedNextAppointmentAndRefusedOrStoppedTreatment(),
                     mappings)),
             mappings),
-        getColumnsForAgeAndGender());
+        getColumnsForAgeAndGenderAndKeyPop());
     // LTFU More Than 90 days
     addRow(
         dsd,
@@ -189,7 +135,7 @@ public class TxMlDataset25 extends BaseDataSet {
                 EptsReportUtils.map(
                     txMlCohortQueries.getPatientsIITMoreThan90DaysComposition(), mappings)),
             mappings),
-        getColumnsForAgeAndGender());
+        getColumnsForAgeAndGenderAndKeyPop());
 
     return dsd;
   }
@@ -199,7 +145,7 @@ public class TxMlDataset25 extends BaseDataSet {
    *
    * @return
    */
-  private List<ColumnParameters> getColumnsForAgeAndGender() {
+  private List<ColumnParameters> getColumnsForAgeAndGenderAndKeyPop() {
     ColumnParameters under1M =
         new ColumnParameters("under1M", "under 1 year male", "gender=M|age=<1", "01");
     ColumnParameters oneTo4M =
@@ -257,6 +203,12 @@ public class TxMlDataset25 extends BaseDataSet {
     ColumnParameters total = new ColumnParameters("totals", "Totals", "", "27");
     ColumnParameters totalF = new ColumnParameters("totalF", "Total of Females", "gender=F", "29");
 
+    // Key population
+    ColumnParameters pid = new ColumnParameters("pid", "PID", "KP=PID", "30");
+    ColumnParameters msm = new ColumnParameters("msm", "MSM", "KP=MSM", "31");
+    ColumnParameters csw = new ColumnParameters("msm", "CSW", "KP=CSW", "32");
+    ColumnParameters pri = new ColumnParameters("pri", "PRI", "KP=PRI", "33");
+
     return Arrays.asList(
         under1M,
         oneTo4M,
@@ -286,6 +238,10 @@ public class TxMlDataset25 extends BaseDataSet {
         above50F,
         unknownF,
         total,
-        totalF);
+        totalF,
+        pid,
+        msm,
+        csw,
+        pri);
   }
 }
