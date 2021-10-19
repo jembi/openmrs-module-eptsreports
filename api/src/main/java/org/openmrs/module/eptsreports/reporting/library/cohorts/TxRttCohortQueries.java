@@ -58,13 +58,15 @@ public class TxRttCohortQueries {
       TxCurrCohortQueries txCurrCohortQueries,
       CommonCohortQueries commonCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
-      HivCohortQueries hivCohortQueries) {
+      HivCohortQueries hivCohortQueries,
+      CommonMetadata commonMetadata) {
     this.hivMetadata = hivMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
     this.commonCohortQueries = commonCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
+    this.commonMetadata = commonMetadata;
   }
 
   /**
