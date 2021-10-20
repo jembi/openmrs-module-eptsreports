@@ -31,8 +31,9 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Deprecated
+@Component
 public class SetupMERQuarterly25 extends EptsDataExportManager {
 
   private TxPvlsDataset txPvlsDataset;
@@ -91,12 +92,12 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "PEPFAR MER 2.5 Quarterly";
+    return "PEPFAR MER 2.6 Quarterly";
   }
 
   @Override
   public String getDescription() {
-    return "MER 2.5 Quarterly Report";
+    return "MER 2.6 Quarterly Report";
   }
 
   @Override
@@ -106,17 +107,20 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.setParameters(txPvlsDataset.getParameters());
-    rd.addDataSetDefinition("N", Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
+    //    rd.addDataSetDefinition("N",
+    // Mapped.mapStraightThrough(txNewDataset.constructTxNewDataset()));
     rd.addDataSetDefinition(
         "C", Mapped.mapStraightThrough(txCurrDataset.constructTxCurrDataset(true)));
-    rd.addDataSetDefinition("P", Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
-    rd.addDataSetDefinition(
-        "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
-    rd.addDataSetDefinition("R", Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
-    rd.addDataSetDefinition(
-        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
-    rd.addDataSetDefinition(
-        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
+    //    rd.addDataSetDefinition("P",
+    // Mapped.mapStraightThrough(txPvlsDataset.constructTxPvlsDatset()));
+    //    rd.addDataSetDefinition(
+    //        "TXML", Mapped.mapStraightThrough(txMlDataset25.constructtxMlDataset()));
+    //    rd.addDataSetDefinition("R",
+    // Mapped.mapStraightThrough(txRttDataset.constructTxRttDataset()));
+    //    rd.addDataSetDefinition(
+    //        "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
+    //    rd.addDataSetDefinition(
+    //        "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
 
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(
@@ -133,8 +137,8 @@ public class SetupMERQuarterly25 extends EptsDataExportManager {
       rd =
           createXlsReportDesign(
               reportDefinition,
-              "PEPFAR_MER_2.5_Quarterly_sheets.xls",
-              "PEPFAR MER 2.5 Quarterly Report",
+              "PEPFAR_MER_2.6_Quarterly.xls",
+              "PEPFAR MER 2.6 Quarterly Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();

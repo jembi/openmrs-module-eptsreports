@@ -7,7 +7,6 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTEligiblePatie
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTTotalListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -62,10 +61,6 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
-    rd.setBaseCohortDefinition(
-        EptsReportUtils.map(
-            tPTEligiblePatientListCohortQueries.getTxCurrWithoutTPT(),
-            "endDate=${endDate},location=${location}"));
 
     rd.addDataSetDefinition(
         "TOTAL",
@@ -91,12 +86,12 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "TPT_List_Patients_Eligibles_Report.xls",
+              "Template_List_Patients_Eligibles_TPT_v1.1.xls",
               "TPT List Patients Eligibles Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:4,dataset:TPT");
+      props.put("repeatingSections", "sheet:1,row:5,dataset:TPT");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
