@@ -124,16 +124,29 @@ public class TxMlDataset25 extends BaseDataSet {
                     mappings)),
             mappings),
         getColumnsForAgeAndGenderAndKeyPop());
-    // LTFU More Than 90 days
+    // LTFU More Than 180 days
     addRow(
         dsd,
         "M7",
-        "ITT More Than 90 days",
+        "ITT More Than 180 days",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "missed and ITT More Than 90 days",
+                "missed and ITT More Than 180 days",
                 EptsReportUtils.map(
-                    txMlCohortQueries.getPatientsIITMoreThan90DaysComposition(), mappings)),
+                    txMlCohortQueries.getPatientsIITMoreThan180DaysComposition(), mappings)),
+            mappings),
+        getColumnsForAgeAndGenderAndKeyPop());
+
+    addRow(
+        dsd,
+        "M8",
+        "IIT On Treatment for 3-5 months",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "missed and ITT for 3-5 months",
+                EptsReportUtils.map(
+                    txMlCohortQueries.getPatientsIITBetween90DaysAnd180DaysComposition(),
+                    mappings)),
             mappings),
         getColumnsForAgeAndGenderAndKeyPop());
 
