@@ -64,9 +64,9 @@ public class StartedArtOnLastClinicalContactCalculation extends AbstractPatientC
     if (periodFlag == 1) {
       return lessThan90DaysMap;
     } else if (periodFlag == 2) {
-      return moreThan180DaysMap;
-    } else if (periodFlag == 3) {
       return between90DaysAnd180DaysMap;
+    } else if (periodFlag == 3) {
+      return moreThan180DaysMap;
     } else {
       return null;
     }

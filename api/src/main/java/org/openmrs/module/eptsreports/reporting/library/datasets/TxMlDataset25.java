@@ -34,6 +34,7 @@ public class TxMlDataset25 extends BaseDataSet {
   public DataSetDefinition constructtxMlDataset() {
     CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mappingsKp = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
     dsd.setName("Tx_Ml Data Set");
     dsd.addParameters(getParameters());
     // tie dimensions to this data definition
@@ -42,6 +43,8 @@ public class TxMlDataset25 extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
+    dsd.addDimension(
+        "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), mappingsKp));
     // start building the datasets
     // get the column for the totals
     dsd.addColumn(

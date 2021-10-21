@@ -24,15 +24,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxMlCohortQueries {
 
-  @Autowired private HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
 
-  @Autowired private GenericCohortQueries genericCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
 
-  @Autowired private TxCurrCohortQueries txCurrCohortQueries;
+  private TxCurrCohortQueries txCurrCohortQueries;
 
-  @Autowired private HivCohortQueries hivCohortQueries;
+  private HivCohortQueries hivCohortQueries;
 
-  @Autowired private TxRttCohortQueries txRttCohortQueries;
+  private TxRttCohortQueries txRttCohortQueries;
+
+  @Autowired
+  public TxMlCohortQueries(
+      HivMetadata hivMetadata,
+      GenericCohortQueries genericCohortQueries,
+      TxCurrCohortQueries txCurrCohortQueries,
+      HivCohortQueries hivCohortQueries,
+      TxRttCohortQueries txRttCohortQueries) {
+    this.hivMetadata = hivMetadata;
+    this.genericCohortQueries = genericCohortQueries;
+    this.txCurrCohortQueries = txCurrCohortQueries;
+    this.hivCohortQueries = hivCohortQueries;
+    this.txRttCohortQueries = txRttCohortQueries;
+  }
 
   /**
    * <b>Description:</b> Patients started ART and missed Next Appointment or Next Drug Pickup (A and
