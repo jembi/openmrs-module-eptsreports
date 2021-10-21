@@ -326,7 +326,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertNotNull(evaluatedCohort.getMemberIds());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1014));
   }
 
   @Test
@@ -344,11 +344,11 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertNotNull(evaluatedCohort.getMemberIds());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1013));
   }
 
   @Test
-  public void getMQC4N1ShouldPass() throws EvaluationException {
+  public void getMQC4N1ShouldNotPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC4N1();
 
@@ -362,7 +362,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertNotNull(evaluatedCohort.getMemberIds());
+    assertFalse(evaluatedCohort.getMemberIds().contains(1050));
   }
 
   @Test
@@ -380,7 +380,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertNotNull(evaluatedCohort.getMemberIds());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1011));
   }
 
   @Test
@@ -398,7 +398,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertNotNull(evaluatedCohort.getMemberIds());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1011));
   }
 
   @Test
@@ -416,11 +416,11 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertNotNull(evaluatedCohort.getMemberIds());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1011));
   }
 
   @Test
-  public void getMQ6Num3ShouldPass() throws EvaluationException {
+  public void getMQ6Num3ShouldNotPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6NUM(3);
 
@@ -434,12 +434,12 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertNotNull(evaluatedCohort.getMemberIds());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1011, 1050)));
   }
 
   @Test
-  public void getMQ6Num4ShouldPass() throws EvaluationException {
-
+  public void getMQ6Num4ShouldNotPass() throws EvaluationException {
+    System.out.println();
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ6NUM(4);
 
     Map<Parameter, Object> parameters = new HashMap<>();
@@ -452,7 +452,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1012, 1014)));
   }
 
   @Test
@@ -511,7 +511,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  public void getMQ7B5ShouldPass() throws EvaluationException {
+  public void getMQ7B5ShouldNotPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ7B(5);
 
@@ -525,7 +525,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1012, 1013, 1014, 1017)));
   }
 
   @Test
@@ -567,7 +567,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  public void getMQ11DEN1ShouldPass() throws EvaluationException {
+  public void getMQ11DEN1ShouldNotPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition =
         qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFandGAdultss(
@@ -583,11 +583,11 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1012, 1014)));
   }
 
   @Test
-  public void getMQC11NUN6ShouldPass() throws EvaluationException {
+  public void getMQC11NUN6ShouldNotPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition =
         qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotIlessThan9Month(
@@ -603,7 +603,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1013, 1014, 1017)));
   }
 
   @Test
@@ -640,16 +640,10 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
     assertTrue(evaluatedCohort.getMemberIds().contains(1013));
-
-    Set<Integer> patients = evaluatedCohort.getMemberIds();
-    for (Integer i : patients) {
-      System.out.println(i);
-    }
-    System.out.println("size:=> " + patients.size());
   }
 
   @Test
-  public void getMQ12P2DENShouldPass() throws EvaluationException {
+  public void getMQ12P2DENShouldNotPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC12P2DEN(11);
 
@@ -663,7 +657,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().contains(1017));
   }
 
   @Test
@@ -759,7 +753,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  public void getMQ10NUMShouldPass() throws EvaluationException {
+  public void getMQ10NUMShouldNotPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQ10NUM(1);
 
@@ -773,7 +767,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1017)));
   }
 
   @Test
@@ -813,7 +807,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  public void getMQC4N2() throws EvaluationException {
+  public void getMQC4N2ShouldNotPass() throws EvaluationException {
 
     CohortDefinition cohortDefinition = qualityImprovement2020CohortQueries.getMQC4N2();
 
@@ -827,11 +821,11 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1012, 1013)));
   }
 
   @Test
-  public void getMQC11NumAnB3nCnotDnotEnotEnotFnG() throws EvaluationException {
+  public void getMQC11NumAnB3nCnotDnotEnotEnotFnGShouldNotPass() throws EvaluationException {
     CohortDefinition cohortDefinition =
         qualityImprovement2020CohortQueries.getMQC11NumAnB3nCnotDnotEnotEnotFnG(
             EptsReportConstants.MIMQ.MQ);
@@ -846,11 +840,11 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1012, 1014)));
   }
 
   @Test
-  public void getMQC11NumAnotCnotDnotEnotFnotGnChildren() throws EvaluationException {
+  public void getMQC11NumAnotCnotDnotEnotFnotGnChildrenShouldNotPass() throws EvaluationException {
     CohortDefinition cohortDefinition =
         qualityImprovement2020CohortQueries.getMQC11NumAnotCnotDnotEnotFnotGnChildren(
             EptsReportConstants.MIMQ.MQ);
@@ -865,7 +859,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().containsAll(Arrays.asList(1011, 1015)));
   }
 
   @Test
@@ -901,7 +895,6 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(1, evaluatedCohort.getMemberIds().size());
     assertTrue(evaluatedCohort.getMemberIds().contains(1018));
   }
 
@@ -1064,7 +1057,7 @@ public class QualityImprovement2020CohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohortDefinition, parameters);
 
-    assertEquals(0, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().contains(1019));
   }
 
   @Test

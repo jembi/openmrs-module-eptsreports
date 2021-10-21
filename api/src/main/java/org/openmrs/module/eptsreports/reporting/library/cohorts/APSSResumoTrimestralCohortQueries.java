@@ -596,6 +596,7 @@ public class APSSResumoTrimestralCohortQueries {
     map.put("24011", hivMetadata.getPatientReturnedAfterVisitConcept().getConceptId());
     map.put("24012", hivMetadata.getDatePatientReturnedAfterVisitConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT "
