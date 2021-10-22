@@ -1401,7 +1401,7 @@ public class TxMlCohortQueries {
    * combination:
    *
    * <ul>
-   *   <li>((A OR B) AND C2) AND NOT Dead AND NOT Transferred-Out AND NOT Refused
+   *   <li>((A OR B) AND C3) AND NOT Dead AND NOT Transferred-Out AND NOT Refused
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -1421,7 +1421,7 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "C2",
+        "C3",
         EptsReportUtils.map(
             getPatientsOnARTForLessOrMoreThan180Days(3),
             "onOrBefore=${endDate},location=${location}"));
@@ -1442,7 +1442,7 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(missedAppointment AND C2) AND NOT dead AND NOT transferredOut AND NOT refusedOrStopped");
+        "(missedAppointment AND C3) AND NOT dead AND NOT transferredOut AND NOT refusedOrStopped");
     return cd;
   }
 
@@ -1540,6 +1540,66 @@ public class TxMlCohortQueries {
 
     cd.setCompositionString(
         "(missedAppointment AND C2) AND NOT dead AND NOT transferredOut AND NOT refusedOrStopped");
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> “Interruption In Treatment Total” will have the following combination:
+   *
+   * <ul>
+   *   <li>(IIT<3month OR IITBetween3-5month OR IIT>6months)
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithIITComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Get All patients who are Lost To Follow Up Composition");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "missedAppointment",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "C1",
+        EptsReportUtils.map(
+            getPatientsOnARTForLessOrMoreThan180Days(1),
+            "onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "C2",
+        EptsReportUtils.map(
+            getPatientsOnARTForLessOrMoreThan180Days(2),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "C3",
+        EptsReportUtils.map(
+            getPatientsOnARTForLessOrMoreThan180Days(3),
+            "onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "dead",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "refusedOrStopped",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndRefusedOrStoppedTreatment(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(missedAppointment AND (C1 OR C2 OR C3)) AND NOT dead AND NOT transferredOut AND NOT refusedOrStopped");
     return cd;
   }
 }

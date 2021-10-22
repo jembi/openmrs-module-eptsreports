@@ -153,6 +153,16 @@ public class TxMlDataset25 extends BaseDataSet {
             mappings),
         getColumnsForAgeAndGenderAndKeyPop());
 
+    dsd.addColumn(
+        "M9",
+        "Total IIT",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "totals IIT",
+                EptsReportUtils.map(txMlCohortQueries.getPatientsWithIITComposition(), mappings)),
+            mappings),
+        "");
+
     return dsd;
   }
 
