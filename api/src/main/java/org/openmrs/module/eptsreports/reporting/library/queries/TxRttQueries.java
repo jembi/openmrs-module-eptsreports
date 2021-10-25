@@ -355,7 +355,7 @@ public class TxRttQueries {
     } else if (minDays != null && maxDays == null) {
       query +=
           "    WHERE  TIMESTAMPDIFF(day, B.final_earliest_date, query_a.final_encounter_date) >= ${minDays} ";
-    } else if (minDays != null && maxDays != null) {
+    } else {
       query +=
           "    WHERE  TIMESTAMPDIFF(day, B.final_earliest_date, query_a.final_encounter_date) >= ${minDays} "
               + " AND TIMESTAMPDIFF(day, B.final_earliest_date, query_a.final_encounter_date) < ${maxDays} ";
