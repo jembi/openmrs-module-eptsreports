@@ -596,7 +596,7 @@ public class TxRttCohortQueries {
     cd.addSearch(
         "AAB",
         EptsReportUtils.map(
-            getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(minDays, maxDays, 28),
+            getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(minDays, maxDays, -28),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
