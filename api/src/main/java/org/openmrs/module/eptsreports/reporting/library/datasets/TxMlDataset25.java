@@ -114,19 +114,19 @@ public class TxMlDataset25 extends BaseDataSet {
             mappings),
         getColumnsForAgeAndGenderAndKeyPop());
     // Refused Or Stopped Treatment
-    addRow(
-        dsd,
-        "M6",
-        "RefusedOrStoppedTreatment",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "missed and RefusedOrStoppedTreatment",
-                EptsReportUtils.map(
-                    txMlCohortQueries
-                        .getPatientsWhoMissedNextAppointmentAndRefusedOrStoppedTreatment(),
-                    mappings)),
-            mappings),
-        getColumnsForAgeAndGenderAndKeyPop());
+    //    addRow(
+    //        dsd,
+    //        "M6",
+    //        "RefusedOrStoppedTreatment",
+    //        EptsReportUtils.map(
+    //            eptsGeneralIndicator.getIndicator(
+    //                "missed and RefusedOrStoppedTreatment",
+    //                EptsReportUtils.map(
+    //                    txMlCohortQueries
+    //                        .getPatientsWhoMissedNextAppointmentAndRefusedOrStoppedTreatment(),
+    //                    mappings)),
+    //            mappings),
+    //        getColumnsForAgeAndGenderAndKeyPop());
     // LTFU More Than 180 days
     addRow(
         dsd,
