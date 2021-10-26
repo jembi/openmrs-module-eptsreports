@@ -82,7 +82,7 @@ public class TbPrevCohortQueries {
         "select distinct obs.person_id from obs "
             + "join encounter on encounter.encounter_id = obs.encounter_id "
             + "where obs.concept_id = %s and obs.voided = false "
-            + "  and obs.value_datetime between :onOrAfter and :onOrBefore "
+            + "  and obs.value_datetime >= :onOrAfter and obs.value_datetime < :onOrBefore "
             + "  and obs.location_id = :location and encounter.encounter_type in (%s) "
             + "  and encounter.voided = false ";
     cd.setQuery(String.format(query, treatmentStartConcept.getConceptId(), encounterTypesList));
@@ -101,12 +101,58 @@ public class TbPrevCohortQueries {
             genericCohortQueries.getStartedArtBeforeDate(false),
             "onOrBefore=${onOrBefore},location=${location}"));
     definition.addSearch(
+        "started-isoniazid",
+        EptsReportUtils.map(
+            getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+    definition.addSearch(
+        "initiated-profilaxia",
+        EptsReportUtils.map(
+            getPatientsThatInitiatedProfilaxia(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+    definition.addSearch(
+        "transferred-out",
+        EptsReportUtils.map(
+            getPatientsTransferredOut(),
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+    definition.addSearch(
         "completed-isoniazid",
         EptsReportUtils.map(
             getPatientsThatCompletedIsoniazidProphylacticTreatment(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    definition.addSearch(
+        "regime-tpt-isoniazid",
+        EptsReportUtils.map(
+            getPatientWhoHaveRegimeTptIsoniazid(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+    definition.addSearch(
+        "outras-prescricoes-3hp",
+        EptsReportUtils.map(
+            getPatientWhoHaveOutrasPrescricoes(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+    definition.addSearch(
+        "regime-tpt-3hp",
+        EptsReportUtils.map(
+            getPatientWhoHaveRegimeTpt3HPor3HP(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+    definition.addSearch(
+        "regime-tpt-INH",
+        EptsReportUtils.map(
+            getPatientWhoHaveRegimeTptINH(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+
+    definition.addSearch(
+        "regime-tpt-3hpOrPiridoxina",
+        EptsReportUtils.map(
+            getPatientWhoHaveRegimeTpt3HP(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+
     definition.setCompositionString(
-        "started-by-end-previous-reporting-period AND completed-isoniazid");
+        "started-by-end-previous-reporting-period AND completed-isoniazid  AND  "
+            + "((started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid OR regime-tpt-INH)"
+            + " OR (outras-prescricoes-3hp OR regime-tpt-3hp OR regime-tpt-3hpOrPiridoxina) "
+            + " ) ");
+
     return definition;
   }
 
@@ -174,25 +220,35 @@ public class TbPrevCohortQueries {
     definition.addSearch(
         "regime-tpt-isoniazid",
         EptsReportUtils.map(
-            getPatientsWhoHaveRegimeTPTWithINHMarkedOnFirstPickUpDateOnFILT(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+            getPatientWhoHaveRegimeTptIsoniazid(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "outras-prescricoes-3hp",
         EptsReportUtils.map(
-            getPatientsWhoHaveOutrasPrescricoesWith3HPMarkedOnFichaClinica(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+            getPatientWhoHaveOutrasPrescricoes(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "regime-tpt-3hp",
         EptsReportUtils.map(
-            getPatientsWhoHaveRegimeTPTWith3HPMarkedOnFirstPickUpDateOnFILT(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
+            getPatientWhoHaveRegimeTpt3HPor3HP(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+    definition.addSearch(
+        "regime-tpt-INH",
+        EptsReportUtils.map(
+            getPatientWhoHaveRegimeTptINH(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+
+    definition.addSearch(
+        "regime-tpt-3hpOrPiridoxina",
+        EptsReportUtils.map(
+            getPatientWhoHaveRegimeTpt3HP(),
+            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
+
     definition.setCompositionString(
-        "started-by-end-previous-reporting-period "
-            + " AND ("
-            + "            (started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid) "
-            + "         OR (outras-prescricoes-3hp OR regime-tpt-3hp) "
-            + "    AND NOT (transferred-out AND NOT completed-isoniazid)"
-            + "     ) ");
+        "started-by-end-previous-reporting-period  AND "
+            + "((started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid OR regime-tpt-INH)"
+            + " OR (outras-prescricoes-3hp OR regime-tpt-3hp OR regime-tpt-3hpOrPiridoxina) "
+            + " AND NOT (transferred-out AND NOT completed-isoniazid)) ");
 
     return definition;
   }
@@ -502,5 +558,361 @@ public class TbPrevCohortQueries {
             4));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”) and
+   * “Seguimento de tratamento TPT” = (‘Inicio’ or ‘Re-Inicio’) marked on Ficha de Levantamento de
+   * TPT (FILT) during the previous reporting period (INH Start Date) or
+   *
+   * <p>Encounter type = 60 RegimeTPT (Concept 23985) = Isoniazida (Concept 656) or Isoniazida +
+   * Piridoxina (Concept 23982) and Seguimento de tratamento TPT (concept ID 23987) =  “inicio” or
+   * “re-inicio”(concept ID in [1256, 1705]) and Encounter datetime(First3HPDate) >= startdate – 6
+   * months and <= enddate – 6 months
+   *
+   * @return
+   */
+  public CohortDefinition getPatientWhoHaveRegimeTptINH() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
+    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + "FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND o2.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${60} "
+            + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982})) "
+            + "  AND (o2.concept_id =${23987} AND o2.value_coded IN (${1256}, ${1705})) "
+            + "  AND e.encounter_datetime >= :onOrAfter AND encounter_datetime <= :onOrBefore ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    cd.setQuery(substitutor.replace(query));
+    return cd;
+  }
+
+  public CohortDefinition getPatientWhoHaveRegimeTptIsoniazid() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
+    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
+    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+
+    String query =
+        " SELECT DISTINCT p.patient_id "
+            + " FROM  patient p "
+            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "          INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date "
+            + "                      FROM    patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                      WHERE   p.voided = 0 "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.voided = 0 "
+            + "                        AND o2.voided = 0 "
+            + "                        AND e.location_id = :location "
+            + "                        AND e.encounter_type = ${60} "
+            + "                        AND (o.concept_id = ${23985} AND o.value_coded IN (${656},${23982})) "
+            + "                        AND ((o2.concept_id =${23987} AND o2.value_coded IN (${1257})) OR o2.concept_id IS NULL) "
+            + "                        AND e.encounter_datetime >= :onOrAfter "
+            + "                        AND e.encounter_datetime <= :onOrBefore "
+            + "                      GROUP BY p.patient_id "
+            + "                      UNION "
+            + "                      SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date "
+            + "                      FROM    patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                      WHERE   p.voided = 0 "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.voided = 0 "
+            + "                        AND o2.voided = 0 "
+            + "                        AND e.location_id = :location "
+            + "                        AND e.encounter_type = ${60} "
+            + "                        AND (o.concept_id = ${23985} AND o.value_coded IN (${656},${23982})) "
+            + "                        AND (o2.concept_id NOT IN (SELECT o.concept_id FROM encounter e "
+            + "                                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                                   WHERE e.patient_id = p.patient_id AND e.encounter_type = ${60} AND  o.concept_id = ${23987})) "
+            + "                        AND e.encounter_datetime >= :onOrAfter "
+            + "                        AND e.encounter_datetime <= :onOrBefore "
+            + "                      GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
+            + " WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND p.patient_id NOT IN ( SELECT pp.patient_id "
+            + "                            FROM patient pp "
+            + "                                JOIN encounter ee ON ee.patient_id = pp.patient_id "
+            + "                                JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "                            WHERE    pp.voided = 0 "
+            + "                              AND ee.voided = 0 "
+            + "                              AND oo.voided = 0 "
+            + "                              AND ee.location_id = :location "
+            + "                              AND ee.encounter_type = ${60} "
+            + "                              AND oo.concept_id = ${23985} "
+            + "                              AND oo.value_coded IN (${656},${23982}) "
+            + "                              AND ee.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 7  MONTH) "
+            + "                              AND ee.encounter_datetime < inh.first_pickup_date "
+            + "                            UNION "
+            + "                            SELECT pp.patient_id FROM patient pp "
+            + "                                JOIN encounter ee ON ee.patient_id = pp.patient_id "
+            + "                                JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "                            WHERE oo.voided = 0 AND ee.voided = 0 "
+            + "                              AND pp.voided = 0 AND ee.location_id = :location "
+            + "                              AND ((ee.encounter_type IN (${6},${9}) AND oo.concept_id =  ${6128} "
+            + "                              AND ee.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 7  MONTH) "
+            + "                              AND ee.encounter_datetime < inh.first_pickup_date)"
+            + "                               OR  (ee.encounter_type IN (${53})   AND oo.concept_id =  ${6128} "
+            + "                              AND oo.value_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 7  MONTH)"
+            + "                              AND oo.value_datetime < inh.first_pickup_date))"
+            + "                              UNION "
+            + "                            SELECT pp.patient_id FROM patient pp "
+            + "                                JOIN encounter ee ON ee.patient_id = pp.patient_id "
+            + "                                JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "                            WHERE ee.encounter_type =   ${6}   AND oo.concept_id = ${6122} "
+            + "                              AND oo.voided = 0 AND ee.voided = 0 "
+            + "                              AND pp.voided = 0 AND ee.location_id = :location "
+            + "                              AND oo.value_coded =   ${1256} "
+            + "                              AND ee.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 7  MONTH) "
+            + "                              AND ee.encounter_datetime < inh.first_pickup_date ) ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    cd.setQuery(substitutor.replace(query));
+    return cd;
+  }
+
+  public CohortDefinition getPatientWhoHaveOutrasPrescricoes() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
+    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
+    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+
+    String query =
+        " SELECT distinct p.patient_id   "
+            + "             FROM  patient p    "
+            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id    "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id    "
+            + "             INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date   "
+            + "                         FROM    patient p    "
+            + "                         INNER JOIN encounter e ON e.patient_id = p.patient_id   "
+            + "                         INNER JOIN obs o ON o.encounter_id = e.encounter_id    "
+            + "                         WHERE   p.voided = 0    "
+            + "                             AND e.voided = 0    "
+            + "                             AND o.voided = 0    "
+            + "                             AND e.location_id = :location   "
+            + "                             AND e.encounter_type = ${6}   "
+            + "                             AND o.concept_id = ${1719}   "
+            + "                             AND o.value_coded IN (${23954})   "
+            + "                             AND e.encounter_datetime >= :onOrAfter   "
+            + "                             AND e.encounter_datetime <= :onOrBefore   "
+            + "                         GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id   "
+            + "             WHERE p.voided = 0   "
+            + "                and e.voided = 0   "
+            + "                and o.voided = 0   "
+            + "                and p.patient_id NOT IN ( SELECT pp.patient_id    "
+            + "                                            FROM patient pp   "
+            + "                                                   JOIN encounter ee ON ee.patient_id = pp.patient_id "
+            + "                                                   JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "                                            WHERE    pp.voided = 0    "
+            + "                                                  AND ee.voided = 0    "
+            + "                                                  AND oo.voided = 0    "
+            + "                                                  AND ee.location_id = :location   "
+            + "                                                  AND ee.encounter_type = ${6}   "
+            + "                                                  AND oo.concept_id = ${1719}   "
+            + "                                                  AND oo.value_coded IN (${23954})   "
+            + "                                                  AND ee.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL  4 MONTH)    "
+            + "                                                  AND ee.encounter_datetime < inh.first_pickup_date "
+            + "                                               "
+            + "                                              UNION "
+            + "                                               "
+            + "                                            SELECT pp.patient_id "
+            + "                                                FROM patient pp "
+            + "                                                   JOIN encounter ee ON ee.patient_id = pp.patient_id "
+            + "                                                   JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "                                                WHERE    pp.voided = 0 "
+            + "                                                  AND ee.voided = 0 "
+            + "                                                  AND oo.voided = 0 "
+            + "                                                  AND ee.location_id = :location "
+            + "                                                  AND ee.encounter_type = ${60} "
+            + "                                                  AND oo.concept_id = ${23985} "
+            + "                                                  AND oo.value_coded IN (${23954},${23984}) "
+            + "                                                  AND ee.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL  4 MONTH)    "
+            + "                                                    AND ee.encounter_datetime < inh.first_pickup_date) ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    cd.setQuery(substitutor.replace(query));
+    return cd;
+  }
+
+  public CohortDefinition getPatientWhoHaveRegimeTpt3HP() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
+    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+    valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + " WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND o2.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${60} "
+            + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${23954}, ${23984})) "
+            + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256}, ${1705})) "
+            + "  AND e.encounter_datetime >= :onOrAfter AND encounter_datetime <= :onOrBefore ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    cd.setQuery(substitutor.replace(query));
+    return cd;
+  }
+
+  public CohortDefinition getPatientWhoHaveRegimeTpt3HPor3HP() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patient states based on end of reporting period");
+    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
+    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+
+    String query =
+        " SELECT DISTINCT p.patient_id "
+            + " FROM  patient p "
+            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "          INNER JOIN (SELECT  p.patient_id, MIN(e.encounter_datetime) first_pickup_date "
+            + "                      FROM    patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                      WHERE   p.voided = 0 "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.voided = 0 "
+            + "                        AND e.location_id = :location "
+            + "                        AND e.encounter_type = ${60} "
+            + "                        AND o.concept_id = ${23985} "
+            + "                        AND o.value_coded IN (${23954},${23984}) "
+            + "                        AND e.encounter_datetime >= :onOrAfter "
+            + "                        AND e.encounter_datetime <= :onOrBefore "
+            + "                      GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
+            + " WHERE p.voided = 0 "
+            + "  and e.voided = 0 "
+            + "  and o.voided = 0 "
+            + "  and p.patient_id NOT IN (SELECT pp.patient_id "
+            + "                           FROM patient pp "
+            + "                                 JOIN encounter ee ON ee.patient_id = pp.patient_id "
+            + "                                 JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "                           WHERE     pp.voided = 0 "
+            + "                             AND ee.voided = 0 "
+            + "                             AND oo.voided = 0 "
+            + "                             AND ee.location_id = :location "
+            + "                             AND ee.encounter_type = ${60} "
+            + "                             AND oo.concept_id = ${23985} "
+            + "                             AND oo.value_coded IN (${23954},${23984}) "
+            + "                             AND ee.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 4 MONTH) "
+            + "                             AND ee.encounter_datetime < inh.first_pickup_date "
+            + "                           UNION "
+            + "                           SELECT pp.patient_id "
+            + "                           FROM patient pp "
+            + "                                 JOIN encounter ee ON ee.patient_id = pp.patient_id "
+            + "                                 JOIN obs oo ON oo.encounter_id = ee.encounter_id "
+            + "                           WHERE     pp.voided = 0 "
+            + "                             AND ee.voided = 0 "
+            + "                             AND oo.voided = 0 "
+            + "                             AND ee.location_id = :location "
+            + "                             AND ee.encounter_type = ${6} "
+            + "                             AND oo.concept_id = ${1719} "
+            + "                             AND oo.value_coded IN (${23954}) "
+            + "                             AND ee.encounter_datetime >= DATE_SUB(inh.first_pickup_date, INTERVAL 4 MONTH) "
+            + "                             AND ee.encounter_datetime < inh.first_pickup_date) ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    cd.setQuery(substitutor.replace(query));
+    return cd;
   }
 }

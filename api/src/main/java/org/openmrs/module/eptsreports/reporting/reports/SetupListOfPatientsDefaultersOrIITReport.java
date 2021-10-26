@@ -1,16 +1,12 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsDefaultersOrIITTemplateDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TotalListOfPatientsDefaultersOrIITTemplateDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -22,7 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportManager {
 
-  @Autowired protected GenericCohortQueries genericCohortQueries;
+  @Autowired
+  protected ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
   @Autowired private ListOfPatientsDefaultersOrIITTemplateDataSet initListOfPatDefIITDataSet;
 
@@ -41,12 +38,12 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
 
   @Override
   public String getName() {
-    return "List of Patients Defaulters or IIT TEMPLATE";
+    return "List of Patients Defaulters or IIT ";
   }
 
   @Override
   public String getDescription() {
-    return "This report provides list of patients defaulters or IIT TEMPLATE";
+    return "This report provides list of patients defaulters or IIT ";
   }
 
   @Override
@@ -56,9 +53,6 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
-    rd.setBaseCohortDefinition(
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     rd.addDataSetDefinition(
         "FATS", Mapped.mapStraightThrough(iniTotalLListOfPatDefIITDataSet.constructDataSet()));
@@ -79,12 +73,12 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_List_Patients_Defaulters_IIT_TARV_v1.2.xls",
-              "Template List Patients Defaulters IIT TARV Report",
+              "Template_List_Patients_Defaulters_IIT_TARV_v1.3.1.xls",
+              "List Patients Defaulters IIT TARV Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:7,dataset:FATL");
+      props.put("repeatingSections", "sheet:1,row:8,dataset:FATL");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
@@ -97,8 +91,9 @@ public class SetupListOfPatientsDefaultersOrIITReport extends EptsDataExportMana
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("startDate", "Start date", Date.class),
         new Parameter("endDate", "End date", Date.class),
+        new Parameter("minDay", "Minimum number of days", Integer.class),
+        new Parameter("maxDay", "Maximum number of days", Integer.class),
         new Parameter("location", "Location", Location.class));
   }
 }

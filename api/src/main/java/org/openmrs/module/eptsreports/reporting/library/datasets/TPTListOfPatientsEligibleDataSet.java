@@ -41,8 +41,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
-  @Autowired private TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries;
-  @Autowired private HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
+  private TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries;
+
+  @Autowired
+  public TPTListOfPatientsEligibleDataSet(
+      HivMetadata hivMetadata,
+      TPTEligiblePatientListCohortQueries tPTEligiblePatientListCohortQueries) {
+    this.hivMetadata = hivMetadata;
+    this.tPTEligiblePatientListCohortQueries = tPTEligiblePatientListCohortQueries;
+  }
 
   public DataSetDefinition constructDataset() throws EvaluationException {
 
@@ -64,9 +72,13 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
 
+    pdd.addRowFilter(
+        tPTEligiblePatientListCohortQueries.getTxCurrWithoutTPT(),
+        "endDate=${endDate},location=${location}");
+
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
     pdd.addColumn("name", nameDef, "");
-    pdd.addColumn("nid", identifierDef, "");
+    pdd.addColumn("nid", this.getNID(identifierType.getPatientIdentifierTypeId()), "");
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
     pdd.addColumn("age", new AgeDataDefinition(), "", null);
     pdd.addColumn(
@@ -128,7 +140,25 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     return obsForPersonDataDefinition;
   }
 
-  private DataDefinition pregnantBreasfeediDefinition() {
+  private DataDefinition getNID(int identifierType) {
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    spdd.setName("NID");
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+
+    String sql =
+        " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
+            + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
+            + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
+            + identifierType;
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(sql));
+    return spdd;
+  }
+
+  public DataDefinition pregnantBreasfeediDefinition() {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("Nome da definition");
     spdd.addParameter(new Parameter("location", "location", Location.class));
@@ -152,7 +182,7 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
 
     String sql =
         "SELECT p.patient_id, CASE "
-            + "                       WHEN (pregnancy_date IS NULL AND breastfeeding_date IS NULL) THEN 'N/A' "
+            + "                       WHEN (pregnancy_date IS NULL AND breastfeeding_date IS NULL) THEN '' "
             + "                       WHEN pregnancy_date IS NOT NULL THEN 'Grávida' "
             + "                       WHEN breastfeeding_date IS NOT NULL THEN 'Lactante' "
             + "                       END AS pregnance_state"
