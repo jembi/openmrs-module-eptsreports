@@ -224,15 +224,14 @@ public class TxRttQueries {
       int artPickupConcept,
       int yesConcept,
       Integer minDays,
-      Integer maxDays,
-      Integer numDays) {
+      Integer maxDays) {
     String query =
         "SELECT  patient_id "
             + " FROM ( "
             + "         SELECT query_a.patient_id, final_encounter_date "
             + "         FROM ( "
             + "                  SELECT most_recent.patient_id, "
-            + "                         Date_add(Max(most_recent.value_datetime), interval ${numDays} day) final_encounter_date "
+            + "                         Max(most_recent.value_datetime) final_encounter_date "
             + "                  FROM (SELECT fila.patient_id, o.value_datetime "
             + "                        from ( "
             + "                                 SELECT pa.patient_id, "
@@ -351,14 +350,14 @@ public class TxRttQueries {
             + "    ON B.patient_id = query_a.patient_id ";
     if (minDays == null && maxDays != null) {
       query +=
-          "    WHERE  TIMESTAMPDIFF(day, B.final_earliest_date, query_a.final_encounter_date) < ${maxDays} ";
+          "    WHERE  TIMESTAMPDIFF(day, query_a.final_encounter_date, B.final_earliest_date) < ${maxDays} ";
     } else if (minDays != null && maxDays == null) {
       query +=
-          "    WHERE  TIMESTAMPDIFF(day, B.final_earliest_date, query_a.final_encounter_date) >= ${minDays} ";
+          "    WHERE  TIMESTAMPDIFF(day, query_a.final_encounter_date, B.final_earliest_date) >= ${minDays} ";
     } else {
       query +=
-          "    WHERE  TIMESTAMPDIFF(day, B.final_earliest_date, query_a.final_encounter_date) >= ${minDays} "
-              + " AND TIMESTAMPDIFF(day, B.final_earliest_date, query_a.final_encounter_date) < ${maxDays} ";
+          "    WHERE  TIMESTAMPDIFF(day, query_a.final_encounter_date, B.final_earliest_date) >= ${minDays} "
+              + " AND TIMESTAMPDIFF(day, query_a.final_encounter_date, B.final_earliest_date) < ${maxDays} ";
     }
     query += ") as final";
 
@@ -374,7 +373,6 @@ public class TxRttQueries {
     map.put("yesConcept", yesConcept);
     map.put("minDays", minDays);
     map.put("maxDays", maxDays);
-    map.put("numDays", numDays);
 
     StringSubstitutor sub = new StringSubstitutor(map);
     return sub.replace(query);

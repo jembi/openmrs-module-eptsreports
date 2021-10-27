@@ -506,7 +506,7 @@ public class TxRttCohortQueries {
   }
 
   public CohortDefinition getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(
-      Integer minDays, Integer maxDays, Integer numDays) {
+      Integer minDays, Integer maxDays) {
     SqlCohortDefinition definition = new SqlCohortDefinition();
 
     definition.setName("patientHavingLastScheduledDrugPickupDate");
@@ -523,8 +523,7 @@ public class TxRttCohortQueries {
             hivMetadata.getArtPickupConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             minDays,
-            maxDays,
-            numDays));
+            maxDays));
 
     definition.addParameter(new Parameter("startDate", "startDate", Date.class));
     definition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -596,7 +595,7 @@ public class TxRttCohortQueries {
     cd.addSearch(
         "AAB",
         EptsReportUtils.map(
-            getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(minDays, maxDays, 28),
+            getTreatmentInterruptionOfXDaysBeforeReturningToTreatment(minDays, maxDays),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
