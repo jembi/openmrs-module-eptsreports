@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +10,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -147,9 +148,8 @@ public class FaltososLevantamentoARVCohortQueries {
    * Scheduled Pick Up</b>
    *
    * <ul>
-   *   <li>the “Data do próximo levantamento” (concept id 5096, value_datetime) from the most recent
-   *       FILA (encounter type 18) by report start date(encounter_datetime <= startDate) and the
-   *       “Data do próximo levantamento” between startdate and enddate
+   *   <li>The “Data do próximo levantamento” (concept id 5096, value_datetime) from the most recent
+   *       FILA (encounter type 18) by report start date(last encounter_datetime < startDate)
    * </ul>
    *
    * </blockquote>
@@ -157,33 +157,35 @@ public class FaltososLevantamentoARVCohortQueries {
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithProximoLevantamentoOnFila() {
-    return listOfPatientsEligibleForVLCohortQueries.getLastNextScheduledPickUpDate();
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Demoninator - Data do próximo levantamento");
+    addSqlCohortDefinitionParameters(sqlCohortDefinition);
+
+    String query = getPatientsWithProximoLevantamentoOnFila(false);
+
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
   }
 
   /**
    * <b>Technical Specs</b>
-   *
    * <blockquote>
-   *
    * <p>Select all patients with the most recent date from the following sources as <b>Last Next
    * Scheduled Pick Up</b>
-   *
    * <ul>
-   *   <li>the most recent “Data de Levantamento” (concept_id 23866, value_datetime) + 30 days, from
+   *   <li>the most recent “Data de Levantamento” (concept_id 23866, value_datetime < startDate) + 30 days, from
    *       “Recepcao Levantou ARV” (encounter type 52) with concept “Levantou ARV” (concept_id
    *       23865) set to “SIM” (Concept id 1065) by report start date (value_datetime <= startDate)
    * </ul>
-   *
    * </blockquote>
-   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithMostRecentDataDeLevantamentoPlus30Days() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Demoninator - Most recent ARV pickup");
+    sqlCohortDefinition.setName("Demoninator - Most recent ARV pick up");
     addSqlCohortDefinitionParameters(sqlCohortDefinition);
-    ;
 
     String sql = getPatientsWithMostRecentDataDeLevantamentoPlus30Days(false);
     sqlCohortDefinition.setQuery(sql);
@@ -208,16 +210,12 @@ public class FaltososLevantamentoARVCohortQueries {
   public CohortDefinition getPatientsTransferredOutRegisteredInProgramState() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Demoninator - Most recent ARV pickup");
+    sqlCohortDefinition.setName("Exlusions  - E1.1 Trasfered out state in program");
     addSqlCohortDefinitionParameters(sqlCohortDefinition);
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
-    valuesMap.put(
-        "7",
-        hivMetadata
-            .getTransferredOutToAnotherHealthFacilityWorkflowState()
-            .getProgramWorkflowStateId());
+    valuesMap.put("7",hivMetadata.getTransferredOutToAnotherHealthFacilityWorkflowState().getProgramWorkflowStateId());
 
     String query =
         " SELECT patient_id "
@@ -755,27 +753,21 @@ public class FaltososLevantamentoARVCohortQueries {
     valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String fromSQL =
-        " FROM "
-            + "    patient p "
-            + "INNER JOIN encounter e ON "
-            + "    e.patient_id = p.patient_id "
-            + "INNER JOIN obs oyes ON "
-            + "    oyes.encounter_id = e.encounter_id "
-            + "INNER JOIN obs ovalue ON "
-            + "    ovalue.encounter_id = e.encounter_id "
-            + "WHERE "
-            + "    e.encounter_type = ${52} "
+        " FROM patient p "
+            + "INNER JOIN encounter e ON  e.patient_id = p.patient_id "
+            + "INNER JOIN obs oyes ON oyes.encounter_id = e.encounter_id "
+            + "INNER JOIN obs ovalue ON ovalue.encounter_id = e.encounter_id "
+            + "WHERE e.encounter_type = ${52} "
             + "    AND e.location_id = :location "
             + "    AND ovalue.concept_id = ${23866} "
-            + "    AND ovalue.value_datetime <= :startDate "
+            + "    AND ovalue.value_datetime < :startDate "
             + "    AND oyes.concept_id = ${23865} "
             + "    AND oyes.value_coded = ${1065} "
             + "    AND p.voided = 0 "
             + "    AND e.voided = 0 "
             + "    AND oyes.voided = 0 "
             + "    AND ovalue.voided = 0 "
-            + "GROUP BY "
-            + "    patient_id ";
+            + "GROUP BY patient_id ";
     String query =
         selectDatetime
             ? "SELECT p.patient_id, MAX(DATE_ADD(ovalue.value_datetime, INTERVAL 30 DAY)) recent_datetime "
@@ -826,6 +818,45 @@ public class FaltososLevantamentoARVCohortQueries {
             + "GROUP  BY last_pickup.patient_id  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+    return stringSubstitutor.replace(query);
+  }
+
+  private String getPatientsWithProximoLevantamentoOnFila(boolean selectDatetime) {
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    String fromSQL =
+        " FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
+            + "			SELECT p.patient_id, MAX(e.encounter_datetime) encounter_date "
+            + "			FROM patient p "
+            + "			INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "			WHERE e.encounter_type = ${18} "
+            + "			AND e.encounter_datetime < :startDate "
+            + "			AND e.location_id = :location "
+            + "			AND e.voided = 0 "
+            + "			AND p.voided = 0 "
+            + "			GROUP BY p.patient_id "
+            + ") most_recent ON most_recent.patient_id = p.patient_id "
+            + "WHERE most_recent.encounter_date = e.encounter_datetime "
+            + "AND e.encounter_type= ${18} "
+            + "AND e.encounter_datetime < :startDate "
+            + "AND e.location_id = :location "
+            + "AND e.voided = 0 "
+            + "AND p.voided = 0 "
+            + "AND o.voided = 0 "
+            + "AND o.concept_id = ${5096} "
+            + "GROUP BY p.patient_id ";
+
+    String query =
+        selectDatetime
+            ? "SELECT p.patient_id, o.value_datetime ".concat(fromSQL)
+            : "SELECT p.patient_id ".concat(fromSQL);
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
     return stringSubstitutor.replace(query);
   }
 
