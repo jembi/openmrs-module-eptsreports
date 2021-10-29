@@ -1226,7 +1226,6 @@ public class TxCurrCohortQueries {
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     cd.setQuery(sub.replace(sqlQuery));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     return cd;
   }
@@ -1247,6 +1246,8 @@ public class TxCurrCohortQueries {
       "Patients marked as DT on Ficha Clinica Mastercard on last Tipo de Levantamento")
   public SqlCohortDefinition getPatientsWithQuarterlyTypeOfDispensation() {
     SqlCohortDefinition patientsWithQuarterlyTypeOfDispensation = new SqlCohortDefinition();
+    patientsWithQuarterlyTypeOfDispensation.setName(
+        "Patients marked as (DT) Quartely Dispensation");
     String sqlQuery =
         "SELECT    p.patient_id                  FROM            "
             + "                                    (SELECT                     "
