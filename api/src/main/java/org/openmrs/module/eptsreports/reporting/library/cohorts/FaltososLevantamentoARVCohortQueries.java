@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +10,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -395,69 +396,18 @@ public class FaltososLevantamentoARVCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
   }
-  /**
-   * <b>Technical Specs</b>
-   *
-   * <blockquote>
-   *
-   * <p>E3- exclude all patients who stopped/suspended treatment by end of the reporting period
-   *
-   * <ul>
-   *   <li>3.1 - All suspended registered in Patient Program State by reporting end date
-   * </ul>
-   *
-   * </blockquote>
-   *
-   * @return {@link CohortDefinition}
-   */
-
-  public CohortDefinition getPatientsWhoSuspensionsAreRegisteredInProgramState() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("3.1 - All suspended registered in Patient Program State");
-    addSqlCohortDefinitionParameters(sqlCohortDefinition);
-
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
-    valuesMap.put(
-        "8", hivMetadata.getArtSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
-
-    String query =
-        " SELECT p.patient_id FROM   patient p "
-            + "               INNER JOIN patient_program pg ON pg.patient_id = p.patient_id "
-            + "               INNER JOIN patient_state ps ON ps.patient_program_id = pg.patient_program_id "
-            + "        WHERE  pg.program_id = ${2} "
-            + "               AND pg.location_id = :location "
-            + "               AND ps.state = ${8} "
-            + "               AND ps.start_date <= :endDate "
-            + "               AND ps.end_date IS NULL "
-            + "               AND p.voided = 0 "
-            + "               AND pg.voided = 0 "
-            + "               AND ps.voided = 0 "
-            + "        GROUP  BY p.patient_id ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-    return sqlCohortDefinition;
-  }
 
   /**
    * <b>Technical Specs</b>
-   *
    * <blockquote>
-   *
    * <p>Select all patients from the A (Denominator) and filter
-   *
    * <ul>
    *   <li>All patients with more than 7 days between
    *   <li>The last pick up between Fila (encounter type 18, encounter datetime) and Master card
    *       Levantou ARV (encounter type 52,(concept_id 23866, value_datetime) ) by report enddate as
    *       <b>data de levantamento</b> minus “Last Next Scheduled Pick Up” should be > 7
    * </ul>
-   *
    * </blockquote>
-   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithMoreThan7DaysBetweenPickupDateAndLastNextScheduled() {
@@ -498,17 +448,20 @@ public class FaltososLevantamentoARVCohortQueries {
   }
 
   /**
-   * <b>2.5</b> - Exclude all patients who after the most recent date from 2.1 to 2.4, have a drugs
+   *<p> <b>2.5</b> - Exclude all patients who after the most recent date from 2.1 to 2.4, have a drugs
    * pick up or consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most recent
    * date OR Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) >
-   * the most recent date.
+   * the most recent date.</p>
+   *  *<p> <b>3.3</b> - 3.3 - Except all patients who after the most recent date from 3.1 to 3.2, have a drugs pick up or consultation:
+   * Encounter Type ID= 6, 9, 18 and encounter_datetime> the most recent date and <= Report EndDate
+   * OR Encounter Type ID = 52 and “Data de Levantamento” (Concept Id 23866 value_datetime) > the most recent date and <= Report EndDate</p>
    *
    * @return
    */
   public CohortDefinition getPatientsWhoDiedOrSuspendedTratmentE2AndE3() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" All patients that started ART during inclusion period ");
+    sqlCohortDefinition.setName("E2 and E3 - Patients who died or stopped/suspended treatment ");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "EndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -520,10 +473,10 @@ public class FaltososLevantamentoARVCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
-    String deathDayInProgramState = getPatientsDeathDayRegisteredInProgramState();
+    String deathDayInProgramState = getPatientsDeathDayOrTreatmentSuspensionRegisteredInProgramState();
     String deathsRegisteredInDemographics = getPatientsDeathsRegisteredInDemographics();
-    String deathRegisteredInFichaClinica = getPatientsAndDeathDayRegisteredInFichaClinica();
-    String deathRegisteredInFichaResumo = getPatientsAndDeathDayRegisteredInFichaResumo();
+    String deathRegisteredInFichaClinica = getPatientsAndDeathDayOrTreatmentSuspensionRegisteredInFichaClinica();
+    String deathRegisteredInFichaResumo = getPatientsAndDeathDayOrTreatmentSuspensionRegisteredInFichaResumo();
     String deathDayRegisteredInLastHomeVisit =
         getPatientsAndDeathsDayRegisteredInLastHomeVisitCard();
 
@@ -544,33 +497,26 @@ public class FaltososLevantamentoARVCohortQueries {
             + "        GROUP  BY transferout.patient_id) max_transferout "
             + " WHERE  max_transferout.patient_id NOT IN (SELECT p.patient_id "
             + "                                          FROM   patient p "
-            + "                                                     JOIN encounter e "
-            + "                                                          ON p.patient_id = "
-            + "                                                             e.patient_id "
+            + "                                          JOIN encounter e ON p.patient_id = e.patient_id "
             + "                                          WHERE  p.voided = 0 "
             + "                                            AND e.voided = 0 "
             + "                                            AND e.encounter_type IN (${6},${9},${18})  "
             + "                                            AND e.location_id = :location "
-            + "                                            AND "
-            + "                                                  e.encounter_datetime > max_transferout.transferout_date AND max_transferout.patient_id = p.patient_id "
-            + "                                            AND "
-            + "                                                  e.encounter_datetime <= :endDate "
+            + "                                            AND e.encounter_datetime > max_transferout.transferout_date " +
+                "                                          AND max_transferout.patient_id = p.patient_id "
+            + "                                            AND e.encounter_datetime <= :endDate "
             + "                                          UNION "
             + "                                          SELECT p.patient_id "
             + "                                          FROM   patient p "
-            + "                                                     JOIN encounter e "
-            + "                                                          ON p.patient_id = "
-            + "                                                             e.patient_id "
-            + "                                                     JOIN obs o "
-            + "                                                          ON e.encounter_id = "
-            + "                                                             o.encounter_id "
+            + "                                          JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                          JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                                          WHERE  p.voided = 0"
             + "                                            AND e.voided = 0 "
             + "                                            AND e.encounter_type =  ${52} "
             + "                                            AND e.location_id = :location "
             + "                                            AND o.concept_id =  ${23866} "
             + "                                            AND o.value_datetime > max_transferout.transferout_date AND max_transferout.patient_id = p.patient_id"
-            + "                                            AND o.value_datetime <= :endDate); ";
+            + "                                            AND o.value_datetime <= :endDate) GROUP BY patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -596,19 +542,24 @@ public class FaltososLevantamentoARVCohortQueries {
    *
    * @return {@link String}
    */
-  public String getPatientsDeathDayRegisteredInProgramState() {
+  public String getPatientsDeathDayOrTreatmentSuspensionRegisteredInProgramState() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
     valuesMap.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
+    valuesMap.put("8", hivMetadata. getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
 
     String query =
-        "   SELECT pg.patient_id, (ps.start_date) AS transferout_date FROM patient p "
+        "   SELECT pg.patient_id, MAX(ps.start_date) AS transferout_date " +
+                "FROM patient p "
             + "   INNER JOIN patient_program pg ON p.patient_id=pg.patient_id "
             + "   INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id "
             + "   WHERE pg.voided=0 AND ps.voided=0 AND p.voided=0 "
-            + "   AND pg.program_id=${2} AND ps.state=${10} AND ps.end_date is null "
-            + "   AND ps.start_date <= :endDate AND location_id=:location ";
+            + "   AND pg.program_id=${2} AND ps.state IN (${10}, ${8})"
+                + " AND ps.end_date is null "
+            + "   AND ps.start_date <= :endDate " +
+                "AND location_id=:location " +
+                "GROUP BY pg.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -617,18 +568,13 @@ public class FaltososLevantamentoARVCohortQueries {
 
   /**
    * <b>Technical Specs</b>
-   *
    * <blockquote>
-   *
    * <p>All deaths registered in Patient Program State by reporting end date
-   *
    * <ul>
    *   <li>Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 10
    *       (Died) patient_State.start_date <= Report End Date Patient_state.end_date is null
    * </ul>
-   *
    * </blockquote>
-   *
    * @return {@link String}
    */
   public String getPatientsDeathsRegisteredInDemographics() {
@@ -636,7 +582,7 @@ public class FaltososLevantamentoARVCohortQueries {
     Map<String, Integer> valuesMap = new HashMap<>();
 
     String query =
-        "        SELECT p.person_id, (ps.start_date) AS transferout_date   "
+        "        SELECT p.person_id, ps.start_date AS transferout_date   "
             + "     FROM person p  "
             + "     INNER JOIN patient_program pg ON p.person_id=pg.patient_id "
             + "     INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id "
@@ -651,29 +597,26 @@ public class FaltososLevantamentoARVCohortQueries {
 
   /**
    * <b>Technical Specs</b>
-   *
    * <blockquote>
-   *
    * <p>All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end date
-   *
    * <ul>
-   *   <li>OR Encounter Type ID= 53 Estado de Permanencia (Concept Id 6272) = Dead (Concept ID 1366)
-   *       obs_datetime <= Report EndDate
+   *   <li>2.4 OR Encounter Type ID= 53 Estado de Permanencia (Concept Id 6272) = Dead (Concept ID 1366)
+   *       obs_datetime <= Report EndDate</li>
+   *       <li>3.2 - All suspensions registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end date</li>
    * </ul>
-   *
    * </blockquote>
-   *
    * @return {@link String}
    */
-  public String getPatientsAndDeathDayRegisteredInFichaResumo() {
+  public String getPatientsAndDeathDayOrTreatmentSuspensionRegisteredInFichaResumo() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     valuesMap.put("6272", hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId());
     valuesMap.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    valuesMap.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
 
     String query =
-        "                SELECT  p.patient_id, (e.encounter_datetime) AS transferout_date "
+        "                SELECT  p.patient_id, MAX(e.encounter_datetime) AS transferout_date "
             + "                FROM patient p "
             + "                         INNER JOIN encounter e "
             + "                                    ON e.patient_id=p.patient_id "
@@ -682,7 +625,7 @@ public class FaltososLevantamentoARVCohortQueries {
             + "                WHERE e.encounter_type =  ${53} "
             + "                  AND o.obs_datetime <= :endDate "
             + "                  AND o.concept_id =  ${6272} "
-            + "                  AND o.value_coded= ${1366} "
+            + "                  AND o.value_coded IN (${1366}, ${1709}) "
             + "                  AND e.location_id = :location "
             + "                  AND p.voided=0 "
             + "                  AND e.voided=0 "
@@ -702,23 +645,26 @@ public class FaltososLevantamentoARVCohortQueries {
    * <p>All deaths registered in Ficha Resumo and Ficha Clinica of Master Card by reporting end date
    *
    * <ul>
-   *   <li>OR Encounter Type ID= 53 Estado de Permanencia (Concept Id 6272) = Dead (Concept ID 1366)
-   *       obs_datetime <= Report EndDate
+   *   <li>OR Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) = Dead (Concept ID 1366)
+   *       encounter_datetime <= Report EndDate</li>
+   *       <li>3.2 Encounter Type ID= 6 Estado de Permanencia (Concept Id 6273) =  Suspended (Concept ID 1709)
+   *        Encounter_datetime <= Report EndDate</li>
    * </ul>
    *
    * </blockquote>
    *
    * @return {@link String}
    */
-  public String getPatientsAndDeathDayRegisteredInFichaClinica() {
+  public String getPatientsAndDeathDayOrTreatmentSuspensionRegisteredInFichaClinica() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     valuesMap.put("1366", hivMetadata.getPatientHasDiedConcept().getConceptId());
+    valuesMap.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
 
     String query =
-        "                SELECT  p.patient_id , (e.encounter_datetime) AS transferout_date "
+        "                SELECT  p.patient_id , MAX(e.encounter_datetime) AS transferout_date "
             + "                FROM patient p "
             + "                         INNER JOIN encounter e "
             + "                                    ON e.patient_id=p.patient_id "
@@ -727,7 +673,7 @@ public class FaltososLevantamentoARVCohortQueries {
             + "                WHERE e.encounter_type =  ${6} "
             + "                  AND e.encounter_datetime <= :endDate "
             + "                  AND o.concept_id =  ${6273} "
-            + "                  AND o.value_coded= ${1366} "
+            + "                  AND o.value_coded IN (${1366}, ${1709}) "
             + "                  AND e.location_id = :location "
             + "                  AND p.voided= 0 "
             + "                  AND e.voided= 0 "
