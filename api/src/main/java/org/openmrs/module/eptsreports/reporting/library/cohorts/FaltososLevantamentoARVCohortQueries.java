@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -10,10 +13,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -115,7 +114,7 @@ public class FaltososLevantamentoARVCohortQueries {
     CohortDefinition chdRegisteredInFichaResumoAndClinica =
         getPatientsTransferredOutRegisteredInFichaResumoAndMasterCard();
     CohortDefinition chdWhoHaveDrugsPickUp = getPatientsWhoHaveDrugsPickUpOrConsultation();
-    CohortDefinition chdWhoDied = getPatientsWhoDiedE2();
+    CohortDefinition chdWhoDied = getPatientsWhoDiedOrSuspendedTratmentE2AndE3();
 
     cd.addSearch(
         "E11",
@@ -170,15 +169,21 @@ public class FaltososLevantamentoARVCohortQueries {
 
   /**
    * <b>Technical Specs</b>
+   *
    * <blockquote>
+   *
    * <p>Select all patients with the most recent date from the following sources as <b>Last Next
    * Scheduled Pick Up</b>
+   *
    * <ul>
-   *   <li>the most recent “Data de Levantamento” (concept_id 23866, value_datetime < startDate) + 30 days, from
-   *       “Recepcao Levantou ARV” (encounter type 52) with concept “Levantou ARV” (concept_id
-   *       23865) set to “SIM” (Concept id 1065) by report start date (value_datetime <= startDate)
+   *   <li>the most recent “Data de Levantamento” (concept_id 23866, value_datetime < startDate) +
+   *       30 days, from “Recepcao Levantou ARV” (encounter type 52) with concept “Levantou ARV”
+   *       (concept_id 23865) set to “SIM” (Concept id 1065) by report start date (value_datetime <=
+   *       startDate)
    * </ul>
+   *
    * </blockquote>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithMostRecentDataDeLevantamentoPlus30Days() {
@@ -215,7 +220,11 @@ public class FaltososLevantamentoARVCohortQueries {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
-    valuesMap.put("7",hivMetadata.getTransferredOutToAnotherHealthFacilityWorkflowState().getProgramWorkflowStateId());
+    valuesMap.put(
+        "7",
+        hivMetadata
+            .getTransferredOutToAnotherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
 
     String query =
         " SELECT patient_id "
@@ -386,6 +395,52 @@ public class FaltososLevantamentoARVCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
   }
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>E3- exclude all patients who stopped/suspended treatment by end of the reporting period
+   *
+   * <ul>
+   *   <li>3.1 - All suspended registered in Patient Program State by reporting end date
+   * </ul>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+
+  public CohortDefinition getPatientsWhoSuspensionsAreRegisteredInProgramState() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("3.1 - All suspended registered in Patient Program State");
+    addSqlCohortDefinitionParameters(sqlCohortDefinition);
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
+    valuesMap.put(
+        "8", hivMetadata.getArtSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
+
+    String query =
+        " SELECT p.patient_id FROM   patient p "
+            + "               INNER JOIN patient_program pg ON pg.patient_id = p.patient_id "
+            + "               INNER JOIN patient_state ps ON ps.patient_program_id = pg.patient_program_id "
+            + "        WHERE  pg.program_id = ${2} "
+            + "               AND pg.location_id = :location "
+            + "               AND ps.state = ${8} "
+            + "               AND ps.start_date <= :endDate "
+            + "               AND ps.end_date IS NULL "
+            + "               AND p.voided = 0 "
+            + "               AND pg.voided = 0 "
+            + "               AND ps.voided = 0 "
+            + "        GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }
 
   /**
    * <b>Technical Specs</b>
@@ -450,7 +505,7 @@ public class FaltososLevantamentoARVCohortQueries {
    *
    * @return
    */
-  public CohortDefinition getPatientsWhoDiedE2() {
+  public CohortDefinition getPatientsWhoDiedOrSuspendedTratmentE2AndE3() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" All patients that started ART during inclusion period ");
@@ -532,8 +587,9 @@ public class FaltososLevantamentoARVCohortQueries {
    * <p>All deaths registered in Patient Program State by reporting end date
    *
    * <ul>
-   *   <li>Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 10
+   *   <li>2.1 Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 10
    *       (Died) patient_State.start_date <= Report End Date Patient_state.end_date is null
+   *   <li>3.1 - All suspended registered in Patient Program State by reporting end date
    * </ul>
    *
    * </blockquote>
