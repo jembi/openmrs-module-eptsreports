@@ -59,8 +59,8 @@ public class FaltososLevantamentoARVCohortQueries {
     addParameters(cd);
 
     CohortDefinition chdDenominator = getDenominator();
-    CohortDefinition chdMoreThan7Days =
-        getPatientsWithMoreThan7DaysBetweenPickupDateAndLastNextScheduled();
+    CohortDefinition chdMoreThan7Days = getPatientsWithMoreThan7DaysBetweenPickupDateAndLastNextScheduled();
+    CohortDefinition chWithoutPickup = getPatientsWithoutAnyDrugPickupAfterLastPlus7Days();
 
     cd.addSearch(
         "denominator",
@@ -69,9 +69,11 @@ public class FaltososLevantamentoARVCohortQueries {
     cd.addSearch(
         "moreThan7Days",
         EptsReportUtils.map(
-            chdMoreThan7Days, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            chdMoreThan7Days, "startDate=${startDate},endDate=${endDate},location=${location}"));    cd.addSearch(
+        "withoutPickup",
+        EptsReportUtils.map(chWithoutPickup, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("denominator AND moreThan7Days");
+    cd.setCompositionString("denominator AND (moreThan7Days OR withoutPickup)");
 
     return cd;
   }
@@ -397,55 +399,6 @@ public class FaltososLevantamentoARVCohortQueries {
     return sqlCohortDefinition;
   }
 
-  /**
-   * <b>Technical Specs</b>
-   * <blockquote>
-   * <p>Select all patients from the A (Denominator) and filter
-   * <ul>
-   *   <li>All patients with more than 7 days between
-   *   <li>The last pick up between Fila (encounter type 18, encounter datetime) and Master card
-   *       Levantou ARV (encounter type 52,(concept_id 23866, value_datetime) ) by report enddate as
-   *       <b>data de levantamento</b> minus “Last Next Scheduled Pick Up” should be > 7
-   * </ul>
-   * </blockquote>
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsWithMoreThan7DaysBetweenPickupDateAndLastNextScheduled() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Select all patients from the A (Denominator) and filter ");
-    addSqlCohortDefinitionParameters(sqlCohortDefinition);
-
-    String mostRecentDataLevantamento = getPatientsWithMostRecentDataDeLevantamentoPlus30Days(true);
-    String mostRecentDateFromFila =
-        listOfPatientsEligibleForVLCohortQueries.getLastNextScheduledPickUpDate(true);
-
-    String lastPickupBetweenFilaAndMasterCard =
-        getPatientsAndLastPickupDateBetweenFilaAndMasterCard();
-    String query =
-        " SELECT more_days.patient_id FROM( "
-            + " "
-            + "                SELECT schedule.patient_id,    MAX(recent_datetime) scheduled_date "
-            + "                FROM( "
-            + mostRecentDataLevantamento
-            + "                        UNION "
-            + mostRecentDateFromFila
-            + "                    ) AS schedule "
-            + "                GROUP BY "
-            + "                schedule.patient_id "
-            + "                 "
-            + "                ) more_days "
-            + "                 "
-            + "                INNER JOIN ( "
-            + lastPickupBetweenFilaAndMasterCard
-            + "                            ) last_pickup ON last_pickup.patient_id = more_days.patient_id "
-            + "                WHERE TIMESTAMPDIFF(DAY ,more_days.scheduled_date, last_pickup.pickup_date) > 7 "
-            + "                 "
-            + "GROUP BY more_days.patient_id ";
-
-    sqlCohortDefinition.setQuery(query);
-    return sqlCohortDefinition;
-  }
 
   /**
    *<p> <b>2.5</b> - Exclude all patients who after the most recent date from 2.1 to 2.4, have a drugs
@@ -524,6 +477,136 @@ public class FaltososLevantamentoARVCohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   * <b>Technical Specs</b>
+   * <blockquote>
+   * <p>Select all patients from the A (Denominator) and filter
+   * <ul>
+   *   <li>All patients with more than 7 days between
+   *   <li>The last pick up between Fila (encounter type 18, encounter datetime) and Master card
+   *       Levantou ARV (encounter type 52,(concept_id 23866, value_datetime) ) by report enddate as
+   *       <b>data de levantamento</b> minus “Last Next Scheduled Pick Up” should be > 7
+   * </ul>
+   * </blockquote>
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithMoreThan7DaysBetweenPickupDateAndLastNextScheduled() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Select all patients from the A (Denominator) and filter ");
+    addSqlCohortDefinitionParameters(sqlCohortDefinition);
+
+    String mostRecentDataLevantamento = getPatientsWithMostRecentDataDeLevantamentoPlus30Days(true);
+    String mostRecentDateFromFila =
+            listOfPatientsEligibleForVLCohortQueries.getLastNextScheduledPickUpDate(true);
+
+    String lastPickupBetweenFilaAndMasterCard =
+            getPatientsAndLastPickupDateBetweenFilaAndMasterCard();
+    String query =
+            " SELECT more_days.patient_id FROM( "
+                    + " "
+                    + "                SELECT schedule.patient_id,    MAX(recent_datetime) scheduled_date "
+                    + "                FROM( "
+                    + mostRecentDataLevantamento
+                    + "                        UNION "
+                    + mostRecentDateFromFila
+                    + "                    ) AS schedule "
+                    + "                GROUP BY "
+                    + "                schedule.patient_id "
+                    + "                 "
+                    + "                ) more_days "
+                    + "                 "
+                    + "                INNER JOIN ( "
+                    + lastPickupBetweenFilaAndMasterCard
+                    + "                            ) last_pickup ON last_pickup.patient_id = more_days.patient_id "
+                    + "                WHERE TIMESTAMPDIFF(DAY ,more_days.scheduled_date, last_pickup.pickup_date) > 7 "
+                    + "                 "
+                    + "GROUP BY more_days.patient_id ";
+
+    sqlCohortDefinition.setQuery(query);
+    return sqlCohortDefinition;
+  }
+  /**
+   * <b>Technical Specs</b>
+   * <blockquote>
+   * <p>All patients without any drugs pickup after the last pick up and reporting end date + 7 days as follows
+   * <ul>
+   *   <li>No drug pickup on FILA (encounter type 18, encounter datetime) and no drug pickup on Mastercard Levantou ARV (encounter type 52, concept_id 23866, value_datetime)
+   *   between the “Last Pick Up Date” and  endDate + 7 days (count of drugs pickup should be zero)</li>
+   *   <li>TThe “Last Pick Up Date” is the most recent date between the following:</li>
+   *   <li>The last pick up on FILA by reporting start date(encounter type 18, last encounter datetime < startDate) and</li>
+   *   <li>The last pick up on Mastercard Levantou ARV by reporting start date (encounter type 52, concept_id 23866, last value_datetime < startDate)</li>
+   * </ul>
+   * </blockquote>
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithoutAnyDrugPickupAfterLastPlus7Days() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Numerator - All patients without any drugs pickup after the last pick up ");
+    addSqlCohortDefinitionParameters(sqlCohortDefinition);
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+              "SELECT pickup_after.patient_id "
+            + "FROM   (SELECT last_pickup.patient_id, MAX(last_pickup.last_date) AS pickup_date "
+            + "        FROM  (SELECT p.patient_id, Max(e.encounter_datetime) last_date "
+            + "               FROM   patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "               WHERE  e.encounter_type = ${18} "
+            + "                      AND e.encounter_datetime < :startDate "
+            + "                      AND e.location_id = :location "
+            + "                      AND e.voided = 0 "
+            + "                      AND p.voided = 0 "
+            + "               GROUP  BY p.patient_id "
+            + "               UNION "
+            + "               SELECT p.patient_id, MAX(o.value_datetime) pickup_date "
+            + "               FROM   patient p "
+            + "                      INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "               WHERE  e.encounter_type = ${52} "
+            + "                      AND e.location_id = :location "
+            + "                      AND e.voided = 0 "
+            + "                      AND o.concept_id = ${23866} "
+            + "                      AND o.value_datetime < :startDate "
+            + "                      AND o.voided = 0 "
+            + "                      AND p.voided = 0 "
+            + "               GROUP  BY p.patient_id) last_pickup "
+            + "        GROUP  BY last_pickup.patient_id) pickup_after "
+            + "WHERE  pickup_after.patient_id NOT IN(SELECT p.patient_id "
+            + "                                      FROM   patient p "
+            + "                                             INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                      WHERE  e.encounter_type = ${18} "
+            + "                                             AND e.encounter_datetime BETWEEN pickup_after.pickup_date AND DATE_ADD(:endDate, INTERVAL 7 DAY ) "
+            + "                                             AND e.location_id = :location "
+            + "                                             AND e.voided = 0 "
+            + "                                             AND pickup_after.patient_id = p.patient_id "
+            + "                                             AND p.voided = 0 "
+            + "                                      GROUP  BY p.patient_id "
+            + "                                      UNION "
+            + "                                      SELECT p.patient_id "
+            + "                                      FROM   patient p "
+            + "                                             INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                      WHERE  e.encounter_type = ${52} "
+            + "                                             AND e.location_id = :location "
+            + "                                             AND e.voided = 0 "
+            + "                                             AND o.concept_id = ${23866} "
+            + "                                             AND o.value_datetime BETWEEN pickup_after.pickup_date AND DATE_ADD(:endDate, INTERVAL 7 DAY) "
+            + "                                             AND o.voided = 0 "
+            + "                                             AND pickup_after.patient_id = p.patient_id "
+            + "                                             AND p.voided = 0 "
+            + "                                      GROUP  BY p.patient_id)";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }
+
 
   /**
    * <b>Technical Specs</b>
