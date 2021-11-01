@@ -184,6 +184,23 @@ public class FaltososLevantamentoARVCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getF() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("APSS Consultation  ");
+    addParameters(cd);
+
+    CohortDefinition chAPSS = getPatientsWithLeastOneAPSSConsultation();
+    CohortDefinition chAandNotB = getDenominator();
+
+    cd.addSearch("F", EptsReportUtils.map(chAPSS, "location=${location}"));
+
+    cd.addSearch(     "AandNotB", EptsReportUtils.map( chAandNotB, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("AandNotB AND F");
+    return cd;
+  }
+
   /**
    * <b>Technical Specs</b>
    *
@@ -765,6 +782,48 @@ public class FaltososLevantamentoARVCohortQueries {
             + "       AND ps.gender = 'F' "
             + "       AND ps.voided = 0 "
             + "GROUP BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Consulta de APSS/PP nos últimos 3 Meses
+   *
+   * <ul>
+   *   <li>Select all patients with at least one APSS/PP consultation (encounter type 35) between the report generation date minus 3 months and report generation date
+   * </ul>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+
+  public CohortDefinition getPatientsWithLeastOneAPSSConsultation() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Pregnant - Female Patients Marked as Pregnant");
+    addSqlCohortDefinitionParameters(sqlCohortDefinition);
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+            String query =
+             "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "WHERE  e.encounter_type = 35 "
+            + "       AND e.encounter_datetime BETWEEN Date_add(Curdate(), INTERVAL -3 month) AND  Curdate() "
+            + "       AND e.location_id = :location " +
+                     "AND e.voided = 0  "
+            + "       AND p.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
