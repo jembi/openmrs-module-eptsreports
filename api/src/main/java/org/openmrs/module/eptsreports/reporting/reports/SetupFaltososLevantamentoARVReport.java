@@ -37,7 +37,7 @@ public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "Faltosos ao Levantamento de ARV - MISAU";
+    return "RELATÓRIO DE FALTOSOS AO LEVANTAMENTO DE ARV - MISAU";
   }
 
   @Override
@@ -81,7 +81,7 @@ public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
           createXlsReportDesign(
               reportDefinition,
               "Template_Faltosos_Levantamento_ARV.xls",
-              "Faltos ao Levantameto de ARV - MISAU",
+              "FALTOSOS AO LEVANTAMENTO DE ARV",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();

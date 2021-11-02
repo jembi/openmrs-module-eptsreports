@@ -9,7 +9,6 @@ import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDef
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,29 +24,25 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
   @Autowired
   public FaltososLevantamentoARVDataSet(
       FaltososLevantamentoARVCohortQueries faltososLevantamentoARVCohortQueries,
-      EptsGeneralIndicator eptsGeneralIndicator,
-      EptsCommonDimension eptsCommonDimension,
-      @Qualifier("commonAgeDimensionCohort")
-          AgeDimensionCohortInterface ageDimensionCohortInterface) {
+      EptsGeneralIndicator eptsGeneralIndicator) {
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.faltososLevantamentoARVCohortQueries = faltososLevantamentoARVCohortQueries;
-    this.eptsCommonDimension = eptsCommonDimension;
-    this.ageDimensionCohortInterface = ageDimensionCohortInterface;
   }
 
   public DataSetDefinition constructDataSet() {
 
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
-    dataSetDefinition.setName("Relatório de Faltosos ao Levantamento de ARV - MISAU");
+    dataSetDefinition.setName("FALTOSOS AO LEVANTAMENTO DE ARV");
     dataSetDefinition.addParameters(getParameters());
 
-    dataSetDefinition.addDimension(
-        "age",
-        EptsReportUtils.map(
-            eptsCommonDimension.age(ageDimensionCohortInterface),
-            "effectiveDate=${generationDate}"));
+    /*    dataSetDefinition.addDimension(
+    "age",
+    EptsReportUtils.map(
+        eptsCommonDimension.age(ageDimensionCohortInterface),
+        "effectiveDate=${generationDate}"));*/
 
-    dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
+    // dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(),
+    // ""));
 
     CohortIndicator ciFaltosoDenominator =
         eptsGeneralIndicator.getIndicator(

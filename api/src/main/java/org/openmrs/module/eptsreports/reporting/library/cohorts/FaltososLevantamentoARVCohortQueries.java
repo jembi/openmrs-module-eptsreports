@@ -31,7 +31,7 @@ public class FaltososLevantamentoARVCohortQueries {
   public CohortDefinition getDenominator() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Relatório de Faltosos ao Levantamento de ARV");
+    cd.setName("FALTOSOS de ARV");
     addParameters(cd);
 
     CohortDefinition chdA = getA();
