@@ -1,10 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.FaltososLevantamentoARVDataSet;
@@ -17,13 +12,19 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
 @Component
-public class FaltososLevantamentoARVReport extends EptsDataExportManager {
+public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
   protected GenericCohortQueries genericCohortQueries;
   private FaltososLevantamentoARVDataSet faltososLevantamentoARVDataSet;
 
   @Autowired
-  public FaltososLevantamentoARVReport(
+  public SetupFaltososLevantamentoARVReport(
       GenericCohortQueries genericCohortQueries,
       FaltososLevantamentoARVDataSet faltososLevantamentoARVDataSet) {
     this.genericCohortQueries = genericCohortQueries;
@@ -80,7 +81,7 @@ public class FaltososLevantamentoARVReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Faltosos_Levantamento_ARV_Template.xls",
+              "Template_Faltosos_Levantamento_ARV.xls",
               "Faltos ao Levantameto de ARV - MISAU",
               getExcelDesignUuid(),
               null);

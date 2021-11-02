@@ -829,7 +829,8 @@ public class FaltososLevantamentoARVCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
-  }  /**
+  }
+  /**
    * <b>Technical Specs</b>
    *
    * <blockquote>
@@ -837,16 +838,19 @@ public class FaltososLevantamentoARVCohortQueries {
    * <p>Viral Load
    *
    * <ul>
-   *   <li>Select all patients with the most recent VL Result (concept Id 856 or concept id 1305) documented in the Laboratory Form
-   *   (encounter type 13, encounter_datetime) or Ficha Clinica (encounter type 6, encounter_datetime) or Ficha Resumo (encounter type 53, obs_datetime )
-   *   or FSR form (encounter type 51, encounter_datetime) between
-   *   the report generation date minus 12 months and report generation date and the Result is >= 1000 copias/ml (concept 856 value_numeric >= 1000)
+   *   <li>Select all patients with the most recent VL Result (concept Id 856 or concept id 1305)
+   *       documented in the Laboratory Form (encounter type 13, encounter_datetime) or Ficha
+   *       Clinica (encounter type 6, encounter_datetime) or Ficha Resumo (encounter type 53,
+   *       obs_datetime ) or FSR form (encounter type 51, encounter_datetime) between the report
+   *       generation date minus 12 months and report generation date and the Result is >= 1000
+   *       copias/ml (concept 856 value_numeric >= 1000)
    * </ul>
    *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
+
   public CohortDefinition getPatientsWithMostRecentVLResult() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -860,8 +864,9 @@ public class FaltososLevantamentoARVCohortQueries {
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
-    String query = ""
-            + "SELECT p.patient_id "
+
+    String query =
+              "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -892,11 +897,11 @@ public class FaltososLevantamentoARVCohortQueries {
             + "                                  AND p.voided = 0 "
             + "                           GROUP  BY p.patient_id) recent_result "
             + "                   GROUP  BY recent_result.patient_id) vl_result "
-            + "               ON vl_result.patient_id = p.patient_id " +
-            "                 WHERE  ( ( o.concept_id = ${856} AND o.value_numeric >= 1000 ) OR ( o.concept_id = ${1305} ) ) "
+            + "               ON vl_result.patient_id = p.patient_id "
+            + "                 WHERE  ( ( o.concept_id = ${856} AND o.value_numeric >= 1000 ) OR ( o.concept_id = ${1305} ) ) "
             + "               AND ( ( e.encounter_datetime = vl_result.recentvl_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
-            + "               OR ( o.obs_datetime = vl_result.recentvl_date AND e.encounter_type = ${53} ) ) " +
-            "                 GROUP BY p.patient_id ";
+            + "               OR ( o.obs_datetime = vl_result.recentvl_date AND e.encounter_type = ${53} ) ) "
+            + "                 GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
