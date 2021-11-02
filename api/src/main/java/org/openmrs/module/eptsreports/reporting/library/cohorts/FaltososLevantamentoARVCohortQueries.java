@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +10,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -31,7 +32,7 @@ public class FaltososLevantamentoARVCohortQueries {
   public CohortDefinition getDenominator() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("FALTOSOS de ARV");
+    cd.setName("DENOMINATOR ");
     addParameters(cd);
 
     CohortDefinition chdA = getA();
@@ -143,7 +144,7 @@ public class FaltososLevantamentoARVCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getD() {
+  public CohortDefinition getPregnantsOnDenominator() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Pregant - All Female Patients Marked as Pregnant ");
@@ -163,7 +164,7 @@ public class FaltososLevantamentoARVCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getE() {
+  public CohortDefinition getBreatfeedingOnDenominator() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Breastfeeding - Mulheres Lactantes  ");
@@ -183,7 +184,27 @@ public class FaltososLevantamentoARVCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getF() {
+  public CohortDefinition getViralLoadOnDenominator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("APSS Consultation  ");
+    addParameters(cd);
+
+    CohortDefinition chVLResult = getPatientsWithMostRecentVLResult();
+    CohortDefinition chAandNotB = getDenominator();
+
+    cd.addSearch("F", EptsReportUtils.map(chVLResult, "location=${location}"));
+
+    cd.addSearch(
+        "AandNotB",
+        EptsReportUtils.map(
+            chAandNotB, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("AandNotB AND F");
+    return cd;
+  }
+
+  public CohortDefinition getAPSSConsultationOnDenominator() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("APSS Consultation  ");
@@ -192,14 +213,14 @@ public class FaltososLevantamentoARVCohortQueries {
     CohortDefinition chAPSS = getPatientsWithLeastOneAPSSConsultation();
     CohortDefinition chAandNotB = getDenominator();
 
-    cd.addSearch("F", EptsReportUtils.map(chAPSS, "location=${location}"));
+    cd.addSearch("G", EptsReportUtils.map(chAPSS, "location=${location}"));
 
     cd.addSearch(
         "AandNotB",
         EptsReportUtils.map(
             chAandNotB, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("AandNotB AND F");
+    cd.setCompositionString("AandNotB AND G");
     return cd;
   }
 

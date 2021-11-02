@@ -9,7 +9,11 @@ import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDef
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class FaltososLevantamentoARVDataSet extends BaseDataSet {
@@ -19,34 +23,37 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
   private EptsCommonDimension eptsCommonDimension;
   private AgeDimensionCohortInterface ageDimensionCohortInterface;
 
-  private String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
-
   @Autowired
   public FaltososLevantamentoARVDataSet(
       FaltososLevantamentoARVCohortQueries faltososLevantamentoARVCohortQueries,
-      EptsGeneralIndicator eptsGeneralIndicator) {
+      EptsGeneralIndicator eptsGeneralIndicator,
+      EptsCommonDimension eptsCommonDimension,
+      @Qualifier("commonAgeDimensionCohort")
+          AgeDimensionCohortInterface ageDimensionCohortInterface) {
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.faltososLevantamentoARVCohortQueries = faltososLevantamentoARVCohortQueries;
+    this.eptsCommonDimension = eptsCommonDimension;
+    this.ageDimensionCohortInterface = ageDimensionCohortInterface;
   }
 
   public DataSetDefinition constructDataSet() {
+
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
     dataSetDefinition.setName("FALTOSOS AO LEVANTAMENTO DE ARV");
     dataSetDefinition.addParameters(getParameters());
 
-    /*    dataSetDefinition.addDimension(
-    "age",
-    EptsReportUtils.map(
-        eptsCommonDimension.age(ageDimensionCohortInterface),
-        "effectiveDate=${generationDate}"));*/
+    dataSetDefinition.addDimension(
+        "age",
+        EptsReportUtils.map(
+            eptsCommonDimension.age(ageDimensionCohortInterface), "effectiveDate=${endDate}"));
 
-    // dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(),
-    // ""));
+    dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
     CohortIndicator ciFaltosoDenominator =
         eptsGeneralIndicator.getIndicator(
-            "denominator",
+            "CI denominator",
             EptsReportUtils.map(faltososLevantamentoARVCohortQueries.getDenominator(), mappings));
 
     CohortIndicator ciFaltososNumerador =
@@ -55,11 +62,95 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
             EptsReportUtils.map(faltososLevantamentoARVCohortQueries.getNumerator(), mappings));
 
     dataSetDefinition.addColumn(
-        "denominator", "DENOMINANTOR", EptsReportUtils.map(ciFaltosoDenominator, mappings), "");
+        "denominator",
+        "DENOMINANTOR FOR CHILDREN",
+        EptsReportUtils.map(ciFaltosoDenominator, mappings),
+        "");
+
+    addRow(
+        dataSetDefinition,
+        "denChildren",
+        "Children on Denominator",
+        EptsReportUtils.map(ciFaltosoDenominator, mappings),
+        getColumnsForChildren());
+
+    addRow(
+        dataSetDefinition,
+        "denAdult",
+        "Adult on Denominator",
+        EptsReportUtils.map(ciFaltosoDenominator, mappings),
+        getColumnsForAdult());
 
     dataSetDefinition.addColumn(
-        "numerator", "NUMERATOR", EptsReportUtils.map(ciFaltososNumerador, mappings), "");
+        "denPregnant",
+        "PREGNANT PATIENTS",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CI Pregnant",
+                EptsReportUtils.map(
+                    faltososLevantamentoARVCohortQueries.getPregnantsOnDenominator(), mappings)),
+            mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "denBreastfeeding",
+        "BREASTFEEDING PATIENTS",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CI Breastfeeding",
+                EptsReportUtils.map(
+                    faltososLevantamentoARVCohortQueries.getBreatfeedingOnDenominator(), mappings)),
+            mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "denViralLoad",
+        "VIRAL LOAD",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CI Viral Load",
+                EptsReportUtils.map(
+                    faltososLevantamentoARVCohortQueries.getViralLoadOnDenominator(), mappings)),
+            mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "denAPSSConsultation",
+        "APSS CONSULTATION",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CI APSS",
+                EptsReportUtils.map(
+                    faltososLevantamentoARVCohortQueries.getAPSSConsultationOnDenominator(),
+                    mappings)),
+            mappings),
+        "");
 
     return dataSetDefinition;
+  }
+
+  private List<ColumnParameters> getColumnsForChildren() {
+    ColumnParameters lessThan15 =
+        new ColumnParameters("under15", "under 15 year ", "age=<15", "lessThan15");
+    ColumnParameters lessTha15Female =
+        new ColumnParameters(
+            "under15Female", "under 15 years Female", "gender=F|age=<15", "lessThan15Female");
+    ColumnParameters lessThan15Male =
+        new ColumnParameters(
+            "under15Male", "under 15 years Male", "gender=M|age=<15", "lessThan15Male");
+
+    return Arrays.asList(lessThan15, lessTha15Female, lessThan15Male);
+  }
+
+  private List<ColumnParameters> getColumnsForAdult() {
+    ColumnParameters greaterThan15 =
+        new ColumnParameters("above15", "above 15", "age=15+", "greaterThan15");
+    ColumnParameters greaterTha15Female =
+        new ColumnParameters(
+            "above15Female", "above 15 female", "gender=F|age=15+", "greaterThan15Female");
+    ColumnParameters greaterThan15Male =
+        new ColumnParameters("above15Male", "above15Male", "gender=M|age=15+", "greaterThan15Male");
+
+    return Arrays.asList(greaterThan15, greaterTha15Female, greaterThan15Male);
   }
 }
