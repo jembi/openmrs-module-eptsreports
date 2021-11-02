@@ -195,7 +195,10 @@ public class FaltososLevantamentoARVCohortQueries {
 
     cd.addSearch("F", EptsReportUtils.map(chAPSS, "location=${location}"));
 
-    cd.addSearch(     "AandNotB", EptsReportUtils.map( chAandNotB, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "AandNotB",
+        EptsReportUtils.map(
+            chAandNotB, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("AandNotB AND F");
     return cd;
@@ -754,7 +757,6 @@ public class FaltososLevantamentoARVCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-
   public CohortDefinition getPatientsMarkedAsBreastfeeding() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -796,14 +798,14 @@ public class FaltososLevantamentoARVCohortQueries {
    * <p>Consulta de APSS/PP nos últimos 3 Meses
    *
    * <ul>
-   *   <li>Select all patients with at least one APSS/PP consultation (encounter type 35) between the report generation date minus 3 months and report generation date
+   *   <li>Select all patients with at least one APSS/PP consultation (encounter type 35) between
+   *       the report generation date minus 3 months and report generation date
    * </ul>
    *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
-
   public CohortDefinition getPatientsWithLeastOneAPSSConsultation() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -813,19 +815,90 @@ public class FaltososLevantamentoARVCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
-            String query =
-             "SELECT p.patient_id "
+    String query =
+        "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "WHERE  e.encounter_type = 35 "
             + "       AND e.encounter_datetime BETWEEN Date_add(Curdate(), INTERVAL -3 month) AND  Curdate() "
-            + "       AND e.location_id = :location " +
-                     "AND e.voided = 0  "
+            + "       AND e.location_id = :location "
+            + "AND e.voided = 0  "
             + "       AND p.voided = 0 "
             + "GROUP  BY p.patient_id";
 
-
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Viral Load
+   *
+   * <ul>
+   *   <li>Select all patients with the most recent VL Result (concept Id 856 or concept id 1305) documented in the Laboratory Form
+   *   (encounter type 13, encounter_datetime) or Ficha Clinica (encounter type 6, encounter_datetime) or Ficha Resumo (encounter type 53, obs_datetime )
+   *   or FSR form (encounter type 51, encounter_datetime) between
+   *   the report generation date minus 12 months and report generation date and the Result is >= 1000 copias/ml (concept 856 value_numeric >= 1000)
+   * </ul>
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithMostRecentVLResult() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Viral Load - Patients with Most Recent VL Result");
+    addSqlCohortDefinitionParameters(sqlCohortDefinition);
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    String query = ""
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT patient_id, MAX(most_recent) recentvl_date "
+            + "                   FROM   (SELECT p.patient_id, MAX(e.encounter_datetime) most_recent "
+            + "                           FROM   patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                           WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "                                  AND e.encounter_datetime BETWEEN DATE_ADD( CURDATE(), INTERVAL - 12 MONTH ) AND CURDATE() "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND e.voided = 0 "
+            + "                                  AND o.concept_id IN( ${856}, ${1305} ) "
+            + "                                  AND o.voided = 0 "
+            + "                                  AND p.voided = 0 "
+            + "                           GROUP  BY p.patient_id "
+            + "                           UNION "
+            + "                           SELECT p.patient_id, MAX(o.obs_datetime) most_recent "
+            + "                           FROM   patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                           WHERE  e.encounter_type = ${53} "
+            + "                                  AND e.location_id = :location "
+            + "                                  AND e.voided = 0 "
+            + "                                  AND o.concept_id IN( ${856}, ${1305} ) "
+            + "                                  AND o.obs_datetime BETWEEN Date_add(Curdate(), INTERVAL - 12 MONTH) AND Curdate() "
+            + "                                  AND o.voided = 0 "
+            + "                                  AND p.voided = 0 "
+            + "                           GROUP  BY p.patient_id) recent_result "
+            + "                   GROUP  BY recent_result.patient_id) vl_result "
+            + "               ON vl_result.patient_id = p.patient_id " +
+            "                 WHERE  ( ( o.concept_id = ${856} AND o.value_numeric >= 1000 ) OR ( o.concept_id = ${1305} ) ) "
+            + "               AND ( ( e.encounter_datetime = vl_result.recentvl_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
+            + "               OR ( o.obs_datetime = vl_result.recentvl_date AND e.encounter_type = ${53} ) ) " +
+            "                 GROUP BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
   }
