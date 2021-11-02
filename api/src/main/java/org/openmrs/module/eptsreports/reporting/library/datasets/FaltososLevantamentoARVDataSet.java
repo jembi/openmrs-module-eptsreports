@@ -47,7 +47,8 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
     dataSetDefinition.addDimension(
         "age",
         EptsReportUtils.map(
-            eptsCommonDimension.age(ageDimensionCohortInterface), "effectiveDate=${endDate}"));
+            eptsCommonDimension.age(ageDimensionCohortInterface),
+            "effectiveDate=${generationDate}"));
 
     dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
@@ -55,11 +56,6 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "CI denominator",
             EptsReportUtils.map(faltososLevantamentoARVCohortQueries.getDenominator(), mappings));
-
-    CohortIndicator ciFaltososNumerador =
-        eptsGeneralIndicator.getIndicator(
-            "numerator",
-            EptsReportUtils.map(faltososLevantamentoARVCohortQueries.getNumerator(), mappings));
 
     dataSetDefinition.addColumn(
         "denominator",
@@ -122,6 +118,72 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
                 "CI APSS",
                 EptsReportUtils.map(
                     faltososLevantamentoARVCohortQueries.getAPSSConsultationOnDenominator(),
+                    mappings)),
+            mappings),
+        "");
+
+    CohortIndicator ciFaltososNumerador =
+        eptsGeneralIndicator.getIndicator(
+            "numerator",
+            EptsReportUtils.map(faltososLevantamentoARVCohortQueries.getNumerator(), mappings));
+    dataSetDefinition.addColumn(
+        "numerator", "NUMERATOR COLUMN", EptsReportUtils.map(ciFaltososNumerador, mappings), "");
+
+    addRow(
+        dataSetDefinition,
+        "numChildren",
+        "Children on Numerator",
+        EptsReportUtils.map(ciFaltososNumerador, mappings),
+        getColumnsForChildren());
+
+    addRow(
+        dataSetDefinition,
+        "numAdults",
+        "Adult on Numerator",
+        EptsReportUtils.map(ciFaltososNumerador, mappings),
+        getColumnsForAdult());
+
+    dataSetDefinition.addColumn(
+        "numPregnant",
+        "PREGNANT PATIENTS",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CI Pregnant and Numerator",
+                EptsReportUtils.map(
+                    faltososLevantamentoARVCohortQueries.getPregnantsOnNumerator(), mappings)),
+            mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "numBreastfeeding",
+        "BREASTFEEDING PATIENTS",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CI Breastfeeding and numerator",
+                EptsReportUtils.map(
+                    faltososLevantamentoARVCohortQueries.getBreatfeedingOnNumerator(), mappings)),
+            mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "numViralLoad",
+        "VIRAL LOAD",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CI Viral Load and Numerator",
+                EptsReportUtils.map(
+                    faltososLevantamentoARVCohortQueries.getViralLoadOnNumerator(), mappings)),
+            mappings),
+        "");
+
+    dataSetDefinition.addColumn(
+        "numAPSSConsultation",
+        "APSS CONSULTATION",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "CI APSS and Numerator",
+                EptsReportUtils.map(
+                    faltososLevantamentoARVCohortQueries.getAPSSConsultationOnNumerator(),
                     mappings)),
             mappings),
         "");

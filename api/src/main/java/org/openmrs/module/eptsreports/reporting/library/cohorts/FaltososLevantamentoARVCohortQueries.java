@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -10,10 +13,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -221,6 +220,86 @@ public class FaltososLevantamentoARVCohortQueries {
             chAandNotB, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("AandNotB AND G");
+    return cd;
+  }
+
+  public CohortDefinition getPregnantsOnNumerator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Pregant - All Female Patients Marked as Pregnant on numerator ");
+    addParameters(cd);
+
+    CohortDefinition chPregnant = getPatientsMarkedAsPregnant();
+    CohortDefinition chNumerator = getNumerator();
+
+    cd.addSearch("D", EptsReportUtils.map(chPregnant, "location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            chNumerator, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("C AND D");
+    return cd;
+  }
+
+  public CohortDefinition getBreatfeedingOnNumerator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Breastfeeding - Mulheres Lactantes on Numerator ");
+    addParameters(cd);
+
+    CohortDefinition chBreastfeeding = getPatientsMarkedAsBreastfeeding();
+    CohortDefinition chNumetator = getNumerator();
+
+    cd.addSearch("E", EptsReportUtils.map(chBreastfeeding, "location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            chNumetator, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("C AND E");
+    return cd;
+  }
+
+  public CohortDefinition getViralLoadOnNumerator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Viral Load Result and Numerator ");
+    addParameters(cd);
+
+    CohortDefinition chVLResult = getPatientsWithMostRecentVLResult();
+    CohortDefinition chNumerator = getNumerator();
+
+    cd.addSearch("F", EptsReportUtils.map(chVLResult, "location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            chNumerator, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("C AND F");
+    return cd;
+  }
+
+  public CohortDefinition getAPSSConsultationOnNumerator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("APSS Consultation  and Numerator");
+    addParameters(cd);
+
+    CohortDefinition chAPSS = getPatientsWithLeastOneAPSSConsultation();
+    CohortDefinition chNumetator = getNumerator();
+
+    cd.addSearch("G", EptsReportUtils.map(chAPSS, "location=${location}"));
+
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            chNumetator, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("C AND G");
     return cd;
   }
 
