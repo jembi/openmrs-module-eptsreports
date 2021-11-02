@@ -18,32 +18,36 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
   private FaltososLevantamentoARVCohortQueries faltososLevantamentoARVCohortQueries;
   private EptsGeneralIndicator eptsGeneralIndicator;
   private EptsCommonDimension eptsCommonDimension;
-  @Qualifier("commonAgeDimensionCohort")
   private AgeDimensionCohortInterface ageDimensionCohortInterface;
 
-  private  String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+  private String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public FaltososLevantamentoARVDataSet(
       FaltososLevantamentoARVCohortQueries faltososLevantamentoARVCohortQueries,
       EptsGeneralIndicator eptsGeneralIndicator,
-      EptsCommonDimension eptsCommonDimension, AgeDimensionCohortInterface ageDimensionCohortInterface) {
+      EptsCommonDimension eptsCommonDimension,
+      @Qualifier("commonAgeDimensionCohort")
+          AgeDimensionCohortInterface ageDimensionCohortInterface) {
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.faltososLevantamentoARVCohortQueries = faltososLevantamentoARVCohortQueries;
     this.eptsCommonDimension = eptsCommonDimension;
     this.ageDimensionCohortInterface = ageDimensionCohortInterface;
   }
 
-
   public DataSetDefinition constructDataSet() {
 
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
     dataSetDefinition.setName("Relatório de Faltosos ao Levantamento de ARV - MISAU");
     dataSetDefinition.addParameters(getParameters());
+
     dataSetDefinition.addDimension(
-            "age",
-            EptsReportUtils.map(
-                    eptsCommonDimension.age(ageDimensionCohortInterface), "effectiveDate=${generationDate}"));
+        "age",
+        EptsReportUtils.map(
+            eptsCommonDimension.age(ageDimensionCohortInterface),
+            "effectiveDate=${generationDate}"));
+
+    dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
     CohortIndicator ciFaltosoDenominator =
         eptsGeneralIndicator.getIndicator(
