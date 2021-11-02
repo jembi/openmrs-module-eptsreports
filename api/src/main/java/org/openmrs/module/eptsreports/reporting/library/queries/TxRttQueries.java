@@ -224,15 +224,14 @@ public class TxRttQueries {
       int artPickupConcept,
       int yesConcept,
       Integer minDays,
-      Integer maxDays,
-      Integer numDays) {
+      Integer maxDays) {
     String query =
         "SELECT  patient_id "
             + " FROM ( "
             + "         SELECT query_a.patient_id, final_encounter_date "
             + "         FROM ( "
             + "                  SELECT most_recent.patient_id, "
-            + "                         Date_add(Max(most_recent.value_datetime), interval ${numDays} day) final_encounter_date "
+            + "                         Max(most_recent.value_datetime) final_encounter_date "
             + "                  FROM (SELECT fila.patient_id, o.value_datetime "
             + "                        from ( "
             + "                                 SELECT pa.patient_id, "
@@ -244,7 +243,7 @@ public class TxRttQueries {
             + "                                   AND enc.voided = 0 "
             + "                                   AND enc.encounter_type = ${aRVPharmaciaEncounterType} "
             + "                                   AND enc.location_id = :location "
-            + "                                   AND enc.encounter_datetime <= :endDate "
+            + "                                   AND enc.encounter_datetime <= DATE_ADD(:startDate, interval -1 DAY) "
             + "                                 GROUP BY pa.patient_id) fila "
             + "                                 INNER JOIN encounter e on "
             + "                                    e.patient_id = fila.patient_id and "
@@ -252,7 +251,7 @@ public class TxRttQueries {
             + "                                    e.encounter_type = ${aRVPharmaciaEncounterType} and "
             + "                                    e.location_id = :location and "
             + "                                    e.voided = 0 and "
-            + "                                    e.encounter_datetime <= :endDate "
+            + "                                    e.encounter_datetime <= DATE_ADD(:startDate, interval -1 DAY) "
             + "                                 INNER JOIN obs o on "
             + "                                    o.encounter_id = e.encounter_id and "
             + "                                    o.concept_id = ${returnVisitDateForArvDrugConcept} and "
@@ -269,7 +268,7 @@ public class TxRttQueries {
             + "                                   AND enc.voided = 0 "
             + "                                   AND enc.encounter_type IN (${adultoSeguimentoEncounterType}, ${pediatriaSeguimentoEncounterType}) "
             + "                                   AND enc.location_id = :location "
-            + "                                   AND enc.encounter_datetime <= :endDate "
+            + "                                   AND enc.encounter_datetime <= DATE_ADD(:startDate, interval -1 DAY) "
             + "                                 GROUP BY pa.patient_id) ficha "
             + "                                 INNER JOIN encounter e on "
             + "                                    e.patient_id = ficha.patient_id and "
@@ -296,14 +295,14 @@ public class TxRttQueries {
             + "                          AND obs.value_datetime IS NOT NULL "
             + "                          AND enc.encounter_type = ${masterCardDrugPickupEncounterType} "
             + "                          AND enc.location_id = :location "
-            + "                          AND obs.value_datetime <= :endDate "
+            + "                          AND obs.value_datetime <= DATE_ADD(:startDate, interval -1 DAY) "
             + "                        GROUP BY pa.patient_id "
             + "                       ) most_recent "
             + "                  GROUP BY most_recent.patient_id "
-            + "                  HAVING final_encounter_date < :endDate "
+            + "                  HAVING final_encounter_date < DATE_ADD(:startDate, interval -1 DAY) "
             + "              ) query_a "
             + "        INNER JOIN ( "
-            + "             SELECT patient_id, earliest_date "
+            + "             SELECT patient_id, MIN(earliest_date) as final_earliest_date "
             + "             FROM ( "
             + "                      SELECT p.patient_id, MIN(e.encounter_datetime) as earliest_date "
             + "                      FROM patient p "
@@ -318,7 +317,7 @@ public class TxRttQueries {
             + "                        AND e.encounter_type = ${masterCardDrugPickupEncounterType} "
             + "                        AND o1.voided = 0 "
             + "                        AND o2.voided = 0 "
-            + "                        AND (o1.concept_id = ${artPickupConcept} AND o1.value_coded = ${yesConcept}) "
+            + "                        AND (o1.concept_id = ${artPickupConcept} AND o1.value_coded = ${yesConcept} AND o1.value_datetime BETWEEN :startDate AND :endDate) "
             + "                        AND (o2.concept_id = ${artDatePickupMasterCard} AND o2.value_datetime BETWEEN :startDate AND :endDate) "
             + "                        AND e.location_id = :location "
             + "                      GROUP BY p.patient_id "
@@ -346,18 +345,19 @@ public class TxRttQueries {
             + "                        AND e.location_id = :location "
             + "                      GROUP BY p.patient_id "
             + "                  ) as query_b "
+            + "               GROUP BY patient_id "
             + "         ) as B "
             + "    ON B.patient_id = query_a.patient_id ";
     if (minDays == null && maxDays != null) {
       query +=
-          "    WHERE  TIMESTAMPDIFF(day, B.earliest_date, query_a.final_encounter_date) < ${maxDays} ";
+          "    WHERE  TIMESTAMPDIFF(day, query_a.final_encounter_date, B.final_earliest_date) < ${maxDays} ";
     } else if (minDays != null && maxDays == null) {
       query +=
-          "    WHERE  TIMESTAMPDIFF(day, B.earliest_date, query_a.final_encounter_date) >= ${minDays} ";
+          "    WHERE  TIMESTAMPDIFF(day, query_a.final_encounter_date, B.final_earliest_date) >= ${minDays} ";
     } else {
       query +=
-          "    WHERE  TIMESTAMPDIFF(day, B.earliest_date, query_a.final_encounter_date) >= ${minDays} "
-              + " AND TIMESTAMPDIFF(day, B.earliest_date, query_a.final_encounter_date) < ${maxDays} ";
+          "    WHERE  TIMESTAMPDIFF(day, query_a.final_encounter_date, B.final_earliest_date) >= ${minDays} "
+              + " AND TIMESTAMPDIFF(day, query_a.final_encounter_date, B.final_earliest_date) < ${maxDays} ";
     }
     query += ") as final";
 
@@ -373,7 +373,6 @@ public class TxRttQueries {
     map.put("yesConcept", yesConcept);
     map.put("minDays", minDays);
     map.put("maxDays", maxDays);
-    map.put("numDays", numDays);
 
     StringSubstitutor sub = new StringSubstitutor(map);
     return sub.replace(query);
