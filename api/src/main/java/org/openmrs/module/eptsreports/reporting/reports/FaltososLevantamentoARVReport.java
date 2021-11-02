@@ -18,12 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
+public class FaltososLevantamentoARVReport extends EptsDataExportManager {
   protected GenericCohortQueries genericCohortQueries;
   private FaltososLevantamentoARVDataSet faltososLevantamentoARVDataSet;
 
   @Autowired
-  public SetupFaltososLevantamentoARVReport(
+  public FaltososLevantamentoARVReport(
       GenericCohortQueries genericCohortQueries,
       FaltososLevantamentoARVDataSet faltososLevantamentoARVDataSet) {
     this.genericCohortQueries = genericCohortQueries;
@@ -32,7 +32,7 @@ public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
 
   @Override
   public String getUuid() {
-    return "6b3762b8-2cf0-11ec-8e14-97de0861d5ef";
+    return "73ba713a-3bca-11ec-b0d7-b7913905b82c";
   }
 
   @Override
@@ -52,7 +52,7 @@ public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
 
   @Override
   public String getExcelDesignUuid() {
-    return "284c9ad8-81b0-11eb-b8e0-0242ac120002";
+    return "67f5bf1c-3bca-11ec-9e72-cb0763b0876d";
   }
 
   @Override
@@ -81,7 +81,7 @@ public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
           createXlsReportDesign(
               reportDefinition,
               "Template_Faltosos_Levantamento_ARV.xls",
-              "FALTOSOS AO LEVANTAMENTO DE ARV",
+              "Relatório de Faltosos ao Levantamento de ARV",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
