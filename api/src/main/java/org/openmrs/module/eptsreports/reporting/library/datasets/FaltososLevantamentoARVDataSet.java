@@ -48,7 +48,7 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohortInterface),
-            "effectiveDate=${generationDate}"));
+            "effectiveDate=${endDate}"));
 
     dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
@@ -59,7 +59,7 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "denominator",
-        "DENOMINANTOR FOR CHILDREN",
+        "DENOMINATOR",
         EptsReportUtils.map(ciFaltosoDenominator, mappings),
         "");
 
