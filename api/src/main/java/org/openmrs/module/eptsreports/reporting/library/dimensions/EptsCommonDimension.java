@@ -11,22 +11,8 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.Date;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.Eri2MonthsCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.Eri4MonthsCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.EriCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.EriDSDCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenderCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.HivCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.MISAUKeyPopsCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TbPrevCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TxNewCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TxPvlsCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
@@ -34,6 +20,10 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 @Component
 public class EptsCommonDimension {
@@ -114,13 +104,16 @@ public class EptsCommonDimension {
     dim.setParameters(ageDimensionCohort.getParameters());
     dim.setName("age dimension");
 
-    dim.addCohortDefinition("UK", ageDimensionCohort.createUnknownAgeCohort());
     dim.addCohortDefinition(
-        "<1", ageDimensionCohort.createXtoYAgeCohort("patients with age below 1", 0, 0));
+        DimensionsKeyForAge.unknown.getKey(), ageDimensionCohort.createUnknownAgeCohort());
     dim.addCohortDefinition(
-        "<2", ageDimensionCohort.createXtoYAgeCohort("patients with age below 2 years", 0, 1));
+        DimensionsKeyForAge.underOneYears.getKey(),
+        ageDimensionCohort.createXtoYAgeCohort("patients with age below 1", 0, 0));
     dim.addCohortDefinition(
-        "0-4",
+        DimensionsKeyForAge.under2Years.getKey(),
+        ageDimensionCohort.createXtoYAgeCohort("patients with age below 2 years", 0, 1));
+    dim.addCohortDefinition(
+        DimensionsKeyForAge.betweenZeroAnd4Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 0 and 4 years", 0, 4));
     dim.addCohortDefinition(
         "0-14",
