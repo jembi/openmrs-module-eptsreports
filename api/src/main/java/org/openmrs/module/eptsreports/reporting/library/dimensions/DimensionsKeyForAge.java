@@ -1,6 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
-public enum AgeDimensionKey implements DimensionKey {
+import java.util.ArrayList;
+import java.util.List;
+
+public enum DimensionsKeyForAge implements DimensionKey {
     unknown("UK"),
     belowOneYear("<1"),
     below2Years("<2"),
@@ -25,9 +28,13 @@ public enum AgeDimensionKey implements DimensionKey {
 
     private String key;
     private final String ageKeyPrefix = "age=";
+    private List<DimensionKey> dimensionKeys ;
 
-    private AgeDimensionKey(String key){
+    private DimensionsKeyForAge(String key){
         this.key = key;
+        dimensionKeys = new ArrayList<>();
+        dimensionKeys.add(this);
+
     }
 
     @Override
@@ -37,7 +44,19 @@ public enum AgeDimensionKey implements DimensionKey {
     }
 
     @Override
-    public String getKeyValue() {
-        return null;
+    public String getDimension() {
+
+        StringBuilder sb = new StringBuilder();
+        for (DimensionKey dimensionKey: dimensionKeys) {
+            sb.append(dimensionKey.getDimension()).append("|");
+        }
+        String dimensionOptions = sb.toString();
+        return dimensionOptions.substring(0, dimensionOptions.length()-1);
+    }
+
+    @Override
+    public DimensionKey and(DimensionKey dimensionKey) {
+        dimensionKeys.add(dimensionKey);
+        return this;
     }
 }
