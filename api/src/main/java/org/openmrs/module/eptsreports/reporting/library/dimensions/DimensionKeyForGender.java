@@ -3,15 +3,14 @@ package org.openmrs.module.eptsreports.reporting.library.dimensions;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum DimensionsKeysForGender implements DimensionKey {
+public enum DimensionKeyForGender implements DimensionKey {
   female("F"),
   male("M");
 
   private String key;
-  private final String genderPrefix = "gender=";
   private List<DimensionKey> dimensionKeys;
 
-  private DimensionsKeysForGender(String key) {
+  private DimensionKeyForGender(String key) {
     this.key = key;
     dimensionKeys = new ArrayList<>();
     dimensionKeys.add(this);
@@ -26,7 +25,7 @@ public enum DimensionsKeysForGender implements DimensionKey {
   public String getDimension() {
     StringBuilder sb = new StringBuilder();
     for (DimensionKey dimensionKey : dimensionKeys) {
-      sb.append(genderPrefix).append(getKey()).append("|");
+      sb.append("gender=").append(getKey()).append("|");
     }
     String dimensionOptions = sb.toString();
     return dimensionOptions.substring(0, dimensionOptions.length() - 1);
@@ -34,7 +33,6 @@ public enum DimensionsKeysForGender implements DimensionKey {
 
   @Override
   public DimensionKey and(DimensionKey dimensionKey) {
-
     dimensionKeys.add(dimensionKey);
     return this;
   }

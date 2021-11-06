@@ -2,8 +2,8 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.module.eptsreports.reporting.library.cohorts.FaltososLevantamentoARVCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionsKeyForAge;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionsKeysForGender;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionKeyForAge;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionKeyForGender;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -194,14 +194,14 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
         new ColumnParameters(
             "under15",
             "under 15 year ",
-            DimensionsKeyForAge.belowAndEqualTo15Years.getDimension(),
+            DimensionKeyForAge.belowAndEqualTo15Years.getDimension(),
             "lessThan15");
     ColumnParameters lessTha15Female =
         new ColumnParameters(
             "under15Female",
             "under 15 years Female",
-            DimensionsKeysForGender.female
-                .and(DimensionsKeyForAge.belowAndEqualTo15Years)
+            DimensionKeyForGender.female
+                .and(DimensionKeyForAge.belowAndEqualTo15Years)
                 .getDimension(),
             "lessThan15Female");
     ColumnParameters lessThan15Male =
