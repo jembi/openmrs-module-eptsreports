@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.List;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.FaltososLevantamentoARVCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionsKeyForAge;
@@ -13,9 +15,6 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class FaltososLevantamentoARVDataSet extends BaseDataSet {
@@ -194,15 +193,13 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
         new ColumnParameters(
             "under15",
             "under 15 year ",
-            DimensionsKeyForAge.belowAndEqualTo15Years.getDimension(),
+            DimensionsKeyForAge.below15Years.getDimension(),
             "lessThan15");
     ColumnParameters lessTha15Female =
         new ColumnParameters(
             "under15Female",
             "under 15 years Female",
-            DimensionsKeysForGender.female
-                .and(DimensionsKeyForAge.belowAndEqualTo15Years)
-                .getDimension(),
+            DimensionsKeysForGender.female.and(DimensionsKeyForAge.below15Years).getDimension(),
             "lessThan15Female");
     ColumnParameters lessThan15Male =
         new ColumnParameters(
