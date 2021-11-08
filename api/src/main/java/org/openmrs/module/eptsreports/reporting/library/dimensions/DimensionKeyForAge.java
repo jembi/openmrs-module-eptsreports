@@ -13,7 +13,7 @@ public enum DimensionKeyForAge implements DimensionKey {
   betweenOneAnd4("1-4"),
   between2And4Years("2-4"),
   between5And9Years("5-9"),
-  belowAndEqualTo15Years("<15"),
+  underAndEqualTo15Years("<15"),
   overAndEqualTo14Years("14+"),
   between10And14Years("10-14"),
   overAndEqualTo15Years("15+"),

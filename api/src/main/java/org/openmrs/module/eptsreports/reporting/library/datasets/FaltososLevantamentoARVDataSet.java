@@ -194,14 +194,14 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
         new ColumnParameters(
             "under15",
             "under 15 year ",
-            DimensionKeyForAge.belowAndEqualTo15Years.getDimension(),
+            DimensionKeyForAge.underAndEqualTo15Years.getDimension(),
             "lessThan15");
     ColumnParameters lessTha15Female =
         new ColumnParameters(
             "under15Female",
             "under 15 years Female",
             DimensionKeyForGender.female
-                .and(DimensionKeyForAge.belowAndEqualTo15Years)
+                .and(DimensionKeyForAge.underAndEqualTo15Years)
                 .getDimension(),
             "lessThan15Female");
     ColumnParameters lessThan15Male =
