@@ -194,31 +194,43 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
         new ColumnParameters(
             "under15",
             "under 15 year ",
-            DimensionKeyForAge.underAndEqualTo15Years.getDimension(),
+            DimensionKeyForAge.bellow15Years.getDimension(),
             "lessThan15");
     ColumnParameters lessTha15Female =
         new ColumnParameters(
             "under15Female",
             "under 15 years Female",
-            DimensionKeyForGender.female
-                .and(DimensionKeyForAge.underAndEqualTo15Years)
-                .getDimension(),
+            DimensionKeyForGender.female.and(DimensionKeyForAge.bellow15Years).getDimension(),
             "lessThan15Female");
     ColumnParameters lessThan15Male =
         new ColumnParameters(
-            "under15Male", "under 15 years Male", "gender=M|age=<15", "lessThan15Male");
+            "under15Male",
+            "under 15 years Male",
+            DimensionKeyForGender.male.and(DimensionKeyForAge.bellow15Years).getDimension(),
+            "lessThan15Male");
 
     return Arrays.asList(lessThan15, lessTha15Female, lessThan15Male);
   }
 
   private List<ColumnParameters> getColumnsForAdult() {
     ColumnParameters greaterThan15 =
-        new ColumnParameters("above15", "above 15", "age=15+", "greaterThan15");
+        new ColumnParameters(
+            "Equal or above 15",
+            "Equal above 15",
+            DimensionKeyForAge.overOrEqualTo15Years.getDimension(),
+            "greaterThan15");
     ColumnParameters greaterTha15Female =
         new ColumnParameters(
-            "above15Female", "above 15 female", "gender=F|age=15+", "greaterThan15Female");
+            "above15Female",
+            "above 15 female",
+            DimensionKeyForGender.male.and(DimensionKeyForAge.overOrEqualTo15Years).getDimension(),
+            "greaterThan15Female");
     ColumnParameters greaterThan15Male =
-        new ColumnParameters("above15Male", "above15Male", "gender=M|age=15+", "greaterThan15Male");
+        new ColumnParameters(
+            "above15Male",
+            "above15Male",
+            DimensionKeyForGender.male.and(DimensionKeyForAge.overOrEqualTo15Years).getDimension(),
+            "greaterThan15Male");
 
     return Arrays.asList(greaterThan15, greaterTha15Female, greaterThan15Male);
   }
