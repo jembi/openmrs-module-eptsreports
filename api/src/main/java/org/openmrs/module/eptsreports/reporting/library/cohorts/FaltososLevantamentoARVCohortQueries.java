@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -10,10 +13,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -792,10 +791,14 @@ public class FaltososLevantamentoARVCohortQueries {
    * <p>Mulheres Grávidas
    *
    * <ul>
-   *   <li>ASelect all female patients (sex=female) marked as pregnant (concept id 1982) value coded
-   *       Yes (concept id 1065) on Ficha Clinica (encounter type 6) in last 9 months
-   *       (encounter_datetime >= report generation date minus 9 months and
-   *       encounter_datetime<=report generation date)
+   *   <li>Select all female patients (sex=female) and filter those with the most recent record of
+   *       pregnant (concept id 1982) value coded Yes (concept id 1065) on Ficha Clinica (encounter
+   *       type 6) and verify if it falls within the last 9 months (the max (encounter_datetime) is
+   *       >= report generation date minus 9 months and <=report generation date).
+   *   <li>Note: a) If the patient has both states (pregnant and breastfeeding) the most recent one
+   *       should be considered.
+   *   <li>b) For patients who have both state (pregnant and breastfeeding) marked on the same day,
+   *       the system will consider the patient as pregnant.
    * </ul>
    *
    * </blockquote>
@@ -810,25 +813,46 @@ public class FaltososLevantamentoARVCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN person ps ON ps.person_id = p.patient_id "
-            + "WHERE  e.encounter_type = ${6} "
-            + "       AND e.encounter_datetime BETWEEN Date_add(Curdate(), INTERVAL -9 month) AND Curdate() "
-            + "AND e.location_id = :location"
-            + "       AND e.voided = 0 "
-            + "       AND o.concept_id = ${1982} "
-            + "       AND o.value_coded = ${1065} "
-            + "       AND o.voided = 0 "
-            + "       AND ps.gender = 'F' "
-            + "       AND ps.voided = 0 "
-            + "GROUP BY p.patient_id ";
+        ""
+            + "SELECT pw.patient_id "
+            + "FROM   (SELECT p.patient_id, MAX(e.encounter_datetime) AS pregnancy_date, breastfeeding.breastfeed_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o  ON o.encounter_id = e.encounter_id "
+            + "               INNER JOIN person ps ON ps.person_id = p.patient_id "
+            + "               LEFT JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) breastfeed_date "
+            + "                          FROM   patient p "
+            + "                                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                 INNER JOIN person ps ON ps.person_id = p.patient_id "
+            + "                          WHERE  e.encounter_type = ${6} "
+            + "                                 AND e.encounter_datetime BETWEEN DATE_ADD(Curdate(), INTERVAL -18 MONTH) AND Curdate() "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.concept_id = ${6332} "
+            + "                                 AND o.value_coded = ${1065} "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND ps.gender = 'F' "
+            + "                                 AND ps.voided = 0 "
+            + "                          GROUP  BY p.patient_id) breastfeeding "
+            + "                      ON breastfeeding.patient_id = p.patient_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "               AND e.encounter_datetime BETWEEN Date_add(Curdate(), INTERVAL -9 MONTH) AND Curdate() "
+            + "               AND e.location_id = :location "
+            + "               AND e.voided = 0 "
+            + "               AND o.concept_id = ${1982} "
+            + "               AND o.value_coded = ${1065} "
+            + "               AND o.voided = 0 "
+            + "               AND ps.gender = 'F' "
+            + "               AND ps.voided = 0 "
+            + "        GROUP  BY p.patient_id) pw "
+            + "WHERE  pw.pregnancy_date >= pw.breastfeed_date OR pw.breastfeed_date IS NULL "
+            + "GROUP  BY pw.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -842,10 +866,15 @@ public class FaltososLevantamentoARVCohortQueries {
    * <p>Mulheres Lactantes
    *
    * <ul>
-   *   <li>Select all female patients (sex=female) marked as breastfeeding(concept id 6332) value
-   *       coded Yes (concept id 1065) on Ficha Clinica (encounter type 6) in last 18 months
-   *       (rencounter_datetime >= report generation date minus 9 months and
-   *       encounter_datetime<=report generation date)
+   *   <li>Select all female patients (sex=female) and filter those with the most recent record of
+   *       breastfeeding (concept id 6332) value coded Yes (concept id 1065) on Ficha Clinica
+   *       (encounter type 6) and verify if it falls within the the last 18 months (the max
+   *       (encounter_datetime) is >= report generation date minus 18 months and <=report generation
+   *       date)
+   *   <li>Note: a) If the patient has both states (pregnant and breastfeeding) the most recent one
+   *       should be considered.
+   *   <li>b) For patients who have both state (pregnant and breastfeeding) marked on the same day,
+   *       the system will consider the patient as pregnant.
    * </ul>
    *
    * </blockquote>
@@ -861,24 +890,44 @@ public class FaltososLevantamentoARVCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN person ps ON ps.person_id = p.patient_id "
-            + "WHERE  e.encounter_type = ${6} "
-            + "       AND e.encounter_datetime BETWEEN Date_add(Curdate(), INTERVAL -18 MONTH) AND Curdate() "
-            + "AND e.location_id = :location"
-            + "       AND e.voided = 0 "
-            + "       AND o.concept_id = ${6332} "
-            + "       AND o.value_coded = ${1065} "
-            + "       AND o.voided = 0 "
-            + "       AND ps.gender = 'F' "
-            + "       AND ps.voided = 0 "
-            + "GROUP BY p.patient_id ";
+        ""
+            + "SELECT bf.patient_id "
+            + "FROM   (SELECT p.patient_id, MAX(e.encounter_datetime) breastfeed_date, pregnant.pregnancy_date "
+            + "        FROM   patient p INNER JOIN encounter e "
+            + "                       ON e.patient_id = p.patient_id INNER JOIN obs o "
+            + "                       ON o.encounter_id = e.encounter_id INNER JOIN person ps "
+            + "                       ON ps.person_id = p.patient_id "
+            + "               LEFT JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) pregnancy_date "
+            + "                          FROM   patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                 INNER JOIN person ps ON ps.person_id = p.patient_id "
+            + "                          WHERE  e.encounter_type = ${6} "
+            + "                                 AND e.encounter_datetime BETWEEN DATE_ADD(CURDATE(), INTERVAL -9 month) AND CURDATE() "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.concept_id = ${1982} "
+            + "                                 AND o.value_coded = ${1065} "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND ps.gender = 'F' "
+            + "                                 AND ps.voided = 0 "
+            + "                          GROUP  BY p.patient_id) pregnant "
+            + "                      ON pregnant.patient_id = p.patient_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "               AND e.encounter_datetime BETWEEN DATE_ADD(CURDATE(), INTERVAL -18 MONTH) AND CURDATE() "
+            + "               AND e.location_id = :location "
+            + "               AND e.voided = 0 "
+            + "               AND o.concept_id = ${6332} "
+            + "               AND o.value_coded = ${1065} "
+            + "               AND o.voided = 0 "
+            + "               AND ps.gender = 'F' "
+            + "               AND ps.voided = 0 "
+            + "        GROUP  BY p.patient_id)bf "
+            + "WHERE  bf.breastfeed_date > bf.pregnancy_date OR bf.pregnancy_date IS NULL "
+            + "GROUP  BY bf.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
