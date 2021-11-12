@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +10,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -818,8 +819,8 @@ public class FaltososLevantamentoARVCohortQueries {
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        ""
-            + "SELECT pw.patient_id "
+
+              "SELECT pw.patient_id "
             + "FROM   (SELECT p.patient_id, MAX(e.encounter_datetime) AS pregnancy_date, breastfeeding.breastfeed_date "
             + "        FROM   patient p "
             + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -894,8 +895,7 @@ public class FaltososLevantamentoARVCohortQueries {
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        ""
-            + "SELECT bf.patient_id "
+              "SELECT bf.patient_id "
             + "FROM   (SELECT p.patient_id, MAX(e.encounter_datetime) breastfeed_date, pregnant.pregnancy_date "
             + "        FROM   patient p INNER JOIN encounter e "
             + "                       ON e.patient_id = p.patient_id INNER JOIN obs o "
