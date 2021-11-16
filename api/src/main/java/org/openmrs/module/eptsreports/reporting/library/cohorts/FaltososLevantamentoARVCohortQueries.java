@@ -959,8 +959,9 @@ public class FaltososLevantamentoARVCohortQueries {
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
-    String query = ""
-            + "SELECT viral_result.patient_id "
+    String query =
+
+              "SELECT viral_result.patient_id "
             + "FROM   (SELECT vl_registered.patient_id, vl_registered.encounter_type, vl_registered.concept_id, vl_registered.value_numeric "
             + "        FROM   (SELECT p.patient_id, e.encounter_id, e.encounter_type, encounter_datetime, o.concept_id, o.value_numeric, o.obs_datetime "
             + "                FROM   patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -1040,7 +1041,6 @@ public class FaltososLevantamentoARVCohortQueries {
             + "WHERE  viral_result.concept_id = ${856} "
             + "       AND viral_result.value_numeric >= 1000 "
             + "GROUP  BY viral_result.patient_id";
-
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
