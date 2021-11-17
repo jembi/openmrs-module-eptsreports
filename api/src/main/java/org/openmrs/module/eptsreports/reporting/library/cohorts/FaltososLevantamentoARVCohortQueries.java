@@ -962,7 +962,7 @@ public class FaltososLevantamentoARVCohortQueries {
     String query =
 
               "SELECT viral_result.patient_id "
-            + "FROM   (SELECT vl_registered.patient_id, vl_registered.encounter_type, vl_registered.concept_id, vl_registered.value_numeric "
+            + "FROM   (SELECT vl_registered.patient_id, vl_registered.concept_id, vl_registered.value_numeric "
             + "        FROM   (SELECT p.patient_id, e.encounter_id, e.encounter_type, encounter_datetime, o.concept_id, o.value_numeric, o.obs_datetime "
             + "                FROM   patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1023,9 +1023,9 @@ public class FaltososLevantamentoARVCohortQueries {
             + "       AND encounter_51_13.patient_id = vl_registered.patient_id )) "
             + "       OR EXISTS (SELECT encounter_51.encounter_id "
             + "       FROM   encounter encounter_51 "
-            + "       WHERE  encounter_51 .encounter_id = vl_registered.encounter_id "
+            + "       WHERE  encounter_51.encounter_id = vl_registered.encounter_id "
             + "       AND encounter_51.patient_id = vl_registered.patient_id "
-            + "       AND encounter_51 .encounter_type = ${51} "
+            + "       AND encounter_51.encounter_type = ${51} "
             + "       AND NOT EXISTS (SELECT encounter_13.encounter_id "
             + "       FROM   encounter encounter_13 "
             + "       INNER JOIN obs o ON o.encounter_id = encounter_13.encounter_id "
@@ -1035,9 +1035,9 @@ public class FaltososLevantamentoARVCohortQueries {
             + "       AND encounter_13.patient_id = vl_registered.patient_id)) "
             + "       OR EXISTS (SELECT encounter_13.encounter_id "
             + "       FROM   encounter encounter_13 "
-            + "       WHERE  encounter_13 .encounter_id = vl_registered.encounter_id "
+            + "       WHERE  encounter_13.encounter_id = vl_registered.encounter_id "
             + "       AND encounter_13.patient_id = vl_registered.patient_id "
-            + "       AND encounter_13 .encounter_type = ${13})) viral_result "
+            + "       AND encounter_13.encounter_type = ${13})) viral_result "
             + "WHERE  viral_result.concept_id = ${856} "
             + "       AND viral_result.value_numeric >= 1000 "
             + "GROUP  BY viral_result.patient_id";
