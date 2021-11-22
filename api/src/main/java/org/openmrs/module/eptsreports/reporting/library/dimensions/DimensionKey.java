@@ -7,4 +7,5 @@ public interface DimensionKey {
   public String getDimension();
 
   public DimensionKey and(DimensionKey dimensionKey);
+
 }
