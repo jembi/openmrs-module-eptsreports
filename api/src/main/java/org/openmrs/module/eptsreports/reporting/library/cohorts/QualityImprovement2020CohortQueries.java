@@ -6202,7 +6202,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * 13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN
    * (MG que entraram em TARV na CPN) (Line 91 in the template) Numerator (Column E in the Template)
-   * as following: <code>(B2 and J) and NOT (D or E or F) and Age >= 15*</code>
+   * as following: (B2 and J)
    *
    * @return CohortDefinition
    */
