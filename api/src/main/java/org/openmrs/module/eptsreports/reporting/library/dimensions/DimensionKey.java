@@ -8,4 +8,5 @@ public interface DimensionKey {
 
   public DimensionKey and(DimensionKey dimensionKey);
 
+  public String getPrefix();
 }
