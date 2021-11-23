@@ -5299,8 +5299,8 @@ public class QualityImprovement2020CohortQueries {
    * B2 - Select all female patients with first clinical consultation (encounter type 6) that have
    * the concept “GESTANTE” (Concept Id 1982) and value coded “SIM” (Concept Id 1065) registered
    * (1)during the inclusion period (first occurrence, encounter_datetime >= startDateInclusion and
-   * <=endDateInclusion) and (2) 3 months after the start of ART (encounter_datetime > “Patient ART Start
-   * Date” + 3 months)
+   * <=endDateInclusion) and (2) 3 months after the start of ART (encounter_datetime > “Patient ART
+   * Start Date” + 3 months)
    *
    * @return CohortDefinition
    */
