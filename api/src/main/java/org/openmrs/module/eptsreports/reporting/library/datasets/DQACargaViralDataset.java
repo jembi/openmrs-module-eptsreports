@@ -48,10 +48,12 @@ public class DQACargaViralDataset extends BaseDataSet {
 
     PatientIdentifierType identifierType =
         Context.getPatientService()
-            .getPatientIdentifierTypeByUuid("8a76bb5c-4c57-11ec-81d3-0242ac130003");
+            .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
 
     // TO DO
-    // pdd.addRowFilter(dQACargaViralCohortQueries.getBaseCohort(), , , );
+    pdd.addRowFilter(
+        dQACargaViralCohortQueries.getBaseCohort(),
+        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     /** 1 - NID - Sheet 1: Column B */
     pdd.addColumn("nid", getNID(identifierType.getPatientIdentifierTypeId()), "");
@@ -73,7 +75,11 @@ public class DQACargaViralDataset extends BaseDataSet {
      * 5 - Data de Consulta onde Notificou o Resultado de CV dentro do Período de Revisão - Sheet 1:
      * Column F
      */
-    //    pdd.addColumn("data_consulta_resultado_cv", , , );
+    pdd.addColumn(
+        "data_consulta_resultado_cv",
+        this.getDataNotificouCV(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
     /** 6 - Resultado da Carga Viral - Sheet 1: Column G */
     //    pdd.addColumn("resultado_carga_viral", , , );
@@ -107,5 +113,85 @@ public class DQACargaViralDataset extends BaseDataSet {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
     return cd;
+  }
+
+  private DataDefinition getDataNotificouCV() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data de Consulta onde Notificou o Resultado de CV");
+    spdd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT patient_id, min(first_vl) as lab_result_date "
+            + "FROM( "
+            + "    SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS first_vl "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.concept_id IN ( ${856}, ${1305} ) "
+            + "       AND o.value_coded IS NOT NULL "
+            + "      AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= DATE_SUB(DATE_ADD(:startDate, INTERVAL 1 MONTH), INTERVAL 1 DAY)"
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS first_vl "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.concept_id IN ( ${856}, ${1305} ) "
+            + "       AND o.value_coded IS NOT NULL "
+            + "       AND e.encounter_datetime >= DATE_ADD(:startDate, INTERVAL 1 MONTH)  "
+            + "       AND e.encounter_datetime <= DATE_SUB(DATE_ADD(:startDate, INTERVAL 2 MONTH), INTERVAL 1 DAY) "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS first_vl "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.concept_id IN ( ${856}, ${1305} ) "
+            + "       AND o.value_coded IS NOT NULL "
+            + "       AND e.encounter_datetime >= DATE_ADD(:startDate, INTERVAL 2 MONTH) "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id "
+            + ") vl GROUP BY vl.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
   }
 }
