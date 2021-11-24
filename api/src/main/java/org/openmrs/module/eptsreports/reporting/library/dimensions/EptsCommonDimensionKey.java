@@ -1,36 +1,33 @@
 package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EptsCommonDimensionKey {
 
-  String dimension = null;
-  String firstDimension = null;
+  List<DimensionKey> dimensionKeys;
 
-  public void add(DimensionKey dimensionKey) {
-
-    if (firstDimension == null && dimension == null) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(dimensionKey.getPrefix()).append(dimensionKey.getKey()).append("|");
-      firstDimension = sb.toString();
-      dimension = sb.toString();
-      return;
-    }
-
-    if (firstDimension != null && dimension == null) {
-      dimension = firstDimension.toString();
-      return;
-    }
-
-    if (dimension != null) {
-      StringBuilder sb = new StringBuilder(dimension);
-      sb.append(dimensionKey.getPrefix()).append(dimensionKey.getKey()).append("|");
-      dimension = sb.toString();
-    }
+  private EptsCommonDimensionKey() {
+    dimensionKeys = new ArrayList<>();
   }
 
-  public String getDimension() {
+  public static EptsCommonDimensionKey of(DimensionKey dimensionKey) {
+    EptsCommonDimensionKey commonDimensionKey = new EptsCommonDimensionKey();
+    commonDimensionKey.dimensionKeys.add(dimensionKey);
+    return commonDimensionKey;
+  }
 
-    String dimensioOptions = dimension.substring(0, dimension.length() - 1);
-    dimension = null;
-    return dimensioOptions;
+  public EptsCommonDimensionKey and(DimensionKey dimensionKey) {
+    this.dimensionKeys.add(dimensionKey);
+    return this;
+  }
+
+  public String getDimensions() {
+    StringBuilder sb = new StringBuilder();
+    for (DimensionKey dimensionKey : dimensionKeys) {
+      sb.append(dimensionKey.getDimension()).append("|");
+    }
+    String dimensionOptions = sb.toString();
+    return dimensionOptions.substring(0, dimensionOptions.length() - 1);
   }
 }

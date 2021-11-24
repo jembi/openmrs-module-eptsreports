@@ -34,12 +34,9 @@ public enum DimensionKeyForAge implements DimensionKey {
   overOrEqualTo65Years("65+");
 
   private String key;
-  private EptsCommonDimensionKey eptsCommonDimensionKey;
 
   private DimensionKeyForAge(String key) {
     this.key = key;
-    eptsCommonDimensionKey = new EptsCommonDimensionKey();
-    eptsCommonDimensionKey.add(this);
   }
 
   @Override
@@ -50,15 +47,9 @@ public enum DimensionKeyForAge implements DimensionKey {
 
   @Override
   public String getDimension() {
-
-    String dimension = eptsCommonDimensionKey.getDimension();
-    return dimension;
-  }
-
-  @Override
-  public DimensionKey and(DimensionKey dimensionKey) {
-    eptsCommonDimensionKey.add(dimensionKey);
-    return this;
+    StringBuilder sb = new StringBuilder();
+    sb.append(getPrefix()).append(getKey());
+    return sb.toString();
   }
 
   @Override

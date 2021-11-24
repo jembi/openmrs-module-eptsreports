@@ -5,12 +5,9 @@ public enum DimensionKeyForGender implements DimensionKey {
   male("M");
 
   private String key;
-  private EptsCommonDimensionKey eptsCommonDimensionKey;
 
   private DimensionKeyForGender(String key) {
     this.key = key;
-    eptsCommonDimensionKey = new EptsCommonDimensionKey();
-    eptsCommonDimensionKey.add(this);
   }
 
   @Override
@@ -20,13 +17,9 @@ public enum DimensionKeyForGender implements DimensionKey {
 
   @Override
   public String getDimension() {
-    return eptsCommonDimensionKey.getDimension();
-  }
-
-  @Override
-  public DimensionKey and(DimensionKey dimensionKey) {
-    eptsCommonDimensionKey.add(dimensionKey);
-    return this;
+    StringBuilder sb = new StringBuilder();
+    sb.append(getPrefix()).append(getKey());
+    return sb.toString();
   }
 
   @Override
