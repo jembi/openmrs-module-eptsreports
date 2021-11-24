@@ -13,9 +13,7 @@ public class DQACargaViralCohortQueries {
   private TbMetadata tbMetadata;
 
   @Autowired
-  public DQACargaViralCohortQueries(
-      HivMetadata hivMetadata,
-      TbMetadata tbMetadata) {
+  public DQACargaViralCohortQueries(HivMetadata hivMetadata, TbMetadata tbMetadata) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
   }

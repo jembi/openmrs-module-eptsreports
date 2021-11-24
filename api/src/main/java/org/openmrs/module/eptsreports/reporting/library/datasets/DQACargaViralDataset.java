@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
@@ -32,8 +31,7 @@ public class DQACargaViralDataset extends BaseDataSet {
 
   @Autowired
   public DQACargaViralDataset(
-          HivMetadata hivMetadata,
-          DQACargaViralCohortQueries dQACargaViralCohortQueries) {
+      HivMetadata hivMetadata, DQACargaViralCohortQueries dQACargaViralCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.dQACargaViralCohortQueries = dQACargaViralCohortQueries;
   }
@@ -49,9 +47,8 @@ public class DQACargaViralDataset extends BaseDataSet {
     pdd.setName("DQA Carga Viral");
 
     PatientIdentifierType identifierType =
-            Context.getPatientService()
-                    .getPatientIdentifierTypeByUuid("8a76bb5c-4c57-11ec-81d3-0242ac130003");
-
+        Context.getPatientService()
+            .getPatientIdentifierTypeByUuid("8a76bb5c-4c57-11ec-81d3-0242ac130003");
 
     // TO DO
     // pdd.addRowFilter(dQACargaViralCohortQueries.getBaseCohort(), , , );
@@ -67,16 +64,19 @@ public class DQACargaViralDataset extends BaseDataSet {
 
     /** 4 - Data Início TARV - Sheet 1: Column E */
     pdd.addColumn(
-            "inicio_tarv",
-            getArtStartDate(),
-            "onOrBefore=${endDate},location=${location}",
-            new CalculationResultConverter());
+        "inicio_tarv",
+        getArtStartDate(),
+        "onOrBefore=${endDate},location=${location}",
+        new CalculationResultConverter());
 
-    /** 5 - Data de Consulta onde Notificou o Resultado de CV dentro do Período de Revisão - Sheet 1: Column F */
-//    pdd.addColumn("data_consulta_resultado_cv", , , );
+    /**
+     * 5 - Data de Consulta onde Notificou o Resultado de CV dentro do Período de Revisão - Sheet 1:
+     * Column F
+     */
+    //    pdd.addColumn("data_consulta_resultado_cv", , , );
 
     /** 6 - Resultado da Carga Viral - Sheet 1: Column G */
-//    pdd.addColumn("resultado_carga_viral", , , );
+    //    pdd.addColumn("resultado_carga_viral", , , );
 
     return pdd;
   }
@@ -88,10 +88,10 @@ public class DQACargaViralDataset extends BaseDataSet {
     Map<String, Integer> valuesMap = new HashMap<>();
 
     String sql =
-            " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
-                    + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
-                    + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
-                    + identifierType;
+        " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
+            + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
+            + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
+            + identifierType;
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -101,9 +101,9 @@ public class DQACargaViralDataset extends BaseDataSet {
 
   private DataDefinition getArtStartDate() {
     CalculationDataDefinition cd =
-            new CalculationDataDefinition(
-                    "Art start date",
-                    Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0));
+        new CalculationDataDefinition(
+            "Art start date",
+            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
     return cd;
