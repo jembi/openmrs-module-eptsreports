@@ -5,7 +5,7 @@ import java.util.List;
 
 public class EptsCommonDimensionKey {
 
-  List<DimensionKey> dimensionKeys;
+  private List<DimensionKey> dimensionKeys;
 
   private EptsCommonDimensionKey() {
     dimensionKeys = new ArrayList<>();
