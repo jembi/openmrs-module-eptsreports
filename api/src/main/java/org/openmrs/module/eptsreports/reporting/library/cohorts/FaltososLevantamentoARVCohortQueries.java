@@ -326,6 +326,14 @@ public class FaltososLevantamentoARVCohortQueries {
     sqlCohortDefinition.setName("Exlusions  - E1.1 Trasfered out state in program");
     addSqlCohortDefinitionParameters(sqlCohortDefinition);
 
+    String queryPatientsTransferedOut = getPatientsTransferredOutRegisteredInProgramState(false);
+
+    sqlCohortDefinition.setQuery(queryPatientsTransferedOut);
+    return sqlCohortDefinition;
+  }
+
+  private String getPatientsTransferredOutRegisteredInProgramState(boolean selectDatetime) {
+
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
     valuesMap.put(
@@ -334,15 +342,11 @@ public class FaltososLevantamentoARVCohortQueries {
             .getTransferredOutToAnotherHealthFacilityWorkflowState()
             .getProgramWorkflowStateId());
 
-    String query =
-        " SELECT patient_id "
-            + "FROM   (SELECT p.patient_id, "
-            + "               Max(ps.start_date) recent_startdate "
+    String fromSql =
+        "FROM   (SELECT p.patient_id, Max(ps.start_date) recent_date "
             + "        FROM   patient p "
-            + "               INNER JOIN patient_program pg "
-            + "                       ON pg.patient_id = p.patient_id "
-            + "               INNER JOIN patient_state ps "
-            + "                       ON ps.patient_program_id = pg.patient_program_id "
+            + "               INNER JOIN patient_program pg ON pg.patient_id = p.patient_id "
+            + "               INNER JOIN patient_state ps ON ps.patient_program_id = pg.patient_program_id "
             + "        WHERE  pg.program_id = ${2} "
             + "               AND pg.location_id = :location "
             + "               AND ps.state = ${7} "
@@ -351,12 +355,16 @@ public class FaltososLevantamentoARVCohortQueries {
             + "               AND pg.voided = 0 "
             + "               AND ps.voided = 0 "
             + "        GROUP  BY p.patient_id "
-            + "        HAVING recent_startdate <= :endDate) transfered_out "
+            + "        HAVING recent_date <= :endDate) transfered_out "
             + "GROUP  BY patient_id ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-    return sqlCohortDefinition;
+    String query =
+        selectDatetime
+            ? "SELECT patient_id, recent_date ".concat(fromSql)
+            : "SELECT patient_id ".concat(fromSql);
+
+    return stringSubstitutor.replace(query);
   }
 
   /**
@@ -385,6 +393,15 @@ public class FaltososLevantamentoARVCohortQueries {
         "All transferred-outs registered in Ficha Resumo and Ficha Clinica of Master Card ");
     addSqlCohortDefinitionParameters(sqlCohortDefinition);
 
+    String transferedOut = getPatientsTransferredOutRegisteredInFichaResumoAndMasterCard(false);
+
+    sqlCohortDefinition.setQuery(transferedOut);
+    return sqlCohortDefinition;
+  }
+
+  public String getPatientsTransferredOutRegisteredInFichaResumoAndMasterCard(
+      boolean selectDatetime) {
+
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
@@ -392,14 +409,13 @@ public class FaltososLevantamentoARVCohortQueries {
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     valuesMap.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
 
-    String query =
-        " SELECT patient_id "
-            + "FROM   (SELECT p.patient_id "
+    String fromSql =
+        "FROM ("
+            + " SELECT transferred_out.patient_id, MAX(transferred_out.recent_datetime) recent_date "
+            + "FROM   (SELECT p.patient_id, MAX(e.encounter_datetime) recent_datetime "
             + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON e.patient_id = p.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON o.encounter_id = e.encounter_id "
+            + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "        WHERE  e.encounter_type = ${6} "
             + "               AND e.location_id = :location "
             + "               AND o.concept_id = ${6273} "
@@ -410,12 +426,10 @@ public class FaltososLevantamentoARVCohortQueries {
             + "               AND o.voided = 0 "
             + "        GROUP  BY p.patient_id "
             + "        UNION "
-            + "        SELECT p.patient_id "
+            + "        SELECT p.patient_id, MAX(o.obs_datetime) recent_datetime "
             + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON e.patient_id = p.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON o.encounter_id = e.encounter_id "
+            + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "        WHERE  e.encounter_type = ${53} "
             + "               AND o.concept_id = ${6272} "
             + "               AND o.value_coded = ${1706} "
@@ -424,12 +438,15 @@ public class FaltososLevantamentoARVCohortQueries {
             + "               AND p.voided = 0 "
             + "               AND e.voided = 0 "
             + "               AND o.voided = 0 "
-            + "        GROUP  BY p.patient_id) trasfered_out "
-            + "GROUP  BY patient_id  ";
+            + "        GROUP  BY p.patient_id) transferred_out "
+            + "GROUP  BY transferred_out.patient_id  ) transferred "
+            + "GROUP BY transferred.patient_id ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-    return sqlCohortDefinition;
+    String query =
+        selectDatetime
+            ? "SELECT patient_id, recent_date ".concat(fromSql)
+            : "SELECT patient_id ".concat(fromSql);
+    return stringSubstitutor.replace(query);
   }
 
   /**
@@ -464,39 +481,40 @@ public class FaltososLevantamentoARVCohortQueries {
     valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
+    String transferredOutInProgram = getPatientsTransferredOutRegisteredInProgramState(true);
+    String transferredOutInResumoAndMasterCard =
+        getPatientsTransferredOutRegisteredInFichaResumoAndMasterCard(true);
     String query =
-        "SELECT pickedup_drugs.patient_id "
-            + "FROM   (SELECT p.patient_id, "
-            + "               Max(e.encounter_datetime) recent_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON e.patient_id = p.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON o.encounter_id = e.encounter_id "
-            + "        WHERE  e.encounter_type IN ( ${6}, ${9}, ${18} ) "
-            + "               AND e.location_id = :location "
-            + "               AND p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "        GROUP  BY p.patient_id "
-            + "        HAVING recent_date <= :endDate "
-            + "        UNION "
-            + "        SELECT p.patient_id, "
-            + "               Max(o.value_datetime) recent_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON e.patient_id = p.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON o.encounter_id = e.encounter_id "
-            + "        WHERE  e.encounter_type = ${52} "
-            + "               AND e.location_id = :location "
-            + "               AND o.concept_id = ${23866} "
-            + "               AND p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "        GROUP  BY p.patient_id "
-            + "        HAVING recent_date <= :endDate) pickedup_drugs "
-            + "GROUP  BY patient_id  ";
+        "SELECT patient_id "
+            + "FROM   (SELECT transferout.patient_id,   Max(transferout.recent_date) transferred_date "
+            + "        FROM   ( "
+            + transferredOutInProgram
+            + "                UNION "
+            + transferredOutInResumoAndMasterCard
+            + "                ) transferout "
+            + "        GROUP  BY transferout.patient_id) max_transfer"
+            + " WHERE  max_transfer.patient_id NOT IN (SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                          JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                            AND e.voided = 0 "
+            + "                                            AND e.encounter_type IN (${6},${9},${18})  "
+            + "                                            AND e.location_id = :location "
+            + "                                            AND e.encounter_datetime > max_transfer.transferred_date "
+            + "                                          AND max_transfer.patient_id = p.patient_id "
+            + "                                            AND e.encounter_datetime <= :endDate "
+            + "                                          UNION "
+            + "                                          SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                          JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                          JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                          WHERE  p.voided = 0"
+            + "                                            AND e.voided = 0 "
+            + "                                            AND e.encounter_type =  ${52} "
+            + "                                            AND e.location_id = :location "
+            + "                                            AND o.concept_id =  ${23866} "
+            + "                                            AND o.value_datetime > max_transfer.transferred_date AND max_transfer.patient_id = p.patient_id"
+            + "                                            AND o.value_datetime <= :endDate) GROUP BY patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
