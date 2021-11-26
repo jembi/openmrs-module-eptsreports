@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +10,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -1342,7 +1343,7 @@ public class FaltososLevantamentoARVCohortQueries {
     valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     String fromSQL =
-        "FROM   (SELECT p.patient_id, o.value_datetime recent_datetime "
+        "FROM   (SELECT p.patient_id, MAX(o.value_datetime) recent_datetime "
             + "        FROM   patient p "
             + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
