@@ -95,16 +95,338 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
   }
 
   private void addDenominatorColumnsForLabAndFsr(
-      CohortIndicatorDataSetDefinition dsd, String mappings) {}
+      CohortIndicatorDataSetDefinition dsd, String mappings) {
+    dsd.addColumn(
+        "0DLF",
+        "Total patients with Viral load - Denominator based on Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "patients with viral load",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPatientsViralLoadWithin12MonthsForLabAndFsrDenominatorAndOnArtForMoreThan3Months(),
+                    mappings)),
+            mappings),
+        "");
+
+    // Get patients with viral load and on routine
+    addRow(
+        dsd,
+        "DRLF",
+        "Patients Denominator on Routine based on Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "viral load results on routine adults and children based on Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPatientsWithViralLoadResultsAndOnRoutineForLabAndFsrDenominator(),
+                    mappings)),
+            mappings),
+        getAdultChildrenColumns());
+    // Get patients with viral load and on target
+    addRow(
+        dsd,
+        "DTLF",
+        "Patients Denominator on Target based on Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "viral load results on target adults and children based on Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPatientsWhoAreOnTargetForLabAndFsrDenominator(),
+                    mappings)),
+            mappings),
+        getAdultChildrenColumns());
+
+    // Breastfeeding & Pregnant
+    // Breastfeeding and on ART for more than 3 months and have VL results
+    addRow(
+        dsd,
+        "BLF",
+        "Breast feeding, have vl results and on ART more than 3 months Denominator with Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Breast feeding, have vl results and on ART more than 3 months Denominator with Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getBreastfeedingWomenWhoHaveViralLoadResultsForLabAndFsrDenominator(),
+                    mappings)),
+            mappings),
+        getRoutineTargetedColumns());
+
+    // Pregnant women on ART for more than 3 months and have VL results
+    addRow(
+        dsd,
+        "PLF",
+        "Pregnant, have vl results and on ART more than 3 months Denominator with Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Pregnant, have vl results and on ART more than 3 months Denominator with Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPregnantWomenWithViralLoadResultsForLabAndFsrDenominator(),
+                    mappings)),
+            mappings),
+        getRoutineTargetedColumns());
+
+    // Routine for Adults & Children denominator KP
+    addRow(
+        dsd,
+        "KPDLF",
+        "Key population patients and are on routine and target Denominator with Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Key population patients and are on routine and target Denominator with Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPatientsViralLoadWithin12MonthsForLabAndFsrDenominatorAndOnArtForMoreThan3Months(),
+                    mappings)),
+            mappings),
+        getKpRoutineTargetedColumns());
+  }
 
   private void addNumeratorColumnsForLabAndFsr(
-      CohortIndicatorDataSetDefinition dsd, String mappings) {}
+      CohortIndicatorDataSetDefinition dsd, String mappings) {
+    dsd.addColumn(
+        "LFN",
+        "Total patients with suppressed Viral load based on Lab or FSR - Numerator",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "suppressed viral load",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPatientsWithViralLoadSuppressionForLabAndFsrNumeratorWhoAreOnArtMoreThan3Months(),
+                    mappings)),
+            mappings),
+        "");
+
+    // Breastfeeding & Pregnant
+    // Breastfeeding
+    addRow(
+        dsd,
+        "BLFN",
+        "Breast feeding, have vl suppression and on ART more than 3 months numerator based on Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Breast feeding, have vl suppression and on ART more than 3 months numerator based on FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getBreastfeedingWomenWithViralSuppressionForLabAndFsrNumerator(),
+                    mappings)),
+            mappings),
+        getRoutineTargetedColumns());
+    // Pregnant
+    addRow(
+        dsd,
+        "PLFN",
+        "Pregnant patients, have vl suppression and on ART more than 3 months numerator based on Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Pregnant patients, have vl suppression and on ART more than 3 months numerator based on Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPregnantWomenWithViralLoadSuppressionForLabAndFsrNumerator(),
+                    mappings)),
+            mappings),
+        getRoutineTargetedColumns());
+
+    // Adults & children on Routine
+    addRow(
+        dsd,
+        "NLFR",
+        "Adult and children with viral load suppression, have more than 3 months on ART and on routine based on Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Adult and children with viral load suppression, have more than 3 months on ART and on routine based on Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPatientWithViralSuppressionAndOnRoutineForLabAndFsrNumerator(),
+                    mappings)),
+            mappings),
+        getAdultChildrenColumns());
+    // Adults and children on Target
+    addRow(
+        dsd,
+        "NTFR",
+        "Adult and children with viral load suppression, have more than 3 months on ART and on target based on Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Adult and children with viral load suppression, have more than 3 months on ART and on target based on Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPatientWithViralSuppressionAndOnTargetForLabAndFsrNumerator(),
+                    mappings)),
+            mappings),
+        getAdultChildrenColumns());
+
+    // Routine for Adults & Children Numerator KP
+    addRow(
+        dsd,
+        "KPNLF",
+        "Key population patients and are on routine and target Numerator based on Lab or FSR",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Key population patients and are on routine and target Numerator based on Lab or FSR",
+                EptsReportUtils.map(
+                    txPvlsBySourceLabOrFsrCohortQueries
+                        .getPatientsWithViralLoadSuppressionForLabAndFsrNumeratorWhoAreOnArtMoreThan3Months(),
+                    mappings)),
+            mappings),
+        getKpRoutineTargetedColumns());
+  }
 
   private void addDenominatorColumnsForClinicalForms(
-      CohortIndicatorDataSetDefinition dsd, String mappings) {}
+      CohortIndicatorDataSetDefinition dsd, String mappings) {
+    dsd.addColumn(
+        "0DC",
+        "Total patients with Viral load - Denominator based on Clinical forms",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "patients with viral load based on clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getPatientsViralLoadWithin12MonthsForFichaMestreDenominatorAndOnArtForMoreThan3Months(),
+                    mappings)),
+            mappings),
+        "");
+
+    // Get patients with viral load and on routine
+    addRow(
+        dsd,
+        "DRC",
+        "Patients Denominator on Routine based on Clinical forms",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "viral load results on routine adults and children based on clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getPatientsWithViralLoadResultsAndOnRoutineForFichaMestreDenominator(),
+                    mappings)),
+            mappings),
+        getAdultChildrenColumns());
+
+    // Breastfeeding & Pregnant
+    // Breastfeeding and on ART for more than 3 months and have VL results
+    addRow(
+        dsd,
+        "BC",
+        "Breast feeding, have vl results and on ART more than 3 months Denominator with Clinical forms",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Breast feeding, have vl results and on ART more than 3 months Denominator with clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getBreastfeedingWomenWhoHaveViralLoadResultsForFichaMestreDenominator(),
+                    mappings)),
+            mappings),
+        getRoutineTargetedColumns());
+
+    // Pregnant women on ART for more than 3 months and have VL results
+    addRow(
+        dsd,
+        "PC",
+        "Pregnant, have vl results and on ART more than 3 months Denominator with Clinical forms",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Pregnant, have vl results and on ART more than 3 months Denominator with Clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getPregnantWomenWithViralLoadResultsForFichaMestreDenominator(),
+                    mappings)),
+            mappings),
+        getRoutineTargetedColumns());
+
+    // Routine for Adults & Children denominator KP
+    addRow(
+        dsd,
+        "KPDC",
+        "Key population patients and are on routine and target Denominator with Clinical forms",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Key population patients and are on routine and target Denominator with Clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getPatientsViralLoadWithin12MonthsForFichaMestreDenominatorAndOnArtForMoreThan3Months(),
+                    mappings)),
+            mappings),
+        getKpRoutineTargetedColumns());
+  }
 
   private void addNumeratorColumnsForClinicalForms(
-      CohortIndicatorDataSetDefinition dsd, String mappings) {}
+      CohortIndicatorDataSetDefinition dsd, String mappings) {
+    dsd.addColumn(
+        "CNT",
+        "Total patients with suppressed Viral load based on Clinical forms- Numerator",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "suppressed viral load based on clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getPatientsWithViralLoadSuppressionForFichaMestreNumeratorWhoAreOnArtMoreThan3Months(),
+                    mappings)),
+            mappings),
+        "");
+
+    // Breastfeeding & Pregnant
+    // Breastfeeding
+    addRow(
+        dsd,
+        "BCN",
+        "Breast feeding, have vl suppression and on ART more than 3 months numerator based on Clinical forms",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Breast feeding, have vl suppression and on ART more than 3 months numerator based on clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getBreastfeedingWomenWithViralSuppressionForFichaMestreNumerator(),
+                    mappings)),
+            mappings),
+        getRoutineTargetedColumns());
+    // Pregnant
+    addRow(
+        dsd,
+        "PCN",
+        "Pregnant patients, have vl suppression and on ART more than 3 months numerator based on Clinical form",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Pregnant patients, have vl suppression and on ART more than 3 months numerator based on Clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getPregnantWomenWithViralLoadSuppressionForLabAndFsrNumerator(),
+                    mappings)),
+            mappings),
+        getRoutineTargetedColumns());
+
+    // Adults & children on Routine
+    addRow(
+        dsd,
+        "NCR",
+        "Adult and children with viral load suppression, have more than 3 months on ART and on routine based on Clinical forms",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Adult and children with viral load suppression, have more than 3 months on ART and on routine based on Clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getPatientWithViralSuppressionAndOnRoutineForFichaMestreNumerator(),
+                    mappings)),
+            mappings),
+        getAdultChildrenColumns());
+
+    // Routine for Adults & Children Numerator KP
+    addRow(
+        dsd,
+        "KPC",
+        "Key population patients and are on routine and target Numerator based on Clinical forms",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Key population patients and are on routine and target Numerator based on Clinical forms",
+                EptsReportUtils.map(
+                    txPvlsBySourceClinicalOrFichaResumoCohortQueries
+                        .getPatientsWithViralLoadSuppressionForFichaMestreNumeratorWhoAreOnArtMoreThan3Months(),
+                    mappings)),
+            mappings),
+        getKpRoutineTargetedColumns());
+  }
 
   private List<ColumnParameters> getAdultChildrenColumns() {
     // Male

@@ -303,31 +303,6 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
   }
 
   /**
-   * <b>Description</b> Get patients who are on target Composition
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getPatientsWhoAreOnTargetForFichaMestreDenominator() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("All patients on Target");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addSearch(
-        "results",
-        EptsReportUtils.map(
-            getPatientsViralLoadWithin12MonthsForFichaMestreDenominator(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "routine",
-        EptsReportUtils.map(
-            getPatientsWithViralLoadResultsAndOnRoutineForFichaMestreDenominator(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("results AND NOT routine");
-    return cd;
-  }
-
-  /**
    * <b>Description</b>Get patients having viral load suppression and routine for adults and
    * children - Numerator
    *
@@ -348,29 +323,6 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
 
     cd.addSearch("RoutineByClinical", EptsReportUtils.map(getRoutineByClinicalForms(), mappings));
     cd.setCompositionString("supp AND RoutineByClinical");
-    return cd;
-  }
-
-  /**
-   * <b>Description</b>Get patients having viral load suppression and target for adults and children
-   * - Numerator
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getPatientWithViralSuppressionAndOnTargetForFichaMestreNumerator() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Suppression and on target adult and children ForFichaMestre Numerator");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
-    cd.addSearch(
-        "supp",
-        EptsReportUtils.map(
-            getPatientsWithViralLoadSuppressionForFichaMestreNumeratorWhoAreOnArtMoreThan3Months(),
-            mappings));
-    cd.addSearch("RoutineByClinical", EptsReportUtils.map(getRoutineByClinicalForms(), mappings));
-    cd.setCompositionString("supp AND NOT RoutineByClinical");
     return cd;
   }
 }
