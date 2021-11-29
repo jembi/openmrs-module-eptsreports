@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class TxPvlsClinicalOrFichaResumoCohortQueries {
 
-    private TxPvlsCohortQueries txPvlsCohortQueries;
+  private TxPvlsCohortQueries txPvlsCohortQueries;
 
-    private HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
 
-    @Autowired
-    public TxPvlsClinicalOrFichaResumoCohortQueries(
-            TxPvlsCohortQueries txPvlsCohortQueries, HivMetadata hivMetadata) {
-        this.txPvlsCohortQueries = txPvlsCohortQueries;
-        this.hivMetadata = hivMetadata;
-    }
+  @Autowired
+  public TxPvlsClinicalOrFichaResumoCohortQueries(
+      TxPvlsCohortQueries txPvlsCohortQueries, HivMetadata hivMetadata) {
+    this.txPvlsCohortQueries = txPvlsCohortQueries;
+    this.hivMetadata = hivMetadata;
+  }
 }

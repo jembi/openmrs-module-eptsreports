@@ -14,14 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TxPvlsClinicalOrFichaResumoCohortQueries {
+public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
 
   private TxPvlsCohortQueries txPvlsCohortQueries;
 
   private HivMetadata hivMetadata;
 
   @Autowired
-  public TxPvlsClinicalOrFichaResumoCohortQueries(
+  public TxPvlsBySourceClinicalOrFichaResumoCohortQueries(
       TxPvlsCohortQueries txPvlsCohortQueries, HivMetadata hivMetadata) {
     this.txPvlsCohortQueries = txPvlsCohortQueries;
     this.hivMetadata = hivMetadata;
