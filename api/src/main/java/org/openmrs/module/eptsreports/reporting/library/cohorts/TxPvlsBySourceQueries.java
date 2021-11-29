@@ -210,4 +210,48 @@ public class TxPvlsBySourceQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
   }
+
+  /**
+   * <b>Description</b> Patients or routine using FSR with VL results
+   *
+   * @param adultoEncounter
+   * @param paedEncounter
+   * @param resumoEncounter
+   * @param viralLoadRequestReasonConceptId
+   * @param routineViralLoadConceptId
+   * @param unknownConceptId
+   * @return String
+   */
+  public static String getPatientsHavingRoutineViralLoadTestsUsingClinicalForms(
+      int adultoEncounter,
+      int paedEncounter,
+      int resumoEncounter,
+      int viralLoadRequestReasonConceptId,
+      int routineViralLoadConceptId,
+      int unknownConceptId) {
+    Map<String, String> map = new HashMap<>();
+    map.put("6", String.valueOf(adultoEncounter));
+    map.put("9", String.valueOf(paedEncounter));
+    map.put("53", String.valueOf(resumoEncounter));
+    map.put("23818", String.valueOf(viralLoadRequestReasonConceptId));
+    map.put("23817", String.valueOf(routineViralLoadConceptId));
+    map.put("1067", String.valueOf(unknownConceptId));
+    String query =
+        " SELECT final.patient_id FROM( "
+            + " SELECT p.patient_id, MAX(ee.encounter_datetime) AS viral_load_date "
+            + " FROM patient p "
+            + " INNER JOIN encounter ee ON p.patient_id=ee.patient_id "
+            + " INNER JOIN obs oo ON ee.encounter_id = oo.encounter_id "
+            + " WHERE "
+            + " ee.voided = 0 AND "
+            + " ee.encounter_type IN( ${6}, ${9}, ${53} AND "
+            + " oo.voided = 0 AND "
+            + " oo.concept_id = ${23818} AND oo.value_coded IN(${23817}, ${1067}) AND "
+            + " ee.location_id = :location "
+            + " AND ee.encounter_datetime <= :endDate "
+            + " GROUP BY p.patient_id ) final";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
 }
