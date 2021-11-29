@@ -1,10 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.IntensiveMonitoringDataSet;
@@ -18,6 +13,12 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
@@ -100,7 +101,7 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Monitoria_Intensiva_HIV_v1.xls",
+              "Template_MI_2021_v1.9.1.xls",
               "Template Ficha Relatório Monitoria Intensiva HIV",
               getExcelDesignUuid(),
               null);
