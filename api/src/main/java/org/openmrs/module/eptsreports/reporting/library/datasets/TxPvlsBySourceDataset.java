@@ -97,7 +97,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
   private void addDenominatorColumnsForLabAndFsr(
       CohortIndicatorDataSetDefinition dsd, String mappings) {
     dsd.addColumn(
-        "0DLF",
+        "DTT",
         "Total patients with Viral load - Denominator based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -112,7 +112,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Get patients with viral load and on routine
     addRow(
         dsd,
-        "DRLF",
+        "DR",
         "Patients Denominator on Routine based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -126,7 +126,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Get patients with viral load and on target
     addRow(
         dsd,
-        "DTLF",
+        "DT",
         "Patients Denominator on Target based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -142,7 +142,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Breastfeeding and on ART for more than 3 months and have VL results
     addRow(
         dsd,
-        "BLF",
+        "BD",
         "Breast feeding, have vl results and on ART more than 3 months Denominator with Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -157,7 +157,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Pregnant women on ART for more than 3 months and have VL results
     addRow(
         dsd,
-        "PLF",
+        "PD",
         "Pregnant, have vl results and on ART more than 3 months Denominator with Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -172,7 +172,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Routine for Adults & Children denominator KP
     addRow(
         dsd,
-        "KPDLF",
+        "KPD",
         "Key population patients and are on routine and target Denominator with Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -188,7 +188,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
   private void addNumeratorColumnsForLabAndFsr(
       CohortIndicatorDataSetDefinition dsd, String mappings) {
     dsd.addColumn(
-        "LFN",
+        "NTT",
         "Total patients with suppressed Viral load based on Lab or FSR - Numerator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -204,7 +204,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Breastfeeding
     addRow(
         dsd,
-        "BLFN",
+        "BN",
         "Breast feeding, have vl suppression and on ART more than 3 months numerator based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -218,7 +218,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Pregnant
     addRow(
         dsd,
-        "PLFN",
+        "PN",
         "Pregnant patients, have vl suppression and on ART more than 3 months numerator based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -233,7 +233,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Adults & children on Routine
     addRow(
         dsd,
-        "NLFR",
+        "NR",
         "Adult and children with viral load suppression, have more than 3 months on ART and on routine based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -247,7 +247,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Adults and children on Target
     addRow(
         dsd,
-        "NTFR",
+        "NT",
         "Adult and children with viral load suppression, have more than 3 months on ART and on target based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -262,7 +262,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Routine for Adults & Children Numerator KP
     addRow(
         dsd,
-        "KPNLF",
+        "KPN",
         "Key population patients and are on routine and target Numerator based on Lab or FSR",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -278,7 +278,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
   private void addDenominatorColumnsForClinicalForms(
       CohortIndicatorDataSetDefinition dsd, String mappings) {
     dsd.addColumn(
-        "0DC",
+        "DTC",
         "Total patients with Viral load - Denominator based on Clinical forms",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -309,7 +309,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Breastfeeding and on ART for more than 3 months and have VL results
     addRow(
         dsd,
-        "BC",
+        "DBC",
         "Breast feeding, have vl results and on ART more than 3 months Denominator with Clinical forms",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -324,7 +324,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Pregnant women on ART for more than 3 months and have VL results
     addRow(
         dsd,
-        "PC",
+        "DPC",
         "Pregnant, have vl results and on ART more than 3 months Denominator with Clinical forms",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -355,7 +355,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
   private void addNumeratorColumnsForClinicalForms(
       CohortIndicatorDataSetDefinition dsd, String mappings) {
     dsd.addColumn(
-        "CNT",
+        "NTC",
         "Total patients with suppressed Viral load based on Clinical forms- Numerator",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -371,7 +371,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Breastfeeding
     addRow(
         dsd,
-        "BCN",
+        "NBC",
         "Breast feeding, have vl suppression and on ART more than 3 months numerator based on Clinical forms",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -385,7 +385,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Pregnant
     addRow(
         dsd,
-        "PCN",
+        "NPC",
         "Pregnant patients, have vl suppression and on ART more than 3 months numerator based on Clinical form",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -400,7 +400,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Adults & children on Routine
     addRow(
         dsd,
-        "NCR",
+        "NRC",
         "Adult and children with viral load suppression, have more than 3 months on ART and on routine based on Clinical forms",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -415,7 +415,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     // Routine for Adults & Children Numerator KP
     addRow(
         dsd,
-        "KPC",
+        "NKPC",
         "Key population patients and are on routine and target Numerator based on Clinical forms",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
