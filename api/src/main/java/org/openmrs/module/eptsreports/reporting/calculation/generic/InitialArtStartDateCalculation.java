@@ -211,6 +211,7 @@ public class InitialArtStartDateCalculation extends AbstractPatientCalculation {
             + "  AND pickupdate.voided = 0 "
             + "  AND pickupdate.concept_id = %d "
             + "  AND pickupdate.value_datetime <= :onOrBefore "
+            + "  AND pickupdate.value_datetime > '1900-00-00'"
             + "GROUP BY p.patient_id;";
 
     def.setSql(
