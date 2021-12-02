@@ -2,8 +2,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -14,23 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DQACargaViralCohortQueries {
 
-  private HivMetadata hivMetadata;
-
-  private TbMetadata tbMetadata;
-
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   @Autowired
-  public DQACargaViralCohortQueries(
-      HivMetadata hivMetadata,
-      TbMetadata tbMetadata,
-      ResumoMensalCohortQueries resumoMensalCohortQueries) {
-    this.hivMetadata = hivMetadata;
-    this.tbMetadata = tbMetadata;
+  public DQACargaViralCohortQueries(ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
-
-  // TO DO
 
   public CohortDefinition getBaseCohort() {
 

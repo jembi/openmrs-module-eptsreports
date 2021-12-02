@@ -10,6 +10,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.ForwardSlashDateConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.DQACargaViralCohortQueries;
@@ -42,15 +43,12 @@ public class DQACargaViralDataset extends BaseDataSet {
     pdd.addParameter(new Parameter("startDate", "startDate", Date.class));
     pdd.addParameter(new Parameter("endDate", "endDate", Date.class));
     pdd.addParameter(new Parameter("location", "Location", Location.class));
-    pdd.addParameter(new Parameter("province", "Province", Location.class)); // Address (Província)
-    pdd.addParameter(new Parameter("district", "District", Location.class)); // Address (Distrito)
     pdd.setName("DQA Carga Viral");
 
     PatientIdentifierType identifierType =
         Context.getPatientService()
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
 
-    // TO DO
     pdd.addRowFilter(
         dQACargaViralCohortQueries.getBaseCohort(),
         "startDate=${startDate},endDate=${endDate},location=${location}");
@@ -62,7 +60,7 @@ public class DQACargaViralDataset extends BaseDataSet {
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
     /** 3 - Faixa Etária - Sheet 1: Column D */
-    // pdd.addColumn("age", .getAge(), , );
+    pdd.addColumn("age", new AgeDataDefinition(), "", null);
 
     /** 4 - Data Início TARV - Sheet 1: Column E */
     pdd.addColumn(
@@ -79,10 +77,13 @@ public class DQACargaViralDataset extends BaseDataSet {
         "data_consulta_resultado_cv",
         this.getDataNotificouCV(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     /** 6 - Resultado da Carga Viral - Sheet 1: Column G */
-    //    pdd.addColumn("resultado_carga_viral", , , );
+    pdd.addColumn(
+        "resultado_carga_viral",
+        this.getViralLoadResults(),
+        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     return pdd;
   }
@@ -182,6 +183,122 @@ public class DQACargaViralDataset extends BaseDataSet {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${6} "
             + "       AND o.concept_id IN ( ${856}, ${1305} ) "
+            + "       AND o.value_coded IS NOT NULL "
+            + "       AND e.encounter_datetime >= DATE_ADD(:startDate, INTERVAL 2 MONTH) "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id "
+            + ") vl GROUP BY vl.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  private DataDefinition getViralLoadResults() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data de Consulta onde Notificou o Resultado de CV");
+    spdd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        "SELECT patient_id, min(first_vl_result) as first_vl_result "
+            + "FROM( "
+            + "   SELECT p.patient_id, Min(o.value_numeric) AS first_vl_result "
+            + "   FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "   WHERE p.voided = 0 "
+            + "     AND e.voided = 0 "
+            + "     AND o.voided = 0 "
+            + "     AND e.location_id = :location "
+            + "     AND e.encounter_type = ${6} "
+            + "     AND o.concept_id = ${856} "
+            + "     AND o.value_numeric IS NOT NULL "
+            + "     AND e.encounter_datetime >= :startDate "
+            + "     AND e.encounter_datetime <= DATE_SUB(DATE_ADD(:startDate, INTERVAL 1 MONTH), INTERVAL 1 DAY)"
+            + "   GROUP  BY p.patient_id "
+            + "   UNION "
+            + "   SELECT p.patient_id, Min(o.value_coded) AS first_vl_result "
+            + "   FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "   WHERE  p.voided = 0 "
+            + "     AND e.voided = 0 "
+            + "     AND o.voided = 0 "
+            + "     AND e.location_id = :location "
+            + "     AND e.encounter_type = ${6} "
+            + "     AND o.concept_id = ${1305} "
+            + "     AND o.value_coded IS NOT NULL "
+            + "     AND e.encounter_datetime >= :startDate "
+            + "     AND e.encounter_datetime <= DATE_SUB(DATE_ADD(:startDate, INTERVAL 1 MONTH), INTERVAL 1 DAY)"
+            + "   GROUP  BY p.patient_id "
+            + "   UNION "
+            + "SELECT p.patient_id, Min(o.value_numeric) AS first_vl_result "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.value_numeric = ${856} "
+            + "       AND o.value_numeric IS NOT NULL "
+            + "       AND e.encounter_datetime >= DATE_ADD(:startDate, INTERVAL 1 MONTH)  "
+            + "       AND e.encounter_datetime <= DATE_SUB(DATE_ADD(:startDate, INTERVAL 2 MONTH), INTERVAL 1 DAY) "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id, Min(o.value_coded) AS first_vl_result "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.concept_id = ${1305} "
+            + "       AND o.value_coded IS NOT NULL "
+            + "       AND e.encounter_datetime >= DATE_ADD(:startDate, INTERVAL 1 MONTH)  "
+            + "       AND e.encounter_datetime <= DATE_SUB(DATE_ADD(:startDate, INTERVAL 2 MONTH), INTERVAL 1 DAY) "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id, Min(o.value_numeric) AS first_vl_result "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.concept_id = ${856} "
+            + "       AND o.value_numeric IS NOT NULL "
+            + "       AND e.encounter_datetime >= DATE_ADD(:startDate, INTERVAL 2 MONTH) "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id, Min(o.value_coded) AS first_vl_result "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.concept_id = ${1305} "
             + "       AND o.value_coded IS NOT NULL "
             + "       AND e.encounter_datetime >= DATE_ADD(:startDate, INTERVAL 2 MONTH) "
             + "       AND e.encounter_datetime <= :endDate "

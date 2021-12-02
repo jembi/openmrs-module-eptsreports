@@ -19,11 +19,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DQACargaViralDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TransferredInDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DQASESPDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -37,18 +36,13 @@ public class SetupDQACargaViral extends EptsDataExportManager {
 
   private DQACargaViralDataset dqaCargaViralDataset;
 
-  private GenericCohortQueries genericCohortQueries;
-
-  private TransferredInDataset transferredInDataset;
+  private DQASESPDataset dqaSESPDataset;
 
   @Autowired
   public SetupDQACargaViral(
-      DQACargaViralDataset dqaCargaViralDataset,
-      GenericCohortQueries genericCohortQueries,
-      TransferredInDataset transferredInDataset) {
+      DQACargaViralDataset dqaCargaViralDataset, DQASESPDataset dqaSESPDataset) {
     this.dqaCargaViralDataset = dqaCargaViralDataset;
-    this.genericCohortQueries = genericCohortQueries;
-    this.transferredInDataset = transferredInDataset;
+    this.dqaSESPDataset = dqaSESPDataset;
   }
 
   @Override
@@ -83,13 +77,11 @@ public class SetupDQACargaViral extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.setParameters(getParameters());
+    rd.addDataSetDefinition("HF", Mapped.mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition(
         "CV", Mapped.mapStraightThrough(dqaCargaViralDataset.constructDQACargaViralDataset()));
-
-    // add a base cohort here to help in calculations running
-    rd.setBaseCohortDefinition(
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+    rd.addDataSetDefinition(
+        "SESP", Mapped.mapStraightThrough(dqaSESPDataset.constructDQASESPDataset(true)));
 
     return rd;
   }
@@ -106,6 +98,7 @@ public class SetupDQACargaViral extends EptsDataExportManager {
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
+      props.put("repeatingSections", "sheet:1,row:7,dataset:CV");
       props.put("sortWeight", "5000");
       rd.setProperties(props);
     } catch (IOException e) {
