@@ -17,10 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionKeyForAge;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionKeyForGender;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.*;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
@@ -188,48 +185,61 @@ public class DQASESPDataset extends BaseDataSet {
         new ColumnParameters(
             "betweenZeroAnd4Years",
             "0-4",
-            DimensionKeyForAge.betweenZeroAnd4Years.getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForAge.betweenZeroAnd4Years).getDimensions(),
             "01");
     ColumnParameters between5And9Years =
         new ColumnParameters(
-            "between5And9Years", "5-9", DimensionKeyForAge.between5And9Years.getDimension(), "02");
+            "between5And9Years",
+            "5-9",
+            EptsCommonDimensionKey.of(DimensionKeyForAge.between5And9Years).getDimensions(),
+            "02");
     ColumnParameters between10And14YearsF =
         new ColumnParameters(
             "between10And14YearsF",
             "10-14 Female",
-            DimensionKeyForGender.female.and(DimensionKeyForAge.between10And14Years).getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForGender.female)
+                .and(DimensionKeyForAge.between10And14Years)
+                .getDimensions(),
             "03");
     ColumnParameters between10And14YearsM =
         new ColumnParameters(
             "between10And14YearsM",
             "10-14 Male",
-            DimensionKeyForGender.male.and(DimensionKeyForAge.between10And14Years).getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForGender.male)
+                .and(DimensionKeyForAge.between10And14Years)
+                .getDimensions(),
             "04");
     ColumnParameters between15And29YearsF =
         new ColumnParameters(
             "between15And29YearsF",
             "15-29 Female",
-            DimensionKeyForGender.female.and(DimensionKeyForAge.between15And29Years).getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForGender.female)
+                .and(DimensionKeyForAge.between15And29Years)
+                .getDimensions(),
             "05");
     ColumnParameters between15And29YearsM =
         new ColumnParameters(
             "between15And29YearsM",
             "15-29 Male",
-            DimensionKeyForGender.male.and(DimensionKeyForAge.between15And29Years).getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForGender.male)
+                .and(DimensionKeyForAge.between15And29Years)
+                .getDimensions(),
             "06");
     ColumnParameters overOrEqualTo20YearsF =
         new ColumnParameters(
             "overOrEqualTo20YearsF",
             "20+ Female",
-            DimensionKeyForGender.female
+            EptsCommonDimensionKey.of(DimensionKeyForGender.female)
                 .and(DimensionKeyForAge.overOrEqualTo20Years)
-                .getDimension(),
+                .getDimensions(),
             "07");
     ColumnParameters overOrEqualTo20YearsM =
         new ColumnParameters(
             "overOrEqualTo20YearsM",
             "20+ Male",
-            DimensionKeyForGender.male.and(DimensionKeyForAge.overOrEqualTo20Years).getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForGender.male)
+                .and(DimensionKeyForAge.overOrEqualTo20Years)
+                .getDimensions(),
             "08");
 
     return Arrays.asList(
@@ -246,12 +256,15 @@ public class DQASESPDataset extends BaseDataSet {
   private List<ColumnParameters> disagForCargaViralM1() {
     ColumnParameters bellow15Years =
         new ColumnParameters(
-            "bellow15Years", "<15", DimensionKeyForAge.bellow15Years.getDimension(), "01");
+            "bellow15Years",
+            "<15",
+            EptsCommonDimensionKey.of(DimensionKeyForAge.bellow15Years).getDimensions(),
+            "01");
     ColumnParameters overOrEqualTo15Years =
         new ColumnParameters(
             "overOrEqualTo15Years",
             "15+",
-            DimensionKeyForAge.overOrEqualTo15Years.getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForAge.overOrEqualTo15Years).getDimensions(),
             "02");
 
     return Arrays.asList(bellow15Years, overOrEqualTo15Years);
@@ -260,12 +273,15 @@ public class DQASESPDataset extends BaseDataSet {
   private List<ColumnParameters> disagForCargaViralM2() {
     ColumnParameters bellow15Years =
         new ColumnParameters(
-            "bellow15Years", "<15", DimensionKeyForAge.bellow15Years.getDimension(), "01");
+            "bellow15Years",
+            "<15",
+            EptsCommonDimensionKey.of(DimensionKeyForAge.bellow15Years).getDimensions(),
+            "01");
     ColumnParameters overOrEqualTo15Years =
         new ColumnParameters(
             "overOrEqualTo15Years",
             "15+",
-            DimensionKeyForAge.overOrEqualTo15Years.getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForAge.overOrEqualTo15Years).getDimensions(),
             "02");
 
     return Arrays.asList(bellow15Years, overOrEqualTo15Years);
@@ -274,12 +290,15 @@ public class DQASESPDataset extends BaseDataSet {
   private List<ColumnParameters> disagForCargaViralM3() {
     ColumnParameters bellow15Years =
         new ColumnParameters(
-            "bellow15Years", "<15", DimensionKeyForAge.bellow15Years.getDimension(), "01");
+            "bellow15Years",
+            "<15",
+            EptsCommonDimensionKey.of(DimensionKeyForAge.bellow15Years).getDimensions(),
+            "01");
     ColumnParameters overOrEqualTo15Years =
         new ColumnParameters(
             "overOrEqualTo15Years",
             "15+",
-            DimensionKeyForAge.overOrEqualTo15Years.getDimension(),
+            EptsCommonDimensionKey.of(DimensionKeyForAge.overOrEqualTo15Years).getDimensions(),
             "02");
 
     return Arrays.asList(bellow15Years, overOrEqualTo15Years);
