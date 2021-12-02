@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.FaltososLevantamentoARVDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -64,6 +65,8 @@ public class FaltososLevantamentoARVReport extends EptsDataExportManager {
     reportDefinition.addParameters(getParameters());
     reportDefinition.addDataSetDefinition(
         "FALTOSOS", Mapped.mapStraightThrough(faltososLevantamentoARVDataSet.constructDataSet()));
+    reportDefinition.addDataSetDefinition(
+        "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
@@ -96,8 +99,8 @@ public class FaltososLevantamentoARVReport extends EptsDataExportManager {
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("endDate", "End date", Date.class),
         new Parameter("startDate", "Start date", Date.class),
+        new Parameter("endDate", "End date", Date.class),
         new Parameter("location", "Location", Location.class));
   }
 }
