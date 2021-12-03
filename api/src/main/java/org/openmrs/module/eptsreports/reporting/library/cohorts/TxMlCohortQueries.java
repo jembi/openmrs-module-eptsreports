@@ -34,18 +34,22 @@ public class TxMlCohortQueries {
 
   private TxRttCohortQueries txRttCohortQueries;
 
+  private CommonCohortQueries commonCohortQueries;
+
   @Autowired
   public TxMlCohortQueries(
       HivMetadata hivMetadata,
       GenericCohortQueries genericCohortQueries,
       TxCurrCohortQueries txCurrCohortQueries,
       HivCohortQueries hivCohortQueries,
-      TxRttCohortQueries txRttCohortQueries) {
+      TxRttCohortQueries txRttCohortQueries,
+      CommonCohortQueries commonCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.txCurrCohortQueries = txCurrCohortQueries;
     this.hivCohortQueries = hivCohortQueries;
     this.txRttCohortQueries = txRttCohortQueries;
+    this.commonCohortQueries = commonCohortQueries;
   }
 
   /**
@@ -66,7 +70,9 @@ public class TxMlCohortQueries {
     CohortDefinition noScheduled = txRttCohortQueries.getSecondPartFromITT();
     CohortDefinition startedArt = genericCohortQueries.getStartedArtBeforeDate(false);
 
-    CohortDefinition transferredOut = hivCohortQueries.getPatientsTransferredOut();
+    CohortDefinition transferredOut =
+        commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod();
+    // hivCohortQueries.getPatientsTransferredOut();
 
     CohortDefinition dead = getDeadPatientsComposition();
 
