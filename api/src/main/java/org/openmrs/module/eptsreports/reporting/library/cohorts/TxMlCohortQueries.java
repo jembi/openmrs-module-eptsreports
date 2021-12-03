@@ -69,20 +69,15 @@ public class TxMlCohortQueries {
     CohortDefinition missedAppointment = getAllPatientsWhoMissedNextAppointment();
     CohortDefinition noScheduled = txRttCohortQueries.getSecondPartFromITT();
     CohortDefinition startedArt = genericCohortQueries.getStartedArtBeforeDate(false);
-
     CohortDefinition transferredOut =
         commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod();
-    // hivCohortQueries.getPatientsTransferredOut();
-
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    String mappings2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
     CohortDefinition dead = getDeadPatientsComposition();
 
     cd.addSearch("missedAppointment", Mapped.mapStraightThrough(missedAppointment));
-
-    String mappings = "onOrBefore=${endDate},location=${location}";
-    String mappings2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
     cd.addSearch("noScheduled", EptsReportUtils.map(noScheduled, mappings));
     cd.addSearch("startedArt", EptsReportUtils.map(startedArt, mappings));
-
     cd.addSearch(
         "transferredOut",
         EptsReportUtils.map(transferredOut, "onOrBefore=${startDate-1d},location=${location}"));
@@ -93,10 +88,11 @@ public class TxMlCohortQueries {
 
     return cd;
   }
+
   /**
    * <b>Description:</b> All patients who do not have the next scheduled drug pick up date (Fila)
    * and next scheduled consultation date (Ficha de Seguimento or Ficha Clinica – Master Card) and
-   * ART Pickup date (Recepção – Levantou ARV).
+   * ART Pickup date (Recepção – Levantou ARV) (C).
    *
    * <p><b>Technical Specs</b>
    *
@@ -1434,15 +1430,9 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getDeadPatientsComposition(), "endDate=${startDate-1d},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C3) AND NOT dead AND NOT transferredOut");
+    cd.setCompositionString("(missedAppointment AND C3) AND NOT dead");
     return cd;
   }
 
@@ -1474,15 +1464,9 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
-            getDeadPatientsComposition(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getDeadPatientsComposition(), "endDate=${startDate-1d},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C1) AND NOT dead AND NOT transferredOut");
+    cd.setCompositionString("(missedAppointment AND C1) AND NOT dead");
 
     return cd;
   }
@@ -1519,15 +1503,9 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(
-            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getDeadPatientsComposition(), "endDate=${startDate-1d},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C2) AND NOT dead AND NOT transferredOut");
+    cd.setCompositionString("(missedAppointment AND C2) AND NOT dead");
     return cd;
   }
 
