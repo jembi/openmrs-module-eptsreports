@@ -92,17 +92,13 @@ public class DQACargaViralDataset extends BaseDataSet {
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
     spdd.setName("NID");
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-
     String sql =
         " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
             + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
             + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
             + identifierType;
 
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
-
-    spdd.setQuery(substitutor.replace(sql));
+    spdd.setQuery(sql);
     return spdd;
   }
 
