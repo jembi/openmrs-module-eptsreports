@@ -9,10 +9,11 @@ public class ForwardSlashDateConverter implements DataConverter {
 
   @Override
   public Object convert(Object obj) {
-    if (obj == null) {
-      return "";
+
+    if (obj != null && obj instanceof Date) {
+      return formatDate((Date) obj);
     }
-    return formatDate((Date) obj);
+    return "";
   }
 
   @Override
