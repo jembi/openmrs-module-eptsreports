@@ -1,21 +1,24 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsArtCohortDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TotalListOfPatientsArtCohortDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SetupListOfPatientsArtCohort extends EptsDataExportManager {
@@ -64,13 +67,13 @@ public class SetupListOfPatientsArtCohort extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
-
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "TOTAL", Mapped.mapStraightThrough(totalListOfPatientsArtCohortDataset.contructDataset()));
     try {
       rd.addDataSetDefinition(
-          "ART", Mapped.mapStraightThrough(listOfPatientsArtCohortDataset.contructDataset()));
-    } catch (Exception e) {
+          "ARV", Mapped.mapStraightThrough(listOfPatientsArtCohortDataset.contructDataset()));
+    } catch (EvaluationException e) {
       e.printStackTrace();
     }
 
@@ -89,7 +92,7 @@ public class SetupListOfPatientsArtCohort extends EptsDataExportManager {
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:7,dataset:ART");
+      props.put("repeatingSections", "sheet:1,row:7,dataset:ARV");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
@@ -104,7 +107,7 @@ public class SetupListOfPatientsArtCohort extends EptsDataExportManager {
     return Arrays.asList(
         new Parameter("startDate", "Cohort Start Date", Date.class),
         new Parameter("endDate", "Cohort End Date", Date.class),
-        new Parameter("evaluationEndDate", "Evaluation Date", Date.class),
+        new Parameter("evaluationDate", "Evaluation Date", Date.class),
         new Parameter("location", "Location", Location.class));
   }
 }
