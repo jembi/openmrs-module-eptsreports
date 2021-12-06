@@ -241,7 +241,7 @@ public class TxPvlsBySourceQueries {
             + " INNER JOIN obs oo ON ee.encounter_id = oo.encounter_id "
             + " WHERE "
             + " ee.voided = 0 AND "
-            + " ee.encounter_type IN( ${6}, ${9}, ${53} AND "
+            + " ee.encounter_type IN( ${6}, ${9}, ${53}) AND "
             + " oo.voided = 0 AND "
             + " oo.concept_id = ${23818} AND oo.value_coded IN(${23817}, ${1067}) AND "
             + " ee.location_id = :location "
