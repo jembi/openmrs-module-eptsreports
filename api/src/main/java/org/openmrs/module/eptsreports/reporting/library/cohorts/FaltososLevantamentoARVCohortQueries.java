@@ -1160,7 +1160,7 @@ public class FaltososLevantamentoARVCohortQueries {
     valuesMap.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
 
     String query =
-        "                SELECT  p.patient_id, MAX(e.encounter_datetime) AS transferout_date "
+        "                SELECT  p.patient_id, MAX(o.obs_datetime) AS transferout_date "
             + "                FROM patient p "
             + "                         INNER JOIN encounter e "
             + "                                    ON e.patient_id=p.patient_id "
