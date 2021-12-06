@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +10,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -1308,12 +1309,12 @@ public class FaltososLevantamentoARVCohortQueries {
             + "                      ON o.encounter_id = e.encounter_id "
             + "       WHERE  e.encounter_type = ${52} "
             + "              AND e.location_id = :location "
+            + "          AND o.value_datetime < :endDate"
             + "              AND o.concept_id = ${23866} "
             + "              AND p.voided = 0 "
             + "              AND e.voided = 0 "
             + "              AND o.voided = 0 "
             + "       GROUP  BY p.patient_id "
-            + "       HAVING recent_date <= :endDate "
             + "       UNION "
             + "       SELECT p.patient_id, "
             + "              Max(e.encounter_datetime)recent_date "
@@ -1321,11 +1322,11 @@ public class FaltososLevantamentoARVCohortQueries {
             + "              INNER JOIN encounter e "
             + "                      ON e.patient_id = p.patient_id "
             + "       WHERE  e.encounter_type = ${18} "
+            + "          AND e.encounter_datetime < :endDate"
             + "              AND e.location_id = :location "
             + "              AND p.voided = 0 "
             + "              AND e.voided = 0 "
-            + "       GROUP  BY p.patient_id "
-            + "       HAVING recent_date <= :endDate) last_pickup "
+            + "       GROUP  BY p.patient_id ) last_pickup "
             + "GROUP  BY last_pickup.patient_id  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
