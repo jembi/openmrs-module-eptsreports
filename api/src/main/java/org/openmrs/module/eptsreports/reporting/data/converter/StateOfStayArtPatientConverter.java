@@ -47,11 +47,11 @@ public class StateOfStayArtPatientConverter implements DataConverter {
 
   @Override
   public Class<?> getInputDataType() {
-    return null;
+    return String.class;
   }
 
   @Override
   public Class<?> getDataType() {
-    return null;
+    return String.class;
   }
 }

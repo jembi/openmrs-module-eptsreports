@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
@@ -27,6 +24,10 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class ListOfPatientsArtCohortDataset extends BaseDataSet {
@@ -99,7 +100,7 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
     /** 4 - Idade - Sheet 1: Column D */
-    pdd.addColumn("age", new AgeDataDefinition(), "", null);
+    pdd.addColumn("age", new AgeDataDefinition(), "effectiveDate=${evaluationDate}", null);
 
     /** 5 - Data Inicio Tarv - Sheet 1: Column E */
     pdd.addColumn(
