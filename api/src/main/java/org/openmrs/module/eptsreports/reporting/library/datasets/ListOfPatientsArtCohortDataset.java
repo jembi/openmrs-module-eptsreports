@@ -81,6 +81,9 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
     DataDefinition nameDef =
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
 
+    AgeDataDefinition ageOnDate = new AgeDataDefinition();
+    ageOnDate.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
     pdd.setParameters(getParameters());
 
     pdd.addRowFilter(
@@ -100,7 +103,8 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
     /** 4 - Idade - Sheet 1: Column D */
-    pdd.addColumn("age", new AgeDataDefinition(), "effectiveDate=${evaluationDate}", null);
+    pdd.addColumn(
+        "age", ageOnDate, "effectiveDate=${evaluationDate}", new NotApplicableIfNullConverter());
 
     /** 5 - Data Inicio Tarv - Sheet 1: Column E */
     pdd.addColumn(
