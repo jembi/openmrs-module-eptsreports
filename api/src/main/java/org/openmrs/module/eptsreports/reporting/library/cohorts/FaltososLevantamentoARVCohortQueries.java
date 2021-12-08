@@ -1386,7 +1386,7 @@ public class FaltososLevantamentoARVCohortQueries {
 
     String query =
         selectDatetime
-            ? "SELECT patient_id, recent_datetime ".concat(fromSQL)
+            ? "SELECT patient_id, MAX(recent_datetime) recent_datetime ".concat(fromSQL)
             : "SELECT patient_id ".concat(fromSQL);
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
