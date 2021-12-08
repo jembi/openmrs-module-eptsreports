@@ -6,6 +6,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStayArtPatientConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.StoYesAndNtoNoConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationDataDefinitionQueries;
@@ -125,7 +126,7 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
         "ontbtreatment",
         listChildrenOnARTandFormulationsDataset.getPatientsActiveOnTB(),
         "endDate=${generationDate},location=${location}",
-        null);
+        new StoYesAndNtoNoConverter());
 
     /** 8 - Last Drug Pick-up Date on FILA- Sheet 1: Column H */
     pdd.addColumn(
