@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum DimensionKeyForAge implements DimensionKey {
   unknown("UK"),
   bellowOneYear("<1"),
@@ -16,6 +13,7 @@ public enum DimensionKeyForAge implements DimensionKey {
   bellow15Years("<15"),
   overAndEqualTo14Years("14+"),
   between10And14Years("10-14"),
+  between15And29Years("15-29"),
   between25And29Years("25-29"),
   between30And34Years("30-34"),
   between35And39Years("35-39"),
@@ -38,12 +36,9 @@ public enum DimensionKeyForAge implements DimensionKey {
   overOrEqualTo65Years("65+");
 
   private String key;
-  private List<DimensionKey> dimensionKeys;
 
   private DimensionKeyForAge(String key) {
     this.key = key;
-    dimensionKeys = new ArrayList<>();
-    dimensionKeys.add(this);
   }
 
   @Override
@@ -54,18 +49,13 @@ public enum DimensionKeyForAge implements DimensionKey {
 
   @Override
   public String getDimension() {
-
     StringBuilder sb = new StringBuilder();
-    for (DimensionKey dimensionKey : dimensionKeys) {
-      sb.append("age=").append(getKey()).append("|");
-    }
-    String dimensionOptions = sb.toString();
-    return dimensionOptions.substring(0, dimensionOptions.length() - 1);
+    sb.append(getPrefix()).append(getKey());
+    return sb.toString();
   }
 
   @Override
-  public DimensionKey and(DimensionKey dimensionKey) {
-    dimensionKeys.add(dimensionKey);
-    return this;
+  public String getPrefix() {
+    return "age=";
   }
 }

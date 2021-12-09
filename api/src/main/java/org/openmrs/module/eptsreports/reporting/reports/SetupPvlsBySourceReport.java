@@ -1,16 +1,3 @@
-/*
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
- *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
- */
 package org.openmrs.module.eptsreports.reporting.reports;
 
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
@@ -20,49 +7,49 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.MISAUKeyPopsDataSetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TxPvlsBySourceDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
+public class SetupPvlsBySourceReport extends EptsDataExportManager {
 
-  private MISAUKeyPopsDataSetDefinition mISAUKeyPopsDataSetDefinition;
+  private TxPvlsBySourceDataset txPvlsBySourceDataset;
 
   private GenericCohortQueries genericCohortQueries;
 
   @Autowired
-  public SetupMISAUKeyPopsReport(
-      MISAUKeyPopsDataSetDefinition mISAUKeyPopsDataSetDefinition,
-      GenericCohortQueries genericCohortQueries) {
-    this.mISAUKeyPopsDataSetDefinition = mISAUKeyPopsDataSetDefinition;
+  public SetupPvlsBySourceReport(
+      TxPvlsBySourceDataset txPvlsBySourceDataset, GenericCohortQueries genericCohortQueries) {
+    this.txPvlsBySourceDataset = txPvlsBySourceDataset;
     this.genericCohortQueries = genericCohortQueries;
   }
 
   @Override
   public String getExcelDesignUuid() {
-    return "4e227c85-2270-11eb-b9a1-0242ac120002";
+    return "b4c94868-48a9-11ec-b7f3-77069269667a";
   }
 
   @Override
   public String getUuid() {
-    return "55da64fe-2270-11eb-b9a1-0242ac120002";
+    return "be6adcf6-48a9-11ec-848e-7738679e3c37";
   }
 
   @Override
   public String getName() {
-    return "Relatorio de Populacao Chave - MISAU";
+    return "Tx PVLS By Source";
   }
 
   @Override
   public String getDescription() {
-    return "Relatorio de Populacao Chave - MISAU";
+    return "Tx PVLS By Source Report";
   }
 
   @Override
@@ -71,10 +58,10 @@ public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
     rd.setUuid(getUuid());
     rd.setName(getName());
     rd.setDescription(getDescription());
-    rd.addParameters(mISAUKeyPopsDataSetDefinition.getParameters());
-    rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
-    rd.addDataSetDefinition(
-        "R", mapStraightThrough(mISAUKeyPopsDataSetDefinition.constructMISAUKeyPopsDataset()));
+    rd.addParameters(txPvlsBySourceDataset.getParameters());
+    rd.addDataSetDefinition("PLF", mapStraightThrough(txPvlsBySourceDataset.getPvlsLabFsr()));
+    rd.addDataSetDefinition("PFM", mapStraightThrough(txPvlsBySourceDataset.getPvlFichaMestre()));
+    rd.addDataSetDefinition("DATIM", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
@@ -93,8 +80,8 @@ public class SetupMISAUKeyPopsReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Relatorio_de_Populacao_Chave_-_MISAUv2.xls",
-              "Relatorio de Populacao Chave - MISAU",
+              "TX_PVLS_BY_SOURCE_Template.xls",
+              "TX PVLS BY SOURCE",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
