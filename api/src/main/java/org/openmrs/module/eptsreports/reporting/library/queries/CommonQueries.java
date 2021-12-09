@@ -797,6 +797,7 @@ public class CommonQueries {
             ? "SELECT art.patient_id , MIN(art.first_pickup) first_pickup ".concat(fromSQL)
             : "SELECT art.patient_id ".concat(fromSQL);
 
+
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     return stringSubstitutor.replace(sql);
