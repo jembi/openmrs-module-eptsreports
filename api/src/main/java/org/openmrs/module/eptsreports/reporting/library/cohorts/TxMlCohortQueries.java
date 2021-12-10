@@ -1431,9 +1431,15 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
-            getDeadPatientsComposition(), "endDate=${startDate-1d},location=${location}"));
+            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C3) AND NOT dead");
+    cd.setCompositionString("(missedAppointment AND C3) AND NOT dead AND NOT transferredOut");
     return cd;
   }
 
@@ -1465,9 +1471,15 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
-            getDeadPatientsComposition(), "endDate=${startDate-1d},location=${location}"));
+            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C1) AND NOT dead");
+    cd.setCompositionString("(missedAppointment AND C1) AND NOT dead ANd NOT transferredOut");
 
     return cd;
   }
@@ -1504,9 +1516,15 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
-            getDeadPatientsComposition(), "endDate=${startDate-1d},location=${location}"));
+            getPatientsWhoMissedNextAppointmentAndDiedDuringReportingPeriod(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndTransferredOut(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C2) AND NOT dead");
+    cd.setCompositionString("(missedAppointment AND C2) AND NOT dead AND NOT transferredOut");
     return cd;
   }
 
