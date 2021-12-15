@@ -37,7 +37,7 @@ public class StateOfStayArtPatientConverter implements DataConverter {
       case "1707":
         return abandoned;
       case "1366":
-        return abandoned;
+        return died;
       case "23863":
         return autoTransfer;
       default:

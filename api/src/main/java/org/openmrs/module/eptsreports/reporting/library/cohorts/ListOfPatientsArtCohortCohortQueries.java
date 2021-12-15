@@ -239,18 +239,30 @@ public class ListOfPatientsArtCohortCohortQueries {
         "8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
 
     String query =
-        "SELECT p.patient_id, Max(ps.start_date) start_date "
+        "SELECT p.patient_id,"
+            + "       ps.start_date"
             + " FROM   patient p"
             + "       INNER JOIN patient_program pg"
             + "               ON p.patient_id = pg.patient_id"
             + "       INNER JOIN patient_state ps"
-            + "               ON pg.patient_program_id = "
-            + "                  ps.patient_program_id "
-            + " WHERE  pg.program_id = ${2}"
-            + "       AND ps.state IN ( ${7}, ${8}, ${9}, ${10} )"
-            + "       AND ps.start_date < :startDate"
-            + "   AND pg.location_id= :location "
-            + " GROUP  BY p.patient_id";
+            + "               ON pg.patient_program_id = ps.patient_program_id"
+            + "       INNER JOIN (SELECT p.patient_id,"
+            + "                          Max(ps.start_date) start_date"
+            + "                   FROM   patient p"
+            + "                          INNER JOIN patient_program pg"
+            + "                                  ON p.patient_id = pg.patient_id"
+            + "                          INNER JOIN patient_state ps"
+            + "                                  ON pg.patient_program_id ="
+            + "                                     ps.patient_program_id"
+            + "                   WHERE  pg.program_id = ${2}"
+            + "                          AND ps.start_date < :startDate"
+            + "                      AND pg.location_id= :location "
+            + "                   GROUP  BY p.patient_id)most_recent"
+            + "               ON most_recent.patient_id = p.patient_id"
+            + " WHERE  ps.start_date = most_recent.start_date"
+            + "       AND pg.location_id= :location "
+            + "                          AND ps.state IN ( ${7}, ${8}, ${9}, ${10} )"
+            + "       AND pg.program_id = ${2}";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
