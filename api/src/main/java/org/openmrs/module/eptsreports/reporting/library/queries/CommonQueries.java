@@ -1,12 +1,13 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class CommonQueries {
@@ -770,7 +771,7 @@ public class CommonQueries {
             + "                ON p.patient_id = pg.patient_id  "
             + "        INNER JOIN patient_state ps  "
             + "                   ON pg.patient_program_id = ps.patient_program_id  "
-            + "     WHERE  pg.location_id = :location "
+            + "     WHERE  pg.location_id = :location AND pg.voided = 0"
             + "    AND pg.program_id = ${2} and ps.start_date <= :endDate "
             + "     "
             + "    UNION "
@@ -796,7 +797,6 @@ public class CommonQueries {
         startDate
             ? "SELECT art.patient_id , MIN(art.first_pickup) first_pickup ".concat(fromSQL)
             : "SELECT art.patient_id ".concat(fromSQL);
-
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
