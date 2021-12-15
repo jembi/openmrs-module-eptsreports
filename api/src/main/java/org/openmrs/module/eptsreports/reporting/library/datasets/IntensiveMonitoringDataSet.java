@@ -102,7 +102,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "ageBasedOnArt73",
         EptsReportUtils.map(
             eptsCommonDimension.ageBasedOnArtStartDateMOH(),
-            "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${{revisionEndDate-1m},location=${location}"));
+            "onOrAfter=${revisionEndDate-2m+1d},onOrBefore=${revisionEndDate-1m},location=${location}"));
     /**
      * *********************************** CATEGORY 7 ********************* //*********************
      * Denominator CAT7 **************
