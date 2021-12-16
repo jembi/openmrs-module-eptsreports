@@ -1479,7 +1479,7 @@ public class TxMlCohortQueries {
             getPatientsWhoMissedNextAppointmentAndTransferredOut(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(missedAppointment AND C1) AND NOT dead ANd NOT transferredOut");
+    cd.setCompositionString("(missedAppointment AND C1) AND NOT dead AND NOT transferredOut");
 
     return cd;
   }
