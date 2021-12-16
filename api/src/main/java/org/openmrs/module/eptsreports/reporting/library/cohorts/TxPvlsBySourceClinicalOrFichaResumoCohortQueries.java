@@ -309,9 +309,8 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getReasonForRequestingViralLoadConcept().getConceptId(),
-            hivMetadata.getRoutineForRequestingViralLoadConcept().getConceptId(),
-            hivMetadata.getUnkownConcept().getConceptId()));
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getHivViralLoadQualitative().getConceptId()));
     return cd;
   }
 
