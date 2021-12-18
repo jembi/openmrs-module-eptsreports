@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +10,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -676,7 +677,7 @@ public class FaltososLevantamentoARVCohortQueries {
             + "                    AND p.voided = 0 "
             + "            ) last_pickup ON last_pickup.patient_id = scheduled_pickup.patient_id "
             + "        WHERE "
-            + "            last_pickup.pickup_date BETWEEN scheduled_pickup.recent_datetime  AND DATE_ADD(:endDate, INTERVAL 7 DAY) "
+            + "            last_pickup.pickup_date BETWEEN DATE_ADD(scheduled_pickup.recent_datetime, INTERVAL -7 DAY)  AND DATE_ADD(:endDate, INTERVAL 7 DAY) "
             + "        GROUP BY "
             + "            scheduled_pickup.patient_id "
             + "    ) first_pickup ON first_pickup.patient_id = denominator.patient_id "
