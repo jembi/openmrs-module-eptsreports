@@ -161,7 +161,10 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
         "breastfeeding",
         EptsReportUtils.map(
             txPvlsCohortQueries.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN),
+                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN,
+                Arrays.asList(
+                    hivMetadata.getMisauLaboratorioEncounterType(),
+                    hivMetadata.getFsrEncounterType())),
             "onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -191,7 +194,10 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
         "breastfeeding",
         EptsReportUtils.map(
             txPvlsCohortQueries.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN),
+                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN,
+                Arrays.asList(
+                    hivMetadata.getMisauLaboratorioEncounterType(),
+                    hivMetadata.getFsrEncounterType())),
             "onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -225,7 +231,10 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
         "pregnant",
         EptsReportUtils.map(
             txPvlsCohortQueries.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN),
+                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN,
+                Arrays.asList(
+                    hivMetadata.getMisauLaboratorioEncounterType(),
+                    hivMetadata.getFsrEncounterType())),
             "onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("suppression AND pregnant");
     return cd;
@@ -251,7 +260,10 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
         "pregnant",
         EptsReportUtils.map(
             txPvlsCohortQueries.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
-                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN),
+                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN,
+                Arrays.asList(
+                    hivMetadata.getMisauLaboratorioEncounterType(),
+                    hivMetadata.getFsrEncounterType())),
             "onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("results AND pregnant");
     return cd;
