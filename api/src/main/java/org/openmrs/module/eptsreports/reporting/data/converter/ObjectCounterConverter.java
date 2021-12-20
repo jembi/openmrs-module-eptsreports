@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.data.converter;
 
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
+/** Gets any Object and counts the number of occurrences */
 public class ObjectCounterConverter implements DataConverter {
   private Integer counter = 0;
 
