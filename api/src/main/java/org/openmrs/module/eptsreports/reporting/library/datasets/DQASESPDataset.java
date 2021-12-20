@@ -74,7 +74,7 @@ public class DQASESPDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "Número de Activos em TARV no fim do período de revisão (SESP - SISMA)",
                 EptsReportUtils.map(
-                    resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
+                    resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
                     mappings)),
             mappings),
         getDisaggregations());
