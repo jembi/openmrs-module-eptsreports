@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.PrepNewQueries;
@@ -9,12 +8,20 @@ import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Component
 public class PrepNewCohortQueries {
 
   private HivMetadata hivMetadata;
+
+  @Autowired
+  public PrepNewCohortQueries(HivMetadata hivMetadata) {
+    this.hivMetadata = hivMetadata;
+  }
 
   public CohortDefinition getClientsWhoNewlyInitiatedPrep() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();

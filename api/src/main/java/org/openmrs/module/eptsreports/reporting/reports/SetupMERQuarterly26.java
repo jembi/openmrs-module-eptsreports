@@ -13,18 +13,8 @@
  */
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.*;
-import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TransferredInDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxCurrDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxNewDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxPvlsDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxRttDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
@@ -33,6 +23,11 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SetupMERQuarterly26 extends EptsDataExportManager {
@@ -53,6 +48,8 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
 
   private TxRTTPLHIVDataset txRTTPLHIVDateset;
 
+  private PrepNewDataset prepNewDataset;
+
   @Autowired
   public SetupMERQuarterly26(
       TxPvlsDataset txPvlsDataset,
@@ -65,7 +62,8 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
       TxRTTPLHIVDataset txRTTPLHIVDateset,
       CXCASCRNDataset cxcascrnDataset,
       CXCASCRNPositiveDataset cxcascrnPositiveDataset,
-      TXCXCADataset txcxcaDataset) {
+      TXCXCADataset txcxcaDataset,
+      PrepNewDataset prepNewDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
@@ -74,6 +72,7 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
     this.genericCohortQueries = genericCohortQueries;
     this.transferredInDataset = transferredInDataset;
     this.txRTTPLHIVDateset = txRTTPLHIVDateset;
+    this.prepNewDataset = prepNewDataset;
   }
 
   @Override
@@ -119,6 +118,8 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
         "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
     rd.addDataSetDefinition(
         "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
+    rd.addDataSetDefinition(
+        "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
 
     // add a base cohort here to help in calculations running
