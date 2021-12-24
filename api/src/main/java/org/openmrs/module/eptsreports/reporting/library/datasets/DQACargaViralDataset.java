@@ -52,11 +52,7 @@ public class DQACargaViralDataset extends BaseDataSet {
         "startDate=${startDate},endDate=${endDate},location=${location}");
 
     /** Patient counter - Sheet 1: Column A */
-    pdd.addColumn(
-        "counter",
-        getNID(identifierType.getPatientIdentifierTypeId()),
-        "",
-        new ObjectCounterConverter());
+    pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
     /** 1 - NID - Sheet 1: Column B */
     pdd.addColumn("nid", getNID(identifierType.getPatientIdentifierTypeId()), "");
