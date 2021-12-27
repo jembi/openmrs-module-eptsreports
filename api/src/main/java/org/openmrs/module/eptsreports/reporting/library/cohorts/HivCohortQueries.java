@@ -13,16 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.DRUG_USER;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.HOMOSEXUAL;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.PRISONER;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.SEX_WORKER;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.TYPE;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.Program;
@@ -41,6 +31,14 @@ import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.*;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.TYPE;
 
 /** Defines all of the HivCohortDefinition instances we want to expose for EPTS */
 @Component
@@ -321,6 +319,26 @@ public class HivCohortQueries {
     comp.setCompositionString("2 AND F");
     return comp;
   }
+
+  //  METHOD FOR MALE SEX WORKERS
+
+  public CohortDefinition getMaleSexWorkersKeyPopCohortDefinition() {
+    CompositionCohortDefinition comp = new CompositionCohortDefinition();
+    comp.setName("Only Male sex workers");
+    comp.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.addParameter(new Parameter("location", "location", Location.class));
+    comp.addSearch(
+        "2",
+        EptsReportUtils.map(
+            getSexWorkerKeyPopCohort(),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+    comp.addSearch("M", EptsReportUtils.map(genderCohortQueries.maleCohort(), ""));
+    comp.setCompositionString("2 AND M");
+    return comp;
+  }
+
+  //  END
 
   public CohortDefinition getPatientsTransferredOut() {
     Integer transferOut = hivMetadata.getTransferredOutConcept().getConceptId();
