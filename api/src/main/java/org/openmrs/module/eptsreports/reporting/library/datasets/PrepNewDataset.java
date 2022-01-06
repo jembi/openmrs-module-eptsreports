@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.List;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.PrepNewCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionKeyForAge;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.DimensionKeyForGender;
@@ -11,9 +13,6 @@ import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDef
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 public class PrepNewDataset extends BaseDataSet {
@@ -50,12 +49,20 @@ public class PrepNewDataset extends BaseDataSet {
     dsd.addDimension(
         "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), mappingsKp));
 
+    dsd.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
+
+    dsd.addDimension(
+        "age",
+        EptsReportUtils.map(
+            eptsCommonDimension.getPatientAgeBasedOnPrepStartDate(),
+            "endDate=${endDate},location=${location}"));
+
     dsd.addColumn(
-        "P1",
-        "Total Clients PrEP",
+        "TOTAL",
+        "Total of Clients Who Newly Initiated PrEP",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Total Clients Who Newly Initiated PrEP",
+                "Total of Clients Who Newly Initiated PrEP",
                 EptsReportUtils.map(
                     prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(), mappings)),
             mappings),
@@ -122,17 +129,17 @@ public class PrepNewDataset extends BaseDataSet {
                 .and(DimensionKeyForAge.between35And39Years)
                 .getDimensions(),
             "05");
-    ColumnParameters foutyTo44M =
+    ColumnParameters fortyTo44M =
         new ColumnParameters(
-            "foutyTo44M",
+            "fortyTo44M",
             "40 - 44 male",
             EptsCommonDimensionKey.of(DimensionKeyForGender.male)
                 .and(DimensionKeyForAge.between40And44Years)
                 .getDimensions(),
             "06");
-    ColumnParameters fouty5To49M =
+    ColumnParameters forty5To49M =
         new ColumnParameters(
-            "fouty5To49M",
+            "forty5To49M",
             "45 - 49 male",
             EptsCommonDimensionKey.of(DimensionKeyForGender.male)
                 .and(DimensionKeyForAge.between45and49Years)
@@ -201,17 +208,17 @@ public class PrepNewDataset extends BaseDataSet {
                 .and(DimensionKeyForAge.between35And39Years)
                 .getDimensions(),
             "14");
-    ColumnParameters foutyTo44F =
+    ColumnParameters fortyTo44F =
         new ColumnParameters(
-            "foutyTo44F",
+            "fortyTo44F",
             "40 - 44 female",
             EptsCommonDimensionKey.of(DimensionKeyForGender.female)
                 .and(DimensionKeyForAge.between40And44Years)
                 .getDimensions(),
             "15");
-    ColumnParameters fouty5To49F =
+    ColumnParameters forty5To49F =
         new ColumnParameters(
-            "fouty5To49F",
+            "forty5To49F",
             "45 - 49 female",
             EptsCommonDimensionKey.of(DimensionKeyForGender.female)
                 .and(DimensionKeyForAge.between45and49Years)
@@ -237,15 +244,17 @@ public class PrepNewDataset extends BaseDataSet {
         new ColumnParameters(
             "totalF",
             "Total of Females",
-            EptsCommonDimensionKey.of(DimensionKeyForGender.male).getDimensions(),
+            EptsCommonDimensionKey.of(DimensionKeyForGender.female).getDimensions(),
             "19");
 
     // Key population
-    ColumnParameters pid = new ColumnParameters("pid", "PID", "KP=PID", "21");
-    ColumnParameters msm = new ColumnParameters("msm", "MSM", "KP=MSM", "22");
-    ColumnParameters csw = new ColumnParameters("csw", "CSW", "KP=CSW", "23");
-    ColumnParameters pri = new ColumnParameters("pri", "PRI", "KP=PRI", "24");
-    ColumnParameters msw = new ColumnParameters("msw", "MSW", "KP=MSW", "25");
+    ColumnParameters pid = new ColumnParameters("pid", "People who inject drugs", "KP=PID", "21");
+    ColumnParameters msm = new ColumnParameters("msm", "Men who have sex with men", "KP=MSM", "22");
+    ColumnParameters csw = new ColumnParameters("csw", "Female sex workers", "KP=CSW", "23");
+    ColumnParameters pri =
+        new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "24");
+    ColumnParameters msw = new ColumnParameters("msw", "Male sex workers", "KP=MSW", "25");
+    ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "26");
 
     return Arrays.asList(
         fifteenTo19M,
@@ -253,8 +262,8 @@ public class PrepNewDataset extends BaseDataSet {
         twenty5To29M,
         thirtyTo34M,
         thirty5To39M,
-        foutyTo44M,
-        fouty5To49M,
+        fortyTo44M,
+        forty5To49M,
         above50M,
         unknownM,
         totalM,
@@ -263,8 +272,8 @@ public class PrepNewDataset extends BaseDataSet {
         twenty5To29F,
         thirtyTo34F,
         thirty5To39F,
-        foutyTo44F,
-        fouty5To49F,
+        fortyTo44F,
+        forty5To49F,
         above50F,
         unknownF,
         totalF,
@@ -272,6 +281,7 @@ public class PrepNewDataset extends BaseDataSet {
         msm,
         csw,
         pri,
-        msw);
+        msw,
+        tg);
   }
 }

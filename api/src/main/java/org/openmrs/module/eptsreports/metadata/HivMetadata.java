@@ -4526,4 +4526,33 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.prepInicialEncounterTypeUuid");
     return getEncounterType(uuid);
   }
+
+  /**
+   * <b>encounterType_id = 81</b>
+   *
+   * <p><b>Name:</b> PREP: PROFILAXIA PRE-EXPOSICAO - SEGUIMENTO
+   *
+   * <p><b>Description:</b> REGISTO PREP: PROFLAXIA PRÉ-EXPOSIÇÃO
+   *
+   * @return {@link EncounterType}
+   */
+  public EncounterType getPrepSeguimentoEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.prepSeguimentoEncounterTypeUuid");
+    return getEncounterType(uuid);
+  }
+
+  /**
+   * <b>concept_id =165205 </b>
+   *
+   * <p><b>Name:</b>TRANSGENDER
+   *
+   * @return {@link Concept}
+   */
+  public Concept getTransGenderConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.transGenderUuid");
+    return getConcept(uuid);
+  }
 }

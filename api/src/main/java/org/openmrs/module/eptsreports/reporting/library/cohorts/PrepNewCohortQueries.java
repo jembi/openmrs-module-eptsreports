@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.PrepNewQueries;
@@ -10,8 +11,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
 
 @Component
 public class PrepNewCohortQueries {
@@ -25,7 +24,7 @@ public class PrepNewCohortQueries {
 
   public CohortDefinition getClientsWhoNewlyInitiatedPrep() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Breastfeeding with viral suppression");
+    cd.setName("Clients Who Newly Initiated PrEP");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -59,7 +58,7 @@ public class PrepNewCohortQueries {
   public CohortDefinition getClientsWhoInitiatedPrep() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Clients WHo initiated PrEP");
+    sqlCohortDefinition.setName("Clients Who Initiated PrEP");
     sqlCohortDefinition.addParameter(new Parameter("startDate", " Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", " End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));

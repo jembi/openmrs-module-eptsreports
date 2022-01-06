@@ -175,4 +175,97 @@ public class PrepNewQueries {
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
     return sb.replace(query);
   }
+
+  /**
+   * <b>Get Clients Age based on PrEP Start date</b>
+   *
+   * @param initialStatusPrep
+   * @param prepInicialEncounterType
+   * @param startDrugsConcept
+   * @param prepStartDateConcept
+   * @param minAge
+   * @param maxAge
+   * @return
+   */
+  public static String getPatientAgeBasedOnPrepStartDate(
+      int initialStatusPrep,
+      int prepInicialEncounterType,
+      int startDrugsConcept,
+      int prepStartDateConcept,
+      int minAge,
+      int maxAge) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName("Get Clients Age based on PrEP Start date");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+
+    valuesMap.put("165296", initialStatusPrep);
+    valuesMap.put("80", prepInicialEncounterType);
+    valuesMap.put("1256", startDrugsConcept);
+    valuesMap.put("165211", prepStartDateConcept);
+    valuesMap.put("minAge", minAge);
+    valuesMap.put("maxAge", maxAge);
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   (SELECT pat.patient_id, "
+            + "               TIMESTAMPDIFF(year, pn.birthdate, clients.earliest_date) AS age "
+            + "        FROM   patient pat "
+            + "               INNER JOIN person pn "
+            + "                       ON pat.patient_id = pn.person_id "
+            + "               INNER JOIN ( SELECT p.patient_id, min(o.value_datetime) AS  earliest_date "
+            + "FROM   patient p "
+            + "           INNER JOIN encounter e "
+            + "                      ON p.patient_id = e.patient_id "
+            + "           INNER JOIN obs o "
+            + "                      ON e.encounter_id = o.encounter_id "
+            + "           INNER JOIN (SELECT p.patient_id, "
+            + "                              o.value_datetime AS earliest_date "
+            + "                       FROM   patient p "
+            + "                                  INNER JOIN encounter e "
+            + "                                             ON p.patient_id = e.patient_id "
+            + "                                  INNER JOIN obs o "
+            + "                                             ON e.encounter_id = o.encounter_id "
+            + "                       WHERE  p.voided = 0 "
+            + "                         AND e.voided = 0 "
+            + "                         AND o.voided = 0 "
+            + "                         AND e.encounter_type = ${80} "
+            + "                         AND o.concept_id = ${165296} "
+            + "                         AND o.value_coded = ${1256}"
+            + "                         AND e.location_id = :location "
+            + "                         AND o.value_datetime < :endDate "
+            + "                       GROUP  BY p.patient_id "
+            + "                       UNION "
+            + "                       SELECT p.patient_id, "
+            + "                              o.value_datetime AS earliest_date "
+            + "                       FROM   patient p "
+            + "                                  INNER JOIN encounter e "
+            + "                                             ON p.patient_id = e.patient_id "
+            + "                                  INNER JOIN obs o "
+            + "                                             ON e.encounter_id = o.encounter_id "
+            + "                       WHERE  p.voided = 0 "
+            + "                         AND e.voided = 0 "
+            + "                         AND o.voided = 0 "
+            + "                         AND e.encounter_type = ${80} "
+            + "                         AND o.concept_id = ${165211} "
+            + "                         AND e.location_id = :location "
+            + "                         AND o.value_datetime < :endDate "
+            + "                       GROUP  BY p.patient_id) tbl "
+            + "                      ON tbl.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND o.value_datetime = tbl.earliest_date "
+            + "  AND e.location_id = :location "
+            + "GROUP  BY p.patient_id ) clients "
+            + "                       ON pat.patient_id = clients.patient_id) fin "
+            + "WHERE  fin.age BETWEEN ${minAge} AND ${maxAge}";
+
+    StringSubstitutor sb = new StringSubstitutor(valuesMap);
+    return sb.replace(query);
+  }
 }
