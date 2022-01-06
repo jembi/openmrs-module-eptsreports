@@ -803,13 +803,47 @@ public class CommonQueries {
   }
 
   public String InitialArtStartDateOverallQuery(String endDate, Integer location) {
-    String sql =
-        "SELECT p.patient_id,e.encounter_datetime FROM patient p INNER JOIN encounter e ON p.patient_id=e.patient_id WHERE e.encounter_datetime <='"
-            + endDate
-            + "' AND e.location_id= "
-            + location;
 
     Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
+
+    String sql =
+        "SELECT art.patient_id AS patient_id, MIN(art.first_pickup) AS first_pickup FROM("
+            + " SELECT p.patient_id, MIN(e.encounter_datetime) first_pickup FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " WHERE e.encounter_type = ${18} "
+            + " AND e.encounter_datetime <='"
+            + endDate
+            + "'"
+            + " AND e.voided = 0 "
+            + " AND p.voided = 0 "
+            + " AND e.location_id = "
+            + location
+            + " GROUP BY p.patient_id "
+            + " UNION "
+            + " SELECT p.patient_id, Min(e.encounter_datetime) first_pickup  "
+            + "                                 FROM patient p  "
+            + "                           INNER JOIN encounter e  "
+            + "                               ON p.patient_id = e.patient_id  "
+            + "                           INNER JOIN obs o  "
+            + "                               ON e.encounter_id = o.encounter_id  "
+            + "                       WHERE  p.voided = 0  "
+            + "                           AND e.voided = 0  "
+            + "                           AND o.voided = 0  "
+            + "                           AND e.encounter_type IN (${6}, ${9}, ${18})  "
+            + "                           AND o.concept_id = ${1255}  "
+            + "                           AND o.value_coded= ${1256}  "
+            + "                           AND e.encounter_datetime <= '"
+            + endDate
+            + "'"
+            + "                           AND e.location_id =  "
+            + location
+            + "                       GROUP  BY p.patient_id  "
+            + ") art";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
