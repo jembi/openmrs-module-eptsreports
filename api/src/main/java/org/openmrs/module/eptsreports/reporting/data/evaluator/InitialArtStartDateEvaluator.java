@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.eptsreports.reporting.data.definition.InitialArtStartDateDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.reporting.common.DateUtil;
 import org.openmrs.module.reporting.data.patient.EvaluatedPatientData;
 import org.openmrs.module.reporting.data.patient.definition.PatientDataDefinition;
@@ -21,7 +22,15 @@ public class InitialArtStartDateEvaluator implements PatientDataEvaluator {
 
   protected static final Log log = LogFactory.getLog(InitialArtStartDateDefinition.class);
 
-  @Autowired private EvaluationService evaluationService;
+  private final EvaluationService evaluationService;
+  private final CommonQueries commonQueries;
+
+  @Autowired
+  public InitialArtStartDateEvaluator(
+      EvaluationService evaluationService, CommonQueries commonQueries) {
+    this.evaluationService = evaluationService;
+    this.commonQueries = commonQueries;
+  }
 
   @Override
   public EvaluatedPatientData evaluate(PatientDataDefinition definition, EvaluationContext context)
@@ -34,10 +43,10 @@ public class InitialArtStartDateEvaluator implements PatientDataEvaluator {
       return evaluatedPatientData;
     }
     String onOrBefore = DateUtil.formatDate(def.getOnOrBefore(), "yyyy-MM-dd");
+    Integer location = def.getLocation().getLocationId();
 
-    String query =
-        "SELECT patient_id,ps.birthdate FROM patient p INNER JOIN person ps ON p.patient_id=ps.person_id";
-    SqlQueryBuilder q = new SqlQueryBuilder(query);
+    SqlQueryBuilder q =
+        new SqlQueryBuilder(commonQueries.InitialArtStartDateOverallQuery(onOrBefore, location));
 
     List<Object[]> results = evaluationService.evaluateToList(q, context);
 

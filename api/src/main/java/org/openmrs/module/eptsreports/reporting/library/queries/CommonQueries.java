@@ -801,4 +801,18 @@ public class CommonQueries {
 
     return stringSubstitutor.replace(sql);
   }
+
+  public String InitialArtStartDateOverallQuery(String endDate, Integer location) {
+    String sql =
+        "SELECT p.patient_id,e.encounter_datetime FROM patient p INNER JOIN encounter e ON p.patient_id=e.patient_id WHERE e.encounter_datetime <='"
+            + endDate
+            + "' AND e.location= "
+            + location;
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    return stringSubstitutor.replace(sql);
+  }
 }
