@@ -806,7 +806,7 @@ public class CommonQueries {
     String sql =
         "SELECT p.patient_id,e.encounter_datetime FROM patient p INNER JOIN encounter e ON p.patient_id=e.patient_id WHERE e.encounter_datetime <='"
             + endDate
-            + "' AND e.location= "
+            + "' AND e.location_id= "
             + location;
 
     Map<String, Integer> valuesMap = new HashMap<>();
