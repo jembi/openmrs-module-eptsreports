@@ -843,7 +843,7 @@ public class CommonQueries {
             + "                           AND e.location_id =  "
             + location
             + "                       GROUP  BY p.patient_id  "
-            + ") art";
+            + ") art GROUP BY patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 

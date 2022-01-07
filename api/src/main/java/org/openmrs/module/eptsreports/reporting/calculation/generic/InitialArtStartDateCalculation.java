@@ -11,10 +11,11 @@
  */
 package org.openmrs.module.eptsreports.reporting.calculation.generic;
 
+import static org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils.latestCalculationMapDateValuePerPatient;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import org.openmrs.Location;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResult;
@@ -63,10 +64,9 @@ public class InitialArtStartDateCalculation extends AbstractPatientCalculation {
         EptsCalculationUtils.evaluateWithReporting(
             initialArtStartDateDefinition, cohort, parameterValues, null, context);
 
-    CalculationResultMap latestArtStartDateMaps = latestArtStartDate(ret);
-    Set<Integer> patientsWhoStoppedART = latestArtStartDateMaps.keySet();
+    CalculationResultMap latestArtStartDateMaps = latestCalculationMapDateValuePerPatient(ret);
 
-    for (Integer pId : patientsWhoStoppedART) {
+    for (Integer pId : cohort) {
       Date actualArtStartDate = null;
       CalculationResult latestDateResult = latestArtStartDateMaps.get(pId);
       if (latestDateResult != null) {
@@ -83,20 +83,5 @@ public class InitialArtStartDateCalculation extends AbstractPatientCalculation {
       return (Date) calculationResult.getValue();
     }
     return null;
-  }
-
-  private CalculationResultMap latestArtStartDate(CalculationResultMap artDates) {
-    CalculationResultMap ret = new CalculationResultMap();
-    for (Map.Entry<Integer, CalculationResult> e : artDates.entrySet()) {
-      Integer ptId = e.getKey();
-      SimpleResult result = (SimpleResult) e.getValue();
-      Date latest = null;
-
-      if (result != null) {
-        latest = ((Date) result.getValue());
-      }
-      ret.put(ptId, latest == null ? null : new SimpleResult(latest, null));
-    }
-    return ret;
   }
 }
