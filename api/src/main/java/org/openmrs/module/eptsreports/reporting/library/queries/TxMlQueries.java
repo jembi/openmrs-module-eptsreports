@@ -987,13 +987,13 @@ public class TxMlQueries {
    * @return
    */
   public static String getPatientsListInitiatedOnPREP(
-      int prepIncialEncounterType, int prepSeguimentoEncounterType) {
+      int prepIncialEncounterType, int prepSeguimentoEncounterType, int initialStatusOfPrEPUserConceptId, int startDrugsConceptId, int prepStartDateConceptId) {
     Map<String, Integer> map = new HashMap<>();
     map.put("80", prepIncialEncounterType);
     map.put("81", prepSeguimentoEncounterType);
-    //    map.put("165296", prepEncounterType);
-    //    map.put("1256", prepEncounterType);
-    //    map.put("165211", prepEncounterType);
+    map.put("165296", initialStatusOfPrEPUserConceptId);
+    map.put("1256", startDrugsConceptId);
+    map.put("165211", prepStartDateConceptId);
 
     String query =
         "SELECT  p.patient_id "
@@ -1039,13 +1039,13 @@ public class TxMlQueries {
    * @return
    */
   public static String getPatientsTransferredInFromAnotherHFByEndOfReportingPeriod(
-      int prepIncialEncounterType, int prepSeguimentoEncounterType) {
+      int entryPointIntoCareConceptId, int transferFromAnotherFacilityConceptId, int prepIncialEncounterType, int prepProgramId, int transferidoDeOutraUsStateId) {
     Map<String, Integer> map = new HashMap<>();
-    //    map.put("1594", prepIncialEncounterType);
-    //    map.put("1369", prepSeguimentoEncounterType);
-    //    map.put("80", prepEncounterType);
-    //    map.put("25", prepEncounterType);
-    //    map.put("76", prepEncounterType);
+    map.put("1594", entryPointIntoCareConceptId);
+    map.put("1369", transferFromAnotherFacilityConceptId);
+    map.put("80", prepIncialEncounterType);
+    map.put("25", prepProgramId);
+    map.put("76", transferidoDeOutraUsStateId);
 
     String query =
         "SELECT results.patient_id FROM ( "
@@ -1084,13 +1084,13 @@ public class TxMlQueries {
    * @return
    */
   public static String getPatientsTransferredInFromAnotherHFDuringReportingPeriod(
-      int prepIncialEncounterType, int prepSeguimentoEncounterType) {
+          int entryPointIntoCareConceptId, int transferFromAnotherFacilityConceptId, int prepIncialEncounterType, int prepProgramId, int transferidoDeOutraUsStateId) {
     Map<String, Integer> map = new HashMap<>();
-    //    map.put("1594", prepIncialEncounterType);
-    //    map.put("1369", prepSeguimentoEncounterType);
-    //    map.put("80", prepEncounterType);
-    //    map.put("25", prepEncounterType);
-    //    map.put("76", prepEncounterType);
+    map.put("1594", entryPointIntoCareConceptId);
+    map.put("1369", transferFromAnotherFacilityConceptId);
+    map.put("80", prepIncialEncounterType);
+    map.put("25", prepProgramId);
+    map.put("76", transferidoDeOutraUsStateId);
 
     String query =
         "SELECT results.patient_id FROM ( "
@@ -1126,11 +1126,11 @@ public class TxMlQueries {
    * @return
    */
   public static String getPatientsReInitiatedToPrEP(
-      int prepIncialEncounterType, int prepSeguimentoEncounterType) {
+      int initialStatusOfThePrEPUserConceptId, int restartConceptId, int prepIncialEncounterType) {
     Map<String, Integer> map = new HashMap<>();
-    //    map.put("165296", prepIncialEncounterType);
-    //    map.put("1705", prepSeguimentoEncounterType);
-    //    map.put("80", prepEncounterType);
+    map.put("165296", initialStatusOfThePrEPUserConceptId);
+    map.put("1705", restartConceptId);
+    map.put("80", prepIncialEncounterType);
 
     String query =
         " SELECT  p.patient_id "
@@ -1157,11 +1157,11 @@ public class TxMlQueries {
    * @return
    */
   public static String getPatientsOnContinuedPrEP(
-      int prepIncialEncounterType, int prepSeguimentoEncounterType) {
+      int initialStatusOfThePrEPUserConceptId, int continueRegimenConceptId, int prepIncialEncounterType) {
     Map<String, Integer> map = new HashMap<>();
-    //    map.put("165296", prepIncialEncounterType);
-    //    map.put("1257", prepSeguimentoEncounterType);
-    //    map.put("80", prepEncounterType);
+    map.put("165296", initialStatusOfThePrEPUserConceptId);
+    map.put("1257", continueRegimenConceptId);
+    map.put("80", prepIncialEncounterType);
 
     String query =
         " SELECT  p.patient_id "

@@ -1708,4 +1708,19 @@ public class TxMlCohortQueries {
 
     return sqlCohortDefinition;
   }
+
+
+  public CohortDefinition getPatientsListInitiatedOnPREP() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients initiated to PREP by end of previous reporting period");
+
+//    definition.setQuery(
+//            TxMlQueries.getPatientsListInitiatedOnPREP();
+
+    definition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    return definition;
+  }
 }
