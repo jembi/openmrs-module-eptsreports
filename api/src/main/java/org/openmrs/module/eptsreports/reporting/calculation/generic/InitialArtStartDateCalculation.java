@@ -22,7 +22,7 @@ import org.openmrs.calculation.result.CalculationResult;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.SimpleResult;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
-import org.openmrs.module.eptsreports.reporting.data.definition.InitialArtStartDateDefinition;
+import org.openmrs.module.eptsreports.reporting.data.definition.InitialArtStartDateDataDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.springframework.stereotype.Component;
 
@@ -54,8 +54,8 @@ public class InitialArtStartDateCalculation extends AbstractPatientCalculation {
 
     CalculationResultMap map = new CalculationResultMap();
 
-    InitialArtStartDateDefinition initialArtStartDateDefinition =
-        new InitialArtStartDateDefinition();
+    InitialArtStartDateDataDefinition initialArtStartDateDefinition =
+        new InitialArtStartDateDataDefinition();
     initialArtStartDateDefinition.setName("Patients with Initial date of ART initiation");
     initialArtStartDateDefinition.setOnOrBefore(onOrBefore);
     initialArtStartDateDefinition.setLocation(location);

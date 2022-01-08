@@ -1,6 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.data.definition;
 
 import java.util.Date;
+import java.util.List;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientDataDefinition;
@@ -9,14 +11,14 @@ import org.openmrs.module.reporting.definition.configuration.ConfigurationProper
 import org.openmrs.module.reporting.evaluation.caching.Caching;
 
 @Caching(strategy = ConfigurationPropertyCachingStrategy.class)
-public class InitialArtStartDateDefinition extends BaseDataDefinition
+public class MaxDateForResultsDataDefinition extends BaseDataDefinition
     implements PatientDataDefinition {
 
-  public InitialArtStartDateDefinition() {
+  public MaxDateForResultsDataDefinition() {
     super();
   }
 
-  public InitialArtStartDateDefinition(String name) {
+  public MaxDateForResultsDataDefinition(String name) {
     super(name);
   }
 
@@ -32,6 +34,29 @@ public class InitialArtStartDateDefinition extends BaseDataDefinition
   }
 
   @ConfigurationProperty private Date onOrBefore;
+
+  @ConfigurationProperty private Date onOrAfter;
+
+  public Date getOnOrAfter() {
+    return onOrAfter;
+  }
+
+  public void setOnOrAfter(Date onOrAfter) {
+    this.onOrAfter = onOrAfter;
+  }
+
+  public Integer getQuestionConcept() {
+    return questionConcept;
+  }
+
+  public void setQuestionConcept(Integer questionConcept) {
+    this.questionConcept = questionConcept;
+  }
+
+  @ConfigurationProperty private Integer questionConcept;
+
+  @ConfigurationProperty(group = "whichEncounter")
+  private List<EncounterType> encounterTypeList;
 
   public Location getLocation() {
     return location;
@@ -49,5 +74,15 @@ public class InitialArtStartDateDefinition extends BaseDataDefinition
 
   public void setOnOrBefore(Date onOrBefore) {
     this.onOrBefore = onOrBefore;
+  }
+
+  /** @return the encounterTypeList */
+  public List<EncounterType> getEncounterTypeList() {
+    return encounterTypeList;
+  }
+
+  /** @param encounterTypeList the encounterTypeList to set */
+  public void setEncounterTypeList(List<EncounterType> encounterTypeList) {
+    this.encounterTypeList = encounterTypeList;
   }
 }

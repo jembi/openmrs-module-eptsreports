@@ -1,8 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.EncounterType;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -920,5 +922,14 @@ public class CommonQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     return stringSubstitutor.replace(sql);
+  }
+
+  public String obsDateOverallQuery(
+      String startDate,
+      String endDate,
+      Integer conceptQuestion,
+      Integer location,
+      List<EncounterType> encounterTypeList) {
+    return "";
   }
 }

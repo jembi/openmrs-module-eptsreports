@@ -18,7 +18,6 @@ import java.util.Map;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
-import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
@@ -28,6 +27,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalcu
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
+import org.openmrs.module.eptsreports.reporting.data.definition.MaxDateForResultsDataDefinition;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -70,46 +70,47 @@ public class OnArtForMoreThanXmonthsCalcultion extends AbstractPatientCalculatio
     Date onOrBefore = (Date) context.getFromCache("onOrBefore");
     Date oneYearBefore = EptsCalculationUtils.addMonths(onOrBefore, -12);
     CalculationResultMap lastVl =
-        ePTSCalculationService.lastObs(
-            encounterTypeList,
-            viralLoadConcept,
-            location,
+        getResultMap(
             oneYearBefore,
             onOrBefore,
+            viralLoadConcept.getConceptId(),
+            location,
+            encounterTypeList,
             cohort,
+            params,
             context);
     CalculationResultMap qViralLoadResultsMap =
-        ePTSCalculationService.lastObs(
-            encounterTypeList,
-            qualitativeViralLoadResults,
-            location,
+        getResultMap(
             oneYearBefore,
-            onOrBefore,
+            oneYearBefore,
+            qualitativeViralLoadResults.getConceptId(),
+            location,
+            encounterTypeList,
             cohort,
+            params,
             context);
 
     for (Integer ptId : cohort) {
       boolean isOnArtForMoreThan3Months = false;
       SimpleResult artStartDateResult = (SimpleResult) arvsInitiationDateMap.get(ptId);
+      SimpleResult lastVlResults1DateResults = (SimpleResult) lastVl.get(ptId);
+      SimpleResult lastVlResults2DateResults = (SimpleResult) qViralLoadResultsMap.get(ptId);
       Date artStartDate;
+      Date lastVlResults1Date;
+      Date lastVlResults2Date;
       if (artStartDateResult != null) {
         artStartDate = (Date) artStartDateResult.getValue();
-        Obs lastVlObs = EptsCalculationUtils.resultForPatient(lastVl, ptId);
-        Obs lastQualitativeResults =
-            EptsCalculationUtils.resultForPatient(qViralLoadResultsMap, ptId);
-        if (checkNotNull(artStartDateResult, lastVlObs)) {
-          if (checkNotNull(artStartDate)
-              && lastVlObs != null
-              && isAtLeastThreeMonthsLater(artStartDate, lastVlObs.getObsDatetime())) {
-            isOnArtForMoreThan3Months = true;
-          }
+        lastVlResults1Date = (Date) lastVlResults1DateResults.getValue();
+        lastVlResults2Date = (Date) lastVlResults2DateResults.getValue();
+        if (artStartDate != null
+            && lastVlResults1Date != null
+            && isAtLeastThreeMonthsLater(artStartDate, lastVlResults1Date)) {
+          isOnArtForMoreThan3Months = true;
         }
         if (artStartDate != null
-            && lastQualitativeResults != null
-            && lastQualitativeResults.getObsDatetime() != null) {
-          if (isAtLeastThreeMonthsLater(artStartDate, lastQualitativeResults.getObsDatetime())) {
-            isOnArtForMoreThan3Months = true;
-          }
+            && lastVlResults2Date != null
+            && isAtLeastThreeMonthsLater(artStartDate, lastVlResults2Date)) {
+          isOnArtForMoreThan3Months = true;
         }
       }
       map.put(ptId, new BooleanResult(isOnArtForMoreThan3Months, this));
@@ -122,10 +123,24 @@ public class OnArtForMoreThanXmonthsCalcultion extends AbstractPatientCalculatio
     return lastVlDate.compareTo(threeMonthsLater) >= 0;
   }
 
-  private boolean checkNotNull(Object... objects) {
-    for (Object object : objects) {
-      if (object == null) return false;
-    }
-    return true;
+  private CalculationResultMap getResultMap(
+      Date startDate,
+      Date endDate,
+      Integer conceptQuestion,
+      Location location,
+      List<EncounterType> types,
+      Collection<Integer> cohort,
+      Map<String, Object> params,
+      PatientCalculationContext context) {
+    MaxDateForResultsDataDefinition maxDateForResultsDataDefinition =
+        new MaxDateForResultsDataDefinition();
+    maxDateForResultsDataDefinition.setName("Patients with given observations on a given date");
+    maxDateForResultsDataDefinition.setOnOrBefore(endDate);
+    maxDateForResultsDataDefinition.setOnOrAfter(startDate);
+    maxDateForResultsDataDefinition.setLocation(location);
+    maxDateForResultsDataDefinition.setQuestionConcept(conceptQuestion);
+    maxDateForResultsDataDefinition.setEncounterTypeList(types);
+    return EptsCalculationUtils.evaluateWithReporting(
+        maxDateForResultsDataDefinition, cohort, params, null, context);
   }
 }
