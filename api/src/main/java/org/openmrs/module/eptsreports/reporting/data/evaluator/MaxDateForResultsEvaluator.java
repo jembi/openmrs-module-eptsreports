@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.data.evaluator;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.logging.Log;
@@ -47,9 +48,12 @@ public class MaxDateForResultsEvaluator implements PatientDataEvaluator {
     String onOrBefore = DateUtil.formatDate(def.getOnOrBefore(), "yyyy-MM-dd");
     String onOrAfter = DateUtil.formatDate(def.getOnOrAfter(), "yyyy-MM-dd");
     Integer location = def.getLocation().getLocationId();
-    List<EncounterType> types = def.getEncounterTypeList();
+    List<Integer> types = new ArrayList<Integer>();
     Integer questionConcept = def.getQuestionConcept();
 
+    for (EncounterType encounterType : def.getEncounterTypeList()) {
+      types.add(encounterType.getEncounterTypeId());
+    }
     SqlQueryBuilder q =
         new SqlQueryBuilder(
             commonQueries.obsDateOverallQuery(
