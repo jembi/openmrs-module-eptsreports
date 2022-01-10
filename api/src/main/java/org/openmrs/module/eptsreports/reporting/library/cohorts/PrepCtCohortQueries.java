@@ -68,6 +68,31 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
+
+  public CohortDefinition getNegativeTestResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients with Negative test Results on PrEP during the reporting period");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+            "1",
+            EptsReportUtils.map(
+                    getNegativeTestResultsPart1(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+            "2",
+            EptsReportUtils.map(
+                    getNegativeTestResultsPart2(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("1 OR 2");
+
+    return cd;
+  }
+
   /**
    * <b>Description:</b> Number of patients who initiated PREP by end of previous reporting period
    * date as follows: All clients who have “O utente esta iniciar pela 1a vez a PrEP Data” (Concept
@@ -231,26 +256,47 @@ public class PrepCtCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Negative Test Results: Clients with the field “Resultado do Teste” (concept
+   * <b>Description:</b> Negative Test Results:
+   * Clients with the field “Resultado do Teste” (concept
    * id 1040) with value “Negativo” (concept id 664) on Ficha de Consulta de Seguimento PrEP
-   * (encounter type 81) registered during the reporting period; or Clients with the field “Data do
+   * (encounter type 81) registered during the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition getNegativeTestResultsPart1() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Negative test Results Part 1 on PrEP during the reporting period");
+
+    definition.setQuery(
+        PrepCtQueries.getNegativeTestResultsPart1(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            hivMetadata.getNegativeConcept().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Negative Test Results:
+   * Clients with the field “Data do
    * Teste de HIV com resultado negativo no Inicio da PrEP” (concept id 165194, value datetime)
    * marked with date that falls during the reporting period on Ficha de Consulta Inicial PrEP
    * (encounter type 80)
    *
    * @return
    */
-  public CohortDefinition getNegativeTestResults() {
+  public CohortDefinition getNegativeTestResultsPart2() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
-    definition.setName("Patients with Negative test Results on PrEP during the reporting period");
+    definition.setName("Patients with Negative test Results Part 2 on PrEP during the reporting period");
 
     definition.setQuery(
-        PrepCtQueries.getNegativeTestResults(
-            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
-            hivMetadata.getNegativeConcept().getConceptId(),
-            hivMetadata.getDateOfInitialHivTestConcept().getConceptId(),
-            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
-            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+            PrepCtQueries.getNegativeTestResultsPart2(
+                    hivMetadata.getDateOfInitialHivTestConcept().getConceptId(),
+                    hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
 
     definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     definition.addParameter(new Parameter("endDate", "End Date", Date.class));
