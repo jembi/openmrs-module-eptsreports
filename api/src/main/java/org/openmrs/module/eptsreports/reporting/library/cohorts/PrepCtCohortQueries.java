@@ -205,4 +205,57 @@ public class PrepCtCohortQueries {
 
     return definition;
   }
+
+  /**
+   * <b>Description:</b> Positive Test Results: Clients with the field “Resultado do Teste”(concept
+   * id 1040) with value “Positivo” (concept id 703) on Ficha de Consulta de Seguimento
+   * PrEP(encounter type 81) registered during the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition getPositiveTestResults() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Positive test Results on PrEP during the reporting period");
+
+    definition.setQuery(
+        PrepCtQueries.getPositiveTestResults(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            hivMetadata.getPositiveConcept().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Negative Test Results: Clients with the field “Resultado do Teste” (concept
+   * id 1040) with value “Negativo” (concept id 664) on Ficha de Consulta de Seguimento PrEP
+   * (encounter type 81) registered during the reporting period; or Clients with the field “Data do
+   * Teste de HIV com resultado negativo no Inicio da PrEP” (concept id 165194, value datetime)
+   * marked with date that falls during the reporting period on Ficha de Consulta Inicial PrEP
+   * (encounter type 80)
+   *
+   * @return
+   */
+  public CohortDefinition getNegativeTestResults() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Negative test Results on PrEP during the reporting period");
+
+    definition.setQuery(
+        PrepCtQueries.getNegativeTestResults(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            hivMetadata.getNegativeConcept().getConceptId(),
+            hivMetadata.getDateOfInitialHivTestConcept().getConceptId(),
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
 }

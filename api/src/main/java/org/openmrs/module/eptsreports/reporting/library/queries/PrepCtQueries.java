@@ -224,4 +224,145 @@ public class PrepCtQueries {
 
     return stringSubstitutor.replace(query);
   }
+
+  /**
+   * <b>Description:</b> Positive Test Results: Clients with the field “Resultado do Teste”(concept
+   * id 1040) with value “Positivo” (concept id 703) on Ficha de Consulta de Seguimento
+   * PrEP(encounter type 81) registered during the reporting period;
+   *
+   * @return
+   */
+  public static String getPositiveTestResults(
+      int hivRapidTest1QualitativeConceptId,
+      int positiveConceptId,
+      int prepSeguimentoEncounterType) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1040", hivRapidTest1QualitativeConceptId);
+    map.put("703", positiveConceptId);
+    map.put("81", prepSeguimentoEncounterType);
+
+    String query =
+        " SELECT  p.patient_id "
+            + "FROM patient p     "
+            + "INNER JOIN encounter e ON e.patient_id=p.patient_id    "
+            + "INNER JOIN obs o ON o.encounter_id=e.encounter_id    "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
+            + "AND o.concept_id = ${1040} AND o.value_coded = ${703} "
+            + "AND e.location_id = :location AND e.encounter_type=${81}  "
+            + "AND e.encounter_datetime >= :startDate   "
+            + "AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * <b>Description:</b> Negative Test Results: Clients with the field “Resultado do Teste” (concept
+   * id 1040) with value “Negativo” (concept id 664) on Ficha de Consulta de Seguimento PrEP
+   * (encounter type 81) registered during the reporting period; or Clients with the field “Data do
+   * Teste de HIV com resultado negativo no Inicio da PrEP” (concept id 165194, value datetime)
+   * marked with date that falls during the reporting period on Ficha de Consulta Inicial PrEP
+   * (encounter type 80)
+   *
+   * @return
+   */
+  public static String getNegativeTestResults(
+      int hivRapidTest1QualitativeConceptId,
+      int negativeConceptId,
+      int dateOfInitialHivTestConceptId,
+      int prepIncialEncounterType,
+      int prepSeguimentoEncounterType) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1040", hivRapidTest1QualitativeConceptId);
+    map.put("664", negativeConceptId);
+    map.put("165194", dateOfInitialHivTestConceptId);
+    map.put("80", prepIncialEncounterType);
+    map.put("81", prepSeguimentoEncounterType);
+
+    String query =
+        " SELECT  p.patient_id "
+            + "FROM patient p     "
+            + "INNER JOIN encounter e ON e.patient_id=p.patient_id    "
+            + "INNER JOIN obs o ON o.encounter_id=e.encounter_id    "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
+            + "AND o.concept_id = ${1040} AND o.value_coded = ${703} "
+            + "AND e.location_id = :location AND e.encounter_type=${81}  "
+            + "AND e.encounter_datetime >= :startDate   "
+            + "AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION  "
+            + "SELECT  p.patient_id  "
+            + "FROM patient p      "
+            + "INNER JOIN encounter e ON e.patient_id=p.patient_id     "
+            + "INNER JOIN obs o ON o.encounter_id=e.encounter_id     "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "AND o.concept_id = ${165194}   "
+            + "AND o.value_datetime  >= :startDate    "
+            + "AND o.value_datetime  >= :endDate  "
+            + "AND e.location_id = :location AND e.encounter_type=${80}  "
+            + "AND e.encounter_datetime >= :startDate   "
+            + "AND e.encounter_datetime <= :endDate  "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients with the field “Resultado do Teste” (concept id
+   * 1040) with value “Indeterminado” (concept id 1138) on Ficha de Consulta de Seguimento PrEP
+   * (encounter type 81) registered during the reporting period; or Clients without the field
+   * “Resultado do Teste” (concept id not in 1040, null) marked with any value on Ficha de Consulta
+   * de Seguimento PrEP (encounter type 81) registered during the reporting period; AND Clients
+   * without “Data do teste HIV com resultado Negativo no Inicio da PrEP” (concept id 165194, value
+   * datetime null) filled on Ficha de Consulta Inicial PrEP (encounter type 80) registered during
+   * the reporting period;
+   *
+   * @return
+   */
+  public static String getOtherTestResults(
+      int hivRapidTest1QualitativeConceptId,
+      int negativeConceptId,
+      int dateOfInitialHivTestConceptId,
+      int prepIncialEncounterType,
+      int prepSeguimentoEncounterType) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("1040", hivRapidTest1QualitativeConceptId);
+    map.put("664", negativeConceptId);
+    map.put("165194", dateOfInitialHivTestConceptId);
+    map.put("80", prepIncialEncounterType);
+    map.put("81", prepSeguimentoEncounterType);
+
+    String query =
+        " SELECT  p.patient_id "
+            + "FROM patient p     "
+            + "INNER JOIN encounter e ON e.patient_id=p.patient_id    "
+            + "INNER JOIN obs o ON o.encounter_id=e.encounter_id    "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
+            + "AND o.concept_id = ${1040} AND o.value_coded = ${703} "
+            + "AND e.location_id = :location AND e.encounter_type=${81}  "
+            + "AND e.encounter_datetime >= :startDate   "
+            + "AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION  "
+            + "SELECT  p.patient_id  "
+            + "FROM patient p      "
+            + "INNER JOIN encounter e ON e.patient_id=p.patient_id     "
+            + "INNER JOIN obs o ON o.encounter_id=e.encounter_id     "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + "AND o.concept_id = ${165194}   "
+            + "AND o.value_datetime  >= :startDate    "
+            + "AND o.value_datetime  >= :endDate  "
+            + "AND e.location_id = :location AND e.encounter_type=${80}  "
+            + "AND e.encounter_datetime >= :startDate   "
+            + "AND e.encounter_datetime <= :endDate  "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
 }

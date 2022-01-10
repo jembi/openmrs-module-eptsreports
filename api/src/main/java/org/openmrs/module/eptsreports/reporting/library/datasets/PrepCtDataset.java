@@ -54,6 +54,8 @@ public class PrepCtDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.getPatientAgeBasedOnPrepStartDate(),
             "endDate=${endDate},location=${location}"));
+    dsd.addDimension(
+        "results", EptsReportUtils.map(eptsCommonDimension.getPatientTestResultsPrep(), mappings));
 
     dsd.addColumn(
         "TOTAL",
@@ -258,6 +260,13 @@ public class PrepCtDataset extends BaseDataSet {
     ColumnParameters breastfeeding =
         new ColumnParameters("breastfeeding", "Breastfeeding", "maternity=breastfeeding", "28");
 
+    // Test Results
+    ColumnParameters positive =
+        new ColumnParameters("positive", "Positive", "results=positive", "29");
+    ColumnParameters negative =
+        new ColumnParameters("negative", "Negative", "results=negative", "30");
+    ColumnParameters other = new ColumnParameters("other", "Other", "results=other", "31");
+
     return Arrays.asList(
         fifteenTo19M,
         twentyTo24M,
@@ -286,6 +295,9 @@ public class PrepCtDataset extends BaseDataSet {
         msw,
         tg,
         pregnant,
-        breastfeeding);
+        breastfeeding,
+        positive,
+        negative,
+        other);
   }
 }
