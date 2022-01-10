@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Date;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.PrepCtQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -17,11 +18,16 @@ public class PrepCtCohortQueries {
 
   private HivMetadata hivMetadata;
   private PrepNewCohortQueries prepNewCohortQueries;
+  private CommonMetadata commonMetadata;
 
   @Autowired
-  public PrepCtCohortQueries(HivMetadata hivMetadata, PrepNewCohortQueries prepNewCohortQueries) {
+  public PrepCtCohortQueries(
+      HivMetadata hivMetadata,
+      PrepNewCohortQueries prepNewCohortQueries,
+      CommonMetadata commonMetadata) {
     this.hivMetadata = hivMetadata;
     this.prepNewCohortQueries = prepNewCohortQueries;
+    this.commonMetadata = commonMetadata;
   }
 
   public CohortDefinition getPREPCTNumerator() {
@@ -68,7 +74,6 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
-
   public CohortDefinition getNegativeTestResults() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients with Negative test Results on PrEP during the reporting period");
@@ -77,18 +82,48 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-            "1",
-            EptsReportUtils.map(
-                    getNegativeTestResultsPart1(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "1",
+        EptsReportUtils.map(
+            getNegativeTestResultsPart1(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "2",
-            EptsReportUtils.map(
-                    getNegativeTestResultsPart2(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "2",
+        EptsReportUtils.map(
+            getNegativeTestResultsPart2(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("1 OR 2");
+
+    return cd;
+  }
+
+  public CohortDefinition getOtherTestResults() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients with Other test Results on PrEP during the reporting period");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "1",
+        EptsReportUtils.map(
+            getOtherTestResultsPart1(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "2",
+        EptsReportUtils.map(
+            getOtherTestResultsPart2(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "3",
+        EptsReportUtils.map(
+            getOtherTestResultsPart3(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(1 OR 2) AND 3");
 
     return cd;
   }
@@ -245,7 +280,7 @@ public class PrepCtCohortQueries {
     definition.setQuery(
         PrepCtQueries.getPositiveTestResults(
             hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
-            hivMetadata.getPositiveConcept().getConceptId(),
+            commonMetadata.getPositive().getConceptId(),
             hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
 
     definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -256,8 +291,7 @@ public class PrepCtCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Negative Test Results:
-   * Clients with the field “Resultado do Teste” (concept
+   * <b>Description:</b> Negative Test Results: Clients with the field “Resultado do Teste” (concept
    * id 1040) with value “Negativo” (concept id 664) on Ficha de Consulta de Seguimento PrEP
    * (encounter type 81) registered during the reporting period;
    *
@@ -265,12 +299,13 @@ public class PrepCtCohortQueries {
    */
   public CohortDefinition getNegativeTestResultsPart1() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
-    definition.setName("Patients with Negative test Results Part 1 on PrEP during the reporting period");
+    definition.setName(
+        "Patients with Negative test Results Part 1 on PrEP during the reporting period");
 
     definition.setQuery(
         PrepCtQueries.getNegativeTestResultsPart1(
             hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
-            hivMetadata.getNegativeConcept().getConceptId(),
+            commonMetadata.getNegative().getConceptId(),
             hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
 
     definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -281,22 +316,91 @@ public class PrepCtCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Negative Test Results:
-   * Clients with the field “Data do
-   * Teste de HIV com resultado negativo no Inicio da PrEP” (concept id 165194, value datetime)
-   * marked with date that falls during the reporting period on Ficha de Consulta Inicial PrEP
-   * (encounter type 80)
+   * <b>Description:</b> Negative Test Results: Clients with the field “Data do Teste de HIV com
+   * resultado negativo no Inicio da PrEP” (concept id 165194, value datetime) marked with date that
+   * falls during the reporting period on Ficha de Consulta Inicial PrEP (encounter type 80)
    *
    * @return
    */
   public CohortDefinition getNegativeTestResultsPart2() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
-    definition.setName("Patients with Negative test Results Part 2 on PrEP during the reporting period");
+    definition.setName(
+        "Patients with Negative test Results Part 2 on PrEP during the reporting period");
 
     definition.setQuery(
-            PrepCtQueries.getNegativeTestResultsPart2(
-                    hivMetadata.getDateOfInitialHivTestConcept().getConceptId(),
-                    hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
+        PrepCtQueries.getNegativeTestResultsPart2(
+            commonMetadata.getIndeterminate().getConceptId(),
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients with the field “Resultado do Teste” (concept id
+   * 1040) with value “Indeterminado” (concept id 1138) on Ficha de Consulta de Seguimento PrEP
+   * (encounter type 81) registered during the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition getOtherTestResultsPart1() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 1 Prep");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsPart1(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            commonMetadata.getIndeterminate().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients without the field “Resultado do Teste” (concept
+   * id not in 1040, null) marked with any value on Ficha de Consulta de Seguimento PrEP (encounter
+   * type 81) registered during the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition getOtherTestResultsPart2() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 2 Prep");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsPart2(
+            hivMetadata.getHivRapidTest1QualitativeConcept().getConceptId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Other Test Results: Clients without “Data do teste HIV com resultado
+   * Negativo no Inicio da PrEP” (concept id 165194, value datetime null) filled on Ficha de
+   * Consulta Inicial PrEP (encounter type 80) registered during the reporting period;
+   *
+   * @return
+   */
+  public CohortDefinition getOtherTestResultsPart3() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients with Other test Results Part 3 Prep");
+
+    definition.setQuery(
+        PrepCtQueries.getOtherTestResultsPart3(
+            hivMetadata.getDateOfInitialHivTestConcept().getConceptId(),
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
 
     definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     definition.addParameter(new Parameter("endDate", "End Date", Date.class));

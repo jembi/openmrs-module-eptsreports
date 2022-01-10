@@ -4557,30 +4557,6 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>concept_id =703 </b>
-   *
-   * <p><b>Name:</b>POSITIVE
-   *
-   * @return {@link Concept}
-   */
-  public Concept getPositiveConcept() {
-    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.positiveUuid");
-    return getConcept(uuid);
-  }
-
-  /**
-   * <b>concept_id =664 </b>
-   *
-   * <p><b>Name:</b>NEGATIVE
-   *
-   * @return {@link Concept}
-   */
-  public Concept getNegativeConcept() {
-    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.negativeUuid");
-    return getConcept(uuid);
-  }
-
-  /**
    * <b>concept_id =165194 </b>
    *
    * <p><b>Name:</b>DATE OF INITIAL HIV TEST
