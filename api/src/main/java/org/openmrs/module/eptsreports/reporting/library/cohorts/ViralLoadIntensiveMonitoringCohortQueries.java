@@ -969,6 +969,9 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
     String sql =
         " SELECT p.patient_id FROM   patient p "
@@ -981,6 +984,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "                                  ON e.patient_id = p.patient_id "
             + "                          INNER JOIN obs o "
             + "                                  ON o.encounter_id = e.encounter_id "
+            + "                      INNER JOIN obs obs_preg  ON obs_preg.encounter_id = e.encounter_id "
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
@@ -990,7 +994,14 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "                          AND e.location_id = :location "
             + "                          AND e.encounter_datetime >= :evaluationPeriodStartDate "
             + "                          AND e.encounter_datetime <= :evaluationPeriodEndDate "
-            + " "
+            + "                           AND obs_preg.concept_id = ${1982} "
+            + "                          AND obs_preg.value_coded = ${1065} "
+            + "                          AND NOT EXISTS ("
+            + "                                           SELECT e2.encounter_id FROM encounter e2 "
+            + "                                             INNER JOIN obs obs_brst ON obs_brst.encounter_id = e2.encounter_id "
+            + "                                           WHERE e.encounter_id = e2.encounter_id "
+            + "                                           AND obs_brst.concept_id = ${6332} "
+            + "                                           AND obs_brst.value_coded = ${1065} ) "
             + "                   UNION "
             + " "
             + "                   SELECT p.patient_id, o.obs_datetime AS vl_date "
@@ -999,6 +1010,7 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "                                  ON e.patient_id = p.patient_id "
             + "                          INNER JOIN obs o "
             + "                                  ON o.encounter_id = e.encounter_id "
+            + "                        INNER JOIN obs obs_preg  ON obs_preg.encounter_id = e.encounter_id"
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
@@ -1007,7 +1019,16 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             + "                          AND o.value_numeric >= 1000 "
             + "                          AND e.location_id = :location "
             + "                          AND o.obs_datetime >= :evaluationPeriodStartDate "
-            + "                          AND o.obs_datetime <= :evaluationPeriodEndDate) AS result  "
+            + "                          AND o.obs_datetime <= :evaluationPeriodEndDate"
+            + "                         AND obs_preg.concept_id = ${1982} "
+            + "                          AND obs_preg.value_coded = ${1065} "
+            + "                          AND NOT EXISTS ( "
+            + "                                           SELECT e2.encounter_id FROM encounter e2 "
+            + "                                             INNER JOIN obs obs_brst ON obs_brst.encounter_id = e2.encounter_id "
+            + "                                           WHERE e.encounter_id = e2.encounter_id "
+            + "                                           AND obs_brst.concept_id = ${6332} "
+            + "                                           AND obs_brst.value_coded = ${1065})"
+            + ") AS result  "
             + "                          GROUP BY result.patient_id))AS result_vl "
             + "               ON result_vl.patient_id = p.patient_id "
             + "        WHERE  e.encounter_type = ${6} "
