@@ -1364,10 +1364,10 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
 
     if (den) {
       compositionCohortDefinition.setCompositionString(
-          "recordSecondVL AND viralLoadResultMasterCard AND linhaTerapeutica AND NOT (transferredIn OR transferredOut OR dead OR linhaTerapeutica)");
+          "recordSecondVL AND viralLoadResultMasterCard AND linhaTerapeutica AND NOT (transferredIn OR transferredOut OR dead)");
     } else {
       compositionCohortDefinition.setCompositionString(
-          "recordSecondVL AND viralLoadResultMasterCard AND secondVlNum15");
+          "recordSecondVL AND viralLoadResultMasterCard AND secondVlNum15 AND linhaTerapeutica AND NOT (transferredIn OR transferredOut OR dead)");
     }
 
     return compositionCohortDefinition;
