@@ -2186,11 +2186,35 @@ public class ViralLoadIntensiveMonitoringCohortQueries {
             getNum12(),
             "evaluationPeriodStartDate=${evaluationPeriodStartDate-12m+1d},evaluationPeriodEndDate=${evaluationPeriodEndDate-11m},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            this.commonCohortQueries.getMohTransferredInPatients(),
+            "onOrBefore=${evaluationPeriodEndDate-11m},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(
+            this.commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod(),
+            "onOrBefore=${evaluationPeriodEndDate-11m},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "dead",
+        EptsReportUtils.map(
+            this.getDeadPatients(), "endDate=${evaluationPeriodEndDate-11m},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "linhaTerapeutica",
+        EptsReportUtils.map(
+            getFirstLineArt(),
+            "startDate=${evaluationPeriodStartDate-12m+1},endDate=${evaluationPeriodEndDate-11m},location=${location}"));
+
     if (den) {
-      compositionCohortDefinition.setCompositionString("secondVlResult AND vlResult");
+      compositionCohortDefinition.setCompositionString(
+          "secondVlResult AND vlResult AND linhaTerapeutica AND NOT (transferredIn OR transferredOut OR dead)");
     } else {
       compositionCohortDefinition.setCompositionString(
-          "secondVlResult AND vlResult AND secondLineResult");
+          "secondVlResult AND vlResult AND secondLineResult AND linhaTerapeutica AND NOT (transferredIn OR transferredOut OR dead)");
     }
 
     return compositionCohortDefinition;
