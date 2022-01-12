@@ -82,7 +82,6 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
     pdd.addRowFilter(
         listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(),
         "startDate=${startDate},endDate=${endDate},location=${location}");
-
     // 1- NID sheet 1 - Column A
     pdd.addColumn(
         "nid",
@@ -98,8 +97,8 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
     // 4 - Idade - Sheet 1: Column D
     pdd.addColumn(
         "age",
-        listChildrenOnARTandFormulationsDataset.getAge(),
-        "endDate=${evaluationDate}",
+        listOfPatientsArtCohortCohortQueries.getAge(),
+        "evaluationDate=${evaluationDate}",
         new NotApplicableIfNullConverter());
 
     // 5 - Data Inicio Tarv - Sheet 1: Column E
@@ -162,9 +161,8 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
     // 13 - Next Follow up Consultation Date - Sheet 1: Column M
     pdd.addColumn(
         "nextfollowup",
-        listOfPatientsEligibleForVLDataDefinitionQueries
-            .getPatientsAndNextFollowUpConsultationDate(),
-        "startDate=${evaluationDate},location=${location}",
+        listOfPatientsArtCohortCohortQueries.getPatientsAndNextFollowUpConsultationDate(),
+        "endDate=${evaluationDate},location=${location}",
         null);
 
     // 14 - Last state on Program Enrollment - Sheet 1: Column N
