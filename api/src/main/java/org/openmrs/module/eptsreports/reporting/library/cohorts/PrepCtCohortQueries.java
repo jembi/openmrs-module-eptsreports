@@ -128,28 +128,98 @@ public class PrepCtCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsListInitiatedOnPREP() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("PPatients initiated to PREP by end of previous reporting period");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "1",
+        EptsReportUtils.map(
+            getPatientsListInitiatedOnPREP1(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "2",
+        EptsReportUtils.map(
+            getPatientsListInitiatedOnPREP2(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "3",
+        EptsReportUtils.map(
+            getPatientsListInitiatedOnPREP3(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(1 OR 2) AND 3");
+
+    return cd;
+  }
+
   /**
    * <b>Description:</b> Number of patients who initiated PREP by end of previous reporting period
    * date as follows: All clients who have “O utente esta iniciar pela 1a vez a PrEP Data” (Concept
    * id 165296 from encounter type 80) and value coded equal to “Start drugs” (concept id 1256) and
-   * value_datetime < start date; or All clients with “Data de Inicio PrEP” (Concept id 165211 from
-   * encounter type 80) and value datetime < start date; And had at least one follow-up visit
-   * registered in Ficha de Consulta de Seguimento PrEP (encounter type 81, encounter datetime)
-   * during the reporting period
+   * value_datetime < start date;
    *
    * @return
    */
-  public CohortDefinition getPatientsListInitiatedOnPREP() {
+  public CohortDefinition getPatientsListInitiatedOnPREP1() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
-    definition.setName("Patients initiated to PREP by end of previous reporting period");
+    definition.setName("Patients initiated to PREP by end of previous reporting period Part 1");
 
     definition.setQuery(
-        PrepCtQueries.getPatientsListInitiatedOnPREP(
+        PrepCtQueries.getPatientsListInitiatedOnPREP1(
             hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
-            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getInitialStatusPrepUserConcept().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Number of patients who initiated PREP by end of previous reporting period
+   * date as follows: or All clients with “Data de Inicio PrEP” (Concept id 165211 from encounter
+   * type 80) and value datetime < start date;
+   *
+   * @return
+   */
+  public CohortDefinition getPatientsListInitiatedOnPREP2() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients initiated to PREP by end of previous reporting period Part 2");
+
+    definition.setQuery(
+        PrepCtQueries.getPatientsListInitiatedOnPREP2(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
             hivMetadata.getPrepStartDateConcept().getConceptId()));
+
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b> Number of patients who initiated PREP by end of previous reporting period
+   * date as follows: And had at least one follow-up visit registered in Ficha de Consulta de
+   * Seguimento PrEP (encounter type 81, encounter datetime) during the reporting period
+   *
+   * @return
+   */
+  public CohortDefinition getPatientsListInitiatedOnPREP3() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("Patients initiated to PREP by end of previous reporting period Part 3");
+
+    definition.setQuery(
+        PrepCtQueries.getPatientsListInitiatedOnPREP3(
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId()));
 
     definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     definition.addParameter(new Parameter("endDate", "End Date", Date.class));

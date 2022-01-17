@@ -10,24 +10,44 @@ public class PrepCtQueries {
    * <b>Description:</b> Number of patients who initiated PREP by end of previous reporting period
    * date as follows: All clients who have “O utente esta iniciar pela 1a vez a PrEP Data” (Concept
    * id 165296 from encounter type 80) and value coded equal to “Start drugs” (concept id 1256) and
-   * value_datetime < start date; or All clients with “Data de Inicio PrEP” (Concept id 165211 from
-   * encounter type 80) and value datetime < start date; And had at least one follow-up visit
-   * registered in Ficha de Consulta de Seguimento PrEP (encounter type 81, encounter datetime)
-   * during the reporting period
+   * value_datetime < start date;
    *
    * @return
    */
-  public static String getPatientsListInitiatedOnPREP(
-      int prepIncialEncounterType,
-      int prepSeguimentoEncounterType,
-      int initialStatusOfPrEPUserConceptId,
-      int startDrugsConceptId,
-      int prepStartDateConceptId) {
+  public static String getPatientsListInitiatedOnPREP1(
+      int prepIncialEncounterType, int initialStatusOfPrEPUserConceptId, int startDrugsConceptId) {
     Map<String, Integer> map = new HashMap<>();
     map.put("80", prepIncialEncounterType);
-    map.put("81", prepSeguimentoEncounterType);
     map.put("165296", initialStatusOfPrEPUserConceptId);
     map.put("1256", startDrugsConceptId);
+
+    String query =
+        "SELECT  p.patient_id "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "AND e.encounter_type=${80} AND o.concept_id=${165296} AND o.value_coded=${1256} "
+            + "AND o.value_datetime < :startDate "
+            + "AND e.location_id = :location "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * <b>Description:</b> Number of patients who initiated PREP by end of previous reporting period
+   * date as follows: or All clients with “Data de Inicio PrEP” (Concept id 165211 from encounter
+   * type 80) and value datetime < start date;
+   *
+   * @return
+   */
+  public static String getPatientsListInitiatedOnPREP2(
+      int prepIncialEncounterType, int prepStartDateConceptId) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("80", prepIncialEncounterType);
     map.put("165211", prepStartDateConceptId);
 
     String query =
@@ -36,26 +56,36 @@ public class PrepCtQueries {
             + "INNER JOIN encounter e ON e.patient_id=p.patient_id "
             + "INNER JOIN obs o ON o.encounter_id=e.encounter_id "
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "AND e.encounter_type=${80} AND "
-            + "( "
-            + " (o.concept_id=${165296} AND o.value_coded=${1256}) "
-            + " OR "
-            + " (o.concept_id=${165211}) "
-            + ") "
-            + " AND o.value_datetime < :startDate "
-            + " AND e.location_id = :location "
-            + " AND p.patient_id IN ( "
-            + " SELECT  p.patient_id "
-            + " FROM patient p "
-            + " INNER JOIN encounter e ON e.patient_id=p.patient_id "
-            + " INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
-            + " WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + " AND e.encounter_type=${81} AND e.encounter_datetime >= '2021-03-21' "
-            + " AND e.encounter_datetime <= :endDate "
-            + " AND e.location_id = :location "
-            + " GROUP  BY p.patient_id "
-            + ") "
+            + "AND e.encounter_type=${80} AND o.concept_id=${165211} "
+            + "AND o.value_datetime < :startDate "
+            + "AND e.location_id = :location "
             + "GROUP BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+  /**
+   * <b>Description:</b> Number of patients who initiated PREP by end of previous reporting period
+   * date as follows: And had at least one follow-up visit registered in Ficha de Consulta de
+   * Seguimento PrEP (encounter type 81, encounter datetime) during the reporting period
+   *
+   * @return
+   */
+  public static String getPatientsListInitiatedOnPREP3(int prepSeguimentoEncounterType) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("81", prepSeguimentoEncounterType);
+
+    String query =
+        "SELECT  p.patient_id "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "AND e.encounter_type=${81} AND e.encounter_datetime >= :startDate "
+            + "AND e.encounter_datetime <= '2021-11-21' "
+            + "AND e.location_id = :location "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
