@@ -17,6 +17,7 @@ import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientData
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
@@ -82,6 +83,7 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
     pdd.addRowFilter(
         listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(),
         "startDate=${startDate},endDate=${endDate},location=${location}");
+    pdd.addColumn("id", new PersonIdDataDefinition(), "");
     // 1- NID sheet 1 - Column A
     pdd.addColumn(
         "nid",
@@ -109,11 +111,17 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
         null);
 
     // 6 - Pregnant/Breastfeeding: - Sheet 1: Column F
+    //    pdd.addColumn(
+    //        "pregnant_breastfeeding",
+    //        tptInitiationDataDefinitionQueries.getPatientsThatArePregnantOrBreastfeeding(),
+    //        "startDate=${generationDate-9m},endDate=${generationDate-18m},location=${location}",
+    //        new EmptyIfNullConverter());
+
     pdd.addColumn(
         "pregnant_breastfeeding",
-        tptInitiationDataDefinitionQueries.getPatientsThatArePregnantOrBreastfeeding(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        new EmptyIfNullConverter());
+        tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
+        "location=${location}",
+        null);
 
     // 7 - Patients active on TB Treatment - Sheet 1: Column G
     pdd.addColumn(
