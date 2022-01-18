@@ -46,7 +46,7 @@ public class PrepCtCohortQueries {
     cd.addSearch(
         "B",
         EptsReportUtils.map(
-                getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod(),
+            getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "C",
@@ -166,16 +166,16 @@ public class PrepCtCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-            "1",
-            EptsReportUtils.map(
-                    getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod1(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "1",
+        EptsReportUtils.map(
+            getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod1(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "2",
-            EptsReportUtils.map(
-                    getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod2(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "2",
+        EptsReportUtils.map(
+            getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod2(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("1 OR 2");
 
@@ -254,10 +254,10 @@ public class PrepCtCohortQueries {
 
   /**
    * <b>Description:</b> Number of patients who were transferred-in from another HF by end of the
-   * previous reporting period:
-   * All clients who are enrolled in PrEP Program (PREP) (program id 25)
+   * previous reporting period: All clients who are enrolled in PrEP Program (PREP) (program id 25)
    * and have the first historical state as “Transferido de outra US” (patient state id= 76) in the
    * client chart by start of the reporting period;
+   *
    * @return
    */
   public CohortDefinition getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod1() {
@@ -277,27 +277,24 @@ public class PrepCtCohortQueries {
     return definition;
   }
 
-
   /**
    * <b>Description:</b> Number of patients who were transferred-in from another HF by end of the
-   * previous reporting period:
-   * or All clients who have marked “Transferido de
-   * outra US”(concept id 1594 value coded 1369) in the first Ficha de Consulta Inicial
-   * PrEP(encounter type 80, Min(encounter datetime)) registered in the system by the start of the
-   * reporting period.
+   * previous reporting period: or All clients who have marked “Transferido de outra US”(concept id
+   * 1594 value coded 1369) in the first Ficha de Consulta Inicial PrEP(encounter type 80,
+   * Min(encounter datetime)) registered in the system by the start of the reporting period.
    *
    * @return
    */
   public CohortDefinition getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod2() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName(
-            "Patients who were transferred-in from another HF by end of the previous reporting period part 2");
+        "Patients who were transferred-in from another HF by end of the previous reporting period part 2");
 
     definition.setQuery(
-            PrepCtQueries.getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod2(
-                    hivMetadata.getReferalTypeConcept().getConceptId(),
-                    hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId(),
-                    hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
+        PrepCtQueries.getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod2(
+            hivMetadata.getReferalTypeConcept().getConceptId(),
+            hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId()));
 
     definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     definition.addParameter(new Parameter("endDate", "End Date", Date.class));
