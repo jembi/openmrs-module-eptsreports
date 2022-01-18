@@ -94,48 +94,63 @@ public class PrepCtQueries {
 
   /**
    * <b>Description:</b> Number of patients who were transferred-in from another HF by end of the
-   * previous reporting period: All clients who are enrolled in PrEP Program (PREP) (program id 25)
+   * previous reporting period:
+   * All clients who are enrolled in PrEP Program (PREP) (program id 25)
    * and have the first historical state as “Transferido de outra US” (patient state id= 76) in the
-   * client chart by start of the reporting period; or All clients who have marked “Transferido de
+   * client chart by start of the reporting period;
+   * @return
+   */
+  public static String getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod1(
+      int prepProgramId,
+      int transferidoDeOutraUsStateId) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("25", prepProgramId);
+    map.put("76", transferidoDeOutraUsStateId);
+
+    String query =
+            " SELECT p.patient_id FROM patient p  "
+            + "INNER JOIN patient_program pg ON p.patient_id=pg.patient_id  "
+            + "INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id  "
+            + "WHERE pg.voided=0 AND ps.voided=0 AND p.voided=0 AND pg.program_id=${25}  "
+            + "AND ps.state=${76} AND ps.end_date IS NULL AND ps.start_date<= :startDate "
+            + "AND pg.location_id= :location GROUP BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * <b>Description:</b> Number of patients who were transferred-in from another HF by end of the
+   * previous reporting period:
+   * or All clients who have marked “Transferido de
    * outra US”(concept id 1594 value coded 1369) in the first Ficha de Consulta Inicial
    * PrEP(encounter type 80, Min(encounter datetime)) registered in the system by the start of the
    * reporting period.
    *
    * @return
    */
-  public static String getPatientsTransferredInFromAnotherHFByEndOfReportingPeriod(
-      int entryPointIntoCareConceptId,
-      int transferFromAnotherFacilityConceptId,
-      int prepIncialEncounterType,
-      int prepProgramId,
-      int transferidoDeOutraUsStateId) {
+  public static String getPatientsTransferredInFromAnotherHFByEndOfPreviousReportingPeriod2(
+          int entryPointIntoCareConceptId,
+          int transferFromAnotherFacilityConceptId,
+          int prepIncialEncounterType) {
     Map<String, Integer> map = new HashMap<>();
     map.put("1594", entryPointIntoCareConceptId);
     map.put("1369", transferFromAnotherFacilityConceptId);
     map.put("80", prepIncialEncounterType);
-    map.put("25", prepProgramId);
-    map.put("76", transferidoDeOutraUsStateId);
 
     String query =
-        "SELECT results.patient_id FROM ( "
-            + " SELECT  p.patient_id, Min(e.encounter_datetime) "
-            + " FROM patient p     "
-            + " INNER JOIN encounter e ON e.patient_id=p.patient_id    "
-            + " INNER JOIN obs o ON o.encounter_id=e.encounter_id    "
-            + " WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
-            + " AND o.concept_id = ${1594} AND o.value_coded = ${1369} "
-            + " AND e.location_id = :location AND e.encounter_type=${80}  "
-            + " AND e.encounter_datetime >= :startDate   "
-            + " AND e.encounter_datetime <= :endDate "
-            + " GROUP  BY p.patient_id "
-            + ")results "
-            + "UNION "
-            + "SELECT p.patient_id FROM patient p  "
-            + "INNER JOIN patient_program pg ON p.patient_id=pg.patient_id  "
-            + "INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id  "
-            + "WHERE pg.voided=0 AND ps.voided=0 AND p.voided=0 AND pg.program_id=${25}  "
-            + "AND ps.patient_state_id=${76} AND ps.end_date IS NULL AND ps.start_date<= :endDate "
-            + "AND pg.location_id= :location GROUP BY p.patient_id";
+            "SELECT results.patient_id FROM ( "
+                    + " SELECT  p.patient_id, Min(e.encounter_datetime) "
+                    + " FROM patient p     "
+                    + " INNER JOIN encounter e ON e.patient_id=p.patient_id    "
+                    + " INNER JOIN obs o ON o.encounter_id=e.encounter_id    "
+                    + " WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
+                    + " AND o.concept_id = ${1594} AND o.value_coded = ${1369} "
+                    + " AND e.location_id = :location AND e.encounter_type=${80}  "
+                    + " AND e.encounter_datetime < :startDate   "
+                    + " GROUP  BY p.patient_id "
+                    + ")results";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
