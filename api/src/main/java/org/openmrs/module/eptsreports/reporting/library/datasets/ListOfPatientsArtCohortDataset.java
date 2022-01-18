@@ -1,12 +1,12 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.eptsreports.reporting.data.converter.*;
+import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStayArtPatientConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.StoYesAndNtoNoConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationDataDefinitionQueries;
@@ -25,6 +25,10 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class ListOfPatientsArtCohortDataset extends BaseDataSet {
@@ -111,12 +115,6 @@ public class ListOfPatientsArtCohortDataset extends BaseDataSet {
         null);
 
     // 6 - Pregnant/Breastfeeding: - Sheet 1: Column F
-    //    pdd.addColumn(
-    //        "pregnant_breastfeeding",
-    //        tptInitiationDataDefinitionQueries.getPatientsThatArePregnantOrBreastfeeding(),
-    //        "startDate=${generationDate-9m},endDate=${generationDate-18m},location=${location}",
-    //        new EmptyIfNullConverter());
-
     pdd.addColumn(
         "pregnant_breastfeeding",
         tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
