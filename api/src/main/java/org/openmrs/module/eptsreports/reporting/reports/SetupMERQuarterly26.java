@@ -19,11 +19,6 @@ import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.*;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TransferredInDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxCurrDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxNewDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxPvlsDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxRttDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
@@ -52,6 +47,10 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
 
   private TxRTTPLHIVDataset txRTTPLHIVDateset;
 
+  private PrepNewDataset prepNewDataset;
+
+  private PrepCtDataset prepCtDataset;
+
   @Autowired
   public SetupMERQuarterly26(
       TxPvlsDataset txPvlsDataset,
@@ -64,7 +63,9 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
       TxRTTPLHIVDataset txRTTPLHIVDateset,
       CXCASCRNDataset cxcascrnDataset,
       CXCASCRNPositiveDataset cxcascrnPositiveDataset,
-      TXCXCADataset txcxcaDataset) {
+      TXCXCADataset txcxcaDataset,
+      PrepNewDataset prepNewDataset,
+      PrepCtDataset prepCtDataset) {
     this.txPvlsDataset = txPvlsDataset;
     this.txNewDataset = txNewDataset;
     this.txCurrDataset = txCurrDataset;
@@ -73,6 +74,8 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
     this.genericCohortQueries = genericCohortQueries;
     this.transferredInDataset = transferredInDataset;
     this.txRTTPLHIVDateset = txRTTPLHIVDateset;
+    this.prepNewDataset = prepNewDataset;
+    this.prepCtDataset = prepCtDataset;
   }
 
   @Override
@@ -118,7 +121,11 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
         "T", Mapped.mapStraightThrough(transferredInDataset.constructTransferInDataset()));
     rd.addDataSetDefinition(
         "PL", Mapped.mapStraightThrough(txRTTPLHIVDateset.constructTxRTTPLHIVDateset()));
-    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));*/
+    rd.addDataSetDefinition(
+        "PREP", Mapped.mapStraightThrough(prepNewDataset.constructPrepNewDataset()));
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition(
+        "PREPNUM", Mapped.mapStraightThrough(prepCtDataset.constructPrepCtDataset()));
 
     // add a base cohort here to help in calculations running
     rd.setBaseCohortDefinition(

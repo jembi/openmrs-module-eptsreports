@@ -11,9 +11,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -22,7 +19,12 @@ import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 @Component
 public class EptsCommonDimension {
@@ -51,6 +53,12 @@ public class EptsCommonDimension {
 
   private MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries;
 
+  private PrepCtCohortQueries prepCtCohortQueries;
+
+  @Autowired
+  @Qualifier("commonAgeDimensionCohort")
+  private AgeDimensionCohortInterface ageDimensionCohort;
+
   @Autowired
   public EptsCommonDimension(
       GenderCohortQueries genderCohortQueries,
@@ -64,7 +72,8 @@ public class EptsCommonDimension {
       TxPvlsCohortQueries txPvlsQueries,
       TxCurrCohortQueries txCurrCohortQueries,
       EriDSDCohortQueries eriDSDCohortQueries,
-      MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries) {
+      MISAUKeyPopsCohortQueries misauKeyPopsCohortQueries,
+      PrepCtCohortQueries prepCtCohortQueries) {
     this.genderCohortQueries = genderCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
@@ -77,6 +86,7 @@ public class EptsCommonDimension {
     this.txCurrCohortQueries = txCurrCohortQueries;
     this.eriDSDCohortQueries = eriDSDCohortQueries;
     this.misauKeyPopsCohortQueries = misauKeyPopsCohortQueries;
+    this.prepCtCohortQueries = prepCtCohortQueries;
   }
 
   /**
@@ -366,10 +376,15 @@ public class EptsCommonDimension {
     CohortDefinition imprisonmentKeyPopCohort = hivCohortQueries.getImprisonmentKeyPopCohort();
     CohortDefinition sexWorkerKeyPopCohort =
         hivCohortQueries.getFemaleSexWorkersKeyPopCohortDefinition();
+    CohortDefinition maleSexWorkerKeyPopCohort =
+        hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
+    CohortDefinition transgenderKeyPopCohort = hivCohortQueries.getTransgenderKeyPopCohort();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
     dim.addCohortDefinition("CSW", mapStraightThrough(sexWorkerKeyPopCohort));
     dim.addCohortDefinition("PRI", mapStraightThrough(imprisonmentKeyPopCohort));
+    dim.addCohortDefinition("MSW", mapStraightThrough(maleSexWorkerKeyPopCohort));
+    dim.addCohortDefinition("TG", mapStraightThrough(transgenderKeyPopCohort));
     return dim;
   }
 
@@ -544,6 +559,99 @@ public class EptsCommonDimension {
             misauKeyPopsCohortQueries.getMtsAndRec(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    return dim;
+  }
+
+  /**
+   * Dimension to calculate patient age based on the PrEP Start Date
+   *
+   * @return @{@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getPatientAgeBasedOnPrepStartDate() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Patients having age based on PrEP Start Date");
+
+    dim.addCohortDefinition(
+        DimensionKeyForAge.unknown.getKey(), ageDimensionCohort.createUnknownAgeCohort());
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between15And19Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(15, 19),
+            "endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between20And24Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(20, 24),
+            "endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between25And29Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(25, 29),
+            "endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between30And34Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(30, 34),
+            "endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between35And39Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(35, 39),
+            "endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between40And44Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(40, 44),
+            "endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between45and49Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(45, 49),
+            "endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        DimensionKeyForAge.overOrEqualTo50Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(50, 200),
+            "endDate=${endDate},location=${location}"));
+
+    dim.addCohortDefinition(
+        DimensionKeyForAge.overOrEqualTo15Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getPatientAgeBasedOnPrepStartDate(15, 200),
+            "endDate=${endDate},location=${location}"));
+
+    return dim;
+  }
+
+  /**
+   * Dimension for returning patients Test Results (Positive, Negative and other) based on reporting
+   * period Prep
+   *
+   * @return @{@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getPatientTestResultsPrep() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Patients having Positive Test Results Prep based on reporting period");
+    dim.addCohortDefinition(
+        "positive",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getPositiveTestResults(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "negative",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getNegativeTestResults(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "other",
+        EptsReportUtils.map(
+            prepCtCohortQueries.getNegativeTestResults(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
 }

@@ -922,30 +922,4 @@ public class CommonQueries {
 
     return stringSubstitutor.replace(sql);
   }
-
-  public String obsDateOverallQuery(
-      String startDate,
-      String endDate,
-      Integer conceptQuestion,
-      Integer location,
-      List<Integer> encounterTypeList) {
-    String encounters =
-        (String.valueOf(encounterTypeList).replaceAll("\\[", "")).replaceAll("]", "");
-    return "SELECT p.patient_id, MAX(o.obs_datetime) FROM patient p INNER JOIN encounter e ON p.patient_id=e.patient_id"
-        + " INNER JOIN obs o ON e.encounter_id=o.encounter_id"
-        + " WHERE p.voided=0 AND e.voided=0 AND o.obs_datetime BETWEEN '"
-        + startDate
-        + "'"
-        + "AND '"
-        + endDate
-        + "'"
-        + " AND e.location_id="
-        + location
-        + " AND e.encounter_type IN("
-        + encounters
-        + ") "
-        + " AND o.voided=0 AND o.concept_id="
-        + conceptQuestion
-        + " GROUP BY p.patient_id";
-  }
 }
