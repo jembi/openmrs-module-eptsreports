@@ -83,7 +83,7 @@ public class PrepCtQueries {
             + "INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "AND e.encounter_type=${81} AND e.encounter_datetime >= :startDate "
-            + "AND e.encounter_datetime <= '2021-11-21' "
+            + "AND e.encounter_datetime <= :endDate "
             + "AND e.location_id = :location "
             + "GROUP  BY p.patient_id";
 
