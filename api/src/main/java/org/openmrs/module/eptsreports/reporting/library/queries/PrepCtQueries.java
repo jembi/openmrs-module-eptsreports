@@ -225,8 +225,8 @@ public class PrepCtQueries {
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "AND o.concept_id = ${165296} AND o.value_coded = ${1705} "
             + "AND e.location_id = :location AND e.encounter_type=${80}  "
-            + "AND e.encounter_datetime >= :startDate   "
-            + "AND e.encounter_datetime <= :endDate "
+            + "AND o.value_datetime >= :startDate   "
+            + "AND o.value_datetime <= :endDate "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -258,8 +258,8 @@ public class PrepCtQueries {
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "AND o.concept_id = ${165296} AND o.value_coded = ${1257} "
             + "AND e.location_id = :location AND e.encounter_type=${80}  "
-            + "AND e.encounter_datetime >= :startDate   "
-            + "AND e.encounter_datetime <= :endDate "
+            + "AND o.value_datetime >= :startDate   "
+            + "AND o.value_datetime <= :endDate "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
