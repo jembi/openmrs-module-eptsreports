@@ -52,7 +52,7 @@ public class PrepCtDataset extends BaseDataSet {
     dsd.addDimension(
         "age",
         EptsReportUtils.map(
-            eptsCommonDimension.getPatientAgeBasedOnPrepStartDate(),
+            eptsCommonDimension.getPatientAgeBasedOnPrepEndDate(),
             "endDate=${endDate},location=${location}"));
     dsd.addDimension(
         "results", EptsReportUtils.map(eptsCommonDimension.getPatientTestResultsPrep(), mappings));

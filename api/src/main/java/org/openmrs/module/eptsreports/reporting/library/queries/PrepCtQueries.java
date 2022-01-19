@@ -458,4 +458,32 @@ public class PrepCtQueries {
 
     return stringSubstitutor.replace(query);
   }
+
+  /**
+   * <b>Description:</b> For clients with birth date information registered in the system the age of
+   * the client will be calculated at the end date of the reporting period (reporting end date minus
+   * birthdate / 365. Clients without birth date information should be considered in unknown age
+   *
+   * @return
+   */
+  public static String patientAgeBasedOnPrepEndDate(int minAge, int maxAge) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+
+    String query =
+        "SELECT patient_id FROM( "
+            + "SELECT  p.patient_id , TIMESTAMPDIFF(YEAR, pn.birthdate, :endDate ) AS age "
+            + "FROM patient p    "
+            + "INNER JOIN person pn ON pn.person_id=p.patient_id     "
+            + "INNER JOIN encounter e ON e.patient_id=p.patient_id     "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND pn.voided = 0   "
+            + "AND e.location_id = :location  "
+            + "GROUP  BY p.patient_id) age_data "
+            + "WHERE age BETWEEN ${minAge} AND ${maxAge}";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
 }
