@@ -28,7 +28,7 @@ public class PrepCtQueries {
             + "INNER JOIN obs o ON o.encounter_id=e.encounter_id "
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "AND e.encounter_type=${80} AND o.concept_id=${165296} AND o.value_coded=${1256} "
-            + "AND o.value_datetime < :startDate "
+            + "AND o.obs_datetime < :startDate "
             + "AND e.location_id = :location "
             + "GROUP BY p.patient_id";
 
@@ -225,8 +225,8 @@ public class PrepCtQueries {
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "AND o.concept_id = ${165296} AND o.value_coded = ${1705} "
             + "AND e.location_id = :location AND e.encounter_type=${80}  "
-            + "AND o.value_datetime >= :startDate   "
-            + "AND o.value_datetime <= :endDate "
+            + "AND o.obs_datetime >= :startDate   "
+            + "AND o.obs_datetime <= :endDate "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -258,8 +258,8 @@ public class PrepCtQueries {
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "AND o.concept_id = ${165296} AND o.value_coded = ${1257} "
             + "AND e.location_id = :location AND e.encounter_type=${80}  "
-            + "AND o.value_datetime >= :startDate   "
-            + "AND o.value_datetime <= :endDate "
+            + "AND o.obs_datetime >= :startDate   "
+            + "AND o.obs_datetime <= :endDate "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
