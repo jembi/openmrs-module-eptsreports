@@ -48,7 +48,9 @@ public class PrepCtDataset extends BaseDataSet {
         "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), mappingsKp));
     dsd.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
     dsd.addDimension(
-        "maternity", EptsReportUtils.map(eptsCommonDimension.maternityDimension(), mappings));
+        "maternity",
+        EptsReportUtils.map(
+            eptsCommonDimension.getPregnantAndBreastfeedingPatientsBasedOnPrep(), mappings));
     dsd.addDimension(
         "age",
         EptsReportUtils.map(

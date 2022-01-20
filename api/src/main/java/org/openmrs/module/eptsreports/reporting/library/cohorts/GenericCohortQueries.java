@@ -24,6 +24,7 @@ import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.*;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
@@ -47,6 +48,8 @@ public class GenericCohortQueries {
   @Autowired private HivMetadata hivMetadata;
 
   @Autowired private TxCurrCohortQueries txCurrCohortQueries;
+
+  @Autowired private CommonMetadata commonMetadata;
 
   /**
    * Generic Coded Observation cohort
@@ -818,5 +821,39 @@ public class GenericCohortQueries {
     return generalSql(
         "getPatientAgeBasedOnPrepEndDate",
         PrepCtQueries.patientAgeBasedOnPrepEndDate(minAge, maxAge));
+  }
+
+  /**
+   * <b>Description:</b> Pregnant patients based on Prep
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPregnantPatientsBasedOnPrep() {
+    return generalSql(
+        "getPregnantPatientsBasedOnPrep",
+        PrepCtQueries.pregnantPatientsBasedOnPrep(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getCurrentStateOfTheWomanUuidConcept().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId()));
+  }
+
+  /**
+   * <b>Description:</b> Breastfeeding patients based on Prep
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getBreastfeedingPatientsBasedOnPrep() {
+    return generalSql(
+        "getPregnantPatientsBasedOnPrep",
+        PrepCtQueries.breastfeedingPatientsBasedOnPrep(
+            hivMetadata.getPrepInicialEncounterType().getEncounterTypeId(),
+            hivMetadata.getPrepSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getCurrentStateOfTheWomanUuidConcept().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId()));
   }
 }

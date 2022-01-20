@@ -649,7 +649,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         "other",
         EptsReportUtils.map(
-            prepCtCohortQueries.getNegativeTestResults(),
+            prepCtCohortQueries.getOtherTestResults(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
@@ -714,6 +714,30 @@ public class EptsCommonDimension {
             genericCohortQueries.getPatientAgeBasedOnPrepEndDate(15, 200),
             "endDate=${endDate},location=${location}"));
 
+    return dim;
+  }
+
+  /**
+   * Dimension for returning patients Maternity (Pregnant, breastfeeding) based on Prep
+   *
+   * @return @{@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getPregnantAndBreastfeedingPatientsBasedOnPrep() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "startDate", Date.class));
+    dim.addParameter(new Parameter("endDate", "endDate", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Patients Pregnant or Breastfeeding based on Prep");
+    dim.addCohortDefinition(
+        "pregnant",
+        EptsReportUtils.map(
+            genericCohortQueries.getPregnantPatientsBasedOnPrep(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    dim.addCohortDefinition(
+        "breastfeeding",
+        EptsReportUtils.map(
+            genericCohortQueries.getBreastfeedingPatientsBasedOnPrep(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
 }
