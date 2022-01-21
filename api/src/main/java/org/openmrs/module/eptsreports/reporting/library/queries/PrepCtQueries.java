@@ -73,17 +73,7 @@ public class PrepCtQueries {
             + "                         AND o.concept_id = ${165211} "
             + "                         AND e.location_id = :location "
             + "                         AND o.value_datetime < :startDate "
-            + "                       GROUP  BY p.patient_id"
-            + "                UNION "
-            + "                 SELECT  p.patient_id, e.encounter_datetime AS earliest_date "
-            + "                     FROM patient p "
-            + "                 INNER JOIN encounter e ON e.patient_id=p.patient_id "
-            + "                 INNER JOIN obs o ON o.encounter_id=e.encounter_id "
-            + "                  WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "                  AND e.encounter_type=${81} AND e.encounter_datetime >= :startDate "
-            + "                   AND e.encounter_datetime <= :endDate "
-            + "                   AND e.location_id = :location "
-            + "    GROUP  BY p.patient_id  ) tbl "
+            + "                       GROUP  BY p.patient_id ) tbl "
             + "                      ON tbl.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
             + "  AND e.voided = 0 "
@@ -92,7 +82,16 @@ public class PrepCtQueries {
             + "GROUP  BY p.patient_id "
             + "    ) clients "
             + "WHERE "
-            + "      clients.earliest_date_ever < :startDate ";
+            + "      clients.earliest_date_ever < :startDate "
+            + " AND clients.patient_id IN ("
+            + "                SELECT  p.patient_id "
+            + "                               FROM patient p "
+            + "                           INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "                            INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + "                           WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                           AND e.encounter_type=${81} AND e.encounter_datetime >= :startDate "
+            + "                            AND e.encounter_datetime <= :endDate "
+            + "                     AND e.location_id = :location GROUP  BY p.patient_id) ";
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
     return sb.replace(query);
   }

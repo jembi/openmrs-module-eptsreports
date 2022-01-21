@@ -69,7 +69,7 @@ public class PrepCtCohortQueries {
             prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("A or B or C or D or E AND NOT F");
+    cd.setCompositionString("(A or B or C or D or E) AND NOT F");
 
     return cd;
   }
