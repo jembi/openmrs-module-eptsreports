@@ -18,9 +18,9 @@ import java.util.List;
  */
 public class DatimCodeDatasetDefinition extends EvaluatableDataSetDefinition {
 
-  int typeId;
+  protected int typeId;
 
-  String columnName;
+  protected String columnName;
 
   protected String getQuery(int typeId, String columnName) {
 
