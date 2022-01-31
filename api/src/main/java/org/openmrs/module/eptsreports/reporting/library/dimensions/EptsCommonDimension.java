@@ -11,9 +11,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -24,6 +21,10 @@ import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimensio
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 @Component
 public class EptsCommonDimension {
@@ -738,6 +739,44 @@ public class EptsCommonDimension {
         EptsReportUtils.map(
             genericCohortQueries.getBreastfeedingPatientsBasedOnPrep(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    return dim;
+  }
+
+  /**
+   * Dimension to calculate patient age based on the Report End Date
+   *
+   * @return @{@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getPatientAgeOnReportEndDate() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    dim.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    dim.addParameter(new Parameter("location", "location", Location.class));
+    dim.setName("Patients having age based on Report End Date");
+
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between10And14Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnReportEndDate(10, 14),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between15And19Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnReportEndDate(15, 19),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between20And24Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnReportEndDate(20, 24),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        DimensionKeyForAge.overOrEqualTo25Years.getKey(),
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnReportEndDate(25, 200),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     return dim;
   }
 }
