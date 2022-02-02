@@ -19,13 +19,13 @@ import java.util.List;
 @Component
 public class MISAUResumoMensalPrepDataset extends BaseDataSet {
 
-  private EptsGeneralIndicator eptsGeneralIndicator;
+  private final EptsGeneralIndicator eptsGeneralIndicator;
 
-  private EptsCommonDimension eptsCommonDimension;
+  private final EptsCommonDimension eptsCommonDimension;
 
-  private PrepNewCohortQueries prepNewCohortQueries;
+  private final PrepNewCohortQueries prepNewCohortQueries;
 
-  private RMPREPCohortQueries rmprepCohortQueries;
+  private final RMPREPCohortQueries rmprepCohortQueries;
 
   @Autowired
   public MISAUResumoMensalPrepDataset(
@@ -65,6 +65,12 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.getPregnantAndBreastfeedingPatientsBasedOnPrep(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dsd.addDimension(
+        "TG",
+        EptsReportUtils.map(
+            eptsCommonDimension.getTargetGroupDimension(),
+            "onOrBefore=${endDate},location=${location}"));
     // A1
     dsd.addColumn(
         "TTA1",
@@ -183,7 +189,8 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
   }
 
   /**
-   * <b>Description:</b> Creates disaggregation based on Age, Gender, Maternity and Key Population.
+   * <b>Description:</b> Creates disaggregation based on Age, Gender, Maternity and Key Population
+   * and Target Group.
    *
    * @return
    */
@@ -276,42 +283,45 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
             "10");
 
     // Maternity
-    //    ColumnParameters tenTo14pregnant =
-    //        new ColumnParameters(
-    //            "tenTo14pregnant", "10 - 14 Pregnant", "age=10-14|maternity=pregnant", "11");
-    //
-    //    ColumnParameters above14pregnant =
-    //        new ColumnParameters("above14pregnant", "14+ Pregnant", "age=14+|maternity=pregnant",
-    // "12");
-    //
-    //    ColumnParameters totalPregnant =
-    //        new ColumnParameters("totalPregnant", "Total of Pregnant", "maternity=pregnant",
-    // "13");
-    //
-    //    ColumnParameters tenTo14breastfeeding =
-    //        new ColumnParameters(
-    //            "tenTo14breastfeeding",
-    //            "10 - 14 Breastfeeding",
-    //            "age=10-14|maternity=breastfeeding",
-    //            "14");
-    //
-    //    ColumnParameters above14breastfeeding =
-    //        new ColumnParameters(
-    //            "above14breastfeeding", "14+ Breastfeeding", "age=14+|maternity=breastfeeding",
-    // "15");
-    //
-    //    ColumnParameters totalBreastfeeding =
-    //        new ColumnParameters(
-    //            "totalBreastfeeding", "Total of Breastfeeding", "maternity=breastfeeding", "16");
+    ColumnParameters tenTo14pregnant =
+        new ColumnParameters(
+            "tenTo14pregnant", "10 - 14 Pregnant", "age=10-14|maternity=pregnant", "11");
+    ColumnParameters above15pregnant =
+        new ColumnParameters("above15pregnant", "15+ Pregnant", "age=15+|maternity=pregnant", "12");
+    ColumnParameters totalPregnant =
+        new ColumnParameters("totalPregnant", "Total of Pregnant", "maternity=pregnant", "13");
+    ColumnParameters tenTo14breastfeeding =
+        new ColumnParameters(
+            "tenTo14breastfeeding",
+            "10 - 14 Breastfeeding",
+            "age=10-14|maternity=breastfeeding",
+            "14");
+    ColumnParameters above15breastfeeding =
+        new ColumnParameters(
+            "above15breastfeeding", "15+ Breastfeeding", "age=15+|maternity=breastfeeding", "15");
+    ColumnParameters totalBreastfeeding =
+        new ColumnParameters(
+            "totalBreastfeeding", "Total of Breastfeeding", "maternity=breastfeeding", "16");
 
     // Key population
     ColumnParameters pid = new ColumnParameters("pid", "People who inject drugs", "KP=PID", "17");
     ColumnParameters msm = new ColumnParameters("msm", "Men who have sex with men", "KP=MSM", "18");
-    ColumnParameters csw = new ColumnParameters("csw", "Female sex workers", "KP=CSW", "19");
+    ColumnParameters sw = new ColumnParameters("sw", "Sex workers", "KP=SW", "19");
     ColumnParameters pri =
         new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "20");
-    ColumnParameters msw = new ColumnParameters("msw", "Male sex workers", "KP=MSW", "21");
     ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "22");
+
+    // Target group
+    ColumnParameters ayr =
+        new ColumnParameters("ayr", "Adolescents and Youth at Risk", "TG=AYR", "23");
+    ColumnParameters pw =
+        new ColumnParameters("pw", "Pregnant Woman 15+ at Risk", "age=15+|TG=PW", "24");
+    ColumnParameters bw =
+        new ColumnParameters("bw", "Breastfeeding Woman 15+ at Risk", "age=15+|TG=BW", "25");
+    ColumnParameters mil = new ColumnParameters("mil", "Military", "TG=MIL", "26");
+    ColumnParameters min = new ColumnParameters("min", "Miner", "TG=MIN", "27");
+    ColumnParameters td = new ColumnParameters("td", "Long Course Truck Driver", "TG=TD", "28");
+    ColumnParameters cs = new ColumnParameters("cs", "Serodiscordant Couples", "TG=CS", "29");
 
     return Arrays.asList(
         tenTo14M,
@@ -324,17 +334,23 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
         twentyTo24F,
         above25F,
         totalF,
-        //        tenTo14pregnant,
-        //        above14pregnant,
-        //        totalPregnant,
-        //        tenTo14breastfeeding,
-        //        above14breastfeeding,
-        //        totalBreastfeeding,
+        tenTo14pregnant,
+        above15pregnant,
+        totalPregnant,
+        tenTo14breastfeeding,
+        above15breastfeeding,
+        totalBreastfeeding,
         pid,
         msm,
-        csw,
+        sw,
         pri,
-        msw,
-        tg);
+        tg,
+        ayr,
+        pw,
+        bw,
+        mil,
+        min,
+        td,
+        cs);
   }
 }

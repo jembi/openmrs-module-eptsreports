@@ -26,49 +26,7 @@ public class RMPREPCohortQueries {
     this.prepNewCohortQueries = prepNewCohortQueries;
   }
 
-  public CohortDefinition getPrepComposition() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("?");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    cd.addSearch(
-        "A1",
-        EptsReportUtils.map(
-            getClientsEligibleForPrep(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "B1",
-        EptsReportUtils.map(
-            prepNewCohortQueries.getClientsWhoNewlyInitiatedPrep(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "B2",
-        EptsReportUtils.map(
-            getClientsReturnedToPrep(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "C1",
-        EptsReportUtils.map(
-            getClientsWhoReceivedPrep(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "D1",
-        EptsReportUtils.map(
-            getClientsFromB1PreviousPeriod(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("A1 AND B1 AND B2 AND C1");
-
-    return cd;
-  }
-
-  /**
+    /**
    * <b>A1: Nº de Utentes elegíveis a PrEP durante o período de reporte </b>
    *
    * <p>Select all clients who are eligible for prep during the reporting period as follows: have

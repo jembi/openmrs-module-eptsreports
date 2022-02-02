@@ -13,13 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.*;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.TYPE;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.Program;
@@ -27,6 +20,7 @@ import org.openmrs.ProgramWorkflowState;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation;
+import org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
@@ -38,6 +32,16 @@ import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.*;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.TYPE;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TIPO;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.*;
 
 /** Defines all of the HivCohortDefinition instances we want to expose for EPTS */
 @Component
@@ -709,5 +713,116 @@ public class HivCohortQueries {
     sqlCohortDefinition.setQuery(mappedQuery);
 
     return sqlCohortDefinition;
+  }
+
+  // TARGET GROUP SECTION
+  public CohortDefinition getAdolescentsAndYouthTargetGroupCohort() {
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    cd.setCalculation(Context.getRegisteredComponents(TargetGroupCalculation.class).get(0));
+    cd.setName("Adolescents and Youth at Risk Target Group");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter(TIPO, ADOLESCENT_AND_YOUTH);
+    return cd;
+  }
+
+  public CohortDefinition getPregnantWomanTargetGroupCohort() {
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    cd.setCalculation(Context.getRegisteredComponents(TargetGroupCalculation.class).get(0));
+    cd.setName("Pregnant Woman at Risk");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter(TIPO, PREGNANT);
+    return cd;
+  }
+
+  public CohortDefinition getBreastfeedingTargetGroupCohort() {
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    cd.setCalculation(Context.getRegisteredComponents(TargetGroupCalculation.class).get(0));
+    cd.setName("Breastfeeding woman at Risk Target Group");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter(TIPO, BREASTFEEDING);
+    return cd;
+  }
+
+  /**
+   * Get Pregnant Woman at Risk (Female)
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getPregnantWomanTargetGroupDefinition() {
+
+    CompositionCohortDefinition comp = new CompositionCohortDefinition();
+    comp.setName("Only Pregnant Woman at Risk Target Group");
+    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.addParameter(new Parameter("location", "location", Location.class));
+    comp.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            getPregnantWomanTargetGroupCohort(), "onOrBefore=${onOrBefore},location=${location}"));
+    comp.addSearch("F", EptsReportUtils.map(genderCohortQueries.femaleCohort(), ""));
+    comp.setCompositionString("pregnant AND F");
+    return comp;
+  }
+
+  /**
+   * Get Breastfeeding Woman at Risk (Female)
+   *
+   * @return @{@link CohortDefinition}
+   */
+  public CohortDefinition getBreastfeedingWomanTargetGroupDefinition() {
+
+    CompositionCohortDefinition comp = new CompositionCohortDefinition();
+    comp.setName("Only Breastfeeding Woman at Risk Target Group");
+    comp.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    comp.addParameter(new Parameter("location", "location", Location.class));
+    comp.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            getBreastfeedingTargetGroupCohort(), "onOrBefore=${onOrBefore},location=${location}"));
+    comp.addSearch("F", EptsReportUtils.map(genderCohortQueries.femaleCohort(), ""));
+    comp.setCompositionString("breastfeeding AND F");
+    return comp;
+  }
+
+  public CohortDefinition getMilitaryTargetGroupCohort() {
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    cd.setCalculation(Context.getRegisteredComponents(TargetGroupCalculation.class).get(0));
+    cd.setName("Military Target Group");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter(TIPO, MILITARY);
+    return cd;
+  }
+
+  public CohortDefinition getMinerTargetGroupCohort() {
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    cd.setCalculation(Context.getRegisteredComponents(TargetGroupCalculation.class).get(0));
+    cd.setName("Miner Target Group");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter(TIPO, MINER);
+    return cd;
+  }
+
+  public CohortDefinition getTruckDriverTargetGroupCohort() {
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    cd.setCalculation(Context.getRegisteredComponents(TargetGroupCalculation.class).get(0));
+    cd.setName("Long Course Truck Driver Target Group");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter(TIPO, TRUCK_DRIVER);
+    return cd;
+  }
+
+  public CohortDefinition getSerodiscordantCouplesTargetGroupCohort() {
+    CalculationCohortDefinition cd = new CalculationCohortDefinition();
+    cd.setCalculation(Context.getRegisteredComponents(TargetGroupCalculation.class).get(0));
+    cd.setName("Serodiscordant Couples Target Group");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addCalculationParameter(TIPO, SERODISCORDANT);
+    return cd;
   }
 }

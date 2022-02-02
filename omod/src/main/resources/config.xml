@@ -3215,6 +3215,14 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.prepTargetGroupUuid</property>
+		<defaultValue>279a7f80-b3cd-45c2-b16b-4706212416fd</defaultValue>
+		<description>
+			UUID FOR PREP TARGET GROUP Concept
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 
