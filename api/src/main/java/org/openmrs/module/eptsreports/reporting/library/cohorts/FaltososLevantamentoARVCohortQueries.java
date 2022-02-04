@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -10,10 +13,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class FaltososLevantamentoARVCohortQueries {
@@ -1042,7 +1041,7 @@ public class FaltososLevantamentoARVCohortQueries {
             + "                WHERE  o.concept_id IN ( ${856}, ${1305} ) AND o.voided = 0"
             + "                       AND ( ( e.encounter_type IN( ${6}, ${13}, ${51} ) AND e.encounter_datetime = recent_vl.vl_datetime ) "
             + "                              OR ( e.encounter_type = ${53} AND o.obs_datetime = recent_vl.vl_datetime ) ) "
-            + "                GROUP  BY p.patient_id, e.encounter_id) vl_registered "
+            + "                GROUP  BY p.patient_id, e.encounter_id, o.concept_id) vl_registered "
             + "        WHERE  EXISTS (SELECT encounter_53.encounter_id "
             + "                       FROM   encounter encounter_53 "
             + "                       WHERE  encounter_53.encounter_id = vl_registered.encounter_id "
