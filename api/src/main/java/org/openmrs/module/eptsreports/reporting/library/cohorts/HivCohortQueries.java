@@ -13,6 +13,25 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.DRUG_USER;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.HOMOSEXUAL;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.PRISONER;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.SEX_WORKER;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.TRANSGENDER;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.TYPE;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TIPO;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.ADOLESCENT_AND_YOUTH;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.BREASTFEEDING;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.MILITARY;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.MINER;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.PREGNANT;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.SERODISCORDANT;
+import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.TRUCK_DRIVER;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.Program;
@@ -32,16 +51,6 @@ import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.KeyPop.*;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.KeyPopulationCalculation.TYPE;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TIPO;
-import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.*;
 
 /** Defines all of the HivCohortDefinition instances we want to expose for EPTS */
 @Component
