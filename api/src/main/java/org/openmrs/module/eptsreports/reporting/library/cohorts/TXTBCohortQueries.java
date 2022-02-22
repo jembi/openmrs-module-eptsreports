@@ -90,7 +90,7 @@ public class TXTBCohortQueries {
             TXTBQueries.tbPulmonaryTBDate(
                 hivMetadata.getMasterCardEncounterType().getId(),
                 hivMetadata.getOtherDiagnosis().getConceptId(),
-                    tbMetadata.getPulmonaryTB().getConceptId()));
+                tbMetadata.getPulmonaryTB().getConceptId()));
     addGeneralParameters(definition);
     return definition;
   }
@@ -1312,8 +1312,7 @@ public class TXTBCohortQueries {
             + "        AND p.voided=0   "
             + "        AND pg.program_id= ${artProgram}  "
             + "        AND ps.state = ${transferredOutToAnotherHealthFacilityWorkflowState}   "
-            + "        AND ps.end_date is null   "
-            + "        AND ps.start_date BETWEEN :startDate AND :endDate    "
+            + "        AND ps.start_date <= :endDate    "
             + "        AND pg.location_id= :location   "
             + "    group by p.patient_id  "
             + "  "
