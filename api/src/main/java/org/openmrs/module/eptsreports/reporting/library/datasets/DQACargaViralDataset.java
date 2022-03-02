@@ -73,10 +73,17 @@ public class DQACargaViralDataset extends BaseDataSet {
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
 
-    /** 6 - Resultado da Carga Viral - Sheet 1: Column G */
+    /** 6 - Resultado da Carga Viral (Resultado Quantitativo) - Sheet 1: Column G */
     pdd.addColumn(
-        "resultado_carga_viral",
-        dQACargaViralCohortQueries.getViralLoadResults(),
+        "resultado_cv_quantitativo",
+        dQACargaViralCohortQueries.getViralLoadResults(true),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    /** Resultado da Carga Viral (Resultado Qualitativo) - Sheet 1: Column H */
+    pdd.addColumn(
+        "resultado_cv_qualitativo",
+        dQACargaViralCohortQueries.getViralLoadResults(false),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
 
