@@ -60,8 +60,12 @@ public class DQACargaViralDataset extends BaseDataSet {
     /** 2 - Sexo - Sheet 1: Column C */
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
-    /** 3 - Faixa Etária - Sheet 1: Column D */
-    pdd.addColumn("age", new AgeDataDefinition(), "", new AgeToLetterConverter());
+    /** 3 - Idade - Sheet 1: Column D */
+    pdd.addColumn(
+        "age",
+        dQACargaViralCohortQueries.getAge("endDate"),
+        "endDate=${endDate}",
+        new NotApplicableIfNullConverter());
 
     /** 4 - Data Início TARV - Sheet 1: Column E */
     pdd.addColumn(
@@ -462,11 +466,5 @@ public class DQACargaViralDataset extends BaseDataSet {
     spdd.setQuery(substitutor.replace(query));
 
     return spdd;
-  }
-
-  private Integer DQACounter() {
-    int counter = 0;
-
-    return counter;
   }
 }
