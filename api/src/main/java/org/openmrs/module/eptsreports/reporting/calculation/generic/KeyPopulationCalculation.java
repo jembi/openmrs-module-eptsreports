@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.calculation.generic;
 
-import java.util.*;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -10,15 +9,21 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenderCohortQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
   public static final String TYPE = "type";
+
+  @Autowired private GenderCohortQueries genderCohortQueries;
 
   // Key population source by precedence in ascending order
   enum KeyPopSource {
@@ -335,7 +340,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
       // there is any that occurred on same date
       for (Obs obs : sortedObs) {
         if (requiredObs != null
-            && obs.getObsDatetime().compareTo(requiredObs.getObsDatetime()) >= 0) {
+            && obs.getObsDatetime().compareTo(requiredObs.getObsDatetime()) > 0) {
           if (obs.getValueCoded().equals(hivMetadata.getDrugUseConcept())) {
             requiredObs = obs;
 
@@ -350,6 +355,28 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
           } else if (obs.getValueCoded().equals(hivMetadata.getTransGenderConcept())) {
             requiredObs = obs;
+          }
+        } else if (requiredObs != null
+            && obs.getObsDatetime().compareTo(requiredObs.getObsDatetime()) == 0) {
+          // define the sequence of evaluation if the obs are occurred on the same date
+          EncounterType encounterType = obs.getEncounter().getEncounterType();
+          if (encounterType.equals(hivMetadata.getAdultoSeguimentoEncounterType())) {
+
+            if (obs.getValueCoded().equals(hivMetadata.getDrugUseConcept())) {
+              requiredObs = obs;
+
+            } else if (obs.getValueCoded().equals(hivMetadata.getHomosexualConcept())) {
+              requiredObs = obs;
+
+            } else if (obs.getValueCoded().equals(hivMetadata.getSexWorkerConcept())) {
+              requiredObs = obs;
+
+            } else if (obs.getValueCoded().equals(hivMetadata.getImprisonmentConcept())) {
+              requiredObs = obs;
+
+            } else if (obs.getValueCoded().equals(hivMetadata.getTransGenderConcept())) {
+              requiredObs = obs;
+            }
           }
         }
       }
