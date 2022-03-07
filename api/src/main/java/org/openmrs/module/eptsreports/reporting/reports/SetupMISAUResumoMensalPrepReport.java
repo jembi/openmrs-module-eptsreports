@@ -87,7 +87,7 @@ public class SetupMISAUResumoMensalPrepReport extends EptsDataExportManager {
       rd =
           createXlsReportDesign(
               reportDefinition,
-              "Template_Resumo_Mensal_de_PrEP V1.1.xls",
+              "Template_Resumo_Mensal_de_PrEP_V1.3.XLS",
               "RESUMO MENSAL DE PrEP - MISAU Report",
               getExcelDesignUuid(),
               null);
