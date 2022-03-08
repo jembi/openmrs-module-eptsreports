@@ -116,13 +116,14 @@ public class TargetGroupCalculation extends AbstractPatientCalculation {
 
     Location location = (Location) context.getFromCache("location");
     Date onOrBefore = (Date) context.getFromCache("onOrBefore");
+    Date onOrAfter = (Date) context.getFromCache("onOrAfter");
 
     CalculationResultMap personAttribute = getPersonAttribute(cohort, context);
 
     CalculationResultMap getPrepInicial = getPrepInicial(cohort, context, location, onOrBefore);
 
     CalculationResultMap getPrepSeguimento =
-        getPrepSeguimento(cohort, context, location, onOrBefore);
+        getPrepSeguimento(cohort, context, location, onOrAfter, onOrBefore);
 
     TargetGroup type = (TargetGroup) parameterValues.get(TIPO);
 
@@ -223,14 +224,15 @@ public class TargetGroupCalculation extends AbstractPatientCalculation {
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getPrepInicialEncounterType());
     Concept targetGroupConcept = hivMetadata.getPrepTargetGroupConcept();
-    return eptsCalculationService.allObservations(
-        targetGroupConcept, null, encounterTypes, location, cohort, context);
+    return eptsCalculationService.lastObs(
+        encounterTypes, targetGroupConcept, location, null, endDate, cohort, context);
   }
 
   private CalculationResultMap getPrepSeguimento(
       Collection<Integer> cohort,
       PatientCalculationContext context,
       Location location,
+      Date startDate,
       Date endDate) {
     EPTSCalculationService eptsCalculationService =
         Context.getRegisteredComponents(EPTSCalculationService.class).get(0);
@@ -238,8 +240,8 @@ public class TargetGroupCalculation extends AbstractPatientCalculation {
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getPrepSeguimentoEncounterType());
     Concept targetGroupConcept = hivMetadata.getPrepTargetGroupConcept();
-    return eptsCalculationService.allObservations(
-        targetGroupConcept, null, encounterTypes, location, cohort, context);
+    return eptsCalculationService.lastObs(
+        encounterTypes, targetGroupConcept, location, startDate, endDate, cohort, context);
   }
 
   private List<Obs> sortObsByObsDatetime(List<Obs> obs) {
