@@ -1,10 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.QualityImprovement2020DataSet;
@@ -16,6 +11,12 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SetupQualityImprovementReport20 extends EptsDataExportManager {
@@ -31,7 +32,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "Melhoria de Qualidade - 2020";
+    return "Melhoria de Qualidade - 2022";
   }
 
   @Override
@@ -77,7 +78,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
           createXlsReportDesign(
               reportDefinition,
               "Melhoria de Qualidade - 2020.xls",
-              "Melhoria de Qualidade - 2020",
+              "Melhoria de Qualidade - 2022",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
