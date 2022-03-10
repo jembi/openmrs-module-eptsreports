@@ -7353,7 +7353,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
     CohortDefinition Mq15B1 = intensiveMonitoringCohortQueries.getMI15B1();
-    CohortDefinition Mq15B2 = intensiveMonitoringCohortQueries.getMI15B2();
+    CohortDefinition Mq15B2 = intensiveMonitoringCohortQueries.getMI15B2(24);
     CohortDefinition E1 = intensiveMonitoringCohortQueries.getMI15E(30, 1);
     CohortDefinition E2 = intensiveMonitoringCohortQueries.getMI15E(60, 31);
     CohortDefinition E3 = intensiveMonitoringCohortQueries.getMI15E(90, 61);

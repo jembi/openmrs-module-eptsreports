@@ -1,10 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -19,6 +14,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class IntensiveMonitoringCohortQueries {
@@ -1291,7 +1288,7 @@ public class IntensiveMonitoringCohortQueries {
    * Consultation Date” (encounter_datetime from A) minus “Data de Início TARV” (concept id 1190
    * value_datetime) is greater than (>) 21 months
    */
-  public CohortDefinition getMI15B2() {
+  public CohortDefinition getMI15B2(Integer months) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("B2 - All patients with the earliest “Data de Início TARV”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1325,7 +1322,7 @@ public class IntensiveMonitoringCohortQueries {
             + "             GROUP by pp.patient_id) as last_encounter "
             + "        ON last_encounter.patient_id=tabela.patient_id "
             + "WHERE timestampdiff(month,tabela.value_datetime,( last_encounter.encounter_datetime "
-            + "             ))>21";
+            + "             ))> " + months;
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     cd.setQuery(stringSubstitutor.replace(query));
@@ -2053,7 +2050,7 @@ public class IntensiveMonitoringCohortQueries {
 
     CohortDefinition a = getMI15A();
     CohortDefinition b1 = getMI15B1();
-    CohortDefinition b2 = getMI15B2();
+    CohortDefinition b2 = getMI15B2(21);
     CohortDefinition c = getMI15C();
     CohortDefinition d = getMI15D();
     CohortDefinition e = getMI15EComplete();
