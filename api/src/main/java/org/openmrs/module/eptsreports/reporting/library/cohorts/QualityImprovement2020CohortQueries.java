@@ -7341,6 +7341,49 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+
+  public CohortDefinition getMQ15DenMDS(){
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Denominator 15 - Pacientes elegíveis a MDS");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+
+    CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
+    CohortDefinition Mq15B1 = intensiveMonitoringCohortQueries.getMI15B1();
+    CohortDefinition Mq15B2 = intensiveMonitoringCohortQueries.getMI15B2();
+    CohortDefinition E1 = intensiveMonitoringCohortQueries.getMI15E(30, 1);
+    CohortDefinition E2 = intensiveMonitoringCohortQueries.getMI15E(60, 31);
+    CohortDefinition E3 = intensiveMonitoringCohortQueries.getMI15E(90, 61);
+    CohortDefinition Mq15C = intensiveMonitoringCohortQueries.getMI15C();// ver nota
+    CohortDefinition Mq15D = intensiveMonitoringCohortQueries.getMI15D();
+    CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
+    CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
+    CohortDefinition Mq15J = intensiveMonitoringCohortQueries.getMI15J();
+    CohortDefinition Mq15AGE2 = intensiveMonitoringCohortQueries.getAgeOnLastConsultationMoreThan2Years();
+
+    cd.addSearch("A", EptsReportUtils.map(Mq15A, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("B1", EptsReportUtils.map(Mq15B1, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("B2", EptsReportUtils.map(Mq15B2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+
+    cd.addSearch("E1", EptsReportUtils.map(E1, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("E2", EptsReportUtils.map(E2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("E3", EptsReportUtils.map(E2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+
+    cd.addSearch("C", EptsReportUtils.map(Mq15C, "startDate = ${revisionEndDate - 14m+1d}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("D", EptsReportUtils.map(Mq15D, "startDate = ${revisionEndDate - 14m+1d}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("F", EptsReportUtils.map(Mq15F, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("G", EptsReportUtils.map(Mq15G, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("J", EptsReportUtils.map(Mq15J, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch("AGE2", EptsReportUtils.map(Mq15AGE2, "startDate = ${startDate}, endDate = {endDate}, location = ${location}"));
+
+    cd.setCompositionString("A AND B1 AND (E1 AND E2 AND E3) AND NOT (C OR D OR F OR G OR J) AND AGE2");
+
+    return cd;
+  }
+
   private CohortDefinition getAgeOnObsDatetime(Integer minAge, Integer maxAge) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
