@@ -1,13 +1,14 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -867,6 +868,67 @@ public class QualityImprovement2020Queries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getMQ15B1(
+
+          Integer adultoSeguimentoEncounterType,
+          Integer clinicalConsultationEncounterType,
+          Integer dataInicioTarvConcept
+  ){
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with earliest data início TARV");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", adultoSeguimentoEncounterType);
+    map.put("6", clinicalConsultationEncounterType);
+    map.put("1190", dataInicioTarvConcept);
+
+    String query = ""
+            + "SELECT    tarv.patient_idfrom "
+            + "          ( "
+            + "                     SELECT    p.patient_id, "
+            + "                                min(o.value_datetime) tarv_date "
+            + "                     FROM       patient p "
+            + "                     INNER JOIN encounter e "
+            + "                     ON         p.patient_id = e.patient_id "
+            + "                     INNER JOIN obs o "
+            + "                     ON         o.encounter_id = e.encounter_id "
+            + "                     WHERE      p.voided = 0 "
+            + "                     AND        e.voided = 0 "
+            + "                     AND        o.voided = 0 "
+            + "                     AND        e.location_id = :location "
+            + "                     AND        e.encounter_type = ${53} "
+            + "                     AND        o.concept_id = ${1190} "
+            + "                     GROUP BY   p.patient_id ) tarv "
+            + "LEFT JOIN "
+            + "          ( "
+            + "                     SELECT     p.patient_id, "
+            + "                                max(e.encounter_datetime) consultation_date "
+            + "                     FROM       patient p "
+            + "                     INNER JOIN encounter e "
+            + "                     ON         e.patient_id = p.patient_id "
+            + "                     WHERE      p.voided = 0 "
+            + "                     AND        e.voided = 0 "
+            + "                     AND        e.location_id = :location "
+            + "                     AND        e.encounter_type = ${6} "
+            + "                     AND        e.encounter_datetime BETWEEN :startDate AND :endaDate "
+            + "                     GROUP BY   p.patient_id ) AS consultation "
+            + "ON        tarv.patient_id = consultation.patient_id "
+            + "WHERE     timestampdiff(month, tarv.tarv_date, consultation.consultation_date) > 3" +
+            "  GROUP BY tarv.patient_id";
+
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+
   }
 
   /**
