@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -14,8 +15,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class IntensiveMonitoringCohortQueries {
@@ -1322,7 +1321,8 @@ public class IntensiveMonitoringCohortQueries {
             + "             GROUP by pp.patient_id) as last_encounter "
             + "        ON last_encounter.patient_id=tabela.patient_id "
             + "WHERE timestampdiff(month,tabela.value_datetime,( last_encounter.encounter_datetime "
-            + "             ))> " + months;
+            + "             ))> "
+            + months;
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     cd.setQuery(stringSubstitutor.replace(query));

@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -25,8 +26,6 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -86,8 +85,7 @@ public class QualityImprovement2020CohortQueries {
       TbMetadata tbMetadata,
       TxPvlsCohortQueries txPvls,
       AgeCohortQueries ageCohortQueries,
-      TxMlCohortQueries txMlCohortQueries,
-      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries) {
+      TxMlCohortQueries txMlCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
@@ -98,7 +96,6 @@ public class QualityImprovement2020CohortQueries {
     this.txPvls = txPvls;
     this.ageCohortQueries = ageCohortQueries;
     this.txMlCohortQueries = txMlCohortQueries;
-    this.intensiveMonitoringCohortQueries = intensiveMonitoringCohortQueries;
   }
 
   /**
@@ -7341,15 +7338,14 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-
-  public CohortDefinition getMQ15DenMDS(){
+  public CohortDefinition getMQ15DenMDS() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Denominator 15 - Pacientes elegíveis a MDS");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
 
     CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
     CohortDefinition Mq15B1 = intensiveMonitoringCohortQueries.getMI15B1();
@@ -7357,30 +7353,101 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition E1 = intensiveMonitoringCohortQueries.getMI15E(30, 1);
     CohortDefinition E2 = intensiveMonitoringCohortQueries.getMI15E(60, 31);
     CohortDefinition E3 = intensiveMonitoringCohortQueries.getMI15E(90, 61);
-    CohortDefinition Mq15C = intensiveMonitoringCohortQueries.getMI15C();// ver nota
+    CohortDefinition Mq15C = intensiveMonitoringCohortQueries.getMI15C(); // ver nota
     CohortDefinition Mq15D = intensiveMonitoringCohortQueries.getMI15D();
     CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
     CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
     CohortDefinition Mq15J = intensiveMonitoringCohortQueries.getMI15J();
-    CohortDefinition Mq15AGE2 = intensiveMonitoringCohortQueries.getAgeOnLastConsultationMoreThan2Years();
+    CohortDefinition Mq15AGE2 =
+        intensiveMonitoringCohortQueries.getAgeOnLastConsultationMoreThan2Years();
 
-    cd.addSearch("A", EptsReportUtils.map(Mq15A, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("B1", EptsReportUtils.map(Mq15B1, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("B2", EptsReportUtils.map(Mq15B2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            Mq15A,
+            "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "B1",
+        EptsReportUtils.map(
+            Mq15B1,
+            "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "B2",
+        EptsReportUtils.map(
+            Mq15B2,
+            "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
 
-    cd.addSearch("E1", EptsReportUtils.map(E1, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("E2", EptsReportUtils.map(E2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("E3", EptsReportUtils.map(E2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "E1",
+        EptsReportUtils.map(
+            E1, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "E2",
+        EptsReportUtils.map(
+            E2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "E3",
+        EptsReportUtils.map(
+            E2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
 
-    cd.addSearch("C", EptsReportUtils.map(Mq15C, "startDate = ${revisionEndDate - 14m+1d}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("D", EptsReportUtils.map(Mq15D, "startDate = ${revisionEndDate - 14m+1d}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("F", EptsReportUtils.map(Mq15F, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("G", EptsReportUtils.map(Mq15G, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("J", EptsReportUtils.map(Mq15J, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
-    cd.addSearch("AGE2", EptsReportUtils.map(Mq15AGE2, "startDate = ${startDate}, endDate = {endDate}, location = ${location}"));
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            Mq15C,
+            "startDate = ${revisionEndDate - 14m+1d}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            Mq15D,
+            "startDate = ${revisionEndDate - 14m+1d}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "F",
+        EptsReportUtils.map(
+            Mq15F,
+            "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "G",
+        EptsReportUtils.map(
+            Mq15G,
+            "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "J",
+        EptsReportUtils.map(
+            Mq15J,
+            "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+    cd.addSearch(
+        "AGE2",
+        EptsReportUtils.map(
+            Mq15AGE2, "startDate = ${startDate}, endDate = {endDate}, location = ${location}"));
 
-    cd.setCompositionString("A AND B1 AND (E1 AND E2 AND E3) AND NOT (C OR D OR F OR G OR J) AND AGE2");
+    cd.setCompositionString(
+        "A AND B1 AND (E1 AND E2 AND E3) AND NOT (C OR D OR F OR G OR J) AND AGE2");
 
+    return cd;
+  }
+
+  public CohortDefinition getMQ15NumeratorMDS() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Numerator MQ 15 - Pacientes elegíveis a MDS");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mq15DenMDS = getMQ15DenMDS();
+    CohortDefinition MqK = intensiveMonitoringCohortQueries.getMI15K();
+    cd.addSearch(
+        "MQ15DenMDS",
+        EptsReportUtils.map(
+            Mq15DenMDS,
+            "startDate = ${startDate}, endDate = ${endDate}, revisionEndDate = ${revisionEndDate}"));
+    cd.addSearch(
+        "K",
+        EptsReportUtils.map(
+            MqK,
+            "startDate = ${startDate}, revisionEndDate = ${revisionEndDate}, location = ${location}"));
+
+    cd.setCompositionString("MQ15DenMDS AND K");
     return cd;
   }
 
