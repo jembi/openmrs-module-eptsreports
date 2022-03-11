@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
+import javax.annotation.PostConstruct;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -14,9 +16,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.util.*;
 
 @Component
 public class IntensiveMonitoringCohortQueries {
@@ -1982,6 +1981,13 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15I() {
 
+    CohortDefinition cd = getMI15I(18, 12);
+
+    return cd;
+  }
+
+  public CohortDefinition getMI15I(Integer monthsBefore, Integer lastVLResultMonths) {
+
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("I - All patients with the last Viral Load Result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1992,6 +1998,7 @@ public class IntensiveMonitoringCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
     String query =
         "SELECT p.patient_id FROM patient p INNER JOIN encounter e on p.patient_id = e.patient_id INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
             + " INNER JOIN (SELECT juncao.patient_id,juncao.encounter_date "
@@ -2015,12 +2022,18 @@ public class IntensiveMonitoringCohortQueries {
             + "            AND e.encounter_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id "
             + "            )  "
             + " as last_consultation on last_consultation.patient_id = juncao.patient_id "
-            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL 18 MONTH)) as lastVLResult "
+            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL "
+            + monthsBefore
+            + " MONTH)) as lastVLResult "
             + " ON lastVLResult.patient_id=p.patient_id "
             + " WHERE "
             + " o.concept_id=${856} AND o.value_numeric is not null AND e.encounter_type=${6} AND  "
-            + " e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL 12 MONTH)  "
-            + " AND DATE_ADD(lastVLResult.encounter_date,INTERVAL 18 MONTH)AND e.location_id=:location";
+            + " e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL "
+            + lastVLResultMonths
+            + " MONTH)  "
+            + " AND DATE_ADD(lastVLResult.encounter_date,INTERVAL "
+            + monthsBefore
+            + " MONTH)AND e.location_id=:location";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String str = stringSubstitutor.replace(query);

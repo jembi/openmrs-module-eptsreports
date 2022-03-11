@@ -7575,7 +7575,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition Mq15MdsDen15 = getMQ15MdsDen15();
-    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I();
+    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(24, 18);
 
     cd.addSearch(
         "Mq15MdsDen15",
@@ -7585,8 +7585,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "Mq15I",
         EptsReportUtils.map(
-            Mq15MdsDen15,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            Mq15I, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("Mq15MdsDen15 AND Mq15I");
 
