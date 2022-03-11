@@ -7592,7 +7592,13 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  /** */
+  /**
+   * <b>C - All female patients registered as “Pregnant” on Ficha Clinica during the revision period (startDateInclusion = endDateRevision - 14 months and endDateRevision):</b>
+   * <ul>
+   *     <li>all patients registered in Ficha Clínica (encounter type=6) with “Gestante”(concept_id  1982) value_coded equal to “Yes” (concept_id 1065) and sex=Female and encounter_datetime >= startDateInclusion (endDateRevision - 14 months) and encounter_datetime <= endDateRevision.</li>
+   *     <i>NOTE: IF the patient has both states pregnant and breastfeeding, the system will consider the most recent registry. If the patient has both states on the same day, the system will consider the patient as pregnant.</i>
+   * </ul>
+   * */
   public CohortDefinition getMQ15CPatientsMarkedAsPregnant() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -7648,6 +7654,13 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * <b>D - All female patients registered as “Breastfeeding” on Ficha Clinica during the revision period (startDateInclusion = endDateRevision - 14 months and endDateRevision):</b>
+   * <ul>
+   *     <li>all patients registered in Ficha Clínica (encounter type=6) with “Lactante”(concept_id  6332) value_coded equal to “Yes” (concept_id 1065) and sex=Female and encounter_datetime >= startDateInclusion (endDateRevision - 14 months) and encounter_datetime <= endDateRevision</li>
+   *     <i>NOTE: IF the patient has both states pregnant and breastfeeding, the system will consider the most recent registry. If the patient has both states on the same day, the system will consider the patient as pregnant.</i>
+   * </ul>
+   * */
   public CohortDefinition getMQ15DPatientsMarkedAsBreastfeeding() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
