@@ -7370,61 +7370,55 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "A",
         EptsReportUtils.map(
-            Mq15A,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            Mq15A, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "B1",
         EptsReportUtils.map(
-            Mq15B1,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            Mq15B1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
-            Mq15B2,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            Mq15B2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "E1",
         EptsReportUtils.map(
-            E1, "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            E1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "E2",
         EptsReportUtils.map(
-            E2, "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            E2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "E3",
         EptsReportUtils.map(
-            E2, "startDate = ${startDate}, endDate = {revisionEndDate}, location = ${location}"));
+            E2, "startDate=${startDate},endDate={revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "C",
         EptsReportUtils.map(
             Mq15C,
-            "startDate = ${revisionEndDate - 14m+1d}, endDate = ${revisionEndDate}, location = ${location}"));
+            "startDate=${revisionEndDate-14m+1d},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "D",
         EptsReportUtils.map(
             Mq15D,
-            "startDate = ${revisionEndDate - 14m+1d}, endDate = ${revisionEndDate}, location = ${location}"));
+            "startDate=${revisionEndDate-14m+1d},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "F",
         EptsReportUtils.map(
-            Mq15F,
-            "startDate = ${startDate}, endDate =${revisionEndDate}, location = ${location}"));
+            Mq15F, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "G",
         EptsReportUtils.map(
-            Mq15G,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            Mq15G, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "J",
         EptsReportUtils.map(
-            Mq15J,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            Mq15J, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "AGE2",
         EptsReportUtils.map(
-            Mq15AGE2, "startDate = ${startDate}, endDate = ${endDate}, location = ${location}"));
+            Mq15AGE2, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "A AND B1 AND (E1 AND E2 AND E3) AND NOT (C OR D OR F OR G OR J) AND AGE2");
@@ -7446,12 +7440,11 @@ public class QualityImprovement2020CohortQueries {
         "MQ15DenMDS",
         EptsReportUtils.map(
             Mq15DenMDS,
-            "startDate = ${startDate}, endDate = ${endDate}, revisionEndDate = ${revisionEndDate}, location = ${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "K",
         EptsReportUtils.map(
-            MqK,
-            "startDate = ${startDate}, revisionEndDate = ${revisionEndDate}, location = ${location}"));
+            MqK, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("MQ15DenMDS AND K");
     return cd;
@@ -7474,23 +7467,20 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "A",
         EptsReportUtils.map(
-            Mq15A,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            Mq15A, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "J",
         EptsReportUtils.map(
-            Mq15J,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            Mq15J, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "H",
         EptsReportUtils.map(
-            Mq15H,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+            Mq15H, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "AGE2",
         EptsReportUtils.map(
-            Mq15AGE2, "startDate = ${startDate}, endDate = ${endDate}, location = ${location}"));
+            Mq15AGE2, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString("A AND J AND H AGE2");
     return cd;
   }
@@ -7510,18 +7500,14 @@ public class QualityImprovement2020CohortQueries {
         "Mq15DenMds14",
         EptsReportUtils.map(
             Mq15DenMds14,
-            "startDate = ${startDate}, endDate = ${endDate}, revisionEndDate = ${revisionEndDate}, location = ${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "MQ15L",
         EptsReportUtils.map(
-            Mq15L,
-            "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
-
-
+            Mq15L, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("Mq15DenMds14 AND MQ15L");
-
 
     return cd;
   }
@@ -7537,35 +7523,32 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
     CohortDefinition Mq15J = intensiveMonitoringCohortQueries.getMI15J();
     CohortDefinition Mq15P = intensiveMonitoringCohortQueries.getMI15P();
-    CohortDefinition Mq15Age2 = intensiveMonitoringCohortQueries.getAgeOnLastConsultationMoreThan2Years();
+    CohortDefinition Mq15Age2 =
+        intensiveMonitoringCohortQueries.getAgeOnLastConsultationMoreThan2Years();
     CohortDefinition Mq15B2 = intensiveMonitoringCohortQueries.getMI15B2(24);
 
     cd.addSearch(
-            "A",
-            EptsReportUtils.map(
-                    Mq15A,
-                    "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+        "A",
+        EptsReportUtils.map(
+            Mq15A, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-            "J",
-            EptsReportUtils.map(
-                    Mq15J,
-                    "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+        "J",
+        EptsReportUtils.map(
+            Mq15J, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-            "B2",
-            EptsReportUtils.map(
-                    Mq15B2,
-                    "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+        "B2",
+        EptsReportUtils.map(
+            Mq15B2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "P",
-            EptsReportUtils.map(
-                    Mq15P,
-                    "startDate = ${startDate}, endDate = ${revisionEndDate}, location = ${location}"));
+        "P",
+        EptsReportUtils.map(
+            Mq15P, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "AGE2",
-            EptsReportUtils.map(
-                    Mq15Age2, "startDate = ${startDate}, endDate = ${endDate}, location = ${location}"));
+        "AGE2",
+        EptsReportUtils.map(
+            Mq15Age2, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString("A AND J AND B2 AND NOT P AND AGE2");
     return cd;
   }
@@ -7580,6 +7563,33 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addCalculationParameter("minAgeOnObsDatetime", minAge);
     cd.addCalculationParameter("maxAgeOnObsDatetime", maxAge);
+    return cd;
+  }
+
+  public CohortDefinition getMQ15MdsNum15() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("15.15 % de pacientes inscritos em MDS em TARV há mais de 21 meses ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mq15MdsDen15 = getMQ15MdsDen15();
+    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I();
+
+    cd.addSearch(
+        "Mq15MdsDen15",
+        EptsReportUtils.map(
+            Mq15MdsDen15,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "Mq15I",
+        EptsReportUtils.map(
+            Mq15MdsDen15,
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("Mq15MdsDen15 AND Mq15I");
+
     return cd;
   }
 
