@@ -7592,12 +7592,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  /**
-   *
-   *
-   *
-   * */
-
+  /** */
   public CohortDefinition getMQ15CPatientsMarkedAsPregnant() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -7613,40 +7608,40 @@ public class QualityImprovement2020CohortQueries {
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-            "SELECT pregnant.patient_id "
-                    + "FROM   (SELECT p.patient_id, MAX(e.encounter_datetime) AS pregnancy_date "
-                    + "        FROM   patient p "
-                    + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
-                    + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-                    + "               INNER JOIN person ps ON ps.person_id = p.patient_id "
-                    + "        WHERE  e.encounter_type = ${6} "
-                    + "               AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-                    + "               AND e.location_id = :location "
-                    + "               AND e.voided = 0 "
-                    + "               AND o.concept_id = ${1982} "
-                    + "               AND o.value_coded = ${1065} "
-                    + "               AND o.voided = 0 "
-                    + "               AND ps.gender = 'F' "
-                    + "               AND ps.voided = 0 "
-                    + "        GROUP  BY p.patient_id) pregnant "
-                    + "       LEFT JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) breastfeed_date "
-                    + "                  FROM   patient p "
-                    + "                         INNER JOIN encounter e ON e.patient_id = p.patient_id "
-                    + "                         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-                    + "                         INNER JOIN person ps ON ps.person_id = p.patient_id "
-                    + "                  WHERE  e.encounter_type = ${6} "
-                    + "                         AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-                    + "                         AND e.location_id = :location "
-                    + "                         AND e.voided = 0 "
-                    + "                         AND o.concept_id = ${6332} "
-                    + "                         AND o.value_coded = ${1065} "
-                    + "                         AND o.voided = 0 "
-                    + "                         AND ps.gender = 'F' "
-                    + "                         AND ps.voided = 0 "
-                    + "                  GROUP  BY p.patient_id) AS breastfeeding "
-                    + "              ON breastfeeding.patient_id = pregnant.patient_id "
-                    + "WHERE  pregnant.pregnancy_date >= breastfeeding.breastfeed_date OR breastfeeding.breastfeed_date IS NULL "
-                    + "GROUP  BY pregnant.patient_id";
+        "SELECT pregnant.patient_id "
+            + "FROM   (SELECT p.patient_id, MAX(e.encounter_datetime) AS pregnancy_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "               INNER JOIN person ps ON ps.person_id = p.patient_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "               AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "               AND e.location_id = :location "
+            + "               AND e.voided = 0 "
+            + "               AND o.concept_id = ${1982} "
+            + "               AND o.value_coded = ${1065} "
+            + "               AND o.voided = 0 "
+            + "               AND ps.gender = 'F' "
+            + "               AND ps.voided = 0 "
+            + "        GROUP  BY p.patient_id) pregnant "
+            + "       LEFT JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) breastfeed_date "
+            + "                  FROM   patient p "
+            + "                         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                         INNER JOIN person ps ON ps.person_id = p.patient_id "
+            + "                  WHERE  e.encounter_type = ${6} "
+            + "                         AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                         AND e.location_id = :location "
+            + "                         AND e.voided = 0 "
+            + "                         AND o.concept_id = ${6332} "
+            + "                         AND o.value_coded = ${1065} "
+            + "                         AND o.voided = 0 "
+            + "                         AND ps.gender = 'F' "
+            + "                         AND ps.voided = 0 "
+            + "                  GROUP  BY p.patient_id) AS breastfeeding "
+            + "              ON breastfeeding.patient_id = pregnant.patient_id "
+            + "WHERE  pregnant.pregnancy_date >= breastfeeding.breastfeed_date OR breastfeeding.breastfeed_date IS NULL "
+            + "GROUP  BY pregnant.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -7668,40 +7663,40 @@ public class QualityImprovement2020CohortQueries {
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-            "SELECT breastfeeding.patient_id "
-                    + "FROM  (SELECT p.patient_id, MAX(e.encounter_datetime) breastfeed_date "
-                    + "       FROM   patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
-                    + "              INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-                    + "              INNER JOIN person ps ON ps.person_id = p.patient_id "
-                    + "       WHERE  e.encounter_type = ${6} "
-                    + "              AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-                    + "              AND e.location_id = :location "
-                    + "              AND e.voided = 0 "
-                    + "              AND o.concept_id = ${6332} "
-                    + "              AND o.value_coded = ${1065} "
-                    + "              AND o.voided = 0 "
-                    + "              AND ps.gender = 'F' "
-                    + "              AND ps.voided = 0 "
-                    + "       GROUP  BY p.patient_id) breastfeeding "
-                    + "      LEFT JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) pregnancy_date "
-                    + "                 FROM   patient p "
-                    + "                        INNER JOIN encounter e ON e.patient_id = p.patient_id "
-                    + "                        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-                    + "                        INNER JOIN person ps ON ps.person_id = p.patient_id "
-                    + "                 WHERE  e.encounter_type = ${6} "
-                    + "                        AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-                    + "                        AND e.location_id = :location "
-                    + "                        AND e.voided = 0 "
-                    + "                        AND o.concept_id = ${1982} "
-                    + "                        AND o.value_coded = ${1065} "
-                    + "                        AND o.voided = 0 "
-                    + "                        AND ps.gender = 'F' "
-                    + "                        AND ps.voided = 0 "
-                    + "                 GROUP  BY p.patient_id) pregnant "
-                    + "             ON pregnant.patient_id = breastfeeding.patient_id "
-                    + "WHERE  breastfeeding.breastfeed_date > pregnant.pregnancy_date "
-                    + "        OR pregnant.pregnancy_date IS NULL "
-                    + "GROUP  BY breastfeeding.patient_id";
+        "SELECT breastfeeding.patient_id "
+            + "FROM  (SELECT p.patient_id, MAX(e.encounter_datetime) breastfeed_date "
+            + "       FROM   patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "              INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "              INNER JOIN person ps ON ps.person_id = p.patient_id "
+            + "       WHERE  e.encounter_type = ${6} "
+            + "              AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "              AND e.location_id = :location "
+            + "              AND e.voided = 0 "
+            + "              AND o.concept_id = ${6332} "
+            + "              AND o.value_coded = ${1065} "
+            + "              AND o.voided = 0 "
+            + "              AND ps.gender = 'F' "
+            + "              AND ps.voided = 0 "
+            + "       GROUP  BY p.patient_id) breastfeeding "
+            + "      LEFT JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) pregnancy_date "
+            + "                 FROM   patient p "
+            + "                        INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                        INNER JOIN person ps ON ps.person_id = p.patient_id "
+            + "                 WHERE  e.encounter_type = ${6} "
+            + "                        AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                        AND e.location_id = :location "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.concept_id = ${1982} "
+            + "                        AND o.value_coded = ${1065} "
+            + "                        AND o.voided = 0 "
+            + "                        AND ps.gender = 'F' "
+            + "                        AND ps.voided = 0 "
+            + "                 GROUP  BY p.patient_id) pregnant "
+            + "             ON pregnant.patient_id = breastfeeding.patient_id "
+            + "WHERE  breastfeeding.breastfeed_date > pregnant.pregnancy_date "
+            + "        OR pregnant.pregnancy_date IS NULL "
+            + "GROUP  BY breastfeeding.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
