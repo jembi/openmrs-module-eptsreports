@@ -800,9 +800,14 @@ public class TXTBCohortQueries {
         EptsReportUtils.map(
             getMarkedAsTratamentoTBInicio(),
             "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
+    cd.addSearch(
+        "in-tb-program",
+        EptsReportUtils.map(
+            getInTBProgram(),
+            "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
 
     cd.setCompositionString(
-        "A NOT (started-tb-treatment-previous-period OR pulmonary-tb-date OR marked-as-tratamento-tb-inicio)");
+        "A AND NOT(started-tb-treatment-previous-period OR pulmonary-tb-date OR marked-as-tratamento-tb-inicio OR in-tb-program)");
     addGeneralParameters(cd);
     return cd;
   }
