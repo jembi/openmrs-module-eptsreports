@@ -2045,7 +2045,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "age=10-14");
 
     // Category 15 Denominator MDS
-    CohortIndicator MQ15DEN13  =
+    CohortIndicator MQ15DEN13 =
         eptsGeneralIndicator.getIndicator(
             "MQ15DEN13",
             EptsReportUtils.map(
@@ -2058,7 +2058,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN13",
         "15.13 - % de pacientes elegíveis a MDS, que foram inscritos em MDS",
         EptsReportUtils.map(
-                MQ15DEN13,
+            MQ15DEN13,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
@@ -2353,99 +2353,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "age=10-14");
 
     // M&Q Report - Categoria 14 Denominador
-    dataSetDefinition.addColumn(
-        "MQ14DEN1",
-        "% de adultos (15/+anos) em TARV com supressão viral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ14DEN1",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ14DEN(1),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "age=15+");
-    dataSetDefinition.addColumn(
-        "MQ14DEN2",
-        "% de crianças (0-14 anos) em TARV com supressão viral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ14DEN2",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ14DEN(1),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "age=0-14");
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN3",
-        "% de MG em TARV com supressão viral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ14DEN3",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ14DEN(3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
-
-    dataSetDefinition.addColumn(
-        "MQ14DEN4",
-        "% de ML em TARV com supressão viral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ14DEN4",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ14DEN(4),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
-    // M&Q Report - Categoria 14 Numerator
-    dataSetDefinition.addColumn(
-        "MQ14NUM1",
-        "% de adultos (15/+anos) em TARV com supressão viral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ14NUM1",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ14NUM(1),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "age=15+");
-    dataSetDefinition.addColumn(
-        "MQ14NUM2",
-        "% de crianças (0-14 anos) em TARV com supressão viral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ14NUM2",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ14NUM(2),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "age=0-14");
-
-    dataSetDefinition.addColumn(
-        "MQ14NUM3",
-        "% de MG em TARV com supressão viral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ14NUM3",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ14NUM(3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
-
-    dataSetDefinition.addColumn(
-        "MQ14NUM4",
-        "% de ML em TARV com supressão viral",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "MQ14NUM4",
-                EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ14NUM(4),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
 
     // MQ indicators category 9 denominator
 

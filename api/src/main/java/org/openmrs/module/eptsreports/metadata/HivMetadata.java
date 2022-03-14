@@ -4765,7 +4765,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getLastRecordOfDispensingModeConcept() {
     String uuid =
-            Context.getAdministrationService().getGlobalProperty("eptsreports.lastRecordOfDispensingModeConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.lastRecordOfDispensingModeConceptUuid");
     return getConcept(uuid);
   }
 
@@ -4780,7 +4781,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getLastRecordOfFarmacConcept() {
     String uuid =
-            Context.getAdministrationService().getGlobalProperty("eptsreports.lastRecordOfFarmacConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.lastRecordOfFarmacConceptUuid");
     return getConcept(uuid);
   }
 
@@ -4795,7 +4797,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getDispensaComunitariaViaApeConcept() {
     String uuid =
-            Context.getAdministrationService().getGlobalProperty("eptsreports.dispensaComunitariaViaApeConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.dispensaComunitariaViaApeConceptUuid");
     return getConcept(uuid);
   }
 }

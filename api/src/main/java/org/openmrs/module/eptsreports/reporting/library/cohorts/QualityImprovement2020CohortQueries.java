@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -25,8 +26,6 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -7345,37 +7344,31 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>Select all patients with at least one of the following models registered in Ficha
-   * Clinica (encounter type 6, encounter_datetime) during the revision period
-   * (start date and end date)</b>
-   * <ul>   *
-   *     <li>Last record of GAAC (concept id 23724) and the response is “Iniciar”
-   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
-   *    * 1257)</li>
-   *    <li>Last record of DT (concept id 23730) and the response is “Iniciar”
-   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
-   *    * 1257) or Type of dispensation (concept id 23793) value coded DT
-   *    * (concept id 23888)</li>
-   *    <li>Last record of DS (concept id 23888) and the response is “Iniciar”
-   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
-   *    * 1257) or Type of dispensation (concept id 23793) value coded DT
-   *    * (concept id 23720)</li>
-   *    <li>Last record of FR (concept id 23729) and the response is “ Iniciar”
-   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
-   *    * 1257)</li>
-   *    <li>Last record of DC (concept id 23731) and the response is “Iniciar”
-   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
-   *    * 1257)</li>
-   *    <li>Last record of Dispensing mode (concept id 165174) and the response is
-   *    * “Dispensa Comunitária via APE (DCAPE)” (value_coded, concept id
-   *    * 165179)</li>
-   *    <li>Last record of FARMAC (concept id 165177) and the response is
-   *    * “Iniciar” (value_coded, concept id 1256) or “Continua” (value_coded,
-   *    * concept id 1257)</li>
+   * <b>Select all patients with at least one of the following models registered in Ficha Clinica
+   * (encounter type 6, encounter_datetime) during the revision period (start date and end date)</b>
+   *
+   * <ul>
+   *   *
+   *   <li>Last record of GAAC (concept id 23724) and the response is “Iniciar” * (value_coded,
+   *       concept id 1256) or “Continua” (value_coded, concept id * 1257)
+   *   <li>Last record of DT (concept id 23730) and the response is “Iniciar” * (value_coded,
+   *       concept id 1256) or “Continua” (value_coded, concept id * 1257) or Type of dispensation
+   *       (concept id 23793) value coded DT * (concept id 23888)
+   *   <li>Last record of DS (concept id 23888) and the response is “Iniciar” * (value_coded,
+   *       concept id 1256) or “Continua” (value_coded, concept id * 1257) or Type of dispensation
+   *       (concept id 23793) value coded DT * (concept id 23720)
+   *   <li>Last record of FR (concept id 23729) and the response is “ Iniciar” * (value_coded,
+   *       concept id 1256) or “Continua” (value_coded, concept id * 1257)
+   *   <li>Last record of DC (concept id 23731) and the response is “Iniciar” * (value_coded,
+   *       concept id 1256) or “Continua” (value_coded, concept id * 1257)
+   *   <li>Last record of Dispensing mode (concept id 165174) and the response is * “Dispensa
+   *       Comunitária via APE (DCAPE)” (value_coded, concept id * 165179)
+   *   <li>Last record of FARMAC (concept id 165177) and the response is * “Iniciar” (value_coded,
+   *       concept id 1256) or “Continua” (value_coded, * concept id 1257)
    * </ul>
+   *
    * @return
    */
-
   public CohortDefinition getMQ14MDS() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -7398,45 +7391,45 @@ public class QualityImprovement2020CohortQueries {
     map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
 
     String query =
-            "SELECT p.patient_id "
-                    + "FROM   patient p "
-                    + "       INNER JOIN encounter e "
-                    + "               ON e.patient_id = p.patient_id "
-                    + "       INNER JOIN obs o "
-                    + "               ON o.encounter_id = e.encounter_id "
-                    + "       INNER JOIN (SELECT p.patient_id, "
-                    + "                          Max(e.encounter_datetime) AS encounter_datetime "
-                    + "                   FROM   patient p "
-                    + "                          INNER JOIN encounter e "
-                    + "                                  ON e.patient_id = p.patient_id "
-                    + "                   WHERE  p.voided = 0 "
-                    + "                          AND e.voided = 0 "
-                    + "                          AND e.location_id = :location "
-                    + "                          AND e.encounter_type = ${6} "
-                    + "                          AND e.encounter_datetime BETWEEN "
-                    + "                              :startDate AND :endDate "
-                    + "                   GROUP  BY p.patient_id) last_consultation "
-                    + "               ON last_consultation.patient_id = p.patient_id "
-                    + "WHERE  p.voided = 0 "
-                    + "       AND o.voided = 0 "
-                    + "       AND e.voided = 0 "
-                    + "       AND e.location_id = :location "
-                    + "       AND e.encounter_type = ${6} "
-                    + "       AND ( ( o.concept_id = ${23724} "
-                    + "               AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
-                    + "              OR ( o.concept_id = ${23730} "
-                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
-                    + "              OR ( o.concept_id = ${23888} "
-                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
-                    + "              OR ( o.concept_id = ${23729} "
-                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
-                    + "              OR ( o.concept_id = ${165174} "
-                    + "                   AND (o.value_coded = ${165179})) "
-                    + "              OR ( o.concept_id = ${165177} "
-                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
-                    + "              OR ( o.concept_id = ${23731} "
-                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256}))) "
-                    + "       AND e.encounter_datetime < last_consultation.encounter_datetime";
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          Max(e.encounter_datetime) AS encounter_datetime "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND e.encounter_datetime BETWEEN "
+            + "                              :startDate AND :endDate "
+            + "                   GROUP  BY p.patient_id) last_consultation "
+            + "               ON last_consultation.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND ( ( o.concept_id = ${23724} "
+            + "               AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+            + "              OR ( o.concept_id = ${23730} "
+            + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+            + "              OR ( o.concept_id = ${23888} "
+            + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+            + "              OR ( o.concept_id = ${23729} "
+            + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+            + "              OR ( o.concept_id = ${165174} "
+            + "                   AND (o.value_coded = ${165179})) "
+            + "              OR ( o.concept_id = ${165177} "
+            + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+            + "              OR ( o.concept_id = ${23731} "
+            + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256}))) "
+            + "       AND e.encounter_datetime < last_consultation.encounter_datetime";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -7444,6 +7437,7 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
   public CohortDefinition getMQ15DenMDS() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -7693,12 +7687,18 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>C - All female patients registered as “Pregnant” on Ficha Clinica during the revision period (startDateInclusion = endDateRevision - 14 months and endDateRevision):</b>
+   * <b>C - All female patients registered as “Pregnant” on Ficha Clinica during the revision period
+   * (startDateInclusion = endDateRevision - 14 months and endDateRevision):</b>
+   *
    * <ul>
-   *     <li>all patients registered in Ficha Clínica (encounter type=6) with “Gestante”(concept_id  1982) value_coded equal to “Yes” (concept_id 1065) and sex=Female and encounter_datetime >= startDateInclusion (endDateRevision - 14 months) and encounter_datetime <= endDateRevision.</li>
-   *     <i>NOTE: IF the patient has both states pregnant and breastfeeding, the system will consider the most recent registry. If the patient has both states on the same day, the system will consider the patient as pregnant.</i>
+   *   <li>all patients registered in Ficha Clínica (encounter type=6) with “Gestante”(concept_id
+   *       1982) value_coded equal to “Yes” (concept_id 1065) and sex=Female and encounter_datetime
+   *       >= startDateInclusion (endDateRevision - 14 months) and encounter_datetime <=
+   *       endDateRevision. <i>NOTE: IF the patient has both states pregnant and breastfeeding, the
+   *       system will consider the most recent registry. If the patient has both states on the same
+   *       day, the system will consider the patient as pregnant.</i>
    * </ul>
-   * */
+   */
   public CohortDefinition getMQ15CPatientsMarkedAsPregnant() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -7755,12 +7755,18 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>D - All female patients registered as “Breastfeeding” on Ficha Clinica during the revision period (startDateInclusion = endDateRevision - 14 months and endDateRevision):</b>
+   * <b>D - All female patients registered as “Breastfeeding” on Ficha Clinica during the revision
+   * period (startDateInclusion = endDateRevision - 14 months and endDateRevision):</b>
+   *
    * <ul>
-   *     <li>all patients registered in Ficha Clínica (encounter type=6) with “Lactante”(concept_id  6332) value_coded equal to “Yes” (concept_id 1065) and sex=Female and encounter_datetime >= startDateInclusion (endDateRevision - 14 months) and encounter_datetime <= endDateRevision</li>
-   *     <i>NOTE: IF the patient has both states pregnant and breastfeeding, the system will consider the most recent registry. If the patient has both states on the same day, the system will consider the patient as pregnant.</i>
+   *   <li>all patients registered in Ficha Clínica (encounter type=6) with “Lactante”(concept_id
+   *       6332) value_coded equal to “Yes” (concept_id 1065) and sex=Female and encounter_datetime
+   *       >= startDateInclusion (endDateRevision - 14 months) and encounter_datetime <=
+   *       endDateRevision <i>NOTE: IF the patient has both states pregnant and breastfeeding, the
+   *       system will consider the most recent registry. If the patient has both states on the same
+   *       day, the system will consider the patient as pregnant.</i>
    * </ul>
-   * */
+   */
   public CohortDefinition getMQ15DPatientsMarkedAsBreastfeeding() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
