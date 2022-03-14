@@ -3225,6 +3225,14 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>@MODULE_ID@.otherOrNonCodedUuid</property>
+		<defaultValue>5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			UUID for OTHER NON-CODED concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>@MODULE_ID@.DT3HPConceptUuid</property>
 		<defaultValue>3d126efc-631b-436f-9e4b-db728071c8d0</defaultValue>
 		<description>
