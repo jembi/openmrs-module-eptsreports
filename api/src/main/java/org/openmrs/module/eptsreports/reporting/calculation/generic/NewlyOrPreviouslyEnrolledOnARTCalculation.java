@@ -122,6 +122,19 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             startDate,
             endDate,
             context);
+    CalculationResultMap anyINHDateMap =
+        ePTSCalculationService.getObs(
+            tbMetadata.getRegimeTPTConcept(),
+            hivMetadata.getMasterCardEncounterType(),
+            cohort,
+            location,
+            Arrays.asList(
+                tbMetadata.getIsoniazidConcept(), tbMetadata.getIsoniazidePiridoxinaConcept()),
+            TimeQualifier.ANY,
+            startDate,
+            endDate,
+            EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+            context);
     CalculationResultMap firstINHDateMap =
         ePTSCalculationService.getObs(
             tbMetadata.getRegimeTPTConcept(),
@@ -135,7 +148,19 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             endDate,
             EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
             context);
-
+    CalculationResultMap lastINHDateMap =
+        ePTSCalculationService.getObs(
+            tbMetadata.getRegimeTPTConcept(),
+            hivMetadata.getMasterCardEncounterType(),
+            cohort,
+            location,
+            Arrays.asList(
+                tbMetadata.getIsoniazidConcept()),
+            TimeQualifier.LAST,
+            startDate,
+            endDate,
+            EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+            context);
     CalculationResultMap anyIsoniazidaPiridoxina =
         ePTSCalculationService.getObs(
             tbMetadata.getRegimeTPTConcept(),
@@ -170,6 +195,19 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             cohort,
             location,
             Arrays.asList(hivMetadata.getContinueRegimenConcept()),
+            TimeQualifier.FIRST,
+            startDate,
+            endDate,
+            EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+            context);
+
+    CalculationResultMap firstINHDateMap3 =
+        ePTSCalculationService.getObs(
+            tbMetadata.getRegimeTPTConcept(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            cohort,
+            location,
+            Arrays.asList(tbMetadata.getIsoniazidConcept()),
             TimeQualifier.FIRST,
             startDate,
             endDate,
@@ -309,8 +347,11 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         Obs fichaClinicaMasterCardStartDrugsObs =
             EptsCalculationUtils.resultForPatient(startDrugsObservations, patientId);
         Obs firstINHDateObs = EptsCalculationUtils.obsResultForPatient(firstINHDateMap, patientId);
+        List<Obs> lastINHDateObsList = getObsListFromResultMap(lastINHDateMap, patientId);
         Obs firstINHDateObs2 =
             EptsCalculationUtils.obsResultForPatient(firstINHDateMap2, patientId);
+        Obs firstINHDateObs3 =
+            EptsCalculationUtils.obsResultForPatient(firstINHDateMap3, patientId);
         List<Obs> anyIsoniazida = getObsListFromResultMap(anyIsoniazidaPiridoxina, patientId);
         List<Obs> anyIsoniazida2 = getObsListFromResultMap(anyIsoniazidaPiridoxina2, patientId);
         List<Obs> in3HPor3HPPiridoxina =
@@ -330,10 +371,12 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         if ((seguimentoOrFichaResumo == null
                 && fichaClinicaMasterCardStartDrugsObs == null
                 && firstINHDateObs == null
+                && lastINHDateObsList == null
                 && anyIsoniazida == null
                 && anyIsoniazida2 == null
                 && !anyIsoniazida2.isEmpty()
                 && firstINHDateObs2 == null
+                && firstINHDateObs3 == null
                 && first3HPDateObs == null
                 && in3HPor3HPPiridoxina == null
                 && first3HPOr3HPPlusPiridoxinaDateObs == null)
@@ -348,6 +391,10 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         if (anyIsoniazida != null && !anyIsoniazida.isEmpty() && anyIsoniazida.size() > 0) {
           anyIsoniazidaaa = anyIsoniazida.get(0);
         }
+        Obs lastINHDateObs = null;
+        if (lastINHDateObsList != null && !lastINHDateObsList.isEmpty() && lastINHDateObsList.size() > 0) {
+          lastINHDateObs = lastINHDateObsList.get(0);
+        }
 
         DateTime artStartDateTime = new DateTime(artStartDate.getTime());
         Date EarliestIptStartDate =
@@ -357,6 +404,8 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
                     fichaClinicaMasterCardStartDrugsObs,
                     anyIsoniazidaaa,
                     anyIsoniazida2a,
+                    lastINHDateObs,
+                    firstINHDateObs3,
                     this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs, -7),
                     this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs2, -7),
                     this.getObsNotInMonthsPriorTo(firstINHDateObs, notInINHDateObs3, -7),
@@ -405,6 +454,22 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             && anyIsoniazidaaa.getValueDatetime() != null
             && anyIsoniazidaaa.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6)) <= 0
             && anyIsoniazidaaa.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6))
+                <= 0) {
+          map.put(patientId, new BooleanResult(true, this));
+        }
+
+        if (lastINHDateObs != null
+            && lastINHDateObs.getValueDatetime() != null
+            && lastINHDateObs.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6)) <= 0
+            && lastINHDateObs.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6))
+                <= 0) {
+          map.put(patientId, new BooleanResult(true, this));
+        }
+
+        if (firstINHDateObs3 != null
+            && firstINHDateObs3.getValueDatetime() != null
+            && firstINHDateObs3.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6)) <= 0
+            && firstINHDateObs3.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6))
                 <= 0) {
           map.put(patientId, new BooleanResult(true, this));
         }
