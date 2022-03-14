@@ -224,8 +224,8 @@ public class TargetGroupCalculation extends AbstractPatientCalculation {
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getPrepInicialEncounterType());
     Concept targetGroupConcept = hivMetadata.getPrepTargetGroupConcept();
-    return eptsCalculationService.lastObs(
-        encounterTypes, targetGroupConcept, location, null, endDate, cohort, context);
+    return eptsCalculationService.allObservations(
+        targetGroupConcept, null, encounterTypes, location, cohort, context);
   }
 
   private CalculationResultMap getPrepSeguimento(
@@ -240,8 +240,8 @@ public class TargetGroupCalculation extends AbstractPatientCalculation {
     ArrayList<EncounterType> encounterTypes = new ArrayList<>();
     encounterTypes.add(hivMetadata.getPrepSeguimentoEncounterType());
     Concept targetGroupConcept = hivMetadata.getPrepTargetGroupConcept();
-    return eptsCalculationService.lastObs(
-        encounterTypes, targetGroupConcept, location, startDate, endDate, cohort, context);
+    return eptsCalculationService.allObservations(
+        targetGroupConcept, null, encounterTypes, location, cohort, context);
   }
 
   private List<Obs> sortObsByObsDatetime(List<Obs> obs) {
