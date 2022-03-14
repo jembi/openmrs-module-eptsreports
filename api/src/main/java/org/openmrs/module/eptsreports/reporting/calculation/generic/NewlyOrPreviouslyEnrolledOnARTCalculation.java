@@ -154,8 +154,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             hivMetadata.getMasterCardEncounterType(),
             cohort,
             location,
-            Arrays.asList(
-                tbMetadata.getIsoniazidConcept()),
+            Arrays.asList(tbMetadata.getIsoniazidConcept()),
             TimeQualifier.LAST,
             startDate,
             endDate,
@@ -394,11 +393,15 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
           anyIsoniazidaaa = anyIsoniazida.get(0);
         }
         Obs lastINHDateObs = null;
-        if (lastINHDateObsList != null && !lastINHDateObsList.isEmpty() && lastINHDateObsList.size() > 0) {
+        if (lastINHDateObsList != null
+            && !lastINHDateObsList.isEmpty()
+            && lastINHDateObsList.size() > 0) {
           lastINHDateObs = lastINHDateObsList.get(0);
         }
         Obs anyINHDateObs = null;
-        if (anyINHDateObsList != null && !anyINHDateObsList.isEmpty() && anyINHDateObsList.size() > 0) {
+        if (anyINHDateObsList != null
+            && !anyINHDateObsList.isEmpty()
+            && anyINHDateObsList.size() > 0) {
           lastINHDateObs = anyINHDateObsList.get(0);
         }
 
@@ -467,14 +470,14 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         if (lastINHDateObs != null
             && lastINHDateObs.getValueDatetime() != null
             && lastINHDateObs.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6)) <= 0
-            && lastINHDateObs.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6))
-                <= 0) {
+            && lastINHDateObs.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6)) <= 0) {
           map.put(patientId, new BooleanResult(true, this));
         }
 
         if (firstINHDateObs3 != null
             && firstINHDateObs3.getValueDatetime() != null
-            && firstINHDateObs3.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6)) <= 0
+            && firstINHDateObs3.getValueDatetime().compareTo(DateUtils.addMonths(startDate, -6))
+                <= 0
             && firstINHDateObs3.getValueDatetime().compareTo(DateUtils.addMonths(endDate, -6))
                 <= 0) {
           map.put(patientId, new BooleanResult(true, this));
