@@ -2358,15 +2358,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "age=10-14");
 
     // M&Q Report - Categoria 14
+
     CohortIndicator MQ14DEN1 =
         eptsGeneralIndicator.getIndicator(
             "MQ14DEN1",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_NOT_A1_AND_NOT_A2),
-                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    MQ14DEN1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ14DEN1",
@@ -2381,9 +2381,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_NOT_A1_AND_NOT_A2),
-                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    MQ14DEN2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ14DEN2",
@@ -2399,9 +2397,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A1_AND_NOT_A2),
-                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    MQ14DEN3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ14DEN3",
@@ -2417,9 +2413,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_NOT_A1_AND_NOT_A2),
-                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    MQ14DEN4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ14DEN4",
@@ -2435,9 +2430,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_NOT_A1_AND_NOT_A2),
-                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    MQ14DEN5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ14DEN5",
@@ -2453,9 +2446,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_NOT_A1_AND_NOT_A2),
-                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    MQ14DEN6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ14DEN6",
@@ -2471,15 +2462,13 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A1_AND_NOT_A2),
-                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    MQ14DEN7.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ14DEN7",
         "14.7. % de MG em TARV com supressão viral (CV<1000 Cps/ml)",
         EptsReportUtils.map(
-            MQ14DEN7, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            MQ14DEN7, "startDate=${startDate},endDate=${endDate},location=${location}"),
         "");
     // 14.8 Den
     CohortIndicator MQ14DEN8 =
@@ -2488,9 +2477,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_NOT_A1_AND_A2),
-                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    MQ14DEN8.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ14DEN8",
