@@ -7343,6 +7343,107 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  /**
+   * <b>Select all patients with at least one of the following models registered in Ficha
+   * Clinica (encounter type 6, encounter_datetime) during the revision period
+   * (start date and end date)</b>
+   * <ul>   *
+   *     <li>Last record of GAAC (concept id 23724) and the response is “Iniciar”
+   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
+   *    * 1257)</li>
+   *    <li>Last record of DT (concept id 23730) and the response is “Iniciar”
+   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
+   *    * 1257) or Type of dispensation (concept id 23793) value coded DT
+   *    * (concept id 23888)</li>
+   *    <li>Last record of DS (concept id 23888) and the response is “Iniciar”
+   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
+   *    * 1257) or Type of dispensation (concept id 23793) value coded DT
+   *    * (concept id 23720)</li>
+   *    <li>Last record of FR (concept id 23729) and the response is “ Iniciar”
+   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
+   *    * 1257)</li>
+   *    <li>Last record of DC (concept id 23731) and the response is “Iniciar”
+   *    * (value_coded, concept id 1256) or “Continua” (value_coded, concept id
+   *    * 1257)</li>
+   *    <li>Last record of Dispensing mode (concept id 165174) and the response is
+   *    * “Dispensa Comunitária via APE (DCAPE)” (value_coded, concept id
+   *    * 165179)</li>
+   *    <li>Last record of FARMAC (concept id 165177) and the response is
+   *    * “Iniciar” (value_coded, concept id 1256) or “Continua” (value_coded,
+   *    * concept id 1257)</li>
+   * </ul>
+   * @return
+   */
+
+  public CohortDefinition getMQ14MDS() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("C: MDS para pacientes estáveis");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("23724", hivMetadata.getGaac().getConceptId());
+    map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId());
+    map.put("23888", hivMetadata.getSemiannualDispensation().getConceptId());
+    map.put("23729", hivMetadata.getRapidFlow().getConceptId());
+    map.put("23731", hivMetadata.getCommunityDispensation().getConceptId());
+    map.put("165177", hivMetadata.getLastRecordOfFarmacConcept().getConceptId());
+    map.put("165179", hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+
+    String query =
+            "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "       INNER JOIN encounter e "
+                    + "               ON e.patient_id = p.patient_id "
+                    + "       INNER JOIN obs o "
+                    + "               ON o.encounter_id = e.encounter_id "
+                    + "       INNER JOIN (SELECT p.patient_id, "
+                    + "                          Max(e.encounter_datetime) AS encounter_datetime "
+                    + "                   FROM   patient p "
+                    + "                          INNER JOIN encounter e "
+                    + "                                  ON e.patient_id = p.patient_id "
+                    + "                   WHERE  p.voided = 0 "
+                    + "                          AND e.voided = 0 "
+                    + "                          AND e.location_id = :location "
+                    + "                          AND e.encounter_type = ${6} "
+                    + "                          AND e.encounter_datetime BETWEEN "
+                    + "                              :startDate AND :endDate "
+                    + "                   GROUP  BY p.patient_id) last_consultation "
+                    + "               ON last_consultation.patient_id = p.patient_id "
+                    + "WHERE  p.voided = 0 "
+                    + "       AND o.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND e.location_id = :location "
+                    + "       AND e.encounter_type = ${6} "
+                    + "       AND ( ( o.concept_id = ${23724} "
+                    + "               AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+                    + "              OR ( o.concept_id = ${23730} "
+                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+                    + "              OR ( o.concept_id = ${23888} "
+                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+                    + "              OR ( o.concept_id = ${23729} "
+                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+                    + "              OR ( o.concept_id = ${165174} "
+                    + "                   AND (o.value_coded = ${165179})) "
+                    + "              OR ( o.concept_id = ${165177} "
+                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256})) "
+                    + "              OR ( o.concept_id = ${23731} "
+                    + "                   AND (o.value_coded = ${1257} OR o.value_coded = ${1256}))) "
+                    + "       AND e.encounter_datetime < last_consultation.encounter_datetime";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
   public CohortDefinition getMQ15DenMDS() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
