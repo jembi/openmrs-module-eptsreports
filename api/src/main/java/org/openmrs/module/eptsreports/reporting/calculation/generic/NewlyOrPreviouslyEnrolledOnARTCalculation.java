@@ -352,6 +352,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             EptsCalculationUtils.obsResultForPatient(firstINHDateMap2, patientId);
         Obs firstINHDateObs3 =
             EptsCalculationUtils.obsResultForPatient(firstINHDateMap3, patientId);
+        List<Obs> anyINHDateObsList = getObsListFromResultMap(anyINHDateMap, patientId);
         List<Obs> anyIsoniazida = getObsListFromResultMap(anyIsoniazidaPiridoxina, patientId);
         List<Obs> anyIsoniazida2 = getObsListFromResultMap(anyIsoniazidaPiridoxina2, patientId);
         List<Obs> in3HPor3HPPiridoxina =
@@ -372,6 +373,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
                 && fichaClinicaMasterCardStartDrugsObs == null
                 && firstINHDateObs == null
                 && lastINHDateObsList == null
+                && anyINHDateObsList == null
                 && anyIsoniazida == null
                 && anyIsoniazida2 == null
                 && !anyIsoniazida2.isEmpty()
@@ -394,6 +396,10 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         Obs lastINHDateObs = null;
         if (lastINHDateObsList != null && !lastINHDateObsList.isEmpty() && lastINHDateObsList.size() > 0) {
           lastINHDateObs = lastINHDateObsList.get(0);
+        }
+        Obs anyINHDateObs = null;
+        if (anyINHDateObsList != null && !anyINHDateObsList.isEmpty() && anyINHDateObsList.size() > 0) {
+          lastINHDateObs = anyINHDateObsList.get(0);
         }
 
         DateTime artStartDateTime = new DateTime(artStartDate.getTime());
