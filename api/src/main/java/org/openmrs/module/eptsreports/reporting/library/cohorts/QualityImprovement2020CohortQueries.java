@@ -6711,7 +6711,7 @@ public class QualityImprovement2020CohortQueries {
    * @param preposition composition string and description
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ14DEN(MQCat14Preposition preposition) {
+  public CohortDefinition getMQ14(MQCat14Preposition preposition) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(preposition.getDescription());
@@ -6742,8 +6742,8 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  public enum MQCat14Preposition{
-    A_AND_NOT_A1_AND_NOT_A2{
+  public enum MQCat14Preposition {
+    A_AND_NOT_A1_AND_NOT_A2 {
       @Override
       public String getCompositionString() {
         return "A AND NOT(A1 AND A2)";
@@ -6754,7 +6754,7 @@ public class QualityImprovement2020CohortQueries {
         return "MQ Cat 14 - A and NOT A1 and NOT A2 and";
       }
     },
-    A_AND_A1_AND_NOT_A2{
+    A_AND_A1_AND_NOT_A2 {
       @Override
       public String getCompositionString() {
         return "A AND A1 AND NOT A2";
@@ -6765,17 +6765,20 @@ public class QualityImprovement2020CohortQueries {
         return "MQ Cat 14 - A and A1 and NOT A2";
       }
     },
-    A_AND_NOT_A1_AND_A2{  @Override
-    public String getCompositionString() {
-      return "A AND NOT A1 AND A2";
-    }
+    A_AND_NOT_A1_AND_A2 {
+      @Override
+      public String getCompositionString() {
+        return "A AND NOT A1 AND A2";
+      }
 
       @Override
       public String getDescription() {
         return "MQ Cat 14 - A and NOT A1 and A2";
-      }};
+      }
+    };
 
     public abstract String getCompositionString();
+
     public abstract String getDescription();
   }
 
@@ -7459,39 +7462,6 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
-
-  /**
-   * 14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml) as
-   * following: A and NOT A1 and NOT A2 and Age < 1 *
-   * @return
-   */
-  public CohortDefinition getMQ15MdsNum15() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml) as\n" +
-            "following ");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition Mq15MdsDen15 = getMQ15MdsDen15();
-    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(24, 18);
-
-    cd.addSearch(
-            "Mq15MdsDen15",
-            EptsReportUtils.map(
-                    Mq15MdsDen15,
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-            "Mq15I",
-            EptsReportUtils.map(
-                    Mq15I, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    cd.setCompositionString("Mq15MdsDen15 AND Mq15I");
-
-    return cd;
-  }
-
-
 
   public CohortDefinition getMQ15DenMDS() {
 
