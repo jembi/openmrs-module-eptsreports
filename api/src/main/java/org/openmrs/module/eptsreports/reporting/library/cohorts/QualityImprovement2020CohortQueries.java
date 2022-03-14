@@ -6742,6 +6742,37 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  public CohortDefinition getMQ14() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Cat 14 Testing");
+
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "A1",
+        EptsReportUtils.map(
+            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+                EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
+            "onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "A2",
+        EptsReportUtils.map(
+            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+                EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
+            "onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("A and A1 and A2");
+
+    return cd;
+  }
+
   public enum MQCat14Preposition {
     A_AND_NOT_A1_AND_NOT_A2 {
       @Override
