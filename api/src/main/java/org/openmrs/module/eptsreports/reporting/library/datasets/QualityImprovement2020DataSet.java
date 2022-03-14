@@ -2352,7 +2352,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "age=10-14");
 
-    // M&Q Report - Categoria 14 Denominador
+    // M&Q Report - Categoria 14
 
 
     // MQ indicators category 9 denominator

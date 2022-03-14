@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -26,6 +25,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -6707,24 +6708,13 @@ public class QualityImprovement2020CohortQueries {
    *   <li>14.4. % de ML em TARV com supressão viral - A and NOT A1 and A2
    * </ul>
    *
-   * @param flag indicator number
+   * @param preposition composition string and description
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ14DEN(Integer flag) {
+  public CohortDefinition getMQ14DEN(MQCat14Preposition preposition) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    switch (flag) {
-      case 1:
-        cd.setName("% de adultos (15/+anos) em TARV com supressão viral");
-        break;
-      case 2:
-        cd.setName("% de crianças (0-14 anos) em TARV com supressão viral");
-        break;
-      case 3:
-        cd.setName("% de MG em TARV com supressão viral");
-        break;
-      case 4:
-        cd.setName("% de ML em TARV com supressão viral");
-    }
+
+    cd.setName(preposition.getDescription());
 
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -6746,15 +6736,47 @@ public class QualityImprovement2020CohortQueries {
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
             "onOrBefore=${endDate},location=${location}"));
-    if (flag == 1 || flag == 2) {
-      cd.setCompositionString("A AND NOT (A1 OR A2)");
-    } else if (flag == 3) {
-      cd.setCompositionString("(A AND A1) AND NOT A2");
-    } else if (flag == 4) {
-      cd.setCompositionString("(A AND NOT A1) AND A2");
-    }
+
+    cd.setCompositionString(preposition.getCompositionString());
 
     return cd;
+  }
+
+  public enum MQCat14Preposition{
+    A_AND_NOT_A1_AND_NOT_A2{
+      @Override
+      public String getCompositionString() {
+        return "A AND NOT(A1 AND A2)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "MQ Cat 14 - A and NOT A1 and NOT A2 and";
+      }
+    },
+    A_AND_A1_AND_NOT_A2{
+      @Override
+      public String getCompositionString() {
+        return "A AND A1 AND NOT A2";
+      }
+
+      @Override
+      public String getDescription() {
+        return "MQ Cat 14 - A and A1 and NOT A2";
+      }
+    },
+    A_AND_NOT_A1_AND_A2{  @Override
+    public String getCompositionString() {
+      return "A AND NOT A1 AND A2";
+    }
+
+      @Override
+      public String getDescription() {
+        return "MQ Cat 14 - A and NOT A1 and A2";
+      }};
+
+    public abstract String getCompositionString();
+    public abstract String getDescription();
   }
 
   /**
@@ -7437,6 +7459,39 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  /**
+   * 14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml) as
+   * following: A and NOT A1 and NOT A2 and Age < 1 *
+   * @return
+   */
+  public CohortDefinition getMQ15MdsNum15() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml) as\n" +
+            "following ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mq15MdsDen15 = getMQ15MdsDen15();
+    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(24, 18);
+
+    cd.addSearch(
+            "Mq15MdsDen15",
+            EptsReportUtils.map(
+                    Mq15MdsDen15,
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+            "Mq15I",
+            EptsReportUtils.map(
+                    Mq15I, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("Mq15MdsDen15 AND Mq15I");
+
+    return cd;
+  }
+
+
 
   public CohortDefinition getMQ15DenMDS() {
 
