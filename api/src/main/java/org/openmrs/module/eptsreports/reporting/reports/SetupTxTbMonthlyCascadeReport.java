@@ -2,8 +2,10 @@ package org.openmrs.module.eptsreports.reporting.reports;
 
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TxTbMonthlyCascadeDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
@@ -18,6 +20,9 @@ import java.util.Properties;
 
 @Component
 public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
+
+    @Autowired
+    private TxTbMonthlyCascadeDataset txtbMonthlyCascadeDataset;
 
     @Autowired
     private GenericCohortQueries genericCohortQueries;
@@ -69,9 +74,9 @@ public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
 
     @Override
     public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-        ReportDesign reportDesign = null;
+        ReportDesign rd = null;
         try {
-            reportDesign =
+            rd =
                     createXlsReportDesign(
                             reportDefinition,
                             "Template_TX_TB_ Monthly_Cascade_Report_v1.2.xls",
@@ -80,19 +85,18 @@ public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
                             null);
             Properties props = new Properties();
             props.put("sortWeight", "5000");
-            reportDesign.setProperties(props);
+            rd.setProperties(props);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ReportingException(e.toString());
         }
 
-        return Arrays.asList(reportDesign);
+        return Arrays.asList(rd);
     }
 
     @Override
     public List<Parameter> getParameters() {
         return Arrays.asList(
-
-                new Parameter("endDate", "End Date", Date.class),
-                new Parameter("location", "Facilities", Location.class));
+                new Parameter("endDate", "End date", Date.class),
+                new Parameter("location", "Location", Location.class));
     }
 }

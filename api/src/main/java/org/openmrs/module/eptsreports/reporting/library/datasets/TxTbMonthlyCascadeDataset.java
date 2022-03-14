@@ -5,7 +5,7 @@ import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TXTBMonthlyDataset extends BaseDataSet {
+public class TxTbMonthlyCascadeDataset extends BaseDataSet {
 
   public DataSetDefinition constructTXTBMonthlyDataset() {
 
