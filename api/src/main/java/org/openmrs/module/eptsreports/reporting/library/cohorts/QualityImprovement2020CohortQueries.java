@@ -7343,7 +7343,6 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
-
   public CohortDefinition getMQ15DenMDS() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();

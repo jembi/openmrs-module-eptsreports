@@ -3232,6 +3232,22 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>eptsreports.lastRecordOfDispensationModeUuid</property>
+		<defaultValue>d2eaec39-9c48-443b-a8d5-b2b163d42c53</defaultValue>
+		<description>
+			Last Record of Dispensing Mode  concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.dispensaComunitariaViaApeUuid</property>
+		<defaultValue>0843c71b-be47-4de2-ba16-a08db52c1136</defaultValue>
+		<description>
+			Dispensa Comunitára via APE (DCAPE)
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 
