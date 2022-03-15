@@ -6773,8 +6773,40 @@ public class QualityImprovement2020CohortQueries {
       @Override
       public String getDescription() {
         return "MQ Cat 14 - A and NOT A1 and A2";
-      }
-    };
+      }},
+
+      B_AND_NOT_B1_AND_NOT_B2 {
+        @Override
+        public String getCompositionString() {
+          return "B AND NOT B1 AND NOT B2";
+        }
+
+        @Override
+        public String getDescription() {
+          return "MQ Cat 14 - B AND NOT B1 AND NOT B2";
+        }
+      },
+      B_AND_B1_AND_NOT_B2 {
+        @Override
+        public String getCompositionString() {
+          return "B AND B1 AND NOT B2";
+        }
+
+        @Override
+        public String getDescription() {
+          return "MQ Cat 14 - B AND B1 AND NOT B2";
+        }
+      },
+      B_AND_NOT_B1_AND_B2 {
+        @Override
+        public String getCompositionString() {
+          return "B AND NOT B1 AND B2";
+        }
+
+        @Override
+        public String getDescription() {
+          return "MQ Cat 14 - A and NOT A1 and A2";
+        }};
 
     public abstract String getCompositionString();
 
@@ -6799,7 +6831,7 @@ public class QualityImprovement2020CohortQueries {
    * @param flag indicator number
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ14NUM(Integer flag) {
+  public CohortDefinition getMQ14NUM(MQCat14Preposition preposition) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     switch (flag) {
       case 1:
