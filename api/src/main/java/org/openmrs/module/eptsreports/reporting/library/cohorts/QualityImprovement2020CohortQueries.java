@@ -6743,37 +6743,37 @@ public class QualityImprovement2020CohortQueries {
   }
 
   public enum MQCat14Preposition {
-    A_AND_NOT_A1_AND_NOT_A2 {
+    A {
       @Override
       public String getCompositionString() {
-        return "A AND NOT(A1 AND A2)";
+        return "A";
       }
 
       @Override
       public String getDescription() {
-        return "MQ Cat 14 - A and NOT A1 and NOT A2 and";
+        return "MQ Cat 14 - A ";
       }
     },
-    A_AND_A1_AND_NOT_A2 {
+    A_AND_A1 {
       @Override
       public String getCompositionString() {
-        return "A AND A1 AND NOT A2";
+        return "A AND A1";
       }
 
       @Override
       public String getDescription() {
-        return "MQ Cat 14 - A and A1 and NOT A2";
+        return "MQ Cat 14 - A and A1 ";
       }
     },
-    A_AND_NOT_A1_AND_A2 {
+    A_AND_A2 {
       @Override
       public String getCompositionString() {
-        return "A AND NOT A1 AND A2";
+        return "A AND A2";
       }
 
       @Override
       public String getDescription() {
-        return "MQ Cat 14 - A and NOT A1 and A2";
+        return "MQ Cat 14 - A and A2";
       }
     },
     B {
