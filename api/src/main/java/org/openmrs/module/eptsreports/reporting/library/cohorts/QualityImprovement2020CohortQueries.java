@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -26,6 +25,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -6828,28 +6829,16 @@ public class QualityImprovement2020CohortQueries {
    *   <li>14.4. % de ML em TARV com supressão viral - B and NOT B1 and B2
    * </ul>
    *
-   * @param flag indicator number
+   * @param preposition
    * @return CohortDefinition
    */
   public CohortDefinition getMQ14NUM(MQCat14Preposition preposition) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    switch (flag) {
-      case 1:
-        cd.setName("% de adultos (15/+anos) em TARV com supressão viral");
-        break;
-      case 2:
-        cd.setName("% de crianças (0-14 anos) em TARV com supressão viral");
-        break;
-      case 3:
-        cd.setName("% de MG em TARV com supressão viral");
-        break;
-      case 4:
-        cd.setName("% de ML em TARV com supressão viral");
-    }
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setName(preposition.getDescription());
     cd.addSearch(
         "B",
         EptsReportUtils.map(
@@ -6867,13 +6856,7 @@ public class QualityImprovement2020CohortQueries {
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
             "onOrBefore=${endDate},location=${location}"));
-    if (flag == 1 || flag == 2) {
-      cd.setCompositionString("B AND NOT (B1 OR B2)");
-    } else if (flag == 3) {
-      cd.setCompositionString("(B AND B1) AND NOT B2");
-    } else if (flag == 4) {
-      cd.setCompositionString("(B AND NOT B1) AND B2");
-    }
+    cd.setCompositionString(cd.getCompositionString());
 
     return cd;
   }
