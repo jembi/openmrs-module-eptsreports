@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.QualityImprovement2020CohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
@@ -15,10 +18,6 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @Component
 public class QualityImprovement2020DataSet extends BaseDataSet {
@@ -2045,7 +2044,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "age=10-14");
 
     // Category 15 Denominator MDS
-    CohortIndicator MQ15DEN13  =
+    CohortIndicator MQ15DEN13 =
         eptsGeneralIndicator.getIndicator(
             "MQ15DEN13",
             EptsReportUtils.map(
@@ -2058,7 +2057,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ15DEN13",
         "15.13 - % de pacientes elegíveis a MDS, que foram inscritos em MDS",
         EptsReportUtils.map(
-                MQ15DEN13,
+            MQ15DEN13,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
