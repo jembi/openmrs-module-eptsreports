@@ -108,7 +108,7 @@ public class TbPrevCohortQueries {
             + "    WHERE e.voided = 0 "
             + "      AND o.voided = 0 "
             + "      AND e.encounter_type = ${53} "
-            + "      AND o.concept_id = ${23985} "
+            + "      AND (o.concept_id = ${23985} AND o.value_coded IS NOT NULL) "
             + "      AND e.encounter_datetime = data_inicio.encounter "
             + ")";
 
