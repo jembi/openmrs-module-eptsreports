@@ -2167,6 +2167,21 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
+    CohortIndicator MQ15NUM16 =
+            eptsGeneralIndicator.getIndicator(
+                    "MQ15NUM16",
+                    EptsReportUtils.map(
+                            qualityImprovement2020CohortQueries.getMQNum15Dot16(),
+                            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dataSetDefinition.addColumn(
+            "MQ15NUM16",
+            "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
+            EptsReportUtils.map(
+                    MQ15NUM15,
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
+
     // Category 15 Numerator indicators
     CohortIndicator MQ15NUM1 =
         eptsGeneralIndicator.getIndicator(

@@ -7747,6 +7747,29 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  public CohortDefinition getMQNum15Dot16() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+            "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral");
+
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.addSearch(
+            "B",
+            EptsReportUtils.map(
+                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+            "C",
+            EptsReportUtils.map(
+                    getMQMdsC(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("B and C");
+    return cd;
+  }
+
   /**
    * <b>C - All female patients registered as “Pregnant” on Ficha Clinica during the revision period
    * (startDateInclusion = endDateRevision - 14 months and endDateRevision):</b>
