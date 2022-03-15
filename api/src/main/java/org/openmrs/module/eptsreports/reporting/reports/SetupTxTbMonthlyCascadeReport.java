@@ -11,6 +11,7 @@ import org.openmrs.module.eptsreports.reporting.library.datasets.TxTbMonthlyCasc
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
@@ -56,9 +57,8 @@ public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
     reportDefinition.setName(getName());
     reportDefinition.setDescription(getDescription());
     reportDefinition.setParameters(getParameters());
-    //  reportDefinition.addDataSetDefinition(
-    //        "TXTB",
-    //      Mapped.mapStraightThrough(dataset));
+    reportDefinition.addDataSetDefinition(
+        "TXTB", Mapped.mapStraightThrough(txtbMonthlyCascadeDataset.constructTXTBMonthlyDataset()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
