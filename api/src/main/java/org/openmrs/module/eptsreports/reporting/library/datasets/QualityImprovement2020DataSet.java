@@ -2522,7 +2522,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14DNUM1",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_NOT_B1_AND_NOT_B2),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2537,7 +2537,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM2",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_NOT_B1_AND_NOT_B2),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2569,7 +2569,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14DEN4",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_NOT_B1_AND_NOT_B2),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2585,7 +2585,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM5",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_NOT_B1_AND_NOT_B2),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
@@ -2601,7 +2601,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ14NUM6",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_NOT_B1_AND_NOT_B2),
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
