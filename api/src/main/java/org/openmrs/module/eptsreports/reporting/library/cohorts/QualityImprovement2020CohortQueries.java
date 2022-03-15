@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -25,8 +26,6 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -7394,7 +7393,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return
    */
-  public CohortDefinition getMQ14MDS() {
+  public CohortDefinition getMQMdsC() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("C: MDS para pacientes estáveis");
@@ -7708,6 +7707,28 @@ public class QualityImprovement2020CohortQueries {
 
     cd.setCompositionString("Mq15MdsDen15 AND Mq15I");
 
+    return cd;
+  }
+
+  public CohortDefinition getMQDen15Dot16() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName(
+        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral");
+
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            txPvls.getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "C",
+        EptsReportUtils.map(
+            getMQMdsC(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("A and C");
     return cd;
   }
 

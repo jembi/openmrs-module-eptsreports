@@ -2152,6 +2152,21 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
+    CohortIndicator MQ15DEN16 =
+        eptsGeneralIndicator.getIndicator(
+            "MQ15DEN16",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQDen15Dot16(),
+                "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    dataSetDefinition.addColumn(
+        "MQ15DEN16",
+        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
+        EptsReportUtils.map(
+            MQ15DEN15,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
     // Category 15 Numerator indicators
     CohortIndicator MQ15NUM1 =
         eptsGeneralIndicator.getIndicator(
@@ -2367,7 +2382,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_NOT_A1_AND_NOT_A2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-
     dataSetDefinition.addColumn(
         "MQ14DEN1",
         "14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml) ",
@@ -2414,7 +2428,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 qualityImprovement2020CohortQueries.getMQ14(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_NOT_A1_AND_NOT_A2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
-
 
     dataSetDefinition.addColumn(
         "MQ14DEN4",
@@ -2468,7 +2481,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "MQ14DEN7",
         "14.7. % de MG em TARV com supressão viral (CV<1000 Cps/ml)",
         EptsReportUtils.map(
-            MQ14DEN7, "startDate=${startDate},endDate=${endDate},location=${location}"),
+            MQ14DEN7, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
         "");
     // 14.8 Den
     CohortIndicator MQ14DEN8 =

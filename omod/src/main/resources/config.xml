@@ -3233,7 +3233,7 @@
 	</globalProperty>
 
 	<globalProperty>
-		<property>eptsreports.lastRecordOfDispensingModeConceptUuidUuid</property>
+		<property>eptsreports.lastRecordOfDispensingModeConceptUuid</property>
 		<defaultValue>40a9a12b-1205-4a55-bb93-caf15452bf61</defaultValue>
 		<description>
 			Last Record of Dispensing Mode  concept
