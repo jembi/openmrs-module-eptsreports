@@ -2521,7 +2521,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ14DNUM1",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
+                qualityImprovement2020CohortQueries.getMQ14NUM(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2536,7 +2536,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ14NUM2",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
+                qualityImprovement2020CohortQueries.getMQ14NUM(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2552,7 +2552,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ14NUM3",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
+                qualityImprovement2020CohortQueries.getMQ14NUM(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A1),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2568,7 +2568,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ14DEN4",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
+                qualityImprovement2020CohortQueries.getMQ14NUM(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2584,7 +2584,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ14NUM5",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
+                qualityImprovement2020CohortQueries.getMQ14NUM(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2600,7 +2600,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ14NUM6",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
+                qualityImprovement2020CohortQueries.getMQ14NUM(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.B),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2616,7 +2616,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ14NUM7",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
+                qualityImprovement2020CohortQueries.getMQ14NUM(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_B1),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2631,7 +2631,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MQ14NUM8",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
+                qualityImprovement2020CohortQueries.getMQ14NUM(
                     QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_B2),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
 
