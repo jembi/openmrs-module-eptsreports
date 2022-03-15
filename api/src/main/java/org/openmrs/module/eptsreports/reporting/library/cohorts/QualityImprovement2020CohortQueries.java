@@ -6774,40 +6774,41 @@ public class QualityImprovement2020CohortQueries {
       @Override
       public String getDescription() {
         return "MQ Cat 14 - A and NOT A1 and A2";
-      }},
+      }
+    },
+    B {
+      @Override
+      public String getCompositionString() {
+        return "B";
+      }
 
-      B_AND_NOT_B1_AND_NOT_B2 {
-        @Override
-        public String getCompositionString() {
-          return "B AND NOT B1 AND NOT B2";
-        }
+      @Override
+      public String getDescription() {
+        return "MQ Cat 14 - B ";
+      }
+    },
+    B_AND_B1 {
+      @Override
+      public String getCompositionString() {
+        return "B AND B1";
+      }
 
-        @Override
-        public String getDescription() {
-          return "MQ Cat 14 - B AND NOT B1 AND NOT B2";
-        }
-      },
-      B_AND_B1_AND_NOT_B2 {
-        @Override
-        public String getCompositionString() {
-          return "B AND B1 AND NOT B2";
-        }
+      @Override
+      public String getDescription() {
+        return "MQ Cat 14 - B AND B1";
+      }
+    },
+    B_AND_B2 {
+      @Override
+      public String getCompositionString() {
+        return "B AND B2";
+      }
 
-        @Override
-        public String getDescription() {
-          return "MQ Cat 14 - B AND B1 AND NOT B2";
-        }
-      },
-      B_AND_NOT_B1_AND_B2 {
-        @Override
-        public String getCompositionString() {
-          return "B AND NOT B1 AND B2";
-        }
-
-        @Override
-        public String getDescription() {
-          return "MQ Cat 14 - A and NOT A1 and A2";
-        }};
+      @Override
+      public String getDescription() {
+        return "MQ Cat 14 - B AND B2";
+      }
+    };
 
     public abstract String getCompositionString();
 
@@ -7751,21 +7752,21 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
-            "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral");
+        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral");
 
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.addSearch(
-            "B",
-            EptsReportUtils.map(
-                    txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "B",
+        EptsReportUtils.map(
+            txPvls.getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-            "C",
-            EptsReportUtils.map(
-                    getMQMdsC(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "C",
+        EptsReportUtils.map(
+            getMQMdsC(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString("B and C");
     return cd;
   }
