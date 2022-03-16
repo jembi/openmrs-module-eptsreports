@@ -91,24 +91,24 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               hivMetadata.getPediatriaSeguimentoEncounterType(),
               hivMetadata.getMasterCardEncounterType());
 
-      Concept c23985 = tbMetadata.getRegimeTPTConcept();
-      EncounterType e60 = tbMetadata.getRegimeTPTEncounterType();
       EncounterType e6 = hivMetadata.getAdultoSeguimentoEncounterType();
       EncounterType e9 = hivMetadata.getPediatriaSeguimentoEncounterType();
       EncounterType e53 = hivMetadata.getMasterCardEncounterType();
+      EncounterType e60 = tbMetadata.getRegimeTPTEncounterType();
       Concept c656 = tbMetadata.getIsoniazidConcept();
-      Concept c23982 = tbMetadata.getIsoniazidePiridoxinaConcept();
-      Concept c1719 = tbMetadata.getTreatmentPrescribedConcept();
-      Concept c23955 = tbMetadata.getDtINHConcept();
-      Concept c23986 = tbMetadata.getTypeDispensationTPTConceptUuid();
       Concept c1098 = hivMetadata.getMonthlyConcept();
-      Concept c6122 = hivMetadata.getIsoniazidUsageConcept();
       Concept c1256 = hivMetadata.getStartDrugs();
       Concept c1257 = hivMetadata.getContinueRegimenConcept();
-      Concept c23720 = hivMetadata.getQuarterlyConcept();
-      Concept c23954 = tbMetadata.get3HPConcept();
-      Concept c23984 = tbMetadata.get3HPPiridoxinaConcept();
+      Concept c1719 = tbMetadata.getTreatmentPrescribedConcept();
+      Concept c6122 = hivMetadata.getIsoniazidUsageConcept();
       Concept c6129 = hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept();
+      Concept c23954 = tbMetadata.get3HPConcept();
+      Concept c23955 = tbMetadata.getDtINHConcept();
+      Concept c23982 = tbMetadata.getIsoniazidePiridoxinaConcept();
+      Concept c23984 = tbMetadata.get3HPPiridoxinaConcept();
+      Concept c23985 = tbMetadata.getRegimeTPTConcept();
+      Concept c23986 = tbMetadata.getTypeDispensationTPTConceptUuid();
+      Concept c23720 = hivMetadata.getQuarterlyConcept();
 
       /** ----- all patients who started IPT in the previous reporting period ---- */
       // I.
@@ -273,17 +273,6 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
 
       /** ------ who completed IPT treatment during the reporting period--- */
       // V
-      CalculationResultMap endProfilaxiaObservations =
-          ePTSCalculationService.lastObs(
-              c6129,
-              null,
-              location,
-              false,
-              null,
-              completionPeriodEndDate,
-              consultationEncounterTypes,
-              cohort,
-              context);
       CalculationResultMap endProfilaxiaObservations6 =
           ePTSCalculationService.getObs(
               c6129,
