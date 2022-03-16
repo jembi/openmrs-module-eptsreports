@@ -43,18 +43,24 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
 
-    CohortIndicator MQC3D1 =
+    CohortIndicator TXCURR =
         eptsGeneralIndicator.getIndicator(
             "TXCURR",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxCurr(),
                 "endDate=${endDate},location=${location}"));
 
+    cohortIndicatorDefinition.addColumn(
+        "TXCURRTOTAL",
+        "TXCURR TOTAL",
+        EptsReportUtils.map(TXCURR, "endDate=${endDate},location=${location}"),
+        "");
+
     addRow(
         cohortIndicatorDefinition,
         "TXCURR",
         " Indicador 1 - Tx Curr ",
-        EptsReportUtils.map(MQC3D1, "endDate=${endDate},location=${location}"),
+        EptsReportUtils.map(TXCURR, "endDate=${endDate},location=${location}"),
         getDisagsForAdultsAndChildrenBasedOnArtStartDateColumn());
 
     return cohortIndicatorDefinition;
