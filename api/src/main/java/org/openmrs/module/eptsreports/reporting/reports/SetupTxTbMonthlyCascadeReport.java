@@ -1,12 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TxTbMonthlyCascadeDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -17,6 +13,12 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
@@ -59,6 +61,9 @@ public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
     reportDefinition.setParameters(getParameters());
     reportDefinition.addDataSetDefinition(
         "TXTB", Mapped.mapStraightThrough(txtbMonthlyCascadeDataset.constructTXTBMonthlyDataset()));
+
+    reportDefinition.addDataSetDefinition(
+            "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
