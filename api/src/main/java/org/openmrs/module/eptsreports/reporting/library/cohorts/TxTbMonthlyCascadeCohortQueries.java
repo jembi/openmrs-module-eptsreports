@@ -118,7 +118,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "exameBaciloscopia OR haveBKTestRequest OR (haveBKTestResult AND ontHaveGENEXPERTInLabForm) AND dontHaveGeneXpertPositive AND dontHaveApplication4LabResearch ");
+        "exameBaciloscopia OR haveBKTestRequest OR (haveBKTestResult AND dontHaveGENEXPERTInLabForm) AND dontHaveGeneXpertPositive AND dontHaveApplication4LabResearch ");
 
     return cd;
   }
@@ -380,7 +380,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("703", tbMetadata.getPositiveConcept().getConceptId());
     map.put("664", tbMetadata.getNegativeConcept().getConceptId());
     String query =
-             "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
@@ -436,7 +436,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23723} "
             + "       AND o.value_coded  IN (${703}, ${664}) "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND endDate"
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate"
             + " GROUP BY p.patient_id ";
     ;
 
@@ -509,8 +509,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-        ""
-            + "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
@@ -525,6 +524,129 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND o.value_coded <> ${23723} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + " GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * have a ‘GeneXpert Positivo ’ registered in the investigações – resultados laboratoriais - ficha
+   * clínica – mastercard: * Encounter Type ID = 6 ● TB GENEXPERT TEST (concept id 23723) value
+   * coded Positive (concept id 703) ● encounter_datetime >= startDate and <=endDate; or ■ have a
+   * ‘GeneXpert Negativo ’ registered in the investigações – resultados laboratoriais - ficha
+   * clínica – mastercard: ● Encounter Type ID = 6 ● TB GENEXPERT TEST (concept id 23723) Answer
+   * Negative (concept id 664) ● encounter_datetime >= startDate and <=endDate; or ■ Have a
+   * GeneXpert request registered in the investigacoes –ficha clinica – mastercard; ● Encounter Type
+   * ID = 6 ● APPLICATION FOR LABORATORY RESEARCH (concept id 23722) value coded TB GENEXPERT TEST
+   * (concept id 23723) ● encounter_datetime >= startDate and <=endDate; or ■ have a GENEXPERT
+   * Result registered in the laboratory form ● Encounter Type ID = 13 ● Teste TB GENEXPERT (concept
+   * id 23723) Value_coded (concept id 664 – Negative, concept id 703 – Positive) ●
+   * encounter_datetime >= startDate and <=endDate ■ have a XpertMTB Result registered in the
+   * laboratory form ● Encounter Type ID = 13 ● Teste XpertMTB (concept id 165189) Value_coded
+   * (concept id 1065 – yes, concept id 1066 – no) ● encounter_datetime >= startDate and
+   *
+   * @return
+   */
+  public CohortDefinition getPatientsGeneXpertMtbRif() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("GeneXpert MTB/RIF");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    map.put("165189", tbMetadata.getNegativeConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+
+
+    String query =
+              "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23723} "
+            + "       AND o.value_coded = ${703} "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23723} "
+            + "       AND o.value_coded = ${664} "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${23723} "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${13} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23723} "
+            + "       AND o.value_coded IN ( ${664}, ${703} ) "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${13} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = 165189 "
+            + "       AND o.value_coded IN( ${1065}, ${1066} ) "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
