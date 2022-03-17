@@ -59,7 +59,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "CLINICAL",
             EptsReportUtils.map(
-                txTbMonthlyCascadeCohortQueries.getSmearMicroscopy(),
+                txTbMonthlyCascadeCohortQueries.getPatientsGeneXpertMtbRif(),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
