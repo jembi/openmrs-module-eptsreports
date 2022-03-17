@@ -121,6 +121,21 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
+  public CohortDefinition getPatientsPreviouslyOnArt(){
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients Previously on ART (B)");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Date.class));
+
+    CohortDefinition onArtBeforeEndDate = getPatientsOnArtBeforeEndDate();
+    CohortDefinition newOnArt = getPatientsNewOnArt();
+    cd.addSearch("newOnArt", EptsReportUtils.map(newOnArt,"endDate=${endDate},location=${location}"));
+    cd.addSearch("onArtBeforeEndDate", EptsReportUtils.map(onArtBeforeEndDate,"endDate=${endDate},location=${location}"));
+    cd.setCompositionString("onArtBeforeEndDate AND NOT newOnArt");
+    return cd;
+  }
+
   public CohortDefinition getPatientsTransferredInFromProgram() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -211,20 +226,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
-  public CohortDefinition getPatientsPreviouslyOnArt(){
 
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Patients Previously on ART (B)");
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Date.class));
-
-    CohortDefinition onArtBeforeEndDate = getPatientsOnArtBeforeEndDate();
-    CohortDefinition newOnArt = getPatientsNewOnArt();
-    cd.addSearch("newOnArt", EptsReportUtils.map(newOnArt,"endDate=${endDate},location=${location}"));
-    cd.addSearch("onArtBeforeEndDate", EptsReportUtils.map(onArtBeforeEndDate,"endDate=${endDate},location=${location}"));
-    cd.setCompositionString("onArtBeforeEndDate AND NOT newOnArt");
-    return cd;
-  }
 
   private String getPatientsOnArt(boolean selectArtDate) {
     Map<String, Integer> valuesMap = new HashMap<>();
