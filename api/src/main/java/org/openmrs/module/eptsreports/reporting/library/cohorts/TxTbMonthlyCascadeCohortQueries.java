@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -23,6 +24,7 @@ public class TxTbMonthlyCascadeCohortQueries {
   @Autowired private TXTBCohortQueries txtbCohortQueries;
 
   @Autowired private HivMetadata hivMetadata;
+  @Autowired private TbMetadata tbMetadata;
 
   public CohortDefinition getTxCurrOrTxCurrWithClinicalConsultation(
       Indicator1and2Composition indicator1and2Composition) {
@@ -121,7 +123,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
-  public CohortDefinition getPatientsPreviouslyOnArt(){
+  public CohortDefinition getPatientsPreviouslyOnArt() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients Previously on ART (B)");
@@ -130,8 +132,11 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     CohortDefinition onArtBeforeEndDate = getPatientsOnArtBeforeEndDate();
     CohortDefinition newOnArt = getPatientsNewOnArt();
-    cd.addSearch("newOnArt", EptsReportUtils.map(newOnArt,"endDate=${endDate},location=${location}"));
-    cd.addSearch("onArtBeforeEndDate", EptsReportUtils.map(onArtBeforeEndDate,"endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "newOnArt", EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "onArtBeforeEndDate",
+        EptsReportUtils.map(onArtBeforeEndDate, "endDate=${endDate},location=${location}"));
     cd.setCompositionString("onArtBeforeEndDate AND NOT newOnArt");
     return cd;
   }
@@ -226,7 +231,46 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * Encounter Type ID = 13 EXAME BACILOSCOPIA (concept id 307) Answers Value_coded (concept id in
+   * [664, 703]) encounter_datetime >= startDate and <=endDate
+   *
+   * @return CortDefinition
+   */
+  public CohortDefinition getBaciloscopiaResult() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Have any value registered for resultado baciloscopia in the laboratory form");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided "
+            + "       AND e.encounter_type = 13 "
+            + "       AND e.location_id = 400 "
+            + "       AND o.concept_id = 307 "
+            + "       AND o.value_coded IN ( 664, 703 ) "
+            + "       AND e.encounter_datetime >= '2020-06-21' "
+            + "       AND e.encounter_datetime <= '2020-12-20'";
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
 
   private String getPatientsOnArt(boolean selectArtDate) {
     Map<String, Integer> valuesMap = new HashMap<>();
