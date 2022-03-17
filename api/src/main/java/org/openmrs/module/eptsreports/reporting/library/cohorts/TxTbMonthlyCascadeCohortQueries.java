@@ -237,7 +237,7 @@ public class TxTbMonthlyCascadeCohortQueries {
    *
    * @return CortDefinition
    */
-  public CohortDefinition getBaciloscopiaResult() {
+  public CohortDefinition getPatientsWithBaciloscopiaResult() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         "Have any value registered for resultado baciloscopia in the laboratory form");
@@ -260,13 +260,226 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided "
-            + "       AND e.encounter_type = 13 "
-            + "       AND e.location_id = 400 "
-            + "       AND o.concept_id = 307 "
-            + "       AND o.value_coded IN ( 664, 703 ) "
-            + "       AND e.encounter_datetime >= '2020-06-21' "
-            + "       AND e.encounter_datetime <= '2020-12-20'";
+            + "       AND o.voided = 0"
+            + "       AND e.encounter_type = ${13} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${307} "
+            + "       AND o.value_coded IN ( ${664}, ${703} ) "
+            + "       AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= :endDate "
+            + " GROUP BY p.patient_id ";
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * have a ‘BK Test” request registered in the investigacoes –ficha clinica – mastercard; Encounter
+   * Type ID = 6 APPLICATION FOR LABORATORY RESEARCH (concept id 23722) Answers: BK Test (concept id
+   * 307) encounter_datetime >= startDate and <=endDate
+   *
+   * @return
+   */
+  public CohortDefinition getPatientsHaveBKTestRequest() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Have a BK Test request registered in the investigaco");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0"
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${307} "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + " GROUP BY p.patient_id ";
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Have a BK Test result registered in the investigacoes – resultados laboratoriais ficha clinica
+   * – mastercard Encounter Type ID = 6 BK TEST (concept id 307) Answer Positive (concept id 703) or
+   * Negative (concept id 664) encounter_datetime >= startDate and <=endDate
+   *
+   * @return
+   */
+  public CohortDefinition getPatientsHaveBKTestResult() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Have a BK Test result registered in the investigacoes");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    String query =
+        ""
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided =0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${307} "
+            + "       AND o.value_coded = In(${703}, ${664}) "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + " GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Do not have a GENEXPERT Result registered in the laboratory form Encounter Type ID = 13 Teste
+   * TB GENEXPERT (concept id 23723) Value_coded (664 – Negative, 703 – Positive) encounter_datetime
+   * >= startDate and <=endDate
+   *
+   * @return
+   */
+  public CohortDefinition getPatientsHaveGENEXPERTResultInLaboratotyForm() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Do not have a GENEXPERT Result registered in the laboratory form");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    String query =
+        ""
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${13} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23723} "
+            + "       AND o.value_coded = In(${703}, ${664}) "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND endDate"
+            + " GROUP BY p.patient_id ";
+    ;
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Do not have GeneXpert( concept id 23723) with any value coded Positive (concept id not in 703)
+   * or Negative (concept id not in 664) registered in Ficha Clínica-Mastercard (encounter type 6,
+   * encounter_datetime >= startDate and <=endDate )
+   *
+   * @return
+   */
+  public CohortDefinition getPatientsDontHaveGeneXpert() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Do not have GeneXpert( concept id 23723) with any value coded Positive");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided =0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23723} "
+            + "       AND o.value_coded = In(${703}, ${664}) "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + " GROUP BY p.patient_id ";
+    ;
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Do no have APPLICATION FOR LABORATORY RESEARCH (concept id 23722) value coded GeneXpert(
+   * concept id not in 23723) in Ficha Clínica-Mastercard (encounter type 6, encounter_datetime >=
+   * startDate and <=endDate)
+   *
+   * @return
+   */
+  public CohortDefinition getPatientsDontHaveApplication4LabResearch() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Do no have APPLICATION FOR LABORATORY RESEARCH");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        ""
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded <> ${23723} "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + " GROUP BY p.patient_id "
+    ;
+
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
     return sqlCohortDefinition;
