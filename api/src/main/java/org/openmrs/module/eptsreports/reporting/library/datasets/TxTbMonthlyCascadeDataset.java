@@ -1,5 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
@@ -12,11 +16,6 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 @Component
 public class TxTbMonthlyCascadeDataset extends BaseDataSet {
@@ -35,8 +34,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     CohortIndicatorDataSetDefinition cohortIndicatorDefinition =
         new CohortIndicatorDataSetDefinition();
     cohortIndicatorDefinition.setName("TX_TB Monthly Cascade Dataset");
-    cohortIndicatorDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cohortIndicatorDefinition.addParameter(new Parameter("location", "Facilities", Locale.class));
+    cohortIndicatorDefinition.addParameters(getParameters());
 
     cohortIndicatorDefinition.addDimension(
         "age",
@@ -45,10 +43,11 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
 
     CohortIndicator TXCURR =
         eptsGeneralIndicator.getIndicator(
-            "TXCURR",
+            "TXCURRTOTAL",
             EptsReportUtils.map(
-                txTbMonthlyCascadeCohortQueries.getTxCurr(),
-                "endDate=${endDate},location=${location}"));
+                txTbMonthlyCascadeCohortQueries.getTxCurrOrTxCurrWithClinicalConsultation(
+                    TxTbMonthlyCascadeCohortQueries.Indicator1and2Composition.TXCURR),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
         "TXCURRTOTAL",
@@ -56,19 +55,26 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(TXCURR, "endDate=${endDate},location=${location}"),
         "");
 
-    addRow(
-        cohortIndicatorDefinition,
-        "TXCURR",
-        " Indicador 1 - Tx Curr ",
-        EptsReportUtils.map(TXCURR, "endDate=${endDate},location=${location}"),
-        getDisagsForAdultsAndChildrenBasedOnArtStartDateColumn());
+    CohortIndicator Clinical =
+        eptsGeneralIndicator.getIndicator(
+            "CLINICAL",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getPatientsNewOnArt(),
+                "endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "CLINICAL",
+        "FICHA CLINICA",
+        EptsReportUtils.map(Clinical, "endDate=${endDate},location=${location}"),
+        "");
 
     return cohortIndicatorDefinition;
   }
 
-  private List<ColumnParameters> getDisagsForAdultsAndChildrenBasedOnArtStartDateColumn() {
-    ColumnParameters adults = new ColumnParameters("ADULTOS", "Adultos", "age=<1", "ADULTOS");
-    ColumnParameters children = new ColumnParameters("CRIANCAS", "Criancas", "age=1-4", "CRIANCAS");
-    return Arrays.asList(adults, children);
+  @Override
+  public List<Parameter> getParameters() {
+    return Arrays.asList(
+        new Parameter("endDate", "endDate", Date.class),
+        new Parameter("location", "Location", Location.class));
   }
 }
