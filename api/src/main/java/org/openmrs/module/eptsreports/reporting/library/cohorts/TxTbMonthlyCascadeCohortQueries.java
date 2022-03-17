@@ -75,6 +75,54 @@ public class TxTbMonthlyCascadeCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getSmearMicroscopy() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Smear Microscopy");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition exameBaciloscopia = getPatientsWithBaciloscopiaResult();
+    CohortDefinition haveBKTestRequest = getPatientsHaveBKTestRequest();
+    CohortDefinition haveBKTestResult = getPatientsHaveBKTestResult();
+    CohortDefinition dontHaveGENEXPERTInLabForm = getPatientsHaveGENEXPERTResultInLaboratotyForm();
+    CohortDefinition dontHaveGeneXpertPositive = getPatientsDontHaveGeneXpert();
+    CohortDefinition dontHaveApplication4LabResearch = getPatientsDontHaveApplication4LabResearch();
+
+    cd.addSearch(
+        "exameBaciloscopia",
+        EptsReportUtils.map(
+            exameBaciloscopia, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "haveBKTestRequest",
+        EptsReportUtils.map(
+            haveBKTestRequest, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "haveBKTestResult",
+        EptsReportUtils.map(
+            haveBKTestResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveGENEXPERTInLabForm",
+        EptsReportUtils.map(
+            dontHaveGENEXPERTInLabForm,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveGeneXpertPositive",
+        EptsReportUtils.map(
+            dontHaveGeneXpertPositive,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "dontHaveApplication4LabResearch",
+        EptsReportUtils.map(
+            dontHaveApplication4LabResearch,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "exameBaciloscopia OR haveBKTestRequest OR (haveBKTestResult AND ontHaveGENEXPERTInLabForm) AND dontHaveGeneXpertPositive AND dontHaveApplication4LabResearch ");
+
+    return cd;
+  }
+
   public CohortDefinition getPatientsWithClinicalConsultationInLast6Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -332,8 +380,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("703", tbMetadata.getPositiveConcept().getConceptId());
     map.put("664", tbMetadata.getNegativeConcept().getConceptId());
     String query =
-        ""
-            + "SELECT p.patient_id "
+             "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
@@ -341,11 +388,11 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided =0 "
+            + "       AND o.voided = 0 "
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${307} "
-            + "       AND o.value_coded = In(${703}, ${664}) "
+            + "       AND o.value_coded IN(${703}, ${664}) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + " GROUP BY p.patient_id ";
 
@@ -388,7 +435,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23723} "
-            + "       AND o.value_coded = In(${703}, ${664}) "
+            + "       AND o.value_coded  IN (${703}, ${664}) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND endDate"
             + " GROUP BY p.patient_id ";
     ;
@@ -408,7 +455,7 @@ public class TxTbMonthlyCascadeCohortQueries {
   public CohortDefinition getPatientsDontHaveGeneXpert() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
-        "Do not have GeneXpert( concept id 23723) with any value coded Positive");
+        "Do not have GeneXpert( concept id 23723) with any value coded Positive or Negative");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
@@ -432,7 +479,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23723} "
-            + "       AND o.value_coded = In(${703}, ${664}) "
+            + "       AND o.value_coded  NOT IN(${703}, ${664}) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + " GROUP BY p.patient_id ";
     ;
@@ -477,8 +524,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND o.concept_id = ${23722} "
             + "       AND o.value_coded <> ${23723} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + " GROUP BY p.patient_id "
-    ;
+            + " GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
