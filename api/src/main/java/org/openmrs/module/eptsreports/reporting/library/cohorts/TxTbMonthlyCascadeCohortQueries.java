@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -10,8 +11,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -48,47 +47,6 @@ public class TxTbMonthlyCascadeCohortQueries {
     return chd;
   }
 
-  public enum Indicator1and2Composition {
-    TXCURR {
-      @Override
-      public String getKey() {
-        return "TXCURR";
-      }
-
-      @Override
-      public String getCompositionString() {
-        return getKey();
-      }
-
-      @Override
-      public String getName() {
-        return "Select all patients from TX CURR";
-      }
-    },
-    TXCURR_AND_CLINICAL_CONSULTATION {
-      @Override
-      public String getKey() {
-        return "CLINICAL";
-      }
-
-      @Override
-      public String getCompositionString() {
-        return TXCURR.getKey() + " AND " + getKey();
-      }
-
-      @Override
-      public String getName() {
-        return "TX_CURR with clinical consultation in last 6 months ";
-      }
-    };
-
-    public abstract String getKey();
-
-    public abstract String getCompositionString();
-
-    public abstract String getName();
-  }
-
   public CohortDefinition getPatientsWithClinicalConsultationInLast6Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -118,6 +76,31 @@ public class TxTbMonthlyCascadeCohortQueries {
   }
 
   public CohortDefinition getPatientsNewOnArt() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients New on ART");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition startedArtLast6Months = getPatientsStartedArtLast6MonthsFromEndDate();
+    CohortDefinition transferredFromProgram = getPatientsTransferredInFromProgram();
+    CohortDefinition transferredFromFichaResumo = getPatientsTransferredInFromFichaResumo();
+
+    cd.addSearch(
+        "startedArtLast6Months",
+        EptsReportUtils.map(startedArtLast6Months, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredFromProgram",
+        EptsReportUtils.map(transferredFromProgram, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredFromFichaResumo",
+        EptsReportUtils.map(transferredFromFichaResumo, "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "startedArtLast6Months AND NOT(transferredFromProgram OR transferredFromFichaResumo)");
+    return cd;
+  }
+
+  public CohortDefinition getPatientsStartedArtLast6MonthsFromEndDate() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients New on ART  ");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -251,18 +234,18 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
-
-  public CohortDefinition getPatientsTransferredInFromProgram(){
+  public CohortDefinition getPatientsTransferredInFromProgram() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Transferred-in from patient program");
-    sqlCohortDefinition.addParameter(new Parameter("endDate","End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("2", hivMetadata.getARTProgram().getProgramId());
 
-    String query = ""
+    String query =
+        ""
             + "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN patient_program pg "
@@ -280,6 +263,95 @@ public class TxTbMonthlyCascadeCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(sb.replace(query));
     return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsTransferredInFromFichaResumo() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Transferred-in from patient program");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1369", hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN obs o2 "
+            + "               ON o2.encounter_id = e.encounter_id "
+            + "       INNER JOIN obs o3 "
+            + "               ON o3.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "       AND o3.voided = 0 "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${1369} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND o.obs_datetime <= endDate "
+            + "       AND o2.concept_id = ${6300} "
+            + "       AND o2.value_coded = ${6276} "
+            + "       AND o.obs_datetime <> o2.obs_datetime "
+            + "       AND o3.concept_id = ${23891} "
+            + "       AND o3.value_datetime <= endDate "
+            + "GROUP  BY patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  public enum Indicator1and2Composition {
+    TXCURR {
+      @Override
+      public String getKey() {
+        return "TXCURR";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    TXCURR_AND_CLINICAL_CONSULTATION {
+      @Override
+      public String getKey() {
+        return "CLINICAL";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXCURR.getKey() + " AND " + getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX_CURR with clinical consultation in last 6 months ";
+      }
+    };
+
+    public abstract String getKey();
+
+    public abstract String getCompositionString();
+
+    public abstract String getName();
   }
 
   private List<Parameter> getParameters() {
