@@ -69,9 +69,9 @@ public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
         "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
 
     // add a base cohort here to help in calculations running
-    reportDefinition.setBaseCohortDefinition(
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endaDate},location=${location}"));
+    // reportDefinition.setBaseCohortDefinition(
+    //   EptsReportUtils.map(
+    //     genericCohortQueries.getBaseCohort(), "endDate=${endaDate},location=${location}"));
 
     return reportDefinition;
   }

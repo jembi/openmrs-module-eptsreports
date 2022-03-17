@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -11,6 +10,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -47,6 +48,32 @@ public class TxTbMonthlyCascadeCohortQueries {
     return chd;
   }
 
+  public CohortDefinition getPatientsNewOnArt() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients New on ART");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition startedArtLast6Months = getPatientsStartedArtLast6MonthsFromEndDate();
+    CohortDefinition transferredFromProgram = getPatientsTransferredInFromProgram();
+    CohortDefinition transferredFromFichaResumo = getPatientsTransferredInFromFichaResumo();
+
+    cd.addSearch(
+            "startedArtLast6Months",
+            EptsReportUtils.map(startedArtLast6Months, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+            "transferredFromProgram",
+            EptsReportUtils.map(transferredFromProgram, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+            "transferredFromFichaResumo",
+            EptsReportUtils.map(transferredFromFichaResumo, "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+            "startedArtLast6Months AND NOT(transferredFromProgram OR transferredFromFichaResumo)");
+    return cd;
+  }
+
+
   public CohortDefinition getPatientsWithClinicalConsultationInLast6Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -75,30 +102,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
-  public CohortDefinition getPatientsNewOnArt() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Patients New on ART");
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition startedArtLast6Months = getPatientsStartedArtLast6MonthsFromEndDate();
-    CohortDefinition transferredFromProgram = getPatientsTransferredInFromProgram();
-    CohortDefinition transferredFromFichaResumo = getPatientsTransferredInFromFichaResumo();
-
-    cd.addSearch(
-        "startedArtLast6Months",
-        EptsReportUtils.map(startedArtLast6Months, "endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferredFromProgram",
-        EptsReportUtils.map(transferredFromProgram, "endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "transferredFromFichaResumo",
-        EptsReportUtils.map(transferredFromFichaResumo, "endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString(
-        "startedArtLast6Months AND NOT(transferredFromProgram OR transferredFromFichaResumo)");
-    return cd;
-  }
 
   public CohortDefinition getPatientsStartedArtLast6MonthsFromEndDate() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -106,6 +110,98 @@ public class TxTbMonthlyCascadeCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    String patientsOnArtQuery = getPatientsOnArt(true);
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   ( "+ patientsOnArtQuery +" ) new_art "
+            + "WHERE  new_art.art_date BETWEEN Date_add(:endDate, INTERVAL -6 month) AND :endDate";
+
+    sqlCohortDefinition.setQuery(patientsOnArtQuery);
+
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsTransferredInFromProgram() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Transferred-in from patient program");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+
+    String query =
+        ""
+            + "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN patient_program pg "
+            + "               ON pg.patient_id = p.patient_id "
+            + "       INNER JOIN patient_state ps "
+            + "               ON ps.patient_program_id = pg.patient_program_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND pg.voided = 0 "
+            + "       AND ps.voided = 0 "
+            + "       AND pg.program_id = ${2} "
+            + "       AND pg.location_id = :location "
+            + "       AND ps.state = 29 "
+            + "       AND ps.start_date <= :endDate ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsTransferredInFromFichaResumo() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Transferred-in from patient program");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1369", hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN obs o2 "
+            + "               ON o2.encounter_id = e.encounter_id "
+            + "       INNER JOIN obs o3 "
+            + "               ON o3.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "       AND o3.voided = 0 "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${1369} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND o.obs_datetime <= :endDate "
+            + "       AND o2.concept_id = ${6300} "
+            + "       AND o2.value_coded = ${6276} "
+            + "       AND o.obs_datetime <> o2.obs_datetime "
+            + "       AND o3.concept_id = ${23891} "
+            + "       AND o3.value_datetime <= :endDate "
+            + "GROUP  BY patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
+    return sqlCohortDefinition;
+  }
+
+  private String getPatientsOnArt(boolean selectArtDate) {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
@@ -125,10 +221,8 @@ public class TxTbMonthlyCascadeCohortQueries {
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
-
     String query =
-        "SELECT patient_id "
-            + "FROM   (SELECT art.patient_id, "
+        "SELECT art.patient_id, "
             + "               Min(art.art_date) art_date "
             + "        FROM   (SELECT p.patient_id, "
             + "                       Min(e.encounter_datetime) art_date "
@@ -226,91 +320,10 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "                       AND e.voided = 0 "
             + "                       AND p.voided = 0 "
             + "                GROUP  BY p.patient_id) art "
-            + "        GROUP  BY art.patient_id) new_art "
-            + "WHERE  new_art.art_date BETWEEN Date_add(:endDate, INTERVAL -6 month) AND :endDate";
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+            + "        GROUP  BY art.patient_id";
+    StringSubstitutor sb = new StringSubstitutor(valuesMap);
 
-    return sqlCohortDefinition;
-  }
-
-  public CohortDefinition getPatientsTransferredInFromProgram() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Transferred-in from patient program");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("2", hivMetadata.getARTProgram().getProgramId());
-
-    String query =
-        ""
-            + "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN patient_program pg "
-            + "               ON pg.patient_id = p.patient_id "
-            + "       INNER JOIN patient_state ps "
-            + "               ON ps.patient_program_id = pg.patient_program_id "
-            + "WHERE  p.voided = 0 "
-            + "       AND pg.voided = 0 "
-            + "       AND ps.voided = 0 "
-            + "       AND pg.program_id = ${2} "
-            + "       AND pg.location_id = :location "
-            + "       AND ps.state = 29 "
-            + "       AND ps.start_date <= :endDate ";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    sqlCohortDefinition.setQuery(sb.replace(query));
-    return sqlCohortDefinition;
-  }
-
-  public CohortDefinition getPatientsTransferredInFromFichaResumo() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Transferred-in from patient program");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1369", hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
-    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-
-    String query =
-        "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN obs o2 "
-            + "               ON o2.encounter_id = e.encounter_id "
-            + "       INNER JOIN obs o3 "
-            + "               ON o3.encounter_id = e.encounter_id "
-            + "WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND o2.voided = 0 "
-            + "       AND o3.voided = 0 "
-            + "       AND e.encounter_type = ${53} "
-            + "       AND e.location_id = :location "
-            + "       AND o.concept_id = ${1369} "
-            + "       AND o.value_coded = ${1065} "
-            + "       AND o.obs_datetime <= endDate "
-            + "       AND o2.concept_id = ${6300} "
-            + "       AND o2.value_coded = ${6276} "
-            + "       AND o.obs_datetime <> o2.obs_datetime "
-            + "       AND o3.concept_id = ${23891} "
-            + "       AND o3.value_datetime <= endDate "
-            + "GROUP  BY patient_id";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    sqlCohortDefinition.setQuery(sb.replace(query));
-    return sqlCohortDefinition;
+    return sb.replace(query);
   }
 
   public enum Indicator1and2Composition {
