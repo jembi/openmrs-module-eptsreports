@@ -50,7 +50,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
   public CohortDefinition getPatientsNewOnArt() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Patients New on ART");
+    cd.setName("Patients New on ART (A)");
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
@@ -59,20 +59,19 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition transferredFromFichaResumo = getPatientsTransferredInFromFichaResumo();
 
     cd.addSearch(
-            "startedArtLast6Months",
-            EptsReportUtils.map(startedArtLast6Months, "endDate=${endDate},location=${location}"));
+        "startedArtLast6Months",
+        EptsReportUtils.map(startedArtLast6Months, "endDate=${endDate},location=${location}"));
     cd.addSearch(
-            "transferredFromProgram",
-            EptsReportUtils.map(transferredFromProgram, "endDate=${endDate},location=${location}"));
+        "transferredFromProgram",
+        EptsReportUtils.map(transferredFromProgram, "endDate=${endDate},location=${location}"));
     cd.addSearch(
-            "transferredFromFichaResumo",
-            EptsReportUtils.map(transferredFromFichaResumo, "endDate=${endDate},location=${location}"));
+        "transferredFromFichaResumo",
+        EptsReportUtils.map(transferredFromFichaResumo, "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-            "startedArtLast6Months AND NOT(transferredFromProgram OR transferredFromFichaResumo)");
+        "startedArtLast6Months AND NOT(transferredFromProgram OR transferredFromFichaResumo)");
     return cd;
   }
-
 
   public CohortDefinition getPatientsWithClinicalConsultationInLast6Months() {
 
@@ -102,8 +101,6 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
-
-
   public CohortDefinition getPatientsStartedArtLast6MonthsFromEndDate() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients New on ART  ");
@@ -114,10 +111,12 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     String query =
         "SELECT patient_id "
-            + "FROM   ( "+ patientsOnArtQuery +" ) new_art "
+            + "FROM   ( "
+            + patientsOnArtQuery
+            + " ) new_art "
             + "WHERE  new_art.art_date BETWEEN Date_add(:endDate, INTERVAL -6 month) AND :endDate";
 
-    sqlCohortDefinition.setQuery(patientsOnArtQuery);
+    sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
   }
@@ -201,6 +200,32 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
+  public CohortDefinition getPatientsOnArtBeforeEndDate() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients Previously on ART - Before End Date");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    String patientsOnArt = getPatientsOnArt(false);
+    sqlCohortDefinition.setQuery(patientsOnArt);
+    return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientsPreviouslyOnArt(){
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Patients Previously on ART (B)");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Date.class));
+
+    CohortDefinition onArtBeforeEndDate = getPatientsOnArtBeforeEndDate();
+    CohortDefinition newOnArt = getPatientsNewOnArt();
+    cd.addSearch("newOnArt", EptsReportUtils.map(newOnArt,"endDate=${endDate},location=${location}"));
+    cd.addSearch("onArtBeforeEndDate", EptsReportUtils.map(onArtBeforeEndDate,"endDate=${endDate},location=${location}"));
+    cd.setCompositionString("onArtBeforeEndDate AND NOT newOnArt");
+    return cd;
+  }
+
   private String getPatientsOnArt(boolean selectArtDate) {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -221,10 +246,9 @@ public class TxTbMonthlyCascadeCohortQueries {
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
-    String query =
-        "SELECT art.patient_id, "
-            + "               Min(art.art_date) art_date "
-            + "        FROM   (SELECT p.patient_id, "
+
+    String fromSql =
+        "        FROM   (SELECT p.patient_id, "
             + "                       Min(e.encounter_datetime) art_date "
             + "                FROM   patient p "
             + "                       INNER JOIN encounter e "
@@ -321,6 +345,11 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "                       AND p.voided = 0 "
             + "                GROUP  BY p.patient_id) art "
             + "        GROUP  BY art.patient_id";
+    String query =
+        selectArtDate
+            ? "SELECT art.patient_id, Min(art.art_date) art_date ".concat(fromSql)
+            : "SELECT art.patient_id ".concat(fromSql);
+
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
 
     return sb.replace(query);
