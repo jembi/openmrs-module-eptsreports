@@ -569,9 +569,7 @@ public class TXTBCohortQueries {
             "ResultForBasiloscopia",
             TXTBQueries.resultForBasiloscopia(
                 hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                hivMetadata.getResultForBasiloscopia().getConceptId(),
-                commonMetadata.getPositive().getConceptId(),
-                commonMetadata.getNegative().getConceptId()));
+                hivMetadata.getResultForBasiloscopia().getConceptId()));
     addGeneralParameters(cd);
     return cd;
   }
