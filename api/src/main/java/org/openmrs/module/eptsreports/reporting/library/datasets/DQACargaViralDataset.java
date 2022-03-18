@@ -41,7 +41,6 @@ public class DQACargaViralDataset extends BaseDataSet {
         dQACargaViralCohortQueries.getBaseCohort(),
         "startDate=${startDate},endDate=${endDate},location=${location}");
 
-
     /** Patient counter - Sheet 1: Column A */
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 

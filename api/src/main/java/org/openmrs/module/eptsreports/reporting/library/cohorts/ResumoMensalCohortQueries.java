@@ -2666,9 +2666,7 @@ public class ResumoMensalCohortQueries {
           map(startedArt, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     } else {
-      cd.addSearch(
-          "startedArt",
-          map(startedArt, "onOrBefore=${endDate},onOrAfter=${startDate},location=${location}"));
+      cd.addSearch("startedArt", map(startedArt, mappingsOnDate));
     }
     cd.addSearch("fila", map(fila, mappingsOnDate));
     cd.addSearch("masterCardPickup", map(masterCardPickup, mappingsOnDate));
