@@ -638,7 +638,7 @@ public class TXTBCohortQueries {
         "started-art-before-startDate-including-transferred-in",
         EptsReportUtils.map(
             genericCohortQueries.getStartedArtBeforeDate(true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.setCompositionString(
         "started-art-on-period-including-transferred-in OR started-art-before-startDate-including-transferred-in");
@@ -1132,7 +1132,7 @@ public class TXTBCohortQueries {
         "started-before-start-reporting-period",
         EptsReportUtils.map(
             genericCohortQueries.getStartedArtBeforeDate(false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "onOrBefore=${startDate-1d},location=${location}"));
     cd.setCompositionString("NUM AND started-before-start-reporting-period");
     addGeneralParameters(cd);
     return cd;
