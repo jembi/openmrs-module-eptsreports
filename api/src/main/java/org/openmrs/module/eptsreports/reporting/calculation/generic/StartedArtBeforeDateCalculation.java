@@ -19,8 +19,6 @@ import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.module.eptsreports.reporting.calculation.AbstractPatientCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.BooleanResult;
-import org.openmrs.module.reporting.common.DateUtil;
-import org.openmrs.module.reporting.common.DurationUnit;
 import org.springframework.stereotype.Component;
 
 /** Returns the patients that have started ART before a specific date */
@@ -28,7 +26,6 @@ import org.springframework.stereotype.Component;
 public class StartedArtBeforeDateCalculation extends AbstractPatientCalculation {
 
   private static final String ON_OR_BEFORE = "onOrBefore";
-  private static final String ON_OR_AFTER = "onOrAfter";
 
   @Override
   public CalculationResultMap evaluate(
@@ -43,10 +40,6 @@ public class StartedArtBeforeDateCalculation extends AbstractPatientCalculation 
             parameterValues,
             context);
     Date endDate = (Date) parameterValues.get(ON_OR_BEFORE);
-    Date onOrAfter = (Date) context.getFromCache(ON_OR_AFTER);
-    if (onOrAfter != null) {
-      onOrAfter = DateUtil.adjustDate(onOrAfter, -1, DurationUnit.DAYS);
-    }
     if (endDate == null) {
       endDate = (Date) context.getFromCache(ON_OR_BEFORE);
     }
@@ -54,7 +47,7 @@ public class StartedArtBeforeDateCalculation extends AbstractPatientCalculation 
       for (Integer patientId : cohort) {
         Date artStartDate =
             InitialArtStartDateCalculation.getArtStartDate(patientId, artStartDates);
-        if (artStartDate != null && artStartDate.compareTo(onOrAfter) <= 0) {
+        if (artStartDate != null && artStartDate.compareTo(endDate) <= 0) {
           map.put(patientId, new BooleanResult(true, this));
         }
       }
