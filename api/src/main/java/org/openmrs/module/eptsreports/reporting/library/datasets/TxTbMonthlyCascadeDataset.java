@@ -125,10 +125,10 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
-            "TXCLINICALART",
-            "TXCLINICALART",
-            EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
-            "");
+        "TXCLINICALART",
+        "TXCLINICALART",
+        EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
+        "");
 
     addRow(
         cohortIndicatorDefinition,
@@ -159,6 +159,64 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "TXCLINICALPREV",
         "TXCLINICALPREV",
         EptsReportUtils.map(TXCLINICALPREV, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // 3.a TX_TB denominator: Number of patients on ART who were screened for TB in the last 6
+    // months
+
+    CohortIndicator TXTBDENTOTAL =
+        eptsGeneralIndicator.getIndicator(
+            "TXTBDENTOTAL",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "TXTBDENTOTAL",
+        "TXTBDENTOTAL",
+        EptsReportUtils.map(TXCURR, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator TXTBDEN =
+        eptsGeneralIndicator.getIndicator(
+            "TXTBDEN",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_AND_NEWART),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "TXTBDEN",
+        "TXTBDEN",
+        EptsReportUtils.map(TXTBDEN, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "TXTBDEN",
+        "TXTBDEN",
+        EptsReportUtils.map(TXTBDEN, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // previously
+    CohortIndicator TXTBDENPREV =
+        eptsGeneralIndicator.getIndicator(
+            "TXTBDENPREV",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_AND_PREVIOUSLYART),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "TXTBDENPREV",
+        "TXTBDENPREV",
+        EptsReportUtils.map(TXTBDENPREV, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "TXTBDENPREV",
+        "TXTBDENPREV",
+        EptsReportUtils.map(TXTBDENPREV, "endDate=${endDate},location=${location}"),
         getSexAndAgeDimension());
 
     return cohortIndicatorDefinition;

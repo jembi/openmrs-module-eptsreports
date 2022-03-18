@@ -27,7 +27,7 @@ public class TxTbMonthlyCascadeCohortQueries {
   @Autowired private TbMetadata tbMetadata;
 
   public CohortDefinition getTxCurrOrTxCurrWithClinicalConsultation(
-          TxCurrComposition indicator1and2Composition) {
+      TxCurrComposition indicator1and2Composition) {
     CompositionCohortDefinition chd = new CompositionCohortDefinition();
     chd.addParameter(new Parameter("startDate", "startDate", Date.class));
     chd.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -38,61 +38,60 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
 
     chd.addSearch(
-            TxCurrComposition.TXCURR.getKey(),
-            EptsReportUtils.map(
-                    txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
-                    "onOrBefore=${endDate},location=${location}"));
+        TxCurrComposition.TXCURR.getKey(),
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
+            "onOrBefore=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxCurrComposition.CLINICAL.getKey(),
-            EptsReportUtils.map(
-                    getPatientsWithClinicalConsultationInLast6Months(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        TxCurrComposition.CLINICAL.getKey(),
+        EptsReportUtils.map(
+            getPatientsWithClinicalConsultationInLast6Months(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxCurrComposition.NEWART.getKey(),
-            EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+        TxCurrComposition.NEWART.getKey(),
+        EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxCurrComposition.PREVIOUSLYART.getKey(),
-            EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+        TxCurrComposition.PREVIOUSLYART.getKey(),
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
 
     chd.setCompositionString(indicator1and2Composition.getCompositionString());
     return chd;
   }
 
-  public CohortDefinition getTxCurrOrTxtCohort(
-          TxCurrComposition indicator1and2Composition) {
+  public CohortDefinition getTxTbDenominatorCohort(TxTbComposition txTbComposition) {
     CompositionCohortDefinition chd = new CompositionCohortDefinition();
     chd.addParameter(new Parameter("startDate", "startDate", Date.class));
     chd.addParameter(new Parameter("endDate", "endDate", Date.class));
     chd.addParameter(new Parameter("location", "location", Location.class));
-    chd.setName(indicator1and2Composition.getName());
+    chd.setName(txTbComposition.getName());
 
     CohortDefinition newOnArt = getPatientsNewOnArt();
     CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
 
     chd.addSearch(
-            TxCurrComposition.TXCURR.getKey(),
-            EptsReportUtils.map(
-                    txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
-                    "onOrBefore=${endDate},location=${location}"));
+        TxTbComposition.TXTB.getKey(),
+        EptsReportUtils.map(
+            txtbCohortQueries.getDenominator(),
+            "startDate=${startDate},endDate=endDate,location=${location}"));
 
     chd.addSearch(
-            TxCurrComposition.CLINICAL.getKey(),
-            EptsReportUtils.map(
-                    getPatientsWithClinicalConsultationInLast6Months(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        TxTbComposition.CLINICAL.getKey(),
+        EptsReportUtils.map(
+            getPatientsWithClinicalConsultationInLast6Months(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxCurrComposition.NEWART.getKey(),
-            EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+        TxTbComposition.NEWART.getKey(),
+        EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxCurrComposition.PREVIOUSLYART.getKey(),
-            EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+        TxTbComposition.PREVIOUSLYART.getKey(),
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
 
-    chd.setCompositionString(indicator1and2Composition.getCompositionString());
+    chd.setCompositionString(txTbComposition.getCompositionString());
     return chd;
   }
 
@@ -142,8 +141,6 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.setCompositionString("txcurr AND previouslyOnArt");
     return cd;
   }
-
-
 
   public CohortDefinition getPatientsNewOnArt() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1636,8 +1633,7 @@ public class TxTbMonthlyCascadeCohortQueries {
       public String getName() {
         return " TXCURR AND CLINICAL AND PREVIOUSLY ON ART ";
       }
-    }
-    ;
+    };
 
     public abstract String getKey();
 
@@ -1729,6 +1725,39 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "TXTB with clinical consultation in last 6 months ";
       }
     },
+    TXTB_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXTB.getKey() + " AND " + PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TXTB with clinical consultation in last 6 months ";
+      }
+    },
+
+    TXTB_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXTB.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TXTB New ART ";
+      }
+    },
     TXTB_AND_CLINICAL_AND_NEWART {
       @Override
       public String getKey() {
@@ -1761,8 +1790,7 @@ public class TxTbMonthlyCascadeCohortQueries {
       public String getName() {
         return " TXTB AND CLINICAL AND PREVIOUSLY ON ART ";
       }
-    }
-    ;
+    };
 
     public abstract String getKey();
 
