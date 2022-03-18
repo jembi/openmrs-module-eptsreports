@@ -2,8 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
-import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.*;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
@@ -41,6 +40,8 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
+    cohortIndicatorDefinition.addDimension(
+        "gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
     CohortIndicator TXCURR =
         eptsGeneralIndicator.getIndicator(
@@ -56,20 +57,127 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(TXCURR, "endDate=${endDate},location=${location}"),
         "");
 
-    CohortIndicator Clinical =
+    CohortIndicator NEWART =
         eptsGeneralIndicator.getIndicator(
-            "CLINICAL",
+            "NEWART ",
             EptsReportUtils.map(
-                txTbMonthlyCascadeCohortQueries.getPatientsWithoutGeneXpertHaveTbLamOrRequest(),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                txTbMonthlyCascadeCohortQueries.getPatientsOnTxCurrAndNewOnArt(),
+                "endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
-        "CLINICAL",
-        "FICHA CLINICA",
-        EptsReportUtils.map(Clinical, "endDate=${endDate},location=${location}"),
+        "NEWART ",
+        "NEWART",
+        EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
         "");
 
+    addRow(
+        cohortIndicatorDefinition,
+        "NEWART",
+        "New on ART",
+        EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+    // Previously On ART
+    CohortIndicator PREVIOUSLYART =
+        eptsGeneralIndicator.getIndicator(
+            "PREVIOUSLYART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getPatientsOnTxCurrAndPreviouslyOnArt(),
+                "endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "PREVIOUSLYART",
+        "PREVIOUSLYART",
+        EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
+        "");
+
+    addRow(
+        cohortIndicatorDefinition,
+        "PREVIOUSLYART",
+        "PREVIOUSLYART",
+        EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
     return cohortIndicatorDefinition;
+  }
+
+  private List<ColumnParameters> getSexAndAgeDimension() {
+    ColumnParameters female =
+        new ColumnParameters(
+            "female",
+            "female",
+            EptsCommonDimensionKey.of(DimensionKeyForGender.female).getDimensions(),
+            "female");
+
+    ColumnParameters over15Female =
+        new ColumnParameters(
+            "above15Female",
+            "above 15 female",
+            EptsCommonDimensionKey.of(DimensionKeyForGender.female)
+                .and(DimensionKeyForAge.overOrEqualTo15Years)
+                .getDimensions(),
+            "above15Female");
+
+    ColumnParameters bellow15Female =
+        new ColumnParameters(
+            "bellow15Female",
+            "bellow15Female",
+            EptsCommonDimensionKey.of(DimensionKeyForGender.female)
+                .and(DimensionKeyForAge.bellow15Years)
+                .getDimensions(),
+            "bellow15Female");
+
+    ColumnParameters unknownAgeFemale =
+        new ColumnParameters(
+            "unknownAgeFemale",
+            "unknownAgeFemale",
+            EptsCommonDimensionKey.of(DimensionKeyForGender.female)
+                .and(DimensionKeyForAge.unknown)
+                .getDimensions(),
+            "unknownAgeFemale");
+
+    ColumnParameters male =
+        new ColumnParameters(
+            "male",
+            "male",
+            EptsCommonDimensionKey.of(DimensionKeyForGender.male).getDimensions(),
+            "male");
+
+    ColumnParameters over15Male =
+        new ColumnParameters(
+            "above15Male",
+            "above15Male",
+            EptsCommonDimensionKey.of(DimensionKeyForGender.male)
+                .and(DimensionKeyForAge.overOrEqualTo15Years)
+                .getDimensions(),
+            "above15Male");
+
+    ColumnParameters bellow15Male =
+        new ColumnParameters(
+            "bellow15Male",
+            "bellow15Male",
+            EptsCommonDimensionKey.of(DimensionKeyForGender.male)
+                .and(DimensionKeyForAge.bellow15Years)
+                .getDimensions(),
+            "bellow15Male");
+
+    ColumnParameters unknownAgeMale =
+        new ColumnParameters(
+            "unknownAgeMale",
+            "unknownAgeMale",
+            EptsCommonDimensionKey.of(DimensionKeyForGender.male)
+                .and(DimensionKeyForAge.unknown)
+                .getDimensions(),
+            "unknownAgeMale");
+
+    return Arrays.asList(
+        bellow15Female,
+        over15Female,
+        unknownAgeFemale,
+        female,
+        bellow15Male,
+        over15Male,
+        unknownAgeMale,
+        male);
   }
 
   @Override
