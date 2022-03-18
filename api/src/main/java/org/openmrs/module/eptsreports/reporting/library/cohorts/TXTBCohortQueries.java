@@ -646,6 +646,27 @@ public class TXTBCohortQueries {
     return cd;
   }
 
+  public CohortDefinition artListNum() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.addSearch(
+        "started-art-on-period-including-transferred-in",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtOnPeriod(true, true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "started-art-before-startDate-including-transferred-in",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtBeforeDateTxTbNum(true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "started-art-on-period-including-transferred-in OR started-art-before-startDate-including-transferred-in");
+    addGeneralParameters(cd);
+    return cd;
+  }
+
   /**
    * <b>Description:</b> Positive Investigation Research result <b>(concept_id = 6277)</b> Positivo
    * <b>(concept_id = 1065)</b> in the follow-up (Adult and Children)
@@ -765,7 +786,7 @@ public class TXTBCohortQueries {
         "patientsWhoInitiatedTbTreatment",
         map(patientsWhoInitiatedTbTreatment, generalParameterMapping));
 
-    CohortDefinition artList = artList();
+    CohortDefinition artList = artListNum();
     cd.addSearch("artList", map(artList, generalParameterMapping));
     cd.setCompositionString(
         "(i OR ii OR patientswithPulmonaryTbDate OR patientsWhoInitiatedTbTreatment) AND artList");
@@ -1131,8 +1152,8 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-before-start-reporting-period",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDate(false),
-            "onOrBefore=${startDate-1d},location=${location}"));
+            genericCohortQueries.getStartedArtBeforeDateTxTbNum(false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("NUM AND started-before-start-reporting-period");
     addGeneralParameters(cd);
     return cd;
