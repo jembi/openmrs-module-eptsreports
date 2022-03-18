@@ -474,7 +474,6 @@ public class GenericCohortQueries {
     cd.addCalculationParameter("considerTransferredIn", considerTransferredIn);
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
     return cd;
   }
 
@@ -482,7 +481,7 @@ public class GenericCohortQueries {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(StartedArtBeforeDateForTxTbCalculation.class).get(0));
-    cd.setName("Art start date");
+    cd.setName("Art start date TX TB");
     cd.addCalculationParameter("considerTransferredIn", considerTransferredIn);
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
