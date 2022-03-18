@@ -243,6 +243,11 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_AND_TXCURR_AND_NEWART),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "TXTBTXCURRNEW",
+        "TTXTBTXCURRNEW",
+        EptsReportUtils.map(TXTBTXCURRNEW, "endDate=${endDate},location=${location}"),
+        "");
     addRow(
         cohortIndicatorDefinition,
         "TXTBTXCURRNEW",
@@ -258,10 +263,71 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition
                         .TXTB_AND_TXCURR_AND_PREVIOUSLYART),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "TXTBTXCURRPREV",
+        "TXTBTXCURRPREV",
+        EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
+        "");
     addRow(
         cohortIndicatorDefinition,
         "TXTBTXCURRPREV",
         "TXTBTXCURRPREV",
+        EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // 4a. Positive TB screening or specimen sent or notified with TB: Number of ART patients who
+    // were screened positive for TB in the last six months
+
+    CohortIndicator POSITIVESCREENING =
+        eptsGeneralIndicator.getIndicator(
+            "POSITIVESCREENING",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.POSITIVESCREENING),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "POSITIVESCREENING",
+        "POSITIVESCREENING",
+        EptsReportUtils.map(POSITIVESCREENING, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator POSITIVENEWART =
+        eptsGeneralIndicator.getIndicator(
+            "POSITIVENEWART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.POSITIVESCREENING_AND_NEWART),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "POSITIVENEWART",
+        "POSITIVENEWART",
+        EptsReportUtils.map(TXTBTXCURRNEW, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "POSITIVENEWART",
+        "POSITIVENEWART",
+        EptsReportUtils.map(POSITIVENEWART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    CohortIndicator POSITIVEPREVIOUSLYRT =
+        eptsGeneralIndicator.getIndicator(
+            "POSITIVEPREVIOUSLYRT",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition
+                        .POSITIVESCREENING_AND_PREVIOUSLYRT),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "POSITIVEPREVIOUSLYRT",
+        "POSITIVEPREVIOUSLYRT",
+        EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
+        "");
+    addRow(
+        cohortIndicatorDefinition,
+        "POSITIVEPREVIOUSLYRT",
+        "POSITIVEPREVIOUSLYRT",
         EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
         getSexAndAgeDimension());
 

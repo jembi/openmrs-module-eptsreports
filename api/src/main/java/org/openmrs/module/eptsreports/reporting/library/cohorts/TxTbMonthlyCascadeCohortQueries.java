@@ -75,6 +75,11 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(
             txtbCohortQueries.getDenominator(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+    chd.addSearch(
+        TxTbComposition.POSITIVESCREENING.getKey(),
+        EptsReportUtils.map(
+            txtbCohortQueries.newOnARTPositiveScreening(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.CLINICAL.getKey(),
@@ -1695,6 +1700,55 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getName() {
         return "TX_CURR with clinical consultation in last 6 months ";
+      }
+    },
+
+    POSITIVESCREENING {
+      @Override
+      public String getKey() {
+        return "POSITIVESCREENING";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB POSITIVESCREENING ";
+      }
+    },
+    POSITIVESCREENING_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "POSITIVESCREENING";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB POSITIVESCREENING ";
+      }
+    },
+    POSITIVESCREENING_AND_PREVIOUSLYRT {
+      @Override
+      public String getKey() {
+        return "POSITIVESCREENING";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey() + " AND " + PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB PREVIOUSLY ART POSITIVESCREENING ";
       }
     },
 
