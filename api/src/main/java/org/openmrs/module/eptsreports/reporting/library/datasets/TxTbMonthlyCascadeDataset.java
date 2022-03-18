@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TXTBCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.*;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
@@ -25,6 +26,8 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
   @Autowired private EptsCommonDimension eptsCommonDimension;
 
+  @Autowired private TXTBCohortQueries txtbCohortQueries;
+
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
   private AgeDimensionCohortInterface ageDimensionCohort;
@@ -48,7 +51,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             "TXCURRTOTAL",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxCurrOrTxCurrWithClinicalConsultation(
-                    TxTbMonthlyCascadeCohortQueries.Indicator1and2Composition.TXCURR),
+                    TxTbMonthlyCascadeCohortQueries.TxCurrComposition.TXCURR),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
@@ -87,14 +90,75 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addColumn(
         "PREVIOUSLYART",
         "PREVIOUSLYART",
-        EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
+        EptsReportUtils.map(PREVIOUSLYART, "endDate=${endDate},location=${location}"),
         "");
 
     addRow(
         cohortIndicatorDefinition,
         "PREVIOUSLYART",
         "PREVIOUSLYART",
-        EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
+        EptsReportUtils.map(PREVIOUSLYART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    // 2.  With Clinical Consultation
+    CohortIndicator TXCLINICAL =
+        eptsGeneralIndicator.getIndicator(
+            "TXCLINICAL",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxCurrOrTxCurrWithClinicalConsultation(
+                    TxTbMonthlyCascadeCohortQueries.TxCurrComposition.TXCURR_AND_CLINICAL),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "TXCLINICAL",
+        "TXCLINICAL",
+        EptsReportUtils.map(TXCLINICAL, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator TXCLINICALART =
+        eptsGeneralIndicator.getIndicator(
+            "TXCLINICALART",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxCurrOrTxCurrWithClinicalConsultation(
+                    TxTbMonthlyCascadeCohortQueries.TxCurrComposition
+                        .TXCURR_AND_CLINICAL_AND_NEWART),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+            "TXCLINICALART",
+            "TXCLINICALART",
+            EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
+            "");
+
+    addRow(
+        cohortIndicatorDefinition,
+        "TXCLINICALART",
+        "TXCLINICALART",
+        EptsReportUtils.map(TXCLINICALART, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    //
+
+    CohortIndicator TXCLINICALPREV =
+        eptsGeneralIndicator.getIndicator(
+            "TXCLINICALPREV",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxCurrOrTxCurrWithClinicalConsultation(
+                    TxTbMonthlyCascadeCohortQueries.TxCurrComposition
+                        .TXCURR_AND_CLINICAL_AND_PREVIUSLYART),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "TXCLINICALPREV",
+        "TXCLINICALPREV",
+        EptsReportUtils.map(TXCLINICALPREV, "endDate=${endDate},location=${location}"),
+        "");
+
+    addRow(
+        cohortIndicatorDefinition,
+        "TXCLINICALPREV",
+        "TXCLINICALPREV",
+        EptsReportUtils.map(TXCLINICALPREV, "endDate=${endDate},location=${location}"),
         getSexAndAgeDimension());
 
     return cohortIndicatorDefinition;

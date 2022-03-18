@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +12,8 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.*;
+
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
 
@@ -24,6 +25,76 @@ public class TxTbMonthlyCascadeCohortQueries {
 
   @Autowired private HivMetadata hivMetadata;
   @Autowired private TbMetadata tbMetadata;
+
+  public CohortDefinition getTxCurrOrTxCurrWithClinicalConsultation(
+          TxCurrComposition indicator1and2Composition) {
+    CompositionCohortDefinition chd = new CompositionCohortDefinition();
+    chd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    chd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    chd.addParameter(new Parameter("location", "location", Location.class));
+    chd.setName(indicator1and2Composition.getName());
+
+    CohortDefinition newOnArt = getPatientsNewOnArt();
+    CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
+
+    chd.addSearch(
+            TxCurrComposition.TXCURR.getKey(),
+            EptsReportUtils.map(
+                    txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
+                    "onOrBefore=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxCurrComposition.CLINICAL.getKey(),
+            EptsReportUtils.map(
+                    getPatientsWithClinicalConsultationInLast6Months(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxCurrComposition.NEWART.getKey(),
+            EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxCurrComposition.PREVIOUSLYART.getKey(),
+            EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.setCompositionString(indicator1and2Composition.getCompositionString());
+    return chd;
+  }
+
+  public CohortDefinition getTxCurrOrTxtCohort(
+          TxCurrComposition indicator1and2Composition) {
+    CompositionCohortDefinition chd = new CompositionCohortDefinition();
+    chd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    chd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    chd.addParameter(new Parameter("location", "location", Location.class));
+    chd.setName(indicator1and2Composition.getName());
+
+    CohortDefinition newOnArt = getPatientsNewOnArt();
+    CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
+
+    chd.addSearch(
+            TxCurrComposition.TXCURR.getKey(),
+            EptsReportUtils.map(
+                    txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
+                    "onOrBefore=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxCurrComposition.CLINICAL.getKey(),
+            EptsReportUtils.map(
+                    getPatientsWithClinicalConsultationInLast6Months(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxCurrComposition.NEWART.getKey(),
+            EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxCurrComposition.PREVIOUSLYART.getKey(),
+            EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.setCompositionString(indicator1and2Composition.getCompositionString());
+    return chd;
+  }
 
   /**
    * Apply the disaggregation as following: Patients New on ART as follows (A)
@@ -72,29 +143,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getTxCurrOrTxCurrWithClinicalConsultation(
-      Indicator1and2Composition indicator1and2Composition) {
-    CompositionCohortDefinition chd = new CompositionCohortDefinition();
-    chd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    chd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    chd.addParameter(new Parameter("location", "location", Location.class));
-    chd.setName(indicator1and2Composition.getName());
 
-    chd.addSearch(
-        Indicator1and2Composition.TXCURR.getKey(),
-        EptsReportUtils.map(
-            txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
-            "onOrBefore=${endDate},location=${location}"));
-
-    chd.addSearch(
-        Indicator1and2Composition.TXCURR_AND_CLINICAL_CONSULTATION.getKey(),
-        EptsReportUtils.map(
-            getPatientsWithClinicalConsultationInLast6Months(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    chd.setCompositionString(indicator1and2Composition.getCompositionString());
-    return chd;
-  }
 
   public CohortDefinition getPatientsNewOnArt() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -1472,7 +1521,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sb.replace(query);
   }
 
-  public enum Indicator1and2Composition {
+  public enum TxCurrComposition {
     TXCURR {
       @Override
       public String getKey() {
@@ -1489,7 +1538,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
-    TXCURR_AND_CLINICAL_CONSULTATION {
+    CLINICAL {
       @Override
       public String getKey() {
         return "CLINICAL";
@@ -1497,14 +1546,223 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXCURR.getKey() + " AND " + getKey();
+        return getKey();
       }
 
       @Override
       public String getName() {
         return "TX_CURR with clinical consultation in last 6 months ";
       }
-    };
+    },
+
+    NEWART {
+      @Override
+      public String getKey() {
+        return "NEWART";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX_CURR with clinical consultation in last 6 months ";
+      }
+    },
+
+    PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "PREVIOUSLYART";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return " PREVIOUSLY ON ART ";
+      }
+    },
+    TXCURR_AND_CLINICAL {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXCURR.getKey() + " AND " + CLINICAL.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX_CURR with clinical consultation in last 6 months ";
+      }
+    },
+    TXCURR_AND_CLINICAL_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXCURR.getKey() + " AND " + CLINICAL.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX_CURR with clinical consultation in last 6 months ";
+      };
+    },
+
+    TXCURR_AND_CLINICAL_AND_PREVIUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXCURR.getKey() + " AND " + CLINICAL.getKey() + " AND " + PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return " TXCURR AND CLINICAL AND PREVIOUSLY ON ART ";
+      }
+    }
+    ;
+
+    public abstract String getKey();
+
+    public abstract String getCompositionString();
+
+    public abstract String getName();
+  }
+
+  public enum TxTbComposition {
+    TXTB {
+      @Override
+      public String getKey() {
+        return "TXTB";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TXTB";
+      }
+    },
+    CLINICAL {
+      @Override
+      public String getKey() {
+        return "CLINICAL";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX_CURR with clinical consultation in last 6 months ";
+      }
+    },
+
+    NEWART {
+      @Override
+      public String getKey() {
+        return "NEWART";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX_CURR with clinical consultation in last 6 months ";
+      }
+    },
+
+    PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "PREVIOUSLYART";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return " PREVIOUSLY ON ART ";
+      }
+    },
+    TXTB_AND_CLINICAL {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXTB.getKey() + " AND " + CLINICAL.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TXTB with clinical consultation in last 6 months ";
+      }
+    },
+    TXTB_AND_CLINICAL_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXTB.getKey() + " AND " + CLINICAL.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TXTB with clinical consultation in last 6 months ";
+      };
+    },
+
+    TXCURR_AND_CLINICAL_AND_PREVIUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXTB.getKey() + " AND " + CLINICAL.getKey() + " AND " + PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return " TXTB AND CLINICAL AND PREVIOUSLY ON ART ";
+      }
+    }
+    ;
 
     public abstract String getKey();
 
