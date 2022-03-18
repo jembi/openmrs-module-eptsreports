@@ -302,7 +302,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addColumn(
         "POSITIVENEWART",
         "POSITIVENEWART",
-        EptsReportUtils.map(TXTBTXCURRNEW, "endDate=${endDate},location=${location}"),
+        EptsReportUtils.map(POSITIVENEWART, "endDate=${endDate},location=${location}"),
         "");
     addRow(
         cohortIndicatorDefinition,
@@ -322,14 +322,177 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addColumn(
         "POSITIVEPREVIOUSLYRT",
         "POSITIVEPREVIOUSLYRT",
-        EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
+        EptsReportUtils.map(POSITIVEPREVIOUSLYRT , "endDate=${endDate},location=${location}"),
         "");
     addRow(
         cohortIndicatorDefinition,
         "POSITIVEPREVIOUSLYRT",
         "POSITIVEPREVIOUSLYRT",
-        EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
+        EptsReportUtils.map(POSITIVEPREVIOUSLYRT, "endDate=${endDate},location=${location}"),
         getSexAndAgeDimension());
+    //4b. Negative TB screening: Number of ART patients who were screened negative for TB in the last six months
+
+    CohortIndicator NEGATIVESCREENING =
+            eptsGeneralIndicator.getIndicator(
+                    "NEGATIVESCREENING",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.NEGATIVESCREENING),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+            "NEGATIVESCREENING",
+            "NEGATIVESCREENING",
+            EptsReportUtils.map(NEGATIVESCREENING, "endDate=${endDate},location=${location}"),
+            "");
+
+    CohortIndicator NEGATIVENEWART =
+            eptsGeneralIndicator.getIndicator(
+                    "NEGATIVENEWART",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.NEGATIVESCREENING_AND_NEWART),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+            "NEGATIVENEWART",
+            "NEGATIVENEWART",
+            EptsReportUtils.map(TXTBTXCURRNEW, "endDate=${endDate},location=${location}"),
+            "");
+    addRow(
+            cohortIndicatorDefinition,
+            "NEGATIVENEWART",
+            "NEGATIVENEWART",
+            EptsReportUtils.map(NEGATIVENEWART, "endDate=${endDate},location=${location}"),
+            getSexAndAgeDimension());
+
+    CohortIndicator NEGATIVEPREVIOUSLYRT =
+            eptsGeneralIndicator.getIndicator(
+                    "NEGATIVEPREVIOUSLYRT",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition
+                                            .NEGATIVESCREENING_AND_PREVIOUSLYRT),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+            "NEGATIVEPREVIOUSLYRT",
+            "NEGATIVEPREVIOUSLYRT",
+            EptsReportUtils.map(NEGATIVEPREVIOUSLYRT, "endDate=${endDate},location=${location}"),
+            "");
+    addRow(
+            cohortIndicatorDefinition,
+            "POSITIVEPREVIOUSLYRT",
+            "POSITIVEPREVIOUSLYRT",
+            EptsReportUtils.map(NEGATIVEPREVIOUSLYRT, "endDate=${endDate},location=${location}"),
+            getSexAndAgeDimension());
+    //8a. TX_TB numerator (screened patients who initiated TB treatment): Number of ART patients screened for TB in the last 6 months who initiated TB treatment (TX_TB numerator)
+
+    CohortIndicator NUMERATORTOTAL =
+            eptsGeneralIndicator.getIndicator(
+                    "NUMERATORTOTAL ",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.NUMERATOR),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+            "NUMERATORTOTAL ",
+            "NUMERATORTOTAL ",
+            EptsReportUtils.map(NUMERATORTOTAL , "endDate=${endDate},location=${location}"),
+            "");
+
+    CohortIndicator NUMERATORNEWART =
+            eptsGeneralIndicator.getIndicator(
+                    "NUMERATORNEWART",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.NEGATIVESCREENING_AND_NEWART),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+            "NUMERATORNEWART",
+            "NUMERATORNEWART",
+            EptsReportUtils.map(NUMERATORNEWART, "endDate=${endDate},location=${location}"),
+            "");
+    addRow(
+            cohortIndicatorDefinition,
+            "NUMERATORNEWART",
+            "NUMERATORNEWART",
+            EptsReportUtils.map(NUMERATORNEWART, "endDate=${endDate},location=${location}"),
+            getSexAndAgeDimension());
+
+    CohortIndicator NUMERATORPREVIOUSLYRT =
+            eptsGeneralIndicator.getIndicator(
+                    "NUMERATORPREVIOUSLYRT ",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition
+                                            .NUMERATOR_AND_PREVIOUSLYART),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+            "NUMERATORPREVIOUSLYRT",
+            "NUMERATORPREVIOUSLYRT",
+            EptsReportUtils.map(NUMERATORPREVIOUSLYRT  , "endDate=${endDate},location=${location}"),
+            "");
+    addRow(
+            cohortIndicatorDefinition,
+            "NUMERATORPREVIOUSLYRT",
+            "NUMERATORPREVIOUSLYRT" ,
+            EptsReportUtils.map(NUMERATORPREVIOUSLYRT , "endDate=${endDate},location=${location}"),
+            getSexAndAgeDimension());
+    //8b. TX_TB numeratornot died not transferred-out (screened patients who initiated TB treatment): Number of ART patients currently receiving ART (TX_CURR), screened for TB in the last 6 months who initiated TB treatment and are thus not dead or not Transferred-out
+
+
+    CohortIndicator NUMERATORTXCURRTOTAL =
+            eptsGeneralIndicator.getIndicator(
+                    "NUMERATORTXCURRTOTAL",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.NUMERATOR_AND_TXCURR),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+            "NUMERATORTXCURRTOTAL",
+            "NUMERATORTXCURRTOTAL",
+            EptsReportUtils.map(NUMERATORTOTAL , "endDate=${endDate},location=${location}"),
+            "");
+
+    CohortIndicator NUMTXCURRNEWART =
+            eptsGeneralIndicator.getIndicator(
+                    "NUMTXCURRNEWART",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.NUMERATOR_AND_TXCURR_AND_NEWART),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+            "NUMTXCURRNEWART",
+            "NUMTXCURRNEWART ",
+            EptsReportUtils.map(NUMTXCURRNEWART , "endDate=${endDate},location=${location}"),
+            "");
+    addRow(
+            cohortIndicatorDefinition,
+            "NUMTXCURRNEWART",
+            "NUMTXCURRNEWART ",
+            EptsReportUtils.map(NUMTXCURRNEWART , "endDate=${endDate},location=${location}"),
+            getSexAndAgeDimension());
+
+    CohortIndicator NUMTXCURPREVART =
+            eptsGeneralIndicator.getIndicator(
+                    "NUMTXCURPREVART",
+                    EptsReportUtils.map(
+                            txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
+                                    TxTbMonthlyCascadeCohortQueries.TxTbComposition
+                                            .NUMERATOR_AND_TXCURR_PREVIOUSLYART),
+                            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+            "NUMTXCURPREVART",
+            "NUMTXCURPREVART",
+            EptsReportUtils.map(NUMTXCURPREVART  , "endDate=${endDate},location=${location}"),
+            "");
+    addRow(
+            cohortIndicatorDefinition,
+            "NUMTXCURPREVART",
+            "NUMTXCURPREVART" ,
+            EptsReportUtils.map(NUMTXCURPREVART , "endDate=${endDate},location=${location}"),
+            getSexAndAgeDimension());
 
     return cohortIndicatorDefinition;
   }

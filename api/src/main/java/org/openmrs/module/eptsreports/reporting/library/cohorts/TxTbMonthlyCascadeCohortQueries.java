@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -12,6 +11,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -82,6 +83,12 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
+            TxTbComposition.NEGATIVESCREENING.getKey(),
+            EptsReportUtils.map(
+                    txtbCohortQueries.newOnARTNegativeScreening(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
         TxTbComposition.CLINICAL.getKey(),
         EptsReportUtils.map(
             getPatientsWithClinicalConsultationInLast6Months(),
@@ -100,6 +107,57 @@ public class TxTbMonthlyCascadeCohortQueries {
         EptsReportUtils.map(
             txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
             "onOrBefore=${endDate},location=${location}"));
+
+    chd.setCompositionString(txTbComposition.getCompositionString());
+    return chd;
+  }
+
+  public CohortDefinition getTxTbNumeratorCohort(TxTbComposition txTbComposition) {
+    CompositionCohortDefinition chd = new CompositionCohortDefinition();
+    chd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    chd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    chd.addParameter(new Parameter("location", "location", Location.class));
+    chd.setName(txTbComposition.getName());
+
+    CohortDefinition newOnArt = getPatientsNewOnArt();
+    CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
+
+    chd.addSearch(
+            TxTbComposition.NUMERATOR.getKey(),
+            EptsReportUtils.map(
+                    txtbCohortQueries.patientsNewOnARTNumerator(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+    chd.addSearch(
+            TxTbComposition.POSITIVESCREENING.getKey(),
+            EptsReportUtils.map(
+                    txtbCohortQueries.newOnARTPositiveScreening(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxTbComposition.NEGATIVESCREENING.getKey(),
+            EptsReportUtils.map(
+                    txtbCohortQueries.newOnARTNegativeScreening(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxTbComposition.CLINICAL.getKey(),
+            EptsReportUtils.map(
+                    getPatientsWithClinicalConsultationInLast6Months(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxTbComposition.NEWART.getKey(),
+            EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxTbComposition.PREVIOUSLYART.getKey(),
+            EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxCurrComposition.TXCURR.getKey(),
+            EptsReportUtils.map(
+                    txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
+                    "onOrBefore=${endDate},location=${location}"));
 
     chd.setCompositionString(txTbComposition.getCompositionString());
     return chd;
@@ -1719,6 +1777,136 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "TX TB POSITIVESCREENING ";
       }
     },
+    NEGATIVESCREENING{
+      @Override
+      public String getKey() {
+        return "NEGATIVESCREENING";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB NEGATIVESCREENING ";
+      }
+    },  NUMERATOR {
+      @Override
+      public String getKey() {
+        return "NUMERATOR ";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from NUMERATOR ";
+      }
+    },
+    NEGATIVESCREENING_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "NEGATIVESCREENING";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB NEGATIVESCREENING ";
+      }
+    },
+    NUMERATOR_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "NUMERATOR";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NUMERATOR.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB NEGATIVESCREENING ";
+      }
+    },
+
+    NUMERATOR_AND_TXCURR_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NUMERATOR.getKey() + " AND "+TxCurrComposition.TXCURR.getKey()+" AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB NEGATIVESCREENING ";
+      }
+    },
+
+    NUMERATOR_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NUMERATOR.getKey() + " AND " +PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB PREVIOUSLYART ";
+      }
+    },
+    NUMERATOR_AND_TXCURR {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NUMERATOR.getKey() + " AND " +TxCurrComposition.TXCURR.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB PREVIOUSLYART ";
+      }
+    },
+    NUMERATOR_AND_TXCURR_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NUMERATOR.getKey() +" AND "+ TxCurrComposition.TXCURR.getKey()+ " AND " +PREVIOUSLYART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB PREVIOUSLYART ";
+      }
+    },
+
     POSITIVESCREENING_AND_NEWART {
       @Override
       public String getKey() {
@@ -1749,6 +1937,22 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getName() {
         return "TX TB PREVIOUSLY ART POSITIVESCREENING ";
+      }
+    },
+    NEGATIVESCREENING_AND_PREVIOUSLYRT {
+      @Override
+      public String getKey() {
+        return "NEGATIVESCREENING";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey() + " AND " + NEGATIVESCREENING.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TX TB PREVIOUSLY ART NEGATIVESCREENING ";
       }
     },
 
