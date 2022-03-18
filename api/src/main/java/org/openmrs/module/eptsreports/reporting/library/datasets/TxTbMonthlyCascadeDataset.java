@@ -219,6 +219,52 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(TXTBDENPREV, "endDate=${endDate},location=${location}"),
         getSexAndAgeDimension());
 
+    // 3.b.TX_TB denominator not died not transferred-out: Number of patients on ART who were
+    // screened for TB in the last 6 months who are not dead or not Transferred-out
+
+    CohortIndicator TXTBTXCURR =
+        eptsGeneralIndicator.getIndicator(
+            "TXTBTXCURR",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_AND_TXCURR),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    cohortIndicatorDefinition.addColumn(
+        "TXTBTXCURR",
+        "TXTBTXCURR",
+        EptsReportUtils.map(TXTBTXCURR, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator TXTBTXCURRNEW =
+        eptsGeneralIndicator.getIndicator(
+            "TXTBTXCURRNEW",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_AND_TXCURR_AND_NEWART),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    addRow(
+        cohortIndicatorDefinition,
+        "TXTBTXCURRNEW",
+        "TXTBTXCURRNEW",
+        EptsReportUtils.map(TXTBTXCURRNEW, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
+    CohortIndicator TXTBTXCURRPREV =
+        eptsGeneralIndicator.getIndicator(
+            "TXTBTXCURRPREV",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition
+                        .TXTB_AND_TXCURR_AND_PREVIOUSLYART),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    addRow(
+        cohortIndicatorDefinition,
+        "TXTBTXCURRPREV",
+        "TXTBTXCURRPREV",
+        EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
+        getSexAndAgeDimension());
+
     return cohortIndicatorDefinition;
   }
 

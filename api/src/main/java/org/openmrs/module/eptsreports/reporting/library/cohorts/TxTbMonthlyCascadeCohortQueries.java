@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -11,8 +12,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -75,7 +74,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         TxTbComposition.TXTB.getKey(),
         EptsReportUtils.map(
             txtbCohortQueries.getDenominator(),
-            "startDate=${startDate},endDate=endDate,location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.CLINICAL.getKey(),
@@ -90,6 +89,12 @@ public class TxTbMonthlyCascadeCohortQueries {
     chd.addSearch(
         TxTbComposition.PREVIOUSLYART.getKey(),
         EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+        TxCurrComposition.TXCURR.getKey(),
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
+            "onOrBefore=${endDate},location=${location}"));
 
     chd.setCompositionString(txTbComposition.getCompositionString());
     return chd;
@@ -1758,6 +1763,22 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "TXTB New ART ";
       }
     },
+    TXTB_AND_TXCURR {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXTB.getKey() + " AND " + TxCurrComposition.TXCURR.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TXTB New ART ";
+      }
+    },
     TXTB_AND_CLINICAL_AND_NEWART {
       @Override
       public String getKey() {
@@ -1767,6 +1788,46 @@ public class TxTbMonthlyCascadeCohortQueries {
       @Override
       public String getCompositionString() {
         return TXTB.getKey() + " AND " + CLINICAL.getKey() + " AND " + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TXTB with clinical consultation in last 6 months ";
+      };
+    },
+    TXTB_AND_TXCURR_AND_NEWART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXTB.getKey()
+            + " AND "
+            + TxCurrComposition.TXCURR.getKey()
+            + " AND "
+            + NEWART.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "TXTB with clinical consultation in last 6 months ";
+      };
+    },
+    TXTB_AND_TXCURR_AND_PREVIOUSLYART {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return TXTB.getKey()
+            + " AND "
+            + TxCurrComposition.TXCURR.getKey()
+            + " AND "
+            + PREVIOUSLYART.getKey();
       }
 
       @Override
