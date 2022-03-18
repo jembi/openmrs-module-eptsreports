@@ -637,27 +637,6 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-art-before-startDate-including-transferred-in",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDate(true),
-            "onOrBefore=${startDate-1d},location=${location}"));
-
-    cd.setCompositionString(
-        "started-art-on-period-including-transferred-in OR started-art-before-startDate-including-transferred-in");
-    addGeneralParameters(cd);
-    return cd;
-  }
-
-  public CohortDefinition artListNum() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    cd.addSearch(
-        "started-art-on-period-including-transferred-in",
-        EptsReportUtils.map(
-            genericCohortQueries.getStartedArtOnPeriod(true, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "started-art-before-startDate-including-transferred-in",
-        EptsReportUtils.map(
             genericCohortQueries.getStartedArtBeforeDateTxTbNum(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
@@ -786,7 +765,7 @@ public class TXTBCohortQueries {
         "patientsWhoInitiatedTbTreatment",
         map(patientsWhoInitiatedTbTreatment, generalParameterMapping));
 
-    CohortDefinition artList = artListNum();
+    CohortDefinition artList = artList();
     cd.addSearch("artList", map(artList, generalParameterMapping));
     cd.setCompositionString(
         "(i OR ii OR patientswithPulmonaryTbDate OR patientsWhoInitiatedTbTreatment) AND artList");
