@@ -1572,7 +1572,8 @@ public class TXTBCohortQueries {
             tbMetadata.getTestTBLAM(),
             tbMetadata.getCultureTest(),
             commonMetadata.getPositive(),
-            commonMetadata.getNegative());
+            commonMetadata.getNegative(),
+            commonMetadata.getNotFoundConcept());
     return cd;
   }
 
@@ -1783,20 +1784,21 @@ public class TXTBCohortQueries {
       Concept tbLamTest,
       Concept cultureTest,
       Concept positive,
-      Concept negative) {
+      Concept negative,
+      Concept notFound) {
 
     CohortDefinition basiloscopiaExamCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaExamCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive)));
+                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
     addGeneralParameters(basiloscopiaExamCohort);
 
     CohortDefinition basiloscopiaLabExamCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaLabExamCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                laboratory, basiloscopiaExam, Arrays.asList(negative, positive)));
+                laboratory, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
     addGeneralParameters(basiloscopiaLabExamCohort);
 
     CohortDefinition genexpertTestCohort =
