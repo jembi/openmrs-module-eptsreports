@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TXTBCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries;
@@ -13,10 +16,6 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @Component
 public class TxTbMonthlyCascadeDataset extends BaseDataSet {
@@ -684,6 +683,72 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "SIXBOTHER",
         "SIXBOTHER",
         EptsReportUtils.map(SIXBOTHER, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator SEVEN =
+        eptsGeneralIndicator.getIndicator(
+            "SEVEN",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SEVEN),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SEVEN",
+        "SEVEN",
+        EptsReportUtils.map(SEVEN, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator SEVENSEMEAR =
+        eptsGeneralIndicator.getIndicator(
+            "SEVENSEMEAR",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SEVEN_AND_SEMEAR),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SEVENSEMEAR",
+        "SEVENSEMEAR",
+        EptsReportUtils.map(SEVENSEMEAR, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator SEVENGENEXPERT =
+        eptsGeneralIndicator.getIndicator(
+            "SEVENGENEXPERT",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
+                        .SEVEN_AND_GENEXPERT),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SEVENGENEXPERT",
+        "SEVENGENEXPERT",
+        EptsReportUtils.map(SEVENGENEXPERT, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator SEVENTBLAM =
+        eptsGeneralIndicator.getIndicator(
+            "SEVENTBLAM",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SEVEN_AND_TBLAM),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SEVENTBLAM",
+        "SEVENTBLAM",
+        EptsReportUtils.map(SEVENTBLAM, "endDate=${endDate},location=${location}"),
+        "");
+
+    CohortIndicator SEVENOTHER =
+        eptsGeneralIndicator.getIndicator(
+            "SEVENOTHER",
+            EptsReportUtils.map(
+                txTbMonthlyCascadeCohortQueries.get5And6and7(
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SEVEN_AND_TBLAM),
+                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+    cohortIndicatorDefinition.addColumn(
+        "SEVENOTHER",
+        "SEVENOTHER",
+        EptsReportUtils.map(SEVENOTHER, "endDate=${endDate},location=${location}"),
         "");
 
     return cohortIndicatorDefinition;
