@@ -83,10 +83,10 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxTbComposition.NEGATIVESCREENING.getKey(),
-            EptsReportUtils.map(
-                    txtbCohortQueries.newOnARTNegativeScreening(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        TxTbComposition.NEGATIVESCREENING.getKey(),
+        EptsReportUtils.map(
+            txtbCohortQueries.newOnARTNegativeScreening(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.CLINICAL.getKey(),
@@ -123,41 +123,41 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
 
     chd.addSearch(
-            TxTbComposition.NUMERATOR.getKey(),
-            EptsReportUtils.map(
-                    txtbCohortQueries.patientsNewOnARTNumerator(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        TxTbComposition.NUMERATOR.getKey(),
+        EptsReportUtils.map(
+            txtbCohortQueries.patientsNewOnARTNumerator(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     chd.addSearch(
-            TxTbComposition.POSITIVESCREENING.getKey(),
-            EptsReportUtils.map(
-                    txtbCohortQueries.newOnARTPositiveScreening(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        TxTbComposition.POSITIVESCREENING.getKey(),
+        EptsReportUtils.map(
+            txtbCohortQueries.newOnARTPositiveScreening(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxTbComposition.NEGATIVESCREENING.getKey(),
-            EptsReportUtils.map(
-                    txtbCohortQueries.newOnARTNegativeScreening(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        TxTbComposition.NEGATIVESCREENING.getKey(),
+        EptsReportUtils.map(
+            txtbCohortQueries.newOnARTNegativeScreening(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxTbComposition.CLINICAL.getKey(),
-            EptsReportUtils.map(
-                    getPatientsWithClinicalConsultationInLast6Months(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        TxTbComposition.CLINICAL.getKey(),
+        EptsReportUtils.map(
+            getPatientsWithClinicalConsultationInLast6Months(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxTbComposition.NEWART.getKey(),
-            EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+        TxTbComposition.NEWART.getKey(),
+        EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxTbComposition.PREVIOUSLYART.getKey(),
-            EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+        TxTbComposition.PREVIOUSLYART.getKey(),
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxCurrComposition.TXCURR.getKey(),
-            EptsReportUtils.map(
-                    txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
-                    "onOrBefore=${endDate},location=${location}"));
+        TxCurrComposition.TXCURR.getKey(),
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
+            "onOrBefore=${endDate},location=${location}"));
 
     chd.setCompositionString(txTbComposition.getCompositionString());
     return chd;
@@ -183,6 +183,59 @@ public class TxTbMonthlyCascadeCohortQueries {
         "newOnArt", EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("txcurr AND newOnArt");
+    return cd;
+  }
+
+  public CohortDefinition get5And6and7(SemearTbLamGXPertComposition semearTbLamGXPertComposition) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Indicator 5");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition sent = txtbCohortQueries.specimenSent();
+    CohortDefinition semear = getSmearMicroscopy();
+    CohortDefinition positiveResult = txtbCohortQueries.positiveResultsReturned();
+    CohortDefinition tbLam = getPetientsHaveTBLAM();
+    CohortDefinition others = getPatientsInOthersWithoutGenexPert();
+    CohortDefinition genex = getPatientsGeneXpertMtbRif();
+    CohortDefinition negativeTbTestWithoutExclusions = getPatientsFrom6bWithoutExclusions();
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.FIVE.getKey(),
+        EptsReportUtils.map(
+            sent, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        SemearTbLamGXPertComposition.SEMEAR.getKey(),
+        EptsReportUtils.map(
+            semear, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.TBLAM.getKey(),
+        EptsReportUtils.map(
+            tbLam, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.OTHER.getKey(),
+        EptsReportUtils.map(
+            others, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.GENEXPERT.getKey(),
+        EptsReportUtils.map(
+            genex, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        SemearTbLamGXPertComposition.SIXA.getKey(),
+        EptsReportUtils.map(
+            positiveResult, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        SemearTbLamGXPertComposition.NEGATIVEWITHOUTEXCLUSIONS.getKey(),
+        EptsReportUtils.map(
+            negativeTbTestWithoutExclusions,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(semearTbLamGXPertComposition.getCompositionString());
     return cd;
   }
 
@@ -1777,7 +1830,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "TX TB POSITIVESCREENING ";
       }
     },
-    NEGATIVESCREENING{
+    NEGATIVESCREENING {
       @Override
       public String getKey() {
         return "NEGATIVESCREENING";
@@ -1792,10 +1845,11 @@ public class TxTbMonthlyCascadeCohortQueries {
       public String getName() {
         return "TX TB NEGATIVESCREENING ";
       }
-    },  NUMERATOR {
+    },
+    NUMERATOR {
       @Override
       public String getKey() {
-        return "NUMERATOR ";
+        return "NUMERATOR";
       }
 
       @Override
@@ -1849,7 +1903,11 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NUMERATOR.getKey() + " AND "+TxCurrComposition.TXCURR.getKey()+" AND " + NEWART.getKey();
+        return NUMERATOR.getKey()
+            + " AND "
+            + TxCurrComposition.TXCURR.getKey()
+            + " AND "
+            + NEWART.getKey();
       }
 
       @Override
@@ -1866,7 +1924,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NUMERATOR.getKey() + " AND " +PREVIOUSLYART.getKey();
+        return NUMERATOR.getKey() + " AND " + PREVIOUSLYART.getKey();
       }
 
       @Override
@@ -1882,7 +1940,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NUMERATOR.getKey() + " AND " +TxCurrComposition.TXCURR.getKey();
+        return NUMERATOR.getKey() + " AND " + TxCurrComposition.TXCURR.getKey();
       }
 
       @Override
@@ -1898,7 +1956,11 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NUMERATOR.getKey() +" AND "+ TxCurrComposition.TXCURR.getKey()+ " AND " +PREVIOUSLYART.getKey();
+        return NUMERATOR.getKey()
+            + " AND "
+            + TxCurrComposition.TXCURR.getKey()
+            + " AND "
+            + PREVIOUSLYART.getKey();
       }
 
       @Override
@@ -2110,6 +2172,366 @@ public class TxTbMonthlyCascadeCohortQueries {
         return " TXTB AND CLINICAL AND PREVIOUSLY ON ART ";
       }
     };
+
+    public abstract String getKey();
+
+    public abstract String getCompositionString();
+
+    public abstract String getName();
+  }
+
+  public enum SemearTbLamGXPertComposition {
+    SEMEAR {
+      @Override
+      public String getKey() {
+        return "SEMEAR";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXA {
+      @Override
+      public String getKey() {
+        return "SIXA";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    GENEXPERT {
+      @Override
+      public String getKey() {
+        return "GENEXPERT";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    TBLAM {
+      @Override
+      public String getKey() {
+        return "TBLAM";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE {
+      @Override
+      public String getKey() {
+        return "FIVE";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    OTHER {
+      @Override
+      public String getKey() {
+        return "TBLAM";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+
+    NEGATIVEWITHOUTEXCLUSIONS {
+      @Override
+      public String getKey() {
+        return "NEGATIVEWITHOUTEXCLUSIONS";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "NEGATIVEWITHOUTEXCLUSIONS";
+      }
+    },
+    FIVE_AND_OTHER {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return OTHER.getKey() + " AND " + FIVE.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE_AND_SEMEAR {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SEMEAR.getKey() + " AND " + FIVE.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE_AND_GENEXPERT {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return GENEXPERT.getKey() + " AND " + FIVE.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    FIVE_AND_TBLAM {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return FIVE.getKey() + " AND " + TBLAM.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXA_AND_OTHER {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return OTHER.getKey() + " AND " + SIXA.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXA_AND_SEMEAR {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SEMEAR.getKey() + " AND " + SIXA.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXA_AND_GENEXPERT {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return GENEXPERT.getKey() + " AND " + SIXA.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXA_AND_TBLAM {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return SIXA.getKey() + " AND " + TBLAM.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
+            + " AND "
+            + FIVE.getKey()
+            + " AND NOT"
+            + SIXA.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB_AND_SEMEAR {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
+            + " AND "
+            + FIVE.getKey()
+            + " AND NOT"
+            + SIXA.getKey()
+            + " AND "
+            + SEMEAR.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB_AND_GENEXPERT {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
+            + " AND "
+            + FIVE.getKey()
+            + " AND NOT"
+            + SIXA.getKey()
+            + " AND "
+            + GENEXPERT.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+
+    SIXB_AND_TBLAM {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
+            + " AND "
+            + FIVE.getKey()
+            + " AND NOT"
+            + SIXA.getKey()
+            + " AND "
+            + TBLAM.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    },
+    SIXB_AND_OTHER {
+      @Override
+      public String getKey() {
+        return "";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return NEGATIVEWITHOUTEXCLUSIONS.getKey()
+            + " AND "
+            + FIVE.getKey()
+            + " AND NOT"
+            + SIXA.getKey()
+            + " AND "
+            + OTHER.getKey();
+      }
+
+      @Override
+      public String getName() {
+        return "Select all patients from TX CURR";
+      }
+    };
+    ;
 
     public abstract String getKey();
 
