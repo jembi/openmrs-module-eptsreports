@@ -477,7 +477,7 @@ public class GenericCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getStartedArtBeforeDateTxTbNum(boolean considerTransferredIn) {
+  public CohortDefinition getStartedArtBeforeDateTxTb(boolean considerTransferredIn) {
     CalculationCohortDefinition cd =
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(StartedArtBeforeDateForTxTbCalculation.class).get(0));

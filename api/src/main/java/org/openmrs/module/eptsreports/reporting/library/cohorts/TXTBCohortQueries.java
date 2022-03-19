@@ -1,11 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
@@ -24,6 +18,13 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 @Component
 public class TXTBCohortQueries {
@@ -635,7 +636,7 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-art-before-startDate-including-transferred-in",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDateTxTbNum(true),
+            genericCohortQueries.getStartedArtBeforeDateTxTb(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString(
@@ -1050,7 +1051,7 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "positive-screening", EptsReportUtils.map(positiveScreening(), generalParameterMapping));
     addGeneralParameters(definition);
-    definition.setCompositionString("(denominator AND new-on-art) NOT positive-screening");
+    definition.setCompositionString("(denominator AND new-on-art) AND NOT positive-screening");
     return definition;
   }
 
@@ -1129,7 +1130,7 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-before-start-reporting-period",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDateTxTbNum(false),
+            genericCohortQueries.getStartedArtBeforeDateTxTb(false),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("NUM AND started-before-start-reporting-period");
     addGeneralParameters(cd);
@@ -1515,7 +1516,13 @@ public class TXTBCohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getStartedArtOnPeriod(false, true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    definition.setCompositionString("started-on-period");
+    definition.addSearch(
+        "started-before-start-reporting-period",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtBeforeDateTxTb(false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    definition.setCompositionString(
+        "started-on-period AND NOT started-before-start-reporting-period");
 
     return definition;
   }
