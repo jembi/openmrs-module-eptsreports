@@ -1028,17 +1028,17 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                 inicioOrContinuaEstadoProfilaxiaOn9Map, patientId);
         Obs fimEstadoProfilaxiaObs6 =
             EptsCalculationUtils.obsResultForPatient(fimEstadoProfilaxiaOn6Map, patientId);
-        Obs atLeast3FILTINHMensal1FILTDTINHObs_9 =
-            EptsCalculationUtils.obsResultForPatient(
-                atLeast3FILTINHMensal1FILTDTINHMap9, patientId);
+
+        List<Obs> atLeast3FILTINHMensal1FILTDTINHObs_9 =
+            getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap9, patientId);
         Obs inicioOrContinuaEstadoProfilaxiaObs6_3 =
             EptsCalculationUtils.obsResultForPatient(
                 inicioOrContinuaEstadoProfilaxiaOn6Map3, patientId);
-        Obs anyProfilaxiaTPTWithINHObs6_2 =
-            EptsCalculationUtils.obsResultForPatient(anyProfilaxiaTPTWithINHOn6Map2, patientId);
-        /*        Obs atLeast3FichaClínicaINHObs =
-                    EptsCalculationUtils.obsResultForPatient(atLeast3FichaClínicaINHMap6, patientId);
-        */
+        List<Obs> anyProfilaxiaTPTWithINHObs6_2 =
+            getObsListFromResultMap(anyProfilaxiaTPTWithINHOn6Map2, patientId);
+        List<Obs> atLeast3FichaClínicaINHObsList =
+            getObsListFromResultMap(atLeast3FichaClínicaINHMap6, patientId);
+
         List<Obs> obss = new ArrayList<>();
 
         // If patient is on TPT treatment AND on regimen INH (Isoniazida) OR INH (Isoniazida) +
@@ -1185,10 +1185,14 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
 
           List<Obs> xcObss = new ArrayList<>();
           for (Obs obs : inicioOrContinuaEstadoProfilaxiaObs6_2) {
-            xcObss.add(obs);
+            if (obs.getEncounter() != null) {
+              xcObss.add(obs);
+            }
           }
           for (Obs obs : dtINHObs2) {
-            xcObss.add(obs);
+            if (obs.getEncounter() != null) {
+              xcObss.add(obs);
+            }
           }
           int xc =
               evaluateOccurrence(
@@ -1247,10 +1251,20 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                   3,
                   7);
 
+          Obs atLeast3FILTINHMensal1FILTDTINHObs9 = null;
+          if (atLeast3FILTINHMensal1FILTDTINHObs_9 != null
+              && !atLeast3FILTINHMensal1FILTDTINHObs_9.isEmpty()
+              && atLeast3FILTINHMensal1FILTDTINHObs_9.size() > 0) {
+            atLeast3FILTINHMensal1FILTDTINHObs9 = atLeast3FILTINHMensal1FILTDTINHObs_9.get(0);
+          }
+
           List<Obs> xiia3Obss = new ArrayList<>();
-          xiia3Obss.add(
-              sameEncounter(
-                  atLeast3FILTINHMensal1FILTDTINHObs_9, inicioOrContinuaEstadoProfilaxiaObs6_3));
+          Obs sameEncounterObs =
+              this.sameEncounter(
+                  atLeast3FILTINHMensal1FILTDTINHObs9, inicioOrContinuaEstadoProfilaxiaObs6_3);
+          if (sameEncounterObs != null) {
+            xiia3Obss.add(sameEncounterObs);
+          }
 
           List<Obs> atLeast3FichaClínicaINHMap3Cleaned3 =
               exclude(xiia3Obss, finalExclusionListFor1719);
@@ -1278,11 +1292,33 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                   1,
                   7);
 
+          Obs anyProfilaxiaTPTWithINHObs62 = null;
+          if (anyProfilaxiaTPTWithINHObs6_2 != null
+              && !anyProfilaxiaTPTWithINHObs6_2.isEmpty()
+              && anyProfilaxiaTPTWithINHObs6_2.size() > 0) {
+            anyProfilaxiaTPTWithINHObs62 = anyProfilaxiaTPTWithINHObs6_2.get(0);
+          }
+
           List<Obs> xiib3Obss = new ArrayList<>();
-          xiia3Obss.add(
-              sameEncounter(anyProfilaxiaTPTWithINHObs6_2, inicioOrContinuaEstadoProfilaxiaObs6_3));
-          //          xiia3Obss.add(sameEncounter(anyProfilaxiaTPTWithINHObs6_2,
-          // atLeast3FichaClínicaINHObs));
+          Obs sameEncounterObs2 =
+              this.sameEncounter(
+                  anyProfilaxiaTPTWithINHObs62, inicioOrContinuaEstadoProfilaxiaObs6_3);
+          if (sameEncounterObs2 != null) {
+            xiib3Obss.add(sameEncounterObs2);
+          }
+
+          Obs atLeast3FichaClínicaINHObs = null;
+          if (atLeast3FichaClínicaINHObsList != null
+              && !atLeast3FichaClínicaINHObsList.isEmpty()
+              && atLeast3FichaClínicaINHObsList.size() > 0) {
+            atLeast3FichaClínicaINHObs = atLeast3FichaClínicaINHObsList.get(0);
+          }
+
+          Obs sameEncounterObs3 =
+              this.sameEncounter(anyProfilaxiaTPTWithINHObs62, atLeast3FichaClínicaINHObs);
+          if (sameEncounterObs3 != null) {
+            xiib3Obss.add(sameEncounterObs3);
+          }
 
           int xiib3 = evaluateOccurrence(xiib3Obss, iptStartDate, 1, 7);
 
