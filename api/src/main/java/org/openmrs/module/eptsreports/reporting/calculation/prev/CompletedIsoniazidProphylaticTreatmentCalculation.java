@@ -1014,26 +1014,24 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
             EptsCalculationUtils.obsResultForPatient(endProfilaxiaObservations9, patientId);
         Obs endDrugsObs =
             EptsCalculationUtils.obsResultForPatient(completedDrugsObservations, patientId);
-        Obs anyProfilaxiaTPTWithINHObs6 =
-            EptsCalculationUtils.obsResultForPatient(anyProfilaxiaTPTWithINHOn6Map, patientId);
         Obs anyProfilaxiaTPTWithINHObs9 =
             EptsCalculationUtils.obsResultForPatient(anyProfilaxiaTPTWithINHOn9Map, patientId);
         Obs lastProfilaxiaTPTWithINHObs53 =
             EptsCalculationUtils.obsResultForPatient(lastProfilaxiaTPTWithINHOn53Map, patientId);
-        Obs inicioOrContinuaEstadoProfilaxiaObs6 =
-            EptsCalculationUtils.obsResultForPatient(
-                inicioOrContinuaEstadoProfilaxiaOn6Map, patientId);
         Obs inicioOrContinuaEstadoProfilaxiaObs9 =
             EptsCalculationUtils.obsResultForPatient(
                 inicioOrContinuaEstadoProfilaxiaOn9Map, patientId);
-        Obs fimEstadoProfilaxiaObs6 =
-            EptsCalculationUtils.obsResultForPatient(fimEstadoProfilaxiaOn6Map, patientId);
 
+        List<Obs> fimEstadoProfilaxiaObs6List =
+            getObsListFromResultMap(fimEstadoProfilaxiaOn6Map, patientId);
+        List<Obs> anyProfilaxiaTPTWithINHObs6List =
+            getObsListFromResultMap(anyProfilaxiaTPTWithINHOn6Map, patientId);
         List<Obs> atLeast3FILTINHMensal1FILTDTINHObs_9 =
             getObsListFromResultMap(atLeast3FILTINHMensal1FILTDTINHMap9, patientId);
-        Obs inicioOrContinuaEstadoProfilaxiaObs6_3 =
-            EptsCalculationUtils.obsResultForPatient(
-                inicioOrContinuaEstadoProfilaxiaOn6Map3, patientId);
+        List<Obs> inicioOrContinuaEstadoProfilaxiaObs6List =
+            getObsListFromResultMap(inicioOrContinuaEstadoProfilaxiaOn6Map3, patientId);
+        List<Obs> inicioOrContinuaEstadoProfilaxiaObs6List2 =
+            getObsListFromResultMap(inicioOrContinuaEstadoProfilaxiaOn6Map, patientId);
         List<Obs> anyProfilaxiaTPTWithINHObs6_2 =
             getObsListFromResultMap(anyProfilaxiaTPTWithINHOn6Map2, patientId);
         List<Obs> atLeast3FichaClínicaINHObsList =
@@ -1042,8 +1040,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
         List<Obs> obss = new ArrayList<>();
 
         // If patient is on TPT treatment AND on regimen INH (Isoniazida) OR INH (Isoniazida) +
-        // Piridoxina
-        // AND is registered to continue a regimen on Seguimento de tratamento TPT
+        // Piridoxina AND is registered to continue a regimen on Seguimento de tratamento TPT
         if ((regimeTPT1stPickUpPreviousPeriod != null
             && regimeTPT1stPickUpPreviousPeriod2 != null)) {
           obss =
@@ -1122,6 +1119,27 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                   anyIsoniazida2 != null && anyIsoniazida2.size() > 0
                       ? anyIsoniazida2.get(0)
                       : null);
+        }
+
+        Obs anyProfilaxiaTPTWithINHObs6 = null;
+        if (anyProfilaxiaTPTWithINHObs6List != null
+            && !anyProfilaxiaTPTWithINHObs6List.isEmpty()
+            && anyProfilaxiaTPTWithINHObs6List.size() > 0) {
+          anyProfilaxiaTPTWithINHObs6 = anyProfilaxiaTPTWithINHObs6List.get(0);
+        }
+
+        Obs inicioOrContinuaEstadoProfilaxiaObs6 = null;
+        if (inicioOrContinuaEstadoProfilaxiaObs6List2 != null
+            && !inicioOrContinuaEstadoProfilaxiaObs6List2.isEmpty()
+            && inicioOrContinuaEstadoProfilaxiaObs6List2.size() > 0) {
+          inicioOrContinuaEstadoProfilaxiaObs6 = inicioOrContinuaEstadoProfilaxiaObs6List2.get(0);
+        }
+
+        Obs fimEstadoProfilaxiaObs6 = null;
+        if (fimEstadoProfilaxiaObs6List != null
+            && !fimEstadoProfilaxiaObs6List.isEmpty()
+            && fimEstadoProfilaxiaObs6List.size() > 0) {
+          fimEstadoProfilaxiaObs6 = fimEstadoProfilaxiaObs6List.get(0);
         }
 
         Date iptStartDate = getMinOrMaxObsDate(obss, Priority.MIN, true);
@@ -1258,7 +1276,16 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
             atLeast3FILTINHMensal1FILTDTINHObs9 = atLeast3FILTINHMensal1FILTDTINHObs_9.get(0);
           }
 
+          Obs inicioOrContinuaEstadoProfilaxiaObs6_3 = null;
+          if (inicioOrContinuaEstadoProfilaxiaObs6List != null
+              && !inicioOrContinuaEstadoProfilaxiaObs6List.isEmpty()
+              && inicioOrContinuaEstadoProfilaxiaObs6List.size() > 0) {
+            inicioOrContinuaEstadoProfilaxiaObs6_3 =
+                inicioOrContinuaEstadoProfilaxiaObs6List.get(0);
+          }
+
           List<Obs> xiia3Obss = new ArrayList<>();
+
           Obs sameEncounterObs =
               this.sameEncounter(
                   atLeast3FILTINHMensal1FILTDTINHObs9, inicioOrContinuaEstadoProfilaxiaObs6_3);
