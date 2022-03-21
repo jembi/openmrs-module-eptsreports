@@ -62,8 +62,8 @@ public class DQACargaViralDataset extends BaseDataSet {
     pdd.addColumn(
         "inicio_tarv",
         dQACargaViralCohortQueries.getArtStartDate(),
-        "onOrBefore=${endDate},location=${location}",
-        new CalculationResultConverter());
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
 
     /**
      * 5 - Data de Consulta onde Notificou o Resultado de CV dentro do Período de Revisão - Sheet 1:

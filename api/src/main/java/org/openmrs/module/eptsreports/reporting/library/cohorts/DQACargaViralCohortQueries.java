@@ -2,10 +2,8 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
-import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -24,12 +22,16 @@ public class DQACargaViralCohortQueries {
 
   private HivMetadata hivMetadata;
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private final CommonQueries commonQueries;
 
   @Autowired
   public DQACargaViralCohortQueries(
-      ResumoMensalCohortQueries resumoMensalCohortQueries, HivMetadata hivMetadata) {
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      HivMetadata hivMetadata,
+      CommonQueries commonQueries) {
     this.hivMetadata = hivMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.commonQueries = commonQueries;
   }
 
   public CohortDefinition getBaseCohort() {
@@ -71,14 +73,31 @@ public class DQACargaViralCohortQueries {
     return spdd;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Patient ART Start Date is the oldest date from the set of criterias defined in the common
+   * query: 1/1 Patients who initiated ART and ART Start Date as earliest from the following
+   * criterias is by End of the period (reporting endDate)
+   *
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public DataDefinition getArtStartDate() {
-    CalculationDataDefinition cd =
-        new CalculationDataDefinition(
-            "Art start date",
-            Context.getRegisteredComponents(InitialArtStartDateCalculation.class).get(0));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addParameter(new Parameter("onOrBefore", "On Or Before", Date.class));
-    return cd;
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("3 - ART Start Date  ");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Location.class));
+
+    String query = commonQueries.getARTStartDate(true);
+    sqlPatientDataDefinition.setQuery(query);
+
+    return sqlPatientDataDefinition;
   }
 
   public DataDefinition getAge(String calculateAgeOn) {
