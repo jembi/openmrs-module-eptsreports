@@ -636,8 +636,8 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-art-before-startDate-including-transferred-in",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDate(true),
-            "onOrBefore=${startDate-1d},location=${location}"));
+            genericCohortQueries.getStartedArtBeforeDateTxTb(true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "started-art-on-period-including-transferred-in OR started-art-before-startDate-including-transferred-in");
@@ -1051,7 +1051,7 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "positive-screening", EptsReportUtils.map(positiveScreening(), generalParameterMapping));
     addGeneralParameters(definition);
-    definition.setCompositionString("(denominator AND new-on-art) NOT positive-screening");
+    definition.setCompositionString("(denominator AND new-on-art) AND NOT positive-screening");
     return definition;
   }
 
@@ -1130,8 +1130,8 @@ public class TXTBCohortQueries {
     cd.addSearch(
         "started-before-start-reporting-period",
         EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDate(false),
-            "onOrBefore=${startDate-1d},location=${location}"));
+            genericCohortQueries.getStartedArtBeforeDateTxTb(false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("NUM AND started-before-start-reporting-period");
     addGeneralParameters(cd);
     return cd;
@@ -1516,7 +1516,13 @@ public class TXTBCohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.getStartedArtOnPeriod(false, true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    definition.setCompositionString("started-on-period");
+    definition.addSearch(
+        "started-before-start-reporting-period",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtBeforeDateTxTb(false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    definition.setCompositionString(
+        "started-on-period AND NOT started-before-start-reporting-period");
 
     return definition;
   }
@@ -1573,7 +1579,8 @@ public class TXTBCohortQueries {
             tbMetadata.getTestTBLAM(),
             tbMetadata.getCultureTest(),
             commonMetadata.getPositive(),
-            commonMetadata.getNegative());
+            commonMetadata.getNegative(),
+            commonMetadata.getNotFoundConcept());
     return cd;
   }
 
@@ -1618,7 +1625,8 @@ public class TXTBCohortQueries {
             hivMetadata.getApplicationForLaboratoryResearch(),
             hivMetadata.getResultForBasiloscopia(),
             commonMetadata.getPositive(),
-            commonMetadata.getNegative());
+            commonMetadata.getNegative(),
+            commonMetadata.getNotFoundConcept());
     return cd;
   }
 
@@ -1784,20 +1792,21 @@ public class TXTBCohortQueries {
       Concept tbLamTest,
       Concept cultureTest,
       Concept positive,
-      Concept negative) {
+      Concept negative,
+      Concept notFound) {
 
     CohortDefinition basiloscopiaExamCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaExamCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive)));
+                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
     addGeneralParameters(basiloscopiaExamCohort);
 
     CohortDefinition basiloscopiaLabExamCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaLabExamCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                laboratory, basiloscopiaExam, Arrays.asList(negative, positive)));
+                laboratory, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
     addGeneralParameters(basiloscopiaLabExamCohort);
 
     CohortDefinition genexpertTestCohort =
@@ -1949,20 +1958,21 @@ public class TXTBCohortQueries {
       Concept applicationForLaboratoryResearch,
       Concept basiloscopiaExam,
       Concept positive,
-      Concept negative) {
+      Concept negative,
+      Concept notFound) {
 
     CohortDefinition basiloscopiaCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive)));
+                fichaClinica, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
     addGeneralParameters(basiloscopiaCohort);
 
     CohortDefinition basiloscopiaLabCohort =
         genericCohortQueries.generalSql(
             "basiloscopiaLabCohort",
             genericCohortQueries.getPatientsWithObsBetweenDates(
-                laboratory, basiloscopiaExam, Arrays.asList(negative, positive)));
+                laboratory, basiloscopiaExam, Arrays.asList(negative, positive, notFound)));
     addGeneralParameters(basiloscopiaLabCohort);
 
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
