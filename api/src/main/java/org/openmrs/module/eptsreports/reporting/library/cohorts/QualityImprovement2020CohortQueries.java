@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -26,6 +25,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -7759,7 +7760,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * Age should be calculated on “Last Consultation Date” (Check A for the algorithm to define this
+   * Age should be calculated on end date inclusion (Check A for the algorithm to define this
    * date).
    *
    * @return CohortDefinition
