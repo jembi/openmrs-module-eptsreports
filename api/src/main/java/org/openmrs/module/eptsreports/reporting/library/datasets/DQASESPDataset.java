@@ -171,19 +171,6 @@ public class DQASESPDataset extends BaseDataSet {
                     mappings)),
             mappings),
         disagForCargaViralM1());
-    addRow(
-        dsd,
-        "ART-B1-M2",
-        "Número de Novos Inícios em TARV durante o período de revisão (M2)",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Número de Novos Inícios em TARV durante o período de revisão (M2)",
-                EptsReportUtils.map(
-                    dQACargaViralCohortQueries.getBaseCohortSesp(
-                        DQACargaViralCohortQueries.SespCompositionString.B1M2),
-                    mappings)),
-            mappings),
-        getDisaggregations());
 
     return dsd;
   }
