@@ -1618,7 +1618,7 @@ public class TxCurrCohortQueries {
             + "                 INNER JOIN obs o ON e.encounter_id = o.encounter_id"
             + "                 WHERE"
             + "                     e.encounter_type = ${6}"
-            + "                         AND (o.concept_id= 23730 OR o.concept_id = 23739 OR o.concept_id = 23888)"
+            + "                         AND (o.concept_id= ${23730} OR o.concept_id = ${23739} OR o.concept_id = ${23888})"
             + "                         AND p.voided = 0"
             + "                         AND o.voided = 0"
             + "                         AND e.voided = 0"
