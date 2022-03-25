@@ -7598,7 +7598,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15H, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch("AGE2", EptsReportUtils.map(Mq15AGE2, "endDate=${revisionEndDate}}"));
+    cd.addSearch("AGE2", EptsReportUtils.map(Mq15AGE2, "endDate=${revisionEndDate}"));
     cd.setCompositionString("A AND J AND H AGE2");
     return cd;
   }
