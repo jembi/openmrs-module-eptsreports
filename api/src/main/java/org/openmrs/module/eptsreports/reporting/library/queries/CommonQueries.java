@@ -1,12 +1,13 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class CommonQueries {
@@ -764,14 +765,14 @@ public class CommonQueries {
             + " AND p.voided = 0 AND o.voided = 0"
             + " GROUP BY p.patient_id "
             + " UNION "
-            + " SELECT p.patient_id, ps.start_date AS first_pickup "
+            + " SELECT p.patient_id, pg.date_enrolled AS first_pickup "
             + "     FROM   patient p   "
             + "           INNER JOIN patient_program pg  "
             + "                ON p.patient_id = pg.patient_id  "
             + "        INNER JOIN patient_state ps  "
             + "                   ON pg.patient_program_id = ps.patient_program_id  "
             + "     WHERE  pg.location_id = :location AND pg.voided = 0"
-            + "    AND pg.program_id = ${2} and ps.start_date <= :endDate "
+            + "    AND pg.program_id = ${2} and pg.date_enrolled <= :endDate "
             + "     "
             + "    UNION "
             + "     "
@@ -817,6 +818,7 @@ public class CommonQueries {
     valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
 
     String sql =
         "SELECT art.patient_id AS patient_id, MIN(art.first_pickup) AS first_pickup FROM("
@@ -851,7 +853,7 @@ public class CommonQueries {
             + location
             + "                       GROUP  BY p.patient_id  "
             + " UNION "
-            + " SELECT p.patient_id, ps.start_date AS first_pickup "
+            + " SELECT p.patient_id, pg.date_enrolled AS first_pickup "
             + "     FROM   patient p   "
             + "           INNER JOIN patient_program pg  "
             + "                ON p.patient_id = pg.patient_id  "
@@ -860,7 +862,7 @@ public class CommonQueries {
             + "     WHERE  pg.location_id = "
             + location
             + " AND pg.voided = 0"
-            + "    AND pg.program_id = ${2} and ps.start_date <='"
+            + "    AND pg.program_id = ${2} and pg.date_enrolled <='"
             + endDate
             + "'"
             + " UNION "
@@ -872,6 +874,23 @@ public class CommonQueries {
             + "                           AND ob.voided = 0  "
             + "                           AND ob.concept_id = ${1190}  "
             + "                           AND ob.obs_datetime <= '"
+            + endDate
+            + "'"
+            + "                           AND ob.location_id =  "
+            + location
+            + "                       GROUP  BY p.patient_id  "
+            + " UNION "
+            + " SELECT p.patient_id, MIN(ob.value_datetime) first_pickup  "
+            + "                                 FROM patient p  "
+            + "                           INNER JOIN encounter e "
+            + "                               ON p.patient_id= e.patient_id "
+            + "                           INNER JOIN obs ob  "
+            + "                               ON e.encounter_id = ob.encounter_id  "
+            + "                       WHERE  p.voided = 0  "
+            + "                           AND ob.voided = 0  "
+            + "                           AND e.encounter_type = ${53}  "
+            + "                           AND ob.concept_id = ${1190}  "
+            + "                           AND ob.value_datetime <= '"
             + endDate
             + "'"
             + "                           AND ob.location_id =  "
