@@ -32,13 +32,13 @@ public class BreastfeedingPregnantCalculation4MQ extends AbstractPatientCalculat
     // External Dependencies
     CalculationResultMap pregnantDateMap =
         calculate(
-            Context.getRegisteredComponents(PregnantDateCalculation.class).get(0),
+            Context.getRegisteredComponents(PregnantDateCalculation4MQ.class).get(0),
             cohort,
             parameterValues,
             context);
     CalculationResultMap breastfeedingDateMap =
         calculate(
-            Context.getRegisteredComponents(BreastfeedingDateCalculation.class).get(0),
+            Context.getRegisteredComponents(BreastfeedingDateCalculation4MQ.class).get(0),
             cohort,
             parameterValues,
             context);

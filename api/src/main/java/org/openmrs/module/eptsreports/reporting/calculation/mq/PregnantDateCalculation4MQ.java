@@ -28,7 +28,7 @@ import java.util.*;
  * @return CalculationResultMap
  */
 @Component
-public class PregnantDateCalculation extends AbstractPatientCalculation {
+public class PregnantDateCalculation4MQ extends AbstractPatientCalculation {
 
   @Override
   public CalculationResultMap evaluate(
@@ -58,13 +58,13 @@ public class PregnantDateCalculation extends AbstractPatientCalculation {
 
     Concept viralLoadConcept = hivMetadata.getHivViralLoadConcept();
     Concept pregnant = hivMetadata.getPregnantConcept();
-    //Concept pregnantBasedOnWeeks = hivMetadata.getNumberOfWeeksPregnant();
-    //Concept pregnancyDueDate = hivMetadata.getPregnancyDueDate();
+    // Concept pregnantBasedOnWeeks = hivMetadata.getNumberOfWeeksPregnant();
+    // Concept pregnancyDueDate = hivMetadata.getPregnancyDueDate();
     Program ptv = hivMetadata.getPtvEtvProgram();
     Concept yes = hivMetadata.getYesConcept();
     Concept sampleCollectionDateAndTime = hivMetadata.getSampleCollectionDateAndTime();
     Concept hivViraloadQualitative = hivMetadata.getHivViralLoadQualitative();
-    //Concept criteriaForArtStart = hivMetadata.getCriteriaForArtStart();
+    // Concept criteriaForArtStart = hivMetadata.getCriteriaForArtStart();
     Concept bPostive = hivMetadata.getBpostiveConcept();
     Concept historicalArtStartDate = hivMetadata.getARVStartDateConcept();
 
@@ -122,8 +122,6 @@ public class PregnantDateCalculation extends AbstractPatientCalculation {
             TimeQualifier.ANY,
             null,
             context);
-
-
 
     CalculationResultMap markedPregnantInProgram =
         ePTSCalculationService.allProgramEnrollment(ptv, cohort, context);
@@ -183,12 +181,10 @@ public class PregnantDateCalculation extends AbstractPatientCalculation {
   private Date getRequiredDate(
       Location location,
       CalculationResultMap pregnantMap,
-
       CalculationResultMap markedPregnantInProgram,
       Integer pId,
       Obs lastVlObs,
       Obs lastVlQualitative,
-
       CalculationResultMap registeredPregnantValueDateBasedOnEncounter53,
       CalculationResultMap getRegisteredPregnantBasedOnEncounter53,
       List<Obs> markedAsPregnatFsrYesMap,
@@ -211,7 +207,6 @@ public class PregnantDateCalculation extends AbstractPatientCalculation {
 
       ListResult pregnantResult = (ListResult) pregnantMap.get(pId);
 
-
       ListResult pregnantsInProgramResults = (ListResult) markedPregnantInProgram.get(pId);
 
       ListResult registeredPregnantListResultBasedOnEncounter53ValueDate =
@@ -220,7 +215,7 @@ public class PregnantDateCalculation extends AbstractPatientCalculation {
           (ListResult) getRegisteredPregnantBasedOnEncounter53.get(pId);
 
       List<Obs> pregnantObsList = EptsCalculationUtils.extractResultValues(pregnantResult);
-            List<PatientProgram> patientProgams =
+      List<PatientProgram> patientProgams =
           EptsCalculationUtils.extractResultValues(pregnantsInProgramResults);
 
       List<Obs> pregRegListBasedOnValueDateAndEncounter53 =
@@ -234,7 +229,6 @@ public class PregnantDateCalculation extends AbstractPatientCalculation {
       List<Date> allPregnancyDates =
           Arrays.asList(
               isPregnantDate(lastVlDate, pregnantObsList),
-
               isPregnantInProgram(lastVlDate, patientProgams, location),
               isPregnantWithFsr(
                   lastVlDate,
@@ -243,7 +237,6 @@ public class PregnantDateCalculation extends AbstractPatientCalculation {
                   markedAsPregnatFsrDateCollectionMap,
                   startDate,
                   endDate),
-
               getPregnantRegistrationDateBasedOnEncounter53(
                   lastVlDate,
                   pregRegListBasedOnValueDateAndEncounter53,

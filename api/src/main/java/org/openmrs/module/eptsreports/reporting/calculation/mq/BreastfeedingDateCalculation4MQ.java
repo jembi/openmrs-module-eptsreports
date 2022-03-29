@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.calculation.mq;
 
+import java.util.*;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -13,8 +14,6 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-
 /**
  * <b>Description</b>Calculates for patient eligibility to be breastfeeding Based on ART start date,
  * the date is obtained by 18 months from last viral date
@@ -22,7 +21,7 @@ import java.util.*;
  * @return CalculationResultMap
  */
 @Component
-public class BreastfeedingDateCalculation extends AbstractPatientCalculation {
+public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation {
 
   @Override
   public CalculationResultMap evaluate(
