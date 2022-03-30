@@ -6734,13 +6734,13 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "A1",
         EptsReportUtils.map(
-            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
             "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "A2",
         EptsReportUtils.map(
-            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
             "onOrBefore=${endDate},location=${location}"));
 
@@ -6855,13 +6855,13 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "B1",
         EptsReportUtils.map(
-            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
             "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
-            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+            txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
             "onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString(preposition.getCompositionString());

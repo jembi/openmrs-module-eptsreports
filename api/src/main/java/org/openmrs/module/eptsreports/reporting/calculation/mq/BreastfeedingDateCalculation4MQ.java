@@ -51,7 +51,7 @@ public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation 
     // Concept criteriaForHivStart = hivMetadata.getCriteriaForArtStart();
     // Concept priorDeliveryDate = hivMetadata.getPriorDeliveryDateConcept();
     Concept hivViraloadQualitative = hivMetadata.getHivViralLoadQualitative();
-    Concept criteriaForArtStart = hivMetadata.getCriteriaForArtStart();
+    // Concept criteriaForArtStart = hivMetadata.getCriteriaForArtStart();
     Date onOrBefore = (Date) context.getFromCache("onOrBefore");
     Date oneYearBefore = EptsCalculationUtils.addMonths(onOrBefore, -12);
     Concept historicalArtStartDate = hivMetadata.getARVStartDateConcept();
@@ -101,16 +101,6 @@ public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation 
             cohort,
             context);
 
-    CalculationResultMap startArtBeingBpostiveMap =
-        ePTSCalculationService.getObs(
-            criteriaForArtStart,
-            null,
-            cohort,
-            Arrays.asList(location),
-            Arrays.asList(breastfeedingConcept),
-            TimeQualifier.ANY,
-            null,
-            context);
     // get calculation map based on breastfeeding on encounter type 53
     CalculationResultMap lactatingBasedOnEncounter53Map =
         ePTSCalculationService.getObs(
@@ -155,7 +145,6 @@ public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation 
               pId,
               lastVlObs,
               lastVlQualitativeObs,
-              startArtBeingBpostiveMap,
               breastfeedingRegistrationBasedOnValueDateAndEncounter53Map,
               lactatingBasedOnEncounter53Map,
               breastfeedingMap,
@@ -173,7 +162,6 @@ public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation 
       Integer pId,
       Obs lastVlObs,
       Obs lastVlQualitative,
-      CalculationResultMap startArtBeingBpostiveMap,
       CalculationResultMap registeredBreastfeedingValueDate53,
       CalculationResultMap registeredBreastfeedingEncounterType53,
       CalculationResultMap breatfeedingMap,
@@ -200,9 +188,7 @@ public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation 
       List<Obs> lactatingObs = EptsCalculationUtils.extractResultValues(lactatingResults);
 
       List<PatientState> patientStateList = EptsCalculationUtils.extractResultValues(patientResult);
-      ListResult startArtBeingBptv = (ListResult) startArtBeingBpostiveMap.get(pId);
-      List<Obs> startArtBeingBptvObsList =
-          EptsCalculationUtils.extractResultValues(startArtBeingBptv);
+
       ListResult registeredBreastfeedingListResultsBasedOnValueDate53 =
           (ListResult) registeredBreastfeedingValueDate53.get(pId);
       List<Obs> registeredBreastfeedingListResultsListBasedOnValueDate53 =
@@ -228,7 +214,6 @@ public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation 
           Arrays.asList(
               this.isLactating(lastVlDate, lactatingObs),
               this.isInBreastFeedingInProgram(lastVlDate, patientStateList),
-              this.getWhenOnARTWhileBpostive(lastVlDate, startArtBeingBptvObsList),
               this.getBreastFeedingRegistrationDate(
                   lastVlDate,
                   registeredBreastfeedingListResultsListBasedOnValueDate53,

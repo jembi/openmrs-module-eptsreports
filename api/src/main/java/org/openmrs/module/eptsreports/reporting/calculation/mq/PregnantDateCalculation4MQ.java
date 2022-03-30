@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.calculation.mq;
 
+import java.util.*;
 import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
@@ -12,8 +13,6 @@ import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculati
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 /**
  * <b>Description</b>Calculates for patient eligibility to be pregnant
@@ -65,7 +64,7 @@ public class PregnantDateCalculation4MQ extends AbstractPatientCalculation {
     Concept sampleCollectionDateAndTime = hivMetadata.getSampleCollectionDateAndTime();
     Concept hivViraloadQualitative = hivMetadata.getHivViralLoadQualitative();
     // Concept criteriaForArtStart = hivMetadata.getCriteriaForArtStart();
-    Concept bPostive = hivMetadata.getBpostiveConcept();
+    // Concept bPostive = hivMetadata.getBpostiveConcept();
     Concept historicalArtStartDate = hivMetadata.getARVStartDateConcept();
 
     CalculationResultMap pregnantMap =
