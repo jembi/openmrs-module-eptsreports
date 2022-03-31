@@ -3874,9 +3874,11 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
+    map.put("21148", hivMetadata.getSecondLineConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
+        " SELECT second_line.patient_id from ( SELECT p.patient_id , o.obs_datetime AS linha_terapeutica, last_clinical.last_visit as last_consultation"
             + " FROM   patient p"
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
@@ -3904,7 +3906,23 @@ public class QualityImprovement2020CohortQueries {
             + "       AND o.value_coded IS NOT NULL "
             + "       AND o.obs_datetime >= :startDate "
             + "       AND o.obs_datetime <= :endDate "
-            + "       AND TIMESTAMPDIFF(MONTH, o.obs_datetime,  last_clinical.last_visit) >= 6 ";
+            + "       AND TIMESTAMPDIFF(MONTH, o.obs_datetime,  last_clinical.last_visit) >= 6"
+            + "   ) second_line where second_line.patient_id not in ( "
+            + " SELECT p.patient_id "
+            + "    FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                          ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                          ON o.encounter_id = e.encounter_id "
+            + "    WHERE  e.voided = 0 "
+            + "      AND p.voided = 0 "
+            + "      AND o.voided = 0 "
+            + "      AND e.encounter_type = ${6} "
+            + "      AND e.location_id = :location "
+            + "      AND o.concept_id = ${21151} "
+            + "      AND o.value_coded <> ${21148} "
+            + "      AND o.obs_datetime > second_line.linha_terapeutica "
+            + "      AND o.obs_datetime <= second_line.last_consultation )";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -4556,7 +4574,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND secondLineB2 AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+            "((B1 AND secondLineB2) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       }
     } else {
       if (line == 1 || line == 6 || line == 7 || line == 8) {
