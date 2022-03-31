@@ -174,7 +174,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addColumn(
         "TXTBDENTOTAL",
         "TXTBDENTOTAL",
-        EptsReportUtils.map(TXCURR, "endDate=${endDate},location=${location}"),
+        EptsReportUtils.map(TXTBDENTOTAL, "endDate=${endDate},location=${location}"),
         "");
 
     CohortIndicator TXTBDEN =

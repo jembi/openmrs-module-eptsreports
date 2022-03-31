@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -12,6 +11,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -560,7 +561,6 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND o.obs_datetime <= :endDate "
             + "       AND o2.concept_id = ${6300} "
             + "       AND o2.value_coded = ${6276} "
-            + "       AND o.obs_datetime <> o2.obs_datetime "
             + "       AND o3.concept_id = ${23891} "
             + "       AND o3.value_datetime <= :endDate "
             + "GROUP  BY patient_id";
@@ -1601,7 +1601,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "                GROUP  BY p.patient_id "
             + "                UNION "
             + "                SELECT p.patient_id, "
-            + "                       ps.start_date AS art_date "
+            + "                       MIN(ps.start_date) AS art_date "
             + "                FROM   patient p "
             + "                       INNER JOIN patient_program pg "
             + "                               ON p.patient_id = pg.patient_id "
