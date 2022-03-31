@@ -446,7 +446,12 @@ public class TxPvlsCohortQueries {
 
     return cd;
   }
-
+  /**
+   * <b>Description</b>Get patients who are breastfeeding or pregnant controlled by parameter
+   * This method implements MQ Cat 14 Criteria
+   * @param state state
+   * @return CohortDefinition
+   */
   public CohortDefinition getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
           PregnantOrBreastfeedingWomen state, List<EncounterType> encounterTypeList) {
     CalculationCohortDefinition cd =
