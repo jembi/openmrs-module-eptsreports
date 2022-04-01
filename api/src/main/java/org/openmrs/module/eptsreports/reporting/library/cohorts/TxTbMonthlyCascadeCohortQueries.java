@@ -1966,7 +1966,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return getKey() + " AND " + NEGATIVESCREENING.getKey();
+        return NEGATIVESCREENING.getKey() + " AND "+ PREVIOUSLYART.getKey();
       }
 
       @Override
