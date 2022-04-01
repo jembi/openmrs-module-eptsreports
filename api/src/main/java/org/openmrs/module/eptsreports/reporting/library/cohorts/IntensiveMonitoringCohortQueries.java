@@ -1,7 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
-import javax.annotation.PostConstruct;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -16,6 +14,9 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.*;
 
 @Component
 public class IntensiveMonitoringCohortQueries {
@@ -1039,7 +1040,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13DEN10",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3DEN(indicator),
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13DEN10");
     return cd;
   }
@@ -1081,7 +1082,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13DEN11",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3DEN(indicator),
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},,revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13DEN11");
     return cd;
   }
@@ -1123,7 +1124,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13DEN14",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3DEN(indicator),
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},location=${location}"));
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13DEN14");
 
     return cd;
@@ -1215,7 +1216,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13NUM14",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3NUM(indicator),
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},location=${location}"));
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13NUM14");
 
     return cd;
@@ -2009,7 +2010,7 @@ public class IntensiveMonitoringCohortQueries {
             + "         WHERE p.voided = 0 AND e.voided = 0 AND e.location_id =:location AND e.encounter_type = ${6} "
             + "         AND o.concept_id=${856} AND o.value_numeric < 1000 "
             + "         UNION "
-            + "         SELECT p.patient_id, o.value_datetime AS encounter_date "
+            + "         SELECT p.patient_id, e.encounter_datetime AS encounter_date "
             + "         FROM patient p "
             + "            INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "            INNER JOIN obs o on e.encounter_id = o.encounter_id "

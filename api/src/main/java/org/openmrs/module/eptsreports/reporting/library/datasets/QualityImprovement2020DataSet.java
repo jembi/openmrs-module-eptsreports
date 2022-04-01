@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.QualityImprovement2020CohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
@@ -18,6 +15,10 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class QualityImprovement2020DataSet extends BaseDataSet {
@@ -1512,7 +1513,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ13DEN3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "mqAge=MqAdults");
+        "age=15+");
 
     CohortIndicator MQ13DEN12 =
         eptsGeneralIndicator.getIndicator(
@@ -2054,7 +2055,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ15DEN13",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DenMDS(),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ15DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2063,7 +2064,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "15.13 - % de pacientes elegíveis a MDS, que foram inscritos em MDS",
         EptsReportUtils.map(
             MQ15DEN13,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MQ15NUM13 =
@@ -2071,7 +2072,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ15NUM13",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NumeratorMDS(),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ15NUM13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2080,7 +2081,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "Numerator:  “# de pacientes elegíveis a MDS ",
         EptsReportUtils.map(
             MQ15NUM13,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MQ15DEN14 =
@@ -2088,7 +2089,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ15DEN14",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15MdsDen14(),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ15DEN14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2097,7 +2098,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "15.14 - % de inscritos em MDS que receberam CV acima de 1000 cópias  ",
         EptsReportUtils.map(
             MQ15DEN14,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MQ15NUM14 =
@@ -2105,7 +2106,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ15NUM14",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15MdsNum14(),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ15NUM14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2114,7 +2115,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "Numerator: # de pacientes inscritos em MDS para pacientes estáveis ",
         EptsReportUtils.map(
             MQ15NUM14,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MQ15DEN15 =
@@ -2122,7 +2123,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ15DEN15",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15MdsDen15(),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ15DEN15.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2131,7 +2132,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "Numerator 15.15 : # de pacientes inscritos em MDS para pacientes estáveis - 21 meses",
         EptsReportUtils.map(
             MQ15DEN15,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MQ15NUM15 =
@@ -2139,7 +2140,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ15NUM15",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15MdsNum15(),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ15NUM15.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2148,7 +2149,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "Numerator: # de pacientes inscritos em MDS para pacientes estáveis ",
         EptsReportUtils.map(
             MQ15NUM15,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MQ15DEN16 =
