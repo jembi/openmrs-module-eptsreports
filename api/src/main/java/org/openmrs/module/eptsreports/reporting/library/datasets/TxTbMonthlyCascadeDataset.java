@@ -46,7 +46,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addDimension(
         "gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
-    /*    CohortIndicator TXCURR =
+        CohortIndicator TXCURR =
         eptsGeneralIndicator.getIndicator(
             "TXCURRTOTAL",
             EptsReportUtils.map(
@@ -169,7 +169,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             "TXTBDENTOTAL",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
-                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB),
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_DENOMINATOR),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
@@ -273,7 +273,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "TXTBTXCURRPREV",
         "TXTBTXCURRPREV",
         EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
-        getSexAndAgeDimension());*/
+        getSexAndAgeDimension());
 
     // 4a. Positive TB screening or specimen sent or notified with TB: Number of ART patients who
     // were screened positive for TB in the last six months
@@ -388,7 +388,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     // 8a. TX_TB numerator (screened patients who initiated TB treatment): Number of ART patients
     // screened for TB in the last 6 months who initiated TB treatment (TX_TB numerator)
 
-    /*    CohortIndicator NUMERATORTOTAL =
+        CohortIndicator NUMERATORTOTAL =
         eptsGeneralIndicator.getIndicator(
             "NUMERATORTOTAL ",
             EptsReportUtils.map(
@@ -407,7 +407,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             "NUMERATORNEWART",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
-                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.NEGATIVESCREENING_AND_NEWART),
+                    TxTbMonthlyCascadeCohortQueries.TxTbComposition.NUMERATOR_AND_NEWART),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "NUMERATORNEWART",
@@ -750,7 +750,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "SEVENOTHER",
         "SEVENOTHER",
         EptsReportUtils.map(SEVENOTHER, "endDate=${endDate},location=${location}"),
-        "");*/
+        "");
 
     return cohortIndicatorDefinition;
   }

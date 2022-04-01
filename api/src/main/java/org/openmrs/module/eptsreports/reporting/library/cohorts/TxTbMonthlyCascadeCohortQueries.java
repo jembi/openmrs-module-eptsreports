@@ -113,6 +113,40 @@ public class TxTbMonthlyCascadeCohortQueries {
   }
 
 
+  public CohortDefinition getTxTbNumeratorCohort(TxTbComposition txTbComposition) {
+    CompositionCohortDefinition chd = new CompositionCohortDefinition();
+    chd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    chd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    chd.addParameter(new Parameter("location", "location", Location.class));
+    chd.setName(txTbComposition.getName());
+
+    CohortDefinition newOnArt = getPatientsNewOnArt();
+    CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
+
+    chd.addSearch(
+            TxTbComposition.NUMERATOR.getKey(),
+            EptsReportUtils.map(
+                    txtbCohortQueries.txTbNumerator(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+
+    chd.addSearch(
+            TxTbComposition.NEWART.getKey(),
+            EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxTbComposition.PREVIOUSLYART.getKey(),
+            EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+            TxCurrComposition.TXCURR.getKey(),
+            EptsReportUtils.map(
+                    txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
+                    "onOrBefore=${endDate},location=${location}"));
+
+    chd.setCompositionString(txTbComposition.getCompositionString());
+    return chd;
+  }
 
   /**
    * Apply the disaggregation as following: Patients New on ART as follows (A)
@@ -1929,12 +1963,12 @@ public class TxTbMonthlyCascadeCohortQueries {
     POSITIVESCREENING_AND_NEWART {
       @Override
       public String getKey() {
-        return "POSITIVESCREENING";
+        return "";
       }
 
       @Override
       public String getCompositionString() {
-        return getKey() + " AND " + NEWART.getKey();
+        return POSITIVESCREENING.getCompositionString() + " AND " + NEWART.getKey();
       }
 
       @Override
@@ -1945,12 +1979,12 @@ public class TxTbMonthlyCascadeCohortQueries {
     POSITIVESCREENING_AND_PREVIOUSLYRT {
       @Override
       public String getKey() {
-        return "POSITIVESCREENING";
+        return "";
       }
 
       @Override
       public String getCompositionString() {
-        return getKey() + " AND " + PREVIOUSLYART.getKey();
+        return POSITIVESCREENING.getCompositionString() + " AND " + PREVIOUSLYART.getKey();
       }
 
       @Override
@@ -1966,7 +2000,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return NEGATIVESCREENING.getKey() + " AND "+ PREVIOUSLYART.getKey();
+        return NEGATIVESCREENING.getCompositionString() + " AND " + PREVIOUSLYART.getKey();
       }
 
       @Override
