@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -12,6 +11,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -71,14 +72,14 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
 
     chd.addSearch(
-        TxTbComposition.TXTB.getKey(),
+        TxTbComposition.TXTB_DENOMINATOR.getKey(),
         EptsReportUtils.map(
-            txtbCohortQueries.positiveScreening(),
+            txtbCohortQueries.getDenominator(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     chd.addSearch(
         TxTbComposition.POSITIVESCREENING.getKey(),
         EptsReportUtils.map(
-            txtbCohortQueries.newOnARTPositiveScreening(),
+            txtbCohortQueries.positiveScreening(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
@@ -1768,7 +1769,7 @@ public class TxTbMonthlyCascadeCohortQueries {
   }
 
   public enum TxTbComposition {
-    TXTB {
+    TXTB_DENOMINATOR {
       @Override
       public String getKey() {
         return "TXTB";
@@ -1826,12 +1827,12 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return getKey();
+        return TXTB_DENOMINATOR.getKey() + " AND " + getKey();
       }
 
       @Override
       public String getName() {
-        return "TX TB POSITIVESCREENING ";
+        return "POSITIVESCREENING ";
       }
     },
     NEGATIVESCREENING {
@@ -1842,7 +1843,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return getKey();
+        return TXTB_DENOMINATOR.getKey() + " AND NOT " + POSITIVESCREENING.getKey();
       }
 
       @Override
@@ -2046,7 +2047,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXTB.getKey() + " AND " + CLINICAL.getKey();
+        return TXTB_DENOMINATOR.getKey() + " AND " + CLINICAL.getKey();
       }
 
       @Override
@@ -2062,7 +2063,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXTB.getKey() + " AND " + PREVIOUSLYART.getKey();
+        return TXTB_DENOMINATOR.getKey() + " AND " + PREVIOUSLYART.getKey();
       }
 
       @Override
@@ -2079,7 +2080,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXTB.getKey() + " AND " + NEWART.getKey();
+        return TXTB_DENOMINATOR.getKey() + " AND " + NEWART.getKey();
       }
 
       @Override
@@ -2095,7 +2096,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXTB.getKey() + " AND " + TxCurrComposition.TXCURR.getKey();
+        return TXTB_DENOMINATOR.getKey() + " AND " + TxCurrComposition.TXCURR.getKey();
       }
 
       @Override
@@ -2111,7 +2112,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXTB.getKey() + " AND " + CLINICAL.getKey() + " AND " + NEWART.getKey();
+        return TXTB_DENOMINATOR.getKey() + " AND " + CLINICAL.getKey() + " AND " + NEWART.getKey();
       }
 
       @Override
@@ -2127,7 +2128,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXTB.getKey()
+        return TXTB_DENOMINATOR.getKey()
             + " AND "
             + TxCurrComposition.TXCURR.getKey()
             + " AND "
@@ -2147,7 +2148,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXTB.getKey()
+        return TXTB_DENOMINATOR.getKey()
             + " AND "
             + TxCurrComposition.TXCURR.getKey()
             + " AND "
@@ -2168,7 +2169,11 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return TXTB.getKey() + " AND " + CLINICAL.getKey() + " AND " + PREVIOUSLYART.getKey();
+        return TXTB_DENOMINATOR.getKey()
+            + " AND "
+            + CLINICAL.getKey()
+            + " AND "
+            + PREVIOUSLYART.getKey();
       }
 
       @Override

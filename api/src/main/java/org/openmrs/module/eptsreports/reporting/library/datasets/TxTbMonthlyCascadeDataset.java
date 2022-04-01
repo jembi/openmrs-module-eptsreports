@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TXTBCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries;
@@ -13,10 +16,6 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @Component
 public class TxTbMonthlyCascadeDataset extends BaseDataSet {
@@ -46,7 +45,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addDimension(
         "gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
-        CohortIndicator TXCURR =
+    /*    CohortIndicator TXCURR =
         eptsGeneralIndicator.getIndicator(
             "TXCURRTOTAL",
             EptsReportUtils.map(
@@ -273,7 +272,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "TXTBTXCURRPREV",
         "TXTBTXCURRPREV",
         EptsReportUtils.map(TXTBTXCURRPREV, "endDate=${endDate},location=${location}"),
-        getSexAndAgeDimension());
+        getSexAndAgeDimension());*/
 
     // 4a. Positive TB screening or specimen sent or notified with TB: Number of ART patients who
     // were screened positive for TB in the last six months
@@ -388,7 +387,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     // 8a. TX_TB numerator (screened patients who initiated TB treatment): Number of ART patients
     // screened for TB in the last 6 months who initiated TB treatment (TX_TB numerator)
 
-    CohortIndicator NUMERATORTOTAL =
+    /*    CohortIndicator NUMERATORTOTAL =
         eptsGeneralIndicator.getIndicator(
             "NUMERATORTOTAL ",
             EptsReportUtils.map(
@@ -750,7 +749,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         "SEVENOTHER",
         "SEVENOTHER",
         EptsReportUtils.map(SEVENOTHER, "endDate=${endDate},location=${location}"),
-        "");
+        "");*/
 
     return cohortIndicatorDefinition;
   }
