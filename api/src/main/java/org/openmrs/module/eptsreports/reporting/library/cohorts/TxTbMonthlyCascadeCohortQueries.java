@@ -112,56 +112,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     return chd;
   }
 
-  public CohortDefinition getTxTbNumeratorCohort(TxTbComposition txTbComposition) {
-    CompositionCohortDefinition chd = new CompositionCohortDefinition();
-    chd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    chd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    chd.addParameter(new Parameter("location", "location", Location.class));
-    chd.setName(txTbComposition.getName());
 
-    CohortDefinition newOnArt = getPatientsNewOnArt();
-    CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
-
-    chd.addSearch(
-        TxTbComposition.NUMERATOR.getKey(),
-        EptsReportUtils.map(
-            txtbCohortQueries.patientsNewOnARTNumerator(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-    chd.addSearch(
-        TxTbComposition.POSITIVESCREENING.getKey(),
-        EptsReportUtils.map(
-            txtbCohortQueries.newOnARTPositiveScreening(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    chd.addSearch(
-        TxTbComposition.NEGATIVESCREENING.getKey(),
-        EptsReportUtils.map(
-            txtbCohortQueries.newOnARTNegativeScreening(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    chd.addSearch(
-        TxTbComposition.CLINICAL.getKey(),
-        EptsReportUtils.map(
-            getPatientsWithClinicalConsultationInLast6Months(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    chd.addSearch(
-        TxTbComposition.NEWART.getKey(),
-        EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
-
-    chd.addSearch(
-        TxTbComposition.PREVIOUSLYART.getKey(),
-        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
-
-    chd.addSearch(
-        TxCurrComposition.TXCURR.getKey(),
-        EptsReportUtils.map(
-            txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
-            "onOrBefore=${endDate},location=${location}"));
-
-    chd.setCompositionString(txTbComposition.getCompositionString());
-    return chd;
-  }
 
   /**
    * Apply the disaggregation as following: Patients New on ART as follows (A)
@@ -1835,6 +1786,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "POSITIVESCREENING ";
       }
     },
+
     NEGATIVESCREENING {
       @Override
       public String getKey() {
