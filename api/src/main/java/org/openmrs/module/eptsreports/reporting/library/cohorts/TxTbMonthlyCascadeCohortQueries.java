@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -11,8 +12,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -112,7 +111,6 @@ public class TxTbMonthlyCascadeCohortQueries {
     return chd;
   }
 
-
   public CohortDefinition getTxTbNumeratorCohort(TxTbComposition txTbComposition) {
     CompositionCohortDefinition chd = new CompositionCohortDefinition();
     chd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -124,25 +122,24 @@ public class TxTbMonthlyCascadeCohortQueries {
     CohortDefinition previouslyOnArt = getPatientsPreviouslyOnArt();
 
     chd.addSearch(
-            TxTbComposition.NUMERATOR.getKey(),
-            EptsReportUtils.map(
-                    txtbCohortQueries.txTbNumerator(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-
-    chd.addSearch(
-            TxTbComposition.NEWART.getKey(),
-            EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+        TxTbComposition.NUMERATOR.getKey(),
+        EptsReportUtils.map(
+            txtbCohortQueries.txTbNumerator(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxTbComposition.PREVIOUSLYART.getKey(),
-            EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+        TxTbComposition.NEWART.getKey(),
+        EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
 
     chd.addSearch(
-            TxCurrComposition.TXCURR.getKey(),
-            EptsReportUtils.map(
-                    txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
-                    "onOrBefore=${endDate},location=${location}"));
+        TxTbComposition.PREVIOUSLYART.getKey(),
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+
+    chd.addSearch(
+        TxCurrComposition.TXCURR.getKey(),
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTxCurrCompositionCohort("tx_curr", true),
+            "onOrBefore=${endDate},location=${location}"));
 
     chd.setCompositionString(txTbComposition.getCompositionString());
     return chd;
@@ -248,7 +245,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "previouslyOnArt",
-        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate-6m},location=${location}"));
 
     cd.setCompositionString("txcurr AND previouslyOnArt");
     return cd;
@@ -368,7 +365,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "FROM   ( "
             + patientsOnArtQuery
             + " ) new_art "
-            + "WHERE  new_art.art_date BETWEEN Date_add(:endDate, INTERVAL -6 month) AND :endDate";
+            + "WHERE  new_art.art_date > Date_add(:endDate, INTERVAL -6 month) AND new_art.art_date <= :endDate";
 
     sqlCohortDefinition.setQuery(query);
 
@@ -383,13 +380,10 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Date.class));
 
     CohortDefinition onArtBeforeEndDate = getPatientsOnArtBeforeEndDate();
-    CohortDefinition newOnArt = getPatientsNewOnArt();
-    cd.addSearch(
-        "newOnArt", EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "onArtBeforeEndDate",
-        EptsReportUtils.map(onArtBeforeEndDate, "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("onArtBeforeEndDate AND NOT newOnArt");
+        EptsReportUtils.map(onArtBeforeEndDate, "endDate=${endDate-6m},location=${location}"));
+    cd.setCompositionString("onArtBeforeEndDate");
     return cd;
   }
 
@@ -1856,12 +1850,12 @@ public class TxTbMonthlyCascadeCohortQueries {
     NEGATIVESCREENING_AND_NEWART {
       @Override
       public String getKey() {
-        return "NEGATIVESCREENING";
+        return "";
       }
 
       @Override
       public String getCompositionString() {
-        return getKey() + " AND " + NEWART.getKey();
+        return NEGATIVESCREENING.getCompositionString() + " AND " + NEWART.getKey();
       }
 
       @Override
@@ -1995,7 +1989,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     NEGATIVESCREENING_AND_PREVIOUSLYRT {
       @Override
       public String getKey() {
-        return "NEGATIVESCREENING";
+        return "";
       }
 
       @Override
