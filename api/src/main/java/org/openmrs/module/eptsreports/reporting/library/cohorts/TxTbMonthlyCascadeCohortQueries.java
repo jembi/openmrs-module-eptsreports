@@ -783,13 +783,11 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
     map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
     map.put("703", tbMetadata.getPositiveConcept().getConceptId());
     map.put("664", tbMetadata.getNegativeConcept().getConceptId());
     String query =
-        ""
-            + "SELECT p.patient_id "
+              " SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
