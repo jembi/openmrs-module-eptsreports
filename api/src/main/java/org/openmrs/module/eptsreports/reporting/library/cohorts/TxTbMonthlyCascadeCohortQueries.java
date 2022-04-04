@@ -843,7 +843,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23723} "
-            + "       AND o.value_coded  NOT IN(${703}, ${664}) "
+            + "       AND o.value_coded IN(${703}, ${664}) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + " GROUP BY p.patient_id ";
     ;
@@ -885,7 +885,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23722} "
-            + "       AND o.value_coded <> ${23723} "
+            + "       AND o.value_coded = ${23723} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + " GROUP BY p.patient_id ";
 
