@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -12,6 +11,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -50,7 +51,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     chd.addSearch(
         TxCurrComposition.NEWART.getKey(),
-        EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxCurrComposition.PREVIOUSLYART.getKey(),
@@ -95,7 +96,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     chd.addSearch(
         TxTbComposition.NEWART.getKey(),
-        EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.PREVIOUSLYART.getKey(),
@@ -129,7 +130,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     chd.addSearch(
         TxTbComposition.NEWART.getKey(),
-        EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.PREVIOUSLYART.getKey(),
@@ -162,7 +163,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addSearch(
         "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
-        "newOnArt", EptsReportUtils.map(newOnArt, "endDate=${endDate},location=${location}"));
+        "newOnArt", EptsReportUtils.map(newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("txcurr AND newOnArt");
     return cd;
@@ -255,6 +256,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients New on ART (A)");
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedArtLast6Months = getPatientsStartedArtLast6MonthsFromEndDate();
@@ -263,7 +265,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     cd.addSearch(
         "startedArtLast6Months",
-        EptsReportUtils.map(startedArtLast6Months, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(startedArtLast6Months, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "transferredFromProgram",
         EptsReportUtils.map(transferredFromProgram, "endDate=${endDate},location=${location}"));
@@ -356,6 +358,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients New on ART  ");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String patientsOnArtQuery = getPatientsOnArt(true);
@@ -365,7 +368,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "FROM   ( "
             + patientsOnArtQuery
             + " ) new_art "
-            + "WHERE  new_art.art_date > Date_add(:endDate, INTERVAL -6 month) AND new_art.art_date <= :endDate";
+            + "WHERE  new_art.art_date BETWEEN :startDate AND :endDate";
 
     sqlCohortDefinition.setQuery(query);
 
