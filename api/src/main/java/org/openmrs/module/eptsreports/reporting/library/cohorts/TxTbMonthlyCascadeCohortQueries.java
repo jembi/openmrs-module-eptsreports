@@ -428,7 +428,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=$startDate,endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "haveTbLamTestResultOrRequestOrResult AND (dontHaveGENEXPERTOrXpertMTBOrBaciloscopia AND dontHaveApplication4LaboratoryResearch AND dontHaveGeneXpertWithAnyValueCodedPositive )");
+        "haveTbLamTestResultOrRequestOrResult AND NOT (dontHaveGENEXPERTOrXpertMTBOrBaciloscopia AND dontHaveApplication4LaboratoryResearch AND dontHaveGeneXpertWithAnyValueCodedPositive )");
     return cd;
   }
 
@@ -1006,7 +1006,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
-            + "       AND o.concept_id = 165189 "
+            + "       AND o.concept_id = ${165189} "
             + "       AND o.value_coded IN( ${1065}, ${1066} ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
@@ -1141,11 +1141,11 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND ( ( o.concept_id = ${23723} "
-            + "               AND o.value_coded NOT IN ( ${703}, ${664} ) ) "
+            + "               AND o.value_coded  IN ( ${703}, ${664} ) ) "
             + "              OR ( o.concept_id = ${165189} "
-            + "                   AND o.value_coded NOT IN ( ${1065}, ${1066} ) ) "
+            + "                   AND o.value_coded IN ( ${1065}, ${1066} ) ) "
             + "              OR ( o.concept_id = ${307} "
-            + "                   AND o.value_coded NOT IN ( ${703}, ${664} ) ) ) "
+            + "                   AND o.value_coded IN ( ${703}, ${664} ) ) ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 
@@ -1191,9 +1191,9 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND ( ( o.concept_id = ${23722} "
-            + "               AND o.value_coded <> ${23723} ) "
+            + "               AND o.value_coded = ${23723} ) "
             + "              OR ( o.concept_id = ${307} "
-            + "                   AND o.value_coded NOT IN ( ${703}, ${664} ) ) ) "
+            + "                   AND o.value_coded  IN ( ${703}, ${664} ) ) ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 
@@ -1239,9 +1239,9 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND ( ( o.concept_id = ${23723} "
-            + "               AND o.value_coded NOT IN( ${664}, ${703} ) ) "
+            + "               AND o.value_coded  IN( ${664}, ${703} ) ) "
             + "              OR ( o.concept_id = ${307} "
-            + "                   AND o.value_coded NOT IN ( ${703}, ${664} ) ) ) "
+            + "                   AND o.value_coded  IN ( ${703}, ${664} ) ) ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 
