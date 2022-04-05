@@ -51,7 +51,8 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     chd.addSearch(
         TxCurrComposition.NEWART.getKey(),
-        EptsReportUtils.map(newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxCurrComposition.PREVIOUSLYART.getKey(),
@@ -96,7 +97,8 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     chd.addSearch(
         TxTbComposition.NEWART.getKey(),
-        EptsReportUtils.map(newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.PREVIOUSLYART.getKey(),
@@ -130,7 +132,8 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     chd.addSearch(
         TxTbComposition.NEWART.getKey(),
-        EptsReportUtils.map(newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.PREVIOUSLYART.getKey(),
@@ -163,7 +166,9 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addSearch(
         "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
-        "newOnArt", EptsReportUtils.map(newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
+        "newOnArt",
+        EptsReportUtils.map(
+            newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("txcurr AND newOnArt");
     return cd;
@@ -265,7 +270,9 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     cd.addSearch(
         "startedArtLast6Months",
-        EptsReportUtils.map(startedArtLast6Months, "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            startedArtLast6Months,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "transferredFromProgram",
         EptsReportUtils.map(transferredFromProgram, "endDate=${endDate},location=${location}"));
@@ -469,7 +476,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "withoutGeneXpertHaveTbLamOrRequestOnOthers AND (dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers AND dontHaveApplication4LaboratoryResearchOnOnthers AND dontHaveGeneXpertOnOnthers)");
+        "withoutGeneXpertHaveTbLamOrRequestOnOthers AND NOT (dontHaveGENEXPERTXpertMTBOrBaciloscopiaOnOthers OR dontHaveApplication4LaboratoryResearchOnOnthers OR dontHaveGeneXpertOnOnthers)");
 
     return cd;
   }
@@ -787,7 +794,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     map.put("703", tbMetadata.getPositiveConcept().getConceptId());
     map.put("664", tbMetadata.getNegativeConcept().getConceptId());
     String query =
-              " SELECT p.patient_id "
+        " SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
@@ -1379,13 +1386,13 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
             + "       AND ( ( o.concept_id = ${23723} "
-            + "               AND o.value_coded NOT IN ( ${703}, ${664} ) ) "
+            + "               AND o.value_coded IN ( ${703}, ${664} ) ) "
             + "              OR ( o.concept_id = ${165189} "
-            + "                   AND o.value_coded NOT IN ( ${1065}, ${1066} ) ) "
+            + "                   AND o.value_coded  IN ( ${1065}, ${1066} ) ) "
             + "              OR ( o.concept_id = ${307} "
-            + "                   AND o.value_coded NOT IN ( ${664}, ${703} ) ) "
+            + "                   AND o.value_coded  IN ( ${664}, ${703} ) ) "
             + "              OR ( o.concept_id = ${23951} "
-            + "                   AND o.value_coded NOT IN ( ${664}, ${703} ) ) ) "
+            + "                   AND o.value_coded  IN ( ${664}, ${703} ) ) ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 
@@ -1431,7 +1438,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23722} "
-            + "       AND o.value_coded NOT IN ( ${23723}, ${307}, ${23951} ) "
+            + "       AND o.value_coded  IN ( ${23723}, ${307}, ${23951} ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 
@@ -1482,11 +1489,11 @@ public class TxTbMonthlyCascadeCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND ( ( o.concept_id = ${23723} "
-            + "               AND o.value_coded NOT IN ( ${703}, ${664} ) ) "
+            + "               AND o.value_coded  IN ( ${703}, ${664} ) ) "
             + "              OR ( o.concept_id = ${307} "
-            + "                   AND o.value_coded NOT IN ( ${703}, ${664} ) ) "
+            + "                   AND o.value_coded  IN ( ${703}, ${664} ) ) "
             + "              OR ( o.concept_id = ${23951} "
-            + "                   AND o.value_coded NOT IN ( ${703}, ${664}, ${1138} ) ) ) "
+            + "                   AND o.value_coded  IN ( ${703}, ${664}, ${1138} ) ) ) "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id";
 

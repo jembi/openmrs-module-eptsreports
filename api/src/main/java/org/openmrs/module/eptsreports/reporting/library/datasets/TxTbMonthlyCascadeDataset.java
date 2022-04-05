@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TXTBCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxTbMonthlyCascadeCohortQueries;
@@ -13,10 +16,6 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @Component
 public class TxTbMonthlyCascadeDataset extends BaseDataSet {
@@ -46,7 +45,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addDimension(
         "gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
-        CohortIndicator TXCURR =
+    CohortIndicator TXCURR =
         eptsGeneralIndicator.getIndicator(
             "TXCURRTOTAL",
             EptsReportUtils.map(
@@ -388,7 +387,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     // 8a. TX_TB numerator (screened patients who initiated TB treatment): Number of ART patients
     // screened for TB in the last 6 months who initiated TB treatment (TX_TB numerator)
 
-        CohortIndicator NUMERATORTOTAL =
+    CohortIndicator NUMERATORTOTAL =
         eptsGeneralIndicator.getIndicator(
             "NUMERATORTOTAL ",
             EptsReportUtils.map(
