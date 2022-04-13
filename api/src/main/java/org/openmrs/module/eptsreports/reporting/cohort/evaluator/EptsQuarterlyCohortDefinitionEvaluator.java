@@ -43,12 +43,21 @@ public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionE
     EptsQuarterlyCohortDefinition.Month month = cd.getMonth();
     Map<String, Date> range = getRange(year, quarter, month);
     context.getParameterValues().putAll(range);
-    context.setBaseCohort(context.getBaseCohort());
+    context.setBaseCohort(evaluateBaseCohort(context));
     Cohort c = cohortDefinitionService.evaluate(cd.getCohortDefinition(), context);
-    if (c == null) {
-      c = getAllPatientsCohort();
-    }
-    ret.getMemberIds().addAll(c.getMemberIds());
+    //    Cohort c = evaluateBaseCohort(context);
+    //    System.out.println(
+    //        "PATIENTS FROM BASECOHORT (LINE 46) =>" + context.getBaseCohort().getMemberIds());
+    //    System.out.println("PATIENTS FROM C(LINE 47) =>" + c.getMemberIds());
+    //    Cohort s = getAllPatientsCohort();
+    //    if (c == null) {
+    //      c = getAllPatientsCohort();
+    //    }
+//    ret.getMemberIds().addAll(getAllMembersIds(c).getMemberIds()); // BRINGS EMPTY ARRAY
+    //    getAllMembersIds(c);
+        ret.setMemberIds(getAllMembersIds(c));
+    //    System.out.println("RET RESULT => " + ret.getMemberIds());
+    //    System.out.println("BY NICHOLAS => " + s.getMemberIds());
     return ret;
   }
 
@@ -66,7 +75,7 @@ public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionE
    *
    * <p>If no month is given returns the dates for the whole quarter.
    */
-  private Map<String, Date> getRange(
+  public Map<String, Date> getRange(
       Integer year,
       EptsQuarterlyCohortDefinition.Quarter quarter,
       EptsQuarterlyCohortDefinition.Month month) {
@@ -95,5 +104,16 @@ public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionE
       }
     }
     return new Cohort("All patients", "All Patients returned from the DB", ids);
+  }
+
+  private Set<Integer> getAllMembersIds(Cohort c) {
+    //    ReportService reportService = Context.getService(ReportService.class);
+    Set<Integer> ids = new HashSet<>();
+    for (Integer values : c.getMemberIds()) {
+      if (values != null) {
+        ids.add(values);
+      }
+    }
+    return ids;
   }
 }

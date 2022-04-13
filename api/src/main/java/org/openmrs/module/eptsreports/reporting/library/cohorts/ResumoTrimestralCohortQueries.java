@@ -1,11 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
@@ -15,6 +9,13 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 @Component
 public class ResumoTrimestralCohortQueries {
@@ -165,8 +166,9 @@ public class ResumoTrimestralCohortQueries {
     wrapper.addSearch("L", mapStraightThrough(indicatorL));
     wrapper.addSearch("lastFirstTherapeuticLine", mapStraightThrough(lastFirstTherapeuticLine));
 
-    wrapper.setCompositionString(
-        "((startedArt NOT transferredOut) NOT (I OR J OR L)) AND lastFirstTherapeuticLine ");
+    //    wrapper.setCompositionString(
+    //        "((startedArt NOT transferredOut) NOT (I OR J OR L)) AND lastFirstTherapeuticLine ");
+    wrapper.setCompositionString("I");
     return wrapper;
   }
 
@@ -303,14 +305,14 @@ public class ResumoTrimestralCohortQueries {
     comp.setParameters(getParameters());
     String yearBefore =
         "onOrAfter=${onOrAfter-12m},onOrBefore=${onOrBefore-12m},location=${location}";
-    comp.addSearch("startedArt", map(startedArt, yearBefore));
+    //    comp.addSearch("startedArt", map(startedArt, yearBefore));
 
     String less12m = "onOrAfter=${onOrAfter-12m},onOrBefore=${onOrBefore},location=${location}";
-    comp.addSearch("transferredOut", map(transferredOut, less12m));
+    //    comp.addSearch("transferredOut", map(transferredOut, less12m));
 
     comp.addSearch("Suspended", map(sqlCohortDefinition, less12m));
 
-    comp.setCompositionString("(startedArt NOT transferredOut) AND Suspended");
+    comp.setCompositionString("Suspended");
     return comp;
   }
 

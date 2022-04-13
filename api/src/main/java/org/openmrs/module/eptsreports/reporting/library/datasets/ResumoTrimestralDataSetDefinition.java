@@ -1,9 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsQuarterlyCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoTrimestralCohortQueries;
 import org.openmrs.module.reporting.ReportingConstants;
@@ -15,6 +11,11 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 @Component
 public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
@@ -62,42 +63,71 @@ public class ResumoTrimestralDataSetDefinition extends BaseDataSet {
     CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
     dsd.setName("Resumo trimestral data set");
     dsd.addParameters(getParameters());
-    dsd.addColumn("Am1", A, getA(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Am2", A, getA(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Am3", A, getA(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Bm1", B, getB(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Bm2", B, getB(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Bm3", B, getB(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Cm1", C, getC(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Cm2", C, getC(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Cm3", C, getC(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn(
-        "Dm1", D + " M1", getD(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn(
-        "Dm2", D + " M2", getD(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn(
-        "Dm3", D + " M3", getD(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Am1", A, getA(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Am2", A, getA(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Am3", A, getA(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Bm1", B, getB(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Bm2", B, getB(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Bm3", B, getB(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Cm1", C, getC(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Cm2", C, getC(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Cm3", C, getC(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn(
+    //        "Dm1", D + " M1", getD(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn(
+    //        "Dm2", D + " M2", getD(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn(
+    //        "Dm3", D + " M3", getD(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
     dsd.addColumn("Em1", E, getE(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Em2", E, getE(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Em3", E, getE(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Fm1", F, getF(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Fm2", F, getF(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Fm3", F, getF(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Gm1", G, getG(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Gm2", G, getG(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Gm3", G, getG(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Hm1", H, getH(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Hm2", H, getH(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Hm3", H, getH(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Im1", I, getI(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Im2", I, getI(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Im3", I, getI(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Jm1", J, getJ(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Jm2", J, getJ(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Jm3", J, getJ(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Lm1", L, getL(EptsQuarterlyCohortDefinition.Month.M1), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Lm2", L, getL(EptsQuarterlyCohortDefinition.Month.M2), NO_DIMENSION_OPTIONS);
-    dsd.addColumn("Lm3", L, getL(EptsQuarterlyCohortDefinition.Month.M3), NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Em2", E, getE(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Em3", E, getE(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Fm1", F, getF(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Fm2", F, getF(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Fm3", F, getF(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Gm1", G, getG(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Gm2", G, getG(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Gm3", G, getG(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Hm1", H, getH(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Hm2", H, getH(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Hm3", H, getH(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Im1", I, getI(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Im2", I, getI(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Im3", I, getI(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Jm1", J, getJ(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Jm2", J, getJ(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Jm3", J, getJ(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Lm1", L, getL(EptsQuarterlyCohortDefinition.Month.M1),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Lm2", L, getL(EptsQuarterlyCohortDefinition.Month.M2),
+    // NO_DIMENSION_OPTIONS);
+    //    dsd.addColumn("Lm3", L, getL(EptsQuarterlyCohortDefinition.Month.M3),
+    // NO_DIMENSION_OPTIONS);
     return dsd;
   }
 
