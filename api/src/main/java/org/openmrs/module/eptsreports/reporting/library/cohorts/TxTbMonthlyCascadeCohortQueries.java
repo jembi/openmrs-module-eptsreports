@@ -173,7 +173,9 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.setCompositionString("txcurr AND newOnArt");
     return cd;
   }
-
+/**
+ *
+ * */
   public CohortDefinition get5And6and7(SemearTbLamGXPertComposition semearTbLamGXPertComposition) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Indicator 5");
@@ -234,7 +236,7 @@ public class TxTbMonthlyCascadeCohortQueries {
   }
 
   /**
-   * Patients Previously on ART (B)
+   *
    *
    * @return
    */
@@ -284,7 +286,10 @@ public class TxTbMonthlyCascadeCohortQueries {
         "startedArtLast6Months AND NOT(transferredFromProgram OR transferredFromFichaResumo)");
     return cd;
   }
-
+/** *
+ * The system will generate the indicators 5, 6a, 6b and 7 with the following disaggregation - Smear Microscopy
+ * return CohortDefinition
+ */
   public CohortDefinition getSmearMicroscopy() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Smear Microscopy");
@@ -328,7 +333,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "exameBaciloscopia OR haveBKTestRequest OR (haveBKTestResult AND dontHaveGENEXPERTInLabForm) AND dontHaveGeneXpertPositive AND dontHaveApplication4LabResearch ");
+        "exameBaciloscopia OR haveBKTestRequest OR haveBKTestResult AND NOT (dontHaveGENEXPERTInLabForm AND dontHaveGeneXpertPositive AND dontHaveApplication4LabResearch ");
 
     return cd;
   }
@@ -783,7 +788,7 @@ public class TxTbMonthlyCascadeCohortQueries {
    */
   public CohortDefinition getPatientsHaveGENEXPERTResultInLaboratotyForm() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Do not have a GENEXPERT Result registered in the laboratory form");
+    sqlCohortDefinition.setName("Have a GENEXPERT Result registered in the laboratory form");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
