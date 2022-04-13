@@ -173,9 +173,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.setCompositionString("txcurr AND newOnArt");
     return cd;
   }
-/**
- *
- * */
+  /** */
   public CohortDefinition get5And6and7(SemearTbLamGXPertComposition semearTbLamGXPertComposition) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Indicator 5");
@@ -235,11 +233,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     return cd;
   }
 
-  /**
-   *
-   *
-   * @return
-   */
+  /** @return */
   public CohortDefinition getPatientsOnTxCurrAndPreviouslyOnArt() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients New on ART (A)");
@@ -259,6 +253,24 @@ public class TxTbMonthlyCascadeCohortQueries {
     return cd;
   }
 
+  /**
+   * From getPatientsStartedArtLast6MonthsFromEndDate()
+   *
+   * <p>Exclude all transferred in patients without ART initiation date (Transferred IN and NOT A):
+   * Transferred-in from patient program Table: patient_program Criterias: program_id=2,
+   * patient_state=29 and start_date <= reporting end date; OR
+   *
+   * <p>Transferred-in from Ficha Resumo Encounter Type Id= 53 Criterias: “Transfer from other
+   * facility” concept Id 1369 = “Yes” concept id 1065 AND obs_datetime <=reporting endDate AND
+   * “Type of Patient Transferred from” concept id 6300 = “ART” concept id 6276 AND Date of
+   * MasterCard File Opening (PT”: “Data de Abertura da Ficha na US”) (Concept ID 23891
+   * value_datetime) <= reporting endDate Note 1: the both concepts 1369 and 6300 should be recorded
+   * in the same encounter the both concepts obs_datetime might be different because in this case
+   * its not referring to encounter date_time, but to transferred in date, hence should not be
+   * considered as encounter_datetime The system will identify the earliest date from the different
+   * sources by the reporting end date as patient ART Start Date and include as New on ART those
+   * with ART Start Date falling in the last 6 months from reporting end date
+   */
   public CohortDefinition getPatientsNewOnArt() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients New on ART (A)");
@@ -286,10 +298,10 @@ public class TxTbMonthlyCascadeCohortQueries {
         "startedArtLast6Months AND NOT(transferredFromProgram OR transferredFromFichaResumo)");
     return cd;
   }
-/** *
- * The system will generate the indicators 5, 6a, 6b and 7 with the following disaggregation - Smear Microscopy
- * return CohortDefinition
- */
+  /**
+   * * The system will generate the indicators 5, 6a, 6b and 7 with the following disaggregation -
+   * Smear Microscopy return CohortDefinition
+   */
   public CohortDefinition getSmearMicroscopy() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Smear Microscopy");
@@ -338,6 +350,11 @@ public class TxTbMonthlyCascadeCohortQueries {
     return cd;
   }
 
+  /**
+   * Select all patients have a clinical consultation (encounter type 6) in the last 6 months from
+   * the end date For the 6 months’ period, consider: Start Date = reporting end date – 6 months End
+   * Date = reporting end date
+   */
   public CohortDefinition getPatientsWithClinicalConsultationInLast6Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -366,6 +383,11 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * From getPatientsOnArt() The system will identify the earliest date from the different sources
+   * by the reporting end date as patient ART Start Date and include as New on ART those with ART
+   * Start Date falling in the last 6 months from reporting end date
+   */
   public CohortDefinition getPatientsStartedArtLast6MonthsFromEndDate() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients New on ART  ");
@@ -1506,7 +1528,27 @@ public class TxTbMonthlyCascadeCohortQueries {
     sqlCohortDefinition.setQuery(sb.replace(query));
     return sqlCohortDefinition;
   }
-
+  /**
+   * Patients New on ART as follows (A): All patients who have their first drugs pick-up date (first
+   * encounter_datetime) set in Pharmacy form FILA (Encounter Type ID 18): first occurrence of
+   * encounter date_time Encounter Type Ids = 18 And encounter_datetime<=EndDate All patients who
+   * have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) = START DRUGS (Concept ID 1256) at
+   * the pharmacy or clinical visits (Encounter Type IDs 6,9,18) first occurrence of encounter
+   * date_time Encounter Type Ids = 6,9,18 ARV PLAN (Concept Id 1255) = START DRUGS (Concept ID
+   * 1256) And encounter_datetime <=EndDate All patients who have the first historical start drugs
+   * date (earliest concept ID 1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9,
+   * 18, 53) earliest “historical start date” Encounter Type Ids = 6,9,18,53 The earliest
+   * “Historical Start Date” (Concept Id 1190) And historical start date(Value_datetime) <=EndDate
+   * All patients enrolled in ART Program (date_enrolled in program_id 2, from patient program
+   * table) program_enrollment date program_id=2 and date_enrolled And date_enrolled <=EndDate All
+   * patients with first drugs pick up date (earliest concept ID 23866 value_datetime) set in
+   * mastercard pharmacy form “Recepção/Levantou ARV”(Encounter Type ID 52) with Levantou ARV
+   * (concept id 23865) = Yes (concept id 1065) earliest “Date of Pick up” Encounter Type Ids = 52
+   * The earliest “Data de Levantamento” (Concept Id 23866 value_datetime) <= endDate Levantou ARV
+   * (concept id 23865) = SIm (1065)
+   *
+   * @return String
+   */
   private String getPatientsOnArt(boolean selectArtDate) {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
