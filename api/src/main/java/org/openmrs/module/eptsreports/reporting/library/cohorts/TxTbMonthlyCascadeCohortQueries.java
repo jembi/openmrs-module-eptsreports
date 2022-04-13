@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -12,6 +11,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -150,8 +151,8 @@ public class TxTbMonthlyCascadeCohortQueries {
 
   /**
    * Apply the disaggregation as following: Patients New on ART as follows (A)
-   *
-   * @return
+   *Check
+   * @return getPatientsNewOnArt() java doc
    */
   public CohortDefinition getPatientsOnTxCurrAndNewOnArt() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -172,7 +173,11 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.setCompositionString("txcurr AND newOnArt");
     return cd;
   }
-  /** */
+  /**
+   * This Cohort Composition implements all combinations to provide indicators 5, 6a and 7
+   * For more details check the java doc of the method on the composition
+   * @return CohortDefinition
+   * */
   public CohortDefinition get5And6and7(SemearTbLamGXPertComposition semearTbLamGXPertComposition) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Indicator 5");
@@ -232,10 +237,13 @@ public class TxTbMonthlyCascadeCohortQueries {
     return cd;
   }
 
-  /** @return */
+  /**
+   *
+   * Cohort Composition to get patients on Tx Curr and previously on Art
+   * @return CohortDefinition*/
   public CohortDefinition getPatientsOnTxCurrAndPreviouslyOnArt() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Patients New on ART (A)");
+    cd.setName("Patients on Tx Curr and previously on Art");
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
