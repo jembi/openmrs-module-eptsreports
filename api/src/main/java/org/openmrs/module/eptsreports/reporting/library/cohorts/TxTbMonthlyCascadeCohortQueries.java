@@ -545,7 +545,12 @@ public class TxTbMonthlyCascadeCohortQueries {
 
     return cd;
   }
-
+  /**
+   * Transferred-in from patient program Table: patient_program Criterias: program_id=2,
+   * patient_state=29 and start_date <= reporting end date
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getPatientsTransferredInFromProgram() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -581,7 +586,18 @@ public class TxTbMonthlyCascadeCohortQueries {
     sqlCohortDefinition.setQuery(sb.replace(query));
     return sqlCohortDefinition;
   }
-
+  /**
+   * Transferred-in from Ficha Resumo Encounter Type Id= 53 Criterias: “Transfer from other
+   * facility” concept Id 1369 = “Yes” concept id 1065 AND obs_datetime <=reporting endDate AND
+   * “Type of Patient Transferred from” concept id 6300 = “ART” concept id 6276 AND Date of
+   * MasterCard File Opening (PT”: “Data de Abertura da Ficha na US”) (Concept ID 23891
+   * value_datetime) <= reporting endDate Note 1: the both concepts 1369 and 6300 should be recorded
+   * in the same encounter the both concepts obs_datetime might be different because in this case
+   * its not referring to encounter date_time, but to transferred in date, hence should not be
+   * considered as encounter_datetime
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getPatientsTransferredInFromFichaResumo() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
