@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -11,8 +12,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class TxTbMonthlyCascadeCohortQueries {
@@ -409,6 +408,25 @@ public class TxTbMonthlyCascadeCohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * <b>Patients Previously on ART(B)</b> All patients who have their first drugs pick-up date
+   * (first encounter_datetime) set in Pharmacy form FILA (Encounter Type ID 18): first occurrence
+   * of encounter date_time Encounter Type Ids = 18 And encounter_datetime<=EndDate All patients who
+   * have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) = START DRUGS (Concept ID 1256) at
+   * the pharmacy or clinical visits (Encounter Type IDs 6,9,18) first occurrence of encounter
+   * date_time Encounter Type Ids = 6,9,18 ARV PLAN (Concept Id 1255) = START DRUGS (Concept ID
+   * 1256) And encounter_datetime <=EndDate All patients who have the first historical start drugs
+   * date (earliest concept ID 1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9,
+   * 18, 53) earliest “historical start date” Encounter Type Ids = 6,9,18,53 The earliest
+   * “Historical Start Date” (Concept Id 1190) And historical start date(Value_datetime) <=EndDate
+   * All patients enrolled in ART Program (date_enrolled in program_id 2, from patient program
+   * table) program_enrollment date program_id=2 and date_enrolled And date_enrolled <=EndDate All
+   * patients with first drugs pick up date (earliest concept ID 23866 value_datetime) set in
+   * mastercard pharmacy form “Recepção/Levantou ARV”(Encounter Type ID 52) with Levantou ARV
+   * (concept id 23865) = Yes (concept id 1065) earliest “Date of Pick up” Encounter Type Ids = 52
+   * The earliest “Data de Levantamento” (Concept Id 23866 value_datetime) <= endDate Levantou ARV
+   * (concept id 23865) = SIm (1065) <b>Exclude all patients from A</b>
+   */
   public CohortDefinition getPatientsPreviouslyOnArt() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
