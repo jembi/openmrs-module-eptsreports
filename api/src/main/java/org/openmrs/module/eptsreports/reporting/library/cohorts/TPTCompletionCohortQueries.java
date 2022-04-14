@@ -90,13 +90,7 @@ public class TPTCompletionCohortQueries {
             txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true),
             "onOrBefore=${endDate},location=${location},locations=${location}"));
 
-    compositionCohortDefinition.addSearch(
-        "A1",
-        EptsReportUtils.map(
-            getINHStartA1(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
-            mapping));
+    compositionCohortDefinition.addSearch("A1", EptsReportUtils.map(getINHStartA1(), mapping));
 
     compositionCohortDefinition.addSearch(
         "A2",
@@ -604,6 +598,124 @@ public class TPTCompletionCohortQueries {
   }
 
   /**
+   *
+   *
+   * <h4>User_Story_ TPT</h4>
+   *
+   * <ul>
+   *   <li>A1.1 : Select all patients with Ficha Resumo (encounter type 53) with “Ultima profilaxia
+   *       Isoniazida (Data Inicio)” (concept id 6128) and value datetime not null and exclude all
+   *       patients with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954) and
+   *       before end date.
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getA1Part1() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("TPT Completion A1.1");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "A1Part1Include",
+        EptsReportUtils.map(
+            getINHStartA1Part1Include(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "A1Part1Exclude",
+        EptsReportUtils.map(
+            getINHStartA1Part1Exclude(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.setCompositionString("A1Part1Include AND NOT A1Part1Exclude");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>User_Story_ TPT</h4>
+   *
+   * <ul>
+   *   <li>A1.2: Select all patients with Ficha Resumo (encounter type 53) with Última
+   *       profilaxia(concept id 23985) value coded INH(concept id 656) and Data Início da
+   *       Profilaxia TPT(value datetime, concept id 6128) not null and before end date.
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getA1Part2() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("TPT Completion A1.2");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "A1Part2A",
+        EptsReportUtils.map(
+            getINHStartA1Part2A(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.addSearch(
+        "A1Part2B",
+        EptsReportUtils.map(
+            getINHStartA1Part1Include(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.setCompositionString("A1Part2A AND A1Part2B");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>User_Story_ TPT: A1 : (A1.1 or A1.2)</h4>
+   *
+   * <ul>
+   *   <li>A1.1 : Select all patients with Ficha Resumo (encounter type 53) with “Ultima profilaxia
+   *       Isoniazida (Data Inicio)” (concept id 6128) and value datetime not null and exclude all
+   *       patients with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954) and
+   *       before end date.
+   *       <p>A1.2: Select all patients with Ficha Resumo (encounter type 53) with Última
+   *       profilaxia(concept id 23985) value coded INH(concept id 656) and Data Início da
+   *       Profilaxia TPT(value datetime, concept id 6128) not null and before end date.
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getINHStartA1() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("TPT Completion A1");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch("A1Part1", EptsReportUtils.map(getA1Part1(), mapping));
+
+    compositionCohortDefinition.addSearch("A1Part2", EptsReportUtils.map(getA1Part1(), mapping));
+
+    compositionCohortDefinition.setCompositionString("A1Part1 OR A1Part2");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
    * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
@@ -613,7 +725,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartA1(
+  public CohortDefinition getINHStartA1Part1Include(
       int masterCardEncounterType, int dataInicioProfilaxiaIsoniazidaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
@@ -639,6 +751,100 @@ public class TPTCompletionCohortQueries {
             + " AND e.encounter_type = ${53}"
             + " AND o.concept_id = ${6128}"
             + " AND o.value_datetime IS NOT NULL"
+            + " AND o.value_datetime < :endDate"
+            + " AND e.location_id = :location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>A -A1.1 Part1 : Select all patients with Última profilaxia(concept id 23985) value coded
+   *       3HP(concept id 23954) and before end date.
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getINHStartA1Part1Exclude(
+      int masterCardEncounterType, int regimeTPTConcept, int threeHPConceptConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Data Inicio)");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", masterCardEncounterType);
+    map.put("23985", regimeTPTConcept);
+    map.put("23954", threeHPConceptConcept);
+
+    String query =
+        "  SELECT"
+            + "  p.patient_id"
+            + "  FROM"
+            + "  patient p"
+            + "     INNER JOIN"
+            + "  encounter e ON p.patient_id = e.patient_id"
+            + "     INNER JOIN"
+            + " obs o ON e.encounter_id = o.encounter_id"
+            + " WHERE"
+            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
+            + " AND e.encounter_type = ${53}"
+            + " AND o.concept_id = ${23985}"
+            + " AND o.value_coded = ${23954}"
+            + " AND o.value_datetime < :endDate"
+            + " AND e.location_id = :location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>A -A1.2: Select all patients with Ficha Resumo (encounter type 53) with Última
+   *       profilaxia(concept id 23985) value coded INH(concept id 656)
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getINHStartA1Part2A(
+      int masterCardEncounterType, int regimeTPTConcept, int isoniazidConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Ficha Resumo)");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", masterCardEncounterType);
+    map.put("23985", regimeTPTConcept);
+    map.put("656", isoniazidConcept);
+
+    String query =
+        "  SELECT"
+            + "  p.patient_id"
+            + "  FROM"
+            + "  patient p"
+            + "     INNER JOIN"
+            + "  encounter e ON p.patient_id = e.patient_id"
+            + "     INNER JOIN"
+            + " obs o ON e.encounter_id = o.encounter_id"
+            + " WHERE"
+            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
+            + " AND e.encounter_type = ${53}"
+            + " AND o.concept_id = ${23985}"
+            + " AND o.value_coded = ${656}"
             + " AND o.value_datetime < :endDate"
             + " AND e.location_id = :location ";
 
