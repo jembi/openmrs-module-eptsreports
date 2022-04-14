@@ -80,6 +80,12 @@
 				<version>${legacyUiVersion}</version>
 				<scope>provided</scope>
 			</dependency>
+
+			<dependency>
+				<groupId>javax.annotation</groupId>
+				<artifactId>javax.annotation-api</artifactId>
+				<version>1.3.2</version>
+			</dependency>
 			<!--End of module dependacy -->
 
 			<!-- Begin OpenMRS core -->
