@@ -31,7 +31,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "Melhoria de Qualidade - 2020";
+    return "Melhoria de Qualidade - 2022";
   }
 
   @Override
@@ -76,8 +76,8 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Melhoria de Qualidade - 2020.xls",
-              "Melhoria de Qualidade - 2020",
+              "Template_MQ_2022.xls",
+              "Melhoria de Qualidade - 2022",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();

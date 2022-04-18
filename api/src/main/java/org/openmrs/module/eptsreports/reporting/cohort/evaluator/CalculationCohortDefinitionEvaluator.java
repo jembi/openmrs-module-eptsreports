@@ -80,9 +80,11 @@ public class CalculationCohortDefinitionEvaluator implements CohortDefinitionEva
   }
 
   private Cohort getAllPatientsCohort() {
+
     List<Patient> patients = Context.getPatientService().getAllPatients();
     Set<Integer> ids =
         patients.stream().map(patient -> patient.getPatientId()).collect(Collectors.toSet());
+
     return new Cohort("All patients", "All Patients returned from the DB", ids);
   }
 }

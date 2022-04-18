@@ -1,10 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -19,6 +14,9 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.*;
 
 @Component
 public class IntensiveMonitoringCohortQueries {
@@ -53,6 +51,11 @@ public class IntensiveMonitoringCohortQueries {
     this.commonCohortQueries = commonCohortQueries;
     this.commonMetadata = commonMetadata;
     this.tbMetadata = tbMetadata;
+  }
+
+  @PostConstruct
+  public void init() {
+    qualityImprovement2020CohortQueries.setIntensiveMonitoringCohortQueries(this);
   }
 
   /**
@@ -1037,7 +1040,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13DEN10",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3DEN(indicator),
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13DEN10");
     return cd;
   }
@@ -1079,7 +1082,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13DEN11",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3DEN(indicator),
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},,revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13DEN11");
     return cd;
   }
@@ -1121,7 +1124,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13DEN14",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3DEN(indicator),
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},location=${location}"));
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13DEN14");
 
     return cd;
@@ -1213,7 +1216,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13NUM14",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3NUM(indicator),
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},location=${location}"));
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13NUM14");
 
     return cd;
@@ -1291,7 +1294,7 @@ public class IntensiveMonitoringCohortQueries {
    * Consultation Date” (encounter_datetime from A) minus “Data de Início TARV” (concept id 1190
    * value_datetime) is greater than (>) 21 months
    */
-  public CohortDefinition getMI15B2() {
+  public CohortDefinition getMI15B2(Integer months) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("B2 - All patients with the earliest “Data de Início TARV”");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1325,7 +1328,8 @@ public class IntensiveMonitoringCohortQueries {
             + "             GROUP by pp.patient_id) as last_encounter "
             + "        ON last_encounter.patient_id=tabela.patient_id "
             + "WHERE timestampdiff(month,tabela.value_datetime,( last_encounter.encounter_datetime "
-            + "             ))>21";
+            + "             ))> "
+            + months;
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     cd.setQuery(stringSubstitutor.replace(query));
@@ -1978,6 +1982,13 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15I() {
 
+    CohortDefinition cd = getMI15I(18, 12);
+
+    return cd;
+  }
+
+  public CohortDefinition getMI15I(Integer monthsBefore, Integer lastVLResultMonths) {
+
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("I - All patients with the last Viral Load Result");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1988,6 +1999,7 @@ public class IntensiveMonitoringCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
     String query =
         "SELECT p.patient_id FROM patient p INNER JOIN encounter e on p.patient_id = e.patient_id INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
             + " INNER JOIN (SELECT juncao.patient_id,juncao.encounter_date "
@@ -1998,7 +2010,7 @@ public class IntensiveMonitoringCohortQueries {
             + "         WHERE p.voided = 0 AND e.voided = 0 AND e.location_id =:location AND e.encounter_type = ${6} "
             + "         AND o.concept_id=${856} AND o.value_numeric < 1000 "
             + "         UNION "
-            + "         SELECT p.patient_id, o.value_datetime AS encounter_date "
+            + "         SELECT p.patient_id, e.encounter_datetime AS encounter_date "
             + "         FROM patient p "
             + "            INNER JOIN encounter e on p.patient_id = e.patient_id "
             + "            INNER JOIN obs o on e.encounter_id = o.encounter_id "
@@ -2011,12 +2023,18 @@ public class IntensiveMonitoringCohortQueries {
             + "            AND e.encounter_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id "
             + "            )  "
             + " as last_consultation on last_consultation.patient_id = juncao.patient_id "
-            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL 18 MONTH)) as lastVLResult "
+            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL "
+            + monthsBefore
+            + " MONTH)) as lastVLResult "
             + " ON lastVLResult.patient_id=p.patient_id "
             + " WHERE "
             + " o.concept_id=${856} AND o.value_numeric is not null AND e.encounter_type=${6} AND  "
-            + " e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL 12 MONTH)  "
-            + " AND DATE_ADD(lastVLResult.encounter_date,INTERVAL 18 MONTH)AND e.location_id=:location";
+            + " e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL "
+            + lastVLResultMonths
+            + " MONTH)  "
+            + " AND DATE_ADD(lastVLResult.encounter_date,INTERVAL "
+            + monthsBefore
+            + " MONTH)AND e.location_id=:location";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String str = stringSubstitutor.replace(query);
@@ -2053,7 +2071,7 @@ public class IntensiveMonitoringCohortQueries {
 
     CohortDefinition a = getMI15A();
     CohortDefinition b1 = getMI15B1();
-    CohortDefinition b2 = getMI15B2();
+    CohortDefinition b2 = getMI15B2(21);
     CohortDefinition c = getMI15C();
     CohortDefinition d = getMI15D();
     CohortDefinition e = getMI15EComplete();

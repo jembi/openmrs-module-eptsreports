@@ -1579,7 +1579,7 @@
 	<!-- 51 - ENCOUNTER TYPE NOT YET IMPLEMENTED SO ENCOUNTER TYPE 13 - LABORATORY UUID BEING REUSED-->
 	<globalProperty>
 		<property>eptsreports.fsrEncounterType</property>
-		<defaultValue>e2790f68-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<defaultValue>b5b7d21f-efd1-407e-81ce-ba9d93c524f8</defaultValue>
 		<description>
             UUID for FSR - Carga Viral encounter type
 		</description>
@@ -3221,6 +3221,62 @@
 		<defaultValue>279a7f80-b3cd-45c2-b16b-4706212416fd</defaultValue>
 		<description>
 			UUID FOR PREP TARGET GROUP Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.otherOrNonCodedUuid</property>
+		<defaultValue>5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</defaultValue>
+		<description>
+			UUID for OTHER NON-CODED concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.DT3HPConceptUuid</property>
+		<defaultValue>3d126efc-631b-436f-9e4b-db728071c8d0</defaultValue>
+		<description>
+			UUID FOR DT-3HP
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.dataEstadoDaProfilaxiaConceptUuid</property>
+		<defaultValue>b6c4d473-2af5-4c4d-a9bb-ad3779fa5579</defaultValue>
+		<description>
+			UUID FOR PROFLAXIS STATUS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.lastRecordOfDispensingModeConceptUuid</property>
+		<defaultValue>40a9a12b-1205-4a55-bb93-caf15452bf61</defaultValue>
+		<description>
+			Last Record of Dispensing Mode  concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.dispensaComunitariaViaApeConceptUuid</property>
+		<defaultValue>0843c71b-be47-4de2-ba16-a08db52c1136</defaultValue>
+		<description>
+			Dispensa Comunitára via APE (DCAPE)
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.lastRecordOfFarmacConceptUuid</property>
+		<defaultValue>d2eaec39-9c48-443b-a8d5-b2b163d42c53</defaultValue>
+		<description>
+			Last Record of FARMAC
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>eptsreports.notFoundConceptUuid</property>
+		<defaultValue>8ee04ec1-9a35-43ba-9a61-4f7927300f87</defaultValue>
+		<description>
+			NOT FOUND
 		</description>
 	</globalProperty>
 

@@ -13,11 +13,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DQACargaViralDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DQASESPDataset;
@@ -31,6 +26,12 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SetupDQACargaViral extends EptsDataExportManager {
@@ -63,12 +64,12 @@ public class SetupDQACargaViral extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "DQA Carga Viral - MISAU";
+    return "DQA - MISAU";
   }
 
   @Override
   public String getDescription() {
-    return "DQA Carga Viral - MISAU Report";
+    return "DQA - MISAU Report";
   }
 
   @Override
@@ -83,7 +84,7 @@ public class SetupDQACargaViral extends EptsDataExportManager {
     rd.addDataSetDefinition(
         "CV", Mapped.mapStraightThrough(dqaCargaViralDataset.constructDQACargaViralDataset()));
     rd.addDataSetDefinition(
-        "SESP", Mapped.mapStraightThrough(dqaSESPDataset.constructDQASESPDataset(true)));
+        "SESP", Mapped.mapStraightThrough(dqaSESPDataset.constructDQASESPDataset()));
 
     return rd;
   }
@@ -95,12 +96,12 @@ public class SetupDQACargaViral extends EptsDataExportManager {
       rd =
           createXlsReportDesign(
               reportDefinition,
-              "DQA_Viral_Load_v1.1.xls",
-              "DQA Carga Viral - MISAU",
+              "DQA_Viral_Load_v1.4.1.xls",
+              "DQA - MISAU",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:7,dataset:CV");
+      props.put("repeatingSections", "sheet:1,row:8,dataset:CV");
       props.put("sortWeight", "5000");
       rd.setProperties(props);
     } catch (IOException e) {
