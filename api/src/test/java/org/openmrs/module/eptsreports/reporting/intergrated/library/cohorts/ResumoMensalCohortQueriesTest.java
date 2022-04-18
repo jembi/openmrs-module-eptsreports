@@ -182,7 +182,7 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(3, evaluatedCohort.getMemberIds().size());
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
     assertTrue(evaluatedCohort.getMemberIds().contains(1021));
   }
 
@@ -280,7 +280,7 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(3, evaluatedCohort.getMemberIds().size());
+    assertEquals(5, evaluatedCohort.getMemberIds().size());
     assertTrue(evaluatedCohort.getMemberIds().contains(1022));
     assertTrue(evaluatedCohort.getMemberIds().contains(1023));
   }
