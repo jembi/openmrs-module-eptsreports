@@ -72,7 +72,9 @@ public class TPTEligiblePatientListCohortQueries {
         EptsReportUtils.map(
             getINHStartA1(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
+                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPConcept().getConceptId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -434,7 +436,10 @@ public class TPTEligiblePatientListCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition getINHStartA1(
-      int masterCardEncounterType, int dataInicioProfilaxiaIsoniazidaConcept) {
+      int masterCardEncounterType,
+      int dataInicioProfilaxiaIsoniazidaConcept,
+      int regimenTpt,
+      int inhRpt) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Data Inicio)");
@@ -444,9 +449,12 @@ public class TPTEligiblePatientListCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("53", masterCardEncounterType);
     map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
+    map.put("23985", regimenTpt);
+    map.put("23954", inhRpt);
 
     String query =
-        " SELECT p.patient_id"
+        "SELECT patient_id FROM( "
+            + " SELECT p.patient_id"
             + " FROM"
             + " patient p"
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id"
@@ -460,7 +468,23 @@ public class TPTEligiblePatientListCohortQueries {
             + " AND o.concept_id = ${6128}"
             + " AND e.location_id = :location"
             + " AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate"
-            + " GROUP BY p.patient_id";
+            + " ) ficha_resumo "
+            + " WHERE patient_id NOT IN( "
+            + " SELECT p.patient_id "
+            + " FROM "
+            + " patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id"
+            + " INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + " WHERE"
+            + " p.voided = 0"
+            + " AND e.voided = 0"
+            + " AND o.voided = 0"
+            + " AND e.encounter_type = ${53} "
+            + " AND o.concept_id = ${23985} "
+            + " AND o.value_coded = ${23954} "
+            + " AND e.location_id = :location "
+            + " AND e.encounter_datetime <= :endDate "
+            + ") ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
