@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -18,6 +15,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class TPTEligiblePatientListCohortQueries {
@@ -83,7 +84,10 @@ public class TPTEligiblePatientListCohortQueries {
             getINHStartA2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId()),
+                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -490,10 +494,10 @@ public class TPTEligiblePatientListCohortQueries {
             + " patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + " WHERE"
-            + " p.voided = 0"
-            + " AND e.voided = 0"
-            + " AND o.voided = 0"
+            + " WHERE "
+            + " p.voided = 0 "
+            + " AND e.voided = 0 "
+            + " AND o.voided = 0 "
             + " AND e.encounter_type = ${53} "
             + " AND (o.concept_id = ${23985} AND o.concept_id = ${6128}) "
             + " AND o.value_coded = ${656} "
@@ -519,7 +523,12 @@ public class TPTEligiblePatientListCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition getINHStartA2(
-      int adultoSeguimentoEncounterType, int startDrugsConcept, int isoniazidUsageConcept) {
+      int adultoSeguimentoEncounterType,
+      int startDrugsConcept,
+      int isoniazidUsageConcept,
+      int regimenTpt,
+      int isoniazid,
+      int proflaxisStatus) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
@@ -531,6 +540,9 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("6", adultoSeguimentoEncounterType);
     map.put("6122", isoniazidUsageConcept);
     map.put("1256", startDrugsConcept);
+    map.put("23985", regimenTpt);
+    map.put("656", isoniazid);
+    map.put("165308", proflaxisStatus);
 
     String query =
         " SELECT p.patient_id FROM patient p  "
@@ -540,6 +552,15 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND o.voided = 0 AND e.voided = 0  "
             + "          AND p.voided = 0 AND e.location_id = :location "
             + "          AND o.value_coded = ${1256} "
+            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate"
+            + " UNION "
+            + " SELECT p.patient_id FROM patient p  "
+            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "          WHERE e.encounter_type = ${6} AND (o.concept_id = ${23985} AND o.concept_id = ${165308} ) "
+            + "          AND (o.value_coded = ${656} AND o.value_coded = ${1256} )  "
+            + "          AND o.voided = 0 AND e.voided = 0  "
+            + "          AND p.voided = 0 AND e.location_id = :location "
             + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
