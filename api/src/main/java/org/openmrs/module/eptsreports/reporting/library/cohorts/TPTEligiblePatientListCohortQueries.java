@@ -484,7 +484,21 @@ public class TPTEligiblePatientListCohortQueries {
             + " AND o.value_coded = ${23954} "
             + " AND e.location_id = :location "
             + " AND e.encounter_datetime <= :endDate "
-            + ") ";
+            + ") "
+            + " UNION "
+            + " SELECT p.patient_id AS patient_id FROM( "
+            + " patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + " WHERE"
+            + " p.voided = 0"
+            + " AND e.voided = 0"
+            + " AND o.voided = 0"
+            + " AND e.encounter_type = ${53} "
+            + " AND (o.concept_id = ${23985} AND o.concept_id = ${6128}) "
+            + " AND o.value_coded = ${656} "
+            + " AND o.value_datetime IS NOT NULL"
+            + " AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
