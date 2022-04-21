@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -15,10 +18,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class TPTEligiblePatientListCohortQueries {
@@ -114,7 +113,8 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
                 hivMetadata.getIsoniazidUsageConcept().getConceptId(),
-                hivMetadata.getStartDrugsConcept().getConceptId()),
+                hivMetadata.getStartDrugsConcept().getConceptId(),
+                tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -646,7 +646,8 @@ public class TPTEligiblePatientListCohortQueries {
       int dataInicioProfilaxiaIsoniazidaConcept,
       int masterCardEncounterType,
       int isoniazidUsageConcept,
-      int startDrugsConcept) {
+      int startDrugsConcept,
+      int proflaxisStatus) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Regime de TPT A4");
@@ -666,6 +667,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("53", masterCardEncounterType);
     map.put("6122", isoniazidUsageConcept);
     map.put("1256", startDrugsConcept);
+    map.put("165308", proflaxisStatus);
 
     String query =
         " SELECT p.patient_id   "
@@ -708,14 +710,16 @@ public class TPTEligiblePatientListCohortQueries {
             + "        SELECT pp.patient_id FROM patient pp "
             + "          INNER JOIN encounter ee ON ee.patient_id = pp.patient_id   "
             + "          INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id "
-            + "        WHERE ee.encounter_type = ${53}   AND oo.concept_id =  ${6128}    "
+            + "        WHERE ee.encounter_type = ${53}   AND (oo.concept_id =  ${6128} AND oo.concept_id = ${23985})    "
             + "          AND oo.voided = 0 AND ee.voided = 0    "
+            + "          AND oo.value_coded = ${656}"
             + "          AND pp.voided = 0 AND ee.location_id = :location   "
             + "          AND p.patient_id = pp.patient_id   "
             + "          AND oo.value_datetime IS NOT NULL  "
             + "          AND oo.value_datetime >= DATE_SUB(pickup.first_pickup_date, INTERVAL 210 DAY)  "
             + "          AND oo.value_datetime < pickup.first_pickup_date   "
             + "        UNION    "
+            + "        SELECT patient_id FROM(    "
             + "        SELECT pp.patient_id FROM patient pp "
             + "           INNER JOIN encounter ee ON ee.patient_id = pp.patient_id  "
             + "           INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id    "
@@ -726,6 +730,18 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND oo.value_coded =   ${1256}    "
             + "          AND ee.encounter_datetime >= DATE_SUB(pickup.first_pickup_date, INTERVAL 210 DAY)  "
             + "          AND ee.encounter_datetime < pickup.first_pickup_date   "
+            + "          UNION "
+            + "        SELECT pp.patient_id FROM patient pp "
+            + "           INNER JOIN encounter ee ON ee.patient_id = pp.patient_id  "
+            + "           INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id    "
+            + "        WHERE ee.encounter_type =   ${6}   AND (oo.concept_id = ${23985} AND oo.concept_id=${165308})  "
+            + "          AND oo.voided = 0 AND ee.voided = 0    "
+            + "          AND pp.voided = 0 AND ee.location_id = :location   "
+            + "          AND p.patient_id = pp.patient_id   "
+            + "          AND (oo.value_coded =   ${1256} AND oo.value_coded =   ${656})   "
+            + "          AND ee.encounter_datetime >= DATE_SUB(pickup.first_pickup_date, INTERVAL 210 DAY)  "
+            + "          AND ee.encounter_datetime < pickup.first_pickup_date   "
+            + "          ) combined"
             + "        UNION    "
             + "        SELECT pp.patient_id FROM patient pp "
             + "           INNER JOIN encounter ee ON ee.patient_id = pp.patient_id  "
