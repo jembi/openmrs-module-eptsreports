@@ -337,13 +337,17 @@ public class TPTCompletionCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-        "C5",
+        "C6",
         EptsReportUtils.map(
             getINHStartC6Query(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDT3HPConcept().getConceptId()),
             mapping));
+
+    compositionCohortDefinition.addSearch(
+        "C7",
+        EptsReportUtils.map(get3HPStartC7(), mapping));
 
     compositionCohortDefinition.addSearch(
         "D1",
@@ -389,7 +393,7 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(getPatientsThatCompletedIsoniazidProphylacticTreatment(), mapping2));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND (((A1 OR A2 OR A3 OR A4 OR A5 OR A6) AND (B1 OR B2 OR B3 OR B4 OR (B5Part1 OR B5Part3 OR B5Part3) OR (B6Part1 OR B6Part3 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5 OR C6) AND (D1 OR D2 OR D3)))");
+        "txcurr AND (((A1 OR A2 OR A3 OR A4 OR A5 OR A6) AND (B1 OR B2 OR B3 OR B4 OR (B5Part1 OR B5Part3 OR B5Part3) OR (B6Part1 OR B6Part3 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5 OR C6 OR C7) AND (D1 OR D2 OR D3)))");
 
     return compositionCohortDefinition;
   }
@@ -1704,6 +1708,322 @@ public class TPTCompletionCohortQueries {
 
     return sqlCohortDefinition;
   }
+
+  /**
+   *
+   *
+   * <h4>User_Story_ TPT</h4>
+   *
+   * <ul>
+   *   <li>C4: Select all patients with “Regime de TPT” (concept id 23985) with value coded “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento TPT”(concept ID 23987) value coded “continua” or “fim” or no value(concept ID in [1257, 1267, null]) marked on the first FILT (encounter type 60) and encounter datetime before end date and:
+   *            No other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the FILT 3HP start date.  ; and
+   *            No other 3HP start dates marked on Ficha clinica (encounter type 6, encounter datetime) with Profilaxia TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da Profilaxia  (concept id 165308) value coded Início (concept id 1256) or Outras prescrições (concept id 1719) value coded 3HP or DT-3HP (concept id in [23954,165307])in the 4 months prior to the FILT 3HP start date.  ; and
+   *            No other 3HP start dates marked on Ficha Resumo (encounter type 53) with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954) and Data Início da Profilaxia TPT(value datetime, concept id 6128) in the 4 months prior to the FILT 3HP start date.  ;
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition get3HPStartC7() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("3HP Start C4");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+            "C4Part1",
+            EptsReportUtils.map(
+                    getINHStartC7Part1Query(
+                            tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                            tbMetadata.getRegimeTPTConcept().getConceptId(),
+                            tbMetadata.get3HPConcept().getConceptId(),
+                            tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                            tbMetadata.getTreatmentFollowUpTPTConcept().getConceptId(),
+                            hivMetadata.getContinueRegimenConcept().getConceptId(),
+                            hivMetadata.getCompletedConcept().getConceptId()
+                    ),
+                    mapping));
+    compositionCohortDefinition.addSearch(
+            "C4Part2",
+            EptsReportUtils.map(
+                    getINHStartC7Part2Query(
+                            tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                            tbMetadata.getRegimeTPTConcept().getConceptId(),
+                            tbMetadata.get3HPConcept().getConceptId(),
+                            tbMetadata.get3HPPiridoxinaConcept().getConceptId()
+                    ),
+                    mapping));
+    compositionCohortDefinition.addSearch(
+            "C4Part3",
+            EptsReportUtils.map(
+                    getINHStartC7Part3Query(
+                            tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                            tbMetadata.getRegimeTPTConcept().getConceptId(),
+                            tbMetadata.get3HPConcept().getConceptId(),
+                            tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                            tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
+                            hivMetadata.getStartDrugs().getConceptId(),
+                            tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                            tbMetadata.getDT3HPConcept().getConceptId()
+                    ), mapping));
+    compositionCohortDefinition.addSearch(
+            "C4Part4",
+            EptsReportUtils.map(
+                    getINHStartC7Part4Query(
+                            tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                            tbMetadata.getRegimeTPTConcept().getConceptId(),
+                            tbMetadata.get3HPConcept().getConceptId()
+                    ),mapping));
+
+    compositionCohortDefinition.setCompositionString("C4Part1 AND C4Part2 AND C4Part3 AND C4Part4");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>C7 Part 1: Select all patients with “Regime de TPT” (concept id 23985) with value coded
+   *       “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento
+   *       TPT”(concept ID 23987) value coded “continua” or “fim” or no value(concept ID in [1257,
+   *       1267, null]) marked on the first FILT (encounter type 60) and encounter datetime before
+   *       end date and:
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getINHStartC7Part1Query(
+      int regimeTPTEncounterType,
+      int regimeTPTConcept,
+      int threeHPConcept,
+      int threeHPPiridoxinaConcept,
+      int treatmentFollowUpTPTConcept,
+      int continueRegimenConcept,
+      int completedConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(
+        "C7 Part 1 Query: all patients with Regime de TPT and Seguimento de tratamento TPT");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("60", regimeTPTEncounterType);
+    map.put("23985", regimeTPTConcept);
+    map.put("23954", threeHPConcept);
+    map.put("23984", threeHPPiridoxinaConcept);
+    map.put("23987", treatmentFollowUpTPTConcept);
+    map.put("1257", continueRegimenConcept);
+    map.put("1267", completedConcept);
+
+    String query =
+        " SELECT"
+            + " p.patient_id"
+            + " FROM"
+            + " patient p"
+            + " INNER JOIN"
+            + " encounter e ON p.patient_id = e.patient_id"
+            + " INNER JOIN"
+            + " obs o ON e.encounter_id = o.encounter_id"
+            + " INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
+            + " WHERE"
+            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
+            + "    AND e.encounter_type = ${60}"
+            + " AND (o.concept_id = ${23985} AND o.value_coded IN(${23954}, ${23984}))   "
+            + " AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1257}, ${1267}, null))   "
+            + "    AND e.encounter_datetime < :endDate"
+            + "    AND e.location_id = :location";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>C7 Part 2: No other Regime de TPT (concept id 23985) value coded “3HP” or ”
+   *       3HP+Piridoxina” (concept id in [23954, 23984]) marked on FILT (encounter type 60) in the
+   *       4 months prior to the FILT 3HP start date.
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getINHStartC7Part2Query(
+      int regimeTPTEncounterType,
+      int regimeTPTConcept,
+      int threeHPConcept,
+      int threeHPPiridoxinaConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName("C7 Part 2 Query: all patients with Regime de TPT marked on FILT");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("60", regimeTPTEncounterType);
+    map.put("23985", regimeTPTConcept);
+    map.put("23954", threeHPConcept);
+    map.put("23984", threeHPPiridoxinaConcept);
+
+    String query =
+        " SELECT p.patient_id FROM patient p    "
+            + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "INNER JOIN (   "
+            + "SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+            + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+            + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "WHERE e.encounter_type = ${60}    "
+            + "AND o.concept_id = ${23985} AND o.value_coded IN(${23954}, ${23984})   "
+            + "AND e.location_id = :location       "
+            + "AND e.encounter_datetime < :endDate "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+            + ") AS regimeTPT    "
+            + "ON regimeTPT.patient_id = p.patient_id   "
+            + "WHERE e.encounter_type = ${60}   "
+            + "AND o.concept_id = ${23985} AND o.value_coded IN(${23954},${23984})   "
+            + "AND e.location_id = :location   "
+            + "AND e.encounter_datetime BETWEEN DATE_SUB(regimeTPT.encounter_datetime, INTERVAL 4 MONTH) AND regimeTPT.encounter_datetime   "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>C7 Part 3: No other 3HP start dates marked on Ficha clinica (encounter type 6, encounter datetime) with Profilaxia TPT (concept id 23985)
+   *   value coded 3HP (concept id 23954) and Estado da Profilaxia  (concept id 165308) value coded Início (concept id 1256) or
+   *   Outras prescrições (concept id 1719) value coded 3HP or DT-3HP (concept id in [23954,165307])in the 4 months prior to the FILT 3HP start date.  ; and
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getINHStartC7Part3Query(
+          int regimeTPTEncounterType,
+          int adultoSeguimentoEncounterType,
+          int regimeTPTConcept,
+          int threeHPConcept,
+          int threeHPPiridoxinaConcept,
+          int dataEstadoDaProfilaxiaConcept,
+          int startDrugsConcept,
+          int treatmentPrescribedConcept,
+          int DT3HPConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName("C7 Part 3 Query: all patients with Regime de TPT marked on FILT");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("60", regimeTPTEncounterType);
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("23985", regimeTPTConcept);
+    map.put("23954", threeHPConcept);
+    map.put("23984", threeHPPiridoxinaConcept);
+    map.put("165308", dataEstadoDaProfilaxiaConcept);
+    map.put("1256", startDrugsConcept);
+    map.put("1719", treatmentPrescribedConcept);
+    map.put("165307", DT3HPConcept);
+
+    String query =
+            " SELECT p.patient_id FROM patient p    "
+                    + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+                    + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+                    + "INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "INNER JOIN (   "
+                    + "SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+                    + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+                    + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+                    + "WHERE e.encounter_type = ${60}    "
+                    + "AND o.concept_id = ${23985} AND o.value_coded IN(${23954}, ${23984})   "
+                    + "AND e.location_id = :location       "
+                    + "AND e.encounter_datetime < :endDate "
+                    + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+                    + ") AS regimeTPT    "
+                    + "ON regimeTPT.patient_id = p.patient_id   "
+                    + "WHERE e.encounter_type = ${6}   "
+                    + "AND (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
+                    + "AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256})   "
+                    + "OR (o.concept_id = ${1719} AND o.value_coded IN (${23954},${165307})) "
+                    + "AND e.location_id = :location   "
+                    + "AND e.encounter_datetime BETWEEN DATE_SUB(regimeTPT.encounter_datetime, INTERVAL 4 MONTH) AND regimeTPT.encounter_datetime   "
+                    + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>: User_Story_ TPT <br>
+   *
+   * <ul>
+   *   <li>C7 Part 4: No other 3HP start dates marked on Ficha Resumo (encounter type 53) with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954)
+   *   and Data Início da Profilaxia TPT(value datetime, concept id 6128) in the 4 months prior to the FILT 3HP start date.  ;
+   *   <li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getINHStartC7Part4Query(
+          int regimeTPTEncounterType,
+          int masterCardEncounterType,
+          int regimeTPTConcept,
+          int threeHPConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName("C7 Part 4 Query: all patients with Regime de TPT marked on FILT");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("60", regimeTPTEncounterType);
+    map.put("53", masterCardEncounterType);
+    map.put("23985", regimeTPTConcept);
+    map.put("23954", threeHPConcept);
+
+    String query =
+            " SELECT p.patient_id FROM patient p    "
+                    + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+                    + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+                    + "INNER JOIN (   "
+                    + "SELECT p.patient_id, e.encounter_datetime FROM patient p    "
+                    + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
+                    + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+                    + "WHERE e.encounter_type = ${60}    "
+                    + "AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
+                    + "AND e.location_id = :location       "
+                    + "AND e.encounter_datetime < :endDate "
+                    + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0   "
+                    + ") AS regimeTPT    "
+                    + "ON regimeTPT.patient_id = p.patient_id   "
+                    + "WHERE e.encounter_type = ${53}   "
+                    + "AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
+                    + "AND e.location_id = :location   "
+                    + "AND o.value_datetime BETWEEN DATE_SUB(regimeTPT.encounter_datetime, INTERVAL 4 MONTH) AND regimeTPT.encounter_datetime   "
+                    + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
 
   /**
    * <b>IMER1</b>:User Story TPT Completion Patient List <br>
