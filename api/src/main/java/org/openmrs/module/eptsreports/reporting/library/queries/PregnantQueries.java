@@ -348,7 +348,7 @@ public class PregnantQueries {
             + yesConcept
             + " AND e.encounter_type = "
             + fsr
-            + " AND pe.gender='F' AND o.value_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id "
+            + " AND pe.gender='F' AND o.value_datetime BETWEEN :onOrAfter AND :onOrBefore GROUP BY p.patient_id "
             + " UNION "
             + " SELECT pp.patient_id, MAX(ps.start_date) AS last_date "
             + " FROM patient_program pp"
