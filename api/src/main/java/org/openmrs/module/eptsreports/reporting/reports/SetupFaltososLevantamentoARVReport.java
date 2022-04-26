@@ -4,6 +4,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.FaltososLevantamentoARVDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -68,6 +69,8 @@ public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
         "FALTOSOS", Mapped.mapStraightThrough(faltososLevantamentoARVDataSet.constructDataSet()));
     reportDefinition.addDataSetDefinition(
         "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    reportDefinition.addDataSetDefinition(
+            "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
