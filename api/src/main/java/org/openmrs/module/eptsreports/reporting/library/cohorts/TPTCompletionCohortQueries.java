@@ -347,51 +347,16 @@ public class TPTCompletionCohortQueries {
 
     compositionCohortDefinition.addSearch("C7", EptsReportUtils.map(get3HPStartC7(), mapping));
 
-    compositionCohortDefinition.addSearch(
-        "D1",
-        EptsReportUtils.map(
-            get3HPD1(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
-            mapping));
+    compositionCohortDefinition.addSearch("D3", EptsReportUtils.map(get3HPD3(), mapping));
 
-    compositionCohortDefinition.addSearch(
-        "D2",
-        EptsReportUtils.map(
-            get3HPD2(
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
-                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getQuarterlyConcept().getConceptId(),
-                hivMetadata.getPatientTreatmentFollowUp().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getRestartConcept().getConceptId()),
-            mapping));
-
-    compositionCohortDefinition.addSearch(
-        "D3",
-        EptsReportUtils.map(
-            get3HPD3(
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
-                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
-                hivMetadata.getMonthlyConcept().getConceptId()),
-            mapping));
+    compositionCohortDefinition.addSearch("D4", EptsReportUtils.map(get3HPD4(), mapping));
 
     compositionCohortDefinition.addSearch(
         "completedAll",
         EptsReportUtils.map(getPatientsThatCompletedIsoniazidProphylacticTreatment(), mapping2));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND (((A1 OR A2 OR A3 OR A4 OR A5 OR A6) AND (B1 OR B2 OR B3 OR B4 OR (B5Part1 OR B5Part3 OR B5Part3) OR (B6Part1 OR B6Part3 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5 OR C6 OR C7) AND (D1 OR D2 OR D3)))");
+        "txcurr AND (((A1 OR A2 OR A3 OR A4 OR A5 OR A6) AND (B1 OR B2 OR B3 OR B4 OR (B5Part1 OR B5Part3 OR B5Part3) OR (B6Part1 OR B6Part3 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5 OR C6 OR C7) AND (D1 OR D2 OR D3 OR D4)))");
 
     return compositionCohortDefinition;
   }
@@ -2036,10 +2001,69 @@ public class TPTCompletionCohortQueries {
   }
 
   /**
+   *
+   *
+   * <h4>User_Story_ TPT</h4>
+   *
+   * <ul>
+   *   <li>D3: Select all pacientes from C and check if The date from M is registered on Ficha
+   *       Clinica - Master Card (encounter type 6) or Ficha Resumo (encounter type 53) and: (a) The
+   *       patient has at least 3 consultations (encounter type 6) with “Outras prescricoes”
+   *       (concept id 1719) with value coded equal to “3HP” (concept id 23954) or with Profilaxia
+   *       TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da Profilaxia
+   *       (concept id 165308) value coded Início/continua (concept id in [1256,1257]) during 120
+   *       days from the date from C1; or (b) At least 1 consultation registered on Ficha Clínica
+   *       (encounter type 6) with DT-3HP (concept ID 1719, value_coded =165307) during 120 days
+   *       from the date from C1; or
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition get3HPD3() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("3HP Final D3");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "get3HPD3A",
+        EptsReportUtils.map(
+            get3HPD3A(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()),
+            mapping));
+    compositionCohortDefinition.addSearch(
+        "get3HPD3B",
+        EptsReportUtils.map(
+            get3HPD3B(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                tbMetadata.getDT3HPConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.setCompositionString("get3HPD3A OR get3HPD3B");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
    * <b>IMER1</b>:User Story TPT Completion Patient List <br>
    *
    * <ul>
-   *   <li>D1: The date from C is registered on Ficha Clinica - Master Card (encounter type 6) and:
+   *   <li>D3 A: The date from C is registered on Ficha Clinica - Master Card (encounter type 6) or
+   *       Ficha Resumo (encounter type 53) and:
    *   <li>The patient has at least 3 consultations (encounter type 6) with “Outras prescricoes”
    *       (concept id 1719) with value coded equal to “3HP” (concept id 23954) during 120 days from
    *       the date from C1; or
@@ -2048,13 +2072,16 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPD1(
+  public CohortDefinition get3HPD3A(
       int adultoSeguimentoEncounterType,
       int threeHPConcept,
       int treatmentPrescribedConcept,
       int filtEncounterType,
       int regimedeTPConcept,
-      int threeHPPiridoxinaConcept) {
+      int threeHPPiridoxinaConcept,
+      int dataEstadoDaProfilaxiaConcept,
+      int startDrugs,
+      int continueRegimenConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes D1");
@@ -2068,6 +2095,137 @@ public class TPTCompletionCohortQueries {
     map.put("60", filtEncounterType);
     map.put("23985", regimedeTPConcept);
     map.put("23984", threeHPPiridoxinaConcept);
+    map.put("165308", dataEstadoDaProfilaxiaConcept);
+    map.put("1256", startDrugs);
+    map.put("1257", continueRegimenConcept);
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM   patient p "
+            + "  INNER JOIN encounter e "
+            + "    ON e.patient_id = p.patient_id "
+            + "  INNER JOIN obs o "
+            + "    ON o.encounter_id = e.encounter_id "
+            + "  INNER JOIN ( SELECT p.patient_id, e.encounter_datetime FROM patient p     "
+            + "             INNER JOIN encounter e ON p.patient_id  = e.patient_id     "
+            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id     "
+            + "             WHERE e.encounter_type =  ${6}   "
+            + "             AND o.concept_id = ${1719} AND o.value_coded = ${23954}     "
+            + "             AND e.location_id = :location     "
+            + "             AND e.encounter_datetime < :endDate    "
+            + "             AND p.voided = 0 AND e.voided = 0 AND o.voided = 0    "
+            + "             AND p.patient_id NOT IN (    "
+            + "                SELECT p.patient_id FROM patient p     "
+            + "                INNER JOIN encounter e ON p.patient_id  = e.patient_id     "
+            + "                INNER JOIN obs o ON e.encounter_id = o.encounter_id     "
+            + "                INNER JOIN (    "
+            + "                   SELECT p.patient_id, e.encounter_datetime FROM patient p     "
+            + "                   INNER JOIN encounter e ON p.patient_id  = e.patient_id     "
+            + "                   INNER JOIN obs o ON e.encounter_id = o.encounter_id     "
+            + "                   WHERE e.encounter_type =  ${6}   "
+            + "                   AND o.concept_id = ${1719} AND o.value_coded = ${23954}     "
+            + "                   AND e.location_id = :location     "
+            + "                   AND e.encounter_datetime < :endDate    "
+            + "                   AND p.voided = 0 AND e.voided = 0 AND o.voided = 0    "
+            + "                ) AS fichaClinica     "
+            + "                ON fichaClinica.patient_id = p.patient_id    "
+            + "                WHERE e.encounter_type =  ${6}   "
+            + "                AND o.concept_id = ${1719} AND o.value_coded = ${23954}     "
+            + "                AND e.location_id = :location     "
+            + "                AND e.encounter_datetime BETWEEN DATE_SUB(fichaClinica.encounter_datetime, INTERVAL 4 MONTH) AND fichaClinica.encounter_datetime    "
+            + "                AND p.voided = 0 AND e.voided = 0 AND o.voided = 0    "
+            + "             )    "
+            + "             AND p.patient_id NOT IN (    "
+            + "                SELECT p.patient_id FROM patient p     "
+            + "                INNER JOIN encounter e ON p.patient_id  = e.patient_id     "
+            + "                INNER JOIN obs o ON e.encounter_id = o.encounter_id     "
+            + "                INNER JOIN (    "
+            + "                   SELECT p.patient_id, e.encounter_datetime FROM patient p     "
+            + "                   INNER JOIN encounter e ON p.patient_id  = e.patient_id     "
+            + "                   INNER JOIN obs o ON e.encounter_id = o.encounter_id     "
+            + "                   WHERE e.encounter_type =  ${6}   "
+            + "                   AND o.concept_id = ${1719} AND o.value_coded = ${23954}     "
+            + "                   AND e.location_id = :location     "
+            + "                   AND e.encounter_datetime < :endDate    "
+            + "                   AND p.voided = 0 AND e.voided = 0 AND o.voided = 0    "
+            + "                ) AS regimeTPT     "
+            + "                ON regimeTPT.patient_id = p.patient_id    "
+            + "                WHERE e.encounter_type = ${60}     "
+            + "                AND o.concept_id = ${23985} AND o.value_coded IN(${23954},${23984})    "
+            + "                AND e.location_id = :location    "
+            + "                AND e.encounter_datetime BETWEEN DATE_SUB(regimeTPT.encounter_datetime, INTERVAL 4 MONTH) AND regimeTPT.encounter_datetime    "
+            + "                AND p.voided = 0 AND e.voided = 0 AND o.voided = 0    "
+            + "             )) AS tabela "
+            + "    ON tabela.patient_id = p.patient_id "
+            + " WHERE  p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND ( (SELECT count(*) "
+            + "  FROM   patient pp "
+            + "       JOIN encounter ee "
+            + "      ON pp.patient_id = ee.patient_id "
+            + "       JOIN obs oo "
+            + "      ON oo.encounter_id = ee.encounter_id "
+            + "     WHERE  pp.voided = 0 "
+            + "      AND ee.voided = 0 "
+            + "      AND oo.voided = 0 "
+            + "      AND p.patient_id = pp.patient_id "
+            + "      AND ee.encounter_type = ${6} "
+            + "      AND ee.location_id = :location "
+            + "      AND ee.voided = 0 "
+            + "      AND ( "
+            + " (oo.concept_id = ${1719} AND oo.value_coded = ${23954} ) "
+            + " OR (oo.concept_id IN (${23985}, ${165308}) AND oo.value_coded IN (${23954},${1256},${1257} )) )"
+            + "      AND ee.encounter_datetime BETWEEN "
+            + "       tabela.encounter_datetime AND "
+            + "    DATE_ADD(tabela.encounter_datetime, "
+            + "    INTERVAL 120 DAY)) >= 3 ) "
+            + " GROUP  BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>IMER1</b>:User Story TPT Completion Patient List <br>
+   *
+   * <ul>
+   *   <li>D1: The date from C is registered on Ficha Clinica - Master Card (encounter type 6) or
+   *       Ficha Resumo (encounter type 53) and:
+   *   <li>At least 1 consultation registered on Ficha Clínica (encounter type 6) with DT-3HP
+   *       (concept ID 1719, value_coded =165307) during 120 days from the date from C1;
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition get3HPD3B(
+      int adultoSeguimentoEncounterType,
+      int threeHPConcept,
+      int treatmentPrescribedConcept,
+      int filtEncounterType,
+      int regimedeTPConcept,
+      int threeHPPiridoxinaConcept,
+      int DT3HPConcept) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(" all patients with Outras prescricoes D1");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("23954", threeHPConcept);
+    map.put("1719", treatmentPrescribedConcept);
+    map.put("60", filtEncounterType);
+    map.put("23985", regimedeTPConcept);
+    map.put("23984", threeHPPiridoxinaConcept);
+    map.put("165307", DT3HPConcept);
 
     String query =
         " SELECT p.patient_id "
@@ -2146,11 +2304,11 @@ public class TPTCompletionCohortQueries {
             + "      AND ee.location_id = :location "
             + "      AND ee.voided = 0 "
             + "      AND oo.concept_id = ${1719} "
-            + "      AND oo.value_coded = ${23954} "
+            + "      AND oo.value_coded = ${165307} "
             + "      AND ee.encounter_datetime BETWEEN "
             + "       tabela.encounter_datetime AND "
             + "    DATE_ADD(tabela.encounter_datetime, "
-            + "    INTERVAL 120 DAY)) >= 3 ) "
+            + "    INTERVAL 120 DAY)) >= 1 ) "
             + " GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -2158,6 +2316,62 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   *
+   * <h4>User_Story_ TPT</h4>
+   *
+   * <ul>
+   *   <li>D4: The patient date from M is registered on FILT (encounter type 60, encounter
+   *       datetime<= enddate) and: The patient has at least 1 drug pick-up on FILT (encounter type
+   *       60) with “Regime de TPT” (concept id 23985) value coded “3HP” doxina” (concept id in
+   *       [23954, 23984]) and “Tipo de dispensa” (concept id 23986) with value coded “Trimestral”
+   *       (concept id 23720) during 120 days from the date from C2; or The patient has at least 3
+   *       drug pick-up on FILT (encounter type 60) with “Regime de TPT” (concept id 23985) value
+   *       coded “3HP” doxina” (concept id -in [23954, 23984]) and “Tipo de dispensa” (concept id
+   *       23986) with value coded “Mensal” (concept id 1098) during 120 days from the date from C2.
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition get3HPD4() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+    compositionCohortDefinition.setName("3HP Final D4");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    compositionCohortDefinition.addSearch(
+        "get3HPD4A",
+        EptsReportUtils.map(
+            get3HPD4A(
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                hivMetadata.getQuarterlyConcept().getConceptId(),
+                hivMetadata.getPatientTreatmentFollowUp().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getRestartConcept().getConceptId()),
+            mapping));
+    compositionCohortDefinition.addSearch(
+        "get3HPD4B",
+        EptsReportUtils.map(
+            get3HPD4B(
+                tbMetadata.get3HPConcept().getConceptId(),
+                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+                tbMetadata.getRegimeTPTConcept().getConceptId(),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
+                hivMetadata.getMonthlyConcept().getConceptId()),
+            mapping));
+
+    compositionCohortDefinition.setCompositionString("get3HPD4A OR get3HPD4B");
+
+    return compositionCohortDefinition;
   }
 
   /**
@@ -2172,7 +2386,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPD2(
+  public CohortDefinition get3HPD4A(
       int threeHPConcept,
       int regimeTPTEncounterType,
       int regimeTPTConcept,
@@ -2273,7 +2487,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPD3(
+  public CohortDefinition get3HPD4B(
       int threeHPConcept,
       int regimeTPTEncounterType,
       int regimeTPTConcept,
