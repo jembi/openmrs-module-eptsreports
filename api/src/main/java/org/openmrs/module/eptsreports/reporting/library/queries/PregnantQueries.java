@@ -26,7 +26,9 @@ public class PregnantQueries {
       int adultInitialEncounter,
       int adultSegEncounter,
       int fichaResumo,
-      int lastMenstrualPeriod,
+      int pregnant,
+      int fsr,
+      int sampleCollectDateAndTime,
       int etvProgram,
       int startARVCriteriaConcept,
       int bPLusConcept,
@@ -125,10 +127,15 @@ public class PregnantQueries {
             + "     INNER JOIN person pe ON p.patient_id=pe.person_id "
             + "     INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + "     INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + "      WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND concept_id= "
-            + lastMenstrualPeriod
+            + "     INNER JOIN obs ob ON e.encounter_id=ob.encounter_id "
+            + "      WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND o.concept_id= "
+            + sampleCollectDateAndTime
+            + " AND ob.concept_id = "
+            + pregnant
+            + " AND ob.value_coded = "
+            + yesConcept
             + "     AND e.encounter_type = "
-            + adultSegEncounter
+            + fsr
             + "     AND pe.gender='F' AND o.value_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id) as pregnant "
             + "     GROUP BY patient_id) max_pregnant "
             + "     LEFT JOIN "
