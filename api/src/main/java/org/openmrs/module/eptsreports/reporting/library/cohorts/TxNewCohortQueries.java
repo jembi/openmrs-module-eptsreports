@@ -209,6 +209,8 @@ public class TxNewCohortQueries {
             hivMetadata.getNumberOfWeeksPregnant().getConceptId(),
             hivMetadata.getBPlusConcept().getConceptId(),
             hivMetadata.getDateOfLastMenstruationConcept().getConceptId(),
+            hivMetadata.getSampleCollectionDateAndTime().getConceptId(),
+            hivMetadata.getFsrEncounterType().getEncounterTypeId(),
             dsd));
     return cd;
   }
