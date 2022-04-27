@@ -11,19 +11,19 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.dimensions;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Component
 public class EptsCommonDimension {
@@ -138,6 +138,9 @@ public class EptsCommonDimension {
     dim.addCohortDefinition(
         DimensionKeyForAge.between5And9Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 5 and 9", 5, 9));
+    dim.addCohortDefinition(
+            DimensionKeyForAge.bellow10Years.getKey(),
+            ageDimensionCohort.createXtoYAgeCohort("patients with age below 15", null, 9));
     dim.addCohortDefinition(
         DimensionKeyForAge.bellow15Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age below 15", null, 14));
