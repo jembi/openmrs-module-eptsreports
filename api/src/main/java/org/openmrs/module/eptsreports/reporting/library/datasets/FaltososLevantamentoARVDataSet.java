@@ -346,7 +346,7 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
                     "EqualOrAbove50",
                     "Equal above 50",
                     EptsCommonDimensionKey.of(DimensionKeyForAge.overOrEqualTo50Years).getDimensions(),
-                    "greaterThan15");
+                    "greaterThan50");
     ColumnParameters greaterTha50Female =
             new ColumnParameters(
                     "above50Female",
