@@ -157,11 +157,19 @@ public class EptsCommonDimension {
         DimensionKeyForAge.between15And19Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 15 and 19", 15, 19));
     dim.addCohortDefinition(
+            DimensionKeyForAge.between15And24Years.getKey(),
+            ageDimensionCohort.createXtoYAgeCohort("patients with age between 15 and 24", 15, 24));
+
+    dim.addCohortDefinition(
         DimensionKeyForAge.between20And24Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 20 and 24", 20, 24));
     dim.addCohortDefinition(
         DimensionKeyForAge.between25And29Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 25 and 29", 25, 29));
+    dim.addCohortDefinition(
+            DimensionKeyForAge.between25And49Years.getKey(),
+            ageDimensionCohort.createXtoYAgeCohort("patients with age between 25 and 49", 25, 49));
+
     dim.addCohortDefinition(
         DimensionKeyForAge.between30And34Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 30 and 34", 30, 34));

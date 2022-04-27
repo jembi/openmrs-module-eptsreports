@@ -265,6 +265,30 @@ public class FaltososLevantamentoARVDataSet extends BaseDataSet {
   }
 
   private List<ColumnParameters> getColumnsForAdult() {
+
+    ColumnParameters between15And24 =
+            new ColumnParameters(
+                    "between 15 And 24",
+                    "between 15 And 24",
+                    EptsCommonDimensionKey.of(DimensionKeyForAge.between15And24Years).getDimensions(),
+                    "between15And24");
+    ColumnParameters between15And24Female =
+            new ColumnParameters(
+                    "between 15 And 24 Female",
+                    "between 15 And 24",
+                    EptsCommonDimensionKey.of(DimensionKeyForGender.female)
+                            .and(DimensionKeyForAge.between15And24Years)
+                            .getDimensions(),
+                    "between15And24Female");
+    ColumnParameters between15And24Male =
+            new ColumnParameters(
+                    "between 15 And 24 Male",
+                    "between 15 And 24 Male",
+                    EptsCommonDimensionKey.of(DimensionKeyForGender.male)
+                            .and(DimensionKeyForAge.between15And24Years)
+                            .getDimensions(),
+                    "between15And24Male");
+
     ColumnParameters greaterThan15 =
         new ColumnParameters(
             "EqualOrAbove15",
