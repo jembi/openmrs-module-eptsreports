@@ -356,7 +356,8 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.get3HPConcept().getConceptId(),
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
+                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
+                    hivMetadata.getMasterCardEncounterType().getEncounterTypeId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -368,7 +369,8 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getCompletedConcept().getConceptId()),
+                hivMetadata.getCompletedConcept().getConceptId(),
+                    hivMetadata.getMasterCardEncounterType().getEncounterTypeId()),
             mapping));
 
     compositionCohortDefinition.addSearch("D3", EptsReportUtils.map(get3HPD3(), mapping));
@@ -2043,7 +2045,8 @@ public class TPTCompletionCohortQueries {
       int threeHPConcept,
       int filtEncounterType,
       int regimedeTPConcept,
-      int threeHPPiridoxinaConcept) {
+      int threeHPPiridoxinaConcept,
+      int masterCardEncounterType) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes D1");
@@ -2057,6 +2060,8 @@ public class TPTCompletionCohortQueries {
     map.put("60", filtEncounterType);
     map.put("23985", regimedeTPConcept);
     map.put("23984", threeHPPiridoxinaConcept);
+    map.put("53", masterCardEncounterType);
+
 
     String query =
         " SELECT p.patient_id FROM patient p    "
@@ -2146,7 +2151,8 @@ public class TPTCompletionCohortQueries {
       int regimedeTPConcept,
       int dataEstadoDaProfilaxiaConcept,
       int startDrugs,
-      int completedConcept) {
+      int completedConcept,
+      int masterCardEncounterType) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes D1");
@@ -2160,6 +2166,8 @@ public class TPTCompletionCohortQueries {
     map.put("165308", dataEstadoDaProfilaxiaConcept);
     map.put("1256", startDrugs);
     map.put("1267", completedConcept);
+    map.put("53", masterCardEncounterType);
+
 
     String query =
         " SELECT p.patient_id FROM patient p    "
