@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -19,6 +16,10 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /** All queries needed for TxMl report needed for EPTS project */
 @Component
@@ -69,7 +70,7 @@ public class TxMlCohortQueries {
     CohortDefinition missedAppointment = getAllPatientsWhoMissedNextAppointment();
     CohortDefinition noScheduled = txRttCohortQueries.getSecondPartFromITT();
     CohortDefinition startedArt = genericCohortQueries.getStartedArtBeforeDate(false);
-    CohortDefinition transferredOut = getTransferredOutPatientsCompositionWithoutVisitCard();
+    CohortDefinition transferredOut = getTransferredOutPatientsComposition();
     String mappings = "onOrBefore=${endDate},location=${location}";
     String mappings2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
     CohortDefinition dead = getDeadPatientsComposition();
