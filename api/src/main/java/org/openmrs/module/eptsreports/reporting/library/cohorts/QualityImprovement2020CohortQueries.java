@@ -26,11 +26,7 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -4425,6 +4421,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition b2e = getMQC13DEN_B2E();
 
+    CohortDefinition b2e2 = getMQC13DEN_B2E2();
+
     CohortDefinition secondLine6Months = getPatientsOnRegimeArvSecondLineB2NEWP1_2();
 
     CohortDefinition changeRegimen6Months =
@@ -4451,6 +4449,9 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getTherapeuticLineConcept(),
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
+
+    CohortDefinition B3E2 = getMQC13DEN_B3E2();
+    CohortDefinition abandonedExclusion = getPatientsWhoAbandonedTarvByEndOfPeriod(true,false, false);
 
     CohortDefinition B4E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
@@ -4560,6 +4561,17 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             b2e,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch( //RF15 EXCLUSION
+        "B2E2",
+        EptsReportUtils.map(
+            b2e2,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch( //RF14 EXCLUSION
+        "B3E2",
+        EptsReportUtils.map(
+            B3E2, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     if (den) {
       if (line == 1) {
@@ -8483,6 +8495,207 @@ public class QualityImprovement2020CohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
 
     cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+//EDITIONS START HERE
+  /**
+   * B3E2 - Exclude all patients who have the last “Mudança de Estado de Permanência” (Concept id 6273) = “Abandono” (Concept 1707)
+   * recorded on Ficha Clinica (encounter type 6, encounter_datetime) during the first six (6) months from Regime Change (
+   * encounter_datetime > “Data última Alternativa 1ª Linha” (from B2New) and <= “Data última Alternativa 1ª Linha” + 6 meses )
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQC13DEN_B3E2() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients with Mudança de Estado de Permanência = Abandono na 1a Linha");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("21190", commonMetadata.getRegimenAlternativeToFirstLineConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+
+    String query =
+        "SELECT "
+            + "    p.patient_id "
+            + "FROM "
+            + "    patient p "
+            + "        INNER JOIN "
+            + "    encounter e ON e.patient_id = p.patient_id "
+            + "        INNER JOIN "
+            + "    obs o ON o.encounter_id = e.encounter_id "
+            + "        INNER JOIN "
+            + "    (SELECT "
+            + " "
+            + "         p.patient_id, MAX(o.obs_datetime) the_time "
+            + "     FROM "
+            + "         patient p "
+            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "             INNER JOIN (SELECT "
+            + "                             p.patient_id, MAX(e.encounter_datetime) last_visit "
+            + "                         FROM "
+            + "                             patient p "
+            + "                                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                         WHERE "
+            + "                                 p.voided = 0 AND e.voided = 0 "
+            + "                           AND e.encounter_type = ${6} "
+            + "                           AND e.location_id = :location "
+            + "                           AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                         GROUP BY p.patient_id) AS clinical ON clinical.patient_id = p.patient_id "
+            + "     WHERE "
+            + "             p.voided = 0 AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${21190} "
+            + "       AND o.value_coded IS NOT NULL "
+            + "       AND DATE(o.obs_datetime) <= DATE(clinical.last_visit) "
+            + "       AND DATE(o.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH) "
+            + "     GROUP BY p.patient_id) treatment_line ON treatment_line.patient_id = p.patient_id "
+            + "INNER JOIN ( "
+            + "        SELECT p.patient_id , MAX(e2.encounter_datetime) as last_encounter "
+            + "             FROM patient p INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
+            + "                            INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
+            + "             WHERE p.voided = 0 AND e2.voided = 0 AND o2.voided = 0 "
+            + "               AND e2.encounter_type = ${6} "
+            + "               AND o2.concept_id = ${6273} "
+            + "               AND o2.value_coded = ${1707} "
+            + "               AND e2.location_id = :location "
+            + "             GROUP BY p.patient_id "
+            + "    ) last_abandoned on last_abandoned.patient_id = p.patient_id "
+            + "                            AND (DATE(last_abandoned.last_encounter) >= DATE(treatment_line.the_time) "
+            + "                            AND DATE(last_abandoned.last_encounter) <= DATE_ADD(treatment_line.the_time, INTERVAL 6 MONTH)) "
+            + "                                GROUP BY p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   *
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getMQC13DEN_B2E2() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients with Mudança de Estado de Permanência = Abandono na 2 Linha");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+
+    String query =
+             " SELECT     p.patient_id "
+            + "             FROM       patient p "
+            + "             INNER JOIN encounter e "
+            + "             ON         e.patient_id = p.patient_id "
+            + "             INNER JOIN obs o "
+            + "             ON         o.encounter_id = e.encounter_id "
+            + "             INNER JOIN "
+            + "                        ( "
+            + "                                   SELECT     p.patient_id , "
+            + "                                              o.obs_datetime  AS linha_terapeutica, "
+            + "                                              last_clinical.last_visit AS last_consultation "
+            + "                                   FROM       patient p "
+            + "                                   INNER JOIN encounter e "
+            + "                                   ON         e.patient_id = p.patient_id "
+            + "                                   INNER JOIN obs o "
+            + "                                   ON         o.encounter_id = e.encounter_id "
+            + "                                   INNER JOIN "
+            + "                                              ( "
+            + "                                                         SELECT     p.patient_id, "
+            + "                                                                    Max(e.encounter_datetime) last_visit "
+            + "                                                         FROM       patient p "
+            + "                                                         INNER JOIN encounter e "
+            + "                                                         ON         e.patient_id = p.patient_id "
+            + "                                                         WHERE      p.voided = 0 "
+            + "                                                         AND        e.voided = 0 "
+            + "                                                         AND        e.encounter_type = ${6} "
+            + "                                                         AND        e.location_id = :location "
+            + "                                                         AND        e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
+            + "                                                         GROUP BY   p.patient_id) AS last_clinical "
+            + "                                   ON         last_clinical.patient_id = p.patient_id "
+            + "                                   WHERE      e.voided = 0 "
+            + "                                   AND        p.voided = 0 "
+            + "                                   AND        o.voided = 0 "
+            + "                                   AND        e.encounter_type = ${53} "
+            + "                                   AND        e.location_id = :location "
+            + "                                   AND        o.concept_id = ${21187} "
+            + "                                   AND        o.value_coded IS NOT NULL "
+            + "                                   AND        o.obs_datetime >= :startDate "
+            + "                                   AND        o.obs_datetime <= :endDate "
+            + "                                   AND        timestampdiff(month, o.obs_datetime, last_clinical.last_visit) >= 6) second_line "
+            + "             ON         second_line.patient_id = p.patient_id "
+            + "             INNER JOIN ( "
+            + "                 SELECT p.patient_id , max(e2.encounter_datetime) as last_encounter "
+            + "                 FROM patient p INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
+            + "                                INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
+            + "                 WHERE p.voided = 0 AND e2.voided = 0 AND o2.voided = 0 "
+            + "                   AND e2.encounter_type = ${6} "
+            + "                   AND o2.concept_id = ${6273} "
+            + "                   AND o2.value_coded = ${1707} "
+            + "                   AND e2.location_id = :location "
+            + "                 GROUP BY p.patient_id "
+            + "             ) last_abandoned ON last_abandoned.patient_id = p.patient_id AND "
+            + "                                 ( last_abandoned.last_encounter > second_line.linha_terapeutica "
+            + "                                     AND        last_abandoned.last_encounter <= DATE_ADD(second_line.linha_terapeutica, INTERVAL 6 MONTH)) "
+            + "GROUP BY p.patient_id ";
+
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   *
+   * @param artStartDate Art Start Date Flag
+   * @param firstLine First Line of art Flag
+   * @param secondLine Second Line of art Flag
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoAbandonedTarvByEndOfPeriod(boolean artStartDate, boolean firstLine, boolean secondLine){
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients with Who abandoned TARV");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(
+            new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setQuery(
+            QualityImprovement2020Queries.getMQ13AbandonedTarv(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+            hivMetadata.getArtDatePickupMasterCard().getConceptId(),
+            hivMetadata.getArtPickupConcept().getConceptId(),
+            commonMetadata.getYesConcept().getConceptId(),
+            hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
+                    artStartDate,
+                    firstLine,
+                    secondLine
+    ));
 
     return cd;
   }
