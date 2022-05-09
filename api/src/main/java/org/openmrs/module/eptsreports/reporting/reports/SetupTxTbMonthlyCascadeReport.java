@@ -8,9 +8,10 @@ import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.FaltososLevantamentoARVDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TxTbMonthlyCascadeDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
@@ -19,31 +20,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FaltososLevantamentoARVReport extends EptsDataExportManager {
-  protected GenericCohortQueries genericCohortQueries;
-  private FaltososLevantamentoARVDataSet faltososLevantamentoARVDataSet;
+public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
 
-  @Autowired
-  public FaltososLevantamentoARVReport(
-      GenericCohortQueries genericCohortQueries,
-      FaltososLevantamentoARVDataSet faltososLevantamentoARVDataSet) {
-    this.genericCohortQueries = genericCohortQueries;
-    this.faltososLevantamentoARVDataSet = faltososLevantamentoARVDataSet;
-  }
+  @Autowired private TxTbMonthlyCascadeDataset txtbMonthlyCascadeDataset;
+
+  @Autowired private GenericCohortQueries genericCohortQueries;
 
   @Override
   public String getUuid() {
-    return "73ba713a-3bca-11ec-b0d7-b7913905b82c";
+    return "b5637fee-a373-11ec-ab03-3bd7c92b4c14";
   }
 
   @Override
   public String getName() {
-    return "RELATÓRIO DE FALTOSOS AO LEVANTAMENTO DE ARV - MISAU";
+    return "TX TB Monthly Cascade Report";
   }
 
   @Override
   public String getDescription() {
-    return "Relatório de Faltosos ao Levantamento de ARV for the selected location and reporting period";
+    return "TX TB Monthly Cascade Report to PEPFAR";
   }
 
   @Override
@@ -53,7 +48,7 @@ public class FaltososLevantamentoARVReport extends EptsDataExportManager {
 
   @Override
   public String getExcelDesignUuid() {
-    return "67f5bf1c-3bca-11ec-9e72-cb0763b0876d";
+    return "4692be1c-a374-11ec-a896-bb0968a58d22";
   }
 
   @Override
@@ -62,9 +57,14 @@ public class FaltososLevantamentoARVReport extends EptsDataExportManager {
     reportDefinition.setUuid(getUuid());
     reportDefinition.setName(getName());
     reportDefinition.setDescription(getDescription());
-    reportDefinition.addParameters(getParameters());
+    reportDefinition.setParameters(getParameters());
+
     reportDefinition.addDataSetDefinition(
-        "FALTOSOS", Mapped.mapStraightThrough(faltososLevantamentoARVDataSet.constructDataSet()));
+        "TXTB",
+        EptsReportUtils.map(
+            txtbMonthlyCascadeDataset.constructTXTBMonthlyDataset(),
+            "endDate=${endDate},location=${location}"));
+
     reportDefinition.addDataSetDefinition(
         "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
 
@@ -78,29 +78,29 @@ public class FaltososLevantamentoARVReport extends EptsDataExportManager {
 
   @Override
   public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
-    ReportDesign reportDesign = null;
+    ReportDesign rd = null;
     try {
-      reportDesign =
+      rd =
           createXlsReportDesign(
               reportDefinition,
-              "Template_Faltosos_Levantamento_ARV.xls",
-              "Relatório de Faltosos ao Levantamento de ARV",
+              "Template_TX_TB_ Monthly_Cascade_Report_v1.2.xls",
+              "TX TB Monthly Cascade Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
       props.put("sortWeight", "5000");
-      reportDesign.setProperties(props);
+      rd.setProperties(props);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new ReportingException(e.toString());
     }
-    return Arrays.asList(reportDesign);
+
+    return Arrays.asList(rd);
   }
 
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("startDate", "Start date", Date.class),
-        new Parameter("endDate", "End date", Date.class),
+        new Parameter("endDate", "End Date", Date.class),
         new Parameter("location", "Location", Location.class));
   }
 }

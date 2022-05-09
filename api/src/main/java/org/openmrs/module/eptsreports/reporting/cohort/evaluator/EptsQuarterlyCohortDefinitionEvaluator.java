@@ -1,5 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.cohort.evaluator;
 
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
@@ -14,11 +18,6 @@ import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reportingcompatibility.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 @Handler(supports = EptsQuarterlyCohortDefinition.class)
 public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
@@ -37,7 +36,6 @@ public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionE
   public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context)
       throws EvaluationException {
     EptsQuarterlyCohortDefinition cd = (EptsQuarterlyCohortDefinition) cohortDefinition;
-    EvaluatedCohort ret = new EvaluatedCohort(cohortDefinition, context);
     Integer year = cd.getYear();
     EptsQuarterlyCohortDefinition.Quarter quarter = cd.getQuarter();
     EptsQuarterlyCohortDefinition.Month month = cd.getMonth();
@@ -45,11 +43,7 @@ public class EptsQuarterlyCohortDefinitionEvaluator implements CohortDefinitionE
     context.getParameterValues().putAll(range);
     context.setBaseCohort(context.getBaseCohort());
     Cohort c = cohortDefinitionService.evaluate(cd.getCohortDefinition(), context);
-    if (c == null) {
-      c = getAllPatientsCohort();
-    }
-    ret.getMemberIds().addAll(c.getMemberIds());
-    return ret;
+    return new EvaluatedCohort(c, cohortDefinition, context);
   }
 
   private EvaluatedCohort evaluateBaseCohort(EvaluationContext context) throws EvaluationException {

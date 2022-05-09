@@ -8,9 +8,8 @@ import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.IntensiveMonitoringDataSet;
-import org.openmrs.module.eptsreports.reporting.library.datasets.QualityImprovement2020DataSet;
-import org.openmrs.module.eptsreports.reporting.library.datasets.ViralLoadIntensiveMonitoringDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.FaltososLevantamentoARVDataSet;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -21,46 +20,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
-
-  private GenericCohortQueries genericCohortQueries;
-
-  private QualityImprovement2020DataSet initQltyImpDataSet;
-
-  private IntensiveMonitoringDataSet intensiveMonitoringDataSet;
-
-  private ViralLoadIntensiveMonitoringDataSet viralLoadIntensiveMonitoringDataSet;
+public class SetupFaltososLevantamentoARVReport extends EptsDataExportManager {
+  protected GenericCohortQueries genericCohortQueries;
+  private FaltososLevantamentoARVDataSet faltososLevantamentoARVDataSet;
 
   @Autowired
-  public SetupIntensiveMonitoringReport(
+  public SetupFaltososLevantamentoARVReport(
       GenericCohortQueries genericCohortQueries,
-      QualityImprovement2020DataSet initQltyImpDataSet,
-      IntensiveMonitoringDataSet intensiveMonitoringDataSet,
-      ViralLoadIntensiveMonitoringDataSet viralLoadIntensiveMonitoringDataSet) {
+      FaltososLevantamentoARVDataSet faltososLevantamentoARVDataSet) {
     this.genericCohortQueries = genericCohortQueries;
-    this.initQltyImpDataSet = initQltyImpDataSet;
-    this.intensiveMonitoringDataSet = intensiveMonitoringDataSet;
-    this.viralLoadIntensiveMonitoringDataSet = viralLoadIntensiveMonitoringDataSet;
+    this.faltososLevantamentoARVDataSet = faltososLevantamentoARVDataSet;
   }
 
   @Override
   public String getUuid() {
-    return "e248b75a-9b85-11eb-a09b-338d8a9a6376";
-  }
-
-  @Override
-  public String getExcelDesignUuid() {
-    return "91b97104-9c29-11eb-b128-2306b37b08da";
+    return "73ba713a-3bca-11ec-b0d7-b7913905b82c";
   }
 
   @Override
   public String getName() {
-    return "Monitoria Intensiva  - 2021";
+    return "RELATÓRIO DE FALTOSOS AO LEVANTAMENTO DE ARV - MISAU";
   }
 
   @Override
   public String getDescription() {
-    return "Relatórios com os Indicadores Monitoria de Intensiva";
+    return "Relatório de Faltosos ao Levantamento de ARV for the selected location and reporting period";
   }
 
   @Override
@@ -69,29 +53,28 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
   }
 
   @Override
+  public String getExcelDesignUuid() {
+    return "67f5bf1c-3bca-11ec-9e72-cb0763b0876d";
+  }
+
+  @Override
   public ReportDefinition constructReportDefinition() {
     ReportDefinition reportDefinition = new ReportDefinition();
     reportDefinition.setUuid(getUuid());
     reportDefinition.setName(getName());
     reportDefinition.setDescription(getDescription());
-    reportDefinition.setParameters(getParameters());
+    reportDefinition.addParameters(getParameters());
     reportDefinition.addDataSetDefinition(
-        "IM",
-        Mapped.mapStraightThrough(
-            intensiveMonitoringDataSet.constructIntensiveMonitoringDataSet()));
+        "FALTOSOS", Mapped.mapStraightThrough(faltososLevantamentoARVDataSet.constructDataSet()));
+    reportDefinition.addDataSetDefinition(
+        "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    reportDefinition.addDataSetDefinition(
+        "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
 
-    reportDefinition.addDataSetDefinition(
-        "TOTAL",
-        EptsReportUtils.map(
-            this.viralLoadIntensiveMonitoringDataSet.constructViralLoadIntensiveMonitoringDataSet(),
-            "endDate=${revisionEndDate},location=${location}"));
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
         EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(),
-            "endDate=${revisionEndDate},location=${location}"));
-    reportDefinition.addDataSetDefinition(
-        "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
 
     return reportDefinition;
   }
@@ -103,8 +86,8 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_MI_2021_v1.9.3.xls",
-              "Template Ficha Relatório Monitoria Intensiva HIV",
+              "Template_Faltosos_Levantamento_ARV.xls",
+              "Relatório de Faltosos ao Levantamento de ARV",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
@@ -113,14 +96,14 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
     return Arrays.asList(reportDesign);
   }
 
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("revisionEndDate", "Data Final Revisão", Date.class),
-        new Parameter("location", "Unidade Sanitária", Location.class));
+        new Parameter("startDate", "Start date", Date.class),
+        new Parameter("endDate", "End date", Date.class),
+        new Parameter("location", "Location", Location.class));
   }
 }
