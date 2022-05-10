@@ -993,6 +993,61 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEndDateRevision=5-9");
+    // DEN 4
+    dataSetDefinition.addColumn(
+        "MI14DEN4",
+        "14.4. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=10-14");
+    // DEN 5
+    dataSetDefinition.addColumn(
+        "MI14DEN5",
+        "14.5. % de utentes (15 -19 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=15-19");
+    // DEN 6
+    dataSetDefinition.addColumn(
+        "MI14DEN6",
+        "14.6. % de utentes (20+ anos) em TARV com supressão viral (CV<1000 Cps/ml",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=20+");
+    // DEN 7
+    dataSetDefinition.addColumn(
+        "MI14DEN7",
+        "14.7. % de MG em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A1, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    // DEN 8
+    dataSetDefinition.addColumn(
+        "MI14DEN8",
+        "14.8. % de ML em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A2, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
 
     return dataSetDefinition;
   }
