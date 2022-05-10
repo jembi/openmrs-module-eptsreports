@@ -1,10 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.IntensiveMonitoringCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.QualityImprovement2020CohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
@@ -17,6 +15,10 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class IntensiveMonitoringDataSet extends BaseDataSet {
@@ -67,6 +69,11 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${revisionEndDate-4m}"));
+
+    dataSetDefinition.addDimension(
+        "ageByEndDateRevision",
+        EptsReportUtils.map(
+            eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${revisionEndDate}"));
 
     // dimensions to be added here
     dataSetDefinition.addDimension(
@@ -946,6 +953,47 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
+    /**
+     * *********************************** MI CATEGORY 14 *********************
+     * //********************* MI CAT14 Inherited from the MQCAT14 with adjusted date parameters
+     * **************
+     */
+    // MI CAT 14 Denominator
+    // DEN 1
+    dataSetDefinition.addColumn(
+        "MI14DEN1",
+        "14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=<1");
+    // DEN 2
+    dataSetDefinition.addColumn(
+        "MI14DEN2",
+        "14.2.% de utentes (1- 4 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=1-4");
+    // DEN 3
+    dataSetDefinition.addColumn(
+        "MI14DEN3",
+        "14.3.% de utentes (5 - 9 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.A, "DEN"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=5-9");
+
     return dataSetDefinition;
   }
 
