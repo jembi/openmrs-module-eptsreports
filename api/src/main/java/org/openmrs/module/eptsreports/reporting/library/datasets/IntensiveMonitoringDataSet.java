@@ -1049,6 +1049,53 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
+    // MI CAT 14 Numerator
+    // NUM 1
+    dataSetDefinition.addColumn(
+        "MI14NUM1",
+        "14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B, "NUM"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=<1");
+    // NUM 2
+    dataSetDefinition.addColumn(
+        "MI14NUM2",
+        "14.2.% de utentes (1- 4 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B, "NUM"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=1-4");
+    // NUM 3
+    dataSetDefinition.addColumn(
+        "MI14NUM3",
+        "14.3.% de utentes (5 - 9 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B, "NUM"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=5-9");
+
+    // NUM 4
+    dataSetDefinition.addColumn(
+        "MI14NUM4",
+        "14.4. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMICAT14(
+                    QualityImprovement2020CohortQueries.MQCat14Preposition.B, "NUM"),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageByEndDateRevision=10-14");
+
     return dataSetDefinition;
   }
 
