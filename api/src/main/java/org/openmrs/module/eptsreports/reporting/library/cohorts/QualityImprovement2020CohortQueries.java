@@ -2446,6 +2446,13 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
 
+    CohortDefinition abandonedTarv =
+        getPatientsWhoAbandonedTarvDuringThePeriod(true, false, false, false, false);
+    CohortDefinition abandonedFirstLine =
+        getPatientsWhoAbandonedTarvDuringThePeriod(false, false, false, true, false);
+    CohortDefinition abandonedSecondLine =
+        getPatientsWhoAbandonedTarvDuringThePeriod(false, false, false, false, true);
+
     if (indicator == 2) {
       compositionCohortDefinition.addSearch(
           "age",
@@ -2518,11 +2525,21 @@ public class QualityImprovement2020CohortQueries {
             transfOut,
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "ABANDONEDTARV", EptsReportUtils.map(abandonedTarv, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONED1LINE", EptsReportUtils.map(abandonedFirstLine, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONED2LINE", EptsReportUtils.map(abandonedSecondLine, MAPPING1));
+
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       compositionCohortDefinition.setCompositionString(
-          "((A AND NOT C AND NOT D) OR B1) AND NOT (F OR E OR DD) AND age");
+          "((A AND NOT C AND NOT D AND NOT ABANDONEDTARV) OR (B1 AND NOT ABANDONED1LINE)) AND NOT (F OR E OR DD) AND age");
     if (indicator == 5 || indicator == 14)
-      compositionCohortDefinition.setCompositionString("B2New AND NOT (F OR E OR DD) AND age");
+      compositionCohortDefinition.setCompositionString(
+          "B2New AND NOT (F OR E OR DD OR ABANDONED2LINE) AND age");
     return compositionCohortDefinition;
   }
 
@@ -4421,8 +4438,6 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition b2e = getMQC13DEN_B2E();
 
-    CohortDefinition b2e2 = getMQC13DEN_B2E2();
-
     CohortDefinition secondLine6Months = getPatientsOnRegimeArvSecondLineB2NEWP1_2();
 
     CohortDefinition changeRegimen6Months =
@@ -4450,8 +4465,16 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTherapeuticLineConcept(),
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
 
-    CohortDefinition B3E2 = getMQC13DEN_B3E2();
-    CohortDefinition abandonedExclusion = getPatientsWhoAbandonedTarvByEndOfPeriod(true,false, false);
+    CohortDefinition abandonedExclusionDuringThePeriod =
+        getPatientsWhoAbandonedTarvDuringThePeriod(true, false, false, false, false);
+
+    CohortDefinition abandonedExclusionByTarvRestartDate =
+        getPatientsWhoAbandonedTarvDuringThePeriod(false, true, false, false, false);
+
+    CohortDefinition abandonedExclusionFirstLine =
+        getPatientsWhoAbandonedTarvDuringThePeriod(false, false, false, true, false);
+
+    CohortDefinition restartdedExclusion = getPatientsWhoRestartedTarvAtLeastSixMonths();
 
     CohortDefinition B4E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
@@ -4562,24 +4585,25 @@ public class QualityImprovement2020CohortQueries {
             b2e,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.addSearch( //RF15 EXCLUSION
-        "B2E2",
-        EptsReportUtils.map(
-            b2e2,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "RESTARTED", EptsReportUtils.map(restartdedExclusion, MAPPING));
 
-    compositionCohortDefinition.addSearch( //RF14 EXCLUSION
-        "B3E2",
-        EptsReportUtils.map(
-            B3E2, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
+        "RESTARTEDTARV", EptsReportUtils.map(abandonedExclusionByTarvRestartDate, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONEDTARV", EptsReportUtils.map(abandonedExclusionDuringThePeriod, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));
 
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
@@ -4729,6 +4753,24 @@ public class QualityImprovement2020CohortQueries {
             MAPPING));
 
     cd.addSearch(
+        "ABANDONEDTARV",
+        EptsReportUtils.map(
+            getPatientsWhoAbandonedTarvDuringThePeriod(true, false, false, false, false),
+            MAPPING1));
+
+    cd.addSearch(
+        "ABANDONED1LINE",
+        EptsReportUtils.map(
+            getPatientsWhoAbandonedTarvDuringThePeriod(false, false, false, true, false),
+            MAPPING1));
+
+    cd.addSearch(
+        "ABANDONED2LINE",
+        EptsReportUtils.map(
+            getPatientsWhoAbandonedTarvDuringThePeriod(false, false, false, false, true),
+            MAPPING1));
+
+    cd.addSearch(
         "F",
         EptsReportUtils.map(
             commonCohortQueries.getTranferredOutPatients(),
@@ -4745,13 +4787,15 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
-          "((A AND NOT C AND NOT D AND (G OR J) AND NOT DD) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD) AND age");
+          "((A AND NOT C AND NOT D AND NOT ABANDONEDTARV AND (G OR J) AND NOT DD) OR ((B1 AND NOT ABANDONED1LINE) AND (H OR K))) AND NOT (F OR E OR DD) AND age");
 
     if (indicator == 5)
-      cd.setCompositionString("(B2New AND (I OR L)) AND NOT (F OR E OR DD) AND age");
+      cd.setCompositionString(
+          "((B2New AND NOT ABANDONED2LINE) AND (I OR L)) AND NOT (F OR E OR DD) AND age");
 
     if (indicator == 14)
-      cd.setCompositionString("(B2New AND (I OR L)) AND NOT (F OR E OR DD) AND age");
+      cd.setCompositionString(
+          "((B2New AND NOT ABANDONED2LINE) AND (I OR L)) AND NOT (F OR E OR DD) AND age");
 
     return cd;
   }
@@ -5579,6 +5623,9 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
+    CohortDefinition pregnantAbandonedDuringPeriod =
+        getPatientsWhoAbandonedTarvDuringThePeriod(false, false, true, false, false);
+
     cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
@@ -5589,7 +5636,9 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
-    cd.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
+
+    cd.setCompositionString("((A AND NOT ABANDONED) AND C) AND NOT (D OR E OR F)");
 
     return cd;
   }
@@ -6252,8 +6301,11 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
     cd.addSearch("J", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
+    CohortDefinition pregnantAbandonedDuringPeriod =
+        getPatientsWhoAbandonedTarvDuringThePeriod(false, false, true, false, false);
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
-    cd.setCompositionString("(B2 AND J)");
+    cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
 
     return cd;
   }
@@ -8498,204 +8550,77 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
-//EDITIONS START HERE
+
   /**
-   * B3E2 - Exclude all patients who have the last “Mudança de Estado de Permanência” (Concept id 6273) = “Abandono” (Concept 1707)
-   * recorded on Ficha Clinica (encounter type 6, encounter_datetime) during the first six (6) months from Regime Change (
-   * encounter_datetime > “Data última Alternativa 1ª Linha” (from B2New) and <= “Data última Alternativa 1ª Linha” + 6 meses )
+   * <b> RF7.2 EXCLUSION <b/>
+   *
+   * <p>Select all patients with “Mudança de Estado de Permanência” = “Abandono” on Ficha Clínica
+   * during the period (“Data Consulta”>=”Data Início Período” and “Data Consulta”<=”Data Fim
+   * Período” and
+   *
+   * <p>Select all patients with “Mudança de Estado de Permanência” = “Abandono” on Ficha Resumo
+   * during the period (“Data de Mudança de Estado Permanência”>=”Data Início Período” e “Data
+   * Consulta”<=”Data Fim Período”
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getMQC13DEN_B3E2() {
+  public CohortDefinition getPatientsWhoAbandonedTarvDuringThePeriod(
+      boolean artStartDate,
+      boolean restartedArt,
+      boolean pregnants,
+      boolean firstLine,
+      boolean secondLine) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("All patients with Mudança de Estado de Permanência = Abandono na 1a Linha");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("21190", commonMetadata.getRegimenAlternativeToFirstLineConcept().getConceptId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
-
-    String query =
-        "SELECT "
-            + "    p.patient_id "
-            + "FROM "
-            + "    patient p "
-            + "        INNER JOIN "
-            + "    encounter e ON e.patient_id = p.patient_id "
-            + "        INNER JOIN "
-            + "    obs o ON o.encounter_id = e.encounter_id "
-            + "        INNER JOIN "
-            + "    (SELECT "
-            + " "
-            + "         p.patient_id, MAX(o.obs_datetime) the_time "
-            + "     FROM "
-            + "         patient p "
-            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "             INNER JOIN (SELECT "
-            + "                             p.patient_id, MAX(e.encounter_datetime) last_visit "
-            + "                         FROM "
-            + "                             patient p "
-            + "                                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                         WHERE "
-            + "                                 p.voided = 0 AND e.voided = 0 "
-            + "                           AND e.encounter_type = ${6} "
-            + "                           AND e.location_id = :location "
-            + "                           AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                         GROUP BY p.patient_id) AS clinical ON clinical.patient_id = p.patient_id "
-            + "     WHERE "
-            + "             p.voided = 0 AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND e.encounter_type = ${53} "
-            + "       AND e.location_id = :location "
-            + "       AND o.concept_id = ${21190} "
-            + "       AND o.value_coded IS NOT NULL "
-            + "       AND DATE(o.obs_datetime) <= DATE(clinical.last_visit) "
-            + "       AND DATE(o.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH) "
-            + "     GROUP BY p.patient_id) treatment_line ON treatment_line.patient_id = p.patient_id "
-            + "INNER JOIN ( "
-            + "        SELECT p.patient_id , MAX(e2.encounter_datetime) as last_encounter "
-            + "             FROM patient p INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
-            + "                            INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
-            + "             WHERE p.voided = 0 AND e2.voided = 0 AND o2.voided = 0 "
-            + "               AND e2.encounter_type = ${6} "
-            + "               AND o2.concept_id = ${6273} "
-            + "               AND o2.value_coded = ${1707} "
-            + "               AND e2.location_id = :location "
-            + "             GROUP BY p.patient_id "
-            + "    ) last_abandoned on last_abandoned.patient_id = p.patient_id "
-            + "                            AND (DATE(last_abandoned.last_encounter) >= DATE(treatment_line.the_time) "
-            + "                            AND DATE(last_abandoned.last_encounter) <= DATE_ADD(treatment_line.the_time, INTERVAL 6 MONTH)) "
-            + "                                GROUP BY p.patient_id ";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    cd.setQuery(sb.replace(query));
-
-    return cd;
-  }
-
-  /**
-   *
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getMQC13DEN_B2E2() {
-
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("All patients with Mudança de Estado de Permanência = Abandono na 2 Linha");
+    cd.setName("All patients who abandoned TARV during the period");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
-
-    String query =
-             " SELECT     p.patient_id "
-            + "             FROM       patient p "
-            + "             INNER JOIN encounter e "
-            + "             ON         e.patient_id = p.patient_id "
-            + "             INNER JOIN obs o "
-            + "             ON         o.encounter_id = e.encounter_id "
-            + "             INNER JOIN "
-            + "                        ( "
-            + "                                   SELECT     p.patient_id , "
-            + "                                              o.obs_datetime  AS linha_terapeutica, "
-            + "                                              last_clinical.last_visit AS last_consultation "
-            + "                                   FROM       patient p "
-            + "                                   INNER JOIN encounter e "
-            + "                                   ON         e.patient_id = p.patient_id "
-            + "                                   INNER JOIN obs o "
-            + "                                   ON         o.encounter_id = e.encounter_id "
-            + "                                   INNER JOIN "
-            + "                                              ( "
-            + "                                                         SELECT     p.patient_id, "
-            + "                                                                    Max(e.encounter_datetime) last_visit "
-            + "                                                         FROM       patient p "
-            + "                                                         INNER JOIN encounter e "
-            + "                                                         ON         e.patient_id = p.patient_id "
-            + "                                                         WHERE      p.voided = 0 "
-            + "                                                         AND        e.voided = 0 "
-            + "                                                         AND        e.encounter_type = ${6} "
-            + "                                                         AND        e.location_id = :location "
-            + "                                                         AND        e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
-            + "                                                         GROUP BY   p.patient_id) AS last_clinical "
-            + "                                   ON         last_clinical.patient_id = p.patient_id "
-            + "                                   WHERE      e.voided = 0 "
-            + "                                   AND        p.voided = 0 "
-            + "                                   AND        o.voided = 0 "
-            + "                                   AND        e.encounter_type = ${53} "
-            + "                                   AND        e.location_id = :location "
-            + "                                   AND        o.concept_id = ${21187} "
-            + "                                   AND        o.value_coded IS NOT NULL "
-            + "                                   AND        o.obs_datetime >= :startDate "
-            + "                                   AND        o.obs_datetime <= :endDate "
-            + "                                   AND        timestampdiff(month, o.obs_datetime, last_clinical.last_visit) >= 6) second_line "
-            + "             ON         second_line.patient_id = p.patient_id "
-            + "             INNER JOIN ( "
-            + "                 SELECT p.patient_id , max(e2.encounter_datetime) as last_encounter "
-            + "                 FROM patient p INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
-            + "                                INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
-            + "                 WHERE p.voided = 0 AND e2.voided = 0 AND o2.voided = 0 "
-            + "                   AND e2.encounter_type = ${6} "
-            + "                   AND o2.concept_id = ${6273} "
-            + "                   AND o2.value_coded = ${1707} "
-            + "                   AND e2.location_id = :location "
-            + "                 GROUP BY p.patient_id "
-            + "             ) last_abandoned ON last_abandoned.patient_id = p.patient_id AND "
-            + "                                 ( last_abandoned.last_encounter > second_line.linha_terapeutica "
-            + "                                     AND        last_abandoned.last_encounter <= DATE_ADD(second_line.linha_terapeutica, INTERVAL 6 MONTH)) "
-            + "GROUP BY p.patient_id ";
-
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    cd.setQuery(sb.replace(query));
+    cd.setQuery(
+        QualityImprovement2020Queries.getMQ13AbandonedTarvDuringThePeriod(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getAbandonedConcept().getConceptId(),
+            artStartDate,
+            restartedArt,
+            pregnants,
+            firstLine,
+            secondLine));
 
     return cd;
   }
 
   /**
+   * <b>RF14</b>: Select all patients who restarted ATRV for at least 6 months following: all
+   * patients who have “Mudança de Estado de Permanência TARV”=”Reinício” na Ficha Clínica durante o
+   * período de inclusão (“Data Consulta Reinício TARV” >= “Data Início Inclusão” e <= “Data Fim
+   * Inclusão”), where “Data Última Consulta” durante o período de revisão, menos (-) “Data Consulta
+   * Reinício TARV” maior ou igual (>=) a 6 meses
    *
-   * @param artStartDate Art Start Date Flag
-   * @param firstLine First Line of art Flag
-   * @param secondLine Second Line of art Flag
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoAbandonedTarvByEndOfPeriod(boolean artStartDate, boolean firstLine, boolean secondLine){
+  public CohortDefinition getPatientsWhoRestartedTarvAtLeastSixMonths() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("All patients with Who abandoned TARV");
+    cd.setName("All patients who restarted TARV for at least 6 months");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(
-            new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setQuery(
-            QualityImprovement2020Queries.getMQ13AbandonedTarv(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
-            hivMetadata.getArtDatePickupMasterCard().getConceptId(),
-            hivMetadata.getArtPickupConcept().getConceptId(),
-            commonMetadata.getYesConcept().getConceptId(),
-            hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
-                    artStartDate,
-                    firstLine,
-                    secondLine
-    ));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+
+    String query = QualityImprovement2020Queries.getRestartedArtQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
 
     return cd;
   }

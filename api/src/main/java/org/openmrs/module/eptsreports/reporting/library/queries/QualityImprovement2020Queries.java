@@ -1222,119 +1222,114 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
-  /**MISSING: ADD FIRST AND SECOND LINE QUERIES AS STRINGS TO BE ADDED TO THE MAIN QUERY IF THEIR VALUES ARE TRUE
-   *
+  /**
    * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
-   * @param arvPharmaciaEncounterType The S.TARV Encounter Type 18
-   * @param artDatePickupMasterCard The ART pickup date concept
-   * @param artPickupConcept The ART pickup concept
-   * @param yesConcept The Yes concept
-   * @param returnVisitDateForArvDrugConcept The Return Visit Date for ARV Drug
-   * @param artStartDate Art Start Date Flag
-   * @param firstLine First Line of art Flag
-   * @param secondLine Second Line of art Flag
-   * @return
+   * @param masterCardEncounterType The Ficha Resumo Encounter Type 53
+   * @param stateOfStayOfArtPatient The State of Stay in ART Concept
+   * @param abandonedConcept The Abandoned Concept
+   * @param artStartDate ART startDate Flag
+   * @param restartedArt Restart Art Flag
+   * @param pregnants Pregnant Flag
+   * @param firstLine First Line Flag
+   * @param secondLine Second Line Line Flag
+   * @return @{Link String}
    */
-  public static String getMQ13AbandonedTarv(
-          int adultoSeguimentoEncounterType,
-          int arvPharmaciaEncounterType,
-          int artDatePickupMasterCard,
-          int artPickupConcept,
-          int yesConcept,
-          int returnVisitDateForArvDrugConcept,
-          boolean artStartDate,
-          boolean firstLine,
-          boolean secondLine) {
+  public static String getMQ13AbandonedTarvDuringThePeriod(
+      int adultoSeguimentoEncounterType,
+      int masterCardEncounterType,
+      int stateOfStayOfArtPatient,
+      int abandonedConcept,
+      boolean artStartDate,
+      boolean restartedArt,
+      boolean pregnants,
+      boolean firstLine,
+      boolean secondLine) {
 
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
-    HivMetadata hivMetadata =  new HivMetadata();
+    HivMetadata hivMetadata = new HivMetadata();
 
     String arvStart = commonQueries.getARTStartDate(true);
     Map<String, Integer> map = new HashMap<>();
 
     map.put("6", adultoSeguimentoEncounterType);
-    map.put("18", arvPharmaciaEncounterType);
-    map.put("23866", artDatePickupMasterCard);
-    map.put("23865", artPickupConcept);
-    map.put("1065", yesConcept);
-    map.put("5096", returnVisitDateForArvDrugConcept);
-    //first Line concepts
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("53", masterCardEncounterType);
+    map.put("6273", stateOfStayOfArtPatient);
+    map.put("1707", abandonedConcept);
+
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    // first Line concepts
     map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
     map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
     // second line concepts
     map.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    // restarted concepts
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
-    String query =  "SELECT patient_id FROM ( " ;
+    String query = "SELECT patient_id FROM ( ";
 
     // verification to change the column name for artStartDate
-    if (artStartDate) {
-      query += "    SELECT patient_id, DATE_ADD(max(value_datetime), INTERVAL 60 DAY) as most_recent, first_pickup  FROM ( " +
-       "        SELECT end_period.patient_id,end_period.first_pickup, value_datetime FROM (  ";
-    }else {
-      query += "    SELECT patient_id, DATE_ADD(max(value_datetime), INTERVAL 60 DAY) as most_recent, the_time  FROM ( "
-       + "        SELECT end_period.patient_id,end_period.the_time, value_datetime FROM (  ";
+    if (artStartDate || pregnants) {
+      query += "    SELECT end_period.patient_id,end_period.first_pickup, last_encounter FROM (  ";
+    } else {
+      query += "   SELECT end_period.patient_id,end_period.the_time, last_encounter FROM (  ";
     }
 
-
-    if (artStartDate){
-      query+= arvStart ;
-    }
-
-    else if (firstLine){
+    if (artStartDate || pregnants) {
+      query += arvStart;
+    } else if (restartedArt) {
+      query += getRestartedArtQuery();
+    } else if (firstLine) {
       query += getTherapeuticLineQuery(1);
-    }
-
-    else if (secondLine){
+    } else if (secondLine) {
       query += getTherapeuticLineQuery(2);
     }
 
-    query += ") end_period "
+    query +=
+        ") end_period "
             + "INNER JOIN ( "
-            + "                                            SELECT "
-            + "                                                pa.patient_id, "
-            + "                                                DATE_ADD(obs1.value_datetime, INTERVAL 30 DAY) value_datetime "
-            + "                                            FROM "
-            + "                                                patient pa "
-            + "                                                    INNER JOIN encounter enc ON enc.patient_id = pa.patient_id "
-            + "                                                    INNER JOIN obs obs1 ON obs1.encounter_id = enc.encounter_id "
-            + "                                                    INNER JOIN obs obs2 ON obs2.encounter_id = enc.encounter_id "
-            + "                                            WHERE "
-            + "                                                    pa.voided = 0 AND enc.voided = 0 "
-            + "                                              AND obs1.voided = 0 "
-            + "                                              AND obs2.voided = 0 "
-            + "                                              AND enc.encounter_type = 6 "
-            + "                                              AND (obs1.concept_id = 23866 AND obs1.value_datetime IS NOT NULL) "
-            + "                                              AND (obs2.concept_id = 23865 AND obs2.value_coded = 1065) "
-            + "                                              AND enc.location_id = 400 "
-            + "                                            GROUP BY pa.patient_id "
-            + "                                            UNION "
-            + "                                            SELECT "
-            + "                                                pa.patient_id, obs.value_datetime value_datetime "
-            + "                                            FROM "
-            + "                                                patient pa "
-            + "                                                    INNER JOIN encounter enc ON enc.patient_id = pa.patient_id "
-            + "                                                    INNER JOIN obs obs ON obs.encounter_id = enc.encounter_id "
-            + "                                            WHERE "
-            + "                                                    pa.voided = 0 AND enc.voided = 0 "
-            + "                                              AND obs.voided = 0 "
-            + "                                              AND enc.encounter_type = 18 "
-            + "                                              AND obs.value_datetime IS NOT NULL "
-            + "                                              AND obs.concept_id = 5096 "
-            + "                                              AND enc.location_id = 400 "
-            + "                                            GROUP BY pa.patient_id "
-            + "                    ) pickup on pickup.patient_id = end_period.patient_id "
-            + "                                                        GROUP BY end_period.patient_id) most_recent_abandoned ";
+            + "              SELECT p.patient_id , max(e.encounter_datetime) as last_encounter "
+            + "                      FROM patient p INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                                     INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                      WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                        AND e.encounter_type = ${6} "
+            + "                        AND o.concept_id = ${6273} "
+            + "                        AND o.value_coded = ${1707} "
+            + "                        AND e.location_id = :location "
+            + "                      GROUP BY p.patient_id "
+            + "                      UNION "
+            + "                      SELECT p.patient_id , max(o.obs_datetime) as last_encounter "
+            + "                      FROM patient p INNER JOIN encounter e on p.patient_id = e.patient_id "
+            + "                                     INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                      WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                        AND e.encounter_type = ${53} "
+            + "                        AND o.concept_id = ${6273} "
+            + "                        AND o.value_coded = ${1707} "
+            + "                        AND e.location_id = :location "
+            + "                      GROUP BY p.patient_id"
+            + "                    ) changed_state on changed_state.patient_id = end_period.patient_id "
+            + "                                                       GROUP BY end_period.patient_id) most_recent_abandoned ";
     // verification to change the column name for artStartDate
-    if (artStartDate){
-      query +=" WHERE value_datetime <= DATE_ADD(first_pickup, INTERVAL 6 MONTH) GROUP BY patient_id, first_pickup ";
-      query += "       ) final_abandoned WHERE final_abandoned.most_recent < DATE_ADD(final_abandoned.first_pickup, INTERVAL 6 MONTH) GROUP BY patient_id";
-    }else{
-      query += " WHERE value_datetime <= DATE_ADD(the_time, INTERVAL 6 MONTH) GROUP BY patient_id, the_time ";
-      query += "       ) final_abandoned WHERE final_abandoned.most_recent < DATE_ADD(final_abandoned.the_time, INTERVAL 6 MONTH) GROUP BY patient_id ";
+    if (artStartDate) {
+      query +=
+          " WHERE most_recent_abandoned.last_encounter >= most_recent_abandoned.first_pickup "
+              + "    AND most_recent_abandoned.last_encounter <= DATE_ADD(most_recent_abandoned.first_pickup, INTERVAL 6 MONTH) "
+              + "                           GROUP BY patient_id";
+      // verification to change the number of months for pregnants
+    } else if (pregnants) {
+      query +=
+          " WHERE most_recent_abandoned.last_encounter >= most_recent_abandoned.first_pickup "
+              + "    AND most_recent_abandoned.last_encounter <= DATE_ADD(most_recent_abandoned.first_pickup, INTERVAL 3 MONTH) "
+              + "                           GROUP BY patient_id";
+    } else {
+      query +=
+          " WHERE most_recent_abandoned.last_encounter >= most_recent_abandoned.the_time "
+              + "    AND most_recent_abandoned.last_encounter <= DATE_ADD(most_recent_abandoned.the_time, INTERVAL 6 MONTH) "
+              + "                           GROUP BY patient_id";
     }
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -1342,117 +1337,157 @@ public class QualityImprovement2020Queries {
     return stringSubstitutor.replace(query);
   }
 
-
-  public static String getTherapeuticLineQuery(int line){
-    if (line == 1){
-    return " SELECT "
-            + "     pa.patient_id, first_line.the_time "
-            + " FROM "
-            + "     patient pa "
-            + "          JOIN "
-            + "     encounter enc ON enc.patient_id = pa.patient_id "
-            + "          JOIN "
-            + "     obs ob ON ob.encounter_id = enc.encounter_id "
-            + "          JOIN "
-            + "      (SELECT "
-            + "          p.patient_id, filtered.the_time "
-            + "      FROM "
-            + "          patient p "
-            + "      JOIN encounter e ON e.patient_id = p.patient_id "
-            + "      JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "      INNER JOIN (SELECT "
-            + "          p.patient_id, "
-            + "              MAX(e.encounter_datetime) AS the_time "
-            + "      FROM "
-            + "          patient p "
-            + "     INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "      WHERE "
-            + "          e.encounter_type = ${6} AND p.voided = 0 "
-            + "              AND e.voided = 0 "
-            + "             AND e.location_id = :location "
-            + "              AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
-            + "      GROUP BY p.patient_id) filtered ON filtered.patient_id = p.patient_id "
-            + "      WHERE "
-            + "          e.encounter_datetime = filtered.the_time "
-            + "              AND e.location_id = :location "
-            + "              AND o.concept_id = ${21151} "
-            + "              AND e.voided = 0 "
-            + "              AND o.voided = 0 "
-            + "              AND o.value_coded = ${21150} "
-            + "              AND e.encounter_type = ${6}) first_line ON first_line.patient_id = pa.patient_id "
-            + "          INNER JOIN "
-            + "      (SELECT "
-            + "          p.patient_id, MAX(e.encounter_datetime) last_visit "
-            + "      FROM "
-            + "          patient p "
-            + "      INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "      WHERE "
-            + "          p.voided = 0 AND e.voided = 0 "
-            + "              AND e.encounter_type = ${6} "
-            + "              AND e.location_id = :location "
-            + "              AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
-            + "      GROUP BY p.patient_id) AS last_clinical ON last_clinical.patient_id = pa.patient_id "
-            + "          INNER JOIN "
-            + "      (SELECT "
-            + "          p.patient_id, o.value_datetime AS arv_date "
-            + "      FROM "
-            + "          patient p "
-            + "      INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "      WHERE "
-            + "          o.concept_id = ${1190} "
-            + "              AND e.encounter_type = ${53} "
-            + "              AND e.location_id = :location "
-            + "              AND p.voided = 0 "
-            + "              AND e.voided = 0 "
-            + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
-            + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
-            + " WHERE pa.patient_id NOT IN ( "
-            + "    SELECT patient_id FROM "
-            + "    (SELECT p.patient_id , max(e2.encounter_datetime) as last_encounter "
-            + "        FROM patient p INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
-            + "                        INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
-            + "                        WHERE p.voided = 0 AND e2.voided = 0 AND o2.voided = 0 "
-            + "                        AND e2.encounter_type = ${6} "
-            + "                        AND o2.concept_id = ${6273} "
-            + "                        AND o2.value_coded = ${1707} "
-            + "                        AND e2.location_id = :location "
-            + "                        GROUP BY p.patient_id "
-            + "                        ) abandoned_state WHERE DATE(abandoned_state.last_encounter) >= DATE(first_line.the_time) "
-            + "                                              AND DATE(abandoned_state.last_encounter) <= DATE_ADD(first_line.the_time, INTERVAL 6 MONTH) "
-            + "    ) GROUP BY pa.patient_id ";
-    }else if (line == 2){
+  public static String getTherapeuticLineQuery(int line) {
+    if (line == 1) {
+      return " SELECT "
+          + "     pa.patient_id, first_line.the_time "
+          + " FROM "
+          + "     patient pa "
+          + "          JOIN "
+          + "     encounter enc ON enc.patient_id = pa.patient_id "
+          + "          JOIN "
+          + "     obs ob ON ob.encounter_id = enc.encounter_id "
+          + "          JOIN "
+          + "      (SELECT "
+          + "          p.patient_id, filtered.the_time "
+          + "      FROM "
+          + "          patient p "
+          + "      JOIN encounter e ON e.patient_id = p.patient_id "
+          + "      JOIN obs o ON o.encounter_id = e.encounter_id "
+          + "      INNER JOIN (SELECT "
+          + "          p.patient_id, "
+          + "              MAX(e.encounter_datetime) AS the_time "
+          + "      FROM "
+          + "          patient p "
+          + "     INNER JOIN encounter e ON e.patient_id = p.patient_id "
+          + "      WHERE "
+          + "          e.encounter_type = ${6} AND p.voided = 0 "
+          + "              AND e.voided = 0 "
+          + "             AND e.location_id = :location "
+          + "              AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
+          + "      GROUP BY p.patient_id) filtered ON filtered.patient_id = p.patient_id "
+          + "      WHERE "
+          + "          e.encounter_datetime = filtered.the_time "
+          + "              AND e.location_id = :location "
+          + "              AND o.concept_id = ${21151} "
+          + "              AND e.voided = 0 "
+          + "              AND o.voided = 0 "
+          + "              AND o.value_coded = ${21150} "
+          + "              AND e.encounter_type = ${6}) first_line ON first_line.patient_id = pa.patient_id "
+          + "          INNER JOIN "
+          + "      (SELECT "
+          + "          p.patient_id, MAX(e.encounter_datetime) last_visit "
+          + "      FROM "
+          + "          patient p "
+          + "      INNER JOIN encounter e ON e.patient_id = p.patient_id "
+          + "      WHERE "
+          + "          p.voided = 0 AND e.voided = 0 "
+          + "              AND e.encounter_type = ${6} "
+          + "              AND e.location_id = :location "
+          + "              AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
+          + "      GROUP BY p.patient_id) AS last_clinical ON last_clinical.patient_id = pa.patient_id "
+          + "          INNER JOIN "
+          + "      (SELECT "
+          + "          p.patient_id, o.value_datetime AS arv_date "
+          + "      FROM "
+          + "          patient p "
+          + "      INNER JOIN encounter e ON e.patient_id = p.patient_id "
+          + "      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+          + "      WHERE "
+          + "          o.concept_id = ${1190} "
+          + "              AND e.encounter_type = ${53} "
+          + "              AND e.location_id = :location "
+          + "              AND p.voided = 0 "
+          + "              AND e.voided = 0 "
+          + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
+          + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
+          + " WHERE pa.patient_id NOT IN ( "
+          + "    SELECT patient_id FROM "
+          + "    (SELECT p.patient_id , max(e2.encounter_datetime) as last_encounter "
+          + "        FROM patient p INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
+          + "                        INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
+          + "                        WHERE p.voided = 0 AND e2.voided = 0 AND o2.voided = 0 "
+          + "                        AND e2.encounter_type = ${6} "
+          + "                        AND o2.concept_id = ${6273} "
+          + "                        AND o2.value_coded = ${1707} "
+          + "                        AND e2.location_id = :location "
+          + "                        GROUP BY p.patient_id "
+          + "                        ) abandoned_state WHERE DATE(abandoned_state.last_encounter) >= DATE(first_line.the_time) "
+          + "                                              AND DATE(abandoned_state.last_encounter) <= DATE_ADD(first_line.the_time, INTERVAL 6 MONTH) "
+          + "    ) GROUP BY pa.patient_id ";
+    } else if (line == 2) {
       return " SELECT     p.patient_id , o.obs_datetime  AS the_time "
-              + "                                   FROM       patient p "
-              + "                                   INNER JOIN encounter e "
-              + "                                   ON         e.patient_id = p.patient_id "
-              + "                                   INNER JOIN obs o "
-              + "                                   ON         o.encounter_id = e.encounter_id "
-              + "                                   INNER JOIN "
-              + "                                              ( "
-              + "                                                         SELECT     p.patient_id, "
-              + "                                                                    Max(e.encounter_datetime) last_visit "
-              + "                                                         FROM       patient p "
-              + "                                                         INNER JOIN encounter e "
-              + "                                                         ON         e.patient_id = p.patient_id "
-              + "                                                         WHERE      p.voided = 0 "
-              + "                                                         AND        e.voided = 0 "
-              + "                                                         AND        e.encounter_type = ${6} "
-              + "                                                         AND        e.location_id = :location "
-              + "                                                         AND        e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
-              + "                                                         GROUP BY   p.patient_id) AS last_clinical "
-              + "                                   ON         last_clinical.patient_id = p.patient_id "
-              + "                                   WHERE      e.voided = 0 "
-              + "                                   AND        p.voided = 0 "
-              + "                                   AND        o.voided = 0 "
-              + "                                   AND        e.encounter_type = ${53} "
-              + "                                   AND        e.location_id = :location "
-              + "                                   AND        o.concept_id = ${21187} "
-              + "                                   AND        o.value_coded IS NOT NULL "
-              + "                                   AND        o.obs_datetime >= :startDate "
-              + "                                   AND        o.obs_datetime <= :endDate "
-              + "                                   AND        timestampdiff(month, o.obs_datetime, last_clinical.last_visit) >= 6 ";
+          + "                                   FROM       patient p "
+          + "                                   INNER JOIN encounter e "
+          + "                                   ON         e.patient_id = p.patient_id "
+          + "                                   INNER JOIN obs o "
+          + "                                   ON         o.encounter_id = e.encounter_id "
+          + "                                   INNER JOIN "
+          + "                                              ( "
+          + "                                                         SELECT     p.patient_id, "
+          + "                                                                    Max(e.encounter_datetime) last_visit "
+          + "                                                         FROM       patient p "
+          + "                                                         INNER JOIN encounter e "
+          + "                                                         ON         e.patient_id = p.patient_id "
+          + "                                                         WHERE      p.voided = 0 "
+          + "                                                         AND        e.voided = 0 "
+          + "                                                         AND        e.encounter_type = ${6} "
+          + "                                                         AND        e.location_id = :location "
+          + "                                                         AND        e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
+          + "                                                         GROUP BY   p.patient_id) AS last_clinical "
+          + "                                   ON         last_clinical.patient_id = p.patient_id "
+          + "                                   WHERE      e.voided = 0 "
+          + "                                   AND        p.voided = 0 "
+          + "                                   AND        o.voided = 0 "
+          + "                                   AND        e.encounter_type = ${53} "
+          + "                                   AND        e.location_id = :location "
+          + "                                   AND        o.concept_id = ${21187} "
+          + "                                   AND        o.value_coded IS NOT NULL "
+          + "                                   AND        o.obs_datetime >= :startDate "
+          + "                                   AND        o.obs_datetime <= :endDate "
+          + "                                   AND        timestampdiff(month, o.obs_datetime, last_clinical.last_visit) >= 6 ";
     }
     return "";
+  }
+
+  public static String getRestartedArtQuery() {
+    return " SELECT patient_id, "
+        + "       the_time "
+        + "FROM   (SELECT p.patient_id, "
+        + "               e.encounter_datetime AS the_time, "
+        + "               last_consultation.last_consultation_date "
+        + "        FROM   patient p "
+        + "                   INNER JOIN encounter e "
+        + "                              ON p.patient_id = e.patient_id "
+        + "                   INNER JOIN obs o "
+        + "                              ON e.encounter_id = o.encounter_id "
+        + "                   INNER JOIN (SELECT p.patient_id, "
+        + "                                      Max(e.encounter_datetime) AS "
+        + "                                          last_consultation_date "
+        + "                               FROM   patient p "
+        + "                                          INNER JOIN encounter e "
+        + "                                                     ON e.patient_id = p.patient_id "
+        + "                                          INNER JOIN obs o "
+        + "                                                     ON o.encounter_id = e.encounter_id "
+        + "                               WHERE  e.encounter_type IN( ${6}, ${9} ) "
+        + "                                 AND e.encounter_datetime <= :endDate "
+        + "                                 AND e.location_id = :location "
+        + "                                 AND e.voided = 0 "
+        + "                                 AND p.voided = 0 "
+        + "                                 AND o.voided = 0 "
+        + "                               GROUP  BY p.patient_id) last_consultation "
+        + "                              ON last_consultation.patient_id = p.patient_id "
+        + "        WHERE  p.voided = 0 "
+        + "          AND e.voided = 0 "
+        + "          AND o.voided = 0 "
+        + "          AND e.encounter_type = ${6} "
+        + "          AND o.concept_id = ${6273} "
+        + "          AND o.value_coded = ${1705} "
+        + "          AND e.encounter_datetime >= :startDate "
+        + "          AND e.encounter_datetime <= :endDate "
+        + "          AND e.location_id = :location "
+        + "        GROUP  BY p.patient_id) restarted "
+        + "WHERE  Timestampdiff(month, restarted.last_consultation_date, "
+        + "                     restarted.the_time) >= 6";
   }
 }

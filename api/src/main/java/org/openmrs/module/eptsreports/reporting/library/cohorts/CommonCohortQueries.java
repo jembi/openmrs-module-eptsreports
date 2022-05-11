@@ -664,8 +664,6 @@ public class CommonCohortQueries {
     map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
     map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
 
     String query =
         " SELECT "
@@ -730,20 +728,7 @@ public class CommonCohortQueries {
             + "              AND e.voided = 0 "
             + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
             + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
-            + " WHERE pa.patient_id NOT IN ( "
-            + "    SELECT patient_id FROM "
-            + "    (SELECT p.patient_id , max(e2.encounter_datetime) as last_encounter "
-            + "        FROM patient p INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
-            + "                        INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
-            + "                        WHERE p.voided = 0 AND e2.voided = 0 AND o2.voided = 0 "
-            + "                        AND e2.encounter_type = ${6} "
-            + "                        AND o2.concept_id = ${6273} "
-            + "                        AND o2.value_coded = ${1707} "
-            + "                        AND e2.location_id = :location "
-            + "                        GROUP BY p.patient_id "
-            + "                        ) abandoned_state WHERE DATE(abandoned_state.last_encounter) >= DATE(first_line.encounter_datetime) "
-            + "                                              AND DATE(abandoned_state.last_encounter) <= DATE_ADD(first_line.encounter_datetime, INTERVAL 6 MONTH) "
-            + "    ) GROUP BY pa.patient_id ";
+            + " GROUP BY pa.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
