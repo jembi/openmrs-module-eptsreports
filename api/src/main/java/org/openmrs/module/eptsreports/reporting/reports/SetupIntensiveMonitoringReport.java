@@ -56,7 +56,7 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "Monitoria Intensiva  - 2021";
+    return "Monitoria Intensiva de HIV - 2022";
   }
 
   @Override
