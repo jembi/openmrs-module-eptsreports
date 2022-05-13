@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.IntensiveMonitoringCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
@@ -14,10 +17,6 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @Component
 public class IntensiveMonitoringDataSet extends BaseDataSet {
@@ -656,7 +655,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(3),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt135=childrenArt");
+        "");
     // 11.4
     dataSetDefinition.addColumn(
         "MI11NUM4",
