@@ -1223,6 +1223,35 @@ public class QualityImprovement2020Queries {
   }
 
   /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Select all patients with “Mudança de Estado de Permanência” = “Abandono” on Ficha Clínica
+   * during the period (“Data Consulta”>=”Data Início Período” and “Data Consulta”<=”Data Fim
+   * Período” and
+   *
+   * <blockquote>
+   *
+   * <p>Select all patients with “Mudança de Estado de Permanência” = “Abandono” on Ficha Resumo
+   * during the period (“Data de Mudança de Estado Permanência”>=”Data Início Período” e “Data
+   * Consulta”<=”Data Fim Período”
+   *
+   * <p>Nota: O período é definido conforme o requisito onde os utentes abandonos em TARV no fim do
+   * período serão excluídos:
+   * <li>1. para exclusão nos utentes que iniciaram a 1ª linha de TARV, a “Data Início Período” será
+   *     igual a “Data Início TARV” e “Data Fim do Período” será igual a “Data Início TARV”+6meses.
+   * <li>2.para exclusão nos utentes que reiniciaram TARV, a “Data Início Período” será igual a
+   *     “Data Consulta Reinício TARV” e “Data Fim do Período” será igual a “Data Consulta Reínicio
+   *     TARV”+6meses.
+   * <li>3. para exclusão nos utentes que iniciaram novo regime de 1ª Linha, a “Data Início Período”
+   *     será igual a “Data última Alternativa 1ª Linha” e a “Data Fim do Período” será “Data última
+   *     Alternativa 1ª Linha” + 6meses.
+   * <li>4. para exclusão nos utentes que iniciaram 2ª linha de TARV, a “Data Início Período” será
+   *     igual a “Data 2ª Linha” a “Data Fim do Período” será “Data 2ª Linha”+ 6 meses.
+   * <li>5. para exclusão nas mulheres grávidas que iniciaram TARV a “Data Início Período” será
+   *     igual a “Data Início TARV” e “Data Fim do Período” será igual a “Data Início TARV”+3meses.
+   *
    * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
    * @param masterCardEncounterType The Ficha Resumo Encounter Type 53
    * @param stateOfStayOfArtPatient The State of Stay in ART Concept
@@ -1255,7 +1284,6 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
-
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
@@ -1284,9 +1312,9 @@ public class QualityImprovement2020Queries {
     } else if (restartedArt) {
       query += getRestartedArtQuery();
     } else if (firstLine) {
-      query += getTherapeuticLineQuery(1);
+      query += getTherapeuticLineQuery(Linha.FIRST);
     } else if (secondLine) {
-      query += getTherapeuticLineQuery(2);
+      query += getTherapeuticLineQuery(Linha.SECOND);
     }
 
     query +=
@@ -1337,8 +1365,34 @@ public class QualityImprovement2020Queries {
     return stringSubstitutor.replace(query);
   }
 
-  public static String getTherapeuticLineQuery(int line) {
-    if (line == 1) {
+  enum Linha {
+    FIRST,
+    SECOND
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>B2 NEW - B2New - Select all patients with “LINHA TERAPEUTICA” (Concept Id 21151) equal to
+   * “PRIMEIRA LINHA” (concept id 21150) recorded in the Last Clinical Consultation (encounter type
+   * 6, encounter_datetime) occurred during the period (encounter_datetime >= startDateInclusion and
+   * <= endDateRevision) and Last Clinical Consultation Date (encounter_datetime) minus “Patient ART
+   * Start Date” (Concept Id 1190, value_datetime) recorded in Ficha Resumo (encounter type 53,
+   * encounter_datetime) >= 6 months) Excepto os utentes abandono em TARV durante o período
+   * (seguindo os critérios definidos no RF7.2) nos primeiros 6 meses da do início da 2ª Linha TARV
+   * (entre “Data Última 2ª Linha” e “Data Última 2ª Linha”+6meses).
+   *
+   * <blockquote>
+   *
+   * <p>Select all patients who have the REGIME ARV SEGUNDA LINHA (Concept Id 21187, value coded
+   * different NULL) recorded in Ficha Resumo (encounter type 53) and obs_datetime >=
+   * inclusionStartDate and <= inclusionEndDate AND at least for 6 months ( “Last Clinical
+   * Consultation” (last encounter_datetime from B1) minus obs_datetime(from B2) >= 6 months)
+   */
+  public static String getTherapeuticLineQuery(Linha line) {
+    if (line.equals(Linha.FIRST)) {
       return " SELECT "
           + "     pa.patient_id, first_line.the_time "
           + " FROM "
@@ -1415,7 +1469,7 @@ public class QualityImprovement2020Queries {
           + "                        ) abandoned_state WHERE DATE(abandoned_state.last_encounter) >= DATE(first_line.the_time) "
           + "                                              AND DATE(abandoned_state.last_encounter) <= DATE_ADD(first_line.the_time, INTERVAL 6 MONTH) "
           + "    ) GROUP BY pa.patient_id ";
-    } else if (line == 2) {
+    } else {
       return " SELECT     p.patient_id , o.obs_datetime  AS the_time "
           + "                                   FROM       patient p "
           + "                                   INNER JOIN encounter e "
@@ -1447,7 +1501,6 @@ public class QualityImprovement2020Queries {
           + "                                   AND        o.obs_datetime <= :endDate "
           + "                                   AND        timestampdiff(month, o.obs_datetime, last_clinical.last_visit) >= 6 ";
     }
-    return "";
   }
 
   public static String getRestartedArtQuery() {
