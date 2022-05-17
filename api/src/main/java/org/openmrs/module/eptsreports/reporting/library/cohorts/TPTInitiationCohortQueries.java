@@ -288,7 +288,7 @@ public class TPTInitiationCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
-    cd.setName("all patients with Ultima Profilaxia");
+    cd.setName("3HP4 - Patients with Ultima Profilaxia on Resumo");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -335,7 +335,7 @@ public class TPTInitiationCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
-    cd.setName("all patients with Profilaxia TPT");
+    cd.setName("3HP5 - Patients with Profilaxia TPT on Ficha Clinica ");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -383,7 +383,7 @@ public class TPTInitiationCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
-    cd.setName("all patients with Outras Prescricoes");
+    cd.setName("3HP6 - Patients with Outras Prescricoes on Ficha Clinica ");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -396,10 +396,8 @@ public class TPTInitiationCohortQueries {
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON p.patient_id = e.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -449,7 +447,7 @@ public class TPTInitiationCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
-    cd.setName("all patients with Regime de TPT");
+    cd.setName("3HP7 - Patients with Regime de TPT & Seg.Trat TPT on FILT");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -587,7 +585,7 @@ public class TPTInitiationCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
-    cd.setName("all patients with Ficha Resumo");
+    cd.setName("BIPT1 - Patients on Ficha Resumo with Ultima profilaxia Isoniazida");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -647,7 +645,7 @@ public class TPTInitiationCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
-    cd.setName("all patients with Ficha Clinica with Profilaxia INH");
+    cd.setName("BIPT2 - atients with Ficha Clinica with Profilaxia INH");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -667,17 +665,13 @@ public class TPTInitiationCohortQueries {
             + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "        INNER JOIN obs o3 ON e.encounter_id = o3.encounter_id "
-            + "        WHERE      p.voided = 0 "
-            + "        AND        e.voided = 0 "
-            + "        AND        o.voided = 0 "
-            + "        AND        o2.voided = 0 "
-            + "        AND        o3.voided = 0 "
-            + "        AND        e.location_id = :location "
-            + "        AND        e.encounter_type = 6 "
-            + "        AND        ( o.concept_id = 6122 AND o.value_coded = 1256 ) "
-            + "        OR         (  o2.concept_id = 23985 AND o2.value_coded = 656 "
-            + "                   AND o3.concept_id = 165308 AND o3.value_coded = 1256 ) "
-            + "        AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 AND o3.voided = 0 "
+            + "        AND   e.location_id = :location "
+            + "        AND   e.encounter_type = ${6} "
+            + "        AND   ( o.concept_id = ${6122} AND o.value_coded = ${1256} ) "
+            + "        OR    ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
+            + "              AND (o3.concept_id = ${165308} AND o3.value_coded = ${1256}) ) "
+            + "        AND   e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "        GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -703,7 +697,7 @@ public class TPTInitiationCohortQueries {
   public CohortDefinition getPatientsIPTStart3WithFichaClinicaOrFichaPediatrica() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("IPT start 3 - select patients with Ficha Clinica or Pediátrica");
+    sqlCohortDefinition.setName("BIPT3 - select patients with Ficha Clinica or Pediátrica");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -768,7 +762,7 @@ public class TPTInitiationCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
-    cd.setName("all patients with the First Filt with regime de TPT");
+    cd.setName("BIPT4 - Patients with the First Filt with regime de TPT");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -799,12 +793,12 @@ public class TPTInitiationCohortQueries {
             + "               INNER JOIN obs o2 on o2.encounter_id = e.encounter_id "
             + "                                    WHERE   p.voided = 0  AND e.voided = 0 "
             + "               AND o.voided = 0  AND e.location_id = :location "
-            + "               AND e.encounter_type = 60 "
-            + "               AND (o.concept_id = 23985  AND o.value_coded IN (656,23982)) "
-            + "               AND ((o2.concept_id =  23987  AND (o2.value_coded =  1257  OR o2.value_coded IS NULL)) "
+            + "               AND e.encounter_type = ${60} "
+            + "               AND ( o.concept_id = ${23985}  AND o.value_coded IN (${656}, ${23982}) ) "
+            + "               AND ((o2.concept_id =  ${23987}  AND (o2.value_coded =  ${1257}  OR o2.value_coded IS NULL)) "
             + "               OR  o2.concept_id NOT IN( SELECT oo.concept_id FROM obs oo WHERE oo.voided = 0 "
             + "                               AND oo.encounter_id = e.encounter_id "
-            + "                               AND oo.concept_id =  23987  )) "
+            + "                               AND oo.concept_id =  ${23987}  )) "
             + "               AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate "
             + "                                    GROUP BY p.patient_id) AS filt "
             + "                                        ON filt.patient_id = p.patient_id "
@@ -817,9 +811,9 @@ public class TPTInitiationCohortQueries {
             + "                    AND ee.voided = 0 "
             + "                    AND oo.voided = 0 "
             + "                    AND ee.location_id = :location "
-            + "                    AND ee.encounter_type = 60 "
-            + "                    AND oo.concept_id = 23985 "
-            + "                    AND oo.value_coded IN ( 656 ,  23982 ) "
+            + "                    AND ee.encounter_type = ${60} "
+            + "                    AND oo.concept_id = ${23985} "
+            + "                    AND oo.value_coded IN ( ${656} , ${23982} ) "
             + "                    AND ee.encounter_datetime >= DATE_SUB(filt.start_date, INTERVAL 7 MONTH) "
             + "                    AND ee.encounter_datetime < filt.start_date "
             + "                    GROUP BY p.patient_id "
@@ -830,9 +824,9 @@ public class TPTInitiationCohortQueries {
             + "                    JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "                    WHERE o.voided = 0 AND e.voided = 0 AND p.voided = 0 "
             + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_type = 53 "
-            + "                    AND (o.concept_id = 6128  AND o.value_datetime IS NOT NULL) "
-            + "                    AND (o2.concept_id = 23985 AND o2.value_coded = 656 AND o2.value_datetime IS NOT NULL) "
+            + "                    AND e.encounter_type = ${53} "
+            + "                    AND (o.concept_id = ${6128}  AND o.value_datetime IS NOT NULL) "
+            + "                    AND (o2.concept_id = ${23985} AND o2.value_coded = ${656} AND o2.value_datetime IS NOT NULL) "
             + "                    AND e.encounter_datetime >= DATE_SUB(filt.start_date, INTERVAL 7 MONTH) "
             + "                    AND e.encounter_datetime < filt.start_date "
             + "                    UNION "
@@ -843,17 +837,17 @@ public class TPTInitiationCohortQueries {
             + "                    Join obs o3 ON o3.encounter_id = e.encounter_id "
             + "                    WHERE p.voided = 0 AND o.voided = 0 AND e.voided = 0 AND o2.voided = 0 "
             + "                     AND e.location_id = :location "
-            + "                    AND e.encounter_type = 6 "
-            + "                    AND (o.concept_id = 6122 AND o.value_coded = 1256) "
-            + "                    OR  (o2.concept_id = 23985 AND o2.value_coded = 656 "
-            + "                         AND o3.concept_id = 165308 AND o3.value_coded = 1256) "
+            + "                    AND e.encounter_type = ${6} "
+            + "                    AND (o.concept_id = ${6122} AND o.value_coded = ${1256}) "
+            + "                    OR  ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
+            + "                         AND (o3.concept_id = ${165308} AND o3.value_coded = ${1256}) ) "
             + "                    AND e.encounter_datetime >= DATE_SUB(filt.start_date, INTERVAL 7 MONTH) "
             + "                    AND e.encounter_datetime < filt.start_date "
             + "                     UNION "
             + "                    SELECT p.patient_id FROM patient p "
             + "                    JOIN encounter e ON e.patient_id = p.patient_id "
             + "                    JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                    WHERE e.encounter_type IN (6,9) AND o.concept_id = 6128 "
+            + "                    WHERE e.encounter_type IN (${6},${9}) AND o.concept_id = ${6128} "
             + "                    AND o.voided = 0 AND e.voided = 0 "
             + "                    AND p.voided = 0 AND e.location_id = :location "
             + "                    AND o.value_datetime IS NOT NULL "
@@ -886,7 +880,7 @@ public class TPTInitiationCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
-    cd.setName("all patients with Regime de TPT Isonaazid");
+    cd.setName("BIPT5 - Patients with Regime de TPT Isoniazid / Isoniazid + Piridoxina");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
@@ -901,31 +895,19 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT     p.patient_id, "
-            + "           MIN(e.encounter_datetime) AS ipt_start_date "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e "
-            + "ON         p.patient_id = e.patient_id "
-            + "INNER JOIN obs o1 "
-            + "ON         e.encounter_id = o1.encounter_id "
-            + "INNER JOIN obs o2 "
-            + "ON         e.encounter_id = o2.encounter_id "
-            + "WHERE      p.voided = 0 "
-            + "AND        e.voided = 0 "
-            + "AND        o1.voided = 0 "
-            + "AND        o2.voided = 0 "
-            + "AND        e.location_id = :location "
-            + "AND        e.encounter_type = ${60} "
-            + "AND        ( "
-            + "                      o1.concept_id = ${23985} "
-            + "           AND        o1.value_coded IN( ${656}, "
-            + "                                        ${23982} ) ) "
-            + "AND        ( "
-            + "                      o2.concept_id = ${23987} "
-            + "           AND        o2.value_coded IN( ${1256}, "
-            + "                                        ${1705} ) ) "
-            + "AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "GROUP BY   p.patient_id ";
+        "SELECT p.patient_id, "
+            + " MIN(e.encounter_datetime) AS ipt_start_date "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "INNER JOIN obs o1 ON e.encounter_id = o1.encounter_id "
+            + "INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "WHERE p.voided = 0 AND e.voided = 0 AND o1.voided = 0 AND o2.voided = 0 "
+            + "AND   e.location_id = :location "
+            + "AND   e.encounter_type = ${60} "
+            + "AND   ( o1.concept_id = ${23985} AND o1.value_coded IN( ${656}, ${23982} ) ) "
+            + "AND   ( o2.concept_id = ${23987} AND o2.value_coded IN( ${1256}, ${1705} ) ) "
+            + "AND   e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
