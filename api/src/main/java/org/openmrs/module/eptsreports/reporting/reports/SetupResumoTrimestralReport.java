@@ -78,7 +78,6 @@ public class SetupResumoTrimestralReport extends EptsDataExportManager {
         resumoTrimestralDataSetDefinition.constructResumoTrimestralDataset();
     rd.addDataSetDefinition("R", mapStraightThrough(dataset));
     rd.addDataSetDefinition("D", mapStraightThrough(new ResumoTrimestralStartDateDataset()));
-    // base cohort is run on EptsQuarterlyCohortDefinitionEvaluator
     return rd;
   }
 
