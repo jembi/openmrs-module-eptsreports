@@ -1,12 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -16,11 +12,25 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
 @Component
 public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDataExportManager {
 
+  private ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset
+      listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset;
+
   @Autowired
-  public SetupListOfPatientsCurrentlyOnArtWithoutTbScreening() {}
+  public SetupListOfPatientsCurrentlyOnArtWithoutTbScreening(
+      ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset
+          listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset) {
+    this.listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset =
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset;
+  }
 
   @Override
   public String getVersion() {
@@ -55,7 +65,11 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
     rd.setDescription(getDescription());
     rd.setParameters(getParameters());
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
-
+    rd.addDataSetDefinition(
+        "LP",
+        Mapped.mapStraightThrough(
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset
+                .constructListOfPatientsDataset()));
     return rd;
   }
 
