@@ -1,5 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset;
@@ -12,12 +17,6 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 @Component
 public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDataExportManager {
@@ -100,8 +99,7 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-
-        new Parameter("endDate", "End Date", Date.class),
+        new Parameter("endDate", "Report End Date", Date.class),
         new Parameter("location", "Health Facility", Location.class));
   }
 }
