@@ -50,7 +50,7 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
 
   @Override
   public String getName() {
-    return "TB5: List of Patients Currently on ART without TB Screening”";
+    return "TB5: List of Patients Currently on ART without TB Screening";
   }
 
   @Override
@@ -100,7 +100,7 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("startDate", "Start Date", Date.class),
+
         new Parameter("endDate", "End Date", Date.class),
         new Parameter("location", "Health Facility", Location.class));
   }
