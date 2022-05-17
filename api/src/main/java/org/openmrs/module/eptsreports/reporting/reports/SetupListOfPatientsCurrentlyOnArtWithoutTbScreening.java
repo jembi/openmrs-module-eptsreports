@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -65,6 +66,7 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
     rd.setDescription(getDescription());
     rd.setParameters(getParameters());
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition("SC", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "LP",
         Mapped.mapStraightThrough(
@@ -85,7 +87,7 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:8,dataset:CV");
+      props.put("repeatingSections", "sheet:1,row:8,dataset:LP");
       props.put("sortWeight", "5000");
       rd.setProperties(props);
     } catch (IOException e) {
