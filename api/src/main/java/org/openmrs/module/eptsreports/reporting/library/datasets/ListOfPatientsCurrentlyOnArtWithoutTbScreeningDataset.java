@@ -6,9 +6,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -41,6 +39,12 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
 
   @Autowired
   private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
+
+  @Autowired
+  private TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries;
+
+  @Autowired
+  private ListOfPatientsEligibleForVLDataDefinitionQueries listOfPatientsEligibleForVLDataDefinitionQueries;
 
   public DataSetDefinition constructListOfPatientsDataset() {
     PatientDataSetDefinition patientDefinition = new PatientDataSetDefinition();
@@ -110,7 +114,38 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
     patientDefinition.addColumn(
         "art_start",
         listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getArtStartDate(),
-        "");
+        "endDate=${endDate},location=${location}");
+
+    patientDefinition.addColumn(
+            "pregnant_breastfeeding",
+            tptListOfPatientsEligibleDataSet. pregnantBreasfeediDefinition(),
+            "location=${location}");
+
+    patientDefinition.addColumn(
+            "last_pickup_fila",
+            listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndLastDrugPickUpDateOnFila(),
+            "startDate=${endDate},location=${location}");
+
+    patientDefinition.addColumn(
+            "next_scheduled_pickup_fila",
+            listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndNextDrugPickUpDateOnFila(),
+            "startDate=${endDate},location=${location}");
+
+    //Modo de dispensa - Aqui
+
+    patientDefinition.addColumn(
+            "last_followup_consultation",
+            listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndLastFollowUpConsultationDate(),
+            "startDate=${endDate},location=${location}");
+
+    patientDefinition.addColumn(
+            "next_followup_consultation",
+            listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndNextFollowUpConsultationDate(),
+            "startDate=${endDate},location=${location}");
+
+
+
+
 
     return patientDefinition;
   }
