@@ -4,6 +4,8 @@ import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.data.converter.DispensationTypeConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
@@ -40,11 +42,14 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
   @Autowired
   private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
-  @Autowired
-  private TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries;
+  @Autowired private TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries;
 
   @Autowired
-  private ListOfPatientsEligibleForVLDataDefinitionQueries listOfPatientsEligibleForVLDataDefinitionQueries;
+  private ListOfPatientsEligibleForVLDataDefinitionQueries
+      listOfPatientsEligibleForVLDataDefinitionQueries;
+
+  @Autowired
+  private HivMetadata hivMetadata;
 
   public DataSetDefinition constructListOfPatientsDataset() {
     PatientDataSetDefinition patientDefinition = new PatientDataSetDefinition();
@@ -83,7 +88,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
     patientDefinition.addColumn(
         "age",
         listOfPatientsArtCohortCohortQueries.getAge(),
-        "evaluationDate=${evaluationDate}",
+        "evaluationDate=${endDate}",
         new NotApplicableIfNullConverter());
 
     patientDefinition.addColumn(
@@ -117,33 +122,41 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
         "endDate=${endDate},location=${location}");
 
     patientDefinition.addColumn(
-            "pregnant_breastfeeding",
-            tptListOfPatientsEligibleDataSet. pregnantBreasfeediDefinition(),
-            "location=${location}");
+        "pregnant_breastfeeding",
+        tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
+        "location=${location}");
 
     patientDefinition.addColumn(
-            "last_pickup_fila",
-            listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndLastDrugPickUpDateOnFila(),
-            "startDate=${endDate},location=${location}");
+        "last_pickup_fila",
+        listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndLastDrugPickUpDateOnFila(),
+        "startDate=${endDate},location=${location}");
 
     patientDefinition.addColumn(
-            "next_scheduled_pickup_fila",
-            listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndNextDrugPickUpDateOnFila(),
-            "startDate=${endDate},location=${location}");
-
-    //Modo de dispensa - Aqui
+        "next_scheduled_pickup_fila",
+        listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndNextDrugPickUpDateOnFila(),
+        "startDate=${endDate},location=${location}");
 
     patientDefinition.addColumn(
-            "last_followup_consultation",
-            listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndLastFollowUpConsultationDate(),
-            "startDate=${endDate},location=${location}");
+            "fila_dispensation_mode",
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnEncounter(hivMetadata.getARVPharmaciaEncounterType()),
+            "startDate=${endDate},location=${location}", new DispensationTypeConverter());
 
     patientDefinition.addColumn(
-            "next_followup_consultation",
-            listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndNextFollowUpConsultationDate(),
-            "startDate=${endDate},location=${location}");
+        "last_followup_consultation",
+        listOfPatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndLastFollowUpConsultationDate(),
+        "startDate=${endDate},location=${location}");
 
+    patientDefinition.addColumn(
+        "next_followup_consultation",
+        listOfPatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndNextFollowUpConsultationDate(),
+        "startDate=${endDate},location=${location}");
 
+    patientDefinition.addColumn(
+            "clinical_dispensation_mode",
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnEncounter(hivMetadata. getAdultoSeguimentoEncounterType()),
+            "startDate=${endDate},location=${location}", new DispensationTypeConverter());
 
 
 

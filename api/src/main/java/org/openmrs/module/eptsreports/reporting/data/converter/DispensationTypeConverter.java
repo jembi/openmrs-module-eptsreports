@@ -15,6 +15,8 @@ public class DispensationTypeConverter implements DataConverter {
         return "Mensal";
       case "23720":
         return "Trimestral";
+      case "23888":
+        return "Semestral";
       default:
         return "";
     }
