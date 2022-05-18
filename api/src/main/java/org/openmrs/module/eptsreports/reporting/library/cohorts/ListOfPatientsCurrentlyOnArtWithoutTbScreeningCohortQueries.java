@@ -1,10 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
@@ -17,6 +13,10 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -79,16 +79,17 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  public DataDefinition getDispensationTypeOnEncounter(EncounterType encounterType) {
+  public DataDefinition getDispensationTypeOnClinicalAndPediatricEncounter() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Dispensation Type on Encounter " + encounterType.getName());
+    sqlPatientDataDefinition.setName("Dispensation Type on Encounter 6 and 9 ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
-    valuesMap.put("encounter", encounterType.getEncounterTypeId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT p.patient_id , o.value_coded "
@@ -99,7 +100,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "				SELECT p.patient_id , MAX(e.encounter_datetime) encounter_date "
             + "				FROM patient p "
             + "				INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "				WHERE e.encounter_type =  ${encounter} "
+            + "				WHERE e.encounter_type IN (${6},${9}) "
             + "				AND e.location_id = :location "
             + "				AND e.encounter_datetime <= :endDate "
             + "				AND p.voided = 0 "
@@ -107,7 +108,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "				GROUP BY p.patient_id "
             + ") recent_fila ON recent_fila.patient_id = p.patient_id "
             + " "
-            + "WHERE e.encounter_type =  ${encounter} "
+            + "WHERE e.encounter_type IN (${6},${9}) "
             + "AND e.location_id = :location "
             + "AND e.encounter_datetime = recent_fila.encounter_date "
             + "AND o.concept_id = ${23739} "
@@ -115,6 +116,46 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "AND e.voided = 0 "
             + "AND o.voided = 0 "
             + "GROUP BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(valuesMap);
+    sqlPatientDataDefinition.setQuery(sb.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  public DataDefinition getDispensationTypeOnFila() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Dispensation Type on FILA ");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id, o.value_coded "
+            + "FROM   patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN(SELECT p.patient_id, MAX(e.encounter_datetime) encounter_date "
+            + "                  FROM   patient p "
+            + "                         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                  WHERE  e.encounter_type = ${18} "
+            + "                         AND e.location_id = :location "
+            + "                         AND e.encounter_datetime <= :endDate "
+            + "                         AND p.voided = 0 "
+            + "                         AND e.voided = 0 "
+            + "                  GROUP  BY p.patient_id) recent_fila "
+            + "               ON recent_fila.patient_id = p.patient_id "
+            + "WHERE  e.encounter_type = ${18} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime = recent_fila.encounter_date "
+            + "       AND o.concept_id = ${165174} "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
     sqlPatientDataDefinition.setQuery(sb.replace(query));

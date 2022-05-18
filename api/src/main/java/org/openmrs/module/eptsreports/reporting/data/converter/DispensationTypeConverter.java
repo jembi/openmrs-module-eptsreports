@@ -17,6 +17,34 @@ public class DispensationTypeConverter implements DataConverter {
         return "Trimestral";
       case "23888":
         return "Semestral";
+
+      case "165175":
+        return "Horario Normal De Expedinte";
+
+      case "165176":
+        return "Fora Do Horário";
+
+      case "165177":
+        return "Farmac/Farmácia Privada";
+
+      case "165178":
+        return "Dispensa Comunitária Via Provedor";
+
+      case "165179":
+        return "Dispensa Comunitária Via Ape";
+
+      case "165180":
+        return "Brigadas Móveis Diurnas";
+
+      case "165181":
+        return "Brigadas Moveis Noturnas(Hotspots)";
+
+      case "165182":
+        return "Clinicas Moveis Diurnas ";
+
+      case "165183":
+        return "Clinicas Moveis Noturnas(Hotspots)";
+
       default:
         return "";
     }

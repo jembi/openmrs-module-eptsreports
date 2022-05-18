@@ -137,8 +137,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
 
     patientDefinition.addColumn(
         "fila_dispensation_mode",
-        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnEncounter(
-            hivMetadata.getARVPharmaciaEncounterType()),
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnFila(),
         "endDate=${endDate},location=${location}",
         new DispensationTypeConverter());
 
@@ -156,8 +155,8 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
 
     patientDefinition.addColumn(
         "clinical_dispensation_mode",
-        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnEncounter(
-            hivMetadata.getAdultoSeguimentoEncounterType()),
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+            .getDispensationTypeOnClinicalAndPediatricEncounter(),
         "endDate=${endDate},location=${location}",
         new DispensationTypeConverter());
 
