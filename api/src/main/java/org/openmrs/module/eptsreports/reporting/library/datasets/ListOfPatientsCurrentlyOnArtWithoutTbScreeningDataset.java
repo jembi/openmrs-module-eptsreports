@@ -48,8 +48,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
   private ListOfPatientsEligibleForVLDataDefinitionQueries
       listOfPatientsEligibleForVLDataDefinitionQueries;
 
-  @Autowired
-  private HivMetadata hivMetadata;
+  @Autowired private HivMetadata hivMetadata;
 
   public DataSetDefinition constructListOfPatientsDataset() {
     PatientDataSetDefinition patientDefinition = new PatientDataSetDefinition();
@@ -137,9 +136,11 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
         "startDate=${endDate},location=${location}");
 
     patientDefinition.addColumn(
-            "fila_dispensation_mode",
-            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnEncounter(hivMetadata.getARVPharmaciaEncounterType()),
-            "startDate=${endDate},location=${location}", new DispensationTypeConverter());
+        "fila_dispensation_mode",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnEncounter(
+            hivMetadata.getARVPharmaciaEncounterType()),
+        "endDate=${endDate},location=${location}",
+        new DispensationTypeConverter());
 
     patientDefinition.addColumn(
         "last_followup_consultation",
@@ -154,11 +155,23 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
         "startDate=${endDate},location=${location}");
 
     patientDefinition.addColumn(
-            "clinical_dispensation_mode",
-            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnEncounter(hivMetadata. getAdultoSeguimentoEncounterType()),
-            "startDate=${endDate},location=${location}", new DispensationTypeConverter());
+        "clinical_dispensation_mode",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getDispensationTypeOnEncounter(
+            hivMetadata.getAdultoSeguimentoEncounterType()),
+        "endDate=${endDate},location=${location}",
+        new DispensationTypeConverter());
 
+    patientDefinition.addColumn(
+        "recent_arv_pickup",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+            .getMostRecentDrugPickupDateOnRecepcaoLevantouArv(),
+        "endDate=${endDate},location=${location}");
 
+    patientDefinition.addColumn(
+        "scheduled_arv_pickup",
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+            .getNextScheduledDrugPickupDateOnRecepcaoLevantouArv(),
+        "endDate=${endDate},location=${location}");
 
     return patientDefinition;
   }
