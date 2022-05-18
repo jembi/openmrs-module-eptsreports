@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -14,6 +11,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class TPTInitiationCohortQueries {
@@ -504,7 +505,7 @@ public class TPTInitiationCohortQueries {
             + "                  AND e.location_id = :location "
             + "                  AND e.encounter_type = ${60} "
             + "                  AND o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) "
-            + "                  AND e.encounter_datetime >= Date_sub(filt.start_date, interval 4 month) "
+            + "                  AND e.encounter_datetime BETWEEN Date_sub(filt.start_date, interval 4 month) AND filt.start_date "
             + "                  GROUP  BY p.patient_id "
             + "           UNION "
             + "           SELECT p.patient_id "
@@ -531,7 +532,7 @@ public class TPTInitiationCohortQueries {
             + "           AND ( o3.concept_id = ${23985} AND o3.value_coded = ${23954}   "
             + "                 AND o4.concept_id = ${165308} AND o4.value_coded = ${1256} ) "
             + "           OR  ( o5.concept_id = ${1719} AND o5.value_coded IN ( ${23954}, ${165307} ) ) "
-            + "           AND e.encounter_datetime <= Date_sub(filt.start_date, interval 4 month) "
+            + "           AND e.encounter_datetime BETWEEN Date_sub(filt.start_date, interval 4 month) AND filt.start_date "
             + "           GROUP  BY p.patient_id "
             + "           UNION "
             + "           SELECT p.patient_id "
@@ -555,7 +556,7 @@ public class TPTInitiationCohortQueries {
             + "           AND e.location_id = :location "
             + "           AND e.encounter_type = ${53} "
             + "           AND o6.concept_id = ${23985} AND o6.value_coded = ${23954} "
-            + "           AND o7.concept_id = ${6128} AND o7.value_datetime <= Date_sub(filt.start_date, interval 4 month) "
+            + "           AND o7.concept_id = ${6128} AND o7.value_datetime BETWEEN Date_sub(filt.start_date, interval 4 month) AND filt.start_date "
             + "           GROUP BY p.patient_id) "
             + "GROUP BY p.patient_id ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
