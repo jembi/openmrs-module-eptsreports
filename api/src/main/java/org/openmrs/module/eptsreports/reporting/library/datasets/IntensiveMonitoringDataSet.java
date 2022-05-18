@@ -37,9 +37,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
   @Autowired
   public IntensiveMonitoringDataSet(
-          EptsGeneralIndicator eptsGeneralIndicator,
-          IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries,
-          QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries, EptsCommonDimension eptsCommonDimension) {
+      EptsGeneralIndicator eptsGeneralIndicator,
+      IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries,
+      QualityImprovement2020CohortQueries qualityImprovement2020CohortQueries,
+      EptsCommonDimension eptsCommonDimension) {
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.intensiveMonitoringCohortQueries = intensiveMonitoringCohortQueries;
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
@@ -1144,139 +1145,141 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-// ************************* MI CATEGORY 15 MDS INDICATORS **********************
+    // ************************* MI CATEGORY 15 MDS INDICATORS **********************
 
     CohortIndicator MI15DEN13 =
-            eptsGeneralIndicator.getIndicator(
-                    "MI15DEN13",
-                    EptsReportUtils.map(
-                            qualityImprovement2020CohortQueries.getMQ15DenMDS(),
-                            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
+        eptsGeneralIndicator.getIndicator(
+            "MI15DEN13",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15DenMDS(),
+                "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
 
     MI15DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-            "MI15DEN13",
-            "15.13 - % de pacientes elegíveis a MDS, que foram inscritos em MDS",
-            EptsReportUtils.map(
-                    MI15DEN13,
-                    "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
-            "");
+        "MI15DEN13",
+        "15.13 - % de pacientes elegíveis a MDS, que foram inscritos em MDS",
+        EptsReportUtils.map(
+            MI15DEN13,
+            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     CohortIndicator MI15NUM13 =
-            eptsGeneralIndicator.getIndicator(
-                    "MI15NUM13",
-                    EptsReportUtils.map(
-                            qualityImprovement2020CohortQueries.getMQ15NumeratorMDS(),
-                            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
+        eptsGeneralIndicator.getIndicator(
+            "MI15NUM13",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15NumeratorMDS(),
+                "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
 
     MI15NUM13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-            "MI15NUM13",
-            "Numerator:  “# de pacientes elegíveis a MDS ",
-            EptsReportUtils.map(
-                    MI15NUM13,
-                    "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
-            "");
+        "MI15NUM13",
+        "Numerator:  “# de pacientes elegíveis a MDS ",
+        EptsReportUtils.map(
+            MI15NUM13,
+            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     CohortIndicator MI15DEN14 =
-            eptsGeneralIndicator.getIndicator(
-                    "MI15DEN14",
-                    EptsReportUtils.map(
-                            qualityImprovement2020CohortQueries.getMQ15MdsDen14(),
-                            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
+        eptsGeneralIndicator.getIndicator(
+            "MI15DEN14",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15MdsDen14(),
+                "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
 
     MI15DEN14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-            "MI15DEN14",
-            "15.14 - % de inscritos em MDS que receberam CV acima de 1000 cópias  ",
-            EptsReportUtils.map(
-                    MI15DEN14,
-                    "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
-            "");
+        "MI15DEN14",
+        "15.14 - % de inscritos em MDS que receberam CV acima de 1000 cópias  ",
+        EptsReportUtils.map(
+            MI15DEN14,
+            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     CohortIndicator MI15NUM14 =
-            eptsGeneralIndicator.getIndicator(
-                    "MI15NUM14",
-                    EptsReportUtils.map(
-                            qualityImprovement2020CohortQueries.getMQ15MdsNum14(),
-                            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
+        eptsGeneralIndicator.getIndicator(
+            "MI15NUM14",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15MdsNum14(),
+                "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
 
     MI15NUM14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-            "MI15NUM14",
-            "Numerator: # de pacientes inscritos em MDS para pacientes estáveis ",
-            EptsReportUtils.map(
-                    MI15NUM14,
-                    "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
-            "");
+        "MI15NUM14",
+        "Numerator: # de pacientes inscritos em MDS para pacientes estáveis ",
+        EptsReportUtils.map(
+            MI15NUM14,
+            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     CohortIndicator MI15DEN15 =
-            eptsGeneralIndicator.getIndicator(
-                    "MI15DEN15",
-                    EptsReportUtils.map(
-                            qualityImprovement2020CohortQueries.getMQ15MdsDen15(),
-                            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
+        eptsGeneralIndicator.getIndicator(
+            "MI15DEN15",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15MdsDen15(),
+                "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
 
     MI15DEN15.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-            "MI15DEN15",
-            "Numerator 15.15 : # de pacientes inscritos em MDS para pacientes estáveis - 21 meses",
-            EptsReportUtils.map(
-                    MI15DEN15,
-                    "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
-            "");
+        "MI15DEN15",
+        "Numerator 15.15 : # de pacientes inscritos em MDS para pacientes estáveis - 21 meses",
+        EptsReportUtils.map(
+            MI15DEN15,
+            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     CohortIndicator MI15NUM15 =
-            eptsGeneralIndicator.getIndicator(
-                    "MI15NUM15",
-                    EptsReportUtils.map(
-                            qualityImprovement2020CohortQueries.getMQ15MdsNum15(),
-                            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
+        eptsGeneralIndicator.getIndicator(
+            "MI15NUM15",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQ15MdsNum15(),
+                "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"));
 
     MI15NUM15.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-            "MI15NUM15",
-            "Numerator: # de pacientes inscritos em MDS para pacientes estáveis ",
-            EptsReportUtils.map(
-                    MI15NUM15,
-                    "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
-            "");
+        "MI15NUM15",
+        "Numerator: # de pacientes inscritos em MDS para pacientes estáveis ",
+        EptsReportUtils.map(
+            MI15NUM15,
+            "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     CohortIndicator MI15DEN16 =
-            eptsGeneralIndicator.getIndicator(
-                    "MI15DEN16",
-                    EptsReportUtils.map(
-                            qualityImprovement2020CohortQueries.getMQDen15Dot16(),
-                            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+        eptsGeneralIndicator.getIndicator(
+            "MI15DEN16",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQDen15Dot16(),
+                "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+    MI15DEN16.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-            "MI15DEN16",
-            "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
-            EptsReportUtils.map(
-                    MI15DEN16,
-                    "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
-            "");
+        "MI15DEN16",
+        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
+        EptsReportUtils.map(
+            MI15DEN16,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     CohortIndicator MI15NUM16 =
-            eptsGeneralIndicator.getIndicator(
-                    "MI15NUM16",
-                    EptsReportUtils.map(
-                            qualityImprovement2020CohortQueries.getMQNum15Dot16(),
-                            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+        eptsGeneralIndicator.getIndicator(
+            "MI15NUM16",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getMQNum15Dot16(),
+                "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+    MI15NUM16.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-            "MI15NUM16",
-            "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
-            EptsReportUtils.map(
-                    MI15NUM16,
-                    "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
-            "");
+        "MI15NUM16",
+        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
+        EptsReportUtils.map(
+            MI15NUM16,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     return dataSetDefinition;
   }
