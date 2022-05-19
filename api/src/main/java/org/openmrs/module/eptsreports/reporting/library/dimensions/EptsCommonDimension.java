@@ -15,7 +15,19 @@ import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraig
 
 import java.util.Date;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.Eri2MonthsCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.Eri4MonthsCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.EriCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.EriDSDCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenderCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.HivCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.MISAUKeyPopsCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.PrepCtCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TbPrevCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TxNewCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.TxPvlsCohortQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.InverseCohortDefinition;
@@ -139,6 +151,9 @@ public class EptsCommonDimension {
         DimensionKeyForAge.between5And9Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 5 and 9", 5, 9));
     dim.addCohortDefinition(
+        DimensionKeyForAge.bellow10Years.getKey(),
+        ageDimensionCohort.createXtoYAgeCohort("patients with age below 15", null, 9));
+    dim.addCohortDefinition(
         DimensionKeyForAge.bellow15Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age below 15", null, 14));
     dim.addCohortDefinition(
@@ -154,11 +169,19 @@ public class EptsCommonDimension {
         DimensionKeyForAge.between15And19Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 15 and 19", 15, 19));
     dim.addCohortDefinition(
+        DimensionKeyForAge.between15And24Years.getKey(),
+        ageDimensionCohort.createXtoYAgeCohort("patients with age between 15 and 24", 15, 24));
+
+    dim.addCohortDefinition(
         DimensionKeyForAge.between20And24Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 20 and 24", 20, 24));
     dim.addCohortDefinition(
         DimensionKeyForAge.between25And29Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 25 and 29", 25, 29));
+    dim.addCohortDefinition(
+        DimensionKeyForAge.between25And49Years.getKey(),
+        ageDimensionCohort.createXtoYAgeCohort("patients with age between 25 and 49", 25, 49));
+
     dim.addCohortDefinition(
         DimensionKeyForAge.between30And34Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 30 and 34", 30, 34));

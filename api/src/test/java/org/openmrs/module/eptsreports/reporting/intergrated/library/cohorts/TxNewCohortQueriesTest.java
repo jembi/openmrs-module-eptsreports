@@ -2,9 +2,7 @@ package org.openmrs.module.eptsreports.reporting.intergrated.library.cohorts;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.HashMap;
