@@ -20,8 +20,8 @@ public class TxtbDenominatorQueries {
    * i. at least one “S” or “N” selected for TB Screening (Rastreio de TB) during the reporting
    * period consultations; (response 1065: YES or 1066: NO for question 6257: SCREENING FOR TB)
    *
-   * <p>at least one “POS” selected for “Resultado da Investigação para TB de BK e/ou RX?” during
-   * the reporting period consultations; ( response 703: POS or 664: NEG for question: 6277)
+   * <p>i. at least one “S” or “N” selected for TB Screening (Rastreio de TB) during the reporting
+   * period consultations; (response 1065: YES or 1066: NO for question 6257: SCREENING FOR TB)
    *
    * @return {@link String}
    */
@@ -336,6 +336,142 @@ public class TxtbDenominatorQueries {
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "       AND ( o.concept_id = ${1766} "
             + "             AND o.value_coded IN( ${1763}, ${1764}, ${1762}, ${1760},${23760}, ${1765}, ${161} ) ) "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+  /**
+   * Patients with at least one response to the following questions in in Ficha Clinica Master Card
+   * during the reporting period
+   *
+   * <p>• TB OBSERVATIONS (obs concept id = 1766) Answers: <br>
+   * a. FEVER LASTING MORE THAN 3 WEEKS (id = 1763) or <br>
+   * b. WEIGHT LOSS OF MORE THAN 3 KG IN LAST MONTH (id = 1764) or <br>
+   * c. NIGHTSWEATS LASTING MORE THAN 3 WEEKS ( id = 1762) or <br>
+   * d. COUGH LASTING MORE THAN 3 WEEKS ( id = 1760) or <br>
+   * e. ASTHENIA ( id =23760) or <br>
+   * f. COHABITANT BEING TREATED FOR TB (id = 1765) or <br>
+   * g. LYMPHADENOPATHY (id = 161)
+   *
+   * @return {@link String}
+   */
+
+  public String getPatientsWithApplicationsForLabResearch() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("23774", tbMetadata.getCultureTest().getConceptId());
+    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
+    map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
+    map.put("12", tbMetadata.getXRayChest().getConceptId());
+
+    String query =
+        "SELECT p.patient_id,e.encounter_datetime "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded IN( ${23723}, ${23774}, ${23951}, ${307}, ${12} ) "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+  /**
+   * Patients with at least one response to the following questions in in Ficha Clinica Master Card
+   * during the reporting period
+   *
+   * <p>• TB GENEXPERT TEST (id =23723) Answer Positive (id = 703) or Negative (id = 664) <br>
+   * OR • CULTURE TEST (id = 23774) Answer Positive (id = 703) or Negative (id = 664) <br>
+   * OR • Test TB LAM (id = 23951) Answer Positive (id = 703) or Negative (id = 664) <br>
+   * • BK Test (id = 307) Answer Positive (id = 703) or Negative (id = 664) <br>
+   * • Raio X Torax (id = 12) Answer Positive (id = 703) or Negative (id = 664) or Indeterminado (id
+   * = 1138) <br>
+   *
+   * @return {@link String}
+   */
+  public String getPatientsWithTbGenexpertAndDate() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("23774", tbMetadata.getCultureTest().getConceptId());
+    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
+    map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
+    map.put("12", tbMetadata.getXRayChest().getConceptId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    map.put("1138", tbMetadata.getIndeterminate().getConceptId());
+
+    String query =
+        "SELECT p.patient_id,e.encounter_datetime "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND ( ( o.concept_id IN ( ${23723}, ${23774}, ${23951}, ${307}, ${12} ) "
+            + "               AND o.value_coded IN( ${703}, ${664} ) ) OR o.concept_id = ${12} AND o.value_coded = ${1138} ) "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+
+
+  /**
+
+   * <p>                • Encounter Type ID = 13 <br>
+   *     • EXAME BASILOSCOPIA (id=307) Answers Value_coded (664 – Negative or 703 – Positive or ???-Not Found) or <br>
+   *     • Teste TB GENEXPERT (id=23723) Answers Value_coded (664 – Negative, 703 – Positive) or <br>
+   *     • CULTURE TEST (id = 23774) Answer Positive (id = 703) or Negative (id = 664) ) or <br>
+   *     • TEST TB LAM (id = 23951) Answer Positive (id = 703) or Negative (id = 664)
+   *
+   * @return {@link String}
+   */
+  public String getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
+    map.put("23774", tbMetadata.getCultureTest().getConceptId());
+    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
+    map.put("703", tbMetadata.getPositiveConcept().getConceptId());
+    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
+    map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
+
+
+    String query =
+             "SELECT p.patient_id,e.encounter_datetime "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${13} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND ( o.concept_id IN ( ${307}, ${23723}, ${23774}, ${23951} ) "
+            + "             AND o.value_coded IN( ${703}, ${664} ) ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
