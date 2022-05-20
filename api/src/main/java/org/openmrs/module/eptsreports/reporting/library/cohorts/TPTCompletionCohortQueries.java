@@ -134,7 +134,7 @@ public class TPTCompletionCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-        "B1",
+        "B1A",
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB1(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
@@ -149,7 +149,10 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
+            mapping3));
+
+    compositionCohortDefinition.addSearch(
+        "B1B", EptsReportUtils.map(tptEligiblePatientListCohortQueries.getIPTB1part2(), mapping3));
 
     compositionCohortDefinition.addSearch(
         "B2",
@@ -1032,7 +1035,7 @@ public class TPTCompletionCohortQueries {
             + "AND o.concept_id = ${6128} "
             + "AND e.location_id = :location "
             + "AND e.encounter_datetime < :endDate " // N pede nehuma alteracao mas a descricao:
-                                                     // value datetime
+            // value datetime
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1080,7 +1083,7 @@ public class TPTCompletionCohortQueries {
             + "     	AND o.concept_id = ${6128} "
             + " 	AND e.location_id = :location "
             + "     	AND e.encounter_datetime < :endDate "; // N pede nehuma alteracao mas a
-                                                            // descricao: value datetime
+    // descricao: value datetime
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2660,7 +2663,7 @@ public class TPTCompletionCohortQueries {
             + "                                       FROM   obs o    "
             + "                                       WHERE  o.encounter_id = ee.encounter_id "
             + "                                              AND o.concept_id = ${23720} " // AND
-                                                                                           // o.concept_id = ${23986}
+            // o.concept_id = ${23986}
             + "                                              AND o.value_coded IN ( ${23720} )) )    " // AND o.value_coded IN ( ${23720} )
             + "                     AND ee.encounter_datetime BETWEEN "
             + "                         tabela.encounter_datetime AND "
