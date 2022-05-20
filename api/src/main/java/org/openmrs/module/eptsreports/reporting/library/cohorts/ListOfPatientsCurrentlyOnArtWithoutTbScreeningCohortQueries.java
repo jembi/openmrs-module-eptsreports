@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,10 +16,6 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -175,8 +174,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
-        ""
-            + "SELECT p.patient_id, "
+        "SELECT p.patient_id, "
             + "       MAX(o.value_datetime) encounter_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
@@ -209,8 +207,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
 
     String query =
-        ""
-            + "SELECT p.patient_id, "
+        "SELECT p.patient_id, "
             + "       MAX(DATE_ADD(o.value_datetime, INTERVAL 30 MONTH)) encounter_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
