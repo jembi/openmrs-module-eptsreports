@@ -1,25 +1,32 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
-import org.openmrs.module.eptsreports.reporting.data.converter.*;
+import org.openmrs.module.eptsreports.reporting.data.converter.AgeToLetterConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.ForwardSlashDateConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.ObjectCounterConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.DQACargaViralCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.*;
+import org.openmrs.module.reporting.data.person.definition.AgeDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class DQACargaViralDataset extends BaseDataSet {
@@ -53,6 +60,8 @@ public class DQACargaViralDataset extends BaseDataSet {
 
     /** Patient counter - Sheet 1: Column A */
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
+
+    pdd.addColumn("patientId", new PersonIdDataDefinition(), "");
 
     /** 1 - NID - Sheet 1: Column B */
     pdd.addColumn("nid", getNID(identifierType.getPatientIdentifierTypeId()), "");
