@@ -67,6 +67,76 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return composition;
   }
 
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p><b>Total number of patients on the List (TB_NSCRN_FR2) </b>
+   *
+   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical Consultation in last 6 months
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsCurrentlyOnArtWithoutTbScreeningAndWithClinicalConsultationInLast6Months() {
+
+    CompositionCohortDefinition composition = new CompositionCohortDefinition();
+    addParameters(composition);
+    composition.setName("Currently on ART without TB Screening and With Clinical Consultation");
+
+    CohortDefinition currentlyOnArtWithoutTbScreening = getPatientsCurrentlyOnArtWithoutTbScreening();
+    CohortDefinition withClinicalConsultationInLast6Months = getPatientsWithClinicalConsultationInLast6Months();
+
+    composition.addSearch(
+            "onArtWithoutScreening", EptsReportUtils.map(currentlyOnArtWithoutTbScreening , "endDate=${endDate},location=${location}"));
+    composition.addSearch(
+            "withConsultation",
+            EptsReportUtils.map(
+                    withClinicalConsultationInLast6Months, "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    composition.setCompositionString("onArtWithoutScreening AND withConsultation");
+
+    return composition;
+  }
+
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p><b>Total number of patients on the List (TB_NSCRN_FR2) </b>
+   *
+   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical Consultation in last 6 months
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsCurrentlyOnArtWithoutTbScreeningAndWithoutClinicalConsultationInLast6Months() {
+
+    CompositionCohortDefinition composition = new CompositionCohortDefinition();
+    addParameters(composition);
+    composition.setName("Currently on ART without TB Screening and Without Clinical Consultation");
+
+    CohortDefinition currentlyOnArtWithoutTbScreening = getPatientsCurrentlyOnArtWithoutTbScreening();
+    CohortDefinition withClinicalConsultationInLast6Months = getPatientsWithClinicalConsultationInLast6Months();
+
+    composition.addSearch(
+            "onArtWithoutScreening", EptsReportUtils.map(currentlyOnArtWithoutTbScreening , "endDate=${endDate},location=${location}"));
+    composition.addSearch(
+            "withConsultation",
+            EptsReportUtils.map(
+                    withClinicalConsultationInLast6Months, "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+
+    composition.setCompositionString("onArtWithoutScreening AND NOT withConsultation");
+
+    return composition;
+  }
+
   public DataDefinition getArtStartDate() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
@@ -364,6 +434,34 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     };
 
     public abstract String getQuery();
+  }
+
+  public CohortDefinition getPatientsWithClinicalConsultationInLast6Months() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("With clinical consultation in last 6 months ");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+            "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "       INNER JOIN encounter e "
+                    + "               ON e.patient_id = p.patient_id "
+                    + "WHERE  p.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND e.encounter_type = ${6} "
+                    + "       AND e.location_id = :location "
+                    + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+                    + "GROUP BY p.patient_id";
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 
   private void addParameters(CohortDefinition cd) {
