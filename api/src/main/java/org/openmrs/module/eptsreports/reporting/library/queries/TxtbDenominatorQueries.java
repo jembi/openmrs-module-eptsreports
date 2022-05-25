@@ -1,13 +1,12 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class TxtbDenominatorQueries {
@@ -359,7 +358,6 @@ public class TxtbDenominatorQueries {
    *
    * @return {@link String}
    */
-
   public String getPatientsWithApplicationsForLabResearch() {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -437,15 +435,13 @@ public class TxtbDenominatorQueries {
     return sb.replace(query);
   }
 
-
-
   /**
-
-   * <p>                • Encounter Type ID = 13 <br>
-   *     • EXAME BASILOSCOPIA (id=307) Answers Value_coded (664 – Negative or 703 – Positive or ???-Not Found) or <br>
-   *     • Teste TB GENEXPERT (id=23723) Answers Value_coded (664 – Negative, 703 – Positive) or <br>
-   *     • CULTURE TEST (id = 23774) Answer Positive (id = 703) or Negative (id = 664) ) or <br>
-   *     • TEST TB LAM (id = 23951) Answer Positive (id = 703) or Negative (id = 664)
+   * • Encounter Type ID = 13 <br>
+   * • EXAME BASILOSCOPIA (id=307) Answers Value_coded (664 – Negative or 703 – Positive or ???-Not
+   * Found) or <br>
+   * • Teste TB GENEXPERT (id=23723) Answers Value_coded (664 – Negative, 703 – Positive) or <br>
+   * • CULTURE TEST (id = 23774) Answer Positive (id = 703) or Negative (id = 664) ) or <br>
+   * • TEST TB LAM (id = 23951) Answer Positive (id = 703) or Negative (id = 664)
    *
    * @return {@link String}
    */
@@ -460,7 +456,7 @@ public class TxtbDenominatorQueries {
     map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
 
     String query =
-             "SELECT p.patient_id,e.encounter_datetime "
+        "SELECT p.patient_id,e.encounter_datetime "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "

@@ -4805,7 +4805,7 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    * <b>concept_id = 165322</b>
    *
-   * <p><b>Name:</b>  	MDC STATE
+   * <p><b>Name:</b> MDC STATE
    *
    * <p><b>Description:</b> MDC STATE
    *
@@ -4813,8 +4813,7 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getMdcState() {
     String uuid =
-        Context.getAdministrationService()
-            .getGlobalProperty("eptsreports.mdcStateConceptUuid");
+        Context.getAdministrationService().getGlobalProperty("eptsreports.mdcStateConceptUuid");
     return getConcept(uuid);
   }
 }
