@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.IntensiveMonitoringCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.QualityImprovement2020CohortQueries;
@@ -18,6 +15,10 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class IntensiveMonitoringDataSet extends BaseDataSet {
@@ -1248,7 +1249,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
         "");
 
-    /*CohortIndicator MI15DEN16 =
+    CohortIndicator MI15DEN16 =
         eptsGeneralIndicator.getIndicator(
             "MI15DEN16",
             EptsReportUtils.map(
@@ -1278,7 +1279,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15NUM16,
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
-        "");*/
+        "");
 
     return dataSetDefinition;
   }
