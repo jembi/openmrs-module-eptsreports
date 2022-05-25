@@ -227,12 +227,46 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     sqlPatientDataDefinition.setQuery(sb.replace(query));
 
     return sqlPatientDataDefinition;
-  } public DataDefinition getMdcDispensationType(DispensationColumn dispensationColumn) {
+  }
+
+
+  public DataDefinition getMostRecentMdcConsultationDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("MDC Consultation Date ");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("165174", hivMetadata. getLastRecordOfDispensingModeConcept().getConceptId());
+
+    String query =
+
+              "SELECT p.patient_id, Max(e.encounter_datetime) consultation_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime <= CURRENT_DATE() "
+            + "       AND o.concept_id = ${165174} "
+            + "       AND e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
+
+
+    StringSubstitutor sb = new StringSubstitutor(valuesMap);
+    sqlPatientDataDefinition.setQuery(sb.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  public DataDefinition getMdcDispensationType(DispensationColumn dispensationColumn) {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Dispensation Type ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -281,7 +315,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  enum DispensationColumn{
+  public enum DispensationColumn{
     MDC1{
       @Override
       public String getQuery(){

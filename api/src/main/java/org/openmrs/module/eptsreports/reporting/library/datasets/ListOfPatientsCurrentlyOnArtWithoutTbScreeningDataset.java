@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
@@ -26,6 +23,10 @@ import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseDataSet {
@@ -170,6 +171,42 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
         listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
             .getNextScheduledDrugPickupDateOnRecepcaoLevantouArv(),
         "endDate=${endDate},location=${location}");
+
+    patientDefinition.addColumn(
+            "mdc_consultation_date",
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getMostRecentMdcConsultationDate(),
+            "location=${location}");
+
+    patientDefinition.addColumn(
+            "mdc1",
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getMdcDispensationType(ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC1),
+            "location=${location}");
+
+    patientDefinition.addColumn(
+            "mdc2",
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getMdcDispensationType(ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC2),
+            "location=${location}");
+
+    patientDefinition.addColumn(
+            "mdc3",
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getMdcDispensationType(ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC3),
+            "location=${location}");
+
+    patientDefinition.addColumn(
+            "mdc4",
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getMdcDispensationType(ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC4),
+            "location=${location}");
+
+    patientDefinition.addColumn(
+            "mdc5",
+            listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getMdcDispensationType(ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.DispensationColumn.MDC5),
+            "location=${location}");
 
     return patientDefinition;
   }
