@@ -14,63 +14,70 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
 @Component
-public class TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet extends BaseDataSet{
+public class TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet extends BaseDataSet {
 
-    @Autowired
-    private EptsGeneralIndicator eptsGeneralIndicator;
+  @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
 
-    @Autowired
-    private ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
+  @Autowired
+  private ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+      listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
 
-    public DataSetDefinition constructDataset() {
-        CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
-        dataSetDefinition.setName("Patients Currently on ART Without TB Screening");
-        dataSetDefinition.addParameters(getParameters());
+  public DataSetDefinition constructDataset() {
+    CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
+    dataSetDefinition.setName("Patients Currently on ART Without TB Screening");
+    dataSetDefinition.addParameters(getParameters());
 
-        CohortIndicator withoutScreening =
-                eptsGeneralIndicator.getIndicator(
-                        "withoutScreening",
-                        EptsReportUtils.map(
-                                listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getPatientsCurrentlyOnArtWithoutTbScreening(), "endDate=${endDate},location=${location}"));
+    CohortIndicator withoutScreening =
+        eptsGeneralIndicator.getIndicator(
+            "withoutScreening",
+            EptsReportUtils.map(
+                listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getPatientsCurrentlyOnArtWithoutTbScreening(),
+                "endDate=${endDate},location=${location}"));
 
-        dataSetDefinition.addColumn(
-                "withoutScreening",
-                "TOTAL Without Screening",
-                EptsReportUtils.map(withoutScreening , "endDate=${endDate},location=${location}"),
-                "");
+    dataSetDefinition.addColumn(
+        "withoutScreening",
+        "TOTAL Without Screening",
+        EptsReportUtils.map(withoutScreening, "endDate=${endDate},location=${location}"),
+        "");
 
-        CohortIndicator withConsultation =
-                eptsGeneralIndicator.getIndicator(
-                        "withConsultation",
-                        EptsReportUtils.map(
-                                listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getPatientsCurrentlyOnArtWithoutTbScreeningAndWithClinicalConsultationInLast6Months(), "endDate=${endDate},location=${location}"));
+    CohortIndicator withConsultation =
+        eptsGeneralIndicator.getIndicator(
+            "withConsultation",
+            EptsReportUtils.map(
+                listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getPatientsCurrentlyOnArtWithoutTbScreeningAndWithClinicalConsultationInLast6Months(),
+                "endDate=${endDate},location=${location}"));
 
-        dataSetDefinition.addColumn(
-                "withConsultation",
-                "TOTAL Without Screening and at least on clinical consultation",
-                EptsReportUtils.map(withConsultation, "endDate=${endDate},location=${location}"),
-                "");
+    dataSetDefinition.addColumn(
+        "withConsultation",
+        "TOTAL Without Screening and at least on clinical consultation",
+        EptsReportUtils.map(withConsultation, "endDate=${endDate},location=${location}"),
+        "");
 
-        CohortIndicator withoutConsultation =
-                eptsGeneralIndicator.getIndicator(
-                        "withoutConsultation",
-                        EptsReportUtils.map(
-                                listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries.getPatientsCurrentlyOnArtWithoutTbScreeningAndWithClinicalConsultationInLast6Months(), "endDate=${endDate},location=${location}"));
+    CohortIndicator withoutConsultation =
+        eptsGeneralIndicator.getIndicator(
+            "withoutConsultation",
+            EptsReportUtils.map(
+                listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+                    .getPatientsCurrentlyOnArtWithoutTbScreeningAndWithClinicalConsultationInLast6Months(),
+                "endDate=${endDate},location=${location}"));
 
-        dataSetDefinition.addColumn(
-                "withoutConsultation",
-                "TOTAL Without Screening and at least on clinical consultation",
-                EptsReportUtils.map(withoutConsultation, "endDate=${endDate},location=${location}"),
-                "");
+    dataSetDefinition.addColumn(
+        "withoutConsultation",
+        "TOTAL Without Screening and at least on clinical consultation",
+        EptsReportUtils.map(withoutConsultation, "endDate=${endDate},location=${location}"),
+        "");
 
-        return dataSetDefinition;
-    }
+    return dataSetDefinition;
+  }
 
-    @Override
-    public List<Parameter> getParameters() {
-        return Arrays.asList(
-                new Parameter("endDate", "End date", Date.class),
-                new Parameter("location", "Location", Location.class));
-    }
+  @Override
+  public List<Parameter> getParameters() {
+    return Arrays.asList(
+        new Parameter("endDate", "End date", Date.class),
+        new Parameter("location", "Location", Location.class));
+  }
 }

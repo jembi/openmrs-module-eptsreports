@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,10 +16,6 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -67,7 +66,6 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return composition;
   }
 
-
   /**
    * <b>Technical Specs</b>
    *
@@ -75,34 +73,40 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
    *
    * <p><b>Total number of patients on the List (TB_NSCRN_FR2) </b>
    *
-   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical Consultation in last 6 months
+   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical
+   * Consultation in last 6 months
    *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsCurrentlyOnArtWithoutTbScreeningAndWithClinicalConsultationInLast6Months() {
+  public CohortDefinition
+      getPatientsCurrentlyOnArtWithoutTbScreeningAndWithClinicalConsultationInLast6Months() {
 
     CompositionCohortDefinition composition = new CompositionCohortDefinition();
     addParameters(composition);
     composition.setName("Currently on ART without TB Screening and With Clinical Consultation");
 
-    CohortDefinition currentlyOnArtWithoutTbScreening = getPatientsCurrentlyOnArtWithoutTbScreening();
-    CohortDefinition withClinicalConsultationInLast6Months = getPatientsWithClinicalConsultationInLast6Months();
+    CohortDefinition currentlyOnArtWithoutTbScreening =
+        getPatientsCurrentlyOnArtWithoutTbScreening();
+    CohortDefinition withClinicalConsultationInLast6Months =
+        getPatientsWithClinicalConsultationInLast6Months();
 
     composition.addSearch(
-            "onArtWithoutScreening", EptsReportUtils.map(currentlyOnArtWithoutTbScreening , "endDate=${endDate},location=${location}"));
+        "onArtWithoutScreening",
+        EptsReportUtils.map(
+            currentlyOnArtWithoutTbScreening, "endDate=${endDate},location=${location}"));
     composition.addSearch(
-            "withConsultation",
-            EptsReportUtils.map(
-                    withClinicalConsultationInLast6Months, "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+        "withConsultation",
+        EptsReportUtils.map(
+            withClinicalConsultationInLast6Months,
+            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
     composition.setCompositionString("onArtWithoutScreening AND withConsultation");
 
     return composition;
   }
 
-
   /**
    * <b>Technical Specs</b>
    *
@@ -110,27 +114,34 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
    *
    * <p><b>Total number of patients on the List (TB_NSCRN_FR2) </b>
    *
-   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical Consultation in last 6 months
+   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical
+   * Consultation in last 6 months
    *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsCurrentlyOnArtWithoutTbScreeningAndWithoutClinicalConsultationInLast6Months() {
+  public CohortDefinition
+      getPatientsCurrentlyOnArtWithoutTbScreeningAndWithoutClinicalConsultationInLast6Months() {
 
     CompositionCohortDefinition composition = new CompositionCohortDefinition();
     addParameters(composition);
     composition.setName("Currently on ART without TB Screening and Without Clinical Consultation");
 
-    CohortDefinition currentlyOnArtWithoutTbScreening = getPatientsCurrentlyOnArtWithoutTbScreening();
-    CohortDefinition withClinicalConsultationInLast6Months = getPatientsWithClinicalConsultationInLast6Months();
+    CohortDefinition currentlyOnArtWithoutTbScreening =
+        getPatientsCurrentlyOnArtWithoutTbScreening();
+    CohortDefinition withClinicalConsultationInLast6Months =
+        getPatientsWithClinicalConsultationInLast6Months();
 
     composition.addSearch(
-            "onArtWithoutScreening", EptsReportUtils.map(currentlyOnArtWithoutTbScreening , "endDate=${endDate},location=${location}"));
+        "onArtWithoutScreening",
+        EptsReportUtils.map(
+            currentlyOnArtWithoutTbScreening, "endDate=${endDate},location=${location}"));
     composition.addSearch(
-            "withConsultation",
-            EptsReportUtils.map(
-                    withClinicalConsultationInLast6Months, "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+        "withConsultation",
+        EptsReportUtils.map(
+            withClinicalConsultationInLast6Months,
+            "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
 
     composition.setCompositionString("onArtWithoutScreening AND NOT withConsultation");
 
@@ -448,16 +459,16 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-            "SELECT p.patient_id "
-                    + "FROM   patient p "
-                    + "       INNER JOIN encounter e "
-                    + "               ON e.patient_id = p.patient_id "
-                    + "WHERE  p.voided = 0 "
-                    + "       AND e.voided = 0 "
-                    + "       AND e.encounter_type = ${6} "
-                    + "       AND e.location_id = :location "
-                    + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate"
-                    + "GROUP BY p.patient_id";
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+            + "GROUP BY p.patient_id";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 

@@ -1,5 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset;
@@ -14,28 +19,26 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
 @Component
 public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDataExportManager {
 
   private ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset
       listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset;
 
-  private TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet;
+  private TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet
+      totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet;
 
   @Autowired
   public SetupListOfPatientsCurrentlyOnArtWithoutTbScreening(
       ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset
-          listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset, TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet) {
+          listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset,
+      TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet
+          totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet) {
     this.listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset =
         listOfPatientsCurrentlyOnArtWithoutTbScreeningDataset;
 
-    this.totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet = totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet;
+    this.totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet =
+        totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet;
   }
 
   @Override
@@ -79,10 +82,9 @@ public class SetupListOfPatientsCurrentlyOnArtWithoutTbScreening extends EptsDat
                 .constructListOfPatientsDataset()));
 
     rd.addDataSetDefinition(
-            "TP",
-            Mapped.mapStraightThrough(
-                    totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet.constructDataset()
-                            ));
+        "TP",
+        Mapped.mapStraightThrough(
+            totalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet.constructDataset()));
     return rd;
   }
 
