@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -16,6 +13,10 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -226,6 +227,113 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     sqlPatientDataDefinition.setQuery(sb.replace(query));
 
     return sqlPatientDataDefinition;
+  } public DataDefinition getMdcDispensationType(DispensationColumn dispensationColumn) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Dispensation Type ");
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("165174", hivMetadata. getLastRecordOfDispensingModeConcept().getConceptId());
+    valuesMap.put("165322", hivMetadata.getMdcState().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+
+    String query =
+             "SELECT dispensation.patient_id, " + dispensationColumn.getQuery()
+            + "FROM  (SELECT p.patient_id, e.encounter_id, otype.obs_id, otype.value_coded "
+            + "       FROM   patient p "
+            + "              INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "              INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+            + "              INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + "              INNER JOIN (SELECT p.patient_id, Max(e.encounter_datetime) consultation_date "
+            + "                          FROM   patient p "
+            + "                                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          WHERE  e.encounter_type = ${6} "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND e.encounter_datetime <= CURRENT_DATE() "
+            + "                                 AND o.concept_id = ${165174} "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND p.voided = 0 "
+            + "                          GROUP  BY p.patient_id) most_recent "
+            + "                      ON most_recent.patient_id = p.patient_id "
+            + "       WHERE  e.encounter_datetime = most_recent.consultation_date "
+            + "              AND e.encounter_type = ${6} "
+            + "              AND e.location_id = :location "
+            + "              AND otype.concept_id = ${165174} "
+            + "              AND ostate.concept_id = ${165322} "
+            + "              AND ostate.value_coded IN ( ${1256}, ${1257} ) "
+            + "              AND otype.obs_group_id = ostate.obs_group_id "
+            + "              AND e.voided = 0 "
+            + "              AND p.voided = 0 "
+            + "              AND otype.voided = 0 "
+            + "              AND ostate.voided = 0 "
+            + "       GROUP  BY p.patient_id, otype.obs_id) dispensation "
+            + "GROUP  BY dispensation.patient_id, dispensation.obs_id";
+
+
+    StringSubstitutor sb = new StringSubstitutor(valuesMap);
+    sqlPatientDataDefinition.setQuery(sb.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  enum DispensationColumn{
+    MDC1{
+      @Override
+      public String getQuery(){
+        return   "( SELECT obs.value_coded "
+                + "FROM   obs "
+                + "WHERE  obs.encounter_id = dispensation.encounter_id "
+                + "       AND obs.concept_id = 165174 "
+                + "LIMIT  1 ) MDC1";
+      }
+    },
+    MDC2{
+      @Override
+      public String getQuery(){
+        return   "( SELECT obs.value_coded "
+                + "FROM   obs "
+                + "WHERE  obs.encounter_id = dispensation.encounter_id "
+                + "       AND obs.concept_id = 165174 "
+                + "LIMIT  1,1 ) MDC2";
+      }
+    },
+    MDC3{
+      @Override
+      public String getQuery(){
+        return   "( SELECT obs.value_coded "
+                + "FROM   obs "
+                + "WHERE  obs.encounter_id = dispensation.encounter_id "
+                + "       AND obs.concept_id = 165174 "
+                + "LIMIT  2,1 ) MDC3";
+      }
+    },
+    MDC4{
+      @Override
+      public String getQuery(){
+        return   "( SELECT obs.value_coded "
+                + "FROM   obs "
+                + "WHERE  obs.encounter_id = dispensation.encounter_id "
+                + "       AND obs.concept_id = 165174 "
+                + "LIMIT  3,1 ) MDC4";
+      }
+    },
+    MDC5{
+      @Override
+      public String getQuery(){
+        return   "( SELECT obs.value_coded "
+                + "FROM   obs "
+                + "WHERE  obs.encounter_id = dispensation.encounter_id "
+                + "       AND obs.concept_id = 165174 "
+                + "LIMIT  4,1 ) MDC5";
+      }
+    };
+
+    public abstract String getQuery();
   }
 
   private void addParameters(CohortDefinition cd) {

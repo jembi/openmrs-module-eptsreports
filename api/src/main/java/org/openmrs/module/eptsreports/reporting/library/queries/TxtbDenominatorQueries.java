@@ -459,7 +459,6 @@ public class TxtbDenominatorQueries {
     map.put("664", tbMetadata.getNegativeConcept().getConceptId());
     map.put("307", hivMetadata.getResultForBasiloscopia().getConceptId());
 
-
     String query =
              "SELECT p.patient_id,e.encounter_datetime "
             + "FROM   patient p "
