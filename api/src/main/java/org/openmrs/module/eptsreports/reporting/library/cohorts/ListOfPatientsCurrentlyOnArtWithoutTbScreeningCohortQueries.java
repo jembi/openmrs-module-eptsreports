@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -16,6 +13,10 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -160,17 +161,36 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   * <p>Type of Dispensation registered on the most recent Clinical Consultation (value of Column Q) registered on Ficha Clínica – MasterCard by Report End Date
+   * <p>Possible values are:
+   * <ul>
+   *     <li>DM</li>
+   *     <li>DT</li>
+   *     <li>DS</li>
+   *
+   * </ul>   *
+   * <p>Note: For Patients without Type of Dispensation informed, the corresponding cell in the excel file will show NA</p>
+   *
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public DataDefinition getDispensationTypeOnClinicalAndPediatricEncounter() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Dispensation Type on Encounter 6 and 9 ");
+    sqlPatientDataDefinition.setName("Dispensation Type on Encounter 6");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+
 
     String query =
         "SELECT p.patient_id , o.value_coded "
@@ -181,7 +201,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "				SELECT p.patient_id , MAX(e.encounter_datetime) encounter_date "
             + "				FROM patient p "
             + "				INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "				WHERE e.encounter_type IN (${6},${9}) "
+            + "				WHERE e.encounter_type = ${6} "
             + "				AND e.location_id = :location "
             + "				AND e.encounter_datetime <= :endDate "
             + "				AND p.voided = 0 "
@@ -189,7 +209,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "				GROUP BY p.patient_id "
             + ") recent_fila ON recent_fila.patient_id = p.patient_id "
             + " "
-            + "WHERE e.encounter_type IN (${6},${9}) "
+            + "WHERE e.encounter_type = ${6} "
             + "AND e.location_id = :location "
             + "AND e.encounter_datetime = recent_fila.encounter_date "
             + "AND o.concept_id = ${23739} "
@@ -204,6 +224,28 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   * <p>Modes of Dispensation registered on Last Drug Pick up Date (value of Column M) on FILA by report end date.
+   *<p> Possible values are </br>
+   *  <ul>
+   *         <li> Horário Normal de Expediente or</li>
+   *         <li> Fora do Horário </li>
+   *         <li> FARMAC/Farmácia Privada
+   *         <li> Dispensa Comunitária via Provedor
+   *         <li> Dispensa Comunitária via APE
+   *         <li> Brigadas Móveis Diurnas
+   *         <li> Brigadas Móveis Nocturnas (Hotspots)
+   *         <li> Clínicas Móveis Diurnas
+   *         <li> Clínicas Móveis Nocturnas (Hotspots)
+   * </ul>
+   *
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public DataDefinition getDispensationTypeOnFila() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
@@ -244,6 +286,16 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   * <p>The most recent Date of the Drug Pick Up registered on Ficha Recepção Levantou ARV by report end date.
+   *
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public DataDefinition getMostRecentDrugPickupDateOnRecepcaoLevantouArv() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
@@ -277,6 +329,16 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   * <p>Last Drug Pick up Date registered on Ficha Recepção Levantou ARV by report end date (value of Column O) + 30 days
+   *
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public DataDefinition getNextScheduledDrugPickupDateOnRecepcaoLevantouArv() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
@@ -310,6 +372,21 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>
+   *
+   * <p>Patient’s Most Recent Ficha with MDCs Registered
+   * <p>Encounter DATE (encounter.encounter_datetime)</p>
+   * <p>Modo De Dispensa (id= 165174)</p>
+   *
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public DataDefinition getMostRecentMdcConsultationDate() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
@@ -339,6 +416,22 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>The system will identify patient’s most recent records of MDCs (DSD) registered in Ficha
+   * Clínica by report generation date and will show the registered MDC1, MDC2, MDC3, MDC4 and MDC5
+   * if marked as “Inicio” or “Continua” as follows
+   *
+   * <p>Note: For MDC fields for which no MDC was registered, the corresponding cell in the excel
+   * file will show NA
+   *
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public DataDefinition getMdcDispensationType(DispensationColumn dispensationColumn) {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
