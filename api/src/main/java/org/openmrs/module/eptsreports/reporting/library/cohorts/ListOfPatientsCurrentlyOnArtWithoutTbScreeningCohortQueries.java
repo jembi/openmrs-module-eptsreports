@@ -555,6 +555,17 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     public abstract String getQuery();
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical Consultation in last 6 months
+
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public CohortDefinition getPatientsWithClinicalConsultationInLast6Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
