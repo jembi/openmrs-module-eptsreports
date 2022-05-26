@@ -1,10 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -8557,13 +8553,16 @@ public class QualityImprovement2020CohortQueries {
   /**
    * <b> RF7.2 EXCLUSION <b/>
    *
-   * <p>Select all patients with “Mudança de Estado de Permanência” = “Abandono” on Ficha Clínica
-   * during the period (“Data Consulta”>=”Data Início Período” and “Data Consulta”<=”Data Fim
-   * Período” and
+   * <p>O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
+   * seguinte forma:
    *
-   * <p>Select all patients with “Mudança de Estado de Permanência” = “Abandono” on Ficha Resumo
-   * during the period (“Data de Mudança de Estado Permanência”>=”Data Início Período” e “Data
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
    * Consulta”<=”Data Fim Período”
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
+   * Período” e “Data Consulta”<=”Data Fim Período”
    *
    * @return CohortDefinition
    */

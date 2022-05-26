@@ -1223,19 +1223,20 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b> O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
+   * seguinte forma: </b>
    *
    * <blockquote>
    *
-   * <p>Select all patients with “Mudança de Estado de Permanência” = “Abandono” on Ficha Clínica
-   * during the period (“Data Consulta”>=”Data Início Período” and “Data Consulta”<=”Data Fim
-   * Período” and
-   *
-   * <blockquote>
-   *
-   * <p>Select all patients with “Mudança de Estado de Permanência” = “Abandono” on Ficha Resumo
-   * during the period (“Data de Mudança de Estado Permanência”>=”Data Início Período” e “Data
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
    * Consulta”<=”Data Fim Período”
+   *
+   * <blockquote>
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
+   * Período” e “Data Consulta”<=”Data Fim Período”
    *
    * <p>Nota: O período é definido conforme o requisito onde os utentes abandonos em TARV no fim do
    * período serão excluídos:
@@ -1260,7 +1261,7 @@ public class QualityImprovement2020Queries {
    * @param restartedArt Restart Art Flag
    * @param pregnants Pregnant Flag
    * @param firstLine First Line Flag
-   * @param secondLine Second Line Line Flag
+   * @param secondLine Second Line Flag
    * @return @{Link String}
    */
   public static String getMQ13AbandonedTarvDuringThePeriod(
@@ -1466,8 +1467,8 @@ public class QualityImprovement2020Queries {
           + "                        AND o2.value_coded = ${1707} "
           + "                        AND e2.location_id = :location "
           + "                        GROUP BY p.patient_id "
-          + "                        ) abandoned_state WHERE DATE(abandoned_state.last_encounter) >= DATE(first_line.the_time) "
-          + "                                              AND DATE(abandoned_state.last_encounter) <= DATE_ADD(first_line.the_time, INTERVAL 6 MONTH) "
+          + "                        ) abandoned_state WHERE DATE(abandoned_state.encounter) >= DATE(arv_start_date.arv_date) "
+          + "                                              AND DATE(abandoned_state.encounter) <= DATE_ADD(arv_start_date.arv_date, INTERVAL 6 MONTH) "
           + "    ) GROUP BY pa.patient_id ";
     } else {
       return " SELECT     p.patient_id , o.obs_datetime  AS the_time "
