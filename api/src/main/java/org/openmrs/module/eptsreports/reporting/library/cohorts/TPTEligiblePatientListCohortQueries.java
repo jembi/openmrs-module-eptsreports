@@ -8,6 +8,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.tpt.CompletedIsoniazidTPTCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.TPTEligiblePatientsQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -372,6 +373,8 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId()),
             mapping));
+
+    //ADD new 3hp section queries
 
     compositionCohortDefinition.addSearch(
         "TBTreatmentPart1",
@@ -3777,6 +3780,98 @@ public class TPTEligiblePatientListCohortQueries {
             + "             Date_add(tabela.encounter_datetime,   "
             + "             INTERVAL 120 DAY)) >= 3 ) "
             + " GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *<B>For each M:</B>
+   * <li>
+   *     Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954)
+   *     and Data Fim da Profilaxia TPT(value datetime, concept id 6129) registered on Ficha Resumo by end date
+   *     (Encounter type 53) and with value datetime  between 86 days and 365 days from the date of M.3
+   * </li>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition get3HPLastProfilaxyDuringM3Period(){
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(" all patients with Última profilaxia 3HP Between 86 days and 365 days from the date of M.3");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+
+    String m3query = TPTEligiblePatientsQueries.getMpart1();
+    String query =  "SELECT tbl_m.patient_id "
+            + "FROM   ("
+            + m3query
+            + ") AS tbl_m "
+            + "       inner join (SELECT p.patient_id "
+            + "                   FROM   patient p "
+            + "                          inner join encounter e "
+            + "                                  ON p.patient_id = e.patient_id "
+            + "                          inner join obs o "
+            + "                                  ON e.encounter_id = o.encounter_id "
+            + "                          inner join obs o2 "
+            + "                                  ON e.encounter_id = o2.encounter_id "
+            + "                          inner join (SELECT p.patient_id, "
+            + "                                             o2.value_datetime AS value_datetime "
+            + "                                      FROM   patient p "
+            + "                                             inner join encounter e "
+            + "                                                     ON p.patient_id = "
+            + "                                                        e.patient_id "
+            + "                                             inner join obs o "
+            + "                                                     ON e.encounter_id = "
+            + "                                                        o.encounter_id "
+            + "                                             inner join obs o2 "
+            + "                                                     ON e.encounter_id = "
+            + "                                                        o2.encounter_id "
+            + "                                      WHERE  p.voided = 0 "
+            + "                                             AND e.voided = 0 "
+            + "                                             AND o.voided = 0 "
+            + "                                             AND e.location_id = :location "
+            + "                                             AND e.encounter_type = ${53} "
+            + "                                             AND ( o.concept_id = ${23985} "
+            + "                                                   AND o.value_coded = ${23954} ) "
+            + "                                             AND ( o2.concept_id = ${6128} "
+            + "                                                   AND o2.value_datetime IS NOT "
+            + "                                                       NULL "
+            + "                                                   AND o2.value_datetime <= "
+            + "                                                       :endDate )) "
+            + "                                     m3 "
+            + "                                  ON m3.patient_id = p.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND o2.voided = 0 "
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND o.concept_id = ${23985} "
+            + "                          AND o.value_coded = ${23954} "
+            + "                          AND e.location_id = :location "
+            + "                          AND o2.concept_id = ${6129} "
+            + "                          AND o.obs_datetime <= :endDate "
+            + "                          AND o2.value_datetime IS NOT NULL "
+            + "                          AND o2.value_datetime BETWEEN "
+            + "                              Date_add(m3.value_datetime, "
+            + "                              interval 86 day) AND "
+            + "                              Date_add(m3.value_datetime, interval "
+            + "                              365 day)) result "
+            + "               ON result.patient_id = tbl_m.patient_id";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
