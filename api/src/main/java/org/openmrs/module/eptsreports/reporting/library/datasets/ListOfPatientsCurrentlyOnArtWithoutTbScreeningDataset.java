@@ -57,6 +57,11 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
     patientDefinition.setName("List of patients currently no ART without TB Screening");
     patientDefinition.setParameters(getParameters());
 
+    patientDefinition.addRowFilter(
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+            .getPatientsCurrentlyOnArtWithoutTbScreening(),
+        "endDate=${endDate},location=${location}");
+
     PatientIdentifierType identifierType =
         Context.getPatientService()
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
