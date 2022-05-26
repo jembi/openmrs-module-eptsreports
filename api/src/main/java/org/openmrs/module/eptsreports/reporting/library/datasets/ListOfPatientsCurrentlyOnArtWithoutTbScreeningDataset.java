@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
@@ -16,8 +13,6 @@ import org.openmrs.module.eptsreports.reporting.library.queries.TxtbDenominatorQ
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
-import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
@@ -27,6 +22,10 @@ import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseDataSet {
@@ -67,12 +66,6 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
 
     DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
-
-    DataDefinition identifierDef =
-        new ConvertedPatientDataDefinition(
-            "identifier",
-            new PatientIdentifierDataDefinition(identifierType.getName(), identifierType),
-            identifierFormatter);
 
     DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
     DataDefinition nameDef =
