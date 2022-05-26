@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -26,6 +25,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -2109,7 +2110,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition pregnantWithCargaViralHigherThan1000 =
         QualityImprovement2020Queries.getMQ13DenB4_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId());
@@ -2117,7 +2117,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition breastfeedingWithCargaViralHigherThan1000 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
@@ -3151,7 +3150,7 @@ public class QualityImprovement2020CohortQueries {
         new CalculationCohortDefinition(
             Context.getRegisteredComponents(ConsultationUntilEndDateAfterStartingART.class).get(0));
     cd.setName(
-        "Categoru 11 - numerator - Session I - Interval of 33 Daus for APSS consultations after ART start date");
+        "Category 11 - numerator - Session I - Interval of 99 Days for APSS consultations after ART start date");
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
@@ -3254,7 +3253,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition b4 =
         QualityImprovement2020Queries.getMQ13DenB4_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId());
@@ -3262,18 +3260,10 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition b5 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
 
-    CohortDefinition e =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
     CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
     CohortDefinition h = getMQC11NH();
 
@@ -3282,7 +3272,6 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING1));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
@@ -3290,13 +3279,12 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING8));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING7));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING9));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
     }
 
     compositionCohortDefinition.setCompositionString(
-        "B1 AND B2 AND NOT B5 AND NOT E AND NOT F AND NOT B4 AND H");
+        "B1 AND B2 AND NOT B5 AND NOT F AND NOT B4 AND H");
 
     return compositionCohortDefinition;
   }
@@ -3389,7 +3377,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition b4 =
         QualityImprovement2020Queries.getMQ13DenB4_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId());
@@ -3397,7 +3384,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition b5 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
@@ -3407,14 +3393,6 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition e =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
-
     CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
     CohortDefinition h = getMQC11NH();
 
@@ -3423,7 +3401,6 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING1));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
@@ -3431,13 +3408,11 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING7));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING9));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
     }
 
-    compositionCohortDefinition.setCompositionString(
-        "B1 AND NOT B5 AND B4 AND NOT E AND NOT F AND H");
+    compositionCohortDefinition.setCompositionString("B1 AND NOT B5 AND B4 AND NOT F AND H");
 
     return compositionCohortDefinition;
   }
@@ -3603,7 +3578,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition b4 =
         QualityImprovement2020Queries.getMQ13DenB4_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId());
@@ -3611,18 +3585,9 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition b5 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
-
-    CohortDefinition e =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
 
     CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
     CohortDefinition h = getMQC11NH();
@@ -3632,7 +3597,6 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING1));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING));
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
@@ -3640,13 +3604,12 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("B2", EptsReportUtils.map(b2, MAPPING8));
       compositionCohortDefinition.addSearch("B4", EptsReportUtils.map(b4, MAPPING8));
       compositionCohortDefinition.addSearch("B5", EptsReportUtils.map(b5, MAPPING8));
-      compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING7));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING9));
       compositionCohortDefinition.addSearch("H", EptsReportUtils.map(h, MAPPING8));
     }
 
     compositionCohortDefinition.setCompositionString(
-        "B1 AND B2 AND NOT B5 AND NOT E AND NOT F AND NOT B4 AND H");
+        "B1 AND B2 AND NOT B5 AND NOT F AND NOT B4 AND H");
 
     return compositionCohortDefinition;
   }
@@ -3870,7 +3833,7 @@ public class QualityImprovement2020CohortQueries {
    * <ul>
    *   <li>B2NEW P1_2- Select all patients who have the REGIME ARV SEGUNDA LINHA (Concept Id 21187,
    *       value coded different NULL) recorded in Ficha Resumo (encounter type 53) and obs_datetime
-   *       >= inclusionStartDate and <= inclusionEndDate AND at least for 6 months ( “Last Clinical
+   *       >= inclusionStartDate and <= revisionEndDate AND at least for 6 months ( “Last Clinical
    *       Consultation” (last encounter_datetime from B1) minus obs_datetime(from B2) >= 6 months)
    *
    * @return CohortDefinition
@@ -3880,7 +3843,6 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients With Clinical Consultation");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -3921,7 +3883,7 @@ public class QualityImprovement2020CohortQueries {
             + "       AND o.concept_id = ${21187} "
             + "       AND o.value_coded IS NOT NULL "
             + "       AND o.obs_datetime >= :startDate "
-            + "       AND o.obs_datetime <= :endDate "
+            + "       AND o.obs_datetime <= :revisionEndDate "
             + "       AND TIMESTAMPDIFF(MONTH, o.obs_datetime,  last_clinical.last_visit) >= 6";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -4550,7 +4512,7 @@ public class QualityImprovement2020CohortQueries {
         "secondLineB2",
         EptsReportUtils.map(
             secondLine6Months,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B3",
@@ -5302,7 +5264,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition pregnantWithCargaViralHigherThan1000 =
         QualityImprovement2020Queries.getMQ13DenB4_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId());
@@ -5310,7 +5271,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition breastfeedingWithCargaViralHigherThan1000 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
