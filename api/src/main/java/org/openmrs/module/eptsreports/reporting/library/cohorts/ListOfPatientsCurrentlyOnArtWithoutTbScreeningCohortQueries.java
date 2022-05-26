@@ -588,8 +588,4 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
   }
 
-  private void addSqlCohortDefinitionParameters(SqlCohortDefinition sqlCohortDefinition) {
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-  }
 }
