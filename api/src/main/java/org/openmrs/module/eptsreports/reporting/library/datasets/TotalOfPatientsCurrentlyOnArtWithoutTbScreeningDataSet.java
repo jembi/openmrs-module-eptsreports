@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
@@ -11,10 +14,6 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 @Component
 public class TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet extends BaseDataSet {
 
@@ -23,9 +22,13 @@ public class TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet extends Base
       listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
 
   @Autowired
-  public TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet(EptsGeneralIndicator eptsGeneralIndicator, ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries) {
+  public TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet(
+      EptsGeneralIndicator eptsGeneralIndicator,
+      ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+          listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries) {
     this.eptsGeneralIndicator = eptsGeneralIndicator;
-    this.listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries = listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
+    this.listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries =
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
   }
 
   public DataSetDefinition constructDataset() {
