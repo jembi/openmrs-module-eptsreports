@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -16,6 +13,10 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -153,7 +154,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Get ART Start Date");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     sqlPatientDataDefinition.setQuery(commonQueries.getARTStartDate(true));
 
@@ -190,7 +191,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Dispensation Type on Encounter 6");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
@@ -259,7 +260,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Dispensation Type on FILA ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
@@ -311,7 +312,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Most Recent Drug Pick-Up on Recepção Levantou ARVs ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
@@ -356,7 +357,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Most Recent Drug Pick-Up on Recepção Levantou ARVs ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
@@ -364,7 +365,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "       MAX(DATE_ADD(o.value_datetime, INTERVAL 30 MONTH)) encounter_date "
+            + "       MAX(DATE_ADD(o.value_datetime, INTERVAL 30 DAY)) encounter_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
