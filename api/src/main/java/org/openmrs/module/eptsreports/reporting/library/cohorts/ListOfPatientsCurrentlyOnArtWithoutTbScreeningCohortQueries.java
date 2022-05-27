@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,10 +16,6 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -161,20 +160,26 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-
   /**
    * <b>Technical Specs</b>
    *
    * <blockquote>
-   * <p>Type of Dispensation registered on the most recent Clinical Consultation (value of Column Q) registered on Ficha Clínica – MasterCard by Report End Date
-   * <p>Possible values are:
-   * <ul>
-   *     <li>DM</li>
-   *     <li>DT</li>
-   *     <li>DS</li>
    *
-   * </ul>   *
-   * <p>Note: For Patients without Type of Dispensation informed, the corresponding cell in the excel file will show NA</p>
+   * <p>Type of Dispensation registered on the most recent Clinical Consultation (value of Column Q)
+   * registered on Ficha Clínica – MasterCard by Report End Date
+   *
+   * <p>Possible values are:
+   *
+   * <ul>
+   *   <li>DM
+   *   <li>DT
+   *   <li>DS
+   * </ul>
+   *
+   * *
+   *
+   * <p>Note: For Patients without Type of Dispensation informed, the corresponding cell in the
+   * excel file will show NA
    *
    * </blockquote>
    *
@@ -190,7 +195,6 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-
 
     String query =
         "SELECT p.patient_id , o.value_coded "
@@ -228,18 +232,22 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
    * <b>Technical Specs</b>
    *
    * <blockquote>
-   * <p>Modes of Dispensation registered on Last Drug Pick up Date (value of Column M) on FILA by report end date.
-   *<p> Possible values are </br>
-   *  <ul>
-   *         <li> Horário Normal de Expediente or</li>
-   *         <li> Fora do Horário </li>
-   *         <li> FARMAC/Farmácia Privada
-   *         <li> Dispensa Comunitária via Provedor
-   *         <li> Dispensa Comunitária via APE
-   *         <li> Brigadas Móveis Diurnas
-   *         <li> Brigadas Móveis Nocturnas (Hotspots)
-   *         <li> Clínicas Móveis Diurnas
-   *         <li> Clínicas Móveis Nocturnas (Hotspots)
+   *
+   * <p>Modes of Dispensation registered on Last Drug Pick up Date (value of Column M) on FILA by
+   * report end date.
+   *
+   * <p>Possible values are </br>
+   *
+   * <ul>
+   *   <li>Horário Normal de Expediente or
+   *   <li>Fora do Horário
+   *   <li>FARMAC/Farmácia Privada
+   *   <li>Dispensa Comunitária via Provedor
+   *   <li>Dispensa Comunitária via APE
+   *   <li>Brigadas Móveis Diurnas
+   *   <li>Brigadas Móveis Nocturnas (Hotspots)
+   *   <li>Clínicas Móveis Diurnas
+   *   <li>Clínicas Móveis Nocturnas (Hotspots)
    * </ul>
    *
    * </blockquote>
@@ -290,7 +298,9 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
    * <b>Technical Specs</b>
    *
    * <blockquote>
-   * <p>The most recent Date of the Drug Pick Up registered on Ficha Recepção Levantou ARV by report end date.
+   *
+   * <p>The most recent Date of the Drug Pick Up registered on Ficha Recepção Levantou ARV by report
+   * end date.
    *
    * </blockquote>
    *
@@ -333,7 +343,9 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
    * <b>Technical Specs</b>
    *
    * <blockquote>
-   * <p>Last Drug Pick up Date registered on Ficha Recepção Levantou ARV by report end date (value of Column O) + 30 days
+   *
+   * <p>Last Drug Pick up Date registered on Ficha Recepção Levantou ARV by report end date (value
+   * of Column O) + 30 days
    *
    * </blockquote>
    *
@@ -380,8 +392,10 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
    * <p>
    *
    * <p>Patient’s Most Recent Ficha with MDCs Registered
-   * <p>Encounter DATE (encounter.encounter_datetime)</p>
-   * <p>Modo De Dispensa (id= 165174)</p>
+   *
+   * <p>Encounter DATE (encounter.encounter_datetime)
+   *
+   * <p>Modo De Dispensa (id= 165174)
    *
    * </blockquote>
    *
