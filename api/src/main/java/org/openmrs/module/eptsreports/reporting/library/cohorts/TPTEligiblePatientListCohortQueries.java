@@ -3788,6 +3788,59 @@ public class TPTEligiblePatientListCohortQueries {
     return sqlCohortDefinition;
   }
 
+  public enum sectionFromM {
+    ONE{
+      @Override
+      public String getQuery(){
+        return TPTEligiblePatientsQueries.getMpart1();
+      }
+    },
+    TWO{
+      @Override
+      public String getQuery(){
+        return TPTEligiblePatientsQueries.getMpart2();
+      }
+    },
+    THREE{
+      @Override
+      public String getQuery(){
+        return TPTEligiblePatientsQueries.getMpart3();
+      }
+    },
+    FOUR{
+      @Override
+      public String getQuery(){
+        return TPTEligiblePatientsQueries.getMpart4();
+      }
+    },
+    FIVE{
+      @Override
+      public String getQuery(){
+        return TPTEligiblePatientsQueries.getMpart5();
+      }
+    },
+    SIX{
+      @Override
+      public String getQuery(){
+        return TPTEligiblePatientsQueries.getMpart6();
+      }
+    },
+    SEVEN{
+      @Override
+      public String getQuery(){
+        return TPTEligiblePatientsQueries.getMpart7();
+      }
+    },
+    EIGHT{
+      @Override
+      public String getQuery(){
+        return TPTEligiblePatientsQueries.getMpart8();
+      }
+    };
+
+    public abstract String getQuery();
+  }
+
   /**
    *<B>For each M:</B>
    * <li>
@@ -3798,7 +3851,7 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPLastProfilaxyDuringM3Period(){
+  public CohortDefinition get3HPLastProfilaxyDuringM3Period(sectionFromM section){
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Última profilaxia 3HP Between 86 days and 365 days from the date of M.3");
@@ -3815,10 +3868,9 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
 
-    String m3query = TPTEligiblePatientsQueries.getMpart1();
     String query =  "SELECT tbl_m.patient_id "
             + "FROM   ("
-            + m3query
+            + section.getQuery()
             + ") AS tbl_m "
             + "       inner join (SELECT p.patient_id "
             + "                   FROM   patient p "
