@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,10 +16,6 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -560,8 +559,9 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
    *
    * <blockquote>
    *
-   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical Consultation in last 6 months
-
+   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical
+   * Consultation in last 6 months
+   *
    * </blockquote>
    *
    * @return {@link DataDefinition}
@@ -598,5 +598,4 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
   }
-
 }
