@@ -16,8 +16,6 @@ import org.openmrs.module.eptsreports.reporting.library.queries.TxtbDenominatorQ
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
-import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
@@ -31,26 +29,47 @@ import org.springframework.stereotype.Component;
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseDataSet {
 
-  @Autowired
   private ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
       listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
 
-  @Autowired private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
+  private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
 
-  @Autowired private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
+  private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
 
-  @Autowired
   private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
-  @Autowired private TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries;
+  private TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries;
 
-  @Autowired
   private ListOfPatientsEligibleForVLDataDefinitionQueries
       listOfPatientsEligibleForVLDataDefinitionQueries;
 
-  @Autowired private TxtbDenominatorQueries txtbDenominatorQueries;
+  private TxtbDenominatorQueries txtbDenominatorQueries;
 
-  @Autowired private HivMetadata hivMetadata;
+  private HivMetadata hivMetadata;
+
+  @Autowired
+  public ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset(
+      ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+          listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries,
+      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
+      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
+      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
+      TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries,
+      ListOfPatientsEligibleForVLDataDefinitionQueries
+          listOfPatientsEligibleForVLDataDefinitionQueries,
+      TxtbDenominatorQueries txtbDenominatorQueries,
+      HivMetadata hivMetadata) {
+    this.listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries =
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
+    this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
+    this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
+    this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
+    this.tptInitiationDataDefinitionQueries = tptInitiationDataDefinitionQueries;
+    this.listOfPatientsEligibleForVLDataDefinitionQueries =
+        listOfPatientsEligibleForVLDataDefinitionQueries;
+    this.txtbDenominatorQueries = txtbDenominatorQueries;
+    this.hivMetadata = hivMetadata;
+  }
 
   public DataSetDefinition constructListOfPatientsDataset() {
     PatientDataSetDefinition patientDefinition = new PatientDataSetDefinition();
@@ -67,12 +86,6 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
 
     DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
-
-    DataDefinition identifierDef =
-        new ConvertedPatientDataDefinition(
-            "identifier",
-            new PatientIdentifierDataDefinition(identifierType.getName(), identifierType),
-            identifierFormatter);
 
     DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
     DataDefinition nameDef =

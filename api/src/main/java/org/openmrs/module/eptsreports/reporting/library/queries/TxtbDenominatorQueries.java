@@ -1,18 +1,17 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class TxtbDenominatorQueries {
@@ -52,8 +51,7 @@ public class TxtbDenominatorQueries {
             + "       AND o.value_coded IN ( ${1065}, ${1066} ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -88,8 +86,7 @@ public class TxtbDenominatorQueries {
             + "       AND o.value_coded IN ( ${703}, ${664} ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -122,8 +119,8 @@ public class TxtbDenominatorQueries {
             + "       AND o.concept_id = ${1113} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -150,8 +147,8 @@ public class TxtbDenominatorQueries {
             + "       AND p.voided = 0 "
             + "       AND program_id = ${5} "
             + "       AND date_enrolled  BETWEEN :startDate AND :endDate "
-            + "       AND pg.location_id = :location "
-            + "GROUP  BY pg.patient_id";
+            + "       AND pg.location_id = :location ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -187,8 +184,8 @@ public class TxtbDenominatorQueries {
             + "       AND o.value_coded = ${42} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -223,8 +220,8 @@ public class TxtbDenominatorQueries {
             + "       AND o.value_coded = ${1256} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -259,8 +256,8 @@ public class TxtbDenominatorQueries {
             + "       AND o.value_coded IN( ${1065}, ${1066} )  "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -295,8 +292,8 @@ public class TxtbDenominatorQueries {
             + "       AND o.value_coded IN( ${1065} )  "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -343,8 +340,8 @@ public class TxtbDenominatorQueries {
             + "             AND o.value_coded IN( ${1763}, ${1764}, ${1762}, ${1760},${23760}, ${1765}, ${161} ) ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -388,8 +385,8 @@ public class TxtbDenominatorQueries {
             + "       AND o.value_coded IN( ${23723}, ${23774}, ${23951}, ${307}, ${12} ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -434,8 +431,8 @@ public class TxtbDenominatorQueries {
             + "               AND o.value_coded IN( ${703}, ${664} ) ) OR o.concept_id = ${12} AND o.value_coded = ${1138} ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -475,8 +472,8 @@ public class TxtbDenominatorQueries {
             + "             AND o.value_coded IN( ${703}, ${664} ) ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "       AND o.voided = 0 ";
+
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -525,46 +522,5 @@ public class TxtbDenominatorQueries {
     return sqlPatientDataDefinition;
   }
 
-  public CohortDefinition getMostRecentTbScreening() {
 
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Most Recent TB Screening Date ");
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
-
-    String query =
-        " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) recent_date"
-            + " FROM (        "
-            + getPatientAndScreeningDate()
-            + " UNION "
-            + getPatientWithAtLeastOnePosDate()
-            + " UNION "
-            + getPatientWithAtLeastTbTreatmentDate()
-            + " UNION "
-            + getPatientWithTbProgramEnrollmentAndDate()
-            + " UNION "
-            + getPatientWithPulmonaryTbdDate()
-            + " UNION "
-            + getPatientMarkedAsTbTreatmentStartAndDate()
-            + " UNION "
-            + getPatientWithTuberculosisSymptomsAndDate()
-            + " UNION "
-            + getPatientsActiveTuberculosisDate()
-            + " UNION "
-            + getPatientsWithTbObservationsAndDate()
-            + " UNION "
-            + getPatientsWithApplicationsForLabResearch()
-            + " UNION "
-            + getPatientsWithTbGenexpertAndDate()
-            + " UNION "
-            + getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate()
-            + "                ) most_recent "
-            + " WHERE most_recent.encounter_datetime BETWEEN DATE_ADD(:startDate, INTERVAL -6 MONTH)  AND :endDate  "
-            + " GROUP BY most_recent.patient_id  ";
-
-    sqlCohortDefinition.setQuery(query);
-
-    return sqlCohortDefinition;
-  }
 }

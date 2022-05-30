@@ -153,7 +153,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Get ART Start Date");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     sqlPatientDataDefinition.setQuery(commonQueries.getARTStartDate(true));
 
@@ -190,7 +190,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Dispensation Type on Encounter 6");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
@@ -259,7 +259,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Dispensation Type on FILA ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
@@ -311,7 +311,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Most Recent Drug Pick-Up on Recepção Levantou ARVs ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
@@ -356,7 +356,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Most Recent Drug Pick-Up on Recepção Levantou ARVs ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
@@ -364,7 +364,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "       MAX(DATE_ADD(o.value_datetime, INTERVAL 30 MONTH)) encounter_date "
+            + "       MAX(DATE_ADD(o.value_datetime, INTERVAL 30 DAY)) encounter_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
@@ -554,6 +554,17 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     public abstract String getQuery();
   }
 
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Number of Patients Currently on ART without TB screening and at least one Clinical Consultation in last 6 months
+
+   * </blockquote>
+   *
+   * @return {@link DataDefinition}
+   */
   public CohortDefinition getPatientsWithClinicalConsultationInLast6Months() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -587,8 +598,4 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
   }
 
-  private void addSqlCohortDefinitionParameters(SqlCohortDefinition sqlCohortDefinition) {
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-  }
 }

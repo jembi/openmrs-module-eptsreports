@@ -17,11 +17,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet extends BaseDataSet {
 
-  @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
-
-  @Autowired
+  private EptsGeneralIndicator eptsGeneralIndicator;
   private ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
       listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
+
+  @Autowired
+  public TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet(
+      EptsGeneralIndicator eptsGeneralIndicator,
+      ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
+          listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries) {
+    this.eptsGeneralIndicator = eptsGeneralIndicator;
+    this.listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries =
+        listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries;
+  }
 
   public DataSetDefinition constructDataset() {
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
@@ -61,7 +69,7 @@ public class TotalOfPatientsCurrentlyOnArtWithoutTbScreeningDataSet extends Base
             "withoutConsultation",
             EptsReportUtils.map(
                 listOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries
-                    .getPatientsCurrentlyOnArtWithoutTbScreeningAndWithClinicalConsultationInLast6Months(),
+                    .getPatientsCurrentlyOnArtWithoutTbScreeningAndWithoutClinicalConsultationInLast6Months(),
                 "endDate=${endDate},location=${location}"));
 
     dataSetDefinition.addColumn(
