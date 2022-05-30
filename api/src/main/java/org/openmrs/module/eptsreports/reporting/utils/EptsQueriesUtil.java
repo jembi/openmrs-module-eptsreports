@@ -1,50 +1,39 @@
 package org.openmrs.module.eptsreports.reporting.utils;
 
-import java.util.ArrayList;
-import java.util.List;
 
+import org.openmrs.module.eptsreports.reporting.utils.queries.MaxBuilder;
+import org.openmrs.module.eptsreports.reporting.utils.queries.MinBuilder;
+import org.openmrs.module.eptsreports.reporting.utils.queries.UnionBuilder;
+import org.springframework.stereotype.Component;
+
+@Component
 public class EptsQueriesUtil {
 
-  public static class UnionBuilder {
-    List<String> queries = new ArrayList<>();
-    public UnionBuilder(String query) {
-      queries = new ArrayList<>();
+  public UnionBuilder unionBuilder(String query) {
 
-      queries.add(query);
-    }
+    UnionBuilder unionBuilder = new UnionBuilder(query);
+    return unionBuilder;
 
-    public UnionBuilder union(String query) {
-      queries.add(query);
-      return this;
-    }
-
-    public String buildQuery() {
-
-      StringBuilder stringBuilder = new StringBuilder();
-      for (String query : queries) {
-
-        stringBuilder.append(query).append(" UNION ");
-      }
-      String unionQuery = stringBuilder.substring(0,stringBuilder.length() -7);
-
-      return unionQuery;
-    }
   }
 
-  public static class Max{
-    private String query;
-    public Max(String query){
-      this.query = query;
-    }
-    public String getQuery(){
-      StringBuilder stringBuilder = new StringBuilder();
-      stringBuilder.append("SELECT patient_id, max_date FROM ( ");
-      stringBuilder.append(query);
-      stringBuilder.append(" ) most_recent ");
-      stringBuilder.append(" GROUP BY most_recent.patient_id");
+  public MaxBuilder Max(String query){
 
-      return stringBuilder.toString();
-    }
+
+
+
+
+
+    MaxBuilder maxBuilder = new MaxBuilder(query);
+    return maxBuilder;
   }
+
+
+
+  public MinBuilder Min(String query){
+    MinBuilder minBuilder = new MinBuilder(query);
+    return minBuilder;
+  }
+
+
 
 }
