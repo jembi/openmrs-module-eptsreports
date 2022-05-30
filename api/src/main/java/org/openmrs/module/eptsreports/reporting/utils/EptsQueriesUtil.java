@@ -31,4 +31,20 @@ public class EptsQueriesUtil {
     }
   }
 
+  public static class Max{
+    private String query;
+    public Max(String query){
+      this.query = query;
+    }
+    public String getQuery(){
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append("SELECT patient_id, max_date FROM ( ");
+      stringBuilder.append(query);
+      stringBuilder.append(" ) most_recent ");
+      stringBuilder.append(" GROUP BY most_recent.patient_id");
+
+      return stringBuilder.toString();
+    }
+  }
+
 }
