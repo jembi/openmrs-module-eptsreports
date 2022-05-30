@@ -101,8 +101,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
         Context.getPersonService()
             .getPersonAttributeTypeByUuid("e2e3fd64-1d5f-11e0-b929-000c29ad1d07");
 
-
-    patientDefinition.addColumn("patientId", new PersonIdDataDefinition(), "");
+    patientDefinition.addColumn("patient_id", new PersonIdDataDefinition(), "");
     patientDefinition.addColumn(
         "nid",
         tptListOfPatientsEligibleDataSet.getNID(identifierType.getPatientIdentifierTypeId()),
