@@ -1,24 +1,17 @@
 package org.openmrs.module.eptsreports.reporting.utils.queries;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
-public class MaxBuilder {
+public class MaxBuilder  {
 
 
         private String query;
         private List<String> columnsNames;
+        private ColumnsFinder columnsFinder;
         public MaxBuilder(String query){
-
-            String lowerCaseQuery = query.toLowerCase();
-            int firstSelect = lowerCaseQuery.indexOf("select");
-            int firstFrom = lowerCaseQuery.indexOf("from");
-            String columns = query.substring(firstSelect, firstFrom);
             this.query = query;
-            tokenizer(columns);
+            columnsFinder = new ColumnFinderImpl();
+            tokenizer(query);
         }
         public String getQuery(){
             StringBuilder stringBuilder = new StringBuilder();
@@ -37,25 +30,14 @@ public class MaxBuilder {
 
 
     private List<String> tokenizer(String tokens){
-        columnsNames = new ArrayList<>();
-        List<String> columns = Collections.list(new StringTokenizer(tokens, ",")).stream().map(token -> (String) token).collect(Collectors.toList());
 
-        if(columns.size() != 2) {
-            throw new RuntimeException("The query must have two columns");
-        }
+            List<String> columns = columnsFinder.tokenizer(tokens);
+            if (columns.size() != 2){
 
-        for (String column : columns) {
-            String[] split = column.trim().split(" ");
-            String lastToken = split[split.length -1];
-            if (lastToken.contains(".")){
-                columnsNames.add("`"+ lastToken.substring(lastToken.lastIndexOf("."))+ "`");
-            }else{
-                columnsNames.add("`"+lastToken+"`");
+                throw new RuntimeException("Your query result must have two columns");
             }
+           return columns;
 
-
-        }
-        return columns;
     }
 
 
