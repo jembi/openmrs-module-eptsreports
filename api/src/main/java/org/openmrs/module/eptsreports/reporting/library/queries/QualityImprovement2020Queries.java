@@ -1289,15 +1289,14 @@ public class QualityImprovement2020Queries {
     // restarted concepts
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
 
-    String query = "SELECT patient_id FROM ( ";
-
-    // verification to change the column name for artStartDate
-    if (artStartDate || pregnants) {
-      query += "    SELECT end_period.patient_id,end_period.first_pickup, last_encounter FROM (  ";
-    } else {
-      query += "   SELECT end_period.patient_id,end_period.the_time, last_encounter FROM (  ";
-    }
+    String query =
+        " SELECT abandoned.patient_id from ( "
+            + "                                     SELECT p.patient_id, max(e.encounter_datetime) as last_encounter FROM patient p "
+            + "                                                                                                               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                                                                                               INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                                                                                                               INNER JOIN ( ";
 
     if (artStartDate || pregnants) {
       query += arvStart;
@@ -1310,47 +1309,77 @@ public class QualityImprovement2020Queries {
     }
 
     query +=
-        ") end_period "
-            + "INNER JOIN ( "
-            + "              SELECT p.patient_id , max(e.encounter_datetime) as last_encounter "
-            + "                      FROM patient p INNER JOIN encounter e on p.patient_id = e.patient_id "
-            + "                                     INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "                      WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "                        AND e.encounter_type = ${6} "
-            + "                        AND o.concept_id = ${6273} "
-            + "                        AND o.value_coded = ${1707} "
-            + "                        AND e.location_id = :location "
-            + "                      GROUP BY p.patient_id "
-            + "                      UNION "
-            + "                      SELECT p.patient_id , max(o.obs_datetime) as last_encounter "
-            + "                      FROM patient p INNER JOIN encounter e on p.patient_id = e.patient_id "
-            + "                                     INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "                      WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "                        AND e.encounter_type = ${53} "
-            + "                        AND o.concept_id = ${6273} "
-            + "                        AND o.value_coded = ${1707} "
-            + "                        AND e.location_id = :location "
-            + "                      GROUP BY p.patient_id"
-            + "                    ) changed_state on changed_state.patient_id = end_period.patient_id "
-            + "                                                       GROUP BY end_period.patient_id) most_recent_abandoned ";
-    // verification to change the column name for artStartDate
+        " ) end_period ON end_period.patient_id = p.patient_id "
+            + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                       AND e.encounter_type = ${6} "
+            + "                                       AND o.concept_id = ${6273} "
+            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND e.location_id = :location ";
+
+    // verification to change the column name for artStartDate based queries
     if (artStartDate) {
       query +=
-          " WHERE most_recent_abandoned.last_encounter >= most_recent_abandoned.first_pickup "
-              + "    AND most_recent_abandoned.last_encounter <= DATE_ADD(most_recent_abandoned.first_pickup, INTERVAL 6 MONTH) "
-              + "                           GROUP BY patient_id";
-      // verification to change the number of months for pregnants
+          "       AND e.encounter_datetime >= end_period.first_pickup "
+              + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 6 MONTH) "
+              + "                                     GROUP BY p.patient_id ";
+      // verification to change the column name and number of months for pregnants
     } else if (pregnants) {
       query +=
-          " WHERE most_recent_abandoned.last_encounter >= most_recent_abandoned.first_pickup "
-              + "    AND most_recent_abandoned.last_encounter <= DATE_ADD(most_recent_abandoned.first_pickup, INTERVAL 3 MONTH) "
-              + "                           GROUP BY patient_id";
+          "       AND e.encounter_datetime >= end_period.first_pickup "
+              + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 3 MONTH) "
+              + "                                     GROUP BY p.patient_id ";
     } else {
       query +=
-          " WHERE most_recent_abandoned.last_encounter >= most_recent_abandoned.the_time "
-              + "    AND most_recent_abandoned.last_encounter <= DATE_ADD(most_recent_abandoned.the_time, INTERVAL 6 MONTH) "
-              + "                           GROUP BY patient_id";
+          "       AND e.encounter_datetime >= end_period.last_encounter "
+              + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.last_encounter, INTERVAL 6 MONTH) "
+              + "                                     GROUP BY p.patient_id ";
     }
+
+    query +=
+        "UNION "
+            + "     SELECT p.patient_id, max(e.encounter_datetime) as last_encounter FROM patient p "
+            + "                                                                                                               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                                                                                               INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                                                                                                               INNER JOIN ( ";
+
+    if (artStartDate || pregnants) {
+      query += arvStart;
+    } else if (restartedArt) {
+      query += getRestartedArtQuery();
+    } else if (firstLine) {
+      query += getTherapeuticLineQuery(Linha.FIRST);
+    } else if (secondLine) {
+      query += getTherapeuticLineQuery(Linha.SECOND);
+    }
+
+    query +=
+        " ) end_period ON end_period.patient_id = p.patient_id "
+            + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                       AND e.encounter_type = ${53} "
+            + "                                       AND o.concept_id = ${6272} "
+            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND e.location_id = :location ";
+
+    if (artStartDate) {
+      query +=
+          "       AND e.encounter_datetime >= end_period.first_pickup "
+              + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 6 MONTH)"
+              + "                                     GROUP BY p.patient_id ";
+
+      // verification to change the column name and number of months for pregnants
+    } else if (pregnants) {
+      query +=
+          "       AND e.encounter_datetime >= end_period.first_pickup "
+              + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 3 MONTH)"
+              + "                                     GROUP BY p.patient_id ";
+    } else {
+      query +=
+          "       AND e.encounter_datetime >= end_period.last_encounter "
+              + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.last_encounter, INTERVAL 6 MONTH) "
+              + "                                     GROUP BY p.patient_id ";
+    }
+
+    query += "                                 ) abandoned GROUP BY abandoned.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1384,9 +1413,12 @@ public class QualityImprovement2020Queries {
    * Consultation” (last encounter_datetime from B1) minus obs_datetime(from B2) >= 6 months)
    */
   public static String getTherapeuticLineQuery(Linha line) {
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+    String arvStart = commonQueries.getARTStartDate(true);
+
     if (line.equals(Linha.FIRST)) {
       return " SELECT "
-          + "     pa.patient_id, first_line.the_time "
+          + "     pa.patient_id, first_line.the_time AS last_encounter"
           + " FROM "
           + "     patient pa "
           + "          JOIN "
@@ -1448,21 +1480,45 @@ public class QualityImprovement2020Queries {
           + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
           + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
           + " WHERE pa.patient_id NOT IN ( "
-          + "    SELECT patient_id FROM "
-          + "    (SELECT p.patient_id , max(e2.encounter_datetime) as last_encounter "
-          + "        FROM patient p INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
-          + "                        INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
-          + "                        WHERE p.voided = 0 AND e2.voided = 0 AND o2.voided = 0 "
-          + "                        AND e2.encounter_type = ${6} "
-          + "                        AND o2.concept_id = ${6273} "
-          + "                        AND o2.value_coded = ${1707} "
-          + "                        AND e2.location_id = :location "
-          + "                        GROUP BY p.patient_id "
-          + "                        ) abandoned_state WHERE DATE(abandoned_state.encounter) >= DATE(arv_start_date.arv_date) "
-          + "                                              AND DATE(abandoned_state.encounter) <= DATE_ADD(arv_start_date.arv_date, INTERVAL 6 MONTH) "
+          + "    SELECT patient_id FROM ( "
+          + "            SELECT p.patient_id, max(e2.encounter_datetime) as last_encounter "
+          + "                     FROM patient p "
+          + "                              INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
+          + "                              INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
+          + "                        INNER JOIN ( "
+          + arvStart
+          + " ) end_period ON end_period.patient_id = p.patient_id "
+          + "                     WHERE p.voided = 0 "
+          + "                       AND e2.voided = 0 "
+          + "                       AND o2.voided = 0 "
+          + "                       AND e2.encounter_type = ${6} "
+          + "                       AND o2.concept_id = ${6273} "
+          + "                       AND o2.value_coded = ${1707} "
+          + "                       AND e2.location_id = :location "
+          + "                     AND e2.encounter_datetime >= end_period.first_pickup "
+          + "                     AND e2.encounter_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 6 month) "
+          + "                     GROUP BY p.patient_id "
+          + "                     UNION "
+          + "              SELECT p.patient_id, max(o2.obs_datetime) as last_encounter "
+          + "                     FROM patient p "
+          + "                              INNER JOIN encounter e2 on p.patient_id = e2.patient_id "
+          + "                              INNER JOIN obs o2 on e2.encounter_id = o2.encounter_id "
+          + "                        INNER JOIN ( "
+          + arvStart
+          + " ) end_period ON end_period.patient_id = p.patient_id "
+          + "                     WHERE p.voided = 0 "
+          + "                       AND e2.voided = 0 "
+          + "                       AND o2.voided = 0 "
+          + "                       AND e2.encounter_type = ${53} "
+          + "                       AND o2.concept_id = ${6272} "
+          + "                       AND o2.value_coded = ${1707} "
+          + "                       AND e2.location_id = :location "
+          + "                       AND o2.obs_datetime >= end_period.first_pickup "
+          + "                       AND o2.obs_datetime <= DATE_ADD(end_period.first_pickup, interval 6 MONTH) "
+          + "                GROUP BY p.patient_id ) abandoned   "
           + "    ) GROUP BY pa.patient_id ";
     } else {
-      return " SELECT     p.patient_id , o.obs_datetime  AS the_time "
+      return " SELECT     p.patient_id , o.obs_datetime  AS last_encounter "
           + "                                   FROM       patient p "
           + "                                   INNER JOIN encounter e "
           + "                                   ON         e.patient_id = p.patient_id "
@@ -1497,7 +1553,7 @@ public class QualityImprovement2020Queries {
 
   public static String getRestartedArtQuery() {
     return " SELECT patient_id, "
-        + "       the_time "
+        + "       the_time AS last_encounter "
         + "FROM   (SELECT p.patient_id, "
         + "               e.encounter_datetime AS the_time, "
         + "               last_consultation.last_consultation_date "

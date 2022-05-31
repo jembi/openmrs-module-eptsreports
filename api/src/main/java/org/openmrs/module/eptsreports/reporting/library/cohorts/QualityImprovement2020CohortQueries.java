@@ -8577,6 +8577,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
 
     String query = QualityImprovement2020Queries.getRestartedArtQuery();
 
