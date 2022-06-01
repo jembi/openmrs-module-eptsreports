@@ -10,22 +10,23 @@ public class MinBuilder {
     public MinBuilder(String query){
         this.query = query;
         columnsFinder = new ColumnFinderImpl();
-        tokenizer(query);
+      columnsNames =  tokenizer(query);
     }
     public String getQuery(){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("SELECT ");
         stringBuilder.append(columnsNames.get(0));
-        stringBuilder.append(",MIM( ");
+        stringBuilder.append(", MIN( ");
         stringBuilder.append(columnsNames.get(1));
         stringBuilder.append(" ) FROM ( ");
         stringBuilder.append(query);
-        stringBuilder.append(" ) most_recent ");
-        stringBuilder.append(" GROUP BY most_recent.");
+        stringBuilder.append(" ) first ");
+        stringBuilder.append(" GROUP BY first.");
         stringBuilder.append(columnsNames.get(0));
 
         return stringBuilder.toString();
     }
+
 
     private List<String> tokenizer(String tokens){
 

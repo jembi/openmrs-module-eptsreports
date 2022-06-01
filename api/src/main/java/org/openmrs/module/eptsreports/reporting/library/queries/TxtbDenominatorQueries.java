@@ -4,6 +4,9 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -522,5 +525,29 @@ public class TxtbDenominatorQueries {
     return sqlPatientDataDefinition;
   }
 
+  public CohortDefinition getMostRecentTbScreening() {
 
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Most Recent TB Screening Date ");
+    sqlCohortDefinition .addParameter(new Parameter("location", "Location", Location.class));
+    sqlCohortDefinition .addParameter(new Parameter("endDate", "End Date", Location.class));
+    sqlCohortDefinition .addParameter(new Parameter("startDate", "startDate", Location.class));
+
+    String query = new EptsQueriesUtil().unionBuilder(getPatientAndScreeningDate())
+            .union(getPatientMarkedAsTbTreatmentStartAndDate())
+            .union(getPatientsWithTbGenexpertAndDate())
+            .union(getPatientWithAtLeastOnePosDate())
+            .union(getPatientsActiveTuberculosisDate())
+            .buildQuery();
+
+
+   String maxQuery = new EptsQueriesUtil().Min(query).getQuery();
+   String patientQuery = new EptsQueriesUtil().patientIdQueryBuilder(maxQuery).getQuery();
+
+    System.out.println(patientQuery);
+
+    sqlCohortDefinition .setQuery(patientQuery);
+
+    return sqlCohortDefinition ;
+  }
 }

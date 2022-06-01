@@ -11,7 +11,7 @@ public class MaxBuilder  {
         public MaxBuilder(String query){
             this.query = query;
             columnsFinder = new ColumnFinderImpl();
-            tokenizer(query);
+           columnsNames = tokenizer(query);
         }
         public String getQuery(){
             StringBuilder stringBuilder = new StringBuilder();
@@ -29,11 +29,11 @@ public class MaxBuilder  {
         }
 
 
-    private List<String> tokenizer(String tokens){
+    private List<String> tokenizer(String query){
 
-            List<String> columns = columnsFinder.tokenizer(tokens);
+            List<String> columns = columnsFinder.tokenizer(query);
+
             if (columns.size() != 2){
-
                 throw new RuntimeException("Your query result must have two columns");
             }
            return columns;

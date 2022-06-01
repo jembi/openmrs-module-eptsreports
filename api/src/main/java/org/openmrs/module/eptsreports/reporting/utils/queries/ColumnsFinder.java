@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface ColumnsFinder {
 
-     List<String> tokenizer(String tokens);
+     List<String> tokenizer(String query);
 }

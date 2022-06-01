@@ -11,7 +11,7 @@ public class PatientIdBuilder {
 
         this.query = query;
         columnsFinder = new ColumnFinderImpl();
-        tokenizer(query);
+        columnsNames = tokenizer(query);
 
     }
 
@@ -31,9 +31,9 @@ public class PatientIdBuilder {
     private List<String> tokenizer(String tokens){
 
         List<String> columns = columnsFinder.tokenizer(tokens);
-        if (columns.size() != 1){
+        if (columns.size() <1){
 
-            throw new RuntimeException("Your query result must have one column");
+            throw new RuntimeException("Your query result must have at least one column");
         }
         return columns;
 

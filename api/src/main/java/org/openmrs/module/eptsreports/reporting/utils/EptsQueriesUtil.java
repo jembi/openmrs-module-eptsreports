@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.utils;
 
 import org.openmrs.module.eptsreports.reporting.utils.queries.MaxBuilder;
 import org.openmrs.module.eptsreports.reporting.utils.queries.MinBuilder;
+import org.openmrs.module.eptsreports.reporting.utils.queries.PatientIdBuilder;
 import org.openmrs.module.eptsreports.reporting.utils.queries.UnionBuilder;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +18,6 @@ public class EptsQueriesUtil {
   }
 
   public MaxBuilder Max(String query){
-
-
-
-
-
-
     MaxBuilder maxBuilder = new MaxBuilder(query);
     return maxBuilder;
   }
@@ -32,6 +27,12 @@ public class EptsQueriesUtil {
   public MinBuilder Min(String query){
     MinBuilder minBuilder = new MinBuilder(query);
     return minBuilder;
+  }
+
+  public PatientIdBuilder patientIdQueryBuilder(String query){
+
+    PatientIdBuilder patientIdBuilder = new PatientIdBuilder(query);
+    return patientIdBuilder;
   }
 
 
