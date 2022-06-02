@@ -6361,10 +6361,14 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition queryA1 =
         QualityImprovement2020Queries.getMQ15DenA1(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId());
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getGaac().getConceptId(),
+                hivMetadata.getQuarterlyDispensation().getConceptId(),
+                hivMetadata.getSemiannualDispensation().getConceptId(),
+                hivMetadata.getRapidFlow().getConceptId(),
+                hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+                hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
@@ -6380,7 +6384,7 @@ public class QualityImprovement2020CohortQueries {
             BaseObsCohortDefinition.TimeModifier.LAST,
             SetComparator.IN,
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
-            Arrays.asList(hivMetadata.getQuarterlyConcept()));
+            Arrays.asList(hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
@@ -6388,7 +6392,7 @@ public class QualityImprovement2020CohortQueries {
         "A1",
         EptsReportUtils.map(
             queryA1,
-            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
 
@@ -6396,7 +6400,7 @@ public class QualityImprovement2020CohortQueries {
         "A3",
         EptsReportUtils.map(
             queryA3,
-            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},locationList=${location}"));
+            "onOrAfter=${revisionEndDate-26m+1d},onOrBefore=${revisionEndDate-24m},locationList=${location}"));
 
     comp.addSearch(
         "CD",
@@ -6525,7 +6529,11 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getStartDrugs().getConceptId(),
             hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId());
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+                hivMetadata.getSemiannualDispensation().getConceptId(),
+                hivMetadata.getRapidFlow().getConceptId(),
+                hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+                hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(

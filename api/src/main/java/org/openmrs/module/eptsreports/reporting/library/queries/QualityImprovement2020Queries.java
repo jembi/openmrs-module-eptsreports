@@ -1,13 +1,14 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -264,36 +265,61 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-   * <b>MQ15DEN A </b> - Select all patients from Ficha Clinica (Encounter type 6) with at least one
-   * of the following concepts between the period (startDateInclusion = endDateRevision - 14 months
-   * and endDateInclusion = endDateRevision - 11 months)</b><br>
+   * <b>MQ15DEN RF5 </b> - O sistema irá identificar utentes adultos
+   * inscritos no MDS (GAAC/DT/APE/DD/DS/FR) há 24 meses selecionando:</b><br>
    *
    * <ul>
-   *   <li>A1 - GAAC (GA) (Concept Id 23724) = “INICIAR” (value_coded = concept Id 1256) or
-   *   <li>A2 - DISPENSA TRIMESTRAL (DT) (Concept Id 23730) = “INICIAR” (value_coded = concept Id
-   *       1256)
-   *   <li>A3 - Select all patients from Ficha Clinica (Encounter type 6) with THE LAST concept
-   *       “TIPO DE DISPENSA” (Concept Id 23739) with value coded “DISPENSA TRIMESTRAL” (Concept Id
-   *       23720) the period (startDateInclusion = endDateRevision - 14 months and endDateInclusion
-   *       = endDateRevision - 11 months)
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
+   *   “GA” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida
+   *   há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *   Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
+   *   “DT” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida
+   *   há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *   Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
+   *   “APE” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”)
+   *   decorrida há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia
+   *   e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
+   *   “DD” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”)
+   *   decorrida há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia
+   *   e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
+   *   “DS” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”)
+   *   decorrida há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia
+   *   e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
+   *   “FR” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”)
+   *   decorrida há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia
+   *   e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *
    * </ul>
    *
    * @param adultoSeguimentoEncounterType The Clinical Consultation Encounter Type 6
    * @param startDrugs The start Drugs concept Id 1256
    * @param gaac GAAC (GA) Concept Id 23724 (DT) Concept Id 23730
    * @param quarterlyDispensation The quarterly Dispensation Concept Id 23730
-   * @return @return SqlCohortDefinition
+   * @param semiannualDispensation The semiannual Dispensation Concept 23888
+   * @param rapidFlow The Rapid Flow Concept 23729
+   * @param dispensaComunitariaViaApe The Dispensa Comunitaria via APE Concept 165179
+   * @param descentralizedArvDispensation The DESCENTRALIZED ARV DISPENSATION Concept 165315
+   * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA1(
-      int adultoSeguimentoEncounterType, int startDrugs, int gaac, int quarterlyDispensation) {
+      int adultoSeguimentoEncounterType, int startDrugs, int gaac, int quarterlyDispensation,
+      int semiannualDispensation, int rapidFlow, int dispensaComunitariaViaApe, int descentralizedArvDispensation) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
-        "Patients that returned for another clinical consultation or ARV pickup between 25 and 33 days after ART start date(Oldest date From A)");
+        "Inscritos no MDS há 24 meses - Adultos");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -301,25 +327,34 @@ public class QualityImprovement2020Queries {
     map.put("1256", startDrugs);
     map.put("23724", gaac);
     map.put("23730", quarterlyDispensation);
+    map.put("165179", dispensaComunitariaViaApe);
+    map.put("165315", descentralizedArvDispensation);
+    map.put("23729", rapidFlow);
+    map.put("23888", semiannualDispensation);
+
+
 
     String query =
-        "SELECT patient_id "
-            + "FROM   ( "
-            + "       SELECT p.patient_id, e.encounter_datetime "
-            + "       FROM   patient p "
-            + "              INNER JOIN encounter e "
-            + "                      ON p.patient_id = e.patient_id "
-            + "              INNER JOIN obs o "
-            + "                      ON e.encounter_id = o.encounter_id "
-            + "       WHERE  p.voided = 0 "
-            + "              AND e.voided = 0 "
-            + "              AND o.voided = 0 "
-            + "              AND e.location_id = :location "
-            + "              AND e.encounter_type = ${6} "
-            + "              AND ( o.concept_id = ${23724} OR o.concept_id = ${23730} ) "
-            + "              AND o.value_coded = ${1256} "
-            + "              AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + ") denA1";
+            "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "           INNER JOIN encounter e ON e.patient_id = p.patient_id "
+                    + "           INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+                    + "           INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+                    + "WHERE  e.encounter_type = ${6} "
+                    + "  AND e.location_id = :location "
+                    + "  AND otype.concept_id = ${165174} "
+                    + "  AND otype.value_coded IN (${23724},${23730},${165179},${165315},${23729},${23888}) "
+                    + "  AND ostate.concept_id = ${165322} "
+                    + "  AND ostate.value_coded = ${1256} "
+                    + "  AND e.encounter_datetime >= :startDate "
+                    + "  AND e.encounter_datetime <= :endDate "
+                    + "  AND otype.obs_group_id = ostate.obs_group_id "
+                    + "  AND e.voided = 0 "
+                    + "  AND p.voided = 0 "
+                    + "  AND otype.voided = 0 "
+                    + "  AND ostate.voided = 0 "
+                    + "GROUP  BY p.patient_id";
+
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
