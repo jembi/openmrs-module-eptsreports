@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -16,6 +13,10 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -327,7 +328,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${52} "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND o.value_datetime <= :endDate "
             + "       AND o.concept_id = ${23866} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
