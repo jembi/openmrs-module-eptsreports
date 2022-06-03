@@ -55,7 +55,7 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "Monitoria Intensiva  - 2021";
+    return "Monitoria Intensiva de HIV - 2022";
   }
 
   @Override
@@ -103,7 +103,7 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_MI_2021_v1.9.3.xls",
+              "Template_MI_2022_v1.xls",
               "Template Ficha Relatório Monitoria Intensiva HIV",
               getExcelDesignUuid(),
               null);
