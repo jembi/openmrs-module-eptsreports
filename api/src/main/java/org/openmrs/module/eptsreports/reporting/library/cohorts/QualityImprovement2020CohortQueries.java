@@ -7890,8 +7890,7 @@ public class QualityImprovement2020CohortQueries {
    *       id 6128) in Ficha Resumo (encounter type 53) during the Inclusion period as following:
    *       <ul>
    *         <li>
-   *             <p>Encounter Type 53 “Última Profilaxia Isoniazida Data Início” (concept_id 6128)
-   *             value_datetime between startDateInclusion and endDateInclusion
+   *             <p>Encounter Type 53 “Última profilaxia TPT"(concept id 23985) value coded INH(concept id 656) and value_datetime(concept id 6128) during the inclusion period
    *             <p>Note: if there is more than one Ficha Resumo consider the most recent date
    *             during the inclusion period.
    *       </ul>
@@ -7910,7 +7909,9 @@ public class QualityImprovement2020CohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
 
     String query =
         ""
@@ -7921,10 +7922,13 @@ public class QualityImprovement2020CohortQueries {
             + "   FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "   WHERE p.voided = 0 "
             + "     AND e.voided = 0 "
             + "     AND o.voided = 0 "
+            + "     AND o2.voided = 0 "
             + "     AND o.concept_id = ${6128} "
+            + "     AND ( o2.concept_id = ${23985} AND o2.value_coded = ${656} ) "
             + "     AND e.encounter_type = ${53} "
             + "     AND e.location_id = :location "
             + "     AND o.value_datetime between :startDate AND :endDate "
@@ -7980,6 +7984,7 @@ public class QualityImprovement2020CohortQueries {
             + "   WHERE p.voided = 0 "
             + "     AND e.voided = 0 "
             + "     AND o.voided = 0 "
+            + "     AND o2.voided = 0 "
             + "     AND ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
             + "     AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} ) "
             + "     AND e.encounter_type = ${6} "
