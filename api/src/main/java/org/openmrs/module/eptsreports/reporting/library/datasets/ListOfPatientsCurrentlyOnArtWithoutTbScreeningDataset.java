@@ -11,7 +11,6 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.DispensationTypeConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.ToStringConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.library.queries.TxtbDenominatorQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -132,7 +131,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
         new ConvertedPersonDataDefinition(
             "contact",
             new PersonAttributeDataDefinition(contactAttributeType.getName(), contactAttributeType),
-            new ToStringConverter());
+            null);
     patientDefinition.addColumn("contact", conctactDef, "");
 
     patientDefinition.addColumn(
@@ -195,7 +194,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningDataset extends BaseD
     patientDefinition.addColumn(
         "screening_date",
         txtbDenominatorQueries.getMostRecentTbScreeningDate(),
-        "startDate=${startDate-6m},endDate=${endDate},location=${location}");
+        "endDate=${endDate},location=${location}");
 
     patientDefinition.addColumn(
         "mdc_consultation_date",

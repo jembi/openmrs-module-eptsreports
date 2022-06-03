@@ -476,7 +476,6 @@ public class TxtbDenominatorQueries {
     sqlPatientDataDefinition.setName("Most Recent TB Screening Date ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
 
     String query =
         " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) most_recent "
