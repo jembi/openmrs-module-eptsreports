@@ -7944,8 +7944,7 @@ public class QualityImprovement2020CohortQueries {
    *       Inclusion period with the following conditions:
    *       <ul>
    *         <li>
-   *             <p>“PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id
-   *             1256) Encounter_datetime between startDateInclusion and endDateInclusion
+   *             <p>Profilaxia TPT"(concept id 23985) value coded INH(concept id 656) and Estado da Profilaxia (concept id 165308) value coded Inicio(concept id 1256) during the inclusion period.
    *             <p>Note: if there is more than one Ficha Clinica falling in the above criteria
    *             consider the most recent one during the inclusion period.
    *       </ul>
@@ -7964,8 +7963,9 @@ public class QualityImprovement2020CohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
     String query =
         ""
@@ -7976,11 +7976,12 @@ public class QualityImprovement2020CohortQueries {
             + "   FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "   WHERE p.voided = 0 "
             + "     AND e.voided = 0 "
             + "     AND o.voided = 0 "
-            + "     AND o.concept_id = ${6122} "
-            + "     AND o.value_coded = ${1256} "
+            + "     AND ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "     AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} ) "
             + "     AND e.encounter_type = ${6} "
             + "     AND e.location_id = :location "
             + "     AND e.encounter_datetime between :startDate AND :endDate "
