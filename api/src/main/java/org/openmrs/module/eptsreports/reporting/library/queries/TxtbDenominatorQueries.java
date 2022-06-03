@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -10,9 +12,6 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
 public class TxtbDenominatorQueries {
 
@@ -20,8 +19,7 @@ public class TxtbDenominatorQueries {
 
   @Autowired private TbMetadata tbMetadata;
 
-  @Autowired
-  private CommonQueries commonQueries;
+  @Autowired private CommonQueries commonQueries;
 
   /**
    * i. at least one “S” or “N” selected for TB Screening (Rastreio de TB) during the reporting
@@ -481,40 +479,40 @@ public class TxtbDenominatorQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
 
     String query =
-            " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) most_recent "
-                    + " FROM (        "
-                    + getPatientAndScreeningDate()
-                    + " UNION "
-                    + getPatientWithAtLeastOnePosDate()
-                    + " UNION "
-                    + getPatientWithAtLeastTbTreatmentDate()
-                    + " UNION "
-                    + getPatientWithTbProgramEnrollmentAndDate()
-                    + " UNION "
-                    + getPatientWithPulmonaryTbdDate()
-                    + " UNION "
-                    + getPatientMarkedAsTbTreatmentStartAndDate()
-                    + " UNION "
-                    + getPatientWithTuberculosisSymptomsAndDate()
-                    + " UNION "
-                    + getPatientsActiveTuberculosisDate()
-                    + " UNION "
-                    + getPatientsWithTbObservationsAndDate()
-                    + " UNION "
-                    + getPatientsWithApplicationsForLabResearch()
-                    + " UNION "
-                    + getPatientsWithTbGenexpertAndDate()
-                    + " UNION "
-                    + getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate()
-                    + "                ) most_recent "
-                    + " INNER JOIN ( "+ commonQueries.getARTStartDate(true)
-                    + " ) art on art.patient_id = most_recent.patient_id "
-                    +" WHERE most_recent.encounter_datetime BETWEEN  DATE_ADD(art.first_pickup, INTERVAL - 6 MONTH) AND :endDate "
-                    + " GROUP BY patient_id";
+        " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) most_recent "
+            + " FROM (        "
+            + getPatientAndScreeningDate()
+            + " UNION "
+            + getPatientWithAtLeastOnePosDate()
+            + " UNION "
+            + getPatientWithAtLeastTbTreatmentDate()
+            + " UNION "
+            + getPatientWithTbProgramEnrollmentAndDate()
+            + " UNION "
+            + getPatientWithPulmonaryTbdDate()
+            + " UNION "
+            + getPatientMarkedAsTbTreatmentStartAndDate()
+            + " UNION "
+            + getPatientWithTuberculosisSymptomsAndDate()
+            + " UNION "
+            + getPatientsActiveTuberculosisDate()
+            + " UNION "
+            + getPatientsWithTbObservationsAndDate()
+            + " UNION "
+            + getPatientsWithApplicationsForLabResearch()
+            + " UNION "
+            + getPatientsWithTbGenexpertAndDate()
+            + " UNION "
+            + getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate()
+            + "                ) most_recent "
+            + " INNER JOIN ( "
+            + commonQueries.getARTStartDate(true)
+            + " ) art on art.patient_id = most_recent.patient_id "
+            + " WHERE most_recent.encounter_datetime BETWEEN  DATE_ADD(art.first_pickup, INTERVAL - 6 MONTH) AND :endDate "
+            + " GROUP BY patient_id";
 
     sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }
-
 }
