@@ -505,10 +505,9 @@ public class QualityImprovement2020Queries {
   public static SqlCohortDefinition getPatientsWithPickupOnFilaBetween(int startDays, int endDays) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients who started GAAC)");
+    sqlCohortDefinition.setName("Patients who have pickup registered on FILA)");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
