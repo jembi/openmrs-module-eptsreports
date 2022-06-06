@@ -1,14 +1,15 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -510,11 +511,11 @@ public class QualityImprovement2020Queries {
    * próximo levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data
    * Levantamento”>= 173 dias e <= 187 dias).
    *
-   * @param startDays
-   * @param endDays
+   * @param lowerBounded
+   * @param upperBounded
    * @return SqlCohortDefinition
    */
-  public static SqlCohortDefinition getPatientsWithPickupOnFilaBetween(int startDays, int endDays) {
+  public static SqlCohortDefinition getPatientsWithPickupOnFilaBetween(int lowerBounded, int upperBounded) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who have pickup registered on FILA)");
@@ -546,9 +547,9 @@ public class QualityImprovement2020Queries {
             + "AND        e.location_id = :location "
             + "AND        o.concept_id = ${5096} "
             + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) >=  "
-            + startDays
+            + lowerBounded
             + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <=  "
-            + endDays
+            + upperBounded
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "

@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -26,6 +25,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -6388,6 +6389,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
+    CohortDefinition dead = resumoMensalCohortQueries.getPatientsWhoDied(false);
+
     comp.addSearch(
         "A1",
         EptsReportUtils.map(
@@ -6415,8 +6418,10 @@ public class QualityImprovement2020CohortQueries {
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
+    comp.addSearch("dead", EptsReportUtils.map(dead, "onOrBefore=${revisionEndDate},locationList=${location}"));
+
     if (den == 1) {
-      comp.setCompositionString("(A1 OR A3) AND NOT (CD OR F)");
+      comp.setCompositionString("(A1 OR A3) AND NOT (CD OR F OR dead)");
     } else if (den == 2 || den == 3 || den == 4) {
       comp.setCompositionString("((A1 OR A3) AND NOT (CD OR F)) AND G2");
     } else if (den == 5 || den == 6) {
