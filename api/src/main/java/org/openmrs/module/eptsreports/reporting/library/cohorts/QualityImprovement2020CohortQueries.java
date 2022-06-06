@@ -3740,7 +3740,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * <ul>
    *   <li>BI1 - Select all patients who have the most recent “ALTERNATIVA A LINHA - 1a LINHA”
-   *       (Concept Id 23898, obs_datetime) recorded in Ficha Resumo (encounter type 53) with any
+   *       (Concept Id 21190, obs_datetime) recorded in Ficha Resumo (encounter type 53) with any
    *       value coded (not null) during the inclusion period (startDateInclusion and
    *       endDateInclusion) AND
    *   <li>B1E - Exclude all patients from Ficha Clinica (encounter type 6, encounter_datetime) who
@@ -4435,6 +4435,9 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition abandonedExclusionFirstLine =
         getPatientsWhoAbandonedTarvDuringThePeriod(false, false, false, true, false);
 
+    CohortDefinition abandonedExcluusionSecondLine =
+        getPatientsWhoAbandonedTarvDuringThePeriod(false, false, false, false, true);
+
     CohortDefinition restartdedExclusion = getPatientsWhoRestartedTarvAtLeastSixMonths();
 
     CohortDefinition B4E =
@@ -4558,6 +4561,9 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));
 
+    compositionCohortDefinition.addSearch(
+        "ABANDONED2LINE", EptsReportUtils.map(abandonedExcluusionSecondLine, MAPPING1));
+
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
@@ -4567,7 +4573,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
       }
     } else {
       if (line == 1 || line == 6 || line == 7 || line == 8) {
@@ -8490,7 +8496,7 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        o.concept_id = ${21187} "
             + "                      AND        o.value_coded IS NOT NULL "
             + "                      AND        o.obs_datetime >= :startDate "
-            + "                      AND        o.obs_datetime <= :endDate "
+            + "                      AND        o.obs_datetime <= :revisionEndDate "
             + "                      AND        timestampdiff(month, o.obs_datetime, last_clinical.last_visit) >= 6) second_line "
             + "ON         second_line.patient_id = p.patient_id "
             + "WHERE      e.voided = 0 "
@@ -8551,6 +8557,7 @@ public class QualityImprovement2020CohortQueries {
             pregnants,
             firstLine,
             secondLine));
+    System.out.println(cd.getQuery());
 
     return cd;
   }

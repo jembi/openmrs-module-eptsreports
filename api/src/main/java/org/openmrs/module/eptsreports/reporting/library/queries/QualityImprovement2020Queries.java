@@ -1498,7 +1498,7 @@ public class QualityImprovement2020Queries {
           + "                                   AND        o.concept_id = ${21187} "
           + "                                   AND        o.value_coded IS NOT NULL "
           + "                                   AND        o.obs_datetime >= :startDate "
-          + "                                   AND        o.obs_datetime <= :endDate "
+          + "                                   AND        o.obs_datetime <= :revisionEndDate "
           + "                                   AND        timestampdiff(month, o.obs_datetime, last_clinical.last_visit) >= 6 ";
     }
   }
