@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.queries;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -28,7 +29,8 @@ public class QualityImprovement2020Queries {
    * @param artPickupConcept The ART Pickup Concept Id 23865
    * @param artDatePickupMasterCard The ART Date Pickup MasterCard Concept Id 23866
    * @return SqlCohortDefinition
-   */
+
+
   public static SqlCohortDefinition getMQ12NumH(
       int lowerBound,
       int upperBound,
@@ -332,8 +334,6 @@ public class QualityImprovement2020Queries {
     map.put("23729", rapidFlow);
     map.put("23888", semiannualDispensation);
 
-
-
     String query =
             "SELECT p.patient_id "
                     + "FROM   patient p "
@@ -428,16 +428,17 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-   * <b>MQ15DEN A2 </b> - DISPENSA TRIMESTRAL (DT) (​ Concept Id 23730​ ) = “INICIAR” (​ value_coded
-   * = concept Id 1256​ )<br>
+   *<p>Os utentespacientes com registo de “Tipo de Dispensa” = “DT” na última consulta (“Ficha Clínica”) decorrida há 12 24 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 2614 meses+1dia e “Data Consulta Clínica” <= “Data Fim Revisão” – 2411 meses) ou
+   * <p> Os utentes com registo de “Tipo de Dispensa” = “DS” na última consulta (“Ficha Clínica”) decorrida há 24 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses)
    *
    * @param adultoSeguimentoEncounterType The Clinical Consultation Encounter Type 6
    * @param quarterlyConcept The Quarterly Dispensation Concept Id 23720
    * @param typeOfDispensationConcept The Type Of Dispensation Concept Id 23739
+   * @param semiannualDispensation The Type Of Dispensation Concept Id 23888
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA3(
-      int adultoSeguimentoEncounterType, int quarterlyConcept, int typeOfDispensationConcept) {
+      int adultoSeguimentoEncounterType, int quarterlyConcept, int typeOfDispensationConcept, int semiannualDispensation) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who started GAAC)");
@@ -451,6 +452,7 @@ public class QualityImprovement2020Queries {
     map.put("6", adultoSeguimentoEncounterType);
     map.put("23720", quarterlyConcept);
     map.put("23739", typeOfDispensationConcept);
+    map.put("23888", semiannualDispensation);
 
     String query =
         "SELECT p.patient_id "
@@ -471,11 +473,10 @@ public class QualityImprovement2020Queries {
             + " e.location_id = :location "
             + " AND e.encounter_type = ${6} "
             + " AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + " AND o.concept_id =${23739} "
-            + "GROUP BY p.patient_id "
+            + " GROUP BY p.patient_id "
             + " ) a1 "
             + " ON p.patient_id = a1.patient_id "
-            + " wHERE "
+            + " WHERE "
             + " p.voided = 0 "
             + " AND e.voided = 0 "
             + " AND o.voided = 0 "
@@ -483,9 +484,62 @@ public class QualityImprovement2020Queries {
             + " AND e.location_id = :location "
             + " AND e.encounter_type = ${6} "
             + " AND o.concept_id =${23739} "
-            + " AND o.value_coded =${23720} "
+            + " AND o.value_coded IN (${23720}, ${23888}) "
             + " AND e.encounter_datetime "
             + " AND e.encounter_datetime BETWEEN :startDate AND :endDate ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+  /**
+   *<p>os utentes com registo de último levantamento na farmácia (FILA) há 24 meses (última “Data Levantamento”>= “Data Fim Revisão” – 26 meses+1dia e  <= “Data Fim Revisão” – 24 meses) com próximo levantamento agendado para 83 a 97 dias ( “Data Próximo Levantamento” menos “Data Levantamento”>= 83 dias e <= 97 dias) </p>
+   *<p>os utentes com registo de último levantamento na farmácia (FILA) há 24 meses (última “Data Levantamento”>= “Data Fim Revisão” – 26 meses+1dia e <= “Data Fim Revisão” – 24 meses) com próximo levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data Levantamento”>= 173 dias e <= 187 dias).</p>
+
+   * @param startDays
+   * @param endDays
+   * @return SqlCohortDefinition
+   */
+  public static SqlCohortDefinition getPatientsWithPickupOnFilaBetween(int startDays, int endDays) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients who started GAAC)");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    HivMetadata hivMetadata = new HivMetadata();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("5096", hivMetadata. getReturnVisitDateForArvDrugConcept().getConceptId());
+
+    String query =
+             "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e ON  e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN (          SELECT     p.patient_id, Max(e.encounter_datetime) consultation_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e  ON  e.patient_id = p.patient_id "
+            + "                      WHERE      e.encounter_type = ${18} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        p.voided = 0 "
+            + "                      GROUP BY   p.patient_id ) recent_clinical "
+            + "WHERE      e.encounter_datetime = recent_clinical.consultation_date "
+            + "AND        e.encounter_type = ${18} "
+            + "AND        e.location_id = :location "
+            + "AND        o.concept_id = ${5096} "
+            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) >=  "+startDays
+            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <=  "+endDays
+            + "AND        p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "GROUP BY   p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
