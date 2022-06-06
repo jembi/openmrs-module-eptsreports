@@ -8010,7 +8010,7 @@ public class QualityImprovement2020CohortQueries {
    *             period(encounter_datetime >= startDateRevision and <= endDateRevision) with
    *             “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
    *         <li>
-   *             <p>the most recent “Última Profilaxia Isoniazida (Data Fim)” () registered in Ficha
+   *             <p>the most recent “Última Profilaxia Isoniazida (Data Fim)” (6129) registered in Ficha
    *             Resumo (encounter type 53) occurred during the revision period (value_datetime >=
    *             startDateRevision and <= endDateRevision)
    *             <p>and “TPT Start Date” (the most recent date from B4_1 and B4_2) minus “TPT End
@@ -8032,11 +8032,15 @@ public class QualityImprovement2020CohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
-    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
+//!map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
+//!map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+//!map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
     String query =
         ""
@@ -8049,10 +8053,12 @@ public class QualityImprovement2020CohortQueries {
             + "                         FROM patient p  "
             + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id   "
             + "                         WHERE p.voided = 0  "
             + "                           AND e.voided = 0  "
             + "                           AND o.voided = 0  "
             + "                           AND o.concept_id = ${6129}  "
+            + "                           AND ( o2.concept_id = ${23985} AND o2.value_coded = ${656} ) "
             + "                           AND e.encounter_type = ${53}  "
             + "                           AND e.location_id = :location  "
             + "                           AND o.value_datetime BETWEEN :startDate AND :revisionEndDate  "
@@ -8062,11 +8068,12 @@ public class QualityImprovement2020CohortQueries {
             + "                         FROM patient p  "
             + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id   "
             + "                         WHERE p.voided = 0  "
             + "                           AND e.voided = 0  "
             + "                           AND o.voided = 0  "
-            + "                           AND o.concept_id = ${6122}  "
-            + "                           AND o.value_coded = ${1267}  "
+            + "                           AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "                           AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1267} ) ) "
             + "                           AND e.encounter_type = ${6}  "
             + "                           AND e.location_id = :location  "
             + "                           AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate  "
@@ -8097,8 +8104,8 @@ public class QualityImprovement2020CohortQueries {
             + "                         WHERE p.voided = 0  "
             + "                           AND e.voided = 0  "
             + "                           AND o.voided = 0  "
-            + "                           AND o.concept_id = ${6122}  "
-            + "                           AND o.value_coded = ${1256}  "
+            + "                           AND o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${656}  "
             + "                           AND e.encounter_type = ${6}  "
             + "                           AND e.location_id = :location  "
             + "                           AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
