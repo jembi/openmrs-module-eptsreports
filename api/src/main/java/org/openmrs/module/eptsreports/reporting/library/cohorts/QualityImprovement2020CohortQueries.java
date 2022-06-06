@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -25,8 +26,6 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -6361,14 +6360,14 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition queryA1 =
         QualityImprovement2020Queries.getMQ15DenA1(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getGaac().getConceptId(),
-                hivMetadata.getQuarterlyDispensation().getConceptId(),
-                hivMetadata.getSemiannualDispensation().getConceptId(),
-                hivMetadata.getRapidFlow().getConceptId(),
-                hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
-                hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
@@ -6384,7 +6383,8 @@ public class QualityImprovement2020CohortQueries {
             BaseObsCohortDefinition.TimeModifier.LAST,
             SetComparator.IN,
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
-            Arrays.asList(hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));
+            Arrays.asList(
+                hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
@@ -6530,10 +6530,10 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getStartDrugs().getConceptId(),
             hivMetadata.getGaac().getConceptId(),
             hivMetadata.getQuarterlyDispensation().getConceptId(),
-                hivMetadata.getSemiannualDispensation().getConceptId(),
-                hivMetadata.getRapidFlow().getConceptId(),
-                hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
-                hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
@@ -6547,7 +6547,8 @@ public class QualityImprovement2020CohortQueries {
         QualityImprovement2020Queries.getMQ15DenA3(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getQuarterlyConcept().getConceptId(),
-            hivMetadata.getTypeOfDispensationConcept().getConceptId());
+            hivMetadata.getTypeOfDispensationConcept().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
 
     CohortDefinition pregnant =
         commonCohortQueries.getMOHPregnantORBreastfeeding(

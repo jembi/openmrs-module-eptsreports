@@ -1,15 +1,14 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -29,8 +28,7 @@ public class QualityImprovement2020Queries {
    * @param artPickupConcept The ART Pickup Concept Id 23865
    * @param artDatePickupMasterCard The ART Date Pickup MasterCard Concept Id 23866
    * @return SqlCohortDefinition
-
-
+   */
   public static SqlCohortDefinition getMQ12NumH(
       int lowerBound,
       int upperBound,
@@ -267,40 +265,34 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-   * <b>MQ15DEN RF5 </b> - O sistema irá identificar utentes adultos
-   * inscritos no MDS (GAAC/DT/APE/DD/DS/FR) há 24 meses selecionando:</b><br>
+   * <b>MQ15DEN RF5 </b> - O sistema irá identificar utentes adultos inscritos no MDS
+   * (GAAC/DT/APE/DD/DS/FR) há 24 meses selecionando:</b><br>
    *
    * <ul>
-   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
-   *   “GA” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida
-   *   há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *   Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
-   *
-   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
-   *   “DT” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida
-   *   há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
-   *   Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
-   *
-   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
-   *   “APE” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”)
-   *   decorrida há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia
-   *   e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
-   *
-   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
-   *   “DD” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”)
-   *   decorrida há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia
-   *   e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
-   *
-   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
-   *   “DS” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”)
-   *   decorrida há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia
-   *   e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
-   *
-   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como
-   *   “FR” e o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”)
-   *   decorrida há 24 meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia
-   *   e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
-   *
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “GA” e
+   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
+   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DT” e
+   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
+   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “APE” e
+   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
+   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DD” e
+   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
+   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DS” e
+   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
+   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “FR” e
+   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
+   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    * </ul>
    *
    * @param adultoSeguimentoEncounterType The Clinical Consultation Encounter Type 6
@@ -314,12 +306,17 @@ public class QualityImprovement2020Queries {
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA1(
-      int adultoSeguimentoEncounterType, int startDrugs, int gaac, int quarterlyDispensation,
-      int semiannualDispensation, int rapidFlow, int dispensaComunitariaViaApe, int descentralizedArvDispensation) {
+      int adultoSeguimentoEncounterType,
+      int startDrugs,
+      int gaac,
+      int quarterlyDispensation,
+      int semiannualDispensation,
+      int rapidFlow,
+      int dispensaComunitariaViaApe,
+      int descentralizedArvDispensation) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
-        "Inscritos no MDS há 24 meses - Adultos");
+    sqlCohortDefinition.setName("Inscritos no MDS há 24 meses - Adultos");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -335,25 +332,25 @@ public class QualityImprovement2020Queries {
     map.put("23888", semiannualDispensation);
 
     String query =
-            "SELECT p.patient_id "
-                    + "FROM   patient p "
-                    + "           INNER JOIN encounter e ON e.patient_id = p.patient_id "
-                    + "           INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
-                    + "           INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-                    + "WHERE  e.encounter_type = ${6} "
-                    + "  AND e.location_id = :location "
-                    + "  AND otype.concept_id = ${165174} "
-                    + "  AND otype.value_coded IN (${23724},${23730},${165179},${165315},${23729},${23888}) "
-                    + "  AND ostate.concept_id = ${165322} "
-                    + "  AND ostate.value_coded = ${1256} "
-                    + "  AND e.encounter_datetime >= :startDate "
-                    + "  AND e.encounter_datetime <= :endDate "
-                    + "  AND otype.obs_group_id = ostate.obs_group_id "
-                    + "  AND e.voided = 0 "
-                    + "  AND p.voided = 0 "
-                    + "  AND otype.voided = 0 "
-                    + "  AND ostate.voided = 0 "
-                    + "GROUP  BY p.patient_id";
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "           INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "           INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+            + "           INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "  AND e.location_id = :location "
+            + "  AND otype.concept_id = ${165174} "
+            + "  AND otype.value_coded IN (${23724},${23730},${165179},${165315},${23729},${23888}) "
+            + "  AND ostate.concept_id = ${165322} "
+            + "  AND ostate.value_coded = ${1256} "
+            + "  AND e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate "
+            + "  AND otype.obs_group_id = ostate.obs_group_id "
+            + "  AND e.voided = 0 "
+            + "  AND p.voided = 0 "
+            + "  AND otype.voided = 0 "
+            + "  AND ostate.voided = 0 "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -428,8 +425,13 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-   *<p>Os utentespacientes com registo de “Tipo de Dispensa” = “DT” na última consulta (“Ficha Clínica”) decorrida há 12 24 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 2614 meses+1dia e “Data Consulta Clínica” <= “Data Fim Revisão” – 2411 meses) ou
-   * <p> Os utentes com registo de “Tipo de Dispensa” = “DS” na última consulta (“Ficha Clínica”) decorrida há 24 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses)
+   * Os utentespacientes com registo de “Tipo de Dispensa” = “DT” na última consulta (“Ficha
+   * Clínica”) decorrida há 12 24 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 2614
+   * meses+1dia e “Data Consulta Clínica” <= “Data Fim Revisão” – 2411 meses) ou
+   *
+   * <p>Os utentes com registo de “Tipo de Dispensa” = “DS” na última consulta (“Ficha Clínica”)
+   * decorrida há 24 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e
+   * “Data Consulta Clínica” <= “Data Fim Revisão” – 24 meses)
    *
    * @param adultoSeguimentoEncounterType The Clinical Consultation Encounter Type 6
    * @param quarterlyConcept The Quarterly Dispensation Concept Id 23720
@@ -438,7 +440,10 @@ public class QualityImprovement2020Queries {
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA3(
-      int adultoSeguimentoEncounterType, int quarterlyConcept, int typeOfDispensationConcept, int semiannualDispensation) {
+      int adultoSeguimentoEncounterType,
+      int quarterlyConcept,
+      int typeOfDispensationConcept,
+      int semiannualDispensation) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who started GAAC)");
@@ -495,9 +500,16 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
   /**
-   *<p>os utentes com registo de último levantamento na farmácia (FILA) há 24 meses (última “Data Levantamento”>= “Data Fim Revisão” – 26 meses+1dia e  <= “Data Fim Revisão” – 24 meses) com próximo levantamento agendado para 83 a 97 dias ( “Data Próximo Levantamento” menos “Data Levantamento”>= 83 dias e <= 97 dias) </p>
-   *<p>os utentes com registo de último levantamento na farmácia (FILA) há 24 meses (última “Data Levantamento”>= “Data Fim Revisão” – 26 meses+1dia e <= “Data Fim Revisão” – 24 meses) com próximo levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data Levantamento”>= 173 dias e <= 187 dias).</p>
-
+   * os utentes com registo de último levantamento na farmácia (FILA) há 24 meses (última “Data
+   * Levantamento”>= “Data Fim Revisão” – 26 meses+1dia e <= “Data Fim Revisão” – 24 meses) com
+   * próximo levantamento agendado para 83 a 97 dias ( “Data Próximo Levantamento” menos “Data
+   * Levantamento”>= 83 dias e <= 97 dias)
+   *
+   * <p>os utentes com registo de último levantamento na farmácia (FILA) há 24 meses (última “Data
+   * Levantamento”>= “Data Fim Revisão” – 26 meses+1dia e <= “Data Fim Revisão” – 24 meses) com
+   * próximo levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data
+   * Levantamento”>= 173 dias e <= 187 dias).
+   *
    * @param startDays
    * @param endDays
    * @return SqlCohortDefinition
@@ -513,10 +525,10 @@ public class QualityImprovement2020Queries {
     Map<String, Integer> map = new HashMap<>();
     HivMetadata hivMetadata = new HivMetadata();
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("5096", hivMetadata. getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
 
     String query =
-             "SELECT     p.patient_id "
+        "SELECT     p.patient_id "
             + "FROM       patient p "
             + "INNER JOIN encounter e ON  e.patient_id = p.patient_id "
             + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -533,8 +545,10 @@ public class QualityImprovement2020Queries {
             + "AND        e.encounter_type = ${18} "
             + "AND        e.location_id = :location "
             + "AND        o.concept_id = ${5096} "
-            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) >=  "+startDays
-            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <=  "+endDays
+            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) >=  "
+            + startDays
+            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <=  "
+            + endDays
             + "AND        p.voided = 0 "
             + "AND        e.voided = 0 "
             + "AND        o.voided = 0 "
@@ -1231,7 +1245,6 @@ public class QualityImprovement2020Queries {
    * </blockquote>
    *
    * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
-   * @param masterCardEncounterType The masterCard Encounter Type 53
    * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
    * @param yesConcept The answer yes Concept Id 1065
    * @param breastfeedingConcept The breastfeeding Concept Id 6332

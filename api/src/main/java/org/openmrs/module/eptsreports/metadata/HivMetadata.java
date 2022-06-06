@@ -4828,7 +4828,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getDescentralizedArvDispensationConcept() {
     String uuid =
-        Context.getAdministrationService().getGlobalProperty("eptsreports.descentralizedArvDispensationConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.descentralizedArvDispensationConceptUuid");
     return getConcept(uuid);
   }
 }

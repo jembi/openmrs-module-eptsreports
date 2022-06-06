@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -9,9 +11,6 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class TxtbDenominatorQueries {
@@ -121,7 +120,6 @@ public class TxtbDenominatorQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
 
-
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
   }
@@ -148,7 +146,6 @@ public class TxtbDenominatorQueries {
             + "       AND program_id = ${5} "
             + "       AND date_enrolled  BETWEEN :startDate AND :endDate "
             + "       AND pg.location_id = :location ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -186,7 +183,6 @@ public class TxtbDenominatorQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
 
-
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
   }
@@ -221,7 +217,6 @@ public class TxtbDenominatorQueries {
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -258,7 +253,6 @@ public class TxtbDenominatorQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
 
-
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
   }
@@ -293,7 +287,6 @@ public class TxtbDenominatorQueries {
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -342,7 +335,6 @@ public class TxtbDenominatorQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
 
-
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
   }
@@ -386,7 +378,6 @@ public class TxtbDenominatorQueries {
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -433,7 +424,6 @@ public class TxtbDenominatorQueries {
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
 
-
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
   }
@@ -473,7 +463,6 @@ public class TxtbDenominatorQueries {
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -521,6 +510,4 @@ public class TxtbDenominatorQueries {
 
     return sqlPatientDataDefinition;
   }
-
-
 }
