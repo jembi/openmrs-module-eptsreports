@@ -23,20 +23,28 @@ public class ColumnFinderImpl implements ColumnsFinder {
       String[] split = column.trim().split(" ");
       String lastToken = split[split.length - 1];
       String columnName;
+      if(lastToken.contains("(") && lastToken.contains(")")){
+          addColumnNameToTheList(lastToken);
+      }else
       if (lastToken.contains(".")) {
         columnName = lastToken.substring(lastToken.lastIndexOf(".") + 1);
+        addColumnNameToTheList(columnName);
       } else {
-        columnName = lastToken;
+           addColumnNameToTheList(lastToken);
       }
 
-      if (columnName.contains("`")) {
-        columnsNames.add(columnName);
-      } else {
-        columnsNames.add("`" + columnName + "`");
-      }
     }
 
     return columnsNames;
+  }
+
+  private void addColumnNameToTheList(String columnName){
+
+    if (columnName.contains("`")) {
+      columnsNames.add(columnName);
+    } else {
+      columnsNames.add("`" + columnName + "`");
+    }
   }
 
   private String getSelectedColumnsFrom(String query) {
