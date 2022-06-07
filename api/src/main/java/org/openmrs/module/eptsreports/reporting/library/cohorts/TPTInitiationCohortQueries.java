@@ -423,7 +423,9 @@ public class TPTInitiationCohortQueries {
    * 23987) value coded “continua” or “fim” or no value(concept ID in [1257, 1267, null]) marked on
    * the first FILT (encounter type 60) and encounter datetime between start date and end date and:
    *
+
    * <p>◦ No other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
+
    * id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the FILT 3HP
    * start date.  ; and
    *
