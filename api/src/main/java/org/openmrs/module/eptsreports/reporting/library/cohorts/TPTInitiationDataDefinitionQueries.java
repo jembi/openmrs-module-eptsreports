@@ -466,7 +466,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
-            + "       AND o2.concept_id = ${6128} AND o2.value_datetime < CURRENT_DATE() "
+            + "       AND o2.concept_id = ${6128} AND o2.value_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
