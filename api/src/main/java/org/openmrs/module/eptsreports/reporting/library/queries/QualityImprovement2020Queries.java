@@ -295,30 +295,29 @@ public class QualityImprovement2020Queries {
    *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
    *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    * </ul>
-
+   *
    * @return SqlCohortDefinition
    */
   public static SqlCohortDefinition getMQ15DenA1() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Inscritos no MDS há 24 meses - Adultos");
+    sqlCohortDefinition.setName("Inscritos no MDS ");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-
     Map<String, Integer> map = new HashMap<>();
     HivMetadata hivMetadata = new HivMetadata();
-    map.put("6",  hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1256",  hivMetadata.getStartDrugs().getConceptId());
-    map.put("23724",  hivMetadata.getGaac().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("23724", hivMetadata.getGaac().getConceptId());
     map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId());
     map.put("165179", hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId());
-    map.put("165315",hivMetadata.getDescentralizedArvDispensationConcept().getConceptId()    );
-    map.put("23729",  hivMetadata.getRapidFlow().getConceptId());
+    map.put("165315", hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
+    map.put("23729", hivMetadata.getRapidFlow().getConceptId());
     map.put("23888", hivMetadata.getSemiannualDispensation().getConceptId());
-    map.put("165322",hivMetadata.getMdcState().getConceptId());
-    map.put("165174",  hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    map.put("165322", hivMetadata.getMdcState().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -412,6 +411,7 @@ public class QualityImprovement2020Queries {
 
     return sqlCohortDefinition;
   }
+
 
   /**
    * Os utentespacientes com registo de “Tipo de Dispensa” = “DT” na última consulta (“Ficha
@@ -537,12 +537,57 @@ public class QualityImprovement2020Queries {
             + "AND        o.concept_id = ${5096} "
             + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) >=  "
             + lowerBounded
-            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <=  "
+            + " AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <=  "
             + upperBounded
-            + "AND        p.voided = 0 "
-            + "AND        e.voided = 0 "
-            + "AND        o.voided = 0 "
-            + "GROUP BY   p.patient_id";
+            + " AND        p.voided = 0 "
+            + " AND        e.voided = 0 "
+            + " AND        o.voided = 0 "
+            + " GROUP BY   p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+
+  public static SqlCohortDefinition getPatientsWithQuarterlyDispensationOnStart() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Inscritos no MDS - Dispensa Trimestral Inicio");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    HivMetadata hivMetadata = new HivMetadata();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId());
+    map.put("165322", hivMetadata.getMdcState().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+
+    String query =
+            "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "           INNER JOIN encounter e ON e.patient_id = p.patient_id "
+                    + "           INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+                    + "           INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+                    + "WHERE  e.encounter_type = ${6} "
+                    + "  AND e.location_id = :location "
+                    + "  AND otype.concept_id = ${165174} "
+                    + "  AND otype.value_coded IN (${23730}) "
+                    + "  AND ostate.concept_id = ${165322} "
+                    + "  AND ostate.value_coded = ${1256} "
+                    + "  AND e.encounter_datetime >= :startDate "
+                    + "  AND e.encounter_datetime <= :endDate "
+                    + "  AND otype.obs_group_id = ostate.obs_group_id "
+                    + "  AND e.voided = 0 "
+                    + "  AND p.voided = 0 "
+                    + "  AND otype.voided = 0 "
+                    + "  AND ostate.voided = 0 "
+                    + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

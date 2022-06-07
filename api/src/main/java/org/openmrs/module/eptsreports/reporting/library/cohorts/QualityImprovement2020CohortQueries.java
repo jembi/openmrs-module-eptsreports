@@ -6359,16 +6359,10 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition queryA1 =
-        QualityImprovement2020Queries.getMQ15DenA1();
+    CohortDefinition queryA1 = QualityImprovement2020Queries.getMQ15DenA1();
 
-    CohortDefinition queryA2 =
-        QualityImprovement2020Queries.getMQ15DenA1orA2(
-            "A2",
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId());
+    CohortDefinition withDT =
+        QualityImprovement2020Queries.getPatientsWithQuarterlyDispensationOnStart();
 
     CohortDefinition queryA3 =
         genericCohortQueries.hasCodedObs(
@@ -6406,7 +6400,7 @@ public class QualityImprovement2020CohortQueries {
             nextPickupBetween173And187,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
-    comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
+    comp.addSearch("DT", EptsReportUtils.map(withDT, "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
         "A3",
@@ -6436,7 +6430,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (den == 2 || den == 3 || den == 4) {
       comp.setCompositionString("((A1 OR A3) AND NOT (CD OR F)) AND G2");
     } else if (den == 5 || den == 6) {
-      comp.setCompositionString("(A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
+      comp.setCompositionString("(DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 9 || den == 11 || den == 8 || den == 10 || den == 12) {
       comp.setCompositionString("((A2 OR A3) AND  NOT (CD OR F)) AND G2");
     }
@@ -6540,8 +6534,7 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition queryA1 =
-        QualityImprovement2020Queries.getMQ15DenA1();
+    CohortDefinition queryA1 = QualityImprovement2020Queries.getMQ15DenA1();
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
