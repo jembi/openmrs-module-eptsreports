@@ -1363,7 +1363,7 @@ public class QualityImprovement2020Queries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
     String query =
 
                      "   SELECT p.patient_id "

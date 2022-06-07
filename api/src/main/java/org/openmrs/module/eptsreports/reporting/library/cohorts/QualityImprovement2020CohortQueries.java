@@ -6382,6 +6382,8 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition nextPickupBetween173And187 =
         QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(173, 187);
 
+    CohortDefinition viralLoad = QualityImprovement2020Queries.getPatientsWithVlGreaterThen1000();
+
     comp.addSearch(
         "A1",
         EptsReportUtils.map(
@@ -6425,10 +6427,14 @@ public class QualityImprovement2020CohortQueries {
         "dead",
         EptsReportUtils.map(dead, "onOrBefore=${revisionEndDate},locationList=${location}"));
 
+    comp.addSearch(
+            "VL",
+            EptsReportUtils.map(viralLoad, "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate},locationList=${location}"));
+
     if (den == 1) {
       comp.setCompositionString("(A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
     } else if (den == 2 || den == 3 || den == 4) {
-      comp.setCompositionString("((A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F)) AND G2");
+      comp.setCompositionString("((A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString("(DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 9 || den == 11 || den == 8 || den == 10 || den == 12) {
