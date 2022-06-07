@@ -1345,4 +1345,45 @@ public class QualityImprovement2020Queries {
 
     return sqlCohortDefinition;
   }
+
+
+  /**
+   * Todos os utentes com registo de um resultado de Carga Viral >= 1000 cps/ml na Ficha Clínica durante o período compreendido entre “Data Fim Revisão” - 26 meses + 1 dia e
+   * “Data Fim Revisão” - On RF17.
+   *
+   * */
+  public static CohortDefinition getPatientsWithVlGreaterThen1000() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patient with VL >= 1000");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    HivMetadata hivMetadata = new HivMetadata();
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    String query =
+
+                     "   SELECT p.patient_id "
+                    + "  FROM patient p  "
+                    + "  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+                    + "  INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+                    + "  WHERE  p.voided = 0   "
+                    + "         AND e.voided = 0   "
+                    + "         AND o.voided = 0     "
+                    + "         AND o.concept_id = ${856}   "
+                    + "         AND o.value_numeric >= 1000  "
+                    + "         AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
+                    + "         AND e.location_id = :location   "
+                    + "         GROUP  BY p.patient_id    ";
+
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
