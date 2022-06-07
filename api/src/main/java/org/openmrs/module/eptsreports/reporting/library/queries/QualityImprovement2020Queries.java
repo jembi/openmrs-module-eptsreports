@@ -1,15 +1,14 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -412,7 +411,6 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
-
   /**
    * Os utentespacientes com registo de “Tipo de Dispensa” = “DT” na última consulta (“Ficha
    * Clínica”) decorrida há 12 24 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 2614
@@ -551,7 +549,6 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
-
   public static SqlCohortDefinition getPatientsWithQuarterlyDispensationOnStart() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -569,25 +566,25 @@ public class QualityImprovement2020Queries {
     map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
 
     String query =
-            "SELECT p.patient_id "
-                    + "FROM   patient p "
-                    + "           INNER JOIN encounter e ON e.patient_id = p.patient_id "
-                    + "           INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
-                    + "           INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-                    + "WHERE  e.encounter_type = ${6} "
-                    + "  AND e.location_id = :location "
-                    + "  AND otype.concept_id = ${165174} "
-                    + "  AND otype.value_coded IN (${23730}) "
-                    + "  AND ostate.concept_id = ${165322} "
-                    + "  AND ostate.value_coded = ${1256} "
-                    + "  AND e.encounter_datetime >= :startDate "
-                    + "  AND e.encounter_datetime <= :endDate "
-                    + "  AND otype.obs_group_id = ostate.obs_group_id "
-                    + "  AND e.voided = 0 "
-                    + "  AND p.voided = 0 "
-                    + "  AND otype.voided = 0 "
-                    + "  AND ostate.voided = 0 "
-                    + "GROUP  BY p.patient_id";
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "           INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "           INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+            + "           INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "  AND e.location_id = :location "
+            + "  AND otype.concept_id = ${165174} "
+            + "  AND otype.value_coded IN (${23730}) "
+            + "  AND ostate.concept_id = ${165322} "
+            + "  AND ostate.value_coded = ${1256} "
+            + "  AND e.encounter_datetime >= :startDate "
+            + "  AND e.encounter_datetime <= :endDate "
+            + "  AND otype.obs_group_id = ostate.obs_group_id "
+            + "  AND e.voided = 0 "
+            + "  AND p.voided = 0 "
+            + "  AND otype.voided = 0 "
+            + "  AND ostate.voided = 0 "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1346,12 +1343,11 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
-
   /**
-   * Todos os utentes com registo de um resultado de Carga Viral >= 1000 cps/ml na Ficha Clínica durante o período compreendido entre “Data Fim Revisão” - 26 meses + 1 dia e
-   * “Data Fim Revisão” - On RF17.
-   *
-   * */
+   * Todos os utentes com registo de um resultado de Carga Viral >= 1000 cps/ml na Ficha Clínica
+   * durante o período compreendido entre “Data Fim Revisão” - 26 meses + 1 dia e “Data Fim Revisão”
+   * - On RF17.
+   */
   public static CohortDefinition getPatientsWithVlGreaterThen1000() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patient with VL >= 1000");
@@ -1365,20 +1361,18 @@ public class QualityImprovement2020Queries {
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     String query =
-
-                     "   SELECT p.patient_id "
-                    + "  FROM patient p  "
-                    + "  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
-                    + "  INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
-                    + "  WHERE  p.voided = 0   "
-                    + "         AND e.voided = 0   "
-                    + "         AND o.voided = 0     "
-                    + "         AND o.concept_id = ${856}   "
-                    + "         AND o.value_numeric >= 1000  "
-                    + "         AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
-                    + "         AND e.location_id = :location   "
-                    + "         GROUP  BY p.patient_id    ";
-
+        "   SELECT p.patient_id "
+            + "  FROM patient p  "
+            + "  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "  INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "  WHERE  p.voided = 0   "
+            + "         AND e.voided = 0   "
+            + "         AND o.voided = 0     "
+            + "         AND o.concept_id = ${856}   "
+            + "         AND o.value_numeric >= 1000  "
+            + "         AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
+            + "         AND e.location_id = :location   "
+            + "         GROUP  BY p.patient_id    ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

@@ -6402,7 +6402,11 @@ public class QualityImprovement2020CohortQueries {
             nextPickupBetween173And187,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
-    comp.addSearch("DT", EptsReportUtils.map(withDT, "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+    comp.addSearch(
+        "DT",
+        EptsReportUtils.map(
+            withDT,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
         "A3",
@@ -6428,8 +6432,10 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(dead, "onOrBefore=${revisionEndDate},locationList=${location}"));
 
     comp.addSearch(
-            "VL",
-            EptsReportUtils.map(viralLoad, "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate},locationList=${location}"));
+        "VL",
+        EptsReportUtils.map(
+            viralLoad,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate},locationList=${location}"));
 
     if (den == 1) {
       comp.setCompositionString("(A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
@@ -6438,7 +6444,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (den == 5 || den == 6) {
       comp.setCompositionString("(DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 9 || den == 11 || den == 8 || den == 10 || den == 12) {
-      comp.setCompositionString("((A2 OR A3) AND  NOT (CD OR F)) AND G2");
+      comp.setCompositionString("((DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2");
     }
     return comp;
   }
