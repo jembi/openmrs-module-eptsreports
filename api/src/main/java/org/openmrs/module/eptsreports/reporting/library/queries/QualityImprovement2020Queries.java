@@ -295,26 +295,10 @@ public class QualityImprovement2020Queries {
    *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
    *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    * </ul>
-   *
-   * @param adultoSeguimentoEncounterType The Clinical Consultation Encounter Type 6
-   * @param startDrugs The start Drugs concept Id 1256
-   * @param gaac GAAC (GA) Concept Id 23724 (DT) Concept Id 23730
-   * @param quarterlyDispensation The quarterly Dispensation Concept Id 23730
-   * @param semiannualDispensation The semiannual Dispensation Concept 23888
-   * @param rapidFlow The Rapid Flow Concept 23729
-   * @param dispensaComunitariaViaApe The Dispensa Comunitaria via APE Concept 165179
-   * @param descentralizedArvDispensation The DESCENTRALIZED ARV DISPENSATION Concept 165315
+
    * @return SqlCohortDefinition
    */
-  public static SqlCohortDefinition getMQ15DenA1(
-      int adultoSeguimentoEncounterType,
-      int startDrugs,
-      int gaac,
-      int quarterlyDispensation,
-      int semiannualDispensation,
-      int rapidFlow,
-      int dispensaComunitariaViaApe,
-      int descentralizedArvDispensation) {
+  public static SqlCohortDefinition getMQ15DenA1() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Inscritos no MDS há 24 meses - Adultos");
@@ -322,17 +306,19 @@ public class QualityImprovement2020Queries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("1256", startDrugs);
-    map.put("23724", gaac);
-    map.put("23730", quarterlyDispensation);
-    map.put("165179", dispensaComunitariaViaApe);
-    map.put("165315", descentralizedArvDispensation);
-    map.put("23729", rapidFlow);
-    map.put("23888", semiannualDispensation);
-    map.put("165322", semiannualDispensation);
-    map.put("165174", semiannualDispensation);
+    HivMetadata hivMetadata = new HivMetadata();
+    map.put("6",  hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1256",  hivMetadata.getStartDrugs().getConceptId());
+    map.put("23724",  hivMetadata.getGaac().getConceptId());
+    map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId());
+    map.put("165179", hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId());
+    map.put("165315",hivMetadata.getDescentralizedArvDispensationConcept().getConceptId()    );
+    map.put("23729",  hivMetadata.getRapidFlow().getConceptId());
+    map.put("23888", hivMetadata.getSemiannualDispensation().getConceptId());
+    map.put("165322",hivMetadata.getMdcState().getConceptId());
+    map.put("165174",  hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "

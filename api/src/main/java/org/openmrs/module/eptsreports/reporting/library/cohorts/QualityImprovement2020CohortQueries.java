@@ -6360,15 +6360,7 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition queryA1 =
-        QualityImprovement2020Queries.getMQ15DenA1(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId(),
-            hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
-            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
+        QualityImprovement2020Queries.getMQ15DenA1();
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
@@ -6549,15 +6541,7 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition queryA1 =
-        QualityImprovement2020Queries.getMQ15DenA1(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId(),
-            hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
-            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId());
+        QualityImprovement2020Queries.getMQ15DenA1();
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
