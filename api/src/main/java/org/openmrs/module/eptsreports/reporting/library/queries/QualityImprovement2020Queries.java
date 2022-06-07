@@ -331,6 +331,8 @@ public class QualityImprovement2020Queries {
     map.put("165315", descentralizedArvDispensation);
     map.put("23729", rapidFlow);
     map.put("23888", semiannualDispensation);
+    map.put("165322", semiannualDispensation);
+    map.put("165174", semiannualDispensation);
 
     String query =
         "SELECT p.patient_id "
@@ -515,7 +517,8 @@ public class QualityImprovement2020Queries {
    * @param upperBounded
    * @return SqlCohortDefinition
    */
-  public static SqlCohortDefinition getPatientsWithPickupOnFilaBetween(int lowerBounded, int upperBounded) {
+  public static SqlCohortDefinition getPatientsWithPickupOnFilaBetween(
+      int lowerBounded, int upperBounded) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who have pickup registered on FILA)");

@@ -6391,8 +6391,10 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition dead = resumoMensalCohortQueries.getPatientsWhoDied(false);
 
-    CohortDefinition nextPickupBetween83And97 = QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(83, 97);
-    CohortDefinition nextPickupBetween173And187 = QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(173, 187);
+    CohortDefinition nextPickupBetween83And97 =
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(83, 97);
+    CohortDefinition nextPickupBetween173And187 =
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(173, 187);
 
     comp.addSearch(
         "A1",
@@ -6401,16 +6403,16 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
-            "NPF83",
-            EptsReportUtils.map(
-                    nextPickupBetween83And97,
-                    "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+        "NPF83",
+        EptsReportUtils.map(
+            nextPickupBetween83And97,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
-            "NPF173",
-            EptsReportUtils.map(
-                    nextPickupBetween173And187,
-                    "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+        "NPF173",
+        EptsReportUtils.map(
+            nextPickupBetween173And187,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
 
@@ -6419,8 +6421,6 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             queryA3,
             "onOrAfter=${revisionEndDate-26m+1d},onOrBefore=${revisionEndDate-24m},locationList=${location}"));
-
-
 
     comp.addSearch(
         "CD",
@@ -6435,14 +6435,16 @@ public class QualityImprovement2020CohortQueries {
 
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
-    comp.addSearch("dead", EptsReportUtils.map(dead, "onOrBefore=${revisionEndDate},locationList=${location}"));
+    comp.addSearch(
+        "dead",
+        EptsReportUtils.map(dead, "onOrBefore=${revisionEndDate},locationList=${location}"));
 
     if (den == 1) {
       comp.setCompositionString("(A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
     } else if (den == 2 || den == 3 || den == 4) {
       comp.setCompositionString("((A1 OR A3) AND NOT (CD OR F)) AND G2");
     } else if (den == 5 || den == 6) {
-      comp.setCompositionString("(A2 OR A3) AND  NOT (CD OR F)");
+      comp.setCompositionString("(A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 9 || den == 11 || den == 8 || den == 10 || den == 12) {
       comp.setCompositionString("((A2 OR A3) AND  NOT (CD OR F)) AND G2");
     }
