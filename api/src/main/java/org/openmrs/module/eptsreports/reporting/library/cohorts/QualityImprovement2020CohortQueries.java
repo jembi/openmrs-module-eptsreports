@@ -1744,6 +1744,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition b41 = getB4And1();
     CohortDefinition b42 = getB4And2();
+    CohortDefinition b51 = getB5And1();
 
     CohortDefinition tbActive =
         commonCohortQueries.getMohMQPatientsOnCondition(
@@ -1846,18 +1847,20 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("B42", EptsReportUtils.map(b42, MAPPING));
 
+    compositionCohortDefinition.addSearch("B51", EptsReportUtils.map(b51, MAPPING));
+
     if (den == 1 || den == 3) {
       compositionCohortDefinition.setCompositionString(
           "A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (den == 2 || den == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
+          "(A AND (B41 OR B42 OR B51)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
     } else if (den == 5) {
       compositionCohortDefinition.setCompositionString(
           "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     } else if (den == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
+          "(A AND (B41 OR B42 OR B51) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
     }
 
     return compositionCohortDefinition;
@@ -7992,6 +7995,58 @@ public class QualityImprovement2020CohortQueries {
             + "     AND e.encounter_datetime between :startDate AND :endDate "
             + "   GROUP BY p.patient_id "
             + ") AS  final";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  /**
+   *
+   * <ul>
+   *   <li>B5_1 - Filter all patients with a clinical consultation(encounter type 6) during the Inclusion period
+   *   with the following conditions:
+   *       <ul>
+   *         <li>
+   *             <p>"Profilaxia TPT"(concept id 23985) value coded 3HP(concept id 23954) and Estado da Profilaxia
+   *             (concept id 165308) value coded Inicio(concept id 1256) during the inclusion period.
+   *
+   *             <p>Nota: Em caso de existência de mais que uma Ficha Clínica com registo do “Início”, deve-se
+   *             considerar o último registo durante o período de inclusão.
+   *       </ul>
+   * </ul>
+   *
+   */
+  public CohortDefinition getB5And1() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("B5_1");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+
+    String query = ""
+            + "   SELECT p.patient_id "
+            + "   FROM patient p "
+            + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "   WHERE p.voided = 0 "
+            + "     AND e.voided = 0 "
+            + "     AND o.voided = 0 "
+            + "     AND o2.voided = 0 "
+            + "     AND ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
+            + "     AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} ) "
+            + "     AND e.encounter_type = ${6} "
+            + "     AND e.location_id = :location "
+            + "     AND e.encounter_datetime between :startDate AND :endDate "
+            + "   GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     cd.setQuery(sb.replace(query));
