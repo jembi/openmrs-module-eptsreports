@@ -1,14 +1,15 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -370,8 +371,6 @@ public class QualityImprovement2020Queries {
     sqlCohortDefinition.setName("Patients who started GAAC)");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -400,8 +399,8 @@ public class QualityImprovement2020Queries {
             + "        AND "
             + middleQuery
             + "        AND o.value_coded = ${1256} "
-            + "        AND e.encounter_datetime BETWEEN Date_sub(:revisionEndDate, INTERVAL 14 month) "
-            + "        AND Date_sub(:revisionEndDate, INTERVAL 11 month) "
+            + "        AND e.encounter_datetime BETWEEN :startDate "
+            + "        AND :endDate"
             + " GROUP  BY p.patient_id; ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -514,6 +513,8 @@ public class QualityImprovement2020Queries {
     HivMetadata hivMetadata = new HivMetadata();
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("lower", lowerBounded);
+    map.put("upper", upperBounded);
 
     String query =
         "SELECT     p.patient_id "
@@ -533,10 +534,8 @@ public class QualityImprovement2020Queries {
             + "AND        e.encounter_type = ${18} "
             + "AND        e.location_id = :location "
             + "AND        o.concept_id = ${5096} "
-            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) >=  "
-            + lowerBounded
-            + " AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <=  "
-            + upperBounded
+            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) >= ${lower} "
+            + " AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <= ${upper} "
             + " AND        p.voided = 0 "
             + " AND        e.voided = 0 "
             + " AND        o.voided = 0 "

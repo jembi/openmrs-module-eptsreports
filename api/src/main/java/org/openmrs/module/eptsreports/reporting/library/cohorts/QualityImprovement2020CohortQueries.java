@@ -6435,7 +6435,7 @@ public class QualityImprovement2020CohortQueries {
         "VL",
         EptsReportUtils.map(
             viralLoad,
-            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate},locationList=${location}"));
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate},location=${location}"));
 
     if (den == 1) {
       comp.setCompositionString("(A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
@@ -6618,7 +6618,7 @@ public class QualityImprovement2020CohortQueries {
             queryA1,
             "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},location=${location}"));
 
-    comp.addSearch("A2", EptsReportUtils.map(queryA2, MAPPING1));
+    comp.addSearch("A2", EptsReportUtils.map(queryA2, "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
         "A3",
