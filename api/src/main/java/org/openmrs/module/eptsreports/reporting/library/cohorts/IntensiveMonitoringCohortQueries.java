@@ -279,19 +279,19 @@ public class IntensiveMonitoringCohortQueries {
         qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive();
 
     CohortDefinition tbDiagOnPeriod1 =
-            qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive1();
+        qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive1();
 
     CohortDefinition tbSymptomsOnPeriod =
         qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms();
 
     CohortDefinition tbSymptomsOnPeriod1 =
-            qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms1();
+        qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms1();
 
     CohortDefinition tbTreatmentOnPeriod =
         qualityImprovement2020CohortQueries.getPatientsWithTBTreatment();
 
     CohortDefinition tbTreatmentOnPeriod1 =
-            qualityImprovement2020CohortQueries.getPatientsWithTBTreatment1();
+        qualityImprovement2020CohortQueries.getPatientsWithTBTreatment1();
 
     cd.addSearch(
         "A",
@@ -348,10 +348,10 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "H1",
-            EptsReportUtils.map(
-                    tbDiagOnPeriod1,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
+        "H1",
+        EptsReportUtils.map(
+            tbDiagOnPeriod1,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "I",
@@ -360,10 +360,10 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "I1",
-            EptsReportUtils.map(
-                    tbSymptomsOnPeriod1,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
+        "I1",
+        EptsReportUtils.map(
+            tbSymptomsOnPeriod1,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "J",
@@ -372,10 +372,10 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "J1",
-            EptsReportUtils.map(
-                    tbTreatmentOnPeriod1,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
+        "J1",
+        EptsReportUtils.map(
+            tbTreatmentOnPeriod1,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "B41",
@@ -390,16 +390,16 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     cd.addSearch(
-            "B51",
-            EptsReportUtils.map(
-                    b51,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
+        "B51",
+        EptsReportUtils.map(
+            b51,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     cd.addSearch(
-            "B52",
-            EptsReportUtils.map(
-                    b52,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
+        "B52",
+        EptsReportUtils.map(
+            b52,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     if (den == 2 || den == 4) {
       cd.setCompositionString(
@@ -559,16 +559,16 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "B51",
-            EptsReportUtils.map(
-                    b51,
-                    "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+        "B51",
+        EptsReportUtils.map(
+            b51,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "B52",
-            EptsReportUtils.map(
-                    b52,
-                    "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+        "B52",
+        EptsReportUtils.map(
+            b52,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "GNEW",
@@ -577,10 +577,10 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "L",
-            EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ7_L(),
-                    "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+        "L",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ7_L(),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (num == 1 || num == 3) {
       compositionCohortDefinition.setCompositionString(
@@ -686,19 +686,19 @@ public class IntensiveMonitoringCohortQueries {
         qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive();
 
     CohortDefinition tbDiagOnPeriod1 =
-            qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive1();
+        qualityImprovement2020CohortQueries.getPatientsWithTBDiagActive1();
 
     CohortDefinition tbSymptomsOnPeriod =
         qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms();
 
     CohortDefinition tbSymptomsOnPeriod1 =
-            qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms1();
+        qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms1();
 
     CohortDefinition tbTreatmentOnPeriod =
         qualityImprovement2020CohortQueries.getPatientsWithTBTreatment();
 
     CohortDefinition tbTreatmentOnPeriod1 =
-            qualityImprovement2020CohortQueries.getPatientsWithTBTreatment1();
+        qualityImprovement2020CohortQueries.getPatientsWithTBTreatment1();
 
     CohortDefinition b41 = qualityImprovement2020CohortQueries.getB4And1();
 
@@ -769,10 +769,10 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "H1",
-            EptsReportUtils.map(
-                    tbDiagOnPeriod1,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
+        "H1",
+        EptsReportUtils.map(
+            tbDiagOnPeriod1,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "I",
@@ -781,10 +781,10 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "I1",
-            EptsReportUtils.map(
-                    tbSymptomsOnPeriod1,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
+        "I1",
+        EptsReportUtils.map(
+            tbSymptomsOnPeriod1,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "J",
@@ -793,10 +793,10 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "J1",
-            EptsReportUtils.map(
-                    tbTreatmentOnPeriod1,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
+        "J1",
+        EptsReportUtils.map(
+            tbTreatmentOnPeriod1,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B41",
@@ -811,16 +811,16 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "B51",
-            EptsReportUtils.map(
-                    b51,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
+        "B51",
+        EptsReportUtils.map(
+            b51,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "B52",
-            EptsReportUtils.map(
-                    b52,
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
+        "B52",
+        EptsReportUtils.map(
+            b52,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "GNEW",
@@ -829,10 +829,10 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "L",
-            EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ7_L(),
-                    "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
+        "L",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQ7_L(),
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(

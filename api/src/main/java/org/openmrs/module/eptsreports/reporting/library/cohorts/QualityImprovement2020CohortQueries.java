@@ -1079,6 +1079,9 @@ public class QualityImprovement2020CohortQueries {
     map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
     map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
     String query =
         ""
@@ -1247,12 +1250,13 @@ public class QualityImprovement2020CohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
-    map.put("23758", tbMetadata.getHasTbSymptomsConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
     map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("23758", tbMetadata.getHasTbSymptomsConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
     String query =
         ""
@@ -1424,8 +1428,10 @@ public class QualityImprovement2020CohortQueries {
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
     map.put("1268", tbMetadata.getTBTreatmentPlanConcept().getConceptId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
     map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
     String query =
         ""
@@ -8276,6 +8282,7 @@ public class QualityImprovement2020CohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
@@ -8388,10 +8395,10 @@ public class QualityImprovement2020CohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
     String query =
         ""
@@ -8428,9 +8435,12 @@ public class QualityImprovement2020CohortQueries {
    *       following::
    *       <ul>
    *         <li>
-   *             <p>the most recent clinical consultation(encounter type 6)during the revision
-   *             period(encounter_datetime >= startDateRevision and <= endDateRevision) with
-   *             “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
+   *             <p>"Profilaxia TPT"(concept id 23985) value coded INH(concept id 656) and Estado da
+   *             Profilaxia (concept id 165308) value coded FIM(concept id 1267) during the revision
+   *             perid.
+   *             <p>Nota: Em caso de existência de mais que uma Ficha Clínica com registo do “FIM”,
+   *             deve-se considerar o último registo durante o período de revisao.
+   *         <li>or
    *         <li>
    *             <p>the most recent “Última Profilaxia Isoniazida (Data Fim)” (6129) registered in
    *             Ficha Resumo (encounter type 53) occurred during the revision period
@@ -8456,6 +8466,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
