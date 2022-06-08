@@ -1931,7 +1931,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     //            EptsReportUtils.map(
     //                qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod(),
     //
-    // "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    // "startDate=${startDate-4m+1d},endDate=${startDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
     //
     //    MQ13DEN15.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     //
@@ -1943,7 +1943,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
     //        EptsReportUtils.map(
     //            MQ13DEN15,
     //
-    // "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+    // "startDate=${startDate-4m+1d},endDate=${startDate-3m},revisionEndDate=${revisionEndDate},location=${location}"),
     //        "");
     //
     //    CohortIndicator MQ13DEN16 =
