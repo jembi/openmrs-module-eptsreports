@@ -1050,6 +1050,95 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * H1 - Filter all patients with a clinical consultation (encounter type 6) with:
+   *
+   * <p>- with “Diagnótico TB activo” (concept_id 23761) value coded “SIM”(concept id 1065)
+   * Encounter_datetime between:
+   *
+   * <p>- Encounter_datetime (from the last clinical consultation with “PROFILAXIA COM
+   * ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) AND - Encounter_datetime
+   * (from the last colinical consultation with “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value
+   * coded “Inicio” (concept_id 1256)) PLUS 9 MONTHS
+   *
+   * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with TB Diagnosis Active
+   */
+  public CohortDefinition getPatientsWithTBDiagActive1() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with TB Diagnosis Active");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
+    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
+    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
+
+    String query =
+        ""
+            + "SELECT p.patient_id "
+            + "                     FROM patient p "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                         INNER JOIN (SELECT b5_1_or_b5_2.patient_id, MAX(b5_1_or_b5_2.last_encounter) most_recent_date "
+            + "                    FROM ( "
+            + "                             SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter "
+            + "                             FROM patient p "
+            + "                                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                             WHERE p.voided = 0 "
+            + "                               AND e.voided = 0 "
+            + "                               AND o.voided = 0 "
+            + "                               AND o2.voided = 0 "
+            + "                               AND ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
+            + "                               AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} ) "
+            + "                               AND e.encounter_type = ${6} "
+            + "                               AND e.location_id = :location "
+            + "                               AND e.encounter_datetime between :startDate AND :endDate "
+            + "                             GROUP BY p.patient_id "
+            + "                             UNION "
+            + "                             SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter "
+            + "                             FROM patient p "
+            + "                                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                             WHERE p.voided = 0 "
+            + "                               AND e.voided = 0 "
+            + "                               AND o.voided = 0 "
+            + "                               AND o2.voided = 0 "
+            + "                               AND o.concept_id = ${6128} "
+            + "                               AND ( o2.concept_id = ${23985} AND o2.value_coded = ${23954} ) "
+            + "                               AND e.encounter_type = ${53} "
+            + "                               AND e.location_id = :location "
+            + "                               AND e.encounter_datetime between :startDate AND :endDate "
+            + "                             GROUP BY p.patient_id "
+            + "                         ) AS b5_1_or_b5_2 "
+            + "                    GROUP BY b5_1_or_b5_2.patient_id) AS last ON p.patient_id = last.patient_id "
+            + "                     WHERE "
+            + "                         e.location_id = :location "
+            + "                             AND e.encounter_type = ${6} "
+            + "                             AND o.concept_id = ${23761} "
+            + "                             AND o.value_coded = ${1065} "
+            + "                             AND e.encounter_datetime BETWEEN last.most_recent_date AND DATE_ADD(most_recent_date, INTERVAL 6 MONTH) "
+            + "                             AND p.voided = 0 "
+            + "                             AND e.voided = 0 "
+            + "                             AND o.voided = 0";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * All patients ll patients with a clinical consultation(encounter type 6) during the Revision
    * period with the following conditions:
    *
@@ -1135,6 +1224,95 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * All patients ll patients with a clinical consultation(encounter type 6) during the Revision
+   * period with the following conditions:
+   *
+   * <p>- “TEM SINTOMAS DE TB” (concept_id 23758) value coded “SIM” (concept_id IN [1065]) and
+   * Encounter_datetime between:
+   *
+   * <p>Encounter_datetime between Encounter_datetime(from B5_1 or B5_2) and Encounter_datetime(from
+   * B5_1 or B5_2) + 6 months
+   *
+   * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with TB symptoms
+   */
+  public CohortDefinition getPatientsWithTBSymtoms1() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with TB Symptoms");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
+    map.put("23758", tbMetadata.getHasTbSymptomsConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+
+    String query =
+        ""
+            + "SELECT p.patient_id "
+            + "                     FROM patient p "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                         INNER JOIN (SELECT b5_1_or_b5_2.patient_id, MAX(b5_1_or_b5_2.last_encounter) most_recent_date "
+            + "                    FROM ( "
+            + "                             SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter "
+            + "                             FROM patient p "
+            + "                                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                             WHERE p.voided = 0 "
+            + "                               AND e.voided = 0 "
+            + "                               AND o.voided = 0 "
+            + "                               AND o2.voided = 0 "
+            + "                               AND ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
+            + "                               AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} ) "
+            + "                               AND e.encounter_type = ${6} "
+            + "                               AND e.location_id = :location "
+            + "                               AND e.encounter_datetime between :startDate AND :endDate "
+            + "                             GROUP BY p.patient_id "
+            + "                             UNION "
+            + "                             SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter "
+            + "                             FROM patient p "
+            + "                                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                             WHERE p.voided = 0 "
+            + "                               AND e.voided = 0 "
+            + "                               AND o.voided = 0 "
+            + "                               AND o2.voided = 0 "
+            + "                               AND o.concept_id = ${6128} "
+            + "                               AND ( o2.concept_id = ${23985} AND o2.value_coded = ${23954} ) "
+            + "                               AND e.encounter_type = ${53} "
+            + "                               AND e.location_id = :location "
+            + "                               AND e.encounter_datetime between :startDate AND :endDate "
+            + "                             GROUP BY p.patient_id "
+            + "                         ) AS b5_1_or_b5_2 "
+            + "                    GROUP BY b5_1_or_b5_2.patient_id) AS last ON p.patient_id = last.patient_id "
+            + "                     WHERE "
+            + "                         e.location_id = :location "
+            + "                             AND e.encounter_type = ${6} "
+            + "                             AND o.concept_id = ${23758} "
+            + "                             AND o.value_coded = ${1065} "
+            + "                             AND e.encounter_datetime BETWEEN last.most_recent_date AND DATE_ADD(most_recent_date, INTERVAL 6 MONTH) "
+            + "                             AND p.voided = 0 "
+            + "                             AND e.voided = 0 "
+            + "                             AND o.voided = 0";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * All patients patients with a clinical consultation(encounter type 6) during the Revision period
    * with the following conditions:
    *
@@ -1211,6 +1389,94 @@ public class QualityImprovement2020CohortQueries {
             + "         AND p.voided = 0  "
             + "         AND e.voided = 0  "
             + "         AND o.voided = 0;";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * All patients patients with a clinical consultation(encounter type 6) during the Revision period
+   * with the following conditions:
+   *
+   * <p>- “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) value coded “Inicio” or “Continua” or
+   * “Fim”(concept_id IN [1256, 1257, 1267]) and “Data Tratamento TB” (obs datetime 1268) between:
+   *
+   * <p>- Encounter_datetime(from B5_1 or B5_2) and Encounter_datetime(from B5_1 or B5_2) + 6 months
+   *
+   * @return CohortDefinition
+   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
+   *     <li><strong>Should</strong> fetch all patients with TB treatment
+   */
+  public CohortDefinition getPatientsWithTBTreatment1() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with TB Treatment");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    map.put("1268", tbMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
+    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+
+    String query =
+        ""
+            + "SELECT p.patient_id "
+            + "                     FROM patient p "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                         INNER JOIN (SELECT b5_1_or_b5_2.patient_id, MAX(b5_1_or_b5_2.last_encounter) most_recent_date "
+            + "                    FROM ( "
+            + "                             SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter "
+            + "                             FROM patient p "
+            + "                                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                             WHERE p.voided = 0 "
+            + "                               AND e.voided = 0 "
+            + "                               AND o.voided = 0 "
+            + "                               AND o2.voided = 0 "
+            + "                               AND ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
+            + "                               AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} ) "
+            + "                               AND e.encounter_type = ${6} "
+            + "                               AND e.location_id = :location "
+            + "                               AND e.encounter_datetime between :startDate AND :endDate "
+            + "                             GROUP BY p.patient_id "
+            + "                             UNION "
+            + "                             SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter "
+            + "                             FROM patient p "
+            + "                                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                      INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                             WHERE p.voided = 0 "
+            + "                               AND e.voided = 0 "
+            + "                               AND o.voided = 0 "
+            + "                               AND o2.voided = 0 "
+            + "                               AND o.concept_id = ${6128} "
+            + "                               AND ( o2.concept_id = ${23985} AND o2.value_coded = ${23954} ) "
+            + "                               AND e.encounter_type = ${53} "
+            + "                               AND e.location_id = :location "
+            + "                               AND e.encounter_datetime between :startDate AND :endDate "
+            + "                             GROUP BY p.patient_id "
+            + "                         ) AS b5_1_or_b5_2 "
+            + "                    GROUP BY b5_1_or_b5_2.patient_id) AS last ON p.patient_id = last.patient_id "
+            + "                     WHERE "
+            + "                         e.location_id = :location "
+            + "                         AND e.encounter_type = ${6} "
+            + "                         AND o.concept_id = ${1268}  "
+            + "                         AND o.value_coded IN (${1256}, ${1257}, ${1267})  "
+            + "                         AND DATE(o.obs_datetime) BETWEEN DATE(last.most_recent_date) AND DATE(DATE_ADD(last.most_recent_date, INTERVAL 6 MONTH))  "
+            + "                         AND p.voided = 0 "
+            + "                         AND e.voided = 0 "
+            + "                         AND o.voided = 0";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1815,9 +2081,15 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition tbDiagOnPeriod = getPatientsWithTBDiagActive();
 
+    CohortDefinition tbDiagOnPeriod1 = getPatientsWithTBDiagActive1();
+
     CohortDefinition tbSymptomsOnPeriod = getPatientsWithTBSymtoms();
 
+    CohortDefinition tbSymptomsOnPeriod1 = getPatientsWithTBSymtoms1();
+
     CohortDefinition tbTreatmentOnPeriod = getPatientsWithTBTreatment();
+
+    CohortDefinition tbTreatmentOnPeriod1 = getPatientsWithTBTreatment1();
 
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
@@ -1839,9 +2111,15 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(tbDiagOnPeriod, MAPPING));
 
+    compositionCohortDefinition.addSearch("H1", EptsReportUtils.map(tbDiagOnPeriod1, MAPPING));
+
     compositionCohortDefinition.addSearch("I", EptsReportUtils.map(tbSymptomsOnPeriod, MAPPING));
 
+    compositionCohortDefinition.addSearch("I1", EptsReportUtils.map(tbSymptomsOnPeriod1, MAPPING));
+
     compositionCohortDefinition.addSearch("J", EptsReportUtils.map(tbTreatmentOnPeriod, MAPPING));
+
+    compositionCohortDefinition.addSearch("J1", EptsReportUtils.map(tbTreatmentOnPeriod1, MAPPING));
 
     compositionCohortDefinition.addSearch("B41", EptsReportUtils.map(b41, MAPPING));
 
@@ -1856,13 +2134,13 @@ public class QualityImprovement2020CohortQueries {
           "A AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (den == 2 || den == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
+          "(A AND (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (den == 5) {
       compositionCohortDefinition.setCompositionString(
           "(A AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     } else if (den == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B51 OR B52) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
+          "(A AND (B41 OR B42 OR B51 OR B52) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     }
 
     return compositionCohortDefinition;
@@ -2004,9 +2282,15 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition tbDiagOnPeriod = getPatientsWithTBDiagActive();
 
+    CohortDefinition tbDiagOnPeriod1 = getPatientsWithTBDiagActive1();
+
     CohortDefinition tbSymptomsOnPeriod = getPatientsWithTBSymtoms();
 
+    CohortDefinition tbSymptomsOnPeriod1 = getPatientsWithTBSymtoms1();
+
     CohortDefinition tbTreatmentOnPeriod = getPatientsWithTBTreatment();
+
+    CohortDefinition tbTreatmentOnPeriod1 = getPatientsWithTBTreatment1();
 
     CohortDefinition b41 = getB4And1();
 
@@ -2038,9 +2322,15 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(tbDiagOnPeriod, MAPPING));
 
+    compositionCohortDefinition.addSearch("H1", EptsReportUtils.map(tbDiagOnPeriod1, MAPPING));
+
     compositionCohortDefinition.addSearch("I", EptsReportUtils.map(tbSymptomsOnPeriod, MAPPING));
 
+    compositionCohortDefinition.addSearch("I1", EptsReportUtils.map(tbSymptomsOnPeriod1, MAPPING));
+
     compositionCohortDefinition.addSearch("J", EptsReportUtils.map(tbTreatmentOnPeriod, MAPPING));
+
+    compositionCohortDefinition.addSearch("J1", EptsReportUtils.map(tbTreatmentOnPeriod1, MAPPING));
 
     compositionCohortDefinition.addSearch("B41", EptsReportUtils.map(b41, MAPPING));
 
@@ -2059,13 +2349,13 @@ public class QualityImprovement2020CohortQueries {
           "(A AND  (B41 OR B42 OR B51 OR B52)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B51 OR B52) AND GNEW AND L) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
+          "(A AND (B41 OR B42 OR B51 OR B52) AND GNEW AND L) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (num == 5) {
       compositionCohortDefinition.setCompositionString(
           "(A AND C AND (B41 OR B42 OR B51 OR B52) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B51 OR B52) AND C AND GNEW AND L) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
+          "(A AND (B41 OR B42 OR B51 OR B52) AND C AND GNEW AND L) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     }
     return compositionCohortDefinition;
   }
@@ -7905,7 +8195,8 @@ public class QualityImprovement2020CohortQueries {
    *       id 6128) in Ficha Resumo (encounter type 53) during the Inclusion period as following:
    *       <ul>
    *         <li>
-   *             <p>Encounter Type 53 “Última profilaxia TPT"(concept id 23985) value coded INH(concept id 656) and value_datetime(concept id 6128) during the inclusion period
+   *             <p>Encounter Type 53 “Última profilaxia TPT"(concept id 23985) value coded
+   *             INH(concept id 656) and value_datetime(concept id 6128) during the inclusion period
    *             <p>Note: if there is more than one Ficha Resumo consider the most recent date
    *             during the inclusion period.
    *       </ul>
@@ -7963,7 +8254,9 @@ public class QualityImprovement2020CohortQueries {
    *       Inclusion period with the following conditions:
    *       <ul>
    *         <li>
-   *             <p>Profilaxia TPT"(concept id 23985) value coded INH(concept id 656) and Estado da Profilaxia (concept id 165308) value coded Inicio(concept id 1256) during the inclusion period.
+   *             <p>Profilaxia TPT"(concept id 23985) value coded INH(concept id 656) and Estado da
+   *             Profilaxia (concept id 165308) value coded Inicio(concept id 1256) during the
+   *             inclusion period.
    *             <p>Note: if there is more than one Ficha Clinica falling in the above criteria
    *             consider the most recent one during the inclusion period.
    *       </ul>
@@ -8015,19 +8308,19 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    *
+   *
    * <ul>
-   *   <li>B5_1 - Filter all patients with a clinical consultation(encounter type 6) during the Inclusion period
-   *   with the following conditions:
+   *   <li>B5_1 - Filter all patients with a clinical consultation(encounter type 6) during the
+   *       Inclusion period with the following conditions:
    *       <ul>
    *         <li>
-   *             <p>"Profilaxia TPT"(concept id 23985) value coded 3HP(concept id 23954) and Estado da Profilaxia
-   *             (concept id 165308) value coded Inicio(concept id 1256) during the inclusion period.
-   *
-   *             <p>Nota: Em caso de existência de mais que uma Ficha Clínica com registo do “Início”, deve-se
-   *             considerar o último registo durante o período de inclusão.
+   *             <p>"Profilaxia TPT"(concept id 23985) value coded 3HP(concept id 23954) and Estado
+   *             da Profilaxia (concept id 165308) value coded Inicio(concept id 1256) during the
+   *             inclusion period.
+   *             <p>Nota: Em caso de existência de mais que uma Ficha Clínica com registo do
+   *             “Início”, deve-se considerar o último registo durante o período de inclusão.
    *       </ul>
    * </ul>
-   *
    */
   public CohortDefinition getB5And1() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -8043,11 +8336,12 @@ public class QualityImprovement2020CohortQueries {
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
-    String query = ""
+    String query =
+        ""
             + "SELECT  final.patient_id "
             + "FROM "
             + "( "
-            + "   SELECT p.patient_id "
+            + "   SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter "
             + "   FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -8071,16 +8365,19 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    *
+   *
    * <ul>
-   *   <li>B5_2 - Filter all patients with a “’Ultima Profilaxia 3HP” in Ficha Resumo (encounter type 53) during the Inclusion period as following:
+   *   <li>B5_2 - Filter all patients with a “’Ultima Profilaxia 3HP” in Ficha Resumo (encounter
+   *       type 53) during the Inclusion period as following:
    *       <ul>
    *         <li>
-   *             <p>"Ultima profilaxia TPT"(concept id 23985) value coded 3HP (concept id 23985) and value_datetime (concept id 6128) during the inclusion period
-   *
-   *             <p>Nota: Em caso de existência de mais que uma Ficha Resumo com registo do “Última Profilaxia 3HP (Data Início)”, deve-se considerar o último registo durante o período de inclusão.
+   *             <p>"Ultima profilaxia TPT"(concept id 23985) value coded 3HP (concept id 23985) and
+   *             value_datetime (concept id 6128) during the inclusion period
+   *             <p>Nota: Em caso de existência de mais que uma Ficha Resumo com registo do “Última
+   *             Profilaxia 3HP (Data Início)”, deve-se considerar o último registo durante o
+   *             período de inclusão.
    *       </ul>
    * </ul>
-   *
    */
   public CohortDefinition getB5And2() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -8096,11 +8393,12 @@ public class QualityImprovement2020CohortQueries {
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
-    String query = ""
+    String query =
+        ""
             + "SELECT  final.patient_id "
             + "FROM "
             + "( "
-            + "   SELECT p.patient_id "
+            + "   SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter "
             + "   FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -8134,9 +8432,9 @@ public class QualityImprovement2020CohortQueries {
    *             period(encounter_datetime >= startDateRevision and <= endDateRevision) with
    *             “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
    *         <li>
-   *             <p>the most recent “Última Profilaxia Isoniazida (Data Fim)” (6129) registered in Ficha
-   *             Resumo (encounter type 53) occurred during the revision period (value_datetime >=
-   *             startDateRevision and <= endDateRevision)
+   *             <p>the most recent “Última Profilaxia Isoniazida (Data Fim)” (6129) registered in
+   *             Ficha Resumo (encounter type 53) occurred during the revision period
+   *             (value_datetime >= startDateRevision and <= endDateRevision)
    *             <p>and “TPT Start Date” (the most recent date from B4_1 and B4_2) minus “TPT End
    *             Date” is between 170 days and 297 days
    *       </ul>
@@ -8417,21 +8715,27 @@ public class QualityImprovement2020CohortQueries {
    *
    *
    * <ul>
-   *   <li>L: Filter all patients with the most recent date as “TPT - 3HP end Date” between the following:
+   *   <li>L: Filter all patients with the most recent date as “TPT - 3HP end Date” between the
+   *       following:
    *       <ul>
    *         <li>
-   *             <p>"Profilaxia TPT"(concept id 23985) value coded 3HP(concept id 23985) and Estado da Profilaxia (concept id 165308) value coded FIM(concept id 1267) during the revision perid.
-   *             <p>Nota: Em caso de existência de mais que uma Ficha Clínica com registo do “FIM”, deve-se considerar o último registo durante o período de revisao.
-   *
-   *             or
-   *
-   *             <p>"Ultima profilaxia TPT"(concept id 23985) value coded 3HP(concept id 23985) and value_datetime(concept id 6129) during the revision period
-   *             <p>Nota: Em caso de existência de mais que uma Ficha Resumo com registo do “Última Profilaxia 3HP (Data FIM)”, deve-se considerar o último registo durante o período de revisao.
+   *             <p>"Profilaxia TPT"(concept id 23985) value coded 3HP(concept id 23985) and Estado
+   *             da Profilaxia (concept id 165308) value coded FIM(concept id 1267) during the
+   *             revision perid.
+   *             <p>Nota: Em caso de existência de mais que uma Ficha Clínica com registo do “FIM”,
+   *             deve-se considerar o último registo durante o período de revisao.
+   *             <p>or
+   *             <p>"Ultima profilaxia TPT"(concept id 23985) value coded 3HP(concept id 23985) and
+   *             value_datetime(concept id 6129) during the revision period
+   *             <p>Nota: Em caso de existência de mais que uma Ficha Resumo com registo do “Última
+   *             Profilaxia 3HP (Data FIM)”, deve-se considerar o último registo durante o período
+   *             de revisao.
    *         <li>
-   *             <p>sendo a “Data Fim TPT – 3HP” do paciente a data mais recente entre os critérios acima listados.
-   *             Nova NOTA: and “TPT Start Date” (the most recent date from B5_1 and B5_2) minus “TPT End Date” is between 80 days and 190 days
-   *
-   *             <p>If we have more than one encounter with different TPT information both will be considered in G_new and L (there is no mutual exclusion)
+   *             <p>sendo a “Data Fim TPT – 3HP” do paciente a data mais recente entre os critérios
+   *             acima listados. Nova NOTA: and “TPT Start Date” (the most recent date from B5_1 and
+   *             B5_2) minus “TPT End Date” is between 80 days and 190 days
+   *             <p>If we have more than one encounter with different TPT information both will be
+   *             considered in G_new and L (there is no mutual exclusion)
    *       </ul>
    * </ul>
    *
@@ -8455,7 +8759,8 @@ public class QualityImprovement2020CohortQueries {
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
-    String query = ""
+    String query =
+        ""
             + "SELECT p.patient_id  "
             + "FROM patient p "
             + "    INNER JOIN (  "
