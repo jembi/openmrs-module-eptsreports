@@ -192,7 +192,7 @@ public class QualityImprovement2020CohortQueries {
             + "              AND e.location_id = :location "
             + "          GROUP  BY p.patient_id  )  "
             + "               union_tbl  "
-            + "        WHERE  union_tbl.art_date BETWEEN :startDate AND :endDate";          // A query não corre
+            + "        WHERE  union_tbl.art_date BETWEEN :startDate AND :endDate";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -202,12 +202,14 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * O sistema irá identificar utentes que iniciaram TARV há 9 meses seleccionando os utentes:
-    • registados no formulário “Ficha de Resumo” com a “Data do Início TARV” decorrida no mês de avaliação (>= “Data Início Avaliação” e <= “Data Fim Avaliação”)
-    • sendo o período de avaliação o seguinte:
-        ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 10 meses mais (+) 1 dia
-        ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 9 meses
-Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data mais antiga.
+   * O sistema irá identificar utentes que iniciaram TARV há 9 meses seleccionando os utentes: •
+   * registados no formulário “Ficha de Resumo” com a “Data do Início TARV” decorrida no mês de
+   * avaliação (>= “Data Início Avaliação” e <= “Data Fim Avaliação”) • sendo o período de avaliação
+   * o seguinte: ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 10 meses mais (+)
+   * 1 dia ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 9 meses Nota: caso existir
+   * mais que uma “Ficha de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data
+   * mais antiga.
+   *
    * @return {@link CohortDefinition}
    *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
    *     <li><strong>Should</strong> fetch all patients who initiated ART during the inclusion
@@ -225,28 +227,28 @@ Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TAR
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
 
-    String query = 
-    "SELECT patient_id AS ID_Utentes "
-    + "FROM   (SELECT p.patient_id, "
-    + "               Min(value_datetime) art_date "
-    + "        FROM   patient p "
-    + "               INNER JOIN encounter e "
-    + "                       ON p.patient_id = e.patient_id "
-    + "               INNER JOIN obs o "
-    + "                       ON e.encounter_id = o.encounter_id "
-    + "        WHERE  p.voided = 0 "
-    + "               AND e.voided = 0 "
-    + "               AND o.voided = 0 "
-    + "               AND e.location_id = :location "
-    + "               AND e.encounter_type = ${53} "
-    + "               AND o.concept_id = ${1190} "
-    + "               AND o.value_datetime IS NOT NULL "
-    + "               AND ( o.value_datetime >= DATE_ADD(DATE_SUB(:startDate, "
-    + "                                                  INTERVAL 4 month), "
-    + "                                               INTERVAL 1 day) "
-    + "                     AND o.value_datetime <= DATE_SUB(:startDate, "
-    + "                                             INTERVAL 3 month) ) "
-    + "        GROUP  BY p.patient_id) union_tbl ";
+    String query =
+        "SELECT patient_id AS ID_Utentes "
+            + "FROM   (SELECT p.patient_id, "
+            + "               Min(value_datetime) art_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON p.patient_id = e.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON e.encounter_id = o.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               AND e.location_id = :location "
+            + "               AND e.encounter_type = ${53} "
+            + "               AND o.concept_id = ${1190} "
+            + "               AND o.value_datetime IS NOT NULL "
+            + "               AND ( o.value_datetime >= DATE_ADD(DATE_SUB(:startDate, "
+            + "                                                  INTERVAL 4 month), "
+            + "                                               INTERVAL 1 day) "
+            + "                     AND o.value_datetime <= DATE_SUB(:startDate, "
+            + "                                             INTERVAL 3 month) ) "
+            + "        GROUP  BY p.patient_id) union_tbl ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -255,18 +257,20 @@ Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TAR
     return sqlCohortDefinition;
   }
 
-/**
- * O sistema irá identificar utentes que iniciaram TARV há 9 meses seleccionando os utentes:
-    • registados no formulário “Ficha de Resumo” com a “Data do Início TARV” decorrida no mês de avaliação (>= “Data Início Avaliação” e <= “Data Fim Avaliação”)
-    • sendo o período de avaliação o seguinte:
-        ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 10 meses mais (+) 1 dia
-        ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 9 meses
-Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data mais antiga.
- * @return {@link CohortDefinition}
+  /**
+   * O sistema irá identificar utentes que iniciaram TARV há 9 meses seleccionando os utentes: •
+   * registados no formulário “Ficha de Resumo” com a “Data do Início TARV” decorrida no mês de
+   * avaliação (>= “Data Início Avaliação” e <= “Data Fim Avaliação”) • sendo o período de avaliação
+   * o seguinte: ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 10 meses mais (+)
+   * 1 dia ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 9 meses Nota: caso existir
+   * mais que uma “Ficha de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data
+   * mais antiga.
+   *
+   * @return {@link CohortDefinition}
    *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
    *     <li><strong>Should</strong> fetch all patients who initiated ART during the inclusion
    *         period
- */
+   */
   public SqlCohortDefinition getMOHArtStartDateRF51() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -279,36 +283,35 @@ Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TAR
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
 
-    String query = 
-    "SELECT patient_id AS ID_Utentes "
-    + "FROM   (SELECT p.patient_id, "
-    + "               Min(value_datetime) art_date "
-    + "        FROM   patient p "
-    + "               INNER JOIN encounter e "
-    + "                       ON p.patient_id = e.patient_id "
-    + "               INNER JOIN obs o "
-    + "                       ON e.encounter_id = o.encounter_id "
-    + "        WHERE  p.voided = 0 "
-    + "               AND e.voided = 0 "
-    + "               AND o.voided = 0 "
-    + "               AND e.location_id = :location "
-    + "               AND e.encounter_type = ${53} "
-    + "               AND o.concept_id = ${1190} "
-    + "               AND o.value_datetime IS NOT NULL "
-    + "               AND ( o.value_datetime >= Date_add(DATE_SUB(:startDate, "
-    + "                                                  INTERVAL 10 month), "
-    + "                                               INTERVAL 1 day) "
-    + "                     AND o.value_datetime <= DATE_SUB(:startDate, "
-    + "                                             INTERVAL 9 month) ) "
-    + "        GROUP  BY p.patient_id) union_tbl ";
-    
+    String query =
+        "SELECT patient_id AS ID_Utentes "
+            + "FROM   (SELECT p.patient_id, "
+            + "               Min(value_datetime) art_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON p.patient_id = e.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON e.encounter_id = o.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               AND e.location_id = :location "
+            + "               AND e.encounter_type = ${53} "
+            + "               AND o.concept_id = ${1190} "
+            + "               AND o.value_datetime IS NOT NULL "
+            + "               AND ( o.value_datetime >= Date_add(DATE_SUB(:startDate, "
+            + "                                                  INTERVAL 10 month), "
+            + "                                               INTERVAL 1 day) "
+            + "                     AND o.value_datetime <= DATE_SUB(:startDate, "
+            + "                                             INTERVAL 9 month) ) "
+            + "        GROUP  BY p.patient_id) union_tbl ";
+
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
   }
-
 
   /**
    *
@@ -8531,10 +8534,13 @@ Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TAR
   }
 
   /**
-   * O sistema irá identificar mulheres grávidas registadas na última consulta clínica selecionando todos os utentes do sexo feminino, independentemente da idade, e registados como “Grávida=Sim” na última consulta clínica decorrida durante o período de revisão (última “Data Consulta Clínica” >= “Data Início Avaliação” e <= “Data Fim Avaliação”.
-    • sendo o período de avaliação o seguinte:
-        ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 2 meses mais (+) 1 dia
-        ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 1 mês
+   * O sistema irá identificar mulheres grávidas registadas na última consulta clínica selecionando
+   * todos os utentes do sexo feminino, independentemente da idade, e registados como “Grávida=Sim”
+   * na última consulta clínica decorrida durante o período de revisão (última “Data Consulta
+   * Clínica” >= “Data Início Avaliação” e <= “Data Fim Avaliação”. • sendo o período de avaliação o
+   * seguinte: ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 2 meses mais (+) 1
+   * dia ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 1 mês
+   *
    * @return {@link CohortDefinition}
    */
   private CohortDefinition getMQC13RF10() {
@@ -8550,25 +8556,25 @@ Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TAR
     map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
-    String query = 
-    "SELECT p.person_id, "
-    + "       Max(e.encounter_datetime) AS most_recent "
-    + "FROM   person p "
-    + "       JOIN encounter e "
-    + "         ON e.patient_id = p.person_id "
-    + "       JOIN obs o "
-    + "         ON o.encounter_id = e.encounter_id "
-    + "WHERE  e.voided = 0 "
-    + "       AND o.voided = 0 "
-    + "       AND p.voided = 0 "
-    + "       AND e.location_id = :location "
-    + "       AND encounter_type = ${6} "
-    + "       AND o.concept_id = ${1982} "
-    + "       AND o.value_coded = ${1065} "
-    + "       AND p.gender = 'F' "
-    + "       AND e.encounter_datetime >= DATE_ADD(DATE_SUB(:startDate, interval 2 MONTH), interval 1 day) "
-    + "       AND e.encounter_datetime <= DATE_SUB(:startDate, interval 1 MONTH) "
-    + "GROUP  BY p.person_id ";
+    String query =
+        "SELECT p.person_id, "
+            + "       Max(e.encounter_datetime) AS most_recent "
+            + "FROM   person p "
+            + "       JOIN encounter e "
+            + "         ON e.patient_id = p.person_id "
+            + "       JOIN obs o "
+            + "         ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND encounter_type = ${6} "
+            + "       AND o.concept_id = ${1982} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND p.gender = 'F' "
+            + "       AND e.encounter_datetime >= DATE_ADD(DATE_SUB(:startDate, interval 2 MONTH), interval 1 day) "
+            + "       AND e.encounter_datetime <= DATE_SUB(:startDate, interval 1 MONTH) "
+            + "GROUP  BY p.person_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -8578,10 +8584,13 @@ Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TAR
   }
 
   /**
-   * O sistema irá identificar mulheres lactantes registadas na última consulta clínica seleccionando todos os utentes do sexo feminino, independentemente da idade, e registados como “Lactante=Sim” na última consulta clínica decorrida durante o período de revisão (última “Data Consulta Clínica” >= “Data Início Avaliação” e <= “Data Fim Avaliação”. 
-    • sendo o período de avaliação o seguinte:
-        ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 2 meses mais (+) 1 dia
-        ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 1 mês
+   * O sistema irá identificar mulheres lactantes registadas na última consulta clínica
+   * seleccionando todos os utentes do sexo feminino, independentemente da idade, e registados como
+   * “Lactante=Sim” na última consulta clínica decorrida durante o período de revisão (última “Data
+   * Consulta Clínica” >= “Data Início Avaliação” e <= “Data Fim Avaliação”. • sendo o período de
+   * avaliação o seguinte: ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 2 meses
+   * mais (+) 1 dia ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 1 mês
+   *
    * @return {@link CohortDefinition}
    */
   private CohortDefinition getMQC13RF11() {
@@ -8597,25 +8606,25 @@ Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TAR
     map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
 
-    String query = 
-    "SELECT p.person_id, "
-    + "       Max(e.encounter_datetime) AS most_recent "
-    + "FROM   person p "
-    + "       JOIN encounter e "
-    + "         ON e.patient_id = p.person_id "
-    + "       JOIN obs o "
-    + "         ON o.encounter_id = e.encounter_id "
-    + "WHERE  e.voided = 0 "
-    + "       AND o.voided = 0 "
-    + "       AND p.voided = 0 "
-    + "       AND e.location_id = :location "
-    + "       AND encounter_type = ${6} "
-    + "       AND o.concept_id = ${6332} "
-    + "       AND o.value_coded = ${1065} "
-    + "       AND p.gender = 'F' "
-    + "       AND e.encounter_datetime >= DATE_ADD(DATE_SUB(:startDate, interval 2 MONTH), interval 1 day) "
-    + "       AND e.encounter_datetime <= DATE_SUB(:startDate, interval 1 MONTH) "
-    + "GROUP  BY p.person_id ";    
+    String query =
+        "SELECT p.person_id, "
+            + "       Max(e.encounter_datetime) AS most_recent "
+            + "FROM   person p "
+            + "       JOIN encounter e "
+            + "         ON e.patient_id = p.person_id "
+            + "       JOIN obs o "
+            + "         ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND encounter_type = ${6} "
+            + "       AND o.concept_id = ${6332} "
+            + "       AND o.value_coded = ${1065} "
+            + "       AND p.gender = 'F' "
+            + "       AND e.encounter_datetime >= DATE_ADD(DATE_SUB(:startDate, interval 2 MONTH), interval 1 day) "
+            + "       AND e.encounter_datetime <= DATE_SUB(:startDate, interval 1 MONTH) "
+            + "GROUP  BY p.person_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -8623,7 +8632,6 @@ Nota: caso existir mais que uma “Ficha de Resumo” com “Data do Início TAR
 
     return cd;
   }
-
 
   /**
    * B2E - Exclude all patients from Ficha Clinica (encounter type 6, encounter_datetime) who have

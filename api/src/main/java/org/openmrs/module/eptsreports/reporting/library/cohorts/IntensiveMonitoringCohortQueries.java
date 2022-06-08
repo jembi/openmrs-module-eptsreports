@@ -1,16 +1,11 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.IntensiveMonitoringQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -20,6 +15,9 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.*;
 
 @Component
 public class IntensiveMonitoringCohortQueries {
@@ -752,7 +750,8 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "MI13DEN15",
           EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod(), MAPPING));
+              qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod(),
+              "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (level == 16) {
       cd.addSearch(
           "MI13DEN16",
@@ -2282,7 +2281,15 @@ public class IntensiveMonitoringCohortQueries {
 
     CohortDefinition B5E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            false, true, -3);
+            false, true, -12);
+
+    CohortDefinition abandonedDuringTarvStartDate = getPatientsWhoAbandonedTarvOnArtStartDate();
+
+    CohortDefinition restartdedExclusion =
+        qualityImprovement2020CohortQueries.getPatientsWhoRestartedTarvAtLeastSixMonths();
+
+    CohortDefinition abandonedExclusionByTarvRestartDate =
+        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnArtRestartDate();
 
     compositionCohortDefinition.addSearch(
         "age",
@@ -2305,13 +2312,12 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addSearch(
         "C",
         EptsReportUtils.map(
-            pregnant, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            pregnant, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "D",
         EptsReportUtils.map(
-            brestfeeding,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            brestfeeding, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B3",
@@ -2334,8 +2340,20 @@ public class IntensiveMonitoringCohortQueries {
         EptsReportUtils.map(
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "ABANDONEDTARV",
+        EptsReportUtils.map(
+            abandonedDuringTarvStartDate,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "RESTARTED", EptsReportUtils.map(restartdedExclusion, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "RESTARTEDTARV", EptsReportUtils.map(abandonedExclusionByTarvRestartDate, MAPPING));
+
     compositionCohortDefinition.setCompositionString(
-        "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+        "(B1 AND ((B2NEW AND NOT ABANDONEDTARV) OR ((RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
 
     return compositionCohortDefinition;
   }
@@ -2363,6 +2381,44 @@ public class IntensiveMonitoringCohortQueries {
     } else if (level.equals("NUM")) {
       cd.setCompositionString("NUM");
     }
+    return cd;
+  }
+
+  /**
+   * <b> RF7.2 EXCLUSION PATIENTS WHO ABANDONED DURING ART START DATE PERIOD</b>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
+   * seguinte forma:
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
+   * Consulta”<=”Data Fim Período”
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
+   * Período” e “Data Consulta”<=”Data Fim Período”
+   * <li>1. para exclusão nos utentes que iniciaram a 1ª linha de TARV, a “Data Início Período” será
+   *     igual a “Data Início TARV” e “Data Fim do Período” será igual a “Data Início TARV”+6meses.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoAbandonedTarvOnArtStartDate() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients who abandoned TARV On Art Start Date");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setQuery(
+        IntensiveMonitoringQueries.getMQ13AbandonedTarvOnArtStartDate(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
+            hivMetadata.getARVStartDateConcept().getConceptId()));
+
     return cd;
   }
 }
