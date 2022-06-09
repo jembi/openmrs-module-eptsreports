@@ -6359,7 +6359,17 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition queryA1 = QualityImprovement2020Queries.getMQ15DenA1();
+    List<Integer> dispensationTypes = Arrays.asList( hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+
+    List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
+
+    CohortDefinition queryA1 = QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(dispensationTypes, states);
 
     CohortDefinition withDT =
         QualityImprovement2020Queries.getPatientsWithQuarterlyDispensationOnStart();
@@ -6557,7 +6567,17 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition queryA1 = QualityImprovement2020Queries.getMQ15DenA1();
+    List<Integer> dispensationTypes = Arrays.asList( hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+
+    List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
+
+    CohortDefinition queryA1 = QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(dispensationTypes, states);
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
