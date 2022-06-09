@@ -1055,10 +1055,8 @@ public class QualityImprovement2020CohortQueries {
    * <p>- with “Diagnótico TB activo” (concept_id 23761) value coded “SIM”(concept id 1065)
    * Encounter_datetime between:
    *
-   * <p>- Encounter_datetime (from the last clinical consultation with “PROFILAXIA COM
-   * ISONIAZIDA”(concept_id 6122) value coded “Inicio” (concept_id 1256)) AND - Encounter_datetime
-   * (from the last colinical consultation with “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value
-   * coded “Inicio” (concept_id 1256)) PLUS 9 MONTHS
+   * <p>- Encounter_datetime between Encounter_datetime(the most recent from B5_1 or B5_2) and
+   * Encounter_datetime(the most recent from B5_1 or B5_2) + 6 months
    *
    * @return CohortDefinition
    *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
@@ -1076,7 +1074,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
     map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
