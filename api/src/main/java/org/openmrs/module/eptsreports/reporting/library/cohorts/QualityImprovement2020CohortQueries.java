@@ -6425,6 +6425,11 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition IAMDS =
         getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(mdsConcepts);
 
+    // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
+    // data do 2o pedido de CV e Data de Revisao
+    CohortDefinition VLFL =
+        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(mdsConcepts);
+
     comp.addSearch(
         "A1",
         EptsReportUtils.map(
@@ -6496,6 +6501,12 @@ public class QualityImprovement2020CohortQueries {
             IAMDS,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
+    comp.addSearch(
+        "VLFL",
+        EptsReportUtils.map(
+            VLFL,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
+
     if (den == 1) {
       comp.setCompositionString("(A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
     } else if (den == 2 || den == 4) {
@@ -6504,6 +6515,9 @@ public class QualityImprovement2020CohortQueries {
     } else if (den == 3) {
       comp.setCompositionString(
           "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS");
+    } else if (den == 4) {
+      comp.setCompositionString(
+          "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS AND VLFL");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString("(DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 9 || den == 11 || den == 8 || den == 10 || den == 12) {
@@ -6701,8 +6715,10 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition IAMDS =
         getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(concepts);
 
-    // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a data do 2o pedido de CV e Data de Revisao
-    CohortDefinition VLFL = getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(concepts);
+    // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
+    // data do 2o pedido de CV e Data de Revisao
+    CohortDefinition VLFL =
+        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(concepts);
 
     comp.addSearch(
         "A1",
@@ -8715,7 +8731,9 @@ public class QualityImprovement2020CohortQueries {
     cd.setQuery(sb.replace(query));
 
     return cd;
-  }  public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(
+  }
+
+  public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(
       List<Integer> dispensationTypes) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
