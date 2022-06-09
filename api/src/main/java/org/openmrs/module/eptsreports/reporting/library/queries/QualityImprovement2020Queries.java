@@ -1,16 +1,15 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -299,7 +298,8 @@ public class QualityImprovement2020Queries {
    *
    * @return SqlCohortDefinition
    */
-  public static SqlCohortDefinition getPatientsWithFollowingMdcDispensationsWithStates(List<Integer> dispensationTypes, List<Integer> states) {
+  public static SqlCohortDefinition getPatientsWithFollowingMdcDispensationsWithStates(
+      List<Integer> dispensationTypes, List<Integer> states) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Utentes Inscritos no MDS com determinados estados");
@@ -543,8 +543,6 @@ public class QualityImprovement2020Queries {
 
     return sqlCohortDefinition;
   }
-
-
 
   /**
    * <b>MQ15NUM H </b></b><br>

@@ -6359,7 +6359,9 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
 
-    List<Integer> dispensationTypes = Arrays.asList( hivMetadata.getGaac().getConceptId(),
+    List<Integer> dispensationTypes =
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
             hivMetadata.getQuarterlyDispensation().getConceptId(),
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
@@ -6369,10 +6371,23 @@ public class QualityImprovement2020CohortQueries {
 
     List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
 
-    CohortDefinition queryA1 = QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(dispensationTypes, states);
+    CohortDefinition queryA1 =
+        QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(
+            dispensationTypes, states);
 
+    CohortDefinition queryA2 =
+        QualityImprovement2020Queries.getMQ15DenA1orA2(
+            "A2",
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getStartDrugs().getConceptId(),
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId());
+
+    List<Integer> quarterlyDispensation =
+        Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId());
     CohortDefinition withDT =
-        QualityImprovement2020Queries.getPatientsWithQuarterlyDispensationOnStart();
+        QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(
+            quarterlyDispensation, states);
 
     CohortDefinition queryA3 =
         genericCohortQueries.hasCodedObs(
@@ -6394,14 +6409,32 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition viralLoad = QualityImprovement2020Queries.getPatientsWithVlGreaterThen1000();
     // Pacientes com pedidos de investigações depois de DT
-    List<Integer> concepts = Arrays.asList(23730);
+    List<Integer> concepts = Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId());
     CohortDefinition IADT =
         getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(concepts);
+
+    // Utentes que tiveram dois pedidos de investigação depois da inscrição ao GACC/DT/APE/DD/FR/DS
+    List<Integer> mdsConcepts =
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
+    CohortDefinition IAMDS =
+        getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(mdsConcepts);
 
     comp.addSearch(
         "A1",
         EptsReportUtils.map(
             queryA1,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+
+    comp.addSearch(
+        "A2",
+        EptsReportUtils.map(
+            queryA2,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
@@ -6457,15 +6490,25 @@ public class QualityImprovement2020CohortQueries {
             IADT,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
+    comp.addSearch(
+        "IAMDS",
+        EptsReportUtils.map(
+            IAMDS,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+
     if (den == 1) {
-      comp.setCompositionString("(A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
-    } else if (den == 2 || den == 3 || den == 4) {
+      comp.setCompositionString("(A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
+    } else if (den == 2 || den == 4) {
       comp.setCompositionString(
-          "((A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL OR IADT)) AND G2");
+          "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2");
+    } else if (den == 3) {
+      comp.setCompositionString(
+          "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS");
     } else if (den == 5 || den == 6) {
-      comp.setCompositionString("(DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
+      comp.setCompositionString("(DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 9 || den == 11 || den == 8 || den == 10 || den == 12) {
-      comp.setCompositionString("((DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2");
+      comp.setCompositionString(
+          "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2");
     }
     return comp;
   }
@@ -6567,7 +6610,9 @@ public class QualityImprovement2020CohortQueries {
     comp.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     comp.addParameter(new Parameter("location", "location", Location.class));
 
-    List<Integer> dispensationTypes = Arrays.asList( hivMetadata.getGaac().getConceptId(),
+    List<Integer> dispensationTypes =
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
             hivMetadata.getQuarterlyDispensation().getConceptId(),
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
@@ -6577,7 +6622,9 @@ public class QualityImprovement2020CohortQueries {
 
     List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
 
-    CohortDefinition queryA1 = QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(dispensationTypes, states);
+    CohortDefinition queryA1 =
+        QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(
+            dispensationTypes, states);
 
     CohortDefinition queryA2 =
         QualityImprovement2020Queries.getMQ15DenA1orA2(
@@ -6642,6 +6689,17 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    // Utentes que tiveram dois pedidos de investigação depois da inscrição ao GACC/DT/APE/DD/FR/DS
+    List<Integer> concepts =
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
+    CohortDefinition IAMDS =
+        getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(concepts);
 
     comp.addSearch(
         "A1",
@@ -6706,10 +6764,16 @@ public class QualityImprovement2020CohortQueries {
             getCombinedB13ForCat15Indicators(),
             "revisionEndDate=${revisionEndDate},location=${location}"));
 
+    comp.addSearch(
+        "IAMDS",
+        EptsReportUtils.map(
+            IAMDS,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+
     if (num == 1) {
       comp.setCompositionString("Den1 AND G2");
     } else if (num == 2) {
-      comp.setCompositionString("Den1 AND H1 AND G2");
+      comp.setCompositionString("Den1 AND H1 AND G2 AND IAMDS");
     } else if (num == 3) {
       comp.setCompositionString("Den1 AND H2 AND G2");
     } else if (num == 4) {
