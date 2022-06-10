@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -25,8 +26,6 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -7794,6 +7793,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition Mq15DenMDS = getMQ15DenMDS();
     CohortDefinition MqK = intensiveMonitoringCohortQueries.getMI15K();
+    CohortDefinition mds = getPatientsWhoStartedMdsRF36Filter();
     cd.addSearch(
         "MQ15DenMDS",
         EptsReportUtils.map(
@@ -7804,7 +7804,12 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             MqK, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("MQ15DenMDS AND K");
+    cd.addSearch(
+        "MDS",
+        EptsReportUtils.map(
+            mds, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("MQ15DenMDS AND K AND mds");
     return cd;
   }
 
