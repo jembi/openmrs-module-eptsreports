@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -26,6 +25,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -7852,6 +7853,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition Mq15DenMds14 = getMQ15MdsDen14();
     CohortDefinition Mq15L = intensiveMonitoringCohortQueries.getMI15L();
+    CohortDefinition hadFilaAfterClinical =
+        getPatientsWhoHadPickupOnFilaAfterMostRecentVlOnFichaClinica();
 
     cd.addSearch(
         "Mq15DenMds14",
@@ -7864,7 +7867,13 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15L, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("Mq15DenMds14 AND MQ15L");
+    cd.addSearch(
+        "FAC",
+        EptsReportUtils.map(
+            hadFilaAfterClinical,
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("Mq15DenMds14 AND MQ15L AND FAC");
 
     return cd;
   }
@@ -7926,7 +7935,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition Mq15MdsDen15 = getMQ15MdsDen15();
-    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(24, 18);
+    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(20, 10);
 
     cd.addSearch(
         "Mq15MdsDen15",
@@ -8907,6 +8916,66 @@ public class QualityImprovement2020CohortQueries {
             + "AND        otype.voided = 0 "
             + "AND        ostate.voided = 0 "
             + "GROUP BY   p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * Utentes com marcação de levantamento a seguir a última consulta clínica no período de
+   * avaliação/revisão, na qual foi registado o resultado de CV >= 1000, sendo esta marcação de
+   * levantamento entre 23 a 37 dias do levantamento, ou seja, “Data Próximo Levantamento” (marcado
+   * no FILA com “Data Levantamento” >= “Data última Consulta” e <= “Data Fim Revisão”) >= “Data
+   * Levantamento”+23 dias e <= “Data Levantamento + 37 dias)
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoHadPickupOnFilaAfterMostRecentVlOnFichaClinica() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+
+    String query =
+        "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
+            + "                      SELECT     p.patient_id, MAX(e.encounter_datetime) vl_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e ON         e.patient_id = p.patient_id "
+            + "                      INNER JOIN obs o  ON  o.encounter_id = e.encounter_id "
+            + "                      WHERE      e.encounter_type = ${6} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        o.concept_id = ${856} "
+            + "                      AND        o.value_numeric >= 1000 "
+            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                      AND        p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      GROUP BY   p.patient_id ) vl "
+            + "WHERE      e.encounter_type = ${18} "
+            + "AND        e.location_id = :location "
+            + "AND        o.concept_id = ${5096} "
+            + "AND        e.encounter_datetime BETWEEN vl.vl_date AND :endDate "
+            + "AND        o.value_datetime BETWEEN DATE_ADD(e.encounter_datetime, INTERVAL 23 DAY) AND  DATE_ADD(e.encounter_datetime, INTERVAL 37 DAY) "
+            + "AND        e.voided = 0 "
+            + "AND        p.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "GROUP BY   p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
