@@ -6520,9 +6520,15 @@ public class QualityImprovement2020CohortQueries {
           "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS AND VLFL");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString("(DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
-    } else if (den == 7 || den == 9 || den == 11 || den == 8 || den == 10 || den == 12) {
+    } else if (den == 7 || den == 9 || den == 8 || den == 10) {
       comp.setCompositionString(
-          "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2");
+          "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 ");
+    } else if (den == 11 || den == 12) {
+      comp.setCompositionString(
+          "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
+    } else if (den == 9 || den == 10) {
+      comp.setCompositionString(
+          "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 IADT");
     }
     return comp;
   }
@@ -6720,6 +6726,11 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition VLFL =
         getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(concepts);
 
+    // Pacientes com pedidos de investigações depois de DT
+    List<Integer> dtConcept = Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId());
+    CohortDefinition IADT =
+        getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(dtConcept);
+
     comp.addSearch(
         "A1",
         EptsReportUtils.map(
@@ -6794,6 +6805,12 @@ public class QualityImprovement2020CohortQueries {
             VLFL,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    comp.addSearch(
+        "IADT",
+        EptsReportUtils.map(
+            IADT,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+
     if (num == 1) {
       comp.setCompositionString("Den1 AND G2");
     } else if (num == 2) {
@@ -6805,9 +6822,9 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 5 || num == 6) {
       comp.setCompositionString("Den5 AND G2");
     } else if (num == 7 || num == 8) {
-      comp.setCompositionString("Den5 AND H1 AND G2");
+      comp.setCompositionString("Den5 AND H1 AND G2 AND IADT");
     } else if (num == 9 || num == 10) {
-      comp.setCompositionString("Den5 AND H2 AND G2");
+      comp.setCompositionString("Den5 AND H2 AND G2 AND IAMDS");
     } else if (num == 11 || num == 12) {
       comp.setCompositionString("Den5 AND I AND G2");
     }
@@ -7187,7 +7204,7 @@ public class QualityImprovement2020CohortQueries {
    */
   public CohortDefinition getBFromCategory9Numerator() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setQuery(
+    sqlCohortDefinition.setName(
         "B: Filter all patients with CD4 within 33 days from the first clinical consultation");
     sqlCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -8592,6 +8609,8 @@ public class QualityImprovement2020CohortQueries {
    * Investigações Laboratoriais” igual a “Carga Viral”) entre “Data Inscrição MDS (DT)” e “Data Fim
    * Revisão” e o registo de um resultado de CV <1000 cps/ml entre os dois pedidos (“Data Consulta
    * Resultado CV”> “Data Consulta 1º Pedido de CV” e < “Data Consulta 2º Pedido de CV”)
+   *
+   * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(
       List<Integer> dispensationTypes) {
@@ -8732,7 +8751,13 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
-
+  /**
+   * utentes que têm o registo de “Resultado de Carga Viral” < 1000 cópias, na “Ficha de
+   * Laboratório” registada entre “Data Consulta 2º Pedido de CV” e “Data Fim Revisão” .e o
+   * resultado é < 1000 cps/ml.
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(
       List<Integer> dispensationTypes) {
 
@@ -8866,6 +8891,67 @@ public class QualityImprovement2020CohortQueries {
             + "             AND o.voided = 0) vl_result ON two_dispensations.patient_id = vl_result.patient_id "
             + " WHERE  vl_result.vl_date > dispensations.second_date AND vl_result.vl_date <= :revisionEndDate"
             + " GROUP BY two_dispensations.patient_id      ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * utentes que têm o registo de “Resultado de Carga Viral” < 1000 cópias, na “Ficha de
+   * Laboratório” registada entre “Data Consulta 2º Pedido de CV” e “Data Fim Revisão” .e o
+   * resultado é < 1000 cps/ml.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWithMostRecentClinicalFormWithMdsDispensationTypesAndState(
+      List<Integer> dispensationTypes, List<Integer> states) {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
+    map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
+    map.put("dispensationTypes", getMetadataFrom(dispensationTypes));
+    map.put("states", getMetadataFrom(states));
+
+    String query =
+        "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+            + "INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
+            + "                      SELECT     p.patient_id, MAX(e.encounter_datetime) consultation_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                      WHERE      e.encounter_type = ${6} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                      AND        p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      GROUP BY   p.patient_id ) consultation "
+            + "WHERE      e.encounter_type = ${6} "
+            + "AND        e.location_id = :location "
+            + "AND        otype.concept_id = ${165174} "
+            + "AND        otype.value_coded IN (${dispensationTypes}) "
+            + "AND        ostate.concept_id = ${165322} "
+            + "AND        ostate.value_coded IN (${states}) "
+            + "AND        e.encounter_datetime = consultation.consultation_date "
+            + "AND        otype.obs_group_id = ostate.obs_group_id "
+            + "AND        e.voided = 0 "
+            + "AND        p.voided = 0 "
+            + "AND        otype.voided = 0 "
+            + "AND        ostate.voided = 0 "
+            + "GROUP BY   p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
