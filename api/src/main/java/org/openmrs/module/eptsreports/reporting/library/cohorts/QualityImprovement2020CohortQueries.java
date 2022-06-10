@@ -202,118 +202,6 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * O sistema irá identificar utentes que iniciaram TARV há 9 meses seleccionando os utentes: •
-   * registados no formulário “Ficha de Resumo” com a “Data do Início TARV” decorrida no mês de
-   * avaliação (>= “Data Início Avaliação” e <= “Data Fim Avaliação”) • sendo o período de avaliação
-   * o seguinte: ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 10 meses mais (+)
-   * 1 dia ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 9 meses Nota: caso existir
-   * mais que uma “Ficha de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data
-   * mais antiga.
-   *
-   * @return {@link CohortDefinition}
-   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
-   *     <li><strong>Should</strong> fetch all patients who initiated ART during the inclusion
-   *         period
-   */
-  public SqlCohortDefinition getMOHArtStartDateRF5() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" Users who started ART 3 months ago ");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
-
-    String query =
-        "SELECT patient_id AS ID_Utentes "
-            + "FROM   (SELECT p.patient_id, "
-            + "               Min(value_datetime) art_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.location_id = :location "
-            + "               AND e.encounter_type = ${53} "
-            + "               AND o.concept_id = ${1190} "
-            + "               AND o.value_datetime IS NOT NULL "
-            + "               AND ( o.value_datetime >= DATE_ADD(DATE_SUB(:startDate, "
-            + "                                                  INTERVAL 4 month), "
-            + "                                               INTERVAL 1 day) "
-            + "                     AND o.value_datetime <= DATE_SUB(:startDate, "
-            + "                                             INTERVAL 3 month) ) "
-            + "        GROUP  BY p.patient_id) union_tbl ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
-   * O sistema irá identificar utentes que iniciaram TARV há 9 meses seleccionando os utentes: •
-   * registados no formulário “Ficha de Resumo” com a “Data do Início TARV” decorrida no mês de
-   * avaliação (>= “Data Início Avaliação” e <= “Data Fim Avaliação”) • sendo o período de avaliação
-   * o seguinte: ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 10 meses mais (+)
-   * 1 dia ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 9 meses Nota: caso existir
-   * mais que uma “Ficha de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data
-   * mais antiga.
-   *
-   * @return {@link CohortDefinition}
-   *     <li><strong>Should</strong> Returns empty if there is no patient who meets the conditions
-   *     <li><strong>Should</strong> fetch all patients who initiated ART during the inclusion
-   *         period
-   */
-  public SqlCohortDefinition getMOHArtStartDateRF51() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" Users who started ART 9 months ago ");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
-
-    String query =
-        "SELECT patient_id AS ID_Utentes "
-            + "FROM   (SELECT p.patient_id, "
-            + "               Min(value_datetime) art_date "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.location_id = :location "
-            + "               AND e.encounter_type = ${53} "
-            + "               AND o.concept_id = ${1190} "
-            + "               AND o.value_datetime IS NOT NULL "
-            + "               AND ( o.value_datetime >= Date_add(DATE_SUB(:startDate, "
-            + "                                                  INTERVAL 10 month), "
-            + "                                               INTERVAL 1 day) "
-            + "                     AND o.value_datetime <= DATE_SUB(:startDate, "
-            + "                                             INTERVAL 9 month) ) "
-            + "        GROUP  BY p.patient_id) union_tbl ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
    *
    *
    * <h4>Categoria 3 Denominador </h4>
@@ -4685,10 +4573,10 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 1 || line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND secondLineB2 AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
       }
     }
 
@@ -6335,6 +6223,9 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
+    CohortDefinition pregnantAbandonedDuringPeriod =
+        getPatientsWhoAbandonedTarvOnArtStartDateForPregnants();
+
     cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
@@ -6346,7 +6237,9 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch("H", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
 
-    cd.setCompositionString("(A AND C AND H) AND NOT (D OR E OR F)");
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
+
+    cd.setCompositionString("((A AND NOT ABANDONED)AND C AND H) AND NOT (D OR E OR F)");
     return cd;
   }
 

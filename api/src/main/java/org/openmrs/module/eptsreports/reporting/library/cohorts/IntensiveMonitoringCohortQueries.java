@@ -754,10 +754,7 @@ public class IntensiveMonitoringCohortQueries {
               "startDate=${revisionEndDate-4m+1d},endDate=${revisionEndDate-3m},revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (level == 16) {
       cd.addSearch(
-          "MI13DEN16",
-          EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getgetMQC13P2DenMGInIncluisionPeriod33Month(),
-              MAPPING));
+          "MI13DEN16", EptsReportUtils.map(getMQC13P2DenMGInIncluisionPeriod33Month(), MAPPING));
     } else if (level == 17) {
       cd.addSearch(
           "MI13DEN17",
@@ -772,9 +769,7 @@ public class IntensiveMonitoringCohortQueries {
           "MI13NUM15",
           EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQC13P2Num1(), MAPPING));
     } else if (level == 16) {
-      cd.addSearch(
-          "MI13NUM16",
-          EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQC13P2Num2(), MAPPING));
+      cd.addSearch("MI13NUM16", EptsReportUtils.map(getMQC13P2Num2(), MAPPING));
     } else if (level == 17) {
       cd.addSearch(
           "MI13NUM17",
@@ -2411,13 +2406,121 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.setQuery(
-        IntensiveMonitoringQueries.getMQ13AbandonedTarvOnArtStartDate(
+        IntensiveMonitoringQueries.getMI13AbandonedTarvOnArtStartDate(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
             hivMetadata.getAbandonedConcept().getConceptId(),
             hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
             hivMetadata.getARVStartDateConcept().getConceptId()));
+
+    return cd;
+  }
+
+  /**
+   * <b> RF7.2 EXCLUSION PATIENTS WHO ABANDONED DURING FIRST PREGNANCY STATE DATE PERIOD</b>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
+   * seguinte forma:
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
+   * Consulta”<=”Data Fim Período”
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
+   * Período” e “Data Consulta”<=”Data Fim Período”
+   * <li>1. para exclusão nas mulheres grávidas que iniciaram TARV a “Data Início Período” será
+   *     igual a “Data 1ª Consulta Grávida” – 3 meses” e “Data Fim do Período” será igual a e “Data
+   *     1ª Consulta Grávida”).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients who abandoned TARV On First Pregnancy State Date");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setQuery(
+        IntensiveMonitoringQueries.getMI13AbandonedTarvOnFirstPregnancyStateDate(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getPregnantConcept().getConceptId()));
+
+    return cd;
+  }
+
+  /**
+   * 13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN
+   * (MG que entraram em TARV na CPN) Denominator:# de MG que tiveram a primeira CPN no período de
+   * inclusão, e que já estavam em TARV há mais de 3 meses (Line 91,Column F in the Template) as
+   * following: B2
+   *
+   * <p>Excepto as utentes abandono em TARV durante o período (seguindo os critérios definidos no
+   * RF7.2) nos últimos 3 meses (entre “Data 1ª Consulta Grávida” – 3 meses e “Data 1ª Consulta
+   * Grávida”).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMQC13P2DenMGInIncluisionPeriod33Month() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "B2",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P2DenB2(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "ABANDONED",
+        EptsReportUtils.map(
+            getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("B2 AND NOT ABANDONED");
+
+    return cd;
+  }
+
+  /**
+   * 13.16. % de MG elegíveis a CV com registo de pedido de CV feito pelo clínico na primeira CPN
+   * (MG que entraram em TARV na CPN) (Line 91 in the template) Numerator (Column E in the Template)
+   * as following: (B2 and J)
+   *
+   * <p>Excepto as utentes abandono em TARV durante o período (seguindo os critérios definidos no
+   * RF7.2) nos últimos 3 meses (entre “Data 1ª Consulta Grávida” – 3 meses e “Data 1ª Consulta
+   * Grávida”).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMQC13P2Num2() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "B2", EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQC13P2DenB2(), MAPPING));
+    cd.addSearch(
+        "J",
+        EptsReportUtils.map(qualityImprovement2020CohortQueries.getgetMQC13P2DenB4(), MAPPING));
+
+    cd.addSearch(
+        "ABANDONED",
+        EptsReportUtils.map(getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(), MAPPING));
+
+    cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
 
     return cd;
   }
