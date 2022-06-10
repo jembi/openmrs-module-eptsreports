@@ -6831,6 +6831,73 @@ public class QualityImprovement2020CohortQueries {
     return comp;
   }
 
+  public CohortDefinition getPatientsWhoStartedMdsRF36Filter() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName(
+        "MDS para utentes estáveis que tiveram consulta no período de avaliação");
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    List<Integer> mdsConcepts =
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
+
+    List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
+
+    CohortDefinition mdsLastClinical =
+        getPatientsWithMostRecentClinicalFormWithMdsDispensationTypesAndState(mdsConcepts, states);
+
+    CohortDefinition queryA3 =
+        genericCohortQueries.hasCodedObs(
+            hivMetadata.getTypeOfDispensationConcept(),
+            BaseObsCohortDefinition.TimeModifier.LAST,
+            SetComparator.IN,
+            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+            Arrays.asList(
+                hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));
+
+    CohortDefinition nextPickupBetween83And97 =
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(83, 97);
+
+    CohortDefinition nextPickupBetween173And187 =
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(173, 187);
+
+    compositionCohortDefinition.addSearch(
+        "MDS",
+        EptsReportUtils.map(
+            mdsLastClinical,
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "DSDT",
+        EptsReportUtils.map(
+            queryA3,
+            "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate},locationList=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "FILA83",
+        EptsReportUtils.map(
+            nextPickupBetween83And97,
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "FILA173",
+        EptsReportUtils.map(
+            nextPickupBetween83And97,
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("MDS OR DSDT OR FILA83 OR FILA173");
+
+    return compositionCohortDefinition;
+  }
+
   /**
    * <b>MQ14Den: M&Q Report - Categoria 14 Denominador</b><br>
    * <i>A - Select all patientsTX PVLS DENOMINATOR: TX PVLS Denominator</i> <i>A1 - Filter all
@@ -8751,6 +8818,68 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  /**
+   * utentes que têm o registo de “Resultado de Carga Viral” < 1000 cópias, na “Ficha de
+   * Laboratório” registada entre “Data Consulta 2º Pedido de CV” e “Data Fim Revisão” .e o
+   * resultado é < 1000 cps/ml.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWithMostRecentClinicalFormWithMdsDispensationTypesAndState(
+      List<Integer> dispensationTypes, List<Integer> states) {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
+    map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
+    map.put("dispensationTypes", getMetadataFrom(dispensationTypes));
+    map.put("states", getMetadataFrom(states));
+
+    String query =
+        "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+            + "INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + "INNER JOIN ( "
+            + "                      SELECT     p.patient_id, MAX(e.encounter_datetime) consultation_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                      WHERE      e.encounter_type = ${6} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                      AND        p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      GROUP BY   p.patient_id ) consultation "
+            + "WHERE      e.encounter_type = ${6} "
+            + "AND        e.location_id = :location "
+            + "AND        otype.concept_id = ${165174} "
+            + "AND        otype.value_coded IN (${dispensationTypes}) "
+            + "AND        ostate.concept_id = ${165322} "
+            + "AND        ostate.value_coded IN (${states}) "
+            + "AND        e.encounter_datetime = consultation.consultation_date "
+            + "AND        otype.obs_group_id = ostate.obs_group_id "
+            + "AND        e.voided = 0 "
+            + "AND        p.voided = 0 "
+            + "AND        otype.voided = 0 "
+            + "AND        ostate.voided = 0 "
+            + "GROUP BY   p.patient_id ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
   /**
    * utentes que têm o registo de “Resultado de Carga Viral” < 1000 cópias, na “Ficha de
    * Laboratório” registada entre “Data Consulta 2º Pedido de CV” e “Data Fim Revisão” .e o
@@ -8891,67 +9020,6 @@ public class QualityImprovement2020CohortQueries {
             + "             AND o.voided = 0) vl_result ON two_dispensations.patient_id = vl_result.patient_id "
             + " WHERE  vl_result.vl_date > dispensations.second_date AND vl_result.vl_date <= :revisionEndDate"
             + " GROUP BY two_dispensations.patient_id      ";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    cd.setQuery(sb.replace(query));
-
-    return cd;
-  }
-
-  /**
-   * utentes que têm o registo de “Resultado de Carga Viral” < 1000 cópias, na “Ficha de
-   * Laboratório” registada entre “Data Consulta 2º Pedido de CV” e “Data Fim Revisão” .e o
-   * resultado é < 1000 cps/ml.
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getPatientsWithMostRecentClinicalFormWithMdsDispensationTypesAndState(
-      List<Integer> dispensationTypes, List<Integer> states) {
-
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, String> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
-    map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
-    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
-    map.put("dispensationTypes", getMetadataFrom(dispensationTypes));
-    map.put("states", getMetadataFrom(states));
-
-    String query =
-        "SELECT     p.patient_id "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
-            + "INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-            + "INNER JOIN ( "
-            + "                      SELECT     p.patient_id, MAX(e.encounter_datetime) consultation_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                      WHERE      e.encounter_type = ${6} "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                      AND        p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) consultation "
-            + "WHERE      e.encounter_type = ${6} "
-            + "AND        e.location_id = :location "
-            + "AND        otype.concept_id = ${165174} "
-            + "AND        otype.value_coded IN (${dispensationTypes}) "
-            + "AND        ostate.concept_id = ${165322} "
-            + "AND        ostate.value_coded IN (${states}) "
-            + "AND        e.encounter_datetime = consultation.consultation_date "
-            + "AND        otype.obs_group_id = ostate.obs_group_id "
-            + "AND        e.voided = 0 "
-            + "AND        p.voided = 0 "
-            + "AND        otype.voided = 0 "
-            + "AND        ostate.voided = 0 "
-            + "GROUP BY   p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
