@@ -6831,6 +6831,36 @@ public class QualityImprovement2020CohortQueries {
     return comp;
   }
 
+  /**
+   * Filtrando os pacientesutentes que têm o registo de início do MDS para pacienteutente estável na
+   * última consulta decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” –
+   * 12 meses+1dia e <= “Data Fim Revisão”), ou seja, registo de um MDC (MDC1 ou MDC2 ou MDC3 ou
+   * MDC4 ou MDC5) como:
+   *
+   * <p>“GA” e o respectivo “Estado” = “Início” ou “DT” e o respectivo “Estado” = “Início” ou “DS” e
+   * o respectivo “Estado” = “Início” ou “APE” e o respectivo “Estado” = “Início” ou “FR” e o
+   * respectivo “Estado” = “Início” ou “DD” e o respectivo “Estado” = “Início” na última consulta
+   * clínica (“Ficha Clínica”, coluna 24) decorrida entre: “Data Início de Avaliação” = “Data Fim de
+   * Revisão” menos 12 meses + 1 dia “Data Fim de Avaliação” = “Data Fim de Revisão”
+   *
+   * <p>os utentes que têm o registo de “Tipo de Dispensa” = “DT” na última consulta (“Ficha
+   * Clínica”) decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 12
+   * meses+1dia e <= “Data Fim Revisão”)
+   *
+   * <p>os utentes com registo de “Tipo de Dispensa” = “DS” na última consulta (“Ficha Clínica”)
+   * decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 12 meses+1dia e
+   * <= “Data Fim Revisão”)
+   *
+   * <p>os utentes com registo de último levantamento na farmácia (FILA) há 12 meses (última “Data
+   * Levantamento”>= “Data Fim Revisão” – 12 meses+1dia e <= “Data Fim Revisão”) com próximo
+   * levantamento agendado para 83 a 97 dias ( “Data Próximo Levantamento” menos “Data
+   * Levantamento”>= 83 dias e <= 97 dias)
+   *
+   * <p>os utentes com registo de último levantamento na farmácia (FILA) há 12 meses (última “Data
+   * Levantamento”>= “Data Fim Revisão” – 12 meses+1dia e <= “Data Fim Revisão”) com próximo
+   * levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data
+   * Levantamento”>= 173 dias e <= 187 dias)
+   */
   public CohortDefinition getPatientsWhoStartedMdsRF36Filter() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
