@@ -756,11 +756,7 @@ public class IntensiveMonitoringCohortQueries {
       cd.addSearch(
           "MI13DEN16", EptsReportUtils.map(getMQC13P2DenMGInIncluisionPeriod33Month(), MAPPING));
     } else if (level == 17) {
-      cd.addSearch(
-          "MI13DEN17",
-          EptsReportUtils.map(
-              qualityImprovement2020CohortQueries.getMQC13P2DenMGInIncluisionPeriod33Days(),
-              MAPPING));
+      cd.addSearch("MI13DEN17", EptsReportUtils.map(getMIC13Den17(), MAPPING));
     }
 
     // NUMERATOR
@@ -771,9 +767,7 @@ public class IntensiveMonitoringCohortQueries {
     } else if (level == 16) {
       cd.addSearch("MI13NUM16", EptsReportUtils.map(getMQC13P2Num2(), MAPPING));
     } else if (level == 17) {
-      cd.addSearch(
-          "MI13NUM17",
-          EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQC13P2Num3(), MAPPING));
+      cd.addSearch("MI13NUM17", EptsReportUtils.map(getMIC13Num17(), MAPPING));
     }
 
     if ("DEN15".equals(type)) {
@@ -2521,6 +2515,148 @@ public class IntensiveMonitoringCohortQueries {
         EptsReportUtils.map(getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(), MAPPING));
 
     cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
+
+    return cd;
+  }
+
+  /**
+   * <b> O sistema irá produzir o seguinte denominador do Indicador 13.17 da Categoria 13 MG de
+   * Resultado de CV:</b>
+   *
+   * <p>filtrando as que tiveram um registo de resultado de CV (“Data Resultado CV”) numa consulta
+   * clínica durante o mês de avaliação
+   * <li>Nota: Se existir o registo de mais do que uma consulta clínica com registo de resultado de
+   *     CV durante o mês de avaliação deve ser considerada a primeira consulta clínica com o
+   *     registo de resultado de CV durante o mês de avaliação.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithViralLoadResultDuringTheAvaluationMonth() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients With Viral Load Result During The Avaluation Month ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setQuery(
+        IntensiveMonitoringQueries.getViralLoadResultQuery(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getHivViralLoadQualitative().getConceptId()));
+
+    return cd;
+  }
+
+  /**
+   * <b>13.17 DENOMINATOR - O sistema irá produzir o seguinte denominador do Indicador 13.17 da
+   * Categoria 13 MG de Resultado de CV:</b>
+   *
+   * <p>incluindo todos os utentes do sexo feminino que tiveram pelo menos uma consulta clínica
+   * (Ficha Clínica) durante o mês de avaliação com registo de grávida, e
+   *
+   * <p>filtrando as que tiveram um registo de resultado de CV (“Data Resultado CV”) numa consulta
+   * clínica durante o mês de avaliação
+   * <li>Nota: Se existir o registo de mais do que uma consulta clínica com registo de resultado de
+   *     CV durante o mês de avaliação deve ser considerada a primeira consulta clínica com o
+   *     registo de resultado de CV durante o mês de avaliação.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMIC13Den17() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "PREGNANT",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getPregnantAndBreastfeedingStates(
+                hivMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "VL",
+        EptsReportUtils.map(
+            getPatientsWithViralLoadResultDuringTheAvaluationMonth(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("PREGNANT AND VL");
+
+    return cd;
+  }
+
+  /**
+   * <b> O sistema irá produzir o seguinte Numerador do Indicador 13.17 da Categoria 13 MG de
+   * Resultado de CV:</b> Filtrando os utentes com o registo de pedido de CV (“Pedido de
+   * Investigações Laboratoriais”) na Ficha Clínica imediatamente anterior ao registo do resultado
+   * de CV durante o período de avaliação (< “Data Resultado CV”) e sendo este pedido efectuado em
+   * 33 dias, ou seja, “Data Resultado CV” menos “Pedido CV Anterior” <= 33 dias)
+   *
+   * <p>select all patients with S.TARV: ADULTO SEGUIMENTO (ID=6) that have Pedido de Investigações
+   * Laboratoriais (Concept ID = 23722) Data de Consulta (encounter.encounter_datetime) and
+   * Value_coded = “Carga Viral” (concept id 856) for concept Id 23722 (Pedido de Investigações
+   * Laboratoriais) and Max (Encounter_datetime ) as ”Pedido CV Anterior” < “Data Resultado CV” And
+   * “Data Resultado CV” menos “Pedido CV Anterior” <= 33 dias
+   * <li>Nota: “Data Resultado CV” encontra-se definido no Denominador (RF32- Categoria 13 MG
+   *     Indicador 13.17 – Denominador Resultado CV)
+   *
+   * @see #getPatientsWithViralLoadResultDuringTheAvaluationMonth()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWithPreviousViralLoadResultIn33DaysBeforeVLResult() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients With Previous Viral Load Result In 33 Days Before Viral Load Result ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setQuery(
+        IntensiveMonitoringQueries.getPreviousViralLoadQuery(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getHivViralLoadQualitative().getConceptId(),
+            hivMetadata.getApplicationForLaboratoryResearch().getConceptId()));
+
+    return cd;
+  }
+
+  /**
+   * <b>13.17 NUMERATOR - O sistema irá produzir o seguinte Numerador do Indicador 13.17 da
+   * Categoria 13 MG de Resultado de CV:</b>
+   *
+   * <p>Incluindo todos os utentes seleccionados no Indicador 13.17 Denominador definido no RF32
+   * (Categoria 13 MG Indicador 13.17 – Denominador Resultado CV) e
+   *
+   * <p>Filtrando os utentes com o registo de pedido de CV (“Pedido de Investigações Laboratoriais”)
+   * na Ficha Clínica imediatamente anterior ao registo do resultado de CV durante o período de
+   * avaliação (< “Data Resultado CV”) e sendo este pedido efectuado em 33 dias, ou seja, “Data
+   * Resultado CV” menos “Pedido CV Anterior” <= 33 dias).
+   * <li>Nota: “Data Resultado CV” encontra-se definido no Denominador (RF32- Categoria 13 MG
+   *     Indicador 13.17 – Denominador Resultado CV)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMIC13Num17() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "StartDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "EndDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch("DENOMINATOR", EptsReportUtils.map(getMIC13Den17(), MAPPING));
+
+    cd.addSearch(
+        "PREVIOUSVL",
+        EptsReportUtils.map(
+            getPatientsWithPreviousViralLoadResultIn33DaysBeforeVLResult(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("DENOMINATOR AND PREVIOUSVL");
 
     return cd;
   }

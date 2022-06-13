@@ -1,8 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import org.apache.commons.text.StringSubstitutor;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.text.StringSubstitutor;
 
 public class IntensiveMonitoringQueries {
 
@@ -242,5 +243,162 @@ public class IntensiveMonitoringQueries {
         + "           AND e.encounter_datetime >= :startDate "
         + "           AND e.encounter_datetime <= :endDate"
         + "         GROUP BY p.patient_id ";
+  }
+
+  /**
+   * <p>Select all patients with S.TARV: ADULTO SEGUIMENTO (ID=6) that have Resultado Carga Viral
+   * Quantitativo (Concept ID = 856) or Resultado Carga Viral Qualitativo (Concept ID = 1305) and
+   * Value_numeric = any not empty for concept Id 856 (Resultado Carga Viral Quantitativo) or
+   * Value_coded = any not empty for concept Id 1305 (Resultado Carga Viral Qualitativo)
+   *
+   * <li>Nota: Se existir o registo de mais do que uma consulta clínica com registo de resultado de
+   *     CV durante o mês de avaliação deve ser considerada a primeira consulta clínica com o
+   *     registo de resultado de CV durante o mês de avaliação.
+   *
+   * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
+   * @param hivViralLoadConcept The Hiv Viral Load Concept 856
+   * @param hivViralLoadQualitative The Hiv Viral Load Qualitative Concept 1305
+   * @return {@link String}
+   */
+  public static String getViralLoadResultQuery(
+      int adultoSeguimentoEncounterType, int hivViralLoadConcept, int hivViralLoadQualitative) {
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("856", hivViralLoadConcept);
+    map.put("1305", hivViralLoadQualitative);
+
+    String query =
+        " SELECT patient_id FROM ( "
+            + "                           SELECT vl.patient_id, MIN(vl.first_occurrence) as first_vl_result "
+            + "                           FROM  ( "
+            + "                                     SELECT p.patient_id, MIN(e.encounter_datetime) AS first_occurrence "
+            + "                                     FROM   patient p "
+            + "                                                INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                     WHERE p.voided = 0 "
+            + "                                       AND e.voided = 0 "
+            + "                                       AND o.voided = 0 "
+            + "                                       AND e.location_id = :location "
+            + "                                       AND e.encounter_type = ${6} "
+            + "                                       AND o.concept_id = ${856} "
+            + "                                       AND o.value_numeric IS NOT NULL "
+            + "                                       AND e.encounter_datetime >= :startDate "
+            + "                                       AND e.encounter_datetime <= :endDate "
+            + "                                     GROUP  BY p.patient_id "
+            + "                                     UNION "
+            + "                                     SELECT p.patient_id, MIN(e.encounter_datetime) AS first_occurrence "
+            + "                                     FROM   patient p "
+            + "                                                INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                     WHERE p.voided = 0 "
+            + "                                       AND e.voided = 0 "
+            + "                                       AND o.voided = 0 "
+            + "                                       AND e.location_id = :location "
+            + "                                       AND e.encounter_type = ${6} "
+            + "                                       AND o.concept_id = ${1305} "
+            + "                                       AND o.value_coded IS NOT NULL "
+            + "                                       AND e.encounter_datetime >= :startDate "
+            + "                                       AND e.encounter_datetime <= :endDate "
+            + "                                     GROUP  BY p.patient_id "
+            + "                                 ) vl "
+            + "                           GROUP BY vl.patient_id) vl_result ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * Filtrando os utentes com o registo de pedido de CV (“Pedido de Investigações Laboratoriais”) na
+   * Ficha Clínica imediatamente anterior ao registo do resultado de CV durante o período de
+   * avaliação (< “Data Resultado CV”) e sendo este pedido efectuado em 33 dias, ou seja, “Data
+   * Resultado CV” menos “Pedido CV Anterior” <= 33 dias)
+   *
+   * <p>select all patients with S.TARV: ADULTO SEGUIMENTO (ID=6) that have Pedido de Investigações
+   * Laboratoriais (Concept ID = 23722) Data de Consulta (encounter.encounter_datetime) and
+   * Value_coded = “Carga Viral” (concept id 856) for concept Id 23722 (Pedido de Investigações
+   * Laboratoriais) and Max (Encounter_datetime ) as ”Pedido CV Anterior” < “Data Resultado CV” And
+   * “Data Resultado CV” menos “Pedido CV Anterior” <= 33 dias
+   * <li>Nota: “Data Resultado CV” encontra-se definido no Denominador (RF32- Categoria 13 MG
+   *     Indicador 13.17 – Denominador Resultado CV)
+   *
+   * @see #getViralLoadResultQuery(int, int, int)
+   * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
+   * @param hivViralLoadConcept The Hiv Viral Load Concept 856
+   * @param hivViralLoadQualitative The Hiv Viral Load Qualitative Concept 1305
+   * @param applicationForLaboratoryResearch The Application for Laboratory Research 23722
+   * @return {@link String}
+   */
+  public static String getPreviousViralLoadQuery(
+      int adultoSeguimentoEncounterType,
+      int hivViralLoadConcept,
+      int hivViralLoadQualitative,
+      int applicationForLaboratoryResearch) {
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("856", hivViralLoadConcept);
+    map.put("1305", hivViralLoadQualitative);
+    map.put("23722", applicationForLaboratoryResearch);
+
+    String query =
+        "SELECT patient_id FROM ( SELECT p.patient_id, MAX(e.encounter_datetime) as previous_vl "
+            + "FROM       patient p "
+            + "               INNER JOIN encounter e "
+            + "                          ON         p.patient_id = e.patient_id "
+            + "               INNER JOIN obs o "
+            + "                          ON         o.encounter_id=e.encounter_id "
+            + "               INNER JOIN "
+            + "           ( "
+            + "               SELECT vl.patient_id, MIN(vl.first_occurrence) as first_vl_result "
+            + "               FROM  ( "
+            + "                         SELECT p.patient_id, MIN(e.encounter_datetime) AS first_occurrence "
+            + "                         FROM   patient p "
+            + "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                         WHERE p.voided = 0 "
+            + "                           AND e.voided = 0 "
+            + "                           AND o.voided = 0 "
+            + "                           AND e.location_id = :location "
+            + "                           AND e.encounter_type = ${6} "
+            + "                           AND o.concept_id = ${856} "
+            + "                           AND o.value_numeric IS NOT NULL "
+            + "                           AND e.encounter_datetime >= :startDate "
+            + "                           AND e.encounter_datetime <= :endDate "
+            + "                         GROUP  BY p.patient_id "
+            + "                         UNION "
+            + "                         SELECT p.patient_id, MIN(e.encounter_datetime) AS first_occurrence "
+            + "                         FROM   patient p "
+            + "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                         WHERE p.voided = 0 "
+            + "                           AND e.voided = 0 "
+            + "                           AND o.voided = 0 "
+            + "                           AND e.location_id = :location "
+            + "                           AND e.encounter_type = ${6} "
+            + "                           AND o.concept_id = ${1305} "
+            + "                           AND o.value_coded IS NOT NULL "
+            + "                           AND e.encounter_datetime >= :startDate "
+            + "                           AND e.encounter_datetime <= :endDate "
+            + "                         GROUP  BY p.patient_id "
+            + "                     ) vl "
+            + "               GROUP BY vl.patient_id "
+            + "               ) vl_result "
+            + "           ON         p.patient_id = vl_result.patient_id "
+            + "WHERE      p.voided = 0 "
+            + "  AND        e.voided = 0 "
+            + "  AND        o.voided = 0 "
+            + "  AND        e.location_id = :location "
+            + "  AND        e.encounter_type = ${6} "
+            + "  AND        o.concept_id = ${23722} "
+            + "  AND        o.value_coded = ${856} "
+            + "  AND        e.encounter_datetime < vl_result.first_vl_result "
+            + "  AND        TIMESTAMPDIFF(DAY, e.encounter_datetime, vl_result.first_vl_result) >= 33 "
+            + "GROUP BY   p.patient_id ) previous_consultation ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
   }
 }
