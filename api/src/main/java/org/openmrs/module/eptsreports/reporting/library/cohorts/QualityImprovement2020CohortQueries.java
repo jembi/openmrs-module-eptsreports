@@ -2649,15 +2649,18 @@ public class QualityImprovement2020CohortQueries {
             + "                    AND o.location_id = :location"
             + "                    AND o.concept_id = ${856}"
             + "                    AND o.value_numeric >= 1000"
-            + "                    AND (( e.encounter_type = ${6}"
-            + "                    AND e.encounter_datetime BETWEEN :startDate AND :endDate) ";
+            + "                    AND ("
+            + "                         ( e.encounter_type = ${6} "
+            + "                         AND e.encounter_datetime BETWEEN :startDate AND :endDate) ";
 
     if (e53) {
-      query += "                   OR (e.encounter_type = ${53}"
-            + "                    AND o.obs_datetime BETWEEN :startDate AND :endDate)) ";
+      query +=
+          "                         OR (e.encounter_type = ${53} "
+              + "                         AND o.obs_datetime BETWEEN :startDate AND :endDate)";
     }
-
-    query +=  "             GROUP BY p.patient_id) filtered ON p.patient_id = filtered.patient_id ";
+    query +=
+        "                   ) "
+            + "               GROUP BY p.patient_id) filtered ON p.patient_id = filtered.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
