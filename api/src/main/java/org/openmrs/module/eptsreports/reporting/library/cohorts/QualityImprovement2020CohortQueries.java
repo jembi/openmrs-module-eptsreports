@@ -2199,13 +2199,13 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
     }
     if (indicatorFlag == 2 || indicatorFlag == 7) {
-      compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (B5 OR E OR F OR B4)");
+      compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (B5 OR F OR B4)");
     }
     if (indicatorFlag == 3) {
       compositionCohortDefinition.setCompositionString("(A AND C) AND NOT (D OR E OR F)");
     }
     if (indicatorFlag == 4) {
-      compositionCohortDefinition.setCompositionString("(B1 AND B4) AND NOT (B5 OR E OR F)");
+      compositionCohortDefinition.setCompositionString("(B1 AND B4) AND NOT (B5 OR F)");
     }
 
     return compositionCohortDefinition;
