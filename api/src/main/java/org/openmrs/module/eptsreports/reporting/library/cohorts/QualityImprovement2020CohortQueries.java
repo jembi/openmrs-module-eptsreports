@@ -624,7 +624,7 @@ public class QualityImprovement2020CohortQueries {
    * @param conceptIdAns The value coded answers concept
    * @return CohortDefinition
    */
-  private CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
+  public CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
     Map<String, Integer> map = new HashMap<>();
     map.put("conceptIdQn", conceptIdQn);
     map.put("conceptIdAns", conceptIdAns);
