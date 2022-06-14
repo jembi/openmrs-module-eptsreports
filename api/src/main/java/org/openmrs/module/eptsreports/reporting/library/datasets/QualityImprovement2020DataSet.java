@@ -110,7 +110,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MCC4D1",
-        "Crianças em TARV com estado (grau) da avaliação nutricional registado na última consulta clínica",
+        "Crianças em TARV com estado (grau) da avaliação nutricional registado na última  consulta clínica",
         EptsReportUtils.map(
             MCC4D1,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),

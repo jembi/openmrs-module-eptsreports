@@ -3,11 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
 import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -731,7 +727,7 @@ public class CommonCohortQueries {
             + "              AND e.voided = 0 "
             + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
             + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
-            + "  GROUP BY pa.patient_id ";
+            + " GROUP BY pa.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
