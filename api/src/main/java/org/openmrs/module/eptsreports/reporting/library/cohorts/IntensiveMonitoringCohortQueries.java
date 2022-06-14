@@ -2122,11 +2122,11 @@ public class IntensiveMonitoringCohortQueries {
       }
       if (level == 2) {
         cd.setName("Denominator: " + name2);
-        cd.setCompositionString("A AND J AND H AND AGE2");
+        cd.setCompositionString("A AND MDC AND H AND AGE2");
       }
       if (level == 3) {
         cd.setName("Denominator: " + name3);
-        cd.setCompositionString("A AND J AND B2 AND NOT P AND AGE2");
+        cd.setCompositionString("A AND MDC AND B2 AND NOT P AND AGE2");
       }
       return cd;
     }
