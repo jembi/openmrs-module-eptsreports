@@ -7045,6 +7045,8 @@ public class QualityImprovement2020CohortQueries {
         "MDS para utentes estáveis que tiveram consulta no período de avaliação");
     compositionCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     List<Integer> mdsConcepts =
@@ -7062,7 +7064,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getContinueRegimenConcept().getConceptId());
 
     CohortDefinition mdsLastClinical =
-            getPatientsWithMdcBeforeMostRecentClinicalFormWithFollowingDispensationTypesAndState(
+        getPatientsWithMdcBeforeMostRecentClinicalFormWithFollowingDispensationTypesAndState(
             mdsConcepts, states);
 
     CohortDefinition dtBeforeClinical =
@@ -7080,31 +7082,29 @@ public class QualityImprovement2020CohortQueries {
         "MDS",
         EptsReportUtils.map(
             mdsLastClinical,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "DT",
         EptsReportUtils.map(
             dtBeforeClinical,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "DS",
         EptsReportUtils.map(
             dsBeforeClinical,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA83",
         EptsReportUtils.map(
-            filaBC83,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            filaBC83, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA173",
         EptsReportUtils.map(
-            filaBC173,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            filaBC173, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("MDS AND (DS OR DT OR FILA83 OR FILA173)");
 

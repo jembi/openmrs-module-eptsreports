@@ -2086,7 +2086,8 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition k = getMI15K();
     CohortDefinition l = getMI15L();
     CohortDefinition p = getMI15P();
-    CohortDefinition alreadyEnrolledMdc = qualityImprovement2020CohortQueries.getPatientsAlreadyEnrolledInTheMdc();
+    CohortDefinition alreadyEnrolledMdc =
+        qualityImprovement2020CohortQueries.getPatientsAlreadyEnrolledInTheMdc();
 
     CohortDefinition major2 = getAgeOnLastConsultationMoreThan2Years();
     String MAPPINGA =
