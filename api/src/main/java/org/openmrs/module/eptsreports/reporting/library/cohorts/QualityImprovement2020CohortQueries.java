@@ -6924,13 +6924,13 @@ public class QualityImprovement2020CohortQueries {
    * levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data
    * Levantamento”>= 173 dias e <= 187 dias)
    */
-  public CohortDefinition getPatientsWhoStartedMdsRF36Filter() {
+  public CohortDefinition getPatientsWhoHadMdsOnMostRecentClinicalForm() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     compositionCohortDefinition.setName(
         "MDS para utentes estáveis que tiveram consulta no período de avaliação");
-    compositionCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     List<Integer> mdsConcepts =
@@ -6966,26 +6966,24 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "MDS",
         EptsReportUtils.map(
-            mdsLastClinical,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            mdsLastClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "DSDT",
         EptsReportUtils.map(
-            queryA3,
-            "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate},locationList=${location}"));
+            queryA3, "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA83",
         EptsReportUtils.map(
             nextPickupBetween83And97,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA173",
         EptsReportUtils.map(
             nextPickupBetween173And187,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("MDS OR DSDT OR FILA83 OR FILA173");
 
@@ -7978,7 +7976,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition Mq15DenMDS = getMQ15DenMDS();
     CohortDefinition MqK = intensiveMonitoringCohortQueries.getMI15K();
-    CohortDefinition mds = getPatientsWhoStartedMdsRF36Filter();
+    CohortDefinition mds = getPatientsWhoHadMdsOnMostRecentClinicalForm();
     cd.addSearch(
         "MQ15DenMDS",
         EptsReportUtils.map(
@@ -7990,7 +7988,7 @@ public class QualityImprovement2020CohortQueries {
             MqK, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "MDS", EptsReportUtils.map(mds, "revisionEndDate=${revisionEndDate},location=${location}"));
+        "MDS", EptsReportUtils.map(mds, "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("MQ15DenMDS AND K AND MDS");
     return cd;

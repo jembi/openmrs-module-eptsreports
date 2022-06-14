@@ -2088,6 +2088,7 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition p = getMI15P();
     CohortDefinition alreadyEnrolledMdc =
         qualityImprovement2020CohortQueries.getPatientsAlreadyEnrolledInTheMdc();
+    CohortDefinition mdcLastClinical = qualityImprovement2020CohortQueries.getPatientsWhoHadMdsOnMostRecentClinicalForm();
 
     CohortDefinition major2 = getAgeOnLastConsultationMoreThan2Years();
     String MAPPINGA =
@@ -2113,12 +2114,13 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch("L", EptsReportUtils.map(l, MAPPINGA));
     cd.addSearch("P", EptsReportUtils.map(p, MAPPINGA));
     cd.addSearch("AGE2", EptsReportUtils.map(major2, MAPPINGA));
+    cd.addSearch("LMDC", EptsReportUtils.map(mdcLastClinical, MAPPINGA));
 
     if (isDenominator) {
 
       if (level == 1) {
         cd.setName("Denominator: " + name1);
-        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J OR MDC) AND AGE2 ");
+        cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR MDC) AND AGE2 ");
       }
       if (level == 2) {
         cd.setName("Denominator: " + name2);
@@ -2133,7 +2135,7 @@ public class IntensiveMonitoringCohortQueries {
 
     if (level == 1) {
       cd.setName("Numerator: " + name1);
-      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND K AND AGE2 ");
+      cd.setCompositionString("A AND B1 AND E AND NOT (C OR D OR F OR G OR J) AND LMDC AND AGE2 ");
     }
     if (level == 2) {
       cd.setName("Numerator: " + name2);
