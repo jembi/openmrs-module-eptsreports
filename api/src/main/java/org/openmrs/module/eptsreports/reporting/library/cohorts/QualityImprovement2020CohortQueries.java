@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -26,6 +25,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -8418,106 +8419,6 @@ public class QualityImprovement2020CohortQueries {
             + "                        AND o.obs_datetime BETWEEN DATE_ADD(B2NEW.last_consultation, INTERVAL 6 MONTH)   "
             + "                        AND DATE_ADD(B2NEW.last_consultation, INTERVAL 9 MONTH)  "
             + "                        GROUP BY p.patient_id";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    cd.setQuery(sb.replace(query));
-
-    return cd;
-  }
-
-  /**
-   * O sistema irá identificar mulheres grávidas registadas na última consulta clínica selecionando
-   * todos os utentes do sexo feminino, independentemente da idade, e registados como “Grávida=Sim”
-   * na última consulta clínica decorrida durante o período de revisão (última “Data Consulta
-   * Clínica” >= “Data Início Avaliação” e <= “Data Fim Avaliação”. • sendo o período de avaliação o
-   * seguinte: ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 2 meses mais (+) 1
-   * dia ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 1 mês
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getMQC13RF10() {
-
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Pregnant women at the last visit:");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-
-    String query =
-        "SELECT p.person_id, "
-            + "       Max(e.encounter_datetime) AS most_recent "
-            + "FROM   person p "
-            + "       JOIN encounter e "
-            + "         ON e.patient_id = p.person_id "
-            + "       JOIN obs o "
-            + "         ON o.encounter_id = e.encounter_id "
-            + "WHERE  e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND p.voided = 0 "
-            + "       AND e.location_id = :location "
-            + "       AND encounter_type = ${6} "
-            + "       AND o.concept_id = ${1982} "
-            + "       AND o.value_coded = ${1065} "
-            + "       AND p.gender = 'F' "
-            + "       AND e.encounter_datetime >= DATE_ADD(DATE_SUB(:startDate, interval 2 MONTH), interval 1 day) "
-            + "       AND e.encounter_datetime <= DATE_SUB(:startDate, interval 1 MONTH) "
-            + "GROUP  BY p.person_id ";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    cd.setQuery(sb.replace(query));
-
-    return cd;
-  }
-
-  /**
-   * O sistema irá identificar mulheres lactantes registadas na última consulta clínica
-   * seleccionando todos os utentes do sexo feminino, independentemente da idade, e registados como
-   * “Lactante=Sim” na última consulta clínica decorrida durante o período de revisão (última “Data
-   * Consulta Clínica” >= “Data Início Avaliação” e <= “Data Fim Avaliação”. • sendo o período de
-   * avaliação o seguinte: ◦ “Data Início de Avaliação” = “Data Recolha de Dados” menos (-) 2 meses
-   * mais (+) 1 dia ◦ “Data Fim de Avaliação” = “Data Recolha de Dados” menos (-) 1 mês
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getMQC13RF11() {
-
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Lactating women at the last visit::");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1982", commonMetadata.getPregnantConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-
-    String query =
-        "SELECT p.person_id, "
-            + "       Max(e.encounter_datetime) AS most_recent "
-            + "FROM   person p "
-            + "       JOIN encounter e "
-            + "         ON e.patient_id = p.person_id "
-            + "       JOIN obs o "
-            + "         ON o.encounter_id = e.encounter_id "
-            + "WHERE  e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND p.voided = 0 "
-            + "       AND e.location_id = :location "
-            + "       AND encounter_type = ${6} "
-            + "       AND o.concept_id = ${6332} "
-            + "       AND o.value_coded = ${1065} "
-            + "       AND p.gender = 'F' "
-            + "       AND e.encounter_datetime >= DATE_ADD(DATE_SUB(:startDate, interval 2 MONTH), interval 1 day) "
-            + "       AND e.encounter_datetime <= DATE_SUB(:startDate, interval 1 MONTH) "
-            + "GROUP  BY p.person_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
