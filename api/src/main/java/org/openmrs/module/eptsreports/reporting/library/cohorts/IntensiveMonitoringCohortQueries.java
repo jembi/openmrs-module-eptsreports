@@ -2280,6 +2280,9 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition abandonedExclusionByTarvRestartDate =
         qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnArtRestartDate();
 
+    CohortDefinition abandonedExclusionFirstLine =
+        qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnFirstLineDate();
+
     compositionCohortDefinition.addSearch(
         "age",
         EptsReportUtils.map(
@@ -2336,10 +2339,21 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "RESTARTED", EptsReportUtils.map(restartdedExclusion, MAPPING));
+        "RESTARTED",
+        EptsReportUtils.map(
+            restartdedExclusion, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "RESTARTEDTARV", EptsReportUtils.map(abandonedExclusionByTarvRestartDate, MAPPING));
+        "RESTARTEDTARV",
+        EptsReportUtils.map(
+            abandonedExclusionByTarvRestartDate,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONED1LINE",
+        EptsReportUtils.map(
+            abandonedExclusionFirstLine,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
         "(B1 AND ((B2NEW AND NOT ABANDONEDTARV) OR ((RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
@@ -2505,14 +2519,21 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "B2", EptsReportUtils.map(qualityImprovement2020CohortQueries.getMQC13P2DenB2(), MAPPING));
+        "B2",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getMQC13P2DenB2(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "J",
-        EptsReportUtils.map(qualityImprovement2020CohortQueries.getgetMQC13P2DenB4(), MAPPING));
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getgetMQC13P2DenB4(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "ABANDONED",
-        EptsReportUtils.map(getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(), MAPPING));
+        EptsReportUtils.map(
+            getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
 
