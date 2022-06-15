@@ -9446,7 +9446,7 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        p.voided = 0 "
             + "                      AND        e.voided = 0 "
             + "                      AND        o.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) vl ON vl.patient_id = p.patient_id"
+            + "                      GROUP BY   p.patient_id ) vl ON vl.patient_id = p.patient_id "
             + "WHERE      e.encounter_type = ${18} "
             + "AND        e.location_id = :location "
             + "AND        o.concept_id = ${5096} "
