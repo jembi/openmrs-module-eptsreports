@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -27,6 +26,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -625,7 +626,7 @@ public class QualityImprovement2020CohortQueries {
    * @param conceptIdAns The value coded answers concept
    * @return CohortDefinition
    */
-  private CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
+  public CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
     Map<String, Integer> map = new HashMap<>();
     map.put("conceptIdQn", conceptIdQn);
     map.put("conceptIdAns", conceptIdAns);
@@ -4423,15 +4424,15 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTherapeuticLineConcept(),
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
 
-    CohortDefinition abandonedExclusionDuringThePeriod =
-        getPatientsWhoAbandonedTarvOnArtStartDate();
+    CohortDefinition abandonedExclusionInTheLastSixMonthsFromFirstLineDate =
+            getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
 
     CohortDefinition abandonedExclusionByTarvRestartDate =
         getPatientsWhoAbandonedTarvOnArtRestartDate();
 
     CohortDefinition abandonedExclusionFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
 
-    CohortDefinition abandonedExcluusionSecondLine =
+    CohortDefinition abandonedExclusionSecondLine =
         getPatientsWhoAbandonedTarvOnOnSecondLineDate();
 
     CohortDefinition restartdedExclusion = getPatientsWhoRestartedTarvAtLeastSixMonths();
@@ -4552,13 +4553,13 @@ public class QualityImprovement2020CohortQueries {
         "RESTARTEDTARV", EptsReportUtils.map(abandonedExclusionByTarvRestartDate, MAPPING));
 
     compositionCohortDefinition.addSearch(
-        "ABANDONEDTARV", EptsReportUtils.map(abandonedExclusionDuringThePeriod, MAPPING));
+        "ABANDONEDTARV", EptsReportUtils.map(abandonedExclusionInTheLastSixMonthsFromFirstLineDate, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-        "ABANDONED2LINE", EptsReportUtils.map(abandonedExcluusionSecondLine, MAPPING1));
+        "ABANDONED2LINE", EptsReportUtils.map(abandonedExclusionSecondLine, MAPPING1));
 
     if (den) {
       if (line == 1) {
@@ -4574,10 +4575,10 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 1 || line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND (B2NEW OR (B3 AND NOT B3E)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND secondLineB2 AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
       }
     }
 
@@ -6224,6 +6225,9 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
+    CohortDefinition pregnantAbandonedDuringPeriod =
+        getPatientsWhoAbandonedTarvOnArtStartDateForPregnants();
+
     cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
     cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
@@ -6235,7 +6239,9 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch("H", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
 
-    cd.setCompositionString("(A AND C AND H) AND NOT (D OR E OR F)");
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
+
+    cd.setCompositionString("((A AND NOT ABANDONED)AND C AND H) AND NOT (D OR E OR F)");
     return cd;
   }
 
@@ -6924,13 +6930,17 @@ public class QualityImprovement2020CohortQueries {
    * levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data
    * Levantamento”>= 173 dias e <= 187 dias)
    */
+
   public CohortDefinition getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36() {
+
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     compositionCohortDefinition.setName(
         "MDS para utentes estáveis que tiveram consulta no período de avaliação");
+
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     List<Integer> mdsConcepts =
@@ -6947,6 +6957,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition mdsLastClinical =
         getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndState(
             mdsConcepts, states);
+
 
     CohortDefinition queryA3 =
         genericCohortQueries.hasCodedObs(
@@ -6968,10 +6979,13 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             mdsLastClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+
     compositionCohortDefinition.addSearch(
         "DSDT",
         EptsReportUtils.map(
+
             queryA3, "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
+
 
     compositionCohortDefinition.addSearch(
         "FILA83",
@@ -6984,6 +6998,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             nextPickupBetween173And187,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
+
 
     compositionCohortDefinition.setCompositionString("MDS OR DSDT OR FILA83 OR FILA173");
 
@@ -7065,6 +7080,7 @@ public class QualityImprovement2020CohortQueries {
         getPatientsWithMdcBeforeMostRecentClinicalFormWithFollowingDispensationTypesAndState(
             mdsConcepts, states);
 
+
     CohortDefinition dtBeforeClinical =
         getPatientsWithDispensationBeforeLastConsultationDate(hivMetadata.getQuarterlyConcept());
     CohortDefinition dsBeforeClinical =
@@ -7094,15 +7110,18 @@ public class QualityImprovement2020CohortQueries {
             dsBeforeClinical,
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
+
     compositionCohortDefinition.addSearch(
         "FILA83",
         EptsReportUtils.map(
+
             filaBC83, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA173",
         EptsReportUtils.map(
             filaBC173, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        
 
     compositionCohortDefinition.setCompositionString("MDS AND (DS OR DT OR FILA83 OR FILA173)");
 
@@ -7954,9 +7973,11 @@ public class QualityImprovement2020CohortQueries {
         "G", EptsReportUtils.map(Mq15G, "endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "MDS",
+
         EptsReportUtils.map(
             alreadyMds,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
     cd.addSearch("AGE2", EptsReportUtils.map(Mq15AGE2, "endDate=${revisionEndDate}"));
 
     cd.setCompositionString(
@@ -7974,7 +7995,9 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition Mq15DenMDS = getMQ15DenMDS();
     CohortDefinition MqK = intensiveMonitoringCohortQueries.getMI15K();
+
     CohortDefinition mds = getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36();
+
     cd.addSearch(
         "MQ15DenMDS",
         EptsReportUtils.map(
@@ -7990,6 +8013,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             mds,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
 
     cd.setCompositionString("MQ15DenMDS AND K AND MDS");
     return cd;
@@ -8016,6 +8040,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             alreadyMdc,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
     cd.addSearch(
         "H",
         EptsReportUtils.map(
@@ -8079,6 +8104,7 @@ public class QualityImprovement2020CohortQueries {
             Mq15A, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "MDC",
+
         EptsReportUtils.map(
             alreadyMdc,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
@@ -9059,6 +9085,51 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+
+  /**
+   * <b> RF7.2 EXCLUSION FOR PATIENTS WHO ABANDONED IN THE LAST SIX MONTHS FROM FIRST LINE DATE</b>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
+   * seguinte forma:
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
+   * Consulta”<=”Data Fim Período”
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
+   * Período” e “Data Consulta”<=”Data Fim Período”
+   * <li>6. para exclusão nos utentes que estão na 1ª linha de TARV, a “Data Início Período” será
+   *    igual a “Data 1a Linha” – 6 meses e “Data Fim do Período” será igual a “Data 1a Linha”.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients who abandoned TARV In The Last Six Months From First Line Date");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setQuery(
+        QualityImprovement2020Queries.getMQ13AbandonedTarvInTheLastSixMonthsFromFirstLineDate(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
+            hivMetadata.getTherapeuticLineConcept().getConceptId(),
+            hivMetadata.getFirstLineConcept().getConceptId(),
+            hivMetadata.getARVStartDateConcept().getConceptId(),
+            hivMetadata.getJustificativeToChangeArvTreatment().getConceptId(),
+            commonMetadata.getRegimenAlternativeToFirstLineConcept().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId()));
+
+    return cd;
+  }
+
   /**
    * <b> RF7.2 EXCLUSION FOR PATIENTS WHO ABANDONED DURING SECOND LINE REGIMEN DATE PERIOD</b>
    *
@@ -9282,6 +9353,7 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+
    * Utentes que têm o registo de início do MDS para utente estável na última consulta decorrida há
    * 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 12 meses+1dia e <= “Data Fim
    * Revisão”), ou seja, registo de um MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como:
@@ -9295,6 +9367,7 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition
       getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndState(
           List<Integer> dispensationTypes, List<Integer> states) {
+
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
@@ -9528,7 +9601,7 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
-
+  
   /**
    * Os utentes com registo de último levantamento na farmácia (FILA) antes da última consulta do
    * período de revisão (“Data última Consulta) com próximo levantamento agendado para 83 a 97 dias
@@ -9736,7 +9809,8 @@ public class QualityImprovement2020CohortQueries {
 
   private String getMetadataFrom(List<Integer> dispensationTypes) {
     if (dispensationTypes == null || dispensationTypes.isEmpty()) {
-      throw new RuntimeException("The list of encounters or concpts might not be empty ");
+
+      throw new RuntimeException("The list of encounters or concepts might not be empty ");
     }
     return dispensationTypes.toString().replace("[", "").replace("]", "");
   }
