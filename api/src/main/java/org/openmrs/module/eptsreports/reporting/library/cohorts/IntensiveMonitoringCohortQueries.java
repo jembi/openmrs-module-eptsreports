@@ -1,10 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
@@ -2088,7 +2084,26 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition p = getMI15P();
     CohortDefinition alreadyEnrolledMdc =
         qualityImprovement2020CohortQueries.getPatientsAlreadyEnrolledInTheMdc();
-    CohortDefinition mdcLastClinical = qualityImprovement2020CohortQueries.getPatientsWhoHadMdsOnMostRecentClinicalForm();
+    CohortDefinition mdcLastClinical = qualityImprovement2020CohortQueries.getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36();
+
+    List<Integer> mdsConcepts =
+            Arrays.asList(
+                    hivMetadata.getGaac().getConceptId(),
+                    hivMetadata.getQuarterlyDispensation().getConceptId(),
+                    hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+                    hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+                    hivMetadata.getRapidFlow().getConceptId(),
+                    hivMetadata.getSemiannualDispensation().getConceptId());
+
+    List<Integer> states = Arrays.asList(hivMetadata.getCompletedConcept().getConceptId());
+
+    CohortDefinition recentMdc =
+            qualityImprovement2020CohortQueries.getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndState(
+                    mdsConcepts, states);
+
+    CohortDefinition pickupAfterClinical = qualityImprovement2020CohortQueries.getPatientsWhoHadPickupOnFilaAfterMostRecentVlOnFichaClinica();
+
+
 
     CohortDefinition major2 = getAgeOnLastConsultationMoreThan2Years();
     String MAPPINGA =
@@ -2115,6 +2130,8 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch("P", EptsReportUtils.map(p, MAPPINGA));
     cd.addSearch("AGE2", EptsReportUtils.map(major2, MAPPINGA));
     cd.addSearch("LMDC", EptsReportUtils.map(mdcLastClinical, MAPPINGA));
+    cd.addSearch("RMDC", EptsReportUtils.map(recentMdc, MAPPINGA));
+    cd.addSearch("PICKUP", EptsReportUtils.map(pickupAfterClinical, MAPPINGA));
 
     if (isDenominator) {
 
@@ -2139,7 +2156,7 @@ public class IntensiveMonitoringCohortQueries {
     }
     if (level == 2) {
       cd.setName("Numerator: " + name2);
-      cd.setCompositionString("A AND J AND H AND L AND AGE2");
+      cd.setCompositionString("A AND RMDC AND PICKUP AND H AND L AND AGE2");
     }
     if (level == 3) {
       cd.setName("Numerator: " + name3);
@@ -2147,6 +2164,7 @@ public class IntensiveMonitoringCohortQueries {
     }
     return cd;
   }
+
 
   /**
    * Age should be calculated on “Last Consultation Date” (Check A for the algorithm to define this

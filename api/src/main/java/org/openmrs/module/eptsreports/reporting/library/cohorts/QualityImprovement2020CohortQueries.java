@@ -6924,7 +6924,7 @@ public class QualityImprovement2020CohortQueries {
    * levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data
    * Levantamento”>= 173 dias e <= 187 dias)
    */
-  public CohortDefinition getPatientsWhoHadMdsOnMostRecentClinicalForm() {
+  public CohortDefinition getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36() {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     compositionCohortDefinition.setName(
@@ -7976,7 +7976,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition Mq15DenMDS = getMQ15DenMDS();
     CohortDefinition MqK = intensiveMonitoringCohortQueries.getMI15K();
-    CohortDefinition mds = getPatientsWhoHadMdsOnMostRecentClinicalForm();
+    CohortDefinition mds = getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36();
     cd.addSearch(
         "MQ15DenMDS",
         EptsReportUtils.map(
