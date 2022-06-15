@@ -1670,7 +1670,6 @@ public class QualityImprovement2020Queries {
     return stringSubstitutor.replace(query);
   }
 
-
   /**
    * <b> O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
    * seguinte forma: </b>
@@ -1690,7 +1689,7 @@ public class QualityImprovement2020Queries {
    * <p>Nota: O período é definido conforme o requisito onde os utentes abandonos em TARV no fim do
    * período serão excluídos:
    * <li>6. para exclusão nos utentes que estão na 1ª linha de TARV, a “Data Início Período” será
-   * igual a “Data 1a Linha” – 6 meses e “Data Fim do Período” será igual a “Data 1a Linha”.
+   *     igual a “Data 1a Linha” – 6 meses e “Data Fim do Período” será igual a “Data 1a Linha”.
    *
    *     <p>B1= (BI1 and not B1E) ‘: MUDANCA DE REGIME
    * <li>BI1 - Select all patients who have the most recent “ALTERNATIVA A LINHA - 1a LINHA”
