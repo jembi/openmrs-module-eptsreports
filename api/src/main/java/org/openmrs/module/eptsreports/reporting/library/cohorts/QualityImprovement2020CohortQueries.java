@@ -6463,7 +6463,7 @@ public class QualityImprovement2020CohortQueries {
             BaseObsCohortDefinition.TimeModifier.LAST,
             SetComparator.IN,
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
-            Arrays.asList(
+            Arrays.asList(hivMetadata.getQuarterlyDispensation(),
                 hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
