@@ -1948,7 +1948,8 @@ public class QualityImprovement2020Queries {
             + "         AND o.voided = 0     "
             + "         AND o.concept_id = ${856}   "
             + "         AND o.value_numeric >= 1000  "
-            + "         AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
+            + "         AND e.encounter_type = ${6} "
+            + "         AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "         AND e.location_id = :location   "
             + "         GROUP  BY p.patient_id    ";
 
