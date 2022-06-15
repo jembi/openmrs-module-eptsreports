@@ -1453,7 +1453,8 @@ public class IntensiveMonitoringCohortQueries {
             + "       AND ee.encounter_type = ${6} "
             + "       AND oo.concept_id = ${856} "
             + "       AND oo.value_numeric >= 1000 "
-            + "       AND ee.encounter_datetime <  :endDate ";
+            + "       AND ee.encounter_datetime <=  :endDate "
+            + " GROUP BY p.patient_id                        ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1629,9 +1630,11 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
   /**
-   * F - Select all patients with the last CD4 result (concept id 1695) and the result is <= 200
-   * (value_numeric) registered on Ficha Clinica (encounter type 6) before “Last Consultation Date”
-   * (encounter_datetime from A).
+   * Os utentes com último resultado de CD4 (se existir) registado na “Ficha Clínica” (coluna 15)
+   * abaixo ou igual a de 200, ou seja, último “Resultado CD4” <= 200 até a “Data Fim de Avaliação”
+   * (“Data de Recolha Dados” menos (-) 1 mês), excepto os utentes que têm um registo de CV
+   * disponível na Ficha Clinica, último até “Data Fim de Avaliação”( “Data de Recolha Dados” menos
+   * (-) 1 mês)..
    *
    * @return CohortDefinition
    */
