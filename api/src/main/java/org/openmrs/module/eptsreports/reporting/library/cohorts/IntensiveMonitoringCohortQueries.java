@@ -2070,9 +2070,6 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition p = getMI15P();
     CohortDefinition alreadyEnrolledMdc =
         qualityImprovement2020CohortQueries.getPatientsAlreadyEnrolledInTheMdc();
-    CohortDefinition mdcLastClinical =
-        qualityImprovement2020CohortQueries
-            .getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36();
 
     List<Integer> mdsConcepts =
         Arrays.asList(
@@ -2084,6 +2081,11 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getSemiannualDispensation().getConceptId());
 
     List<Integer> states = Arrays.asList(hivMetadata.getCompletedConcept().getConceptId());
+    List<Integer> start = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
+
+    CohortDefinition mdcLastClinical =
+        qualityImprovement2020CohortQueries
+            .getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36(mdsConcepts, start);
 
     CohortDefinition recentMdc =
         qualityImprovement2020CohortQueries

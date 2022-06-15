@@ -6929,7 +6929,8 @@ public class QualityImprovement2020CohortQueries {
    * levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data
    * Levantamento”>= 173 dias e <= 187 dias)
    */
-  public CohortDefinition getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36() {
+  public CohortDefinition getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36(
+      List<Integer> dispensationTypes, List<Integer> states) {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
@@ -6941,20 +6942,9 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    List<Integer> mdsConcepts =
-        Arrays.asList(
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
-            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
-            hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
-
-    List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
-
     CohortDefinition mdsLastClinical =
         getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndState(
-            mdsConcepts, states);
+            dispensationTypes, states);
 
     CohortDefinition queryA3 =
         genericCohortQueries.hasCodedObs(
@@ -7984,7 +7974,19 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15DenMDS = getMQ15DenMDS();
     CohortDefinition MqK = intensiveMonitoringCohortQueries.getMI15K();
 
-    CohortDefinition mds = getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36();
+    List<Integer> mdsConcepts =
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
+
+    List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
+
+    CohortDefinition mds =
+        getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36(mdsConcepts, states);
 
     cd.addSearch(
         "MQ15DenMDS",
@@ -9380,7 +9382,7 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "                      AND        p.voided = 0 "
             + "                      AND        e.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) consultation ON consultation.patient_id = p.patient_id"
+            + "                      GROUP BY   p.patient_id ) consultation ON consultation.patient_id = p.patient_id "
             + "WHERE      e.encounter_type = ${6} "
             + "AND        e.location_id = :location "
             + "AND        otype.concept_id = ${165174} "
@@ -9508,7 +9510,8 @@ public class QualityImprovement2020CohortQueries {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${6} "
             + "       AND  o.concept_id = ${dispensation} "
-            + "       AND e.encounter_datetime <= last_consultation.encounter_datetime";
+            + "       AND e.encounter_datetime <= last_consultation.encounter_datetime "
+            + " GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -9563,7 +9566,7 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "                      AND        p.voided = 0 "
             + "                      AND        e.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) consultation ON consultation.patient_id = p.patient_id"
+            + "                      GROUP BY   p.patient_id ) consultation ON consultation.patient_id = p.patient_id "
             + "WHERE      e.encounter_type = ${6} "
             + "AND        e.location_id = :location "
             + "AND        otype.concept_id = ${165174} "
@@ -9622,7 +9625,7 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "                      AND        e.voided = 0 "
             + "                      AND        p.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) recent_clinical ON recent_clinical.patient_id = p.patient_id"
+            + "                      GROUP BY   p.patient_id ) recent_clinical ON recent_clinical.patient_id = p.patient_id "
             + "WHERE      e.encounter_datetime <= recent_clinical.consultation_date "
             + "AND        e.encounter_type = ${18} "
             + "AND        e.location_id = :location "
