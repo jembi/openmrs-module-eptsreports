@@ -1961,7 +1961,7 @@ public class QualityImprovement2020Queries {
 
   private static String getMetadataFrom(List<Integer> dispensationTypes) {
     if (dispensationTypes == null || dispensationTypes.isEmpty()) {
-      throw new RuntimeException("The list of encounters or concpts might not be empty ");
+      throw new RuntimeException("The list of encounters or concepts might not be empty ");
     }
     return dispensationTypes.toString().replace("[", "").replace("]", "");
   }
