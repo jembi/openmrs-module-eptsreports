@@ -1248,21 +1248,21 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
         "");
 
-    /*  CohortIndicator MI15DEN16 =
+    CohortIndicator MI15DEN16 =
         eptsGeneralIndicator.getIndicator(
             "MI15DEN16",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQDen15Dot16(),
                 "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
-    MI15DEN16.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));*/
+    MI15DEN16.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    /*dataSetDefinition.addColumn(
-    "MI15DEN16",
-    "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
-    EptsReportUtils.map(
-        MI15DEN16,
-        "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
-    "");*/
+    dataSetDefinition.addColumn(
+        "MI15DEN16",
+        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
+        EptsReportUtils.map(
+            MI15DEN16,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+        "");
 
     CohortIndicator MI15NUM16 =
         eptsGeneralIndicator.getIndicator(
