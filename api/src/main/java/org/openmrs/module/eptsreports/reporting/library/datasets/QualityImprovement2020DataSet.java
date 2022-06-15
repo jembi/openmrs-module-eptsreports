@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.QualityImprovement2020CohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
@@ -18,6 +15,10 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class QualityImprovement2020DataSet extends BaseDataSet {
@@ -2157,7 +2158,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQDen15Dot16(),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
-
+    MQ15DEN16.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     dataSetDefinition.addColumn(
         "MQ15DEN16",
         "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
@@ -2171,7 +2172,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQNum15Dot16(),
                 "startDate=${startDate},endDate=${endDate},location=${location}"));
-
+    MQ15NUM16.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     dataSetDefinition.addColumn(
         "MQ15NUM16",
         "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
