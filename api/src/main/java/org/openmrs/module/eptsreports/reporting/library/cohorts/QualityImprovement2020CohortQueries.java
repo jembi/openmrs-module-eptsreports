@@ -7951,9 +7951,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15F, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-        "G",
-        EptsReportUtils.map(
-            Mq15G, "endDate=${revisionEndDate},location=${location}"));
+        "G", EptsReportUtils.map(Mq15G, "endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "MDS",
         EptsReportUtils.map(

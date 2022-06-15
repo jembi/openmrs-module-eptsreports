@@ -1431,7 +1431,9 @@ public class IntensiveMonitoringCohortQueries {
    *
    *
    * <ul>
-   *   <li>utentes com último resultado de Carga Viral (se existir) registado na “Ficha Clínica” (coluna 15) acima ou igual a de 1000 cópias, ou seja, último “Resultado Carga Viral” >= 1000., até “Data Fim de Avaliação”  (“Data de Recolha Dados” menos (-) 1 mês).
+   *   <li>utentes com último resultado de Carga Viral (se existir) registado na “Ficha Clínica”
+   *       (coluna 15) acima ou igual a de 1000 cópias, ou seja, último “Resultado Carga Viral” >=
+   *       1000., até “Data Fim de Avaliação” (“Data de Recolha Dados” menos (-) 1 mês).
    * </ul>
    *
    * @return CohortDefinition
@@ -1652,14 +1654,15 @@ public class IntensiveMonitoringCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        " SELECT p.patient_id "
+        ""
+            + "SELECT p.patient_id "
             + "FROM   patient p "
-            + "       INNER JOIN encounter ee "
-            + "               ON ee.patient_id = p.patient_id "
-            + "       INNER JOIN obs oo "
-            + "               ON oo.encounter_id = ee.encounter_id "
+            + "       INNER JOIN encounter ee ON ee.patient_id = p.patient_id "
+            + "       INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id "
             + "WHERE  p.voided = 0 "
             + "       AND ee.voided = 0 "
             + "       AND oo.voided = 0 "
@@ -1667,15 +1670,17 @@ public class IntensiveMonitoringCohortQueries {
             + "       AND ee.encounter_type = ${6} "
             + "       AND oo.concept_id = ${1695} "
             + "       AND oo.value_numeric <= 200 "
-            + "       AND ee.encounter_datetime < (SELECT "
-            + "           Max(e.encounter_datetime) AS last_consultation_date "
-            + "                                     FROM   encounter e "
-            + "                                     WHERE  e.voided = 0 "
-            + "                                            AND e.location_id = :location "
-            + "                                            AND e.encounter_type = ${6} "
-            + "                                            AND e.patient_id = p.patient_id "
-            + "                                            AND e.encounter_datetime BETWEEN "
-            + "                                                :startDate AND :endDate LIMIT  1) ";
+            + "       AND ee.encounter_datetime <= :endDate "
+            + "       AND NOT EXISTS (SELECT e.encounter_id "
+            + "                       FROM   encounter e    "
+            + "                              INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                       WHERE  e.encounter_type = ${6} "
+            + "                              AND e.location_id = :location "
+            + "                              AND o.concept_id IN( ${856}, ${1305} ) "
+            + "                              AND e.patient_id = p.patient_id "
+            + "                              AND e.voided = 0 "
+            + "                              AND o.voided = 0)"
+            + " GROUP BY p.patient_id         ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
