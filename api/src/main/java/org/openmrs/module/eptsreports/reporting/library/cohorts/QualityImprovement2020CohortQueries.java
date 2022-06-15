@@ -7953,7 +7953,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "G",
         EptsReportUtils.map(
-            Mq15G, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            Mq15G, "endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "MDS",
         EptsReportUtils.map(
@@ -7988,7 +7988,10 @@ public class QualityImprovement2020CohortQueries {
             MqK, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "MDS", EptsReportUtils.map(mds, "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+        "MDS",
+        EptsReportUtils.map(
+            mds,
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("MQ15DenMDS AND K AND MDS");
     return cd;

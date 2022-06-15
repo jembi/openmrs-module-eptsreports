@@ -1431,9 +1431,7 @@ public class IntensiveMonitoringCohortQueries {
    *
    *
    * <ul>
-   *   <li>G - Select all patients with the last (Viral Load Result (concept id 856) )and the result
-   *       is >= 1000 (value_numeric) registered on Ficha Clinica (encounter type 6) before “Last
-   *       Consultation Date” (encounter_datetime from A).
+   *   <li>utentes com último resultado de Carga Viral (se existir) registado na “Ficha Clínica” (coluna 15) acima ou igual a de 1000 cópias, ou seja, último “Resultado Carga Viral” >= 1000., até “Data Fim de Avaliação”  (“Data de Recolha Dados” menos (-) 1 mês).
    * </ul>
    *
    * @return CohortDefinition
@@ -1442,10 +1440,8 @@ public class IntensiveMonitoringCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("G - All patients with the last Viral Load Result");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
@@ -1464,16 +1460,7 @@ public class IntensiveMonitoringCohortQueries {
             + "       AND ee.encounter_type = ${6} "
             + "       AND oo.concept_id = ${856} "
             + "       AND oo.value_numeric >= 1000 "
-            + "       AND ee.encounter_datetime < (SELECT "
-            + "           Max(e.encounter_datetime) AS last_consultation_date "
-            + "                                     FROM   encounter e "
-            + "                                     WHERE  e.voided = 0 "
-            + "                                            AND e.location_id = :location "
-            + "                                            AND e.encounter_type = ${6} "
-            + "                                            AND e.patient_id = p.patient_id "
-            + "                                            AND e.encounter_datetime BETWEEN "
-            + "                                                :startDate AND :endDate "
-            + "                                     LIMIT  1)  ";
+            + "       AND ee.encounter_datetime <  :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -2084,26 +2071,29 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition p = getMI15P();
     CohortDefinition alreadyEnrolledMdc =
         qualityImprovement2020CohortQueries.getPatientsAlreadyEnrolledInTheMdc();
-    CohortDefinition mdcLastClinical = qualityImprovement2020CohortQueries.getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36();
+    CohortDefinition mdcLastClinical =
+        qualityImprovement2020CohortQueries
+            .getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36();
 
     List<Integer> mdsConcepts =
-            Arrays.asList(
-                    hivMetadata.getGaac().getConceptId(),
-                    hivMetadata.getQuarterlyDispensation().getConceptId(),
-                    hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
-                    hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
-                    hivMetadata.getRapidFlow().getConceptId(),
-                    hivMetadata.getSemiannualDispensation().getConceptId());
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
 
     List<Integer> states = Arrays.asList(hivMetadata.getCompletedConcept().getConceptId());
 
     CohortDefinition recentMdc =
-            qualityImprovement2020CohortQueries.getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndState(
-                    mdsConcepts, states);
+        qualityImprovement2020CohortQueries
+            .getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndState(
+                mdsConcepts, states);
 
-    CohortDefinition pickupAfterClinical = qualityImprovement2020CohortQueries.getPatientsWhoHadPickupOnFilaAfterMostRecentVlOnFichaClinica();
-
-
+    CohortDefinition pickupAfterClinical =
+        qualityImprovement2020CohortQueries
+            .getPatientsWhoHadPickupOnFilaAfterMostRecentVlOnFichaClinica();
 
     CohortDefinition major2 = getAgeOnLastConsultationMoreThan2Years();
     String MAPPINGA =
@@ -2120,7 +2110,7 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch("D", EptsReportUtils.map(d, MAPPINGD));
     cd.addSearch("E", EptsReportUtils.map(e, MAPPINGA));
     cd.addSearch("F", EptsReportUtils.map(f, MAPPINGA));
-    cd.addSearch("G", EptsReportUtils.map(g, MAPPINGA));
+    cd.addSearch("G", EptsReportUtils.map(g, "endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch("H", EptsReportUtils.map(h, MAPPINGA));
     cd.addSearch("I", EptsReportUtils.map(i, MAPPINGA));
     cd.addSearch("J", EptsReportUtils.map(j, MAPPINGA));
@@ -2164,7 +2154,6 @@ public class IntensiveMonitoringCohortQueries {
     }
     return cd;
   }
-
 
   /**
    * Age should be calculated on “Last Consultation Date” (Check A for the algorithm to define this
