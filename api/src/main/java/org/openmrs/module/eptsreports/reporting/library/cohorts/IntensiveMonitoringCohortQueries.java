@@ -1672,6 +1672,7 @@ public class IntensiveMonitoringCohortQueries {
             + "                              AND e.location_id = :location "
             + "                              AND o.concept_id IN( ${856}, ${1305} ) "
             + "                              AND e.patient_id = p.patient_id "
+            + "                              AND e.encounter_datetime <= :endDate "
             + "                              AND e.voided = 0 "
             + "                              AND o.voided = 0)"
             + " GROUP BY p.patient_id         ";
