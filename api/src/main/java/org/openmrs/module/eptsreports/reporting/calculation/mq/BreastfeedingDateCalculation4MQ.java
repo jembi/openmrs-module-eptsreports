@@ -86,6 +86,7 @@ public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation 
             null,
             TimeQualifier.ANY,
             null,
+            context.getNow(),
             context);
 
     CalculationResultMap patientStateMap =
@@ -121,6 +122,7 @@ public class BreastfeedingDateCalculation4MQ extends AbstractPatientCalculation 
             Arrays.asList(yes),
             TimeQualifier.ANY,
             null,
+            context.getNow(),
             context);
 
     CalculationResultMap breastfeedingMap =

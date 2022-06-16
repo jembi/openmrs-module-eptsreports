@@ -36,7 +36,7 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
 
   @Override
   public String getDescription() {
-    return "Novo relatórios com Indicadores para estratégia de Melhoria de Qualidade";
+    return "Novo relatório com Indicadores para estratégia de Melhoria de Qualidade";
   }
 
   @Override
