@@ -6463,9 +6463,7 @@ public class QualityImprovement2020CohortQueries {
             BaseObsCohortDefinition.TimeModifier.LAST,
             SetComparator.IN,
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
-            Arrays.asList(
-                hivMetadata.getQuarterlyDispensation(),
-                hivMetadata.getSemiannualDispensation()));
+            Arrays.asList(hivMetadata.getQuarterlyDispensation()));
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
@@ -9631,8 +9629,8 @@ public class QualityImprovement2020CohortQueries {
             + "AND        e.encounter_type = ${18} "
             + "AND        e.location_id = :location "
             + "AND        o.concept_id = ${5096} "
-            + "AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) >= ${lower} "
-            + " AND        DATEDIFF(recent_clinical.consultation_date , o.value_datetime) <= ${upper} "
+            + "AND        DATEDIFF(o.value_datetime, recent_clinical.consultation_date) >= ${lower} "
+            + " AND        DATEDIFF(o.value_datetime, recent_clinical.consultation_date) <= ${upper} "
             + " AND        p.voided = 0 "
             + " AND        e.voided = 0 "
             + " AND        o.voided = 0 "
