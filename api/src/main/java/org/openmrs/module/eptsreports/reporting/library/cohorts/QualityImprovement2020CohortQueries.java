@@ -6471,7 +6471,8 @@ public class QualityImprovement2020CohortQueries {
             SetComparator.IN,
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
             Arrays.asList(
-                hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));
+                hivMetadata.getQuarterlyDispensation(),
+                hivMetadata.getSemiannualDispensation()));
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
@@ -6584,7 +6585,7 @@ public class QualityImprovement2020CohortQueries {
 
     if (den == 1) {
       comp.setCompositionString("(A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
-    } else if (den == 2 || den == 4) {
+    } else if (den == 2) {
       comp.setCompositionString(
           "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2");
     } else if (den == 3) {
@@ -6595,7 +6596,7 @@ public class QualityImprovement2020CohortQueries {
           "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS AND VLFL");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString("(DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
-    } else if (den == 7 || den == 9 || den == 8 || den == 10) {
+    } else if (den == 7 || den == 8) {
       comp.setCompositionString(
           "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 ");
     } else if (den == 11 || den == 12) {
