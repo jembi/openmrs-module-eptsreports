@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.*;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -26,8 +27,6 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -4425,15 +4424,14 @@ public class QualityImprovement2020CohortQueries {
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
 
     CohortDefinition abandonedExclusionInTheLastSixMonthsFromFirstLineDate =
-            getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
+        getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
 
     CohortDefinition abandonedExclusionByTarvRestartDate =
         getPatientsWhoAbandonedTarvOnArtRestartDate();
 
     CohortDefinition abandonedExclusionFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
 
-    CohortDefinition abandonedExclusionSecondLine =
-        getPatientsWhoAbandonedTarvOnOnSecondLineDate();
+    CohortDefinition abandonedExclusionSecondLine = getPatientsWhoAbandonedTarvOnOnSecondLineDate();
 
     CohortDefinition restartdedExclusion = getPatientsWhoRestartedTarvAtLeastSixMonths();
 
@@ -4553,7 +4551,8 @@ public class QualityImprovement2020CohortQueries {
         "RESTARTEDTARV", EptsReportUtils.map(abandonedExclusionByTarvRestartDate, MAPPING));
 
     compositionCohortDefinition.addSearch(
-        "ABANDONEDTARV", EptsReportUtils.map(abandonedExclusionInTheLastSixMonthsFromFirstLineDate, MAPPING1));
+        "ABANDONEDTARV",
+        EptsReportUtils.map(abandonedExclusionInTheLastSixMonthsFromFirstLineDate, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));
@@ -9058,7 +9057,6 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-
   /**
    * <b> RF7.2 EXCLUSION FOR PATIENTS WHO ABANDONED IN THE LAST SIX MONTHS FROM FIRST LINE DATE</b>
    *
@@ -9073,7 +9071,7 @@ public class QualityImprovement2020CohortQueries {
    * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
    * Período” e “Data Consulta”<=”Data Fim Período”
    * <li>6. para exclusão nos utentes que estão na 1ª linha de TARV, a “Data Início Período” será
-   *    igual a “Data 1a Linha” – 6 meses e “Data Fim do Período” será igual a “Data 1a Linha”.
+   *     igual a “Data 1a Linha” – 6 meses e “Data Fim do Período” será igual a “Data 1a Linha”.
    *
    * @return CohortDefinition
    */
