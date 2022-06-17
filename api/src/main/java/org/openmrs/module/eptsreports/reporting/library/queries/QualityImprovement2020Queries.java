@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -2073,7 +2074,7 @@ public class QualityImprovement2020Queries {
     if (dispensationTypes == null || dispensationTypes.isEmpty()) {
       throw new RuntimeException("The list of encounters or concepts might not be empty ");
     }
-    return dispensationTypes.toString().replace("[", "").replace("]", "");
+    return StringUtils.join(dispensationTypes, ",");
   }
 
   /**
