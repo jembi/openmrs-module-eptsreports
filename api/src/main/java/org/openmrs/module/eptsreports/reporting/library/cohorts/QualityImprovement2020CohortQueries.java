@@ -9681,6 +9681,10 @@ public class QualityImprovement2020CohortQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId().toString());
     map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId().toString());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId().toString());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId().toString());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId().toString());
+    map.put("lower", "83");
+    map.put("upper", "97");
     map.put("dispensationTypes", getMetadataFrom(dispensationTypes));
 
     String query =
