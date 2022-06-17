@@ -6495,7 +6495,7 @@ public class QualityImprovement2020CohortQueries {
     // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
     // data do 2o pedido de CV e Data de Revisao
     CohortDefinition VLFL =
-        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(mdsConcepts);
+        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(mdsConcepts);
 
     comp.addSearch(
         "A1",
@@ -6790,8 +6790,10 @@ public class QualityImprovement2020CohortQueries {
 
     // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
     // data do 2o pedido de CV e Data de Revisao
-    CohortDefinition VLFL =
-        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(concepts);
+    CohortDefinition VLFL = getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(concepts);
+
+    CohortDefinition LOWVLFL =
+        getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecudondVLRequest(concepts);
 
     // Pacientes com pedidos de investigações depois de DT
     List<Integer> dtConcept = Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId());
@@ -6849,7 +6851,8 @@ public class QualityImprovement2020CohortQueries {
         "Den1",
         EptsReportUtils.map(
             getMQ15DEN(1),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));    comp.addSearch(
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    comp.addSearch(
         "Den4",
         EptsReportUtils.map(
             getMQ15DEN(4),
@@ -6858,7 +6861,8 @@ public class QualityImprovement2020CohortQueries {
         "Den5",
         EptsReportUtils.map(
             getMQ15DEN(5),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")); comp.addSearch(
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    comp.addSearch(
         "Den11",
         EptsReportUtils.map(
             getMQ15DEN(11),
@@ -6881,6 +6885,12 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
+        "LOWVLFL",
+        EptsReportUtils.map(
+            LOWVLFL,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
         "IADT",
         EptsReportUtils.map(
             IADT,
@@ -6893,18 +6903,17 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 3) {
       comp.setCompositionString("Den1 AND H2 AND G2 AND VLFL");
     } else if (num == 4) {
-      comp.setCompositionString("Den4 AND I AND G2");
+      comp.setCompositionString("Den4 AND I AND G2 LOWVLFL");
     } else if (num == 5 || num == 6) {
       comp.setCompositionString("Den5 AND G2");
     } else if (num == 7 || num == 8) {
       comp.setCompositionString("Den5 AND H1 AND G2 AND IADT");
     } else if (num == 9 || num == 10) {
-      comp.setCompositionString("Den5 AND H2 AND G2 AND IAMDS");
+      comp.setCompositionString("Den5 AND H2 AND G2 AND VLFL");
     } else if (num == 11) {
-      comp.setCompositionString("Den11 AND I AND G2");
-    }
-    else if ( num == 12) {
-      comp.setCompositionString("Den5 AND I AND G2");
+      comp.setCompositionString("Den11 AND I AND G2 AND LOWVLFL");
+    } else if (num == 12) {
+      comp.setCompositionString("Den5 AND I AND G2 LOWVLFL");
     }
     return comp;
   }
@@ -9228,107 +9237,115 @@ public class QualityImprovement2020CohortQueries {
     map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId().toString());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId().toString());
     map.put("dispensationTypes", getMetadataFrom(dispensationTypes));
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId().toString());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId().toString());
+    map.put("lower", "83");
+    map.put("upper", "97");
 
     String query =
         "SELECT two_dispensations.patient_id "
-            + "FROM   (SELECT p.patient_id "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "        WHERE  e.encounter_type = ${6} "
+            + "FROM   (SELECT patient_id, MIN(encounter_datetime) first_date, MAX(encounter_datetime) second_date "
+            + "        FROM   (SELECT p.patient_id, e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o  ON o.encounter_id = e.encounter_id "
+            + "                WHERE  e.encounter_type = ${6} "
+            + "                       AND e.location_id = :location "
+            + "                       AND o.concept_id = ${23722} "
+            + "                       AND o.value_coded = ${856} "
+            + "                       AND e.encounter_datetime <= :revisionEndDate "
+            + "                       AND e.encounter_datetime >= (SELECT dt_date "
+            + "                                                    FROM   (SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) dt_date "
+            + "                                                            FROM   (SELECT p2.patient_id, e2.encounter_datetime "
+            + "                                                                    FROM   patient p2 "
+            + "                                                                    INNER JOIN encounter e2 ON e2.patient_id = p2.patient_id "
+            + "                                                                    INNER JOIN obs otype ON otype.encounter_id = e2.encounter_id "
+            + "                                                                    INNER JOIN obs ostate ON ostate.encounter_id = "
+            + "                  e2.encounter_id "
+            + "                WHERE  e2.encounter_type = ${6} "
+            + "                       AND e2.location_id = :location "
+            + "                       AND otype.concept_id = "
+            + "                           ${165174} "
+            + "                       AND otype.value_coded IN( "
+            + "                           ${23730} "
+            + "                           ) "
+            + "                       AND ostate.concept_id = "
+            + "                           ${165322} "
+            + "                       AND ostate.value_coded = "
+            + "                           ${1256} "
+            + "                       AND e2.encounter_datetime >= "
+            + "                           :startDate "
+            + "                       AND e2.encounter_datetime <= "
+            + "                           :endDate "
+            + "                       AND otype.obs_group_id = "
+            + "                           ostate.obs_group_id "
+            + "                       AND e2.voided = 0 "
+            + "                       AND p2.voided = 0 "
+            + "                       AND otype.voided = 0 "
+            + "                       AND ostate.voided = 0 "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = "
+            + "                                  e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = "
+            + "                                  o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND o.concept_id = ${23730} "
+            + "                       AND e.encounter_datetime "
+            + "                       AND e.encounter_datetime >= "
+            + "                           :startDate "
+            + "                       AND e.encounter_datetime <= "
+            + "                           :endDate "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = "
+            + "                                  p.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON o.encounter_id = "
+            + "                                  e.encounter_id "
+            + "                       INNER JOIN "
+            + "                       (SELECT p.patient_id, "
+            + "               MAX(e.encounter_datetime) "
+            + "               consultation_date "
+            + "               FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "               ON e.patient_id = "
+            + "               p.patient_id "
+            + "               WHERE  e.encounter_type = ${18} "
             + "               AND e.location_id = :location "
-            + "               AND o.concept_id = ${23722} "
-            + "               AND o.value_coded = ${856} "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.encounter_datetime >= (SELECT dt_date "
-            + "                                            FROM   (SELECT  most_recent.patient_id, MAX(most_recent.encounter_datetime) dt_date "
-            + "                                                    FROM   (SELECT p2.patient_id, e2.encounter_datetime "
-            + "                                                             FROM   patient p2 "
-            + "                                                             INNER JOIN encounter e2 ON e2.patient_id = p2.patient_id "
-            + "                                                             INNER JOIN obs otype ON otype.encounter_id = e2.encounter_id "
-            + "                                                             INNER JOIN obs ostate ON ostate.encounter_id = e2.encounter_id "
-            + "                                                    WHERE  e2.encounter_type = ${6} "
-            + "                                                      AND e2.location_id = :location "
-            + "                                                      AND otype.concept_id = ${165174} "
-            + "                                                      AND otype.value_coded IN( ${dispensationTypes} ) "
-            + "                                                      AND ostate.concept_id = ${165322} "
-            + "                                                      AND ostate.value_coded = ${1256} "
-            + "                                                      AND e2.encounter_datetime >= :startDate "
-            + "                                                      AND e2.encounter_datetime <= :endDate "
-            + "                                                      AND otype.obs_group_id = ostate.obs_group_id "
-            + "                                                      AND e2.voided = 0 "
-            + "                                                      AND p2.voided = 0 "
-            + "                                                      AND otype.voided = 0 "
-            + "                                                      AND ostate.voided = 0 "
-            + "                                                   UNION "
-            + "                                                   SELECT p.patient_id, e.encounter_datetime "
-            + "                                                   FROM   patient p "
-            + "                                                   INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                                   INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                                   WHERE  p.voided = 0 "
-            + "                                                     AND o.voided = 0 "
-            + "                                                     AND e.voided = 0 "
-            + "                                                     AND e.location_id = :location "
-            + "                                                     AND e.encounter_type = ${6} "
-            + "                                                     AND o.concept_id = ${23730} "
-            + "                                                     AND o.value_coded = ${1256} "
-            + "                                                     AND e.encounter_datetime "
-            + "                                                     AND e.encounter_datetime >= :startDate "
-            + "                                                     AND e.encounter_datetime <= :endDate ) most_recent "
-            + "                                               GROUP  BY most_recent.patient_id) dispensation "
-            + "                                               WHERE  dispensation.patient_id = p.patient_id) "
-            + "  GROUP  BY p.patient_id "
-            + "  HAVING COUNT(e.encounter_id) = 2) two_dispensations "
-            + "  INNER JOIN (SELECT two.patient_id, MIN(two.encounter_datetime) first_date, MAX(two.encounter_datetime) second_date "
-            + "              FROM   (SELECT p.patient_id, e.encounter_datetime "
-            + "                           FROM   patient p "
-            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                           WHERE  e.encounter_type = ${6} "
-            + "                                  AND e.location_id = :location "
-            + "                                  AND o.concept_id = ${23722} "
-            + "                                  AND o.value_coded = ${856} "
-            + "                                  AND e.encounter_datetime >= (SELECT dt_date "
-            + "                                                               FROM   (SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) dt_date "
-            + "                                                                       FROM   (SELECT p2.patient_id, e2.encounter_datetime "
-            + "                                                                               FROM   patient p2 "
-            + "                                                                               INNER JOIN encounter e2 ON e2.patient_id = p2.patient_id "
-            + "                                                                               INNER JOIN obs otype ON otype.encounter_id = e2.encounter_id "
-            + "                                                                               INNER JOIN obs ostate ON ostate.encounter_id = e2.encounter_id "
-            + "                                                                               WHERE  e2.encounter_type = ${6} "
-            + "                                                                                 AND e2.location_id = :location "
-            + "                                                                                 AND otype.concept_id = ${165174} "
-            + "                                                                                 AND otype.value_coded IN( ${dispensationTypes}) "
-            + "                                                                                 AND ostate.concept_id = ${165322} "
-            + "                                                                                 AND ostate.value_coded = ${1256} "
-            + "                                                                                 AND e2.encounter_datetime >= :startDate "
-            + "                                                                                 AND e2.encounter_datetime <= :endDate "
-            + "                                                                                 AND otype.obs_group_id = ostate.obs_group_id "
-            + "                                                                                 AND e2.voided = 0 "
-            + "                                                                                 AND p2.voided = 0 "
-            + "                                                                                 AND otype.voided = 0 "
-            + "                                                                                 AND ostate.voided = 0 "
-            + "                                                                         UNION "
-            + "                                                                         SELECT p.patient_id, "
-            + "                                                                         e.encounter_datetime "
-            + "                                                                         FROM   patient p "
-            + "                                                                         INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                                                         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                                                         WHERE  p.voided = 0 "
-            + "                                                                           AND o.voided = 0 "
-            + "                                                                           AND e.voided = 0 "
-            + "                                                                           AND e.location_id = :location "
-            + "                                                                           AND e.encounter_type = ${6} "
-            + "                                                                           AND o.concept_id = ${23730} "
-            + "                                                                           AND o.value_coded = ${1256} "
-            + "                                                                           AND e.encounter_datetime "
-            + "                                                                           AND e.encounter_datetime >= :startDate "
-            + "                                                                           AND e.encounter_datetime <= :endDate) most_recent "
-            + "                                                                       GROUP  BY most_recent.patient_id) dispensation "
-            + "                                                                    WHERE  dispensation.patient_id = p.patient_id) "
-            + "                                                                      AND e.encounter_datetime <= :endDate "
-            + "                                                                   ORDER  BY e.encounter_datetime) two "
-            + "                                                                   GROUP  BY two.patient_id) dispensations ON dispensations.patient_id = two_dispensations.patient_id "
+            + "               AND e.encounter_datetime BETWEEN "
+            + "               :startDate AND :endDate "
+            + "               AND e.voided = 0 "
+            + "               AND p.voided = 0 "
+            + "               GROUP  BY p.patient_id) recent_clinical "
+            + "               ON recent_clinical.patient_id = p.patient_id "
+            + "               WHERE  e.encounter_datetime = recent_clinical.consultation_date "
+            + "               AND e.encounter_type = ${18} "
+            + "               AND e.location_id = :location "
+            + "               AND o.concept_id = ${5096} "
+            + "               AND DATEDIFF(o.value_datetime, "
+            + "               recent_clinical.consultation_date) >= ${lower} "
+            + "               AND DATEDIFF(o.value_datetime, "
+            + "               recent_clinical.consultation_date) <= ${upper} "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               GROUP  BY p.patient_id) most_recent "
+            + "               GROUP  BY most_recent.patient_id) dispensation "
+            + "               WHERE  dispensation.patient_id = p.patient_id)) investigations "
+            + "        GROUP  BY investigations.patient_id "
+            + "        HAVING COUNT(investigations.encounter_datetime) = 2) two_dispensations "
             + " INNER JOIN (SELECT p.patient_id, e.encounter_datetime AS vl_date "
             + "             FROM   patient p "
             + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -9339,7 +9356,7 @@ public class QualityImprovement2020CohortQueries {
             + "             AND p.voided = 0 "
             + "             AND e.voided = 0 "
             + "             AND o.voided = 0) vl_result ON two_dispensations.patient_id = vl_result.patient_id "
-            + " WHERE  vl_result.vl_date BETWEEN dispensations.first_date AND dispensations.second_date"
+            + " WHERE  vl_result.vl_date BETWEEN two_dispensations.first_date AND two_dispensations.second_date"
             + " GROUP BY two_dispensations.patient_id      ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -9661,7 +9678,165 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecudondVLRequest(
+  public CohortDefinition
+      getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecudondVLRequest(
+          List<Integer> dispensationTypes) {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId().toString());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId().toString());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId().toString());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
+    map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId().toString());
+    map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId().toString());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId().toString());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId().toString());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId().toString());
+    map.put("lower", "83");
+    map.put("upper", "97");
+    map.put("dispensationTypes", getMetadataFrom(dispensationTypes));
+
+    String query =
+        "SELECT two_dispensations.patient_id "
+            + "FROM   (SELECT patient_id, MIN(encounter_datetime) first_date, MAX(encounter_datetime) second_date "
+            + "        FROM   (SELECT p.patient_id, e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o  ON o.encounter_id = e.encounter_id "
+            + "                WHERE  e.encounter_type = ${6} "
+            + "                       AND e.location_id = :location "
+            + "                       AND o.concept_id = ${23722} "
+            + "                       AND o.value_coded = ${856} "
+            + "                       AND e.encounter_datetime <= :revisionEndDate "
+            + "                       AND e.encounter_datetime >= (SELECT dt_date "
+            + "                                                    FROM   (SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) dt_date "
+            + "                                                            FROM   (SELECT p2.patient_id, e2.encounter_datetime "
+            + "                                                                    FROM   patient p2 "
+            + "                                                                    INNER JOIN encounter e2 ON e2.patient_id = p2.patient_id "
+            + "                                                                    INNER JOIN obs otype ON otype.encounter_id = e2.encounter_id "
+            + "                                                                    INNER JOIN obs ostate ON ostate.encounter_id = "
+            + "                  e2.encounter_id "
+            + "                WHERE  e2.encounter_type = ${6} "
+            + "                       AND e2.location_id = :location "
+            + "                       AND otype.concept_id = "
+            + "                           ${165174} "
+            + "                       AND otype.value_coded IN( "
+            + "                           ${23730} "
+            + "                           ) "
+            + "                       AND ostate.concept_id = "
+            + "                           ${165322} "
+            + "                       AND ostate.value_coded = "
+            + "                           ${1256} "
+            + "                       AND e2.encounter_datetime >= "
+            + "                           :startDate "
+            + "                       AND e2.encounter_datetime <= "
+            + "                           :endDate "
+            + "                       AND otype.obs_group_id = "
+            + "                           ostate.obs_group_id "
+            + "                       AND e2.voided = 0 "
+            + "                       AND p2.voided = 0 "
+            + "                       AND otype.voided = 0 "
+            + "                       AND ostate.voided = 0 "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = "
+            + "                                  e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = "
+            + "                                  o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND o.concept_id = ${23730} "
+            + "                       AND e.encounter_datetime "
+            + "                       AND e.encounter_datetime >= "
+            + "                           :startDate "
+            + "                       AND e.encounter_datetime <= "
+            + "                           :endDate "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = "
+            + "                                  p.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON o.encounter_id = "
+            + "                                  e.encounter_id "
+            + "                       INNER JOIN "
+            + "                       (SELECT p.patient_id, "
+            + "               MAX(e.encounter_datetime) "
+            + "               consultation_date "
+            + "               FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "               ON e.patient_id = "
+            + "               p.patient_id "
+            + "               WHERE  e.encounter_type = ${18} "
+            + "               AND e.location_id = :location "
+            + "               AND e.encounter_datetime BETWEEN "
+            + "               :startDate AND :endDate "
+            + "               AND e.voided = 0 "
+            + "               AND p.voided = 0 "
+            + "               GROUP  BY p.patient_id) recent_clinical "
+            + "               ON recent_clinical.patient_id = p.patient_id "
+            + "               WHERE  e.encounter_datetime = recent_clinical.consultation_date "
+            + "               AND e.encounter_type = ${18} "
+            + "               AND e.location_id = :location "
+            + "               AND o.concept_id = ${5096} "
+            + "               AND DATEDIFF(o.value_datetime, "
+            + "               recent_clinical.consultation_date) >= ${lower} "
+            + "               AND DATEDIFF(o.value_datetime, "
+            + "               recent_clinical.consultation_date) <= ${upper} "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               GROUP  BY p.patient_id) most_recent "
+            + "               GROUP  BY most_recent.patient_id) dispensation "
+            + "               WHERE  dispensation.patient_id = p.patient_id)) investigations "
+            + "        GROUP  BY investigations.patient_id "
+            + "        HAVING COUNT(investigations.encounter_datetime) = 2) two_dispensations "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          e.encounter_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.encounter_type = ${13} "
+            + "                          AND e.location_id = :location "
+            + "                          AND ( ( o.concept_id = ${856} "
+            + "                                  AND o.value_numeric < 1000 ) "
+            + "                                 OR ( o.concept_id = ${1305} "
+            + "                                      AND o.value_coded IS NOT NULL ) ) "
+            + "                          AND p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0) vl_result "
+            + "               ON two_dispensations.patient_id = vl_result.patient_id "
+            + "WHERE  vl_result.vl_date > two_dispensations.second_date "
+            + "       AND vl_result.vl_date < :revisionEndDate";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(
       List<Integer> dispensationTypes) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -9689,114 +9864,124 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "SELECT two_dispensations.patient_id "
-            + "FROM   (SELECT p.patient_id "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "        WHERE  e.encounter_type = ${6} "
+            + "FROM   (SELECT patient_id, MIN(encounter_datetime) first_date, MAX(encounter_datetime) second_date "
+            + "        FROM   (SELECT p.patient_id, e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o  ON o.encounter_id = e.encounter_id "
+            + "                WHERE  e.encounter_type = ${6} "
+            + "                       AND e.location_id = :location "
+            + "                       AND o.concept_id = ${23722} "
+            + "                       AND o.value_coded = ${856} "
+            + "                       AND e.encounter_datetime <= :revisionEndDate "
+            + "                       AND e.encounter_datetime >= (SELECT dt_date "
+            + "                                                    FROM   (SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) dt_date "
+            + "                                                            FROM   (SELECT p2.patient_id, e2.encounter_datetime "
+            + "                                                                    FROM   patient p2 "
+            + "                                                                    INNER JOIN encounter e2 ON e2.patient_id = p2.patient_id "
+            + "                                                                    INNER JOIN obs otype ON otype.encounter_id = e2.encounter_id "
+            + "                                                                    INNER JOIN obs ostate ON ostate.encounter_id = "
+            + "                  e2.encounter_id "
+            + "                WHERE  e2.encounter_type = ${6} "
+            + "                       AND e2.location_id = :location "
+            + "                       AND otype.concept_id = "
+            + "                           ${165174} "
+            + "                       AND otype.value_coded IN( "
+            + "                           ${23730} "
+            + "                           ) "
+            + "                       AND ostate.concept_id = "
+            + "                           ${165322} "
+            + "                       AND ostate.value_coded = "
+            + "                           ${1256} "
+            + "                       AND e2.encounter_datetime >= "
+            + "                           :startDate "
+            + "                       AND e2.encounter_datetime <= "
+            + "                           :endDate "
+            + "                       AND otype.obs_group_id = "
+            + "                           ostate.obs_group_id "
+            + "                       AND e2.voided = 0 "
+            + "                       AND p2.voided = 0 "
+            + "                       AND otype.voided = 0 "
+            + "                       AND ostate.voided = 0 "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = "
+            + "                                  e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = "
+            + "                                  o.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND o.concept_id = ${23730} "
+            + "                       AND e.encounter_datetime "
+            + "                       AND e.encounter_datetime >= "
+            + "                           :startDate "
+            + "                       AND e.encounter_datetime <= "
+            + "                           :endDate "
+            + "                UNION "
+            + "                SELECT p.patient_id, "
+            + "                       e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON e.patient_id = "
+            + "                                  p.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON o.encounter_id = "
+            + "                                  e.encounter_id "
+            + "                       INNER JOIN "
+            + "                       (SELECT p.patient_id, "
+            + "               MAX(e.encounter_datetime) "
+            + "               consultation_date "
+            + "               FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "               ON e.patient_id = "
+            + "               p.patient_id "
+            + "               WHERE  e.encounter_type = ${18} "
             + "               AND e.location_id = :location "
-            + "               AND o.concept_id = ${23722} "
-            + "               AND o.value_coded = ${856} "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.encounter_datetime >= (SELECT dt_date "
-            + "                                            FROM   (SELECT  most_recent.patient_id, MAX(most_recent.encounter_datetime) dt_date "
-            + "                                                    FROM   (SELECT p2.patient_id, e2.encounter_datetime "
-            + "                                                             FROM   patient p2 "
-            + "                                                             INNER JOIN encounter e2 ON e2.patient_id = p2.patient_id "
-            + "                                                             INNER JOIN obs otype ON otype.encounter_id = e2.encounter_id "
-            + "                                                             INNER JOIN obs ostate ON ostate.encounter_id = e2.encounter_id "
-            + "                                                    WHERE  e2.encounter_type = ${6} "
-            + "                                                      AND e2.location_id = :location "
-            + "                                                      AND otype.concept_id = ${165174} "
-            + "                                                      AND otype.value_coded IN( ${dispensationTypes} ) "
-            + "                                                      AND ostate.concept_id = ${165322} "
-            + "                                                      AND ostate.value_coded = ${1256} "
-            + "                                                      AND e2.encounter_datetime >= :startDate "
-            + "                                                      AND e2.encounter_datetime <= :endDate "
-            + "                                                      AND otype.obs_group_id = ostate.obs_group_id "
-            + "                                                      AND e2.voided = 0 "
-            + "                                                      AND p2.voided = 0 "
-            + "                                                      AND otype.voided = 0 "
-            + "                                                      AND ostate.voided = 0 "
-            + "                                                   UNION "
-            + "                                                   SELECT p.patient_id, e.encounter_datetime "
-            + "                                                   FROM   patient p "
-            + "                                                   INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                                   INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                                   WHERE  p.voided = 0 "
-            + "                                                     AND o.voided = 0 "
-            + "                                                     AND e.voided = 0 "
-            + "                                                     AND e.location_id = :location "
-            + "                                                     AND e.encounter_type = ${6} "
-            + "                                                     AND o.concept_id = ${23730} "
-            + "                                                     AND e.encounter_datetime "
-            + "                                                     AND e.encounter_datetime >= :startDate "
-            + "                                                     AND e.encounter_datetime <= :endDate ) most_recent "
-            + "                                               GROUP  BY most_recent.patient_id) dispensation "
-            + "                                               WHERE  dispensation.patient_id = p.patient_id) "
-            + "  GROUP  BY p.patient_id "
-            + "  HAVING COUNT(e.encounter_id) = 2) two_dispensations "
-            + "  INNER JOIN (SELECT two.patient_id, MIN(two.encounter_datetime) first_date, MAX(two.encounter_datetime) second_date "
-            + "              FROM   (SELECT p.patient_id, e.encounter_datetime "
-            + "                           FROM   patient p "
-            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                           WHERE  e.encounter_type = ${6} "
-            + "                                  AND e.location_id = :location "
-            + "                                  AND o.concept_id = ${23722} "
-            + "                                  AND o.value_coded = ${856} "
-            + "                                  AND e.encounter_datetime >= (SELECT dt_date "
-            + "                                                               FROM   (SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) dt_date "
-            + "                                                                       FROM   (SELECT p2.patient_id, e2.encounter_datetime "
-            + "                                                                               FROM   patient p2 "
-            + "                                                                               INNER JOIN encounter e2 ON e2.patient_id = p2.patient_id "
-            + "                                                                               INNER JOIN obs otype ON otype.encounter_id = e2.encounter_id "
-            + "                                                                               INNER JOIN obs ostate ON ostate.encounter_id = e2.encounter_id "
-            + "                                                                               WHERE  e2.encounter_type = ${6} "
-            + "                                                                                 AND e2.location_id = :location "
-            + "                                                                                 AND otype.concept_id = ${165174} "
-            + "                                                                                 AND otype.value_coded IN( ${dispensationTypes}) "
-            + "                                                                                 AND ostate.concept_id = ${165322} "
-            + "                                                                                 AND ostate.value_coded = ${1256} "
-            + "                                                                                 AND e2.encounter_datetime >= :startDate "
-            + "                                                                                 AND e2.encounter_datetime <= :endDate "
-            + "                                                                                 AND otype.obs_group_id = ostate.obs_group_id "
-            + "                                                                                 AND e2.voided = 0 "
-            + "                                                                                 AND p2.voided = 0 "
-            + "                                                                                 AND otype.voided = 0 "
-            + "                                                                                 AND ostate.voided = 0 "
-            + "                                                                         UNION "
-            + "                                                                         SELECT p.patient_id, "
-            + "                                                                         e.encounter_datetime "
-            + "                                                                         FROM   patient p "
-            + "                                                                         INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                                                         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                                                         WHERE  p.voided = 0 "
-            + "                                                                           AND o.voided = 0 "
-            + "                                                                           AND e.voided = 0 "
-            + "                                                                           AND e.location_id = :location "
-            + "                                                                           AND e.encounter_type = ${6} "
-            + "                                                                           AND o.concept_id = ${23730} "
-            + "                                                                           AND e.encounter_datetime "
-            + "                                                                           AND e.encounter_datetime >= :startDate "
-            + "                                                                           AND e.encounter_datetime <= :endDate) most_recent "
-            + "                                                                       GROUP  BY most_recent.patient_id) dispensation "
-            + "                                                                    WHERE  dispensation.patient_id = p.patient_id) "
-            + "                                                                      AND e.encounter_datetime <= :endDate "
-            + "                                                                   ORDER  BY e.encounter_datetime) two "
-            + "                                                                   GROUP  BY two.patient_id) dispensations ON dispensations.patient_id = two_dispensations.patient_id "
-            + " INNER JOIN (SELECT p.patient_id, e.encounter_datetime AS vl_date "
-            + "             FROM   patient p "
-            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "             INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "             WHERE  e.encounter_type = ${13} "
-            + "             AND e.location_id = :location "
-            + "             AND ( ( o.concept_id = ${856} AND o.value_numeric < 1000 ) OR ( o.concept_id = ${1305} AND o.value_coded IS NOT NULL ) ) "
-            + "             AND p.voided = 0 "
-            + "             AND e.voided = 0 "
-            + "             AND o.voided = 0) vl_result ON two_dispensations.patient_id = vl_result.patient_id "
-            + " WHERE  vl_result.vl_date > dispensations.second_date AND vl_result.vl_date <= :revisionEndDate"
-            + " GROUP BY two_dispensations.patient_id      ";
+            + "               AND e.encounter_datetime BETWEEN "
+            + "               :startDate AND :endDate "
+            + "               AND e.voided = 0 "
+            + "               AND p.voided = 0 "
+            + "               GROUP  BY p.patient_id) recent_clinical "
+            + "               ON recent_clinical.patient_id = p.patient_id "
+            + "               WHERE  e.encounter_datetime = recent_clinical.consultation_date "
+            + "               AND e.encounter_type = ${18} "
+            + "               AND e.location_id = :location "
+            + "               AND o.concept_id = ${5096} "
+            + "               AND DATEDIFF(o.value_datetime, "
+            + "               recent_clinical.consultation_date) >= ${lower} "
+            + "               AND DATEDIFF(o.value_datetime, "
+            + "               recent_clinical.consultation_date) <= ${upper} "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               GROUP  BY p.patient_id) most_recent "
+            + "               GROUP  BY most_recent.patient_id) dispensation "
+            + "               WHERE  dispensation.patient_id = p.patient_id)) investigations "
+            + "        GROUP  BY investigations.patient_id "
+            + "        HAVING COUNT(investigations.encounter_datetime) = 2) two_dispensations "
+            + "       INNER JOIN (SELECT p.patient_id, "
+            + "                          e.encounter_datetime AS vl_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.encounter_type = ${13} "
+            + "                          AND e.location_id = :location "
+            + "                          AND  o.concept_id IN(${856},${1305})   AND o.value_coded IS NOT NULL "
+            + "                          AND p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0) vl_result "
+            + "               ON two_dispensations.patient_id = vl_result.patient_id "
+            + "WHERE  vl_result.vl_date > two_dispensations.second_date "
+            + "       AND vl_result.vl_date < :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
