@@ -6560,13 +6560,13 @@ public class QualityImprovement2020CohortQueries {
         "IADT",
         EptsReportUtils.map(
             IADT,
-            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "IAMDS",
         EptsReportUtils.map(
             IAMDS,
-            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "VLFL",
@@ -6877,7 +6877,7 @@ public class QualityImprovement2020CohortQueries {
         "IAMDS",
         EptsReportUtils.map(
             IAMDS,
-            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "VLFL",
         EptsReportUtils.map(
@@ -6894,7 +6894,7 @@ public class QualityImprovement2020CohortQueries {
         "IADT",
         EptsReportUtils.map(
             IADT,
-            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (num == 1) {
       comp.setCompositionString("Den1 AND G2");
@@ -9225,6 +9225,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, String> map = new HashMap<>();
