@@ -6849,11 +6849,19 @@ public class QualityImprovement2020CohortQueries {
         "Den1",
         EptsReportUtils.map(
             getMQ15DEN(1),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));    comp.addSearch(
+        "Den4",
+        EptsReportUtils.map(
+            getMQ15DEN(4),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "Den5",
         EptsReportUtils.map(
             getMQ15DEN(5),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}")); comp.addSearch(
+        "Den11",
+        EptsReportUtils.map(
+            getMQ15DEN(11),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "G2",
@@ -6885,14 +6893,17 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 3) {
       comp.setCompositionString("Den1 AND H2 AND G2 AND VLFL");
     } else if (num == 4) {
-      comp.setCompositionString("Den1 AND I AND G2");
+      comp.setCompositionString("Den4 AND I AND G2");
     } else if (num == 5 || num == 6) {
       comp.setCompositionString("Den5 AND G2");
     } else if (num == 7 || num == 8) {
       comp.setCompositionString("Den5 AND H1 AND G2 AND IADT");
     } else if (num == 9 || num == 10) {
       comp.setCompositionString("Den5 AND H2 AND G2 AND IAMDS");
-    } else if (num == 11 || num == 12) {
+    } else if (num == 11) {
+      comp.setCompositionString("Den11 AND I AND G2");
+    }
+    else if ( num == 12) {
       comp.setCompositionString("Den5 AND I AND G2");
     }
     return comp;
