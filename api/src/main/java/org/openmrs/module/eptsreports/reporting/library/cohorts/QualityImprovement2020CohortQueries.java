@@ -6584,7 +6584,7 @@ public class QualityImprovement2020CohortQueries {
           "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS");
     } else if (den == 4) {
       comp.setCompositionString(
-          "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS AND VLFL");
+          "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND G2 AND IAMDS AND VLFL AND NOT (CD OR F OR VL)) ");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString("(DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 8) {
@@ -6852,6 +6852,18 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             getMQ15DEN(1),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
+        "Den2",
+        EptsReportUtils.map(
+            getMQ15DEN(2),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
+        "Den3",
+        EptsReportUtils.map(
+            getMQ15DEN(3),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "Den4",
         EptsReportUtils.map(
@@ -6861,6 +6873,18 @@ public class QualityImprovement2020CohortQueries {
         "Den5",
         EptsReportUtils.map(
             getMQ15DEN(5),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
+        "Den7",
+        EptsReportUtils.map(
+            getMQ15DEN(7),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    comp.addSearch(
+        "Den10",
+        EptsReportUtils.map(
+            getMQ15DEN(10),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "Den11",
@@ -6899,21 +6923,21 @@ public class QualityImprovement2020CohortQueries {
     if (num == 1) {
       comp.setCompositionString("Den1 AND G2");
     } else if (num == 2) {
-      comp.setCompositionString("Den1 AND H1 AND G2 AND IAMDS");
+      comp.setCompositionString("Den2 AND G2 AND IAMDS");
     } else if (num == 3) {
-      comp.setCompositionString("Den1 AND H2 AND G2 AND VLFL");
+      comp.setCompositionString("Den3  AND G2 AND VLFL");
     } else if (num == 4) {
-      comp.setCompositionString("Den4 AND I AND G2 LOWVLFL");
+      comp.setCompositionString("Den4  AND G2 LOWVLFL");
     } else if (num == 5 || num == 6) {
       comp.setCompositionString("Den5 AND G2");
     } else if (num == 7 || num == 8) {
-      comp.setCompositionString("Den5 AND H1 AND G2 AND IADT");
+      comp.setCompositionString("Den7  AND G2 AND IADT");
     } else if (num == 9 || num == 10) {
-      comp.setCompositionString("Den5 AND H2 AND G2 AND VLFL");
+      comp.setCompositionString("Den10 AND G2 AND VLFL");
     } else if (num == 11) {
-      comp.setCompositionString("Den11 AND I AND G2 AND LOWVLFL");
+      comp.setCompositionString("Den11 AND G2 AND LOWVLFL");
     } else if (num == 12) {
-      comp.setCompositionString("Den5 AND I AND G2 LOWVLFL");
+      comp.setCompositionString("Den11  AND G2 LOWVLFL");
     }
     return comp;
   }
@@ -7117,7 +7141,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             filaBC173, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("MDS OR DS OR DT OR FILA83 OR FILA173)");
+    compositionCohortDefinition.setCompositionString("MDS OR DS OR DT OR FILA83 OR FILA173");
 
     return compositionCohortDefinition;
   }
@@ -7773,7 +7797,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * <p>* @return CohortDefinition
    */
-  private CohortDefinition getCombinedB13ForCat15Indicators() {
+  public CohortDefinition getCombinedB13ForCat15Indicators() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("B13 for the MQ CAT 15 indicators ");
     cd.addParameter(new Parameter("revisionEndDate", "End revision Date", Date.class));
@@ -9264,7 +9288,7 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND otype.concept_id = "
             + "                           ${165174} "
             + "                       AND otype.value_coded IN( "
-            + "                           ${23730} "
+            + "                           ${dispensationTypes} "
             + "                           ) "
             + "                       AND ostate.concept_id = "
             + "                           ${165322} "
@@ -9729,7 +9753,7 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND otype.concept_id = "
             + "                           ${165174} "
             + "                       AND otype.value_coded IN( "
-            + "                           ${23730} "
+            + "                           ${dispensationTypes} "
             + "                           ) "
             + "                       AND ostate.concept_id = "
             + "                           ${165322} "
@@ -9839,7 +9863,7 @@ public class QualityImprovement2020CohortQueries {
       List<Integer> dispensationTypes) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
+    cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Laboratório ");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -9886,7 +9910,7 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND otype.concept_id = "
             + "                           ${165174} "
             + "                       AND otype.value_coded IN( "
-            + "                           ${23730} "
+            + "                           ${dispensationTypes} "
             + "                           ) "
             + "                       AND ostate.concept_id = "
             + "                           ${165322} "
@@ -9974,7 +9998,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                  ON o.encounter_id = e.encounter_id "
             + "                   WHERE  e.encounter_type = ${13} "
             + "                          AND e.location_id = :location "
-            + "                          AND  o.concept_id IN(${856},${1305})   AND o.value_coded IS NOT NULL "
+            + "                          AND  ((o.concept_id = ${856} AND o.value_numeric IS NOT NULL)   OR (o.concept_id = ${1305} AND o.value_coded IS NOT NULL)) "
             + "                          AND p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result "
