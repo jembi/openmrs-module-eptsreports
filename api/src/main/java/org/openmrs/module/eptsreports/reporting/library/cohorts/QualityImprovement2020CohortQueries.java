@@ -7058,8 +7058,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.setName(
         "MDS para utentes estáveis que tiveram consulta no período de avaliação");
-    compositionCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -7096,32 +7095,29 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "MDS",
         EptsReportUtils.map(
-            mdsLastClinical,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            mdsLastClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "DT",
         EptsReportUtils.map(
-            dtBeforeClinical,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            dtBeforeClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "DS",
         EptsReportUtils.map(
-            dsBeforeClinical,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            dsBeforeClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA83",
         EptsReportUtils.map(
-            filaBC83, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            filaBC83, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA173",
         EptsReportUtils.map(
-            filaBC173, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            filaBC173, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("MDS AND (DS OR DT OR FILA83 OR FILA173)");
+    compositionCohortDefinition.setCompositionString("MDS OR DS OR DT OR FILA83 OR FILA173)");
 
     return compositionCohortDefinition;
   }
@@ -9510,6 +9506,7 @@ public class QualityImprovement2020CohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23739", hivMetadata.getTypeOfDispensationConcept().getConceptId());
     map.put("dispensation", dispensationType.getConceptId());
 
     String query =
@@ -9537,8 +9534,9 @@ public class QualityImprovement2020CohortQueries {
             + "       AND e.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${6} "
-            + "       AND  o.concept_id = ${dispensation} "
-            + "       AND e.encounter_datetime <= last_consultation.encounter_datetime "
+            + "       AND  o.concept_id = ${23739} "
+            + "       AND  o.value_coded = ${dispensation} "
+            + "       AND e.encounter_datetime < last_consultation.encounter_datetime "
             + " GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
