@@ -7998,7 +7998,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("AGE2", EptsReportUtils.map(Mq15AGE2, "endDate=${revisionEndDate}"));
 
     cd.setCompositionString(
-        "A AND B1 AND (E1 AND E2 AND E3) AND NOT (C OR D OR F OR G OR MDS) AND AGE2");
+        "A AND B1 AND (E1 AND E2 AND E3) AND AGE2 AND NOT (C OR D OR F OR G OR MDS)");
 
     return cd;
   }
@@ -9676,7 +9676,7 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        e.voided = 0 "
             + "                      AND        p.voided = 0 "
             + "                      GROUP BY   p.patient_id ) recent_clinical ON recent_clinical.patient_id = p.patient_id "
-            + "WHERE      e.encounter_datetime <= recent_clinical.consultation_date "
+            + "WHERE      e.encounter_datetime < recent_clinical.consultation_date "
             + "AND        e.encounter_type = ${18} "
             + "AND        e.location_id = :location "
             + "AND        o.concept_id = ${5096} "
