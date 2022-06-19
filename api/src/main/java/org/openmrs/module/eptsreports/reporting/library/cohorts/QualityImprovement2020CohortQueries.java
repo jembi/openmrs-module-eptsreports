@@ -9727,9 +9727,10 @@ public class QualityImprovement2020CohortQueries {
             + "WHERE  e.encounter_type = ${18} "
             + "       AND e.encounter_datetime = recent_fila.consultation_date "
             + "       AND o.concept_id = ${5096} "
-            + "                          AND e.location_id = :location "
-            + "                          AND p.voided = 0 "
-            + "                          AND e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND 0.voided = 0 "
             + "       AND DATEDIFF(o.value_datetime, e.encounter_datetime) >= ${lower} "
             + "       AND DATEDIFF(o.value_datetime, e.encounter_datetime) <= ${upper} "
             + " GROUP  BY p.patient_id  ";
