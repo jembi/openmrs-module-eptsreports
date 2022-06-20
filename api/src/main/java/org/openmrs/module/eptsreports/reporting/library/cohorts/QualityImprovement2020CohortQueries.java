@@ -1,11 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -22,6 +16,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.Se
 import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.ThirdFollowingEncounterAfterOldestARTStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
+import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants.MIMQ;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -33,6 +28,13 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -7006,14 +7008,14 @@ public class QualityImprovement2020CohortQueries {
         getPatientsWithMdcOnMostRecentClinicalFormWithFollowingDispensationTypesAndState(
             dispensationTypes, states);
 
-    CohortDefinition queryA3 =
-        genericCohortQueries.hasCodedObs(
-            hivMetadata.getTypeOfDispensationConcept(),
-            BaseObsCohortDefinition.TimeModifier.LAST,
-            SetComparator.IN,
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
-            Arrays.asList(
-                hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));
+    CohortDefinition queryA3 = getPatientsHavingTypeOfDispensationBasedOnTheirLastVlResults();
+    /* genericCohortQueries.hasCodedObs(getPatientsHavingTypeOfDispensationBasedOnTheirLastVlResults
+    hivMetadata.getTypeOfDispensationConcept(),
+    BaseObsCohortDefinition.TimeModifier.LAST,
+    SetComparator.IN,
+    Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
+    Arrays.asList(
+        hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));*/
 
     CohortDefinition nextPickupBetween83And97 =
         QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(83, 97);
@@ -7029,7 +7031,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "DSDT",
         EptsReportUtils.map(
-            queryA3, "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
+            queryA3, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA83",
@@ -10057,5 +10059,26 @@ public class QualityImprovement2020CohortQueries {
       throw new RuntimeException("The list of encounters or concepts might not be empty ");
     }
     return StringUtils.join(dispensationTypes, ",");
+  }
+
+  public CohortDefinition getPatientsHavingTypeOfDispensationBasedOnTheirLastVlResults() {
+    SqlCohortDefinition sql = new SqlCohortDefinition();
+    sql.setName("Patients Having Type of Dispensation Based on Last VL");
+    sql.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sql.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sql.addParameter(new Parameter("location", "Location", Location.class));
+    sql.setQuery(
+        ViralLoadQueries.getPatientsHavingTypeOfDispensationBasedOnTheirLastVlResults(
+            hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getFsrEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getHivViralLoadQualitative().getConceptId(),
+            hivMetadata.getTypeOfDispensationConcept().getConceptId(),
+            hivMetadata.getQuarterlyConcept().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId()));
+    return sql;
   }
 }
