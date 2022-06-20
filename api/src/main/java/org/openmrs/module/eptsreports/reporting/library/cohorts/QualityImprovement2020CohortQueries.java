@@ -1,5 +1,11 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -27,12 +33,6 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -9730,7 +9730,7 @@ public class QualityImprovement2020CohortQueries {
             + "       AND e.location_id = :location "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND 0.voided = 0 "
+            + "       AND o.voided = 0 "
             + "       AND DATEDIFF(o.value_datetime, e.encounter_datetime) >= ${lower} "
             + "       AND DATEDIFF(o.value_datetime, e.encounter_datetime) <= ${upper} "
             + " GROUP  BY p.patient_id  ";
