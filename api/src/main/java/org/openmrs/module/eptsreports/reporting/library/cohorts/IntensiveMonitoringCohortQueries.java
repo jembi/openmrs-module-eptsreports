@@ -2366,10 +2366,10 @@ public class IntensiveMonitoringCohortQueries {
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "ABANDONEDTARV",
-            EptsReportUtils.map(
-                    abandonedInTheLastSixMonthsFromFirstLineDate,
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+        "ABANDONEDTARV",
+        EptsReportUtils.map(
+            abandonedInTheLastSixMonthsFromFirstLineDate,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
     compositionCohortDefinition.addSearch(
         "RESTARTED",
         EptsReportUtils.map(
