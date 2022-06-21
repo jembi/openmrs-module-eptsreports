@@ -118,7 +118,6 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
      * Denominator CAT7 **************
      */
     // CAT 7 Denominator
-
     // 7.1
     dataSetDefinition.addColumn(
         "MI7DEN1",
@@ -772,7 +771,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    // ******* */ Part 1 Numerator **************
+    // Part 1 Numerator
     // 12.1
     dataSetDefinition.addColumn(
         "MI12P1NUM1",
@@ -833,7 +832,9 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+
     /* Category 15*/
+
     // Den 15
     dataSetDefinition.addColumn(
         "MI15DEN1",
@@ -1258,10 +1259,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MI15DEN16",
-        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
+        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral - Denominator",
         EptsReportUtils.map(
             MI15DEN16,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
         "");
 
     CohortIndicator MI15NUM16 =
@@ -1274,10 +1275,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MI15NUM16",
-        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
+        "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral - Numerator",
         EptsReportUtils.map(
             MI15NUM16,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
         "");
 
     return dataSetDefinition;

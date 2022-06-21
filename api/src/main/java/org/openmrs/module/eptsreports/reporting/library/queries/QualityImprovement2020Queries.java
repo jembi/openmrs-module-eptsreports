@@ -2075,4 +2075,67 @@ public class QualityImprovement2020Queries {
     }
     return StringUtils.join(dispensationTypes, ",");
   }
+
+  /**
+   * os utentes com registo de último levantamento na farmácia (FILA) há 24 meses (última “Data
+   * Levantamento”>= “Data Fim Revisão” – 26 meses+1dia e <= “Data Fim Revisão” – 24 meses) com
+   * próximo levantamento agendado para 83 a 97 dias ( “Data Próximo Levantamento” menos “Data
+   * Levantamento”>= 83 dias e <= 97 dias)
+   *
+   * <p>os utentes com registo de último levantamento na farmácia (FILA) há 24 meses (última “Data
+   * Levantamento”>= “Data Fim Revisão” – 26 meses+1dia e <= “Data Fim Revisão” – 24 meses) com
+   * próximo levantamento agendado para 173 a 187 dias ( “Data Próximo Levantamento” menos “Data
+   * Levantamento”>= 173 dias e <= 187 dias).
+   *
+   * @param lowerBounded
+   * @param upperBounded
+   * @return SqlCohortDefinition
+   */
+  public static SqlCohortDefinition getPatientsWithPickupOnFilaBasedOnLastVl12Months(
+      int lowerBounded, int upperBounded) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients who have pickup registered on FILA)");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    HivMetadata hivMetadata = new HivMetadata();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("lower", lowerBounded);
+    map.put("upper", upperBounded);
+
+    String query =
+        "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e ON  e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN (          SELECT     p.patient_id, Max(e.encounter_datetime) consultation_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e  ON  e.patient_id = p.patient_id "
+            + "                      WHERE      e.encounter_type = ${18} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        p.voided = 0 "
+            + "                      GROUP BY   p.patient_id ) recent_clinical ON recent_clinical.patient_id = p.patient_id "
+            + "WHERE      e.encounter_datetime = recent_clinical.consultation_date "
+            + "AND        e.encounter_type = ${18} "
+            + "AND        e.location_id = :location "
+            + "AND        o.concept_id = ${5096} "
+            + "AND        DATEDIFF(o.value_datetime, e.encounter_datetime) >= ${lower} "
+            + " AND        DATEDIFF(o.value_datetime, e.encounter_datetime) <= ${upper} "
+            + " AND        p.voided = 0 "
+            + " AND        e.voided = 0 "
+            + " AND        o.voided = 0 "
+            + " GROUP BY   p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
 }
