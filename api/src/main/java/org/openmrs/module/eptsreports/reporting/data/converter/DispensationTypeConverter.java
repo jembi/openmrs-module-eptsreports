@@ -12,11 +12,11 @@ public class DispensationTypeConverter implements DataConverter {
 
     switch (obj.toString()) {
       case "1098":
-        return "Mensal";
+        return "DM";
       case "23720":
-        return "Trimestral";
+        return "DT";
       case "23888":
-        return "Semestral";
+        return "DS";
 
       case "165175":
         return "Horario Normal De Expedinte";
