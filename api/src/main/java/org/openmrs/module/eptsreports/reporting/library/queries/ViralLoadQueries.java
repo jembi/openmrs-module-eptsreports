@@ -267,13 +267,13 @@ public class ViralLoadQueries {
             + " SELECT p.patient_id,o.obs_datetime AS encounter_date FROM  patient p INNER JOIN encounter e ON p.patient_id=e.patient_id INNER JOIN "
             + " obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND "
-            + " e.encounter_type IN (%d) AND o.concept_id=856 AND o.value_numeric IS NOT NULL AND "
+            + " e.encounter_type IN (%d) AND o.concept_id=%d AND o.value_numeric IS NOT NULL AND "
             + " o.obs_datetime <=:endDate AND "
             + " e.location_id=:location "
             + " ) max_vl_date GROUP BY patient_id "
-            + ") vl_date_tbl ON pp.patient_id=vl_date_tbl.patient_id WHERE ee.encounter_datetime BETWEEN date_add(vl_max_date, interval -12 MONTH) AND vl_max_date AND ee.encounter_type =%d "
+            + ") vl_date_tbl ON pp.patient_id=vl_date_tbl.patient_id WHERE ee.encounter_datetime BETWEEN date_add(vl_max_date, interval -12 MONTH) AND vl_max_date AND ee.encounter_type=%d "
             + " ) fin_tbl GROUP BY patient_id "
-            + ") out_p ON pp.patient_id=out_p.patient_id AND op.concept_id =%d AND op.value_coded IN(%d,%d) AND ep.encounter_type=6 AND ep.encounter_datetime=max_vl_date_and_max_ficha";
+            + ") out_p ON pp.patient_id=out_p.patient_id AND op.concept_id =%d AND op.value_coded IN(%d,%d) AND ep.encounter_type=%d AND ep.encounter_datetime=max_vl_date_and_max_ficha";
     return String.format(
         query,
         labEncounter,
@@ -283,8 +283,8 @@ public class ViralLoadQueries {
         vlConceptQuestion,
         vlQualitativeConceptQuestion,
         mastercardEncounter,
-        adultSeguimentoEncounter,
         vlConceptQuestion,
+        adultSeguimentoEncounter,
         typeOfDispensation,
         quartely,
         semiAnnually,

@@ -1,11 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -34,6 +28,13 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -10169,7 +10170,7 @@ public class QualityImprovement2020CohortQueries {
             nextPickupBetween173And187,
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("MDS OR DSDT OR FILA83 OR FILA173");
+    compositionCohortDefinition.setCompositionString("DSDT");
 
     return compositionCohortDefinition;
   }

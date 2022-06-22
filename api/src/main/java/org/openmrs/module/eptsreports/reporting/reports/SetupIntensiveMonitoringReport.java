@@ -80,11 +80,11 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
         Mapped.mapStraightThrough(
             intensiveMonitoringDataSet.constructIntensiveMonitoringDataSet()));
 
-    reportDefinition.addDataSetDefinition(
-        "TOTAL",
-        EptsReportUtils.map(
-            this.viralLoadIntensiveMonitoringDataSet.constructViralLoadIntensiveMonitoringDataSet(),
-            "endDate=${revisionEndDate},location=${location}"));
+    /*reportDefinition.addDataSetDefinition(
+    "TOTAL",
+    EptsReportUtils.map(
+        this.viralLoadIntensiveMonitoringDataSet.constructViralLoadIntensiveMonitoringDataSet(),
+        "endDate=${revisionEndDate},location=${location}"));*/
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
         EptsReportUtils.map(
