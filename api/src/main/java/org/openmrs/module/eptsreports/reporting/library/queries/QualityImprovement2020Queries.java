@@ -2095,7 +2095,8 @@ public class QualityImprovement2020Queries {
       int lowerBounded, int upperBounded) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Patients who have pickup registered on FILA)");
+    sqlCohortDefinition.setName(
+        "Patients who have pickup registered on FILA based on last VL 12 months period)");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -2106,6 +2107,13 @@ public class QualityImprovement2020Queries {
     map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     map.put("lower", lowerBounded);
     map.put("upper", upperBounded);
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
         "SELECT     p.patient_id "
@@ -2115,11 +2123,29 @@ public class QualityImprovement2020Queries {
             + "INNER JOIN (          SELECT     p.patient_id, Max(e.encounter_datetime) consultation_date "
             + "                      FROM       patient p "
             + "                      INNER JOIN encounter e  ON  e.patient_id = p.patient_id "
+            + "                      INNER JOIN("
+            + " SELECT patient_id, MAX(encounter_date) AS vl_max_date FROM( "
+            + " SELECT p.patient_id,e.encounter_datetime AS encounter_date FROM  patient p INNER JOIN encounter e ON p.patient_id=e.patient_id INNER JOIN "
+            + " obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND "
+            + " e.encounter_type IN (${13},${6},${9},${51}) AND "
+            + " ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) AND "
+            + " e.encounter_datetime <=:endDate AND "
+            + " e.location_id=:location "
+            + " UNION "
+            + " SELECT p.patient_id,o.obs_datetime AS encounter_date FROM  patient p INNER JOIN encounter e ON p.patient_id=e.patient_id INNER JOIN "
+            + " obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND "
+            + " e.encounter_type IN (${53}) AND o.concept_id=${856} AND o.value_numeric IS NOT NULL AND "
+            + " o.obs_datetime <=:endDate AND "
+            + " e.location_id=:location "
+            + " ) max_vl_date GROUP BY patient_id "
+            + "                       )vl ON vl.patient_id=p.patient_id "
             + "                      WHERE      e.encounter_type = ${18} "
             + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "                      AND        e.voided = 0 "
             + "                      AND        p.voided = 0 "
+            + "                      AND e.encounter_datetime BETWEEN date_add(vl.vl_max_date, interval -12 MONTH) AND vl.vl_max_date "
             + "                      GROUP BY   p.patient_id ) recent_clinical ON recent_clinical.patient_id = p.patient_id "
             + "WHERE      e.encounter_datetime = recent_clinical.consultation_date "
             + "AND        e.encounter_type = ${18} "
