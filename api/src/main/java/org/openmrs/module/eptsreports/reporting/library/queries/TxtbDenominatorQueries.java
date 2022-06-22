@@ -63,7 +63,7 @@ public class TxtbDenominatorQueries {
    * Clinica: encounter types 6 and 9
    *
    * <p>at least one “POS” selected for “Resultado da Investigação para TB de BK e/ou RX?” during
-   * the reporting period consultations; ( response 703: POS or 664: NEG for question: 6277)
+   * the reporting period consultations; ( response 703: NEG for question: 6277)
    *
    * @return {@link String}
    */
@@ -73,7 +73,6 @@ public class TxtbDenominatorQueries {
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("6277", tbMetadata.getResearchResultConcept().getConceptId());
     map.put("703", tbMetadata.getPositiveConcept().getConceptId());
-    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, e.encounter_datetime "
@@ -84,7 +83,7 @@ public class TxtbDenominatorQueries {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime <= :endDate "
             + "       AND o.concept_id = ${6277} "
-            + "       AND o.value_coded IN ( ${703}, ${664} ) "
+            + "       AND o.value_coded IN ( ${703} ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
