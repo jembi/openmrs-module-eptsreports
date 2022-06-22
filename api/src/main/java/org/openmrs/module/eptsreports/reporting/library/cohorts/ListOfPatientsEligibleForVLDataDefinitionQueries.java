@@ -380,13 +380,11 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
     String query =
         "  SELECT p.patient_id, MAX(e.encounter_datetime) FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + " WHERE e.encounter_type IN(${6},${9}) "
             + " AND e.encounter_datetime <= :startDate "
             + " AND e.location_id = :location "
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
-            + " AND o.voided = 0 "
             + " GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
