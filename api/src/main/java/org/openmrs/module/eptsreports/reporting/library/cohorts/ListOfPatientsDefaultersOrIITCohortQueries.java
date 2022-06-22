@@ -1402,10 +1402,15 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     Map<String, Integer> map = new HashMap<>();
 
     String query =
-        "SELECT p.patient_id, pa.address6 FROM patient p "
-            + "    INNER JOIN person pr on p.patient_id = pr.person_id "
-            + "    INNER JOIN person_address pa ON pa.person_id = pr.person_id "
-            + " WHERE p.voided =0 AND pr.voided =0 ";
+              "SELECT address.patient_id,address.location "
+            + "FROM   (SELECT p.patient_id,pa.address5 location "
+            + "        FROM   patient p "
+            + "               INNER JOIN person pr ON p.patient_id = pr.person_id "
+            + "               INNER JOIN person_address pa ON pa.person_id = pr.person_id "
+            + "        WHERE  p.voided = 0 "
+            + "               AND pr.voided = 0 "
+            + "        ORDER  BY pa.person_address_id DESC) address "
+            + "GROUP  BY address.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
