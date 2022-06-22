@@ -1902,8 +1902,7 @@ public class IntensiveMonitoringCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        ""
-            + "SELECT p.patient_id "
+             "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter ee ON ee.patient_id = p.patient_id "
             + "       INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id "
@@ -2633,7 +2632,6 @@ public class IntensiveMonitoringCohortQueries {
 
     compositionCohortDefinition.setCompositionString(
         "(B1 AND ((B2NEW AND NOT ABANDONEDTARV) OR ((RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
-    //        "B4E");
 
     return compositionCohortDefinition;
   }
