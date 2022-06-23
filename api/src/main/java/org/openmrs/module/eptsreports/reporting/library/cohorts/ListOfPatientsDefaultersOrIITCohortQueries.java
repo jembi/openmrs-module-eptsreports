@@ -1403,7 +1403,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     String query =
         "SELECT address.patient_id,address.location "
-            + "FROM   (SELECT p.patient_id,pa.address5 location "
+            + "FROM   (SELECT p.patient_id,pa.address6 location "
             + "        FROM   patient p "
             + "               INNER JOIN person pr ON p.patient_id = pr.person_id "
             + "               INNER JOIN person_address pa ON pa.person_id = pr.person_id "
@@ -1457,8 +1457,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     Map<String, Integer> map = new HashMap<>();
 
     String query =
-        ""
-            + "SELECT address.patient_id,address.neighborhood "
+        "SELECT address.patient_id,address.neighborhood "
             + "FROM  (SELECT p.patient_id,pa.address5 neighborhood "
             + "       FROM   patient p "
             + "              INNER JOIN person_address pa ON pa.person_id = p.patient_id "
