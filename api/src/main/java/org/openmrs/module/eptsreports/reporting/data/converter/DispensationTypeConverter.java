@@ -78,10 +78,10 @@ public class DispensationTypeConverter implements DataConverter {
       case "165321":
         return "Doença Avançada Por HIV";
 
-        case "165314":
+      case "165314":
         return "Dispensa Anual de ARV";
 
-        case "165315":
+      case "165315":
         return "Dispensa Descentralizada de ARV";
 
       case "23726":
