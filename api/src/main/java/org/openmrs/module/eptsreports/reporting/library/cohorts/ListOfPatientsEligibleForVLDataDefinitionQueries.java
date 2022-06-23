@@ -419,8 +419,8 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
 
-            String query =
-             "SELECT p.patient_id,o.value_datetime "
+    String query =
+        "SELECT p.patient_id,o.value_datetime "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -441,7 +441,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
             + "       AND e.location_id = :location "
             + "       AND p.voided = 0 "
             + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";;
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 

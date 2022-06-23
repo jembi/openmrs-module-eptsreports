@@ -46,7 +46,7 @@ public class DispensationTypeConverter implements DataConverter {
         return "Clinicas Moveis Noturnas(Hotspots)";
 
       case "23730":
-        return "Dispensa Trimestral";
+        return "DT";
 
       case "165264":
         return "Brigadas Moveis (DCBM)";
@@ -78,6 +78,17 @@ public class DispensationTypeConverter implements DataConverter {
       case "165321":
         return "Doença Avançada Por HIV";
 
+        case "165314":
+        return "Dispensa Anual de ARV";
+
+        case "165315":
+        return "Dispensa Descentralizada de ARV";
+
+      case "23726":
+        return "Clubes de Adesão (CA)";
+
+      case "165316":
+        return "Extensão de Horarário";
       default:
         return "";
     }
