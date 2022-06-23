@@ -8059,7 +8059,7 @@ public class QualityImprovement2020CohortQueries {
             mds,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("MQ15DenMDS AND K AND MDS");
+    cd.setCompositionString("MQ15DenMDS AND MDS");
     return cd;
   }
 
