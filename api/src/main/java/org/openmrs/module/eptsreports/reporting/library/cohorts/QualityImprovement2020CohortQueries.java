@@ -8103,7 +8103,6 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition Mq15DenMds14 = getMQ15MdsDen14();
-    CohortDefinition Mq15L = intensiveMonitoringCohortQueries.getMI15L();
     CohortDefinition hadFilaAfterClinical =
         getPatientsWhoHadPickupOnFilaAfterMostRecentVlOnFichaClinica();
 
@@ -8114,17 +8113,12 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "MQ15L",
-        EptsReportUtils.map(
-            Mq15L, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
         "FAC",
         EptsReportUtils.map(
             hadFilaAfterClinical,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("Mq15DenMds14 AND MQ15L AND FAC");
+    cd.setCompositionString("Mq15DenMds14 AND FAC");
 
     return cd;
   }
