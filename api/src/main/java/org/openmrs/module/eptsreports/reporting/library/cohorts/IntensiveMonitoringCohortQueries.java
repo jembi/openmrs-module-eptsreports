@@ -2366,7 +2366,6 @@ public class IntensiveMonitoringCohortQueries {
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-
         "ABANDONEDTARV",
         EptsReportUtils.map(
             abandonedInTheLastSixMonthsFromFirstLineDate,
