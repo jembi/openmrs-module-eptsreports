@@ -6,6 +6,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -476,32 +477,26 @@ public class TxtbDenominatorQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
 
+    String tbScreeningQuery =
+        new EptsQueriesUtil()
+            .unionBuilder(getPatientAndScreeningDate())
+            .union(getPatientWithAtLeastOnePosDate())
+            .union(getPatientWithAtLeastTbTreatmentDate())
+            .union(getPatientWithTbProgramEnrollmentAndDate())
+            .union(getPatientWithPulmonaryTbdDate())
+            .union(getPatientMarkedAsTbTreatmentStartAndDate())
+            .union(getPatientWithTuberculosisSymptomsAndDate())
+            .union(getPatientsActiveTuberculosisDate())
+            .union(getPatientsWithTbObservationsAndDate())
+            .union(getPatientsWithApplicationsForLabResearch())
+            .union(getPatientsWithTbGenexpertAndDate())
+            .union(getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
+            .buildQuery();
+
     String query =
         " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) most_recent "
             + " FROM (        "
-            + getPatientAndScreeningDate()
-            + " UNION "
-            + getPatientWithAtLeastOnePosDate()
-            + " UNION "
-            + getPatientWithAtLeastTbTreatmentDate()
-            + " UNION "
-            + getPatientWithTbProgramEnrollmentAndDate()
-            + " UNION "
-            + getPatientWithPulmonaryTbdDate()
-            + " UNION "
-            + getPatientMarkedAsTbTreatmentStartAndDate()
-            + " UNION "
-            + getPatientWithTuberculosisSymptomsAndDate()
-            + " UNION "
-            + getPatientsActiveTuberculosisDate()
-            + " UNION "
-            + getPatientsWithTbObservationsAndDate()
-            + " UNION "
-            + getPatientsWithApplicationsForLabResearch()
-            + " UNION "
-            + getPatientsWithTbGenexpertAndDate()
-            + " UNION "
-            + getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate()
+            + tbScreeningQuery
             + "                ) most_recent "
             + " INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
