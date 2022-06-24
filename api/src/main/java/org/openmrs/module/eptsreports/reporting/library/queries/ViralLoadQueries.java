@@ -271,7 +271,7 @@ public class ViralLoadQueries {
             + " o.obs_datetime <=:endDate AND "
             + " e.location_id=:location "
             + " ) max_vl_date GROUP BY patient_id "
-            + ") vl_date_tbl ON pp.patient_id=vl_date_tbl.patient_id WHERE ee.encounter_datetime BETWEEN date_add(vl_max_date, interval -12 MONTH) AND vl_max_date AND ee.encounter_type=%d "
+            + ") vl_date_tbl ON pp.patient_id=vl_date_tbl.patient_id WHERE ee.encounter_datetime BETWEEN date_add(vl_max_date, interval -12 MONTH) AND date_add(vl_max_date, interval -1 DAY) AND ee.encounter_type=%d "
             + " ) fin_tbl GROUP BY patient_id "
             + ") out_p ON pp.patient_id=out_p.patient_id AND op.concept_id =%d AND op.value_coded IN(%d,%d) AND ep.encounter_type=%d AND ep.encounter_datetime=max_vl_date_and_max_ficha";
     return String.format(
