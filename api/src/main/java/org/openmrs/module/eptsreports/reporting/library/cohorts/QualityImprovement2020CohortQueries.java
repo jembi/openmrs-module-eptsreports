@@ -1,14 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -34,6 +29,13 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -632,12 +634,20 @@ public class QualityImprovement2020CohortQueries {
    * @param conceptIdAns The value coded answers concept
    * @return CohortDefinition
    */
+  // This will bypass the previous implementation and allow reuse of the method with other
+  // parameters
   public CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
+
+    return getPregnantAndBreastfeedingStates(
+        hivMetadata.getMasterCardEncounterType(), conceptIdQn, conceptIdAns);
+  }
+
+  public CohortDefinition getPregnantAndBreastfeedingStates(
+      EncounterType encounterType, int conceptIdQn, int conceptIdAns) {
     Map<String, Integer> map = new HashMap<>();
     map.put("conceptIdQn", conceptIdQn);
     map.put("conceptIdAns", conceptIdAns);
-    map.put(
-        "fichaClinicaEncounterType", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("fichaClinicaEncounterType", encounterType.getEncounterTypeId());
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String query =
         "SELECT "
