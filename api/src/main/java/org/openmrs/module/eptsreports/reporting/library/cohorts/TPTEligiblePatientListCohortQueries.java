@@ -374,7 +374,7 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getMonthlyConcept().getConceptId()),
             mapping));
 
-    //ADD new 3hp section queries
+    // ADD new 3hp section queries
 
     compositionCohortDefinition.addSearch(
         "TBTreatmentPart1",
@@ -3789,51 +3789,51 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   public enum sectionFromM {
-    ONE{
+    ONE {
       @Override
-      public String getQuery(){
+      public String getQuery() {
         return TPTEligiblePatientsQueries.getMpart1();
       }
     },
-    TWO{
+    TWO {
       @Override
-      public String getQuery(){
+      public String getQuery() {
         return TPTEligiblePatientsQueries.getMpart2();
       }
     },
-    THREE{
+    THREE {
       @Override
-      public String getQuery(){
+      public String getQuery() {
         return TPTEligiblePatientsQueries.getMpart3();
       }
     },
-    FOUR{
+    FOUR {
       @Override
-      public String getQuery(){
+      public String getQuery() {
         return TPTEligiblePatientsQueries.getMpart4();
       }
     },
-    FIVE{
+    FIVE {
       @Override
-      public String getQuery(){
+      public String getQuery() {
         return TPTEligiblePatientsQueries.getMpart5();
       }
     },
-    SIX{
+    SIX {
       @Override
-      public String getQuery(){
+      public String getQuery() {
         return TPTEligiblePatientsQueries.getMpart6();
       }
     },
-    SEVEN{
+    SEVEN {
       @Override
-      public String getQuery(){
+      public String getQuery() {
         return TPTEligiblePatientsQueries.getMpart7();
       }
     },
-    EIGHT{
+    EIGHT {
       @Override
-      public String getQuery(){
+      public String getQuery() {
         return TPTEligiblePatientsQueries.getMpart8();
       }
     };
@@ -3842,19 +3842,19 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   *<B>For each M:</B>
-   * <li>
-   *     Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954)
-   *     and Data Fim da Profilaxia TPT(value datetime, concept id 6129) registered on Ficha Resumo by end date
-   *     (Encounter type 53) and with value datetime  between 86 days and 365 days from the date of M.3
-   * </li>
+   * <B>For each M:</B>
+   * <li>Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id
+   *     23954) and Data Fim da Profilaxia TPT(value datetime, concept id 6129) registered on Ficha
+   *     Resumo by end date (Encounter type 53) and with value datetime between 86 days and 365 days
+   *     from the date of M.3
    *
-   * @return CohortDefinition
+   * @return {@link CohortDefinition}
    */
-  public CohortDefinition get3HPLastProfilaxyDuringM3Period(sectionFromM section){
+  public CohortDefinition get3HPLastProfilaxyDuringM3Period(sectionFromM section) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" all patients with Última profilaxia 3HP Between 86 days and 365 days from the date of M.3");
+    sqlCohortDefinition.setName(
+        " all patients with Última profilaxia 3HP Between 86 days and 365 days from the date of M.3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -3867,11 +3867,14 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
     map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
 
-    String query =  "SELECT tbl_m.patient_id "
-            + "FROM   ("
+    String query =
+        "SELECT mSection.patient_id "
+            + "FROM   ( "
             + section.getQuery()
-            + ") AS tbl_m "
+            + " ) AS mSection "
             + "       inner join (SELECT p.patient_id "
             + "                   FROM   patient p "
             + "                          inner join encounter e "
@@ -3880,30 +3883,9 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                  ON e.encounter_id = o.encounter_id "
             + "                          inner join obs o2 "
             + "                                  ON e.encounter_id = o2.encounter_id "
-            + "                          inner join (SELECT p.patient_id, "
-            + "                                             o2.value_datetime AS value_datetime "
-            + "                                      FROM   patient p "
-            + "                                             inner join encounter e "
-            + "                                                     ON p.patient_id = "
-            + "                                                        e.patient_id "
-            + "                                             inner join obs o "
-            + "                                                     ON e.encounter_id = "
-            + "                                                        o.encounter_id "
-            + "                                             inner join obs o2 "
-            + "                                                     ON e.encounter_id = "
-            + "                                                        o2.encounter_id "
-            + "                                      WHERE  p.voided = 0 "
-            + "                                             AND e.voided = 0 "
-            + "                                             AND o.voided = 0 "
-            + "                                             AND e.location_id = :location "
-            + "                                             AND e.encounter_type = ${53} "
-            + "                                             AND ( o.concept_id = ${23985} "
-            + "                                                   AND o.value_coded = ${23954} ) "
-            + "                                             AND ( o2.concept_id = ${6128} "
-            + "                                                   AND o2.value_datetime IS NOT "
-            + "                                                       NULL "
-            + "                                                   AND o2.value_datetime <= "
-            + "                                                       :endDate )) "
+            + "                          inner join ( "
+            + sectionFromM.THREE.getQuery()
+            + " ) "
             + "                                     m3 "
             + "                                  ON m3.patient_id = p.patient_id "
             + "                   WHERE  p.voided = 0 "
@@ -3911,23 +3893,23 @@ public class TPTEligiblePatientListCohortQueries {
             + "                          AND o.voided = 0 "
             + "                          AND o2.voided = 0 "
             + "                          AND e.encounter_type = ${53} "
-            + "                          AND o.concept_id = ${23985} "
-            + "                          AND o.value_coded = ${23954} "
+            + "                          AND (o.concept_id = ${23985} "
+            + "                          AND o.value_coded = ${23954}) "
             + "                          AND e.location_id = :location "
-            + "                          AND o2.concept_id = ${6129} "
-            + "                          AND o.obs_datetime <= :endDate "
+            + "                          AND ( o2.concept_id = ${6129} "
             + "                          AND o2.value_datetime IS NOT NULL "
             + "                          AND o2.value_datetime BETWEEN "
-            + "                              Date_add(m3.value_datetime, "
+            + "                              Date_add(m3.encounter_datetime, "
             + "                              interval 86 day) AND "
-            + "                              Date_add(m3.value_datetime, interval "
-            + "                              365 day)) result "
-            + "               ON result.patient_id = tbl_m.patient_id";
-
+            + "                              Date_add(m3.encounter_datetime, interval "
+            + "                              365 day))) completed3hp "
+            + "               ON completed3hp.patient_id = mSection.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(sb.replace(query));
+
+    System.out.println(sqlCohortDefinition.getQuery());
 
     return sqlCohortDefinition;
   }
