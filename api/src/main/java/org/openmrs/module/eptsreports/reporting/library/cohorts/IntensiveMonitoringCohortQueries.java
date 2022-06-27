@@ -18,7 +18,6 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class IntensiveMonitoringCohortQueries {
 
@@ -1902,7 +1901,7 @@ public class IntensiveMonitoringCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-             "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter ee ON ee.patient_id = p.patient_id "
             + "       INNER JOIN obs oo ON oo.encounter_id = ee.encounter_id "
