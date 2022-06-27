@@ -1,7 +1,18 @@
 package org.openmrs.module.eptsreports.reporting.calculation.mq;
 
-import java.util.*;
-import org.openmrs.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import org.openmrs.Concept;
+import org.openmrs.EncounterType;
+import org.openmrs.Location;
+import org.openmrs.Obs;
+import org.openmrs.PatientProgram;
+import org.openmrs.Program;
 import org.openmrs.api.context.Context;
 import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
@@ -87,6 +98,7 @@ public class PregnantDateCalculation4MQ extends AbstractPatientCalculation {
             null,
             TimeQualifier.ANY,
             null,
+            context.getNow(),
             context);
 
     CalculationResultMap pregnantOnEncounter53Map =
@@ -98,6 +110,7 @@ public class PregnantDateCalculation4MQ extends AbstractPatientCalculation {
             Arrays.asList(yes),
             TimeQualifier.ANY,
             null,
+            context.getNow(),
             context);
 
     CalculationResultMap lastPregnantFsrMap =

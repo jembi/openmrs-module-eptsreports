@@ -2,25 +2,14 @@ package org.openmrs.module.eptsreports.reporting.data.converter;
 
 import org.openmrs.module.reporting.data.converter.DataConverter;
 
-public class DispensationTypeConverter implements DataConverter {
+public class ToStringConverter implements DataConverter {
 
-  @Override
-  public Object convert(Object obj) {
+  public String convert(Object obj) {
     if (obj == null) {
-      return "";
+      return " ";
     }
 
-    switch (obj.toString()) {
-      case "1098":
-        return "DM";
-      case "23720":
-        return "DT";
-      case "23888":
-        return "DS";
-
-      default:
-        return "";
-    }
+    return " " + obj.toString();
   }
 
   @Override

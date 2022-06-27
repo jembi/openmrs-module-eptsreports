@@ -1,17 +1,17 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class TxtbDenominatorQueries {
@@ -19,6 +19,8 @@ public class TxtbDenominatorQueries {
   @Autowired private HivMetadata hivMetadata;
 
   @Autowired private TbMetadata tbMetadata;
+
+  @Autowired private CommonQueries commonQueries;
 
   /**
    * i. at least one “S” or “N” selected for TB Screening (Rastreio de TB) during the reporting
@@ -46,7 +48,7 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type IN( ${6}, ${9} ) "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND o.concept_id = ${6257} "
             + "       AND o.value_coded IN ( ${1065}, ${1066} ) "
             + "       AND p.voided = 0 "
@@ -62,7 +64,7 @@ public class TxtbDenominatorQueries {
    * Clinica: encounter types 6 and 9
    *
    * <p>at least one “POS” selected for “Resultado da Investigação para TB de BK e/ou RX?” during
-   * the reporting period consultations; ( response 703: POS or 664: NEG for question: 6277)
+   * the reporting period consultations; ( response 703: NEG for question: 6277)
    *
    * @return {@link String}
    */
@@ -72,7 +74,6 @@ public class TxtbDenominatorQueries {
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("6277", tbMetadata.getResearchResultConcept().getConceptId());
     map.put("703", tbMetadata.getPositiveConcept().getConceptId());
-    map.put("664", tbMetadata.getNegativeConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, e.encounter_datetime "
@@ -81,9 +82,9 @@ public class TxtbDenominatorQueries {
             + "       inner join obs o ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type IN( ${6}, ${9} ) "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND o.concept_id = ${6277} "
-            + "       AND o.value_coded IN ( ${703}, ${664} ) "
+            + "       AND o.value_coded IN ( ${703} ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
@@ -115,12 +116,11 @@ public class TxtbDenominatorQueries {
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type IN( ${6}, ${9} ) "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND o.concept_id = ${1113} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -146,9 +146,8 @@ public class TxtbDenominatorQueries {
             + "WHERE  pg.voided = 0 "
             + "       AND p.voided = 0 "
             + "       AND program_id = ${5} "
-            + "       AND date_enrolled  BETWEEN :startDate AND :endDate "
+            + "       AND date_enrolled  <= :endDate "
             + "       AND pg.location_id = :location ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -179,13 +178,12 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${53} "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND o.concept_id = ${1406} "
             + "       AND o.value_coded = ${42} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -215,13 +213,12 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
-            + "       AND o.value_datetime BETWEEN :startDate AND :endDate "
+            + "       AND o.value_datetime <= :endDate "
             + "       AND o.concept_id = ${1268} "
             + "       AND o.value_coded = ${1256} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -251,13 +248,12 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND  o.concept_id = ${23758} "
             + "       AND o.value_coded IN( ${1065}, ${1066} )  "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -287,13 +283,12 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND  o.concept_id = ${23761} "
             + "       AND o.value_coded IN( ${1065} )  "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -335,13 +330,12 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND ( o.concept_id = ${1766} "
             + "             AND o.value_coded IN( ${1763}, ${1764}, ${1762}, ${1760},${23760}, ${1765}, ${161} ) ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -380,13 +374,12 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND o.concept_id = ${23722} "
             + "       AND o.value_coded IN( ${23723}, ${23774}, ${23951}, ${307}, ${12} ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -426,13 +419,12 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND ( ( o.concept_id IN ( ${23723}, ${23774}, ${23951}, ${307}, ${12} ) "
             + "               AND o.value_coded IN( ${703}, ${664} ) ) OR o.concept_id = ${12} AND o.value_coded = ${1138} ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -467,13 +459,12 @@ public class TxtbDenominatorQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "WHERE  e.encounter_type = ${13} "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND ( o.concept_id IN ( ${307}, ${23723}, ${23774}, ${23951} ) "
             + "             AND o.value_coded IN( ${703}, ${664} ) ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
-
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
@@ -485,42 +476,36 @@ public class TxtbDenominatorQueries {
     sqlPatientDataDefinition.setName("Most Recent TB Screening Date ");
     sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "End Date", Location.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
+
+    String tbScreeningQuery =
+        new EptsQueriesUtil()
+            .unionBuilder(getPatientAndScreeningDate())
+            .union(getPatientWithAtLeastOnePosDate())
+            .union(getPatientWithAtLeastTbTreatmentDate())
+            .union(getPatientWithTbProgramEnrollmentAndDate())
+            .union(getPatientWithPulmonaryTbdDate())
+            .union(getPatientMarkedAsTbTreatmentStartAndDate())
+            .union(getPatientWithTuberculosisSymptomsAndDate())
+            .union(getPatientsActiveTuberculosisDate())
+            .union(getPatientsWithTbObservationsAndDate())
+            .union(getPatientsWithApplicationsForLabResearch())
+            .union(getPatientsWithTbGenexpertAndDate())
+            .union(getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
+            .buildQuery();
 
     String query =
-        " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) recent_date"
+        " SELECT most_recent.patient_id, MAX(most_recent.encounter_datetime) most_recent "
             + " FROM (        "
-            + getPatientAndScreeningDate()
-            + " UNION "
-            + getPatientWithAtLeastOnePosDate()
-            + " UNION "
-            + getPatientWithAtLeastTbTreatmentDate()
-            + " UNION "
-            + getPatientWithTbProgramEnrollmentAndDate()
-            + " UNION "
-            + getPatientWithPulmonaryTbdDate()
-            + " UNION "
-            + getPatientMarkedAsTbTreatmentStartAndDate()
-            + " UNION "
-            + getPatientWithTuberculosisSymptomsAndDate()
-            + " UNION "
-            + getPatientsActiveTuberculosisDate()
-            + " UNION "
-            + getPatientsWithTbObservationsAndDate()
-            + " UNION "
-            + getPatientsWithApplicationsForLabResearch()
-            + " UNION "
-            + getPatientsWithTbGenexpertAndDate()
-            + " UNION "
-            + getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate()
+            + tbScreeningQuery
             + "                ) most_recent "
-            + " WHERE most_recent.encounter_datetime BETWEEN DATE_ADD(:startDate, INTERVAL -6 MONTH)  AND :endDate  "
-            + " GROUP BY most_recent.patient_id  ";
+            + " INNER JOIN ( "
+            + commonQueries.getARTStartDate(true)
+            + " ) art on art.patient_id = most_recent.patient_id "
+            + " WHERE most_recent.encounter_datetime BETWEEN  DATE_ADD(art.first_pickup, INTERVAL - 6 MONTH) AND :endDate "
+            + " GROUP BY patient_id";
 
     sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }
-
-
 }
