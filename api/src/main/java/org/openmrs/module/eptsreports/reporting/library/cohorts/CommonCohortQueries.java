@@ -1,13 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -18,12 +10,18 @@ import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition2;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.ResumoMensalTransferredOutCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
+
+import static org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils.map;
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 @Component
 public class CommonCohortQueries {
@@ -389,7 +387,7 @@ public class CommonCohortQueries {
             + "                       AND e.voided = 0 "
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = ${53} "
-            + "                       AND o.obs_datetime BETWEEN :startDate AND :revisionEndDate "
+            + "                       AND o.obs_datetime <= :revisionEndDate "
             + "                       AND o.voided = 0 "
             + "                       AND o.concept_id = ${6272} "
             + "                       AND o.value_coded = ${1706} "
@@ -654,7 +652,10 @@ public class CommonCohortQueries {
    */
   public CohortDefinition getPatientsWithFirstTherapeuticLineOnLastClinicalEncounterB2NEW() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName("Pregnant Or Breastfeeding");
+
+    EptsQueriesUtil pIdBuilder = new EptsQueriesUtil();
+
+    sqlCohortDefinition.setName("All patients with LINHA TERAPEUTICA equal to PRIMEIRA LINHA");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(
@@ -668,9 +669,22 @@ public class CommonCohortQueries {
     map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
 
-    String query =
-        " SELECT "
-            + "     pa.patient_id "
+    String query = pIdBuilder.patientIdQueryBuilder(getFirstLineTherapyQuery()).getQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * @see #getPatientsWithFirstTherapeuticLineOnLastClinicalEncounterB2NEW
+   * @return {@link String}
+   */
+  public String getFirstLineTherapyQuery() {
+    return " SELECT "
+            + "     pa.patient_id, first_line.encounter_datetime AS last_encounter "
             + " FROM "
             + "     patient pa "
             + "          JOIN "
@@ -731,13 +745,7 @@ public class CommonCohortQueries {
             + "              AND e.voided = 0 "
             + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
             + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
-            + "  GROUP BY pa.patient_id ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlCohortDefinition;
+            + " GROUP BY pa.patient_id ";
   }
 
   /**
