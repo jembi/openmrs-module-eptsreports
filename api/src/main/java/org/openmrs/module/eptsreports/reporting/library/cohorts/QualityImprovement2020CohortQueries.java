@@ -8156,7 +8156,7 @@ public class QualityImprovement2020CohortQueries {
             Mq15P, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch("AGE2", EptsReportUtils.map(Mq15Age2, "endDate=${revisionEndDate}"));
-    cd.setCompositionString("A AND MDC AND B2 AND AGE2 AND NOT P ");
+    cd.setCompositionString("A AND MDC AND B2 AND AGE2 AND NOT P");
     return cd;
   }
 
@@ -9568,32 +9568,39 @@ public class QualityImprovement2020CohortQueries {
     String query =
         "SELECT p.patient_id "
             + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON e.patient_id = p.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN (SELECT p.patient_id, "
-            + "                          Max(e.encounter_datetime) AS encounter_datetime "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) encounter_datetime "
             + "                   FROM   patient p "
-            + "                          INNER JOIN encounter e "
-            + "                                  ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) AS encounter_datetime "
+            + "                                      FROM   patient p "
+            + "                                             INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                      WHERE  p.voided = 0 "
+            + "                                             AND e.voided = 0 "
+            + "                                             AND e.location_id = :location "
+            + "                                             AND e.encounter_type = ${6} "
+            + "                                             AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                                      GROUP  BY p.patient_id) last_consultation "
+            + "                                  ON last_consultation.patient_id = p.patient_id "
             + "                   WHERE  p.voided = 0 "
+            + "                          AND o.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND e.location_id = :location "
             + "                          AND e.encounter_type = ${6} "
-            + "                          AND e.encounter_datetime BETWEEN "
-            + "                              :startDate AND :endDate "
-            + "                   GROUP  BY p.patient_id) last_consultation "
-            + "               ON last_consultation.patient_id = p.patient_id "
+            + "                          AND o.concept_id = ${23739} "
+            + "                          AND e.encounter_datetime < last_consultation.encounter_datetime "
+            + "                   GROUP  BY p.patient_id) recent_dispensation_type ON recent_dispensation_type.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${6} "
-            + "       AND  o.concept_id = ${23739} "
-            + "       AND  o.value_coded = ${dispensation} "
-            + "       AND e.encounter_datetime < last_consultation.encounter_datetime "
-            + " GROUP BY p.patient_id ";
+            + "       AND o.concept_id = ${23739} "
+            + "       AND o.value_coded = ${dispensation} "
+            + "       AND e.encounter_datetime = recent_dispensation_type.encounter_datetime "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
