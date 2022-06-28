@@ -3700,7 +3700,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>C: The patient has at least 3 drug pick-up on FILT (encounter type 60) with “Regime de
    *       TPT” (concept id 23985) value coded “3HP” doxina” (concept id -in [23954, 23984]) and
-   *       “Tipo de dispensa” (concept id 23986) with value coded “Trimestral” (concept id 1098)
+   *       “Tipo de dispensa” (concept id 23986) with value coded “Mensal” (concept id 1098)
    *       during 120 DAYs from the date from M.2.
    * </ul>
    *
@@ -3869,6 +3869,13 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
     map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
+    map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
         "SELECT mSection.patient_id "
@@ -3912,6 +3919,51 @@ public class TPTEligiblePatientListCohortQueries {
     System.out.println(sqlCohortDefinition.getQuery());
 
     return sqlCohortDefinition;
+  }
+
+  public CohortDefinition get3HPLastProfilaxyDuringM3ANDM1Periods(){
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Ultima Profilaxia");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String mapping = "endDate=${endDate},location=${location}";
+
+    cd.addSearch("M1",EptsReportUtils.map(
+            get3HPLastProfilaxyDuringM3Period(sectionFromM.ONE), mapping)
+    );
+    cd.addSearch("M2",EptsReportUtils.map(
+            get3HPLastProfilaxyDuringM3Period(sectionFromM.TWO), mapping)
+    );
+
+    cd.addSearch("M3",EptsReportUtils.map(
+            get3HPLastProfilaxyDuringM3Period(sectionFromM.THREE), mapping)
+    );
+
+    cd.addSearch("M4",EptsReportUtils.map(
+            get3HPLastProfilaxyDuringM3Period(sectionFromM.FOUR), mapping)
+    );
+
+    cd.addSearch("M5",EptsReportUtils.map(
+            get3HPLastProfilaxyDuringM3Period(sectionFromM.FIVE), mapping)
+    );
+
+    cd.addSearch("M6",EptsReportUtils.map(
+            get3HPLastProfilaxyDuringM3Period(sectionFromM.SIX), mapping)
+    );
+
+    cd.addSearch("M7",EptsReportUtils.map(
+            get3HPLastProfilaxyDuringM3Period(sectionFromM.SEVEN), mapping)
+    );
+
+    cd.addSearch("M8",EptsReportUtils.map(
+            get3HPLastProfilaxyDuringM3Period(sectionFromM.EIGHT), mapping)
+    );
+
+    cd.setCompositionString(" (M1 OR M2 OR M3 OR M4 OR M5 OR M6 OR M7 OR M8) OR (...)");
+
+    return cd;
   }
 
   /**

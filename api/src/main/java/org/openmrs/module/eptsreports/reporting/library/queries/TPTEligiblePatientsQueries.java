@@ -83,7 +83,7 @@ public class TPTEligiblePatientsQueries {
    */
   public static String getMpart4() {
 
-    return " SELECT p.patient_id, e.encounter_datetime AS encounter_datetime"
+    return " SELECT p.patient_id, e.encounter_datetime AS encounter_datetime "
         + "FROM   patient p "
         + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
         + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -93,7 +93,7 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.encounter_type = ${6}"
         + "       AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
         + "       AND o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-        + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate ";
+        + "       AND e.encounter_datetime <= :endDate ";
   }
 
   /**
@@ -161,15 +161,12 @@ public class TPTEligiblePatientsQueries {
   }
 
   /**
-   * valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
-   * valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId()); valuesMap.put("6",
-   * hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
    * <li>
    *
    *     <p>6: Select all patients with Outras prescricoes(concept id 1719) value coded DT-3HP
    *     (concept id 165307) on Ficha clinica (encounter type 6) by report end date;
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getMpart6() {
 
@@ -194,11 +191,11 @@ public class TPTEligiblePatientsQueries {
    *     de tratamento TPT”(concept ID 23987) value coded “inicio” or “re-inicio”(concept ID in
    *     [1256, 1705]) marked on FILT (encounter type 60) and encounter datetime <= end date;
    *
-   * @return String
+   * @return {@link String}
    */
   public static String getMpart7() {
 
-    return "SELECT p.patient_id, e.encounter_datetime AS encounter_datetime"
+    return "SELECT p.patient_id, e.encounter_datetime AS encounter_datetime "
         + "FROM   patient p "
         + "       inner join encounter e ON p.patient_id = e.patient_id "
         + "       inner join obs o ON e.encounter_id = o.encounter_id "
@@ -211,22 +208,6 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.encounter_datetime <= :endDate ";
   }
 
-  // valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-  //    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
-  //    valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
-  //    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
-  //    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
-  //    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-  //    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-  //    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-  //    valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
-  //    valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
-  //    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-  //    valuesMap.put("6128",
-  // hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
-  //    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
-  //    valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
-  //    valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
   /**
    *
@@ -263,7 +244,7 @@ public class TPTEligiblePatientsQueries {
    */
   public static String getMpart8() {
 
-    return "SELECT p.patient_id, e.encounter_datetime AS encounter_datetime"
+    return "SELECT p.patient_id, e.encounter_datetime AS encounter_datetime "
         + "FROM   patient p "
         + "       inner join encounter e ON p.patient_id = e.patient_id "
         + "       inner join obs o ON e.encounter_id = o.encounter_id "
@@ -273,7 +254,7 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.encounter_type = ${60} "
         + "       AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
         + "       AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1257}, ${1267} ) OR o2.value_coded IS NULL ) "
-        + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+        + "       AND e.encounter_datetime <= :endDate "
         + "       AND p.patient_id NOT IN ( "
         + "           SELECT p.patient_id "
         + "           FROM   patient p "
@@ -289,7 +270,7 @@ public class TPTEligiblePatientsQueries {
         + "                             AND e.encounter_type = ${60} "
         + "                             AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
         + "                             AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) ) "
-        + "                             AND e.encounter_datetime BETWEEN :startDate AND :endDate) filt "
+        + "                             AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, interval 4 month) AND :endDate) filt "
         + "                             ON filt.patient_id = p.patient_id "
         + "                  WHERE  p.voided = 0 "
         + "                  AND e.voided = 0 "
@@ -316,7 +297,7 @@ public class TPTEligiblePatientsQueries {
         + "                 AND e.encounter_type = ${60} "
         + "                 AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
         + "                 AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) ) "
-        + "                 AND e.encounter_datetime BETWEEN :startDate AND :endDate) filt "
+        + "                 AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, interval 4 month) AND :endDate) filt "
         + "                 ON filt.patient_id = p.patient_id "
         + "           WHERE  p.voided = 0 AND e.voided = 0 AND o3.voided = 0 AND o4.voided = 0 AND o5.voided = 0 "
         + "           AND e.location_id = :location "
@@ -342,7 +323,7 @@ public class TPTEligiblePatientsQueries {
         + "                 AND e.encounter_type = ${60} "
         + "                 AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
         + "                 AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) ) "
-        + "                 AND e.encounter_datetime BETWEEN :startDate AND :endDate) filt "
+        + "                 AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, interval 4 month) AND :endDate) filt "
         + "                 ON filt.patient_id = p.patient_id "
         + "           WHERE p.voided = 0 AND e.voided = 0 AND o6.voided = 0 AND o7.voided = 0 "
         + "           AND e.location_id = :location "
