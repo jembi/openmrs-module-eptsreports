@@ -2239,6 +2239,55 @@ public class IntensiveMonitoringCohortQueries {
     String str = stringSubstitutor.replace(query);
     cd.setQuery(str);
     return cd;
+  }  /**
+   * Utentes que têm o registo do “Pedido de Investigações Laboratoriais” igual a “Carga Viral”, na Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido CV”>= “Data Última Consulta” menos (-) 12meses e < “Data Última Consulta”).
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoHadLabInvestigationsRequest() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients with Pedido de Carga Viral Before Last Visit");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setName("All patients with concept PEDIDO DE INVESTIGACOES LABORATORIAIS BEFORE LAST VISIT");
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+
+    String query =
+             "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT p.patient_id, MAX(e.encounter_datetime) visit_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                   WHERE  e.encounter_type = ${6} "
+            + "                          AND location_id = :location "
+            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                          AND p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                   GROUP  BY p.patient_id) last_visit "
+            + "               ON last_visit.patient_id = p.patient_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.encounter_datetime >= DATE_SUB(last_visit.visit_date, INTERVAL 12 MONTH) "
+            + "       AND e.encounter_datetime < last_visit.visit_date "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${856} "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "GROUP  BY p.patient_id";
+    ;
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    String str = stringSubstitutor.replace(query);
+    cd.setQuery(str);
+    return cd;
   }
 
   /**
