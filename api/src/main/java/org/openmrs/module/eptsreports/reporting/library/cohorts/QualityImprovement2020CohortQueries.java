@@ -8123,7 +8123,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  public CohortDefinition getMQ15MdsDen15() {
+  public CohortDefinition getMQMI15DEN15WithoutExclusions() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("15.15 % de pacientes inscritos em MDS em TARV há mais de 21 meses ");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -8132,7 +8132,6 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
     CohortDefinition alreadyMdc = getPatientsAlreadyEnrolledInTheMdc();
-    CohortDefinition Mq15P = intensiveMonitoringCohortQueries.getMI15P();
     CohortDefinition Mq15Age2 = getAgeOnEndDateInclusionMoreThan2Years();
     CohortDefinition Mq15B2 = intensiveMonitoringCohortQueries.getMI15B2(24);
 
@@ -8150,13 +8149,58 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15B2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
+    cd.addSearch("AGE2", EptsReportUtils.map(Mq15Age2, "endDate=${revisionEndDate}"));
+    cd.setCompositionString("A AND MDC AND B2 AND AGE2");
+    return cd;
+  }
+
+  public CohortDefinition getMQ15Den15() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("15.15 % de pacientes inscritos em MDS em TARV há mais de 21 meses MQ ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mq15withoutExclusions = getMQMI15DEN15WithoutExclusions();
+    CohortDefinition Mq15P = intensiveMonitoringCohortQueries.getMI15P();
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            Mq15withoutExclusions,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     cd.addSearch(
         "P",
         EptsReportUtils.map(
             Mq15P, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    cd.addSearch("AGE2", EptsReportUtils.map(Mq15Age2, "endDate=${revisionEndDate}"));
-    cd.setCompositionString("A AND MDC AND B2 AND AGE2 AND NOT P");
+    cd.setCompositionString("A NOT P");
+    return cd;
+  }
+
+  public CohortDefinition getMI15Den15() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("15.15 % de pacientes inscritos em MDS em TARV há mais de 21 meses MQ ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mq15withoutExclusions = getMQMI15DEN15WithoutExclusions();
+    CohortDefinition Mq15P =
+        intensiveMonitoringCohortQueries.getPatientsWhoHadLabInvestigationsRequest();
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(
+            Mq15withoutExclusions,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "IR",
+        EptsReportUtils.map(
+            Mq15P, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("A NOT IR");
     return cd;
   }
 
@@ -8180,7 +8224,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Mq15MdsDen15 = getMQ15MdsDen15();
+    CohortDefinition Mq15MdsDen15 = getMI15Den15();
     CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(20, 10);
 
     cd.addSearch(

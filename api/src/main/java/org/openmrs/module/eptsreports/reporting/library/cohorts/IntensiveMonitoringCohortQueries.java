@@ -2239,11 +2239,15 @@ public class IntensiveMonitoringCohortQueries {
     String str = stringSubstitutor.replace(query);
     cd.setQuery(str);
     return cd;
-  }  /**
-   * Utentes que têm o registo do “Pedido de Investigações Laboratoriais” igual a “Carga Viral”, na Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido CV”>= “Data Última Consulta” menos (-) 12meses e < “Data Última Consulta”).
+  }
+  /**
+   * Utentes que têm o registo do “Pedido de Investigações Laboratoriais” igual a “Carga Viral”, na
+   * Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido CV”>= “Data Última
+   * Consulta” menos (-) 12meses e < “Data Última Consulta”).
    *
    * @return CohortDefinition
    */
+
   public CohortDefinition getPatientsWhoHadLabInvestigationsRequest() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -2259,7 +2263,7 @@ public class IntensiveMonitoringCohortQueries {
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
 
     String query =
-             "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
