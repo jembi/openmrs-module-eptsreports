@@ -2013,9 +2013,7 @@ public class IntensiveMonitoringCohortQueries {
             + "            AND e.encounter_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id "
             + "            )  "
             + " as last_consultation on last_consultation.patient_id = juncao.patient_id "
-            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL "
-            + monthsBefore
-            + " MONTH)) as lastVLResult "
+            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL 24 MONTH)) as lastVLResult "
             + " ON lastVLResult.patient_id=p.patient_id "
             + " WHERE "
             + " o.concept_id=${856} AND o.value_numeric is not null AND e.encounter_type=${6} AND  "
@@ -2247,7 +2245,6 @@ public class IntensiveMonitoringCohortQueries {
    *
    * @return CohortDefinition
    */
-
   public CohortDefinition getPatientsWhoHadLabInvestigationsRequest() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
