@@ -143,8 +143,8 @@ public class TXTBCohortQueries {
             "PULMONARYTB",
             TXTBQueries.pulmonaryTB(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                tbMetadata.getPulmonaryTB().getConceptId(),
-                commonMetadata.getYesConcept().getConceptId()));
+                hivMetadata.getOtherDiagnosis().getConceptId(),
+                tbMetadata.getPulmonaryTB().getConceptId()));
     addGeneralParameters(cd);
     return cd;
   }

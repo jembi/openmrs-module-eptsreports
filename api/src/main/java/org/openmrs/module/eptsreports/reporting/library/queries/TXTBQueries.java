@@ -104,7 +104,7 @@ public class TXTBQueries {
    * @return String
    */
   public static String pulmonaryTB(
-      Integer encounterTypeId, Integer pulmonaryTBConcept, Integer yesConcept) {
+      Integer encounterTypeId, Integer otherDiagnosisConcept ,Integer pulmonaryTBConcept) {
     return String.format(
         "SELECT p.patient_id FROM patient p INNER JOIN encounter e "
             + "ON p.patient_id = e.patient_id "
@@ -112,7 +112,7 @@ public class TXTBQueries {
             + "ON e.encounter_id = o.encounter_id "
             + "WHERE e.location_id = :location AND e.encounter_type = %s AND o.concept_id = %s AND o.value_coded = %s AND o.obs_datetime BETWEEN :startDate AND :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0",
-        encounterTypeId, pulmonaryTBConcept, yesConcept);
+        encounterTypeId, otherDiagnosisConcept ,pulmonaryTBConcept);
   }
 
   /**
