@@ -9574,7 +9574,7 @@ public class QualityImprovement2020CohortQueries {
             + "WHERE      e.encounter_type = ${18} "
             + "AND        e.location_id = :location "
             + "AND        o.concept_id = ${5096} "
-            + "AND        e.encounter_datetime > vl.vl_date AND e.encounter_datetime <= :endDate "
+            + "AND        e.encounter_datetime BETWEEN vl.vl_date AND <= :endDate "
             + "AND        o.value_datetime BETWEEN DATE_ADD(e.encounter_datetime, INTERVAL 23 DAY) AND  DATE_ADD(e.encounter_datetime, INTERVAL 37 DAY) "
             + "AND        e.voided = 0 "
             + "AND        p.voided = 0 "
