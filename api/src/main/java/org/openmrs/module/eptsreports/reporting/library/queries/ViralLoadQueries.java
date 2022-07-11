@@ -13,9 +13,10 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
+import org.apache.commons.text.StringSubstitutor;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.text.StringSubstitutor;
 
 public class ViralLoadQueries {
 
@@ -265,6 +266,7 @@ public class ViralLoadQueries {
             + " FROM   patient pp "
             + " INNER JOIN encounter ee "
             + " ON pp.patient_id = ee.patient_id "
+            + " INNER JOIN obs oo ON ee.encounter_id=oo.encounter_id "
             + " INNER JOIN (SELECT patient_id, "
             + " Max(encounter_date) AS "
             + " vl_max_date "
@@ -318,11 +320,11 @@ public class ViralLoadQueries {
             + " AND "
             + " Date_add(vl_max_date, "
             + " interval - 1 DAY) "
+            + " AND oo.concept_id =% d "
+            + " AND oo.value_coded IN( %d, %d ) "
             + " AND ee.encounter_type =% d) fin_tbl "
             + " GROUP  BY patient_id) out_p "
             + " ON pp.patient_id = out_p.patient_id "
-            + " AND op.concept_id =% d "
-            + " AND op.value_coded IN( %d, %d ) "
             + " AND ep.encounter_type =% d ";
     return String.format(
         query,
@@ -334,10 +336,10 @@ public class ViralLoadQueries {
         vlQualitativeConceptQuestion,
         mastercardEncounter,
         vlConceptQuestion,
-        adultSeguimentoEncounter,
         typeOfDispensation,
         quartely,
         semiAnnually,
+        adultSeguimentoEncounter,
         adultSeguimentoEncounter);
   }
 }
