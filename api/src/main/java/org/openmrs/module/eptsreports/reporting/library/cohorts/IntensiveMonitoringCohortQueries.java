@@ -1992,8 +1992,11 @@ public class IntensiveMonitoringCohortQueries {
 
     String query =
         "SELECT p.patient_id FROM patient p INNER JOIN encounter e on p.patient_id = e.patient_id INNER JOIN obs o ON o.encounter_id=e.encounter_id  "
-            + " INNER JOIN (SELECT juncao.patient_id,juncao.encounter_date "
-            + " FROM ( "
+            + " INNER JOIN ("
+            + "  SELECT patient_id, MAX(encounter_date) encounter_date "
+            + "  FROM ( "
+            + "    SELECT juncao.patient_id,juncao.encounter_date "
+            + "      FROM ( "
             + "         SELECT p.patient_id, e.encounter_datetime AS encounter_date "
             + "         FROM patient p "
             + "                  INNER JOIN encounter e on p.patient_id = e.patient_id INNER JOIN obs o ON o.encounter_id=e.encounter_id "
@@ -2013,7 +2016,7 @@ public class IntensiveMonitoringCohortQueries {
             + "            AND e.encounter_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id "
             + "            )  "
             + " as last_consultation on last_consultation.patient_id = juncao.patient_id "
-            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL 24 MONTH)) as lastVLResult "
+            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL 24 MONTH)) most_recent GROUP BY most_recent.patient_id  ) as lastVLResult "
             + " ON lastVLResult.patient_id=p.patient_id "
             + " WHERE "
             + " o.concept_id=${856} AND o.value_numeric is not null AND e.encounter_type=${6} AND  "
