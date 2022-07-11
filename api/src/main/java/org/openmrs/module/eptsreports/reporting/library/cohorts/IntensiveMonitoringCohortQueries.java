@@ -2012,7 +2012,7 @@ public class IntensiveMonitoringCohortQueries {
             + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL 24 MONTH)) most_recent GROUP BY most_recent.patient_id  ) as lastVLResult "
             + " ON lastVLResult.patient_id=p.patient_id "
             + " WHERE "
-            + " o.concept_id=${856} AND o.value_numeric is not null AND e.encounter_type=${6} AND  "
+            + " ( (o.concept_id=${856} AND o.value_numeric is not null) OR (o.concept_id = 1305 and o.value_coded is not null)) AND e.encounter_type=${6} AND  "
             + " e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL "
             + lastVLResultMonths
             + " MONTH)  "
