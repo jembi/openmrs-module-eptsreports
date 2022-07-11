@@ -13,10 +13,9 @@
  */
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import org.apache.commons.text.StringSubstitutor;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.text.StringSubstitutor;
 
 public class ViralLoadQueries {
 

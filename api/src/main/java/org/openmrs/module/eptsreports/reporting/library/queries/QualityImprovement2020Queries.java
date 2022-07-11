@@ -1,9 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
@@ -14,6 +10,11 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.CommonCohortQuer
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -2133,6 +2134,7 @@ public class QualityImprovement2020Queries {
             + " FROM       patient p "
             + " INNER JOIN encounter e "
             + " ON         e.patient_id = p.patient_id "
+            + " INNER JOIN obs os ON e.encounter_id=os.encounter_id "
             + " INNER JOIN "
             + " ( "
             + " SELECT   patient_id, "
