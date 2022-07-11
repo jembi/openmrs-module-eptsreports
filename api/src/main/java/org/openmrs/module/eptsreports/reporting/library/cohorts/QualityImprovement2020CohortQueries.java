@@ -8224,7 +8224,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition Mq15MdsDen15 = getMI15Den15();
+    CohortDefinition Mq15MdsDen15 = getMQ15Den15();
     CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(20, 10);
 
     cd.addSearch(
