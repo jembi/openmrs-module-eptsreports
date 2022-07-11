@@ -1262,7 +1262,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
         EptsReportUtils.map(
             MI15DEN16,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI15NUM16 =
@@ -1278,7 +1278,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "15.16. % de utentes inscritos em MDS (para pacientes estáveis) com supressão viral",
         EptsReportUtils.map(
             MI15NUM16,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"),
         "");
 
     return dataSetDefinition;
