@@ -1,9 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
@@ -14,6 +10,11 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.CommonCohortQuer
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class QualityImprovement2020Queries {
 
@@ -2185,8 +2186,7 @@ public class QualityImprovement2020Queries {
             + " AND        e.encounter_datetime BETWEEN date_add(vl.vl_max_date, interval -12 month) AND        date_add(vl.vl_max_date, interval -1 day) "
             + " GROUP BY   p.patient_id ) recent_clinical "
             + " ON         recent_clinical.patient_id = p.patient_id "
-            + " WHERE      e.encounter_datetime = recent_clinical.consultation_date "
-            + " AND        e.encounter_type = ${18} "
+            + " WHERE e.encounter_type = ${18} "
             + " AND        e.location_id = :location "
             + " AND        o.concept_id = ${5096} "
             + " AND        datediff(o.value_datetime, e.encounter_datetime) >= ${lower} "

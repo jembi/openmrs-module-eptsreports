@@ -323,8 +323,7 @@ public class ViralLoadQueries {
             + " ON pp.patient_id = out_p.patient_id "
             + " AND op.concept_id =% d "
             + " AND op.value_coded IN( %d, %d ) "
-            + " AND ep.encounter_type =% d "
-            + " AND ep.encounter_datetime = max_vl_date_and_max_ficha ";
+            + " AND ep.encounter_type =% d ";
     return String.format(
         query,
         labEncounter,
