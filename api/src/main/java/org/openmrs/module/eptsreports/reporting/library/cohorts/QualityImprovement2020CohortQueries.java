@@ -8242,6 +8242,33 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  public CohortDefinition getMI15Num15() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("15.15 % de pacientes inscritos em MDS em TARV há mais de 21 meses ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mi15Den = getMI15Den15();
+    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(20, 10);
+
+    cd.addSearch(
+            "MI15DEN15",
+            EptsReportUtils.map(
+                    Mi15Den,
+                    "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+            "Mq15I",
+            EptsReportUtils.map(
+                    Mq15I, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("MI15DEN15 AND Mq15I");
+
+    return cd;
+  }
+
+
+
   public CohortDefinition getMQDen15Dot16() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
