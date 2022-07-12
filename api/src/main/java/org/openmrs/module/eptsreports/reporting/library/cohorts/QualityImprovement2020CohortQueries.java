@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -631,12 +632,20 @@ public class QualityImprovement2020CohortQueries {
    * @param conceptIdAns The value coded answers concept
    * @return CohortDefinition
    */
+  // This will bypass the previous implementation and allow reuse of the method with other
+  // parameters
   public CohortDefinition getPregnantAndBreastfeedingStates(int conceptIdQn, int conceptIdAns) {
+
+    return getPregnantAndBreastfeedingStates(
+        hivMetadata.getMasterCardEncounterType(), conceptIdQn, conceptIdAns);
+  }
+
+  public CohortDefinition getPregnantAndBreastfeedingStates(
+      EncounterType encounterType, int conceptIdQn, int conceptIdAns) {
     Map<String, Integer> map = new HashMap<>();
     map.put("conceptIdQn", conceptIdQn);
     map.put("conceptIdAns", conceptIdAns);
-    map.put(
-        "fichaClinicaEncounterType", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("fichaClinicaEncounterType", encounterType.getEncounterTypeId());
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String query =
         "SELECT "
@@ -8253,21 +8262,19 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(20, 10);
 
     cd.addSearch(
-            "MI15DEN15",
-            EptsReportUtils.map(
-                    Mi15Den,
-                    "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+        "MI15DEN15",
+        EptsReportUtils.map(
+            Mi15Den,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-            "Mq15I",
-            EptsReportUtils.map(
-                    Mq15I, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "Mq15I",
+        EptsReportUtils.map(
+            Mq15I, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("MI15DEN15 AND Mq15I");
 
     return cd;
   }
-
-
 
   public CohortDefinition getMQDen15Dot16() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();

@@ -392,7 +392,7 @@ public class IntensiveMonitoringQueries {
             + "  AND        o.concept_id = ${23722} "
             + "  AND        o.value_coded = ${856} "
             + "  AND        e.encounter_datetime < vl_result.first_vl_result "
-            + "  AND        TIMESTAMPDIFF(DAY, e.encounter_datetime, vl_result.first_vl_result) >= 33 "
+            + "  AND        TIMESTAMPDIFF(DAY, e.encounter_datetime, vl_result.first_vl_result) <= 33 "
             + "GROUP BY   p.patient_id ) previous_consultation ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
