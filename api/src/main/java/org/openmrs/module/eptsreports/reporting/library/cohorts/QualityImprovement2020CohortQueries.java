@@ -8049,53 +8049,53 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15AGE2 = getAgeOnEndDateInclusionMoreThan2Years();
 
     cd.addSearch(
-            "A",
-            EptsReportUtils.map(
-                    Mq15A, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "A",
+        EptsReportUtils.map(
+            Mq15A, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-            "B1",
-            EptsReportUtils.map(
-                    Mq15B1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "B1",
+        EptsReportUtils.map(
+            Mq15B1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "E1",
-            EptsReportUtils.map(
-                    E1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "E1",
+        EptsReportUtils.map(
+            E1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-            "E2",
-            EptsReportUtils.map(
-                    E2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "E2",
+        EptsReportUtils.map(
+            E2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-            "E3",
-            EptsReportUtils.map(
-                    E3, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "E3",
+        EptsReportUtils.map(
+            E3, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "C",
-            EptsReportUtils.map(
-                    Mq15C,
-                    "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+        "C",
+        EptsReportUtils.map(
+            Mq15C,
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch(
-            "D",
-            EptsReportUtils.map(
-                    Mq15D,
-                    "startDate=${revisionEndDate-19m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+        "D",
+        EptsReportUtils.map(
+            Mq15D,
+            "startDate=${revisionEndDate-19m+1d},endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch(
-            "F",
-            EptsReportUtils.map(
-                    Mq15F, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        "F",
+        EptsReportUtils.map(
+            Mq15F, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-            "G", EptsReportUtils.map(Mq15G, "endDate=${revisionEndDate},location=${location}"));
+        "G", EptsReportUtils.map(Mq15G, "endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-            "MDS",
-            EptsReportUtils.map(
-                    alreadyMds,
-                    "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+        "MDS",
+        EptsReportUtils.map(
+            alreadyMds,
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch("AGE2", EptsReportUtils.map(Mq15AGE2, "endDate=${revisionEndDate}"));
 
     cd.setCompositionString(
-            "A AND B1 AND (E1 AND E2 AND E3) AND AGE2 AND NOT (C OR D OR F OR G OR MDS)");
+        "A AND B1 AND (E1 AND E2 AND E3) AND AGE2 AND NOT (C OR D OR F OR G OR MDS)");
 
     return cd;
   }
@@ -8150,30 +8150,30 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mi15Den13 = getMI15Den13();
 
     List<Integer> mdsConcepts =
-            Arrays.asList(
-                    hivMetadata.getGaac().getConceptId(),
-                    hivMetadata.getQuarterlyDispensation().getConceptId(),
-                    hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
-                    hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
-                    hivMetadata.getRapidFlow().getConceptId(),
-                    hivMetadata.getSemiannualDispensation().getConceptId());
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
 
     List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
 
     CohortDefinition mds =
-            getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36(mdsConcepts, states);
+        getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36(mdsConcepts, states);
 
     cd.addSearch(
-            "MQ15Den13",
-            EptsReportUtils.map(
-                    Mi15Den13,
-                    "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+        "MQ15Den13",
+        EptsReportUtils.map(
+            Mi15Den13,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "MDS",
-            EptsReportUtils.map(
-                    mds,
-                    "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+        "MDS",
+        EptsReportUtils.map(
+            mds,
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("MQ15Den13 AND MDS");
     return cd;
@@ -8341,7 +8341,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition Mq15MdsDen15 = getMQ15Den15();
-    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(24,10, 20);
+    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(24, 10, 20);
 
     cd.addSearch(
         "Mq15MdsDen15",
