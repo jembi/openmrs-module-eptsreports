@@ -100,7 +100,7 @@ public class TXTBCohortQueries {
             "markedAsTratamentoTBInicio",
             TXTBQueries.markedAsTratamentoTBInicio(
                 hivMetadata.getAdultoSeguimentoEncounterType().getId(),
-                hivMetadata.getMasterCardEncounterType().getId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getId(),
                 tbMetadata.getTBTreatmentPlanConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId()));
     addGeneralParameters(definition);
