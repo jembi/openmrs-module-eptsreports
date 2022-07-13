@@ -8,7 +8,6 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.QualityImproveme
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
@@ -66,7 +65,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     // Category 3 Denominator
-    CohortIndicator MQC3D1 =
+    /*    CohortIndicator MQC3D1 =
         eptsGeneralIndicator.getIndicator(
             "MQC3D1",
             EptsReportUtils.map(
@@ -2149,7 +2148,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ15NUM15,
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     CohortIndicator MQ15DEN16 =
         eptsGeneralIndicator.getIndicator(
@@ -2180,559 +2179,559 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "");
 
     // Category 15 Numerator indicators
-    CohortIndicator MQ15NUM1 =
-        eptsGeneralIndicator.getIndicator(
+    /* CohortIndicator MQ15NUM1 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM1",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(1),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+        MQ15NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+        dataSetDefinition.addColumn(
             "MQ15NUM1",
+            "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS  (DT ou GAAC) que continuam activos em TARV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(1),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM1,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=15+");
 
-    MQ15NUM1.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM2 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM2",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(2),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM1",
-        "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS  (DT ou GAAC) que continuam activos em TARV",
-        EptsReportUtils.map(
-            MQ15NUM1,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        MQ15NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM2 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM2",
+            "% de Adultos (15/+anos) inscritos há pelo menos 12 meses em algum MDS (DT ou GAAC) com pedido de pelo menos uma CV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(2),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM2,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=15+");
 
-    MQ15NUM2.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM3 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM3",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(3),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM2",
-        "% de Adultos (15/+anos) inscritos há pelo menos 12 meses em algum MDS (DT ou GAAC) com pedido de pelo menos uma CV",
-        EptsReportUtils.map(
-            MQ15NUM2,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        MQ15NUM3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM3 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM3",
+            "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) que receberam pelo menos um resultado de CV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(3),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM3,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=15+");
 
-    MQ15NUM3.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM4 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM4",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(4),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM3",
-        "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) que receberam pelo menos um resultado de CV",
-        EptsReportUtils.map(
-            MQ15NUM3,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        MQ15NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM4 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM4",
+            "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) com CV <1000 Cópias",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(4),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM4,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=15+");
 
-    MQ15NUM4.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM5 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM5",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(5),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM4",
-        "% de Adultos (15/+anos) inscritos há 12 meses em algum MDS (DT ou GAAC) com CV <1000 Cópias",
-        EptsReportUtils.map(
-            MQ15NUM4,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        MQ15NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM5 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM5",
+            "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que continuam activos em TARV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(5),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM5,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=2-9");
 
-    MQ15NUM5.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM6 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM6",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(6),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM5",
-        "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que continuam activos em TARV",
-        EptsReportUtils.map(
-            MQ15NUM5,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2-9");
+        MQ15NUM6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM6 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM6",
+            "% de Crianças (10-14 anos) inscritas há 12 em algum MDS (DT) que continuam activos em TARV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(6),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM6,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=10-14");
 
-    MQ15NUM6.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM7 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM7",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(7),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM6",
-        "% de Crianças (10-14 anos) inscritas há 12 em algum MDS (DT) que continuam activos em TARV",
-        EptsReportUtils.map(
-            MQ15NUM6,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=10-14");
+        MQ15NUM7.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM7 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM7",
+            "% de Crianças (2-9 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(7),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM7,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=2-9");
 
-    MQ15NUM7.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM8 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM8",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(8),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM7",
-        "% de Crianças (2-9 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
-        EptsReportUtils.map(
-            MQ15NUM7,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2-9");
+        MQ15NUM8.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM8 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM8",
+            "% de Crianças (10-14 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(8),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM8,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=10-14");
 
-    MQ15NUM8.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM9 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM9",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(9),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM8",
-        "% de Crianças (10-14 anos de idade) inscritas há 12 meses em algum MDS (DT) com pedido de pelo menos uma CV",
-        EptsReportUtils.map(
-            MQ15NUM8,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=10-14");
+        MQ15NUM9.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM9 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM9",
+            "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(9),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM9,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=2-9");
 
-    MQ15NUM9.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM10 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM10",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(10),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM9",
-        "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
-        EptsReportUtils.map(
-            MQ15NUM9,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2-9");
+        MQ15NUM10.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM10 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM10",
+            "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(10),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM10,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=10-14");
 
-    MQ15NUM10.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM11 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM11",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(11),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM10",
-        "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) que receberam pelo menos um resultado de CV",
-        EptsReportUtils.map(
-            MQ15NUM10,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=10-14");
+        MQ15NUM11.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM11 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM11",
+            "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(11),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM11,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=2-9");
 
-    MQ15NUM11.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        CohortIndicator MQ15NUM12 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ15NUM12",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ15NUM(12),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM11",
-        "% de Crianças (2-9 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
-        EptsReportUtils.map(
-            MQ15NUM11,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2-9");
+        MQ15NUM12.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
-    CohortIndicator MQ15NUM12 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ15NUM12",
+            "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15NUM(12),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                MQ15NUM12,
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "age=10-14");
 
-    MQ15NUM12.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        // M&Q Report - Categoria 14
 
-    dataSetDefinition.addColumn(
-        "MQ15NUM12",
-        "% de Crianças (10-14 anos) inscritas há 12 meses em algum MDS (DT) com CV <1000 Cópias",
-        EptsReportUtils.map(
-            MQ15NUM12,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=10-14");
+        // Denominator
 
-    // M&Q Report - Categoria 14
+        CohortIndicator MQ14DEN1 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14DEN1",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // Denominator
-
-    CohortIndicator MQ14DEN1 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14DEN1",
+            "14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml) ",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14DEN1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=<1");
+        // 14.2 Den
+        CohortIndicator MQ14DEN2 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14DEN2",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN1",
-        "14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml) ",
-        EptsReportUtils.map(
-            MQ14DEN1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=<1");
-    // 14.2 Den
-    CohortIndicator MQ14DEN2 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14DEN2",
+            "14.2.% de utentes (1- 4 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14DEN2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=1-4");
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN2",
-        "14.2.% de utentes (1- 4 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14DEN2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=1-4");
+        // 14.3 Den
+        CohortIndicator MQ14DEN3 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14DEN3",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.3 Den
-    CohortIndicator MQ14DEN3 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14DEN3",
+            "14.3.% de utentes (5 - 9 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14DEN3, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=5-9");
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN3",
-        "14.3.% de utentes (5 - 9 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14DEN3, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=5-9");
+        // 14.4 Den
+        CohortIndicator MQ14DEN4 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14DEN4",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.4 Den
-    CohortIndicator MQ14DEN4 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14DEN4",
+            "14.4. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14DEN4, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=10-14");
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN4",
-        "14.4. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14DEN4, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=10-14");
+        // 14.5 Den
+        CohortIndicator MQ14DEN5 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14DEN5",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.5 Den
-    CohortIndicator MQ14DEN5 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14DEN5",
+            "14.5. % de utentes (15 -19 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14DEN5, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=15-19");
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN5",
-        "14.5. % de utentes (15 -19 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14DEN5, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=15-19");
+        // 14.6 Den
+        CohortIndicator MQ14DEN6 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14DEN6",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.A),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.6 Den
-    CohortIndicator MQ14DEN6 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14DEN6",
+            "14.6. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14DEN6, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=20+");
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN6",
-        "14.6. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml",
-        EptsReportUtils.map(
-            MQ14DEN6, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=20+");
+        // 14.7 Den
+        CohortIndicator MQ14DEN7 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14DEN7",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A1),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.7 Den
-    CohortIndicator MQ14DEN7 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14DEN7",
+            "14.7. % de MG em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A1),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14DEN7, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "");
+        // 14.8 Den
+        CohortIndicator MQ14DEN8 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14DEN8",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A2),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN7",
-        "14.7. % de MG em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14DEN7, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
-    // 14.8 Den
-    CohortIndicator MQ14DEN8 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14DEN8",
+            "14.8. % de ML em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A2),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14DEN8, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "");
 
-    dataSetDefinition.addColumn(
-        "MQ14DEN8",
-        "14.8. % de ML em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14DEN8, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
+        // Numerator
+        CohortIndicator MQ14NUM1 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14NUM1",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14NUM(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // Numerator
-    CohortIndicator MQ14NUM1 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14NUM1",
+            "14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14NUM1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=<1");
 
-    dataSetDefinition.addColumn(
-        "MQ14NUM1",
-        "14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14NUM1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=<1");
+        CohortIndicator MQ14NUM2 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14NUM2",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14NUM(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    CohortIndicator MQ14NUM2 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14NUM2",
+            "14.2.% de utentes (1- 4 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14NUM2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=1-4");
 
-    dataSetDefinition.addColumn(
-        "MQ14NUM2",
-        "14.2.% de utentes (1- 4 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14NUM2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=1-4");
+        // 14.3
+        CohortIndicator MQ14NUM3 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14NUM3",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14NUM(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.3
-    CohortIndicator MQ14NUM3 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14NUM3",
+            "14.3.% de utentes (5 - 9 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14NUM3, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=5-9");
 
-    dataSetDefinition.addColumn(
-        "MQ14NUM3",
-        "14.3.% de utentes (5 - 9 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14NUM3, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=5-9");
+        // 14.4
+        CohortIndicator MQ14NUM4 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14NUM4",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14NUM(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.4
-    CohortIndicator MQ14NUM4 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14NUM4",
+            "14.4. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14NUM4, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=10-14");
 
-    dataSetDefinition.addColumn(
-        "MQ14NUM4",
-        "14.4. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14NUM4, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=10-14");
+        // 14.5
+        CohortIndicator MQ14NUM5 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14NUM5",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14NUM(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.5
-    CohortIndicator MQ14NUM5 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14NUM5",
+            "14.5. % de utentes (15 -19 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14NUM5, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=15-19");
 
-    dataSetDefinition.addColumn(
-        "MQ14NUM5",
-        "14.5. % de utentes (15 -19 anos) em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14NUM5, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=15-19");
+        // 14.6
+        CohortIndicator MQ14NUM6 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14NUM6",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14NUM(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.B),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.6
-    CohortIndicator MQ14NUM6 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14NUM6",
+            "14.6. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14NUM6, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "ageByEndDateRevision=20+");
 
-    dataSetDefinition.addColumn(
-        "MQ14NUM6",
-        "14.6. % de utentes (10 - 14 anos) em TARV com supressão viral (CV<1000 Cps/ml",
-        EptsReportUtils.map(
-            MQ14NUM6, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "ageByEndDateRevision=20+");
+        // 14.7
+        CohortIndicator MQ14NUM7 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14NUM7",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14NUM(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_B1),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // 14.7
-    CohortIndicator MQ14NUM7 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14NUM7",
+            "14.7. % de MG em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_B1),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14NUM7, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "");
+        // 14.8
+        CohortIndicator MQ14NUM8 =
+            eptsGeneralIndicator.getIndicator(
+                "MQ14NUM8",
+                EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ14NUM(
+                        QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_B2),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    dataSetDefinition.addColumn(
-        "MQ14NUM7",
-        "14.7. % de MG em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14NUM7, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
-    // 14.8
-    CohortIndicator MQ14NUM8 =
-        eptsGeneralIndicator.getIndicator(
+        dataSetDefinition.addColumn(
             "MQ14NUM8",
+            "14.8. % de ML em TARV com supressão viral (CV<1000 Cps/ml)",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ14NUM(
-                    QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_B2),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
+                MQ14NUM8, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "");
 
-    dataSetDefinition.addColumn(
-        "MQ14NUM8",
-        "14.8. % de ML em TARV com supressão viral (CV<1000 Cps/ml)",
-        EptsReportUtils.map(
-            MQ14NUM8, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
+        // MQ indicators category 9 denominator
 
-    // MQ indicators category 9 denominator
-
-    dataSetDefinition.addColumn(
-        "MQ9DEN1",
-        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getMQ9Den(1),
+        dataSetDefinition.addColumn(
+            "MQ9DEN1",
+            "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+            EptsReportUtils.map(
+                customCohortIndicator(
+                    qualityImprovement2020CohortQueries.getMQ9Den(1),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
-    dataSetDefinition.addColumn(
-        "MQ9DEN2",
-        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getMQ9Den(2),
+            "");
+        dataSetDefinition.addColumn(
+            "MQ9DEN2",
+            "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+            EptsReportUtils.map(
+                customCohortIndicator(
+                    qualityImprovement2020CohortQueries.getMQ9Den(2),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+            "");
 
-    // MQ indicators category 10 denominator
+        // MQ indicators category 10 denominator
 
-    CohortIndicator MQ10DEN1A =
-        eptsGeneralIndicator.getIndicator(
-            "",
-            EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ10Den(true),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    dataSetDefinition.addColumn(
-        "MQ10DEN1A",
-        "%  % de adultos que iniciaram o TARV dentro de 15 dias após diagnóstico",
-        EptsReportUtils.map(
-            MQ10DEN1A, "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "");
-
-    CohortIndicator MQ10DEN1C =
-        eptsGeneralIndicator.getIndicator(
-            "",
-            EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ10Den(false),
-                "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    dataSetDefinition.addColumn(
-        "MQ10DEN1C",
-        "% de crianças HIV+ que iniciaram TARV dentro de 15 dias após diagnóstico",
-        EptsReportUtils.map(
-            MQ10DEN1C, "startDate=${startDate},endDate=${endDate},location=${location}"),
-        "");
-    // Category 10 numerator results dataset
-    dataSetDefinition.addColumn(
-        "MQ10NUM1",
-        "% de adultos (15/+anos) que iniciaram o TARV dentro de 15 dias após diagnóstico",
-        EptsReportUtils.map(
+        CohortIndicator MQ10DEN1A =
             eptsGeneralIndicator.getIndicator(
-                "MQ10NUM1",
+                "",
                 EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ10NUM(1),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
-    dataSetDefinition.addColumn(
-        "MQ10NUM3",
-        "% de crianças (0-14 anos) HIV+ que iniciaram TARV dentro de 15 dias após diagnóstico",
-        EptsReportUtils.map(
+                    qualityImprovement2020CohortQueries.getMQ10Den(true),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+        dataSetDefinition.addColumn(
+            "MQ10DEN1A",
+            "%  % de adultos que iniciaram o TARV dentro de 15 dias após diagnóstico",
+            EptsReportUtils.map(
+                MQ10DEN1A, "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "");
+
+        CohortIndicator MQ10DEN1C =
             eptsGeneralIndicator.getIndicator(
-                "MQ10NUM3",
+                "",
                 EptsReportUtils.map(
-                    qualityImprovement2020CohortQueries.getMQ10NUM(3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}")),
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
-        "");
+                    qualityImprovement2020CohortQueries.getMQ10Den(false),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    // MQ indicators category 9 numerator
-    dataSetDefinition.addColumn(
-        "MQ9NUM1",
-        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getMQ9Num(1),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
-    dataSetDefinition.addColumn(
-        "MQ9NUM2",
-        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getMQ9Num(2),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        dataSetDefinition.addColumn(
+            "MQ10DEN1C",
+            "% de crianças HIV+ que iniciaram TARV dentro de 15 dias após diagnóstico",
+            EptsReportUtils.map(
+                MQ10DEN1C, "startDate=${startDate},endDate=${endDate},location=${location}"),
+            "");
+        // Category 10 numerator results dataset
+        dataSetDefinition.addColumn(
+            "MQ10NUM1",
+            "% de adultos (15/+anos) que iniciaram o TARV dentro de 15 dias após diagnóstico",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "MQ10NUM1",
+                    EptsReportUtils.map(
+                        qualityImprovement2020CohortQueries.getMQ10NUM(1),
+                        "startDate=${startDate},endDate=${endDate},location=${location}")),
+                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "");
+        dataSetDefinition.addColumn(
+            "MQ10NUM3",
+            "% de crianças (0-14 anos) HIV+ que iniciaram TARV dentro de 15 dias após diagnóstico",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "MQ10NUM3",
+                    EptsReportUtils.map(
+                        qualityImprovement2020CohortQueries.getMQ10NUM(3),
+                        "startDate=${startDate},endDate=${endDate},location=${location}")),
+                "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
+            "");
 
+        // MQ indicators category 9 numerator
+        dataSetDefinition.addColumn(
+            "MQ9NUM1",
+            "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+            EptsReportUtils.map(
+                customCohortIndicator(
+                    qualityImprovement2020CohortQueries.getMQ9Num(1),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
+        dataSetDefinition.addColumn(
+            "MQ9NUM2",
+            "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+            EptsReportUtils.map(
+                customCohortIndicator(
+                    qualityImprovement2020CohortQueries.getMQ9Num(2),
+                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
+    */
     return dataSetDefinition;
   }
 

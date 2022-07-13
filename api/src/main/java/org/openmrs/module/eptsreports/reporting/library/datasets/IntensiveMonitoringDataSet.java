@@ -117,7 +117,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
      * *********************************** CATEGORY 7 ********************* //*********************
      * Denominator CAT7 **************
      */
-    // CAT 7 Denominator
+    /*// CAT 7 Denominator
 
     //     7.1
     dataSetDefinition.addColumn(
@@ -178,10 +178,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMI2021Part246Definition(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     // ********************* NUMERATOR CAT7 **************
-    // 7.1
+    /*// 7.1
     dataSetDefinition.addColumn(
         "MI7NUM1",
         "% de adultos HIV+ em TARV elegíveis ao TPT e que iniciaram TPT",
@@ -240,13 +240,13 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7NumMI2021Part246Definition(6),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     /**
      * *********************************** CATEGORY 13 ********************* //*********************
      * PART 1 *************
      */
-
+    /*
     // CAT 13 P2 DENOMINATOR
     // 13.15
     dataSetDefinition.addColumn(
@@ -313,10 +313,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMICat13Part2(17, "NUM17"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     // Category 13 Part-1
-
+    /*
     // 13.1
     dataSetDefinition.addColumn(
         "MI13DEN1",
@@ -516,10 +516,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMI13NUM14(14),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     // ********************* PART 2 **************
-
+    /*
     // 13.4
     dataSetDefinition.addColumn(
         "MI13DEN4",
@@ -559,13 +559,13 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat13Den(13, true),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     /**
      * *********************************** CATEGORY 11 ********************* //*********************
      * Denominator **************
      */
-    // 11.1
+    /*// 11.1
     dataSetDefinition.addColumn(
         "MI11DEN1",
         "MI DEN 11.1",
@@ -634,10 +634,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11DEN(7),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge11=MqChildren");
+        "miAge11=MqChildren");*/
 
     // ********************* Numerator **************
-    // 11.1
+    /*// 11.1
     dataSetDefinition.addColumn(
         "MI11NUM1",
         "MI NUM 11.1",
@@ -706,13 +706,13 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(7),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge11=MqChildren");
+        "miAge11=MqChildren");*/
 
     /**
      * *********************************** CATEGORY 12 ******************************************
      * //* Part 1 Denominator **************
      */
-    // 12.1
+    /*// 12.1
     dataSetDefinition.addColumn(
         "MI12P1DEN1",
         "MI DEN 12.1",
@@ -771,10 +771,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat12P1DenNum(10, false),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     // ******* */ Part 1 Numerator **************
-    // 12.1
+    /*// 12.1
     dataSetDefinition.addColumn(
         "MI12P1NUM1",
         "MI NUM 12.1",
@@ -834,7 +834,9 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
+    */
     /* Category 15*/
+    /*
     // Den 15
     dataSetDefinition.addColumn(
         "MI15DEN1",
@@ -956,14 +958,14 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMICat13Part4(18, true),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     /**
      * *********************************** MI CATEGORY 14 *********************
      * //********************* MI CAT14 Inherited from the MQCAT14 with adjusted date parameters
      * **************
      */
-    // MI CAT 14 Denominator
+    /*// MI CAT 14 Denominator
     // CAT 14 DEN 1
     dataSetDefinition.addColumn(
         "MI14DEN1",
@@ -1051,11 +1053,11 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                     QualityImprovement2020CohortQueries.MQCat14Preposition.A_AND_A2, "DEN"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     // MI CAT 14 Numerator
     // CAT 14 NUM 1
-    dataSetDefinition.addColumn(
+    /*dataSetDefinition.addColumn(
         "MI14NUM1",
         "14.1. % de utentes (<1 ano) em TARV com supressão viral (CV<1000 Cps/ml)",
         EptsReportUtils.map(
@@ -1143,10 +1145,10 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                     QualityImprovement2020CohortQueries.MQCat14Preposition.B_AND_B2, "NUM"),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "");*/
 
     // ************************* MI CATEGORY 15 MDS INDICATORS **********************
-
+    /*
     CohortIndicator MI15DEN13 =
         eptsGeneralIndicator.getIndicator(
             "MI15DEN13",
@@ -1247,7 +1249,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15NUM15,
             "startDate=${revisionEndDate-2m+1d},revisionEndDate=${revisionEndDate-1m},location=${location}"),
-        "");
+        "");*/
 
     CohortIndicator MI15DEN16 =
         eptsGeneralIndicator.getIndicator(
