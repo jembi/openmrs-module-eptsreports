@@ -2217,7 +2217,7 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15I() {
 
-    CohortDefinition cd = getMI15I(24, 12, 18);
+    CohortDefinition cd = getMI15I(12, 12, 18);
 
     return cd;
   }
