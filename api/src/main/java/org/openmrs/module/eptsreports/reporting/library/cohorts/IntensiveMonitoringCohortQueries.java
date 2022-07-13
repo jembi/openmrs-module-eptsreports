@@ -2217,12 +2217,12 @@ public class IntensiveMonitoringCohortQueries {
    */
   public CohortDefinition getMI15I() {
 
-    CohortDefinition cd = getMI15I(18, 12);
+    CohortDefinition cd = getMI15I(24, 12, 18);
 
     return cd;
   }
 
-  public CohortDefinition getMI15I(Integer monthsBefore, Integer lastVLResultMonths) {
+  public CohortDefinition getMI15I(Integer monthsBeforeClinical, Integer vlMonthsLower,Integer vlMonthsUpper) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("I - All patients with the last Viral Load Result");
@@ -2254,15 +2254,15 @@ public class IntensiveMonitoringCohortQueries {
             + "            AND e.encounter_datetime BETWEEN :startDate AND :endDate GROUP BY p.patient_id "
             + "            )  "
             + " as last_consultation on last_consultation.patient_id = juncao.patient_id "
-            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL 24 MONTH)) most_recent GROUP BY most_recent.patient_id  ) as lastVLResult "
+            + " WHERE juncao.encounter_date < DATE_SUB(last_consultation.last_consultation_date, INTERVAL "+ monthsBeforeClinical +" MONTH)) most_recent GROUP BY most_recent.patient_id  ) as lastVLResult "
             + " ON lastVLResult.patient_id=p.patient_id "
             + " WHERE "
             + " ( (o.concept_id=${856} AND o.value_numeric is not null) OR (o.concept_id = 1305 and o.value_coded is not null)) AND e.encounter_type=${6} AND  "
             + " e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL "
-            + lastVLResultMonths
+            + vlMonthsLower
             + " MONTH)  "
             + " AND DATE_ADD(lastVLResult.encounter_date,INTERVAL "
-            + monthsBefore
+            + vlMonthsUpper
             + " MONTH)AND e.location_id=:location";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);

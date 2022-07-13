@@ -8028,6 +8028,78 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  public CohortDefinition getMI15Den13() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Denominator 15 - Pacientes elegíveis a MDS");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
+    CohortDefinition Mq15B1 = intensiveMonitoringCohortQueries.getMI15B1();
+    CohortDefinition E1 = intensiveMonitoringCohortQueries.getMI15E(30, 1);
+    CohortDefinition E2 = intensiveMonitoringCohortQueries.getMI15E(60, 31);
+    CohortDefinition E3 = intensiveMonitoringCohortQueries.getMI15E(90, 61);
+    CohortDefinition Mq15C = getMQ15CPatientsMarkedAsPregnant();
+    CohortDefinition Mq15D = getMQ15DPatientsMarkedAsBreastfeeding();
+    CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
+    CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
+    CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
+    CohortDefinition Mq15AGE2 = getAgeOnEndDateInclusionMoreThan2Years();
+
+    cd.addSearch(
+            "A",
+            EptsReportUtils.map(
+                    Mq15A, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+            "B1",
+            EptsReportUtils.map(
+                    Mq15B1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+            "E1",
+            EptsReportUtils.map(
+                    E1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+            "E2",
+            EptsReportUtils.map(
+                    E2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+            "E3",
+            EptsReportUtils.map(
+                    E3, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+            "C",
+            EptsReportUtils.map(
+                    Mq15C,
+                    "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+    cd.addSearch(
+            "D",
+            EptsReportUtils.map(
+                    Mq15D,
+                    "startDate=${revisionEndDate-19m+1d},endDate=${revisionEndDate-1m},location=${location}"));
+    cd.addSearch(
+            "F",
+            EptsReportUtils.map(
+                    Mq15F, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+            "G", EptsReportUtils.map(Mq15G, "endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+            "MDS",
+            EptsReportUtils.map(
+                    alreadyMds,
+                    "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch("AGE2", EptsReportUtils.map(Mq15AGE2, "endDate=${revisionEndDate}"));
+
+    cd.setCompositionString(
+            "A AND B1 AND (E1 AND E2 AND E3) AND AGE2 AND NOT (C OR D OR F OR G OR MDS)");
+
+    return cd;
+  }
+
   public CohortDefinition getMQ15NumeratorMDS() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Numerator MQ 15 - Pacientes elegíveis a MDS");
@@ -8057,10 +8129,6 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15DenMDS,
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "K",
-        EptsReportUtils.map(
-            MqK, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "MDS",
@@ -8069,6 +8137,45 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("MQ15DenMDS AND MDS");
+    return cd;
+  }
+
+  public CohortDefinition getMI15Nume13() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Numerator MQ 15 - Pacientes elegíveis a MDS");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition Mi15Den13 = getMI15Den13();
+
+    List<Integer> mdsConcepts =
+            Arrays.asList(
+                    hivMetadata.getGaac().getConceptId(),
+                    hivMetadata.getQuarterlyDispensation().getConceptId(),
+                    hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+                    hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+                    hivMetadata.getRapidFlow().getConceptId(),
+                    hivMetadata.getSemiannualDispensation().getConceptId());
+
+    List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
+
+    CohortDefinition mds =
+            getPatientsWhoHadMdsOnMostRecentClinicalAndPickupOnFilaFR36(mdsConcepts, states);
+
+    cd.addSearch(
+            "MQ15Den13",
+            EptsReportUtils.map(
+                    Mi15Den13,
+                    "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+            "MDS",
+            EptsReportUtils.map(
+                    mds,
+                    "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("MQ15Den13 AND MDS");
     return cd;
   }
 
@@ -8234,7 +8341,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition Mq15MdsDen15 = getMQ15Den15();
-    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(20, 10);
+    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(24,10, 20);
 
     cd.addSearch(
         "Mq15MdsDen15",
@@ -8259,7 +8366,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition Mi15Den = getMI15Den15();
-    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(20, 10);
+    CohortDefinition Mq15I = intensiveMonitoringCohortQueries.getMI15I(20, 10, 20);
 
     cd.addSearch(
         "MI15DEN15",
