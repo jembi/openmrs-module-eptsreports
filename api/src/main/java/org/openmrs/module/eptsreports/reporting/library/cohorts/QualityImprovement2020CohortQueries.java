@@ -7975,7 +7975,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
 
-
     cd.addSearch(
         "A",
         EptsReportUtils.map(
@@ -8020,10 +8019,7 @@ public class QualityImprovement2020CohortQueries {
             alreadyMds,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
-
-
-    cd.setCompositionString(
-        "A AND B1 AND (E1 AND E2 AND E3) AND NOT (C OR D OR F OR G OR MDS)");
+    cd.setCompositionString("A AND B1 AND (E1 AND E2 AND E3) AND NOT (C OR D OR F OR G OR MDS)");
 
     return cd;
   }
@@ -8046,7 +8042,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
     CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
-
 
     cd.addSearch(
         "A",
@@ -8092,10 +8087,7 @@ public class QualityImprovement2020CohortQueries {
             alreadyMds,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
-
-
-    cd.setCompositionString(
-        "A AND B1 AND (E1 AND E2 AND E3)  AND NOT (C OR D OR F OR G OR MDS)");
+    cd.setCompositionString("A AND B1 AND (E1 AND E2 AND E3)  AND NOT (C OR D OR F OR G OR MDS)");
 
     return cd;
   }
@@ -8206,7 +8198,6 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15H, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-
     cd.setCompositionString("A AND MDC AND H");
     return cd;
   }
@@ -8263,7 +8254,6 @@ public class QualityImprovement2020CohortQueries {
         "B2",
         EptsReportUtils.map(
             Mq15B2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
 
     cd.setCompositionString("A AND MDC AND B2");
     return cd;
@@ -8448,7 +8438,6 @@ public class QualityImprovement2020CohortQueries {
     cd.setCompositionString("B AND MDC");
     return cd;
   }
-
 
   /**
    * <b>C - All female patients registered as “Pregnant” on Ficha Clinica during the revision period

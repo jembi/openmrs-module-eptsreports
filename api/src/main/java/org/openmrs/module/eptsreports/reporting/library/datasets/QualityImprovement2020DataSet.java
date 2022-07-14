@@ -43,10 +43,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
-    dataSetDefinition.addDimension(
-        "ageByEvaluationEndDate",
-        EptsReportUtils.map(
-            eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${revisionEndDate-1m}"));
 
     dataSetDefinition.addDimension(
         "ageByEndDateRevision",
