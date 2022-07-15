@@ -324,20 +324,108 @@ public class ViralLoadQueries {
             + " GROUP  BY patient_id) out_p "
             + " ON pp.patient_id = out_p.patient_id "
             + " AND ep.encounter_type =% d ";
-    return String.format(
-        query,
-        labEncounter,
-        adultSeguimentoEncounter,
-        pediatriaSeguimentoEncounter,
-        fsrEncounter,
-        vlConceptQuestion,
-        vlQualitativeConceptQuestion,
-        mastercardEncounter,
-        vlConceptQuestion,
-        typeOfDispensation,
-        quartely,
-        semiAnnually,
-        adultSeguimentoEncounter,
-        adultSeguimentoEncounter);
+    return "SELECT out_p.patient_id "
+        + "FROM   patient pp "
+        + "       INNER JOIN encounter ep "
+        + "               ON pp.patient_id = ep.patient_id "
+        + "       INNER JOIN obs op "
+        + "               ON ep.encounter_id = op.encounter_id "
+        + "       INNER JOIN (SELECT patient_id, "
+        + "                          Max(encounter_datetime) AS max_vl_date_and_max_ficha "
+        + "                   FROM   (SELECT pp.patient_id, "
+        + "                                  ee.encounter_datetime "
+        + "                           FROM   patient pp "
+        + "                                  INNER JOIN encounter ee "
+        + "                                          ON pp.patient_id = ee.patient_id "
+        + "                                  INNER JOIN obs oo "
+        + "                                          ON ee.encounter_id = oo.encounter_id "
+        + "                                  INNER JOIN (SELECT patient_id, "
+        + "                                                     Max(encounter_date) AS "
+        + "                                                     vl_max_date "
+        + "                                              FROM   (SELECT p.patient_id, "
+        + "															e.encounter_datetime AS "
+        + "															encounter_date "
+        + "															FROM   patient p "
+        + "															INNER JOIN encounter e "
+        + "																	ON p.patient_id = "
+        + "																	   e.patient_id "
+        + "															INNER JOIN obs o "
+        + "																	ON e.encounter_id "
+        + "																	   = "
+        + "																	   o.encounter_id "
+        + "															WHERE  p.voided = 0 "
+        + "															AND e.voided = 0 "
+        + "															AND o.voided = 0 "
+        + "															AND e.encounter_type IN ( "
+        + "																13, 6, 9, 51 ) "
+        + "															AND "
+        + "															( ( o.concept_id = 856 "
+        + "															AND o.value_numeric IS NOT "
+        + "															 NULL ) "
+        + "															OR ( o.concept_id = 1305 "
+        + "															 AND o.value_coded IS NOT "
+        + "																 NULL ) ) "
+        + "															AND e.encounter_datetime "
+        + "																<= "
+        + "																'2021-01-20' "
+        + "															AND e.location_id = 400 "
+        + "														UNION "
+        + "															SELECT p.patient_id, "
+        + "															o.obs_datetime AS "
+        + "															encounter_date "
+        + "															FROM   patient p "
+        + "															INNER JOIN encounter e "
+        + "																	ON p.patient_id = "
+        + "																	   e.patient_id "
+        + "															INNER JOIN obs o "
+        + "																	ON e.encounter_id "
+        + "																	   = "
+        + "																	   o.encounter_id "
+        + "															WHERE  p.voided = 0 "
+        + "															AND e.voided = 0 "
+        + "															AND o.voided = 0 "
+        + "															AND e.encounter_type IN ( "
+        + "																53 ) "
+        + "															AND o.concept_id = 856 "
+        + "															AND o.value_numeric IS NOT "
+        + "																NULL "
+        + "															AND o.obs_datetime <= "
+        + "																'2021-01-20' "
+        + "															AND e.location_id = 400	) "
+        + "												max_vl_date "
+        + "												GROUP  BY patient_id) vl_date_tbl "
+        + "												ON pp.patient_id = vl_date_tbl.patient_id "
+        + "												WHERE  ee.encounter_datetime BETWEEN "
+        + "												Date_add(vl_date_tbl.vl_max_date, "
+        + "												interval - 12 MONTH) "
+        + "												AND "
+        + "												Date_add(vl_date_tbl.vl_max_date, "
+        + "												interval - 1 DAY) "
+        + "												AND oo.concept_id = 23739 "
+        + "												AND ee.encounter_type = 6) fin_tbl "
+        + "				GROUP  BY patient_id) out_p "
+        + "		ON pp.patient_id = out_p.patient_id "
+        + "		WHERE ep.encounter_type = 6 "
+        + "   AND        op.voided = 0 "
+        + "   AND        ep.voided = 0 "
+        + "   AND        pp.voided = 0 "
+        + "   AND ep.encounter_datetime = max_vl_date_and_max_ficha "
+        + "   AND op.concept_id = 23739 "
+        + "		AND op.value_coded IN( 23720, 23888 )";
+    // return String.format(
+    //     query,
+    //     labEncounter,
+    //     adultSeguimentoEncounter,
+    //     pediatriaSeguimentoEncounter,
+    //     fsrEncounter,
+    //     vlConceptQuestion,
+    //     vlQualitativeConceptQuestion,
+    //     mastercardEncounter,
+    //     vlConceptQuestion,
+    //     typeOfDispensation,
+    //     quartely,
+    //     semiAnnually,
+    //     adultSeguimentoEncounter,
+    //     adultSeguimentoEncounter);
   }
 }
