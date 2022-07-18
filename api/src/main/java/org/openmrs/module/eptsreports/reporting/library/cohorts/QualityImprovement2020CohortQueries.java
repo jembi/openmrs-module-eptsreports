@@ -10194,41 +10194,78 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, String> map = new HashMap<>();
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId().toString());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId().toString());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId().toString());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId().toString());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId().toString());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId().toString());
     map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
     map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
     map.put("dispensationTypes", getMetadataFrom(dispensationTypes));
     map.put("states", getMetadataFrom(states));
 
     String query =
-        "SELECT     p.patient_id "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
-            + "INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-            + "INNER JOIN ( "
-            + "                      SELECT     p.patient_id, MAX(e.encounter_datetime) consultation_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                      WHERE      e.encounter_type = ${6} "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "                      AND        p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      GROUP BY   p.patient_id ) consultation ON consultation.patient_id = p.patient_id "
-            + "WHERE      e.encounter_type = ${6} "
-            + "AND        e.location_id = :location "
-            + "AND        otype.concept_id = ${165174} "
-            + "AND        otype.value_coded IN (${dispensationTypes}) "
-            + "AND        ostate.concept_id = ${165322} "
-            + "AND        ostate.value_coded IN (${states}) "
-            + "AND        e.encounter_datetime = consultation.consultation_date "
-            + "AND        otype.obs_group_id = ostate.obs_group_id "
-            + "AND        e.voided = 0 "
-            + "AND        p.voided = 0 "
-            + "AND        otype.voided = 0 "
-            + "AND        ostate.voided = 0 "
-            + "GROUP BY   p.patient_id ";
+        "SELECT out_p.patient_id "
+            + "FROM   patient pp "
+            + "       INNER JOIN encounter ep ON pp.patient_id = ep.patient_id "
+            + "       INNER JOIN obs otype ON otype.encounter_id = ep.encounter_id "
+            + "       INNER JOIN obs ostate ON ostate.encounter_id = ep.encounter_id "
+            + "       INNER JOIN (SELECT patient_id, MAX(encounter_datetime) AS max_vl_date_and_max_ficha "
+            + "                   FROM   (SELECT pp.patient_id, ee.encounter_datetime "
+            + "                           FROM   patient pp "
+            + "                                  INNER JOIN encounter ee ON pp.patient_id = ee.patient_id "
+            + "                                  INNER JOIN obs oo ON ee.encounter_id = oo.encounter_id "
+            + "                                  INNER JOIN (SELECT patient_id, DATE( Max(encounter_date)) AS vl_max_date "
+            + "                                              FROM   (SELECT p.patient_id, DATE(e.encounter_datetime) AS encounter_date "
+            + "                                                      FROM   patient p "
+            + "                                                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                                      WHERE  p.voided = 0 "
+            + "                                                       AND e.voided = 0 "
+            + "                                                       AND o.voided = 0 "
+            + "                                                       AND e.encounter_type IN ( ${13}, ${6}, ${9}, ${51} ) "
+            + "                                                       AND ( ( o.concept_id = ${856} AND o.value_numeric IS NOT  NULL ) "
+            + "                                                             OR ( o.concept_id = ${1305}  AND o.value_coded IS NOT NULL ) ) "
+            + "                                                       AND DATE(e.encounter_datetime) BETWEEN :startDate AND :endDate "
+            + "                                                       AND e.location_id = :location "
+            + "                                               UNION "
+            + "                                               SELECT p.patient_id, DATE(o.obs_datetime) AS encounter_date "
+            + "                                               FROM   patient p "
+            + "                                               INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                               INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                               WHERE  p.voided = 0 "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND o.voided = 0 "
+            + "                                                 AND e.encounter_type IN ( ${53} ) "
+            + "                                                 AND o.concept_id = ${856} "
+            + "                                                 AND o.value_numeric IS NOT NULL "
+            + "                                                 AND DATE(o.obs_datetime) BETWEEN :startDate AND :endDate "
+            + "                                                 AND e.location_id = :location) max_vl_date "
+            + "                                                 GROUP  BY patient_id "
+            + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
+            + "                 WHERE  ee.encounter_datetime BETWEEN Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) AND  DATE_ADD( vl_date_tbl.vl_max_date,INTERVAL - 1 DAY) "
+            + "                 AND oo.concept_id = ${165174} "
+            + "                 AND oo.voided = 0 "
+            + "                 AND ee.voided = 0 "
+            + "                 AND ee.location_id = :location "
+            + "                 AND ee.encounter_type = ${6}) fin_tbl "
+            + "                 GROUP  BY patient_id) out_p ON pp.patient_id = out_p.patient_id "
+            + "WHERE  ep.encounter_type = ${6} "
+            + "	AND        ep.location_id = :location "
+            + "	AND        otype.concept_id = ${165174} "
+            + "	AND        otype.value_coded IN (${dispensationTypes}) "
+            + "	AND        ostate.concept_id = ${165322} "
+            + "	AND        ostate.value_coded IN (${states}) "
+            + "	AND        ep.encounter_datetime = out_p.max_vl_date_and_max_ficha  "
+            + "	AND        otype.obs_group_id = ostate.obs_group_id "
+            + "	AND        ep.voided = 0 "
+            + "	AND        pp.voided = 0 "
+            + "	AND        otype.voided = 0 "
+            + "	AND        ostate.voided = 0 "
+            + "	GROUP BY   pp.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
