@@ -10085,18 +10085,7 @@ public class QualityImprovement2020CohortQueries {
     sql.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sql.addParameter(new Parameter("endDate", "End Date", Date.class));
     sql.addParameter(new Parameter("location", "Location", Location.class));
-    sql.setQuery(
-        ViralLoadQueries.getPatientsHavingTypeOfDispensationBasedOnTheirLastVlResults(
-            hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            hivMetadata.getFsrEncounterType().getEncounterTypeId(),
-            hivMetadata.getHivViralLoadConcept().getConceptId(),
-            hivMetadata.getHivViralLoadQualitative().getConceptId(),
-            hivMetadata.getTypeOfDispensationConcept().getConceptId(),
-            hivMetadata.getQuarterlyConcept().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId()));
+    sql.setQuery(ViralLoadQueries.getPatientsHavingTypeOfDispensationBasedOnTheirLastVlResults());
     return sql;
   }
 
