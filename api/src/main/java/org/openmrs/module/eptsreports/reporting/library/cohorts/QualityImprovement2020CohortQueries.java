@@ -7039,7 +7039,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "DSDT",
         EptsReportUtils.map(
-            queryA3, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            queryA3, "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
 
     compositionCohortDefinition.addSearch(
         "FILA83",
