@@ -565,7 +565,22 @@ uuid="25a16b62-05fd-4b4e-83e0-8a3659c69981" />
 property_value="92653c45-9eb2-486d-90c0-3e00569e99c0" 
 description="UUID for the APPLICATION FOR LABORATORY RESEARCH concept" 
 uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
-		
+
+<global_property property="eptsreports.isoniazidConceptUuid"
+property_value="e1d43e52-1d5f-11e0-b929-000c29ad1d07"
+description="UUID for ISONIAZID concept" 
+uuid="a7e4adb7-d97f-4891-88bf-71c35caa7cf3"/>
+
+<global_property property="eptsreports.regimeTPTConceptUuid"
+property_value="9db4ce3b-4c1c-45dd-905f-c984a052f26e"
+description="UUID for Regime TPT concept" 
+uuid="a135cb58-84aa-48ad-97d0-a2232c376c9a"/>
+
+<global_property property="eptsreports.dataEstadoDaProfilaxiaConceptUuid"
+property_value="b6c4d473-2af5-4c4d-a9bb-ad3779fa5579"
+description="UUID FOR PROFLAXIS STATUS Concept" 
+uuid="b534e130-da4c-42ef-811b-b94810112d4c"/>
+
 		<!-- concept & concept_name -->
 
 	<!--1255 -->
@@ -851,7 +866,42 @@ uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 		date_created="2012-02-29 09:50:50" concept_name_id="2462" voided="0"
 		uuid="e249f6c4-1d5f-11e0-b929-000c29ad1d07"
 		locale_preferred="0" />
+
+	<!-- 656 -->
+	<concept concept_id="656" retired="0" creator="1"
+		is_set="0"  class_id="11" datatype_id="4"
+		date_created="2012-02-27 11:30:21"
+		uuid="e1d43e52-1d5f-11e0-b929-000c29ad1d07" />
 		
+		<concept_name concept_id="656" creator="1"
+		name="INH" locale="en"   
+		date_created="2012-02-29 09:50:50" concept_name_id="2463" voided="0"
+		uuid="e262bc2c-1d5f-11e0-b929-000c29ad1d07"
+		locale_preferred="0" />
+	
+	<!-- 23985 -->
+	<concept concept_id="23985" retired="0" creator="1"
+		is_set="0"  class_id="11" datatype_id="4"
+		date_created="2012-02-27 11:30:21"
+		uuid="9db4ce3b-4c1c-45dd-905f-c984a052f26e" />
+		
+		<concept_name concept_id="23985" creator="1"
+		name="Regime TPT" locale="en"   
+		date_created="2012-02-29 09:50:50" concept_name_id="2464" voided="0"
+		uuid="8c541c29-791e-43fc-8ed4-07789dfd57e4"
+		locale_preferred="0" />
+	
+	<!-- 165308 -->
+	<concept concept_id="165308" retired="0" creator="1"
+		is_set="0"  class_id="11" datatype_id="4"
+		date_created="2012-02-27 11:30:21"
+		uuid="b6c4d473-2af5-4c4d-a9bb-ad3779fa5579" />
+		
+		<concept_name concept_id="165308" creator="1"
+		name="PROFLAXIS STATUS" locale="en"   
+		date_created="2012-02-29 09:50:50" concept_name_id="2466" voided="0"
+		uuid="84346f48-8dd4-4710-a28f-5ca1ea411de5"
+		locale_preferred="0" />
 	
 	<!-- 6128 -->
 	<concept concept_id="6128" retired="0" 
