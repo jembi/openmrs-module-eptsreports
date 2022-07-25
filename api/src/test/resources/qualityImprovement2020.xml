@@ -566,6 +566,12 @@ property_value="92653c45-9eb2-486d-90c0-3e00569e99c0"
 description="UUID for the APPLICATION FOR LABORATORY RESEARCH concept" 
 uuid="27066b38-7156-4fbb-8f45-0c940c4f1179" />
 
+<global_property property="eptsreports.3HPConceptUuid"
+property_value="bce7d965-3396-4667-8294-aa5260c26334"
+description="UUID for 3HP concept"
+uuid="21342092-0bf3-11ed-ad7a-4fe812c44ae2"/>
+
+
 <global_property property="eptsreports.isoniazidConceptUuid"
 property_value="e1d43e52-1d5f-11e0-b929-000c29ad1d07"
 description="UUID for ISONIAZID concept" 
@@ -878,7 +884,13 @@ uuid="b534e130-da4c-42ef-811b-b94810112d4c"/>
 		date_created="2012-02-29 09:50:50" concept_name_id="2463" voided="0"
 		uuid="e262bc2c-1d5f-11e0-b929-000c29ad1d07"
 		locale_preferred="0" />
-	
+
+	<!-- 23984 -->
+	<concept concept_id="23984" retired="0" creator="1"
+			 is_set="0"  class_id="11" datatype_id="4"
+			 date_created="2012-02-27 11:30:21"
+			 uuid="bce7d965-3396-4667-8294-aa5260c26334" />
+
 	<!-- 23985 -->
 	<concept concept_id="23985" retired="0" creator="1"
 		is_set="0"  class_id="11" datatype_id="4"
