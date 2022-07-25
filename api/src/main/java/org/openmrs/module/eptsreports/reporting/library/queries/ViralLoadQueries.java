@@ -44,7 +44,7 @@ public class ViralLoadQueries {
         "SELECT fn1.patient_id FROM( "
             + " SELECT  patient_id, MAX(data_carga) AS data_carga FROM( "
             + " SELECT patient_id,data_carga FROM "
-            + " (SELECT p.patient_id, MAX(e.encounter_datetime) data_carga "
+            + " (SELECT p.patient_id, MAX(o.obs_datetime) data_carga "
             + " FROM patient p INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type IN (%d, %d, %d, %d) "
