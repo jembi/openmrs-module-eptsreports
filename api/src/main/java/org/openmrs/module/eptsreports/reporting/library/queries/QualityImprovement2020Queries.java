@@ -2161,7 +2161,7 @@ public class QualityImprovement2020Queries {
             + "             AND e.voided = 0 "
             + "             AND p.voided = 0 "
             + "             AND os.voided = 0 "
-            + "             AND e.encounter_datetime BETWEEN date_add(vl.vl_max_date, interval -12 month) AND date_add(vl.vl_max_date, interval -1 day) "
+            + "             AND e.encounter_datetime < vl.vl_max_date "
             + "             GROUP BY   p.patient_id ) recent_clinical "
             + " ON  recent_clinical.patient_id = p.patient_id "
             + " WHERE e.encounter_type = ${18} "
