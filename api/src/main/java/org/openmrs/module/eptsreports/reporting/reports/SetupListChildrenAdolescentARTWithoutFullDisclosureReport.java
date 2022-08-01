@@ -1,21 +1,43 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.reporting.ReportingException;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-import org.openmrs.module.reporting.report.ReportDesign;
-import org.openmrs.module.reporting.report.definition.ReportDefinition;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.datasets.ListChildrenAdolescentARTWithoutFullDisclosureDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.TotalChildrenAdolescentARTWithoutFullDisclosureDataset;
+import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.reporting.ReportingException;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.openmrs.module.reporting.report.ReportDesign;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
-public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport extends EptsDataExportManager {
+public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
+    extends EptsDataExportManager {
+
+  private final ListChildrenAdolescentARTWithoutFullDisclosureDataset
+      listChildrenAdolescentARTWithoutFullDisclosureDataset;
+  private final TotalChildrenAdolescentARTWithoutFullDisclosureDataset
+      totalChildrenAdolescentARTWithoutFullDisclosureDataset;
+
+  @Autowired
+  public SetupListChildrenAdolescentARTWithoutFullDisclosureReport(
+      ListChildrenAdolescentARTWithoutFullDisclosureDataset
+          listChildrenAdolescentARTWithoutFullDisclosureDataset,
+      TotalChildrenAdolescentARTWithoutFullDisclosureDataset
+          totalChildrenAdolescentARTWithoutFullDisclosureDataset) {
+    this.listChildrenAdolescentARTWithoutFullDisclosureDataset =
+        listChildrenAdolescentARTWithoutFullDisclosureDataset;
+    this.totalChildrenAdolescentARTWithoutFullDisclosureDataset =
+        totalChildrenAdolescentARTWithoutFullDisclosureDataset;
+  }
+
   @Override
   public String getExcelDesignUuid() {
     return "5F1006D0-73BA-4435-8E5A-649664320D78";
@@ -43,6 +65,16 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport extends E
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
+    rd.addDataSetDefinition(
+        "L1",
+        Mapped.mapStraightThrough(
+            listChildrenAdolescentARTWithoutFullDisclosureDataset
+                .constructListChildrenAdolescentARTWithoutFullDisclosureDataset()));
+    rd.addDataSetDefinition(
+        "LT",
+        Mapped.mapStraightThrough(
+            totalChildrenAdolescentARTWithoutFullDisclosureDataset
+                .constructTotalChildrenAdolescentARTWithoutFullDisclosureDataset()));
     return rd;
   }
 
@@ -50,19 +82,20 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport extends E
   public String getVersion() {
     return "1.0-SNAPSHOT";
   }
+
   @Override
   public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
     ReportDesign reportDesign = null;
     try {
       reportDesign =
-              createXlsReportDesign(
-                      reportDefinition,
-                      "Template_ListChildrenAdolescentARTWithoutFullDisclosure_v0.3.xls",
-                      "List of Adolescent Children On ART Without Full Disclosure",
-                      getExcelDesignUuid(),
-                      null);
+          createXlsReportDesign(
+              reportDefinition,
+              "Template_ListChildrenAdolescentARTWithoutFullDisclosure_v0.3.xls",
+              "List of Adolescent Children On ART Without Full Disclosure",
+              getExcelDesignUuid(),
+              null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:9,dataset:LCAFD");
+      props.put("repeatingSections", "sheet:1,row:9,dataset:L1");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
@@ -71,11 +104,12 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport extends E
 
     return Arrays.asList(reportDesign);
   }
+
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-            new Parameter("startDate", "Start Date", Date.class),
-            new Parameter("endDate", "End date", Date.class),
-            new Parameter("location", "Location", Location.class));
+        new Parameter("startDate", "Start Date", Date.class),
+        new Parameter("endDate", "End date", Date.class),
+        new Parameter("location", "Location", Location.class));
   }
 }
