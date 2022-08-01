@@ -1,0 +1,81 @@
+package org.openmrs.module.eptsreports.reporting.reports;
+
+import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.reporting.ReportingException;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.openmrs.module.reporting.report.ReportDesign;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
+@Component
+public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport extends EptsDataExportManager {
+  @Override
+  public String getExcelDesignUuid() {
+    return "5F1006D0-73BA-4435-8E5A-649664320D78";
+  }
+
+  @Override
+  public String getUuid() {
+    return "0E6C1595-8539-4E05-B1D1-9BA58ED1CF8F";
+  }
+
+  @Override
+  public String getName() {
+    return "ListChildrenAdolescentARTWithoutFullDisclosure";
+  }
+
+  @Override
+  public String getDescription() {
+    return "List of Adolescent Children on ART Without Full Disclosure";
+  }
+
+  @Override
+  public ReportDefinition constructReportDefinition() {
+    ReportDefinition rd = new ReportDefinition();
+    rd.setUuid(getUuid());
+    rd.setName(getName());
+    rd.setDescription(getDescription());
+    rd.addParameters(getParameters());
+    return rd;
+  }
+
+  @Override
+  public String getVersion() {
+    return "1.0-SNAPSHOT";
+  }
+  @Override
+  public List<ReportDesign> constructReportDesigns(ReportDefinition reportDefinition) {
+    ReportDesign reportDesign = null;
+    try {
+      reportDesign =
+              createXlsReportDesign(
+                      reportDefinition,
+                      "Template_ListChildrenAdolescentARTWithoutFullDisclosure_v0.3.xls",
+                      "List of Adolescent Children On ART Without Full Disclosure",
+                      getExcelDesignUuid(),
+                      null);
+      Properties props = new Properties();
+      props.put("repeatingSections", "sheet:1,row:9,dataset:LCAFD");
+      props.put("sortWeight", "5000");
+      reportDesign.setProperties(props);
+    } catch (IOException e) {
+      throw new ReportingException(e.toString());
+    }
+
+    return Arrays.asList(reportDesign);
+  }
+  @Override
+  public List<Parameter> getParameters() {
+    return Arrays.asList(
+            new Parameter("startDate", "Start Date", Date.class),
+            new Parameter("endDate", "End date", Date.class),
+            new Parameter("location", "Location", Location.class));
+  }
+}
