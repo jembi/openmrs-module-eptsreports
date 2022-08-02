@@ -2301,8 +2301,6 @@ public class TPTEligiblePatientListCohortQueries {
 
     sqlCohortDefinition.setQuery(sb.replace(query));
 
-    System.out.println(sqlCohortDefinition.getQuery());
-
     return sqlCohortDefinition;
   }
 
@@ -2651,7 +2649,7 @@ public class TPTEligiblePatientListCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(sb.replace(query));
-    System.out.println(sqlCohortDefinition.getQuery());
+
     return sqlCohortDefinition;
   }
 
