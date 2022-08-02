@@ -475,10 +475,18 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>A1:Select all patients with Ficha Resumo (encounter type 53) with “Ultima profilaxia
-   *       Isoniazida (Data Inicio)” (concept id 6128) and value datetime not null and between
+   *   <li>A1.1:Select all patients with Ficha Resumo (encounter type 53) with “Ultima profilaxia
+   *       Isoniazida (Data Inicio)” (concept id 6128) and value datetime not null
+   *       and exclude all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954)
+   *       and between
    *       endDate-7months (210 DAYs) and endDate. or
    *   <li>
+   *       <li>
+   *           A1.2:  Select all patients with Ficha Resumo (encounter type 53) with Última
+   *          profilaxia(concept id 23985) value coded INH(concept id 656) and Data Início da
+   *          Profilaxia TPT(value datetime, concept id 6128)  not null and value datetime not
+   *          null and between endDate-7months (210 days) and endDate.
+   *       </li>
    * </ul>
    *
    * @return CohortDefinition
@@ -561,8 +569,10 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>A2: Select all patients with Ficha clinica (encounter type 6) with “Profilaxia INH”
-   *       (concept id 6122) with value code “Inicio” (concept id 1256) and encounter datetime
-   *       between endDate-7months (210 DAYs) and endDate. or
+   *       (concept id 6122) with value code “Inicio” (concept id 1256) or
+   *       Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
+   *       Profilaxia (concept id 165308) value coded Início (concept id 1256)
+   *       and encounter datetime between endDate-7months (210 DAYs) and endDate. or
    * </ul>
    *
    * @return CohortDefinition
@@ -670,11 +680,13 @@ public class TPTEligiblePatientListCohortQueries {
    *   <li>and no other INH values (“Isoniazida” or “Isoniazida + Piridoxina”) marked on FILT in the
    *       210 DAYs prior to the INH Start Date and
    *   <li>no Última profilaxia Isoniazida (Data Início) (Concept ID 6128, value_datetime)
-   *       registered in Ficha Resumo - Mastercard (Encounter Type ID 53) in the 7 months prior to
-   *       ‘INH Start Date’
+   *       or Última profilaxia(concept id 23985) value coded INH(concept id 656) and Data Início da Profilaxia
+   *       TPT(value datetime, concept id 6128) registered in Ficha Resumo - Mastercard (Encounter Type ID 53) in
+   *       the 7 months prior to ‘INH Start Date’
    *   <li>and no Profilaxia (INH) (Concept ID 6122) with the value “I” (Início) (Concept ID 1256)
-   *       marked on Ficha Clínica - Mastercard (Encounter Type ID 6) in the 7 months prior to ‘INH
-   *       Start Date’
+   *       or Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia
+   *       (concept id 165308) value coded Início (concept id 1256) marked on Ficha Clínica - Mastercard
+   *       (Encounter Type ID 6) in the 7 months prior to ‘INH Start Date’
    *   <li>and no Profilaxia com INH – TPI (Data Início) (Concept ID 6128, value_datetime) marked in
    *       Ficha de Seguimento (Adulto e Pediatria) (Encounter Type ID 6,9) in the 7 months prior to
    *       ‘INH Start Date’
@@ -1563,7 +1575,7 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>B2: Select all patients with Ficha clinica - Master Card (encounter type 6) with
-   *       “Profilaxia INH” (concept id 6122) with value code “Fim” (concept id 1267) Profilaxia TPT
+   *       “Profilaxia INH” (concept id 6122) with value code “Fim” (concept id 1267) or Profilaxia TPT
    *       (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id
    *       165308) value coded FIm (concept id 1267) and encounter datetime between (date from Y +
    *       173 DAYs) and (date from Y + 365 DAYs)
@@ -2210,7 +2222,7 @@ public class TPTEligiblePatientListCohortQueries {
    *       (encounter type 53) check if the patient has:
    *   <li>At least 5 consultations (((encounter type 6) with (profilaxia INH (6122)= inicio(I) or
    *       Continua(C) (concept id in [1256, 1257])) or ((encounter type 9) “Profilaxia com INH-TPI”
-   *       (concept id 6122) with value coded “YES” (concept id 1065))) Profilaxia TPT (concept id
+   *       (concept id 6122) with value coded “YES” (concept id 1065))) or Profilaxia TPT (concept id
    *       23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id 165308)
    *       value coded Início/continua (concept id in [1256,1257]) during 210 DAYs from the date
    *       Y2,3 or
@@ -2429,9 +2441,13 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>B5: ((At least 3 consultations registered on Ficha Clínica (encounter type 6) with INH =
-   *       Iniício or Continua (concept ID 6122, value_coded in [1257, 1256]) ) AND ( at least 1
-   *       consultation registered on Ficha Clínica (encounter type 6) with DT-INH (concept ID 1719,
-   *       value_coded =23955) ) )until a 7-month (210 DAYs) period from the date from Y2,3. OR
+   *       Iniício or Continua (concept ID 6122, value_coded in [1257, 1256]) ) OR
+   *       (Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia
+   *       (concept id 165308) value coded Início/continua (concept id in [1256,1257]) )
+   *       AND ( at least 1 consultation registered on Ficha Clínica (encounter type 6) with DT-INH (concept ID 1719,
+   *       value_coded =23955) OR (Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia
+   *       (concept id 165308) value coded Início/continua (concept id in [1256,1257]) and Outras prescricoes(concept id 1719)
+   *       value coded DT-INH (concept id 23955) ) )until a 7-month (210 DAYs) period from the date from Y2,3. OR
    *   <li>
    * </ul>
    *
@@ -2896,6 +2912,7 @@ public class TPTEligiblePatientListCohortQueries {
    *       (concept id 165308) value coded Início/continua (concept id in [1256,1257])during 120
    *       DAYs from the date from M.1; or
    *   <li>
+   *
    * </ul>
    *
    * @return CohortDefinition
