@@ -1,5 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
@@ -16,12 +21,6 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
 @Component
 public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
     extends EptsDataExportManager {
@@ -34,10 +33,11 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
 
   @Autowired
   public SetupListChildrenAdolescentARTWithoutFullDisclosureReport(
-          ListChildrenAdolescentARTWithoutFullDisclosureDataset
-                  listChildrenAdolescentARTWithoutFullDisclosureDataset,
-          TotalChildrenAdolescentARTWithoutFullDisclosureDataset
-                  totalChildrenAdolescentARTWithoutFullDisclosureDataset, GenericCohortQueries genericCohortQueries) {
+      ListChildrenAdolescentARTWithoutFullDisclosureDataset
+          listChildrenAdolescentARTWithoutFullDisclosureDataset,
+      TotalChildrenAdolescentARTWithoutFullDisclosureDataset
+          totalChildrenAdolescentARTWithoutFullDisclosureDataset,
+      GenericCohortQueries genericCohortQueries) {
     this.listChildrenAdolescentARTWithoutFullDisclosureDataset =
         listChildrenAdolescentARTWithoutFullDisclosureDataset;
     this.totalChildrenAdolescentARTWithoutFullDisclosureDataset =
@@ -85,8 +85,8 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
             totalChildrenAdolescentARTWithoutFullDisclosureDataset
                 .constructTotalChildrenAdolescentARTWithoutFullDisclosureDataset()));
     rd.setBaseCohortDefinition(
-            EptsReportUtils.map(
-                    genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
     return rd;
   }
 
