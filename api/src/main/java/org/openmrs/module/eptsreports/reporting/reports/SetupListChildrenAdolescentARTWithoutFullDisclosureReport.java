@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListChildrenAdolescentARTWithoutFullDisclosureDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TotalChildrenAdolescentARTWithoutFullDisclosureDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
@@ -65,13 +67,15 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition("SC", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
-        "L1",
+        "LCA",
         Mapped.mapStraightThrough(
             listChildrenAdolescentARTWithoutFullDisclosureDataset
                 .constructListChildrenAdolescentARTWithoutFullDisclosureDataset()));
     rd.addDataSetDefinition(
-        "LT",
+        "LCAT",
         Mapped.mapStraightThrough(
             totalChildrenAdolescentARTWithoutFullDisclosureDataset
                 .constructTotalChildrenAdolescentARTWithoutFullDisclosureDataset()));
