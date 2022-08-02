@@ -1,11 +1,13 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListChildrenAdolescentARTWithoutFullDisclosureDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TotalChildrenAdolescentARTWithoutFullDisclosureDataset;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -28,17 +30,19 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
       listChildrenAdolescentARTWithoutFullDisclosureDataset;
   private final TotalChildrenAdolescentARTWithoutFullDisclosureDataset
       totalChildrenAdolescentARTWithoutFullDisclosureDataset;
+  private final GenericCohortQueries genericCohortQueries;
 
   @Autowired
   public SetupListChildrenAdolescentARTWithoutFullDisclosureReport(
-      ListChildrenAdolescentARTWithoutFullDisclosureDataset
-          listChildrenAdolescentARTWithoutFullDisclosureDataset,
-      TotalChildrenAdolescentARTWithoutFullDisclosureDataset
-          totalChildrenAdolescentARTWithoutFullDisclosureDataset) {
+          ListChildrenAdolescentARTWithoutFullDisclosureDataset
+                  listChildrenAdolescentARTWithoutFullDisclosureDataset,
+          TotalChildrenAdolescentARTWithoutFullDisclosureDataset
+                  totalChildrenAdolescentARTWithoutFullDisclosureDataset, GenericCohortQueries genericCohortQueries) {
     this.listChildrenAdolescentARTWithoutFullDisclosureDataset =
         listChildrenAdolescentARTWithoutFullDisclosureDataset;
     this.totalChildrenAdolescentARTWithoutFullDisclosureDataset =
         totalChildrenAdolescentARTWithoutFullDisclosureDataset;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   @Override
@@ -53,7 +57,7 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
 
   @Override
   public String getName() {
-    return "ListChildrenAdolescentARTWithoutFullDisclosure";
+    return "List ofAdolescent Children on ART Without Full Disclosure";
   }
 
   @Override
@@ -80,6 +84,9 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
         Mapped.mapStraightThrough(
             totalChildrenAdolescentARTWithoutFullDisclosureDataset
                 .constructTotalChildrenAdolescentARTWithoutFullDisclosureDataset()));
+    rd.setBaseCohortDefinition(
+            EptsReportUtils.map(
+                    genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
     return rd;
   }
 
@@ -113,7 +120,6 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("startDate", "Start Date", Date.class),
         new Parameter("endDate", "End date", Date.class),
         new Parameter("location", "Location", Location.class));
   }
