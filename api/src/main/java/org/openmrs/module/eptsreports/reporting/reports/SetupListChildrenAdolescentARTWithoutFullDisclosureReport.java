@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListChildrenAdolescentARTWithoutFullDisclosureDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
@@ -29,7 +29,8 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
       listChildrenAdolescentARTWithoutFullDisclosureDataset;
   private final TotalChildrenAdolescentARTWithoutFullDisclosureDataset
       totalChildrenAdolescentARTWithoutFullDisclosureDataset;
-  private final GenericCohortQueries genericCohortQueries;
+  private final ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries
+      listChildrenAdolescentARTWithoutFullDisclosureCohortQueries;
 
   @Autowired
   public SetupListChildrenAdolescentARTWithoutFullDisclosureReport(
@@ -37,12 +38,14 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
           listChildrenAdolescentARTWithoutFullDisclosureDataset,
       TotalChildrenAdolescentARTWithoutFullDisclosureDataset
           totalChildrenAdolescentARTWithoutFullDisclosureDataset,
-      GenericCohortQueries genericCohortQueries) {
+      ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries
+          listChildrenAdolescentARTWithoutFullDisclosureCohortQueries) {
     this.listChildrenAdolescentARTWithoutFullDisclosureDataset =
         listChildrenAdolescentARTWithoutFullDisclosureDataset;
     this.totalChildrenAdolescentARTWithoutFullDisclosureDataset =
         totalChildrenAdolescentARTWithoutFullDisclosureDataset;
-    this.genericCohortQueries = genericCohortQueries;
+    this.listChildrenAdolescentARTWithoutFullDisclosureCohortQueries =
+        listChildrenAdolescentARTWithoutFullDisclosureCohortQueries;
   }
 
   @Override
@@ -73,7 +76,7 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
     rd.setDescription(getDescription());
     rd.addParameters(getParameters());
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
-    rd.addDataSetDefinition("SC", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+    rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "LCA",
         Mapped.mapStraightThrough(
@@ -86,7 +89,9 @@ public class SetupListChildrenAdolescentARTWithoutFullDisclosureReport
                 .constructTotalChildrenAdolescentARTWithoutFullDisclosureDataset()));
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
+            listChildrenAdolescentARTWithoutFullDisclosureCohortQueries
+                .getBaseCohortForAdolescent(),
+            "endDate=${endDate},location=${location}"));
     return rd;
   }
 
