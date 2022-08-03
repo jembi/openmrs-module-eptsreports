@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -11,10 +14,6 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
@@ -51,12 +50,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             ageCohortQueries.createXtoYAgeCohort("age", 8, 14), "effectiveDate=${endDate}"));
     cd.addSearch(
         "art", EptsReportUtils.map(getPatientsOnART(), "endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "full",
-        EptsReportUtils.map(
-            getAdolescentsCurrentlyOnArtWithFullDisclosure(),
-            "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("(base AND age AND art) AND NOT full");
+    cd.setCompositionString("(base AND age AND art)");
     return cd;
   }
 
@@ -75,13 +69,13 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getAdolescentsCurrentlyOnArtWithFullDisclosure() {
+  public CohortDefinition getAdolescentsCurrentlyOnArtWithDisclosures(int valueCoded) {
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put(
         "6340",
         hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
-    map.put("6337", hivMetadata.getRevealdConcept().getConceptId());
+    map.put("answer", valueCoded);
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Adolescent patients with full disclosure");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
@@ -91,7 +85,55 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${53} "
-            + " AND o.concept_id=${6340} AND o.value_coded= ${6337} AND e.encounter_datetime <= :endDate "
+            + " AND o.concept_id=${6340} AND o.value_coded= ${answer} AND e.encounter_datetime <= :endDate "
+            + " AND e.location_id=:location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    String replacedQuery = sb.replace(query);
+    cd.setQuery(replacedQuery);
+    return cd;
+  }
+
+  public CohortDefinition getTotalAdolescentsCurrentlyOnArtWithDisclosures() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put(
+        "6340",
+        hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Adolescent patients with disclosures made");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        "SELECT p.patient_id FROM patient p "
+            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${53} "
+            + " AND o.concept_id=${6340} AND o.value_coded IS NOT NULL AND e.encounter_datetime <= :endDate "
+            + " AND e.location_id=:location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    String replacedQuery = sb.replace(query);
+    cd.setQuery(replacedQuery);
+    return cd;
+  }
+
+  public CohortDefinition getTotalAdolescentsCurrentlyOnArtWithBlankDisclosures() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put(
+        "6340",
+        hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Adolescent patients with blank disclosures made");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        "SELECT p.patient_id FROM patient p "
+            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${53} "
+            + " AND o.concept_id=${6340} AND o.value_coded IS NULL AND e.encounter_datetime <= :endDate "
             + " AND e.location_id=:location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);

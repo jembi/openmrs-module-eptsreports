@@ -7,8 +7,10 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -30,13 +32,22 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureDataset extends BaseD
 
   private final ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
   private final CommonQueries commonQueries;
+  private final ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries
+      listChildrenAdolescentARTWithoutFullDisclosureCohortQueries;
+  private final HivMetadata hivMetadata;
 
   @Autowired
   public ListChildrenAdolescentARTWithoutFullDisclosureDataset(
       ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
-      CommonQueries commonQueries) {
+      CommonQueries commonQueries,
+      ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries
+          listChildrenAdolescentARTWithoutFullDisclosureCohortQueries,
+      HivMetadata hivMetadata) {
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.commonQueries = commonQueries;
+    this.listChildrenAdolescentARTWithoutFullDisclosureCohortQueries =
+        listChildrenAdolescentARTWithoutFullDisclosureCohortQueries;
+    this.hivMetadata = hivMetadata;
   }
 
   public DataSetDefinition constructListChildrenAdolescentARTWithoutFullDisclosureDataset() {
@@ -51,6 +62,11 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureDataset extends BaseD
     DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
     DataDefinition nameDef =
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
+    pdsd.addRowFilter(
+        listChildrenAdolescentARTWithoutFullDisclosureCohortQueries
+            .getAdolescentsCurrentlyOnArtWithDisclosures(
+                hivMetadata.getRevealdConcept().getConceptId()),
+        "endDate=${endDate},location=${location}");
 
     pdsd.addColumn("patient_id", new PersonIdDataDefinition(), "");
 
