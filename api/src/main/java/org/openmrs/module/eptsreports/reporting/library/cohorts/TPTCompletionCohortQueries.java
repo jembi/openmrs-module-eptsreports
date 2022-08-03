@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -17,6 +14,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class TPTCompletionCohortQueries {
@@ -846,7 +847,7 @@ public class TPTCompletionCohortQueries {
             + " AND e.encounter_type = ${53}"
             + " AND o.concept_id = ${23985}"
             + " AND o.value_coded = ${23954}"
-            + " AND e.encounter_datetime < :endDate"
+            + " AND o.obs_datetime < :endDate"
             + " AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -893,7 +894,6 @@ public class TPTCompletionCohortQueries {
             + " AND e.encounter_type = ${53}"
             + " AND o.concept_id = ${23985}"
             + " AND o.value_coded = ${656}"
-            + " AND o.value_datetime < :endDate"
             + " AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1010,8 +1010,8 @@ public class TPTCompletionCohortQueries {
    * <b>IMER1</b>: User_Story_ TPT <br>
    *
    * <ul>
-   *   <li>A3: Select all patients with Ficha clinica (encounter type 6) with “Profilaxia com INH”
-   *       (concept id 6128) value datetime before end date
+   *   <li>A3: Select all patients with Ficha clinica (encounter type 6) with “Ultima profilaxia
+   *       Isoniazida (Data Inicio)” (concept id 6128) value datetime before end date
    *   <li>
    *
    * @return CohortDefinition
@@ -1019,7 +1019,8 @@ public class TPTCompletionCohortQueries {
   public CohortDefinition getINHStartA3(int encounterType, int profilaxiaIsoniazidaConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
-    sqlCohortDefinition.setName(" all patients with Ficha Clinica ");
+    sqlCohortDefinition.setName(
+        " all patients with Data de Inicio de Profilaxia before endDate marked on Ficha Clinica ");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1034,8 +1035,7 @@ public class TPTCompletionCohortQueries {
             + "WHERE e.encounter_type = ${6} "
             + "AND o.concept_id = ${6128} "
             + "AND e.location_id = :location "
-            + "AND e.encounter_datetime < :endDate " // N pede nehuma alteracao mas a descricao:
-            // value datetime
+            + "AND o.value_datetime < :endDate "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1082,8 +1082,7 @@ public class TPTCompletionCohortQueries {
             + "     	AND e.encounter_type = ${9} "
             + "     	AND o.concept_id = ${6128} "
             + " 	AND e.location_id = :location "
-            + "     	AND e.encounter_datetime < :endDate "; // N pede nehuma alteracao mas a
-    // descricao: value datetime
+            + "     	AND o.value_datetime < :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -1817,22 +1816,43 @@ public class TPTCompletionCohortQueries {
     map.put("1267", completedConcept);
 
     String query =
-        " SELECT"
-            + " p.patient_id"
-            + " FROM"
-            + " patient p"
-            + " INNER JOIN"
-            + " encounter e ON p.patient_id = e.patient_id"
-            + " INNER JOIN"
-            + " obs o ON e.encounter_id = o.encounter_id"
-            + " INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
-            + " WHERE"
-            + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
-            + "    AND e.encounter_type = ${60}"
-            + " AND (o.concept_id = ${23985} AND o.value_coded IN(${23954}, ${23984}))   "
-            + " AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1257}, ${1267}, null))   "
-            + "    AND e.encounter_datetime < :endDate"
-            + "    AND e.location_id = :location";
+        " SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         p.patient_id = e.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         e.encounter_id = o.encounter_id "
+            + "INNER JOIN obs o2 "
+            + "ON         e.encounter_id = o2.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     p.patient_id, "
+            + "                                 Min(e.encounter_datetime) AS first_filt "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e "
+            + "                      ON         p.patient_id = e.patient_id "
+            + "                      WHERE      p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        e.encounter_type = ${60} "
+            + "                      AND        e.encounter_datetime < :endDate "
+            + "                      AND        e.location_id = :location "
+            + "                      GROUP BY   p.patient_id) filt "
+            + "ON         filt.patient_id = p.patient_id "
+            + "WHERE      p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "AND        e.encounter_type = ${60} "
+            + "AND        e.encounter_datetime = filt.first_filt "
+            + "AND        ( "
+            + "                      o.concept_id = ${23985}"
+            + "           AND        o.value_coded IN( ${23954}, "
+            + "                                       ${23984} ) ) "
+            + "AND        ( "
+            + "                      o2.concept_id = ${23987} "
+            + "           AND        o2.value_coded IN ( ${1257}, "
+            + "                                         ${1267}, "
+            + "                                         NULL ) ) "
+            + "AND        e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -2034,6 +2054,15 @@ public class TPTCompletionCohortQueries {
    *       registered on Ficha Resumo by end date (Encounter type 53) and with value datetime
    *       between 86 days and 365 days from the date of C3 or
    *   <li>
+   *   <li>C3: Select all patients with FILT (encounter type 60) with “Regime de TPT” (concept id
+   *       23985) value coded “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and
+   *       encounter_datetime before end date as “3HP Start Date” no other 3HP prescriptions
+   *       [“Outras prescricoes” (concept id 1719) with value coded equal to “3HP” (concept id
+   *       23954)] marked on Ficha-Clínica in the 4 months prior to the 3HP Start Date and no
+   *       “Regime de TPT” (concept id 23985) with value coded “3HP” or ” 3HP+Piridoxina” (concept
+   *       id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the 3HP
+   *       Start Date;
+   *   <li>
    * </ul>
    *
    * @return CohortDefinition
@@ -2060,11 +2089,13 @@ public class TPTCompletionCohortQueries {
     map.put("23985", regimedeTPConcept);
     map.put("23984", threeHPPiridoxinaConcept);
     map.put("53", masterCardEncounterType);
+    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id FROM patient p    "
             + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
             + "INNER JOIN obs o ON e.encounter_id = o.encounter_id    "
+            + "INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id    "
             + "INNER JOIN (   "
             + " SELECT p.patient_id, e.encounter_datetime FROM patient p    "
             + "INNER JOIN encounter e ON p.patient_id  = e.patient_id    "
@@ -2119,9 +2150,9 @@ public class TPTCompletionCohortQueries {
             + "ON regimeTPT.patient_id = p.patient_id   "
             + "WHERE e.encounter_type = ${53}   "
             + "AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
-            + "AND e.location_id = :location   "
-            + "AND DATEDIFF(o.value_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(o.value_datetime, regimeTPT.encounter_datetime) <= 365   "
-            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 ";
+            + "AND e.location_id = :location  AND o2.concept_id = ${6129} "
+            + "AND DATEDIFF(o2.value_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(o2.value_datetime, regimeTPT.encounter_datetime) <= 365   "
+            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -2138,6 +2169,10 @@ public class TPTCompletionCohortQueries {
    *       23954) and Estado da Profilaxia (concept id 165308) value coded Fim (concept id 1267)
    *       registered on Ficha clinica(encounter type 6) by end date and encounter datetime between
    *       86 days and 365 days from the date of C5; OR
+   *   <li>
+   *   <li>C5: Select all patients with Profilaxia TPT (concept id 23985) value coded 3HP (concept
+   *       id 23954) and Estado da Profilaxia (concept id 165308) value coded Início (concept id
+   *       1256) registered reporting end date on Ficha Clinica (Encounter type 6) ; or
    *   <li>
    * </ul>
    *
@@ -2188,11 +2223,11 @@ public class TPTCompletionCohortQueries {
             + "                AND e.encounter_datetime < :endDate "
             + "                AND e.location_id = :location ) AS regimeTPT    "
             + "ON regimeTPT.patient_id = p.patient_id   "
-            + "WHERE e.encounter_type = ${53}   "
+            + "WHERE e.encounter_type = ${6}   "
             + "AND (o.concept_id = ${23985} AND o.value_coded = ${23954})    "
             + "AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267})    "
-            + "AND e.location_id = :location   "
-            + "AND DATEDIFF(o.value_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(o.value_datetime, regimeTPT.encounter_datetime) <= 365   "
+            + "AND e.location_id = :location  AND e.encounter_datetime <= endDate "
+            + "AND DATEDIFF(e.encounter_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(e.encounter_datetime, regimeTPT.encounter_datetime) <= 365   "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
