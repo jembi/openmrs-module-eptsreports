@@ -86,7 +86,7 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_List_Patients_Eligibles_TPT_v1.1.xls",
+              "Template_List_Patients_Eligibles_TPT_v1.3.xls",
               "TPT List Patients Eligibles Report",
               getExcelDesignUuid(),
               null);
