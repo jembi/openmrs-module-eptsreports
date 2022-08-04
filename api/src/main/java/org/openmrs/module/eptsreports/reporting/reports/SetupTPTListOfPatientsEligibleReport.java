@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.*;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTEligiblePatientListCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.library.datasets.TPTTotalListOfPatientsEligibleDataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
@@ -71,6 +73,8 @@ public class SetupTPTListOfPatientsEligibleReport extends EptsDataExportManager 
     } catch (EvaluationException e) {
       e.printStackTrace();
     }
+    rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     return rd;
   }
 
