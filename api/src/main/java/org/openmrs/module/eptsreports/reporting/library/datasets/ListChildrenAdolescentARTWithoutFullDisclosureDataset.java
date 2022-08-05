@@ -1,5 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -28,11 +32,6 @@ import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListChildrenAdolescentARTWithoutFullDisclosureDataset extends BaseDataSet {
@@ -87,7 +86,11 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureDataset extends BaseD
         listOfPatientsArtCohortCohortQueries.getAge(),
         "evaluationDate=${endDate}",
         new NotApplicableIfNullConverter());
-    pdsd.addColumn("art", getArtStartDate(), "endDate=${endDate},location=${location}");
+    pdsd.addColumn(
+        "art",
+        getArtStartDate(),
+        "endDate=${endDate},location=${location}",
+        new DateOfPatientFirstConsultationConverter("date"));
     pdsd.addColumn(
         "edrF",
         getAdolescentsCurrentlyOnArtWithDisclosures(),
