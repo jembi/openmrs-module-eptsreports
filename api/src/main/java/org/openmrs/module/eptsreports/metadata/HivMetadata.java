@@ -4836,9 +4836,9 @@ public class HivMetadata extends ProgramsMetadata {
   /**
    * <b>concept_id = 165314</b>
    *
-   * <p><b>Name:</b> ANUAL ARV DISPENSATION
+   * <p><b>Name:</b> ANNUAL ARV DISPENSATION
    *
-   * <p><b>Description:</b> ANUAL ARV DISPENSATION Concept
+   * <p><b>Description:</b> ANNUAL ARV DISPENSATION Concept
    *
    * @return {@link Concept}
    */
