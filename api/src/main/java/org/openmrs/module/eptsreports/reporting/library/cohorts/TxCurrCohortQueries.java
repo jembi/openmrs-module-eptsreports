@@ -2280,7 +2280,7 @@ public class TxCurrCohortQueries {
             + "      AND ostate.concept_id = ${165322}   "
             + "      AND ostate.value_coded IS NOT NULL   "
             + "      AND otype.obs_group_id = ostate.obs_group_id   "
-            + "      AND e.encounter_datetime <= :endDate"
+            + "      AND e.encounter_datetime <= :onOrBefore "
             + "      AND e.location_id = :location    "
             + "    group by p.patient_id    "
             + ") first_mdc ON first_mdc.patient_id = p.patient_id   "
