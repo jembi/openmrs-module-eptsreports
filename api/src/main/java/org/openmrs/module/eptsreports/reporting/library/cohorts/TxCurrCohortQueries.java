@@ -2176,11 +2176,13 @@ public class TxCurrCohortQueries {
    * @param dispensationType The Type Of Dispensation Concept
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithDispensationOnLastConsultationDate(
+  public SqlCohortDefinition getPatientsWithDispensationOnLastConsultationDate(
       Concept dispensationType) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Utentes com último registo de tipo de dispensa marcado como DM");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -2231,12 +2233,14 @@ public class TxCurrCohortQueries {
    * @param states The list of MDC states
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWithTypeOfDispensationOnLastMdcRecord(
+  public SqlCohortDefinition getPatientsWithTypeOfDispensationOnLastMdcRecord(
       List<Integer> dispensationTypes, List<Integer> states) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName(
         "All active patients whose one of the MDCs is marked as “DT OR DS OR DA” with Iniciar or Continuar in the last Ficha Clinica with MDC");
+    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, String> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
@@ -2296,7 +2300,6 @@ public class TxCurrCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     cd.setQuery(stringSubstitutor.replace(query));
-    System.out.println(cd.getQuery());
 
     return cd;
   }
