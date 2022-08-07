@@ -153,6 +153,9 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureDataset extends BaseD
     obsForPersonDataDefinition.setQuestion(
         hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept());
     obsForPersonDataDefinition.setWhich(TimeQualifier.LAST);
+    obsForPersonDataDefinition.setValueCodedList(
+        Arrays.asList(
+            hivMetadata.getPartiallyRevealedConcept(), hivMetadata.getNotRevealedConcept()));
 
     return obsForPersonDataDefinition;
   }

@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -14,6 +11,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
@@ -77,16 +78,22 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
         hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
     map.put("answer", valueCoded);
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Adolescent patients with full disclosure");
+    cd.setName("Adolescent patients with disclosures filled");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     String query =
-        "SELECT p.patient_id FROM patient p "
+        "SELECT p.patient_id FROM patient p"
+            + " INNER JOIN ("
+            + " SELECT p.patient_id,MAX(e.encounter_datetime) AS encounter_datetime FROM patient p "
             + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${35} "
-            + " AND o.concept_id=${6340} AND o.value_coded= ${answer} AND e.encounter_datetime <= :endDate "
-            + " AND e.location_id=:location ";
+            + " AND o.concept_id=${6340} AND e.encounter_datetime <= :endDate "
+            + " AND e.location_id=:location GROUP BY p.patient_id) tt ON p.patient_id=tt.patient_id "
+            + " INNER JOIN encounter e1 ON p.patient_id=e1.patient_id "
+            + " INNER JOIN obs ob ON e1.encounter_id=ob.encounter_id "
+            + " WHERE tt.encounter_datetime=e1.encounter_datetime AND p.voided=0 "
+            + " AND e1.voided=0 AND ob.voided=0 AND ob.value_coded= ${answer} ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
@@ -129,12 +136,13 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     String query =
-        "SELECT p.patient_id FROM patient p "
+        "SELECT pp.patient_id FROM patient pp WHERE pp.voided=0 AND pp.patient_id NOT IN("
+            + " SELECT p.patient_id FROM patient p "
             + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${35} "
-            + " AND o.concept_id=${6340} AND o.value_coded IS NULL AND e.encounter_datetime <= :endDate "
-            + " AND e.location_id=:location ";
+            + " AND o.concept_id=${6340} AND e.encounter_datetime <= :endDate "
+            + " AND e.location_id=:location)";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
@@ -150,16 +158,23 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
         hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
     map.put("answer", valueCoded);
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Adolescent patients with full disclosure");
+    cd.setName("Adolescent patients without full disclosure");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     String query =
-        "SELECT p.patient_id FROM patient p "
+        "SELECT wfd.patient_id FROM( "
+            + " SELECT p.patient_id, MAX(e.encounter_datetime) AS encounter_datetime FROM patient p "
             + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${35} "
-            + " AND o.concept_id=${6340} AND o.value_coded NOT IN(${answer}) AND e.encounter_datetime <= :endDate "
-            + " AND e.location_id=:location ";
+            + " AND o.concept_id=${6340} AND e.encounter_datetime <= :endDate "
+            + " AND e.location_id=:location "
+            + " GROUP BY p.patient_id) wfd INNER JOIN encounter ee ON wfd.patient_id=ee.patient_id"
+            + " INNER JOIN obs ob ON ee.encounter_id=ob.encounter_id "
+            + " WHERE ee.voided=0 AND ob.voided=0 AND ee.encounter_datetime <= :endDate "
+            + " AND wfd.encounter_datetime=ee.encounter_datetime "
+            + " AND ee.encounter_type = ${35} "
+            + " AND ob.value_coded NOT IN(${answer}) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
