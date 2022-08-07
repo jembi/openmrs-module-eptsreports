@@ -101,30 +101,6 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getTotalAdolescentsCurrentlyOnArtWithDisclosures() {
-    Map<String, Integer> map = new HashMap<>();
-    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put(
-        "6340",
-        hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Adolescent patients with disclosures made");
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    String query =
-        "SELECT p.patient_id FROM patient p "
-            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${35} "
-            + " AND o.concept_id=${6340} AND o.value_coded IS NOT NULL AND e.encounter_datetime <= :endDate "
-            + " AND e.location_id=:location ";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    String replacedQuery = sb.replace(query);
-    cd.setQuery(replacedQuery);
-    return cd;
-  }
-
   public CohortDefinition getTotalAdolescentsCurrentlyOnArtWithBlankDisclosures() {
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
@@ -174,7 +150,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             + " WHERE ee.voided=0 AND ob.voided=0 AND ee.encounter_datetime <= :endDate "
             + " AND wfd.encounter_datetime=ee.encounter_datetime "
             + " AND ee.encounter_type = ${35} "
-            + " AND ob.value_coded NOT IN(${answer}) ";
+            + " AND (ob.value_coded NOT IN(${answer}) OR ob.value_coded IS NULL) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
