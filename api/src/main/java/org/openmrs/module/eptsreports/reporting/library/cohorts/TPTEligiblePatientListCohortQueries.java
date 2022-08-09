@@ -592,9 +592,9 @@ public class TPTEligiblePatientListCohortQueries {
    *       endDate-7months (210 DAYs) and endDate
    *   <li>and no other INH values (“Isoniazida” or “Isoniazida + Piridoxina”) marked on FILT in the
    *       210 DAYs prior to the INH Start Date and
-   *   <li>no Última profilaxia(concept id 23985) value coded INH(concept id 656) and Estado da
-   *       Profilaxia with the value “Inicio (I)” Data Início da Profilaxia TPT(value datetime,
-   *       concept id 6128) registered in Ficha Resumo - Mastercard (Encounter Type ID 53) in the 7
+   *   <li>no Última profilaxia(concept id 23985) value coded INH(concept id 656)
+   *       Data Início da Profilaxia TPT(value datetime, concept id 6128)
+   *       registered in Ficha Resumo - Mastercard (Encounter Type ID 53) in the 7
    *       months prior to ‘INH Start Date’
    *   <li>and no Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
    *       Profilaxia (concept id 165308) value coded Início (concept id 1256) marked on Ficha
@@ -696,22 +696,22 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                         ON ee.patient_id = pp.patient_id "
             + "                                 inner join obs oo "
             + "                                         ON oo.encounter_id = ee.encounter_id "
+            + "                                 inner join obs oo2 "
+            + "                                         ON oo2.encounter_id = ee.encounter_id "
             + "                          WHERE  ee.encounter_type = ${53} "
-            + "                                 AND ( oo.concept_id = ${6128} "
-            + "                                       AND oo.concept_id = ${23985} ) "
+            + "                                 AND ( oo.concept_id = ${23985} AND oo.value_coded = ${656} ) "
             + "                                 AND oo.voided = 0 "
             + "                                 AND ee.voided = 0 "
-            + "                                 AND oo.value_coded = ${656} "
             + "                                 AND pp.voided = 0 "
             + "                                 AND ee.location_id = :location "
             + "                                 AND first_filt.patient_id = pp.patient_id "
-            + "                                 AND oo.value_datetime IS NOT NULL "
-            + "                                 AND oo.value_datetime >= Date_sub( "
+            + "                                 AND ( oo2.concept_id = ${6128} AND oo2.value_datetime IS NOT NULL "
+            + "                                 AND oo2.value_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, interval "
             + "                                                          210 day "
             + "                                                          ) "
-            + "                                 AND oo.value_datetime < "
-            + "                                     first_filt.first_pickup_date "
+            + "                                 AND oo2.value_datetime < "
+            + "                                     first_filt.first_pickup_date ) "
             + "                          UNION "
             + "                           SELECT pp.patient_id FROM"
             + "                     patient pp"
@@ -759,11 +759,12 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                                              ) "
             + "                                 AND ee.encounter_datetime < "
             + "                                     first_filt.first_pickup_date "
-            + "GROUP  BY patient_id";
+            + "GROUP  BY patient_id) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(sb.replace(query));
+
 
     return sqlCohortDefinition;
   }
