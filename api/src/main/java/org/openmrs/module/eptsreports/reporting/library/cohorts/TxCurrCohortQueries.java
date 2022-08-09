@@ -2171,7 +2171,7 @@ public class TxCurrCohortQueries {
 
   /**
    * All active patients whose last “Tipo de Levantamento” (Concept_id = 23739) is marked as @param
-   * dispensationType (Value.code = 1098 OR 23720 OR 23888) in Ficha Clinica Mastercard
+   * dispensationType in Ficha Clinica Mastercard
    *
    * @param dispensationType The Type Of Dispensation Concept
    * @return {@link CohortDefinition}
@@ -2276,7 +2276,7 @@ public class TxCurrCohortQueries {
             + "      AND ostate.voided = 0    "
             + "      AND e.encounter_type = ${6}   "
             + "      AND otype.concept_id = ${165174}    "
-            + "      AND otype.value_coded IN (${23724}, ${23730}, ${165179}, ${165315}, ${23888}, ${23729})    "
+            + "      AND otype.value_coded IS NOT NULL "
             + "      AND ostate.concept_id = ${165322}   "
             + "      AND ostate.value_coded IS NOT NULL   "
             + "      AND otype.obs_group_id = ostate.obs_group_id   "
