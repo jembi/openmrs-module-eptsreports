@@ -277,8 +277,8 @@ public class TPTInitiationCohortQueries {
    * <blockquote>
    *
    * <p>Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id
-   * 23954) and Data Início da Profilaxia TPT(value datetime, concept id 6128) registered during the
-   * reporting period on Ficha Resumo (Encounter type 53);
+   * 23954) and Data Início da Profilaxia TPT(value datetime, concept id 6128) selected in
+   * Ficha Resumo - Mastercard (3HP Start Date) between endDate-4 months and endDate
    *
    * </blockquote>
    *
@@ -309,7 +309,8 @@ public class TPTInitiationCohortQueries {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${53} "
             + "       AND ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
-            + "       AND ( o2.concept_id = ${6128} AND o2.value_datetime BETWEEN :startDate AND :endDate ) ";
+            + "       AND ( o2.concept_id = ${6128} "
+            + "             AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 120 DAY) AND :endDate ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -323,9 +324,9 @@ public class TPTInitiationCohortQueries {
    *
    * <blockquote>
    *
-   * <p>Select all patients with Profilaxia TPT (concept id 23985) value coded 3HP (concept id
-   * 23954) and Estado da Profilaxia (concept id 165308) value coded Início (concept id 1256)
-   * registered during the reporting period on Ficha Clinica (Encounter type 6)
+   * <p>Select all patients with Profilaxia TPT (concept id 23985) value coded 3HP (concept id 23954)
+   * and Estado da Profilaxia (concept id 165308) value coded Início (concept id 1256)
+   * marked on Ficha Clínica – Mastercard (Encounter type 6) (3HP Start Date) between endDate-4 months and endDate or
    *
    * </blockquote>
    *
@@ -358,7 +359,7 @@ public class TPTInitiationCohortQueries {
             + "       AND e.encounter_type = ${6}"
             + "       AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
             + "       AND o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate ";
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 120 DAY) AND :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -373,7 +374,7 @@ public class TPTInitiationCohortQueries {
    * <blockquote>
    *
    * <p>Select all patients with Outras prescricoes(concept id 1719) value coded DT-3HP (concept id
-   * 165307) on Ficha clinica (encounter type 6) during the reporting period;
+   * 165307) marked in Ficha Clínica – Mastercard (Encounter type 6) (3HP Start Date) between endDate-4 months or
    *
    * </blockquote>
    *
@@ -405,7 +406,7 @@ public class TPTInitiationCohortQueries {
             + "       AND e.encounter_type = ${6} "
             + "       AND o.concept_id = ${1719} "
             + "       AND o.value_coded = ${165307} "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate ";
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 120 DAY) AND :endDate ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     cd.setQuery(stringSubstitutor.replace(query));
