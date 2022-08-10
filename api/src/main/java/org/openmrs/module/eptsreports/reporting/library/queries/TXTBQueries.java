@@ -99,8 +99,8 @@ public class TXTBQueries {
    * Patients with Pulmonary TB Date in Patient Clinical Record of ART date TB
    *
    * @param encounterTypeId
+   * @param otherDiagnosisConcept
    * @param pulmonaryTBConcept
-   * @param yesConcept
    * @return String
    */
   public static String pulmonaryTB(
