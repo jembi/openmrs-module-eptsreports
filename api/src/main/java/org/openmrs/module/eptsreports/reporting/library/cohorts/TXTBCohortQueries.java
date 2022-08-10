@@ -127,12 +127,16 @@ public class TXTBCohortQueries {
    *
    * <blockquote>
    *
-   * Patients with Pulmonary TB Date <b>(concept_id = 41)</b> and Positive Screening "YES"
-   * <b>(concept_id = 1065)</b> in Patient Clinical Record of ART date TB
-   *
-   * <p>Registered Ficha Resumo Mastercard <b>(encounterType_id = 53)</b> during the reporting
+   * Patients with Pulmonary TB Date in Patient Clinical Record of ART date TB
+   * (Condicoes medicas importantes – Ficha Resumo Mastercard during reporting
    * period
+   * <ul>
+   * <li>Encounter Type ID = 53</li>
+   * <li>Concept ID for Other Diagnosis = 1406</li>
+   * <li>Answer = Pulmonary TB (value_coded 42)</li>
+   * <li>Obs_datetime >= startDate and <=endDate</li>
    *
+   * </ul>
    * </blockquote>
    *
    * @return {@link CohortDefinition}

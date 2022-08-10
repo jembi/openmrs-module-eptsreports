@@ -97,6 +97,15 @@ public class TXTBQueries {
 
   /**
    * Patients with Pulmonary TB Date in Patient Clinical Record of ART date TB
+   * (Condicoes medicas importantes – Ficha Resumo Mastercard during reporting
+   * period.
+   * <ul>
+   * <li>Encounter Type ID = 53</li>
+   * <li>Concept ID for Other Diagnosis = 1406</li>
+   * <li>Answer = Pulmonary TB (value_coded 42)</li>
+   *<li>Obs_datetime >= startDate and <=endDate</li>
+   *
+   * </ul>
    *
    * @param encounterTypeId
    * @param otherDiagnosisConcept
