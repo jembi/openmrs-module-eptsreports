@@ -36,6 +36,15 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     this.hivMetadata = hivMetadata;
   }
 
+  /**
+   * All patients must be officially enrolled on ART Service at the end of the reporting period in
+   * the specified health facility. has “Processo Clínico Parte A” registered in health facility or
+   * has been enrolled in “SERVICO TARV – CUIDADO” program in health facility or has been enrolled
+   * in “SERVICO TARV – TRATAMENTO” in health facility or has a Ficha Resumo (Master Card)
+   * registered in health facility Children and Adolescent between 8 and on ART BASE COHORT
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getBaseCohortForAdolescent() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("List Children Adolescent ART Without Full Disclosure - base cohort");
@@ -55,6 +64,18 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     return cd;
   }
 
+  /**
+   * ART Start Date (Data Início Tarv) Patient’s first drugs pick up date set in Pharmacy form
+   * (FILA) by reporting end Date or Date that patient started drugs (ARV PLAN = START DRUGS) during
+   * the pharmacy or clinical visits by reporting end Date or●Patient’s first historical start drugs
+   * date set in Pharmacy Tool (FILA) or Clinical tools (Ficha de Seguimento Adulto and Ficha de
+   * Seguimento Pediatria) or Ficha Resumo - Master Card by reporting end Date or●Date that Patient
+   * was enrolled in ART Program by reporting end Date or Patient’s first drug pick-up date set on
+   * Recepção Levantou ARV – Master Card with “Levantou ARV”= “Sim” by reporting end Date The system
+   * will define the earliest date amongst all sources as the Patients ART Start Date
+   *
+   * @return CohortDefinition
+   */
   private CohortDefinition getPatientsOnART() {
     String query = commonQueries.getARTStartDate(true);
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -70,6 +91,13 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     return cd;
   }
 
+  /**
+   * Number of Children and Adolescent between 8 and 14 currently on ART with RD marked as any of
+   * “N” (Não) , “P” (Partial) “T”
+   *
+   * @param valueCoded
+   * @return CohortDefinition
+   */
   public CohortDefinition getAdolescentsCurrentlyOnArtWithDisclosures(int valueCoded) {
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
@@ -101,6 +129,11 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     return cd;
   }
 
+  /**
+   * Number of Children and Adolescent between 8 and 14 currently on ART with RD marked
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getTotalAdolescentsCurrentlyOnArtWithBlankDisclosures() {
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
@@ -126,6 +159,13 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     return cd;
   }
 
+  /**
+   * Number of Children and Adolescent between 8 and 14 currently on ART with RD Value coded value
+   * that is NOT "T" Anything else including null
+   *
+   * @param valueCoded
+   * @return
+   */
   public CohortDefinition getAdolescentsCurrentlyOnArtWithoutDisclosures(int valueCoded) {
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
