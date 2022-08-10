@@ -592,10 +592,9 @@ public class TPTEligiblePatientListCohortQueries {
    *       endDate-7months (210 DAYs) and endDate
    *   <li>and no other INH values (“Isoniazida” or “Isoniazida + Piridoxina”) marked on FILT in the
    *       210 DAYs prior to the INH Start Date and
-   *   <li>no Última profilaxia(concept id 23985) value coded INH(concept id 656)
-   *       Data Início da Profilaxia TPT(value datetime, concept id 6128)
-   *       registered in Ficha Resumo - Mastercard (Encounter Type ID 53) in the 7
-   *       months prior to ‘INH Start Date’
+   *   <li>no Última profilaxia(concept id 23985) value coded INH(concept id 656) Data Início da
+   *       Profilaxia TPT(value datetime, concept id 6128) registered in Ficha Resumo - Mastercard
+   *       (Encounter Type ID 53) in the 7 months prior to ‘INH Start Date’
    *   <li>and no Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
    *       Profilaxia (concept id 165308) value coded Início (concept id 1256) marked on Ficha
    *       Clínica - Mastercard or Ficha de Seguimento (Encounter Type ID IN 6, 9) in the 7 months
@@ -764,7 +763,6 @@ public class TPTEligiblePatientListCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(sb.replace(query));
-
 
     return sqlCohortDefinition;
   }

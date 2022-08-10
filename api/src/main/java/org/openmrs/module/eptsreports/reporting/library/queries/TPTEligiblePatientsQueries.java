@@ -337,10 +337,9 @@ public class TPTEligiblePatientsQueries {
   /**
    * <b>K. Patients IPT Start Dates as:</b>
    *
-   * <p>Y1: Select “Ultima profilaxia Isoniazida (Data Inicio)[value datetime]” (concept id 6128) or
-   * Última profilaxia(concept id 23985) value coded INH (concept id 656) and Data Início da
-   * Profilaxia TPT(value datetime, concept id 6128) from Ficha Resumo (encounter type 53) with and
-   * value datetime not null and <= end date. Or
+   * <p>Y1: Select “Ultima profilaxia Isoniazida (Data Inicio)[value datetime]” (concept id 6128)
+   * and Data Início da Profilaxia TPT(value datetime, concept id 6128) from Ficha Resumo (encounter
+   * type 53) with and value datetime not null and <= end date.
    * <li>Note: if there is more than one Ficha Resumo then information from all Ficha Resumo should
    *     be included.
    *
@@ -358,23 +357,6 @@ public class TPTEligiblePatientsQueries {
         + "       AND ee.location_id = :location "
         + "       AND oo.value_datetime IS NOT NULL "
         + "       AND oo.value_datetime <= :endDate "
-        + "UNION "
-        + "SELECT o3.value_datetime "
-        + "FROM   encounter ee "
-        + "       JOIN obs o2 "
-        + "         ON o2.encounter_id = ee.encounter_id "
-        + "       JOIN obs o3 "
-        + "         ON o3.encounter_id = ee.encounter_id "
-        + "WHERE  ee.encounter_type = ${53} "
-        + "       AND o2.voided = 0 "
-        + "       AND o3.voided = 0 "
-        + "       AND ee.voided = 0 "
-        + "       AND ee.location_id = :location "
-        + "       AND o2.concept_id = ${23985} "
-        + "       AND o2.value_coded = ${656} "
-        + "       AND o3.concept_id = ${6128} "
-        + "       AND o3.value_datetime IS NOT NULL "
-        + "       AND o3.value_datetime <= :endDate "
         + "       AND p.patient_id = ee.patient_id";
   }
 
@@ -416,28 +398,14 @@ public class TPTEligiblePatientsQueries {
   /**
    * <b>K. Patients IPT Start Dates as:</b>
    *
-   * <p>Y2: Select Encounter Datetime from Ficha clinica (encounter type 6) with “Profilaxia INH”
-   * (concept id 6122) with value code “Inicio” (concept id 1256) or Profilaxia TPT (concept id
-   * 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id 165308) value
-   * coded Início (concept id 1256) and encounter datetime <= end date. or
+   * <p>Y2: Select Encounter Datetime from Ficha clinica (encounter type 6) with Profilaxia TPT
+   * (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id
+   * 165308) value coded Início (concept id 1256) and encounter datetime <= end date. or
    *
    * @return {@link String}
    */
   public static String getY2Query() {
-    return "SELECT ee.encounter_datetime "
-        + "FROM   encounter ee "
-        + "           JOIN obs oo "
-        + "                ON oo.encounter_id = ee.encounter_id "
-        + "WHERE  ee.encounter_type = ${6} "
-        + "    AND oo.concept_id = ${6122} "
-        + "    AND oo.value_coded = ${1256} "
-        + "    AND oo.voided = 0 "
-        + "    AND ee.voided = 0 "
-        + "    AND ee.location_id = :location "
-        + "    AND ee.encounter_datetime <= :endDate "
-        + "    AND p.patient_id = ee.patient_id "
-        + "UNION "
-        + "SELECT "
+    return "SELECT "
         + "    ee.encounter_datetime "
         + "FROM "
         + "    encounter ee "
@@ -646,17 +614,14 @@ public class TPTEligiblePatientsQueries {
    * between start date and end date and:
    * <li>No other INH values [Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
    *     ‘Isoniazid + piridoxina’ (concept id in [656, 23982])] marked on FILT in the 7 months prior
-   *     to ‘INH Start Date’; and No Última profilaxia Isoniazida (Data Início) (Concept ID 6128,
-   *     value_datetime) or Última profilaxia(concept id 23985) value coded INH(concept id 656) and
-   *     Data Início da Profilaxia TPT(value datetime, concept id 6128) not null registered in Ficha
+   *     to ‘INH Start Date’; and
+   * <li>No Última profilaxia Isoniazida (Data Início) (Concept ID 6128, value_datetime) and Estado
+   *     da Profilaxia (concept id 165308) value coded Início (concept id 1256) registered in Ficha
    *     Resumo - Mastercard (Encounter Type ID 53) in the 7 months prior to ‘INH Start Date’; and
-   * <li>No Profilaxia (INH) (Concept ID 6122) with the value “I” (Início) (Concept ID 1256) or
-   *     Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia
-   *     (concept id 165308) value coded Início (concept id 1256) marked on Ficha Clínica -
-   *     Mastercard (Encounter Type ID 6) in the 7 months prior to ‘INH Start Date’; and
+   * <li>No profilaxia Isoniazida (Data Início) (Concept ID 6128, value_datetime) marked on Ficha de
+   *     Seguimento (Encounter Type ID IN 6, 9) in the 7 months prior to ‘INH Start Date’; and
    * <li>No Profilaxia com INH – TPI (Data Início) (Concept ID 6128, value_datetime) marked in Ficha
-   *     de Seguimento (Adulto e Pediatria) (Encounter Type ID 6,9) in the 7 months prior to ‘INH
-   *     Start Date’
+   *     Resumo (Encounter Type ID 53) in the 7 months prior to ‘INH Start Date’
    *
    * @return {@link String}
    */
@@ -738,10 +703,8 @@ public class TPTEligiblePatientsQueries {
         + "                              AND e.encounter_type = ${53} "
         + "                              AND ( o.concept_id = ${6128} "
         + "                                AND o.value_datetime IS NOT NULL ) "
-        + "                              AND ( o2.concept_id = ${23985} "
-        + "                                AND o2.value_coded = ${656} "
-        + "                                AND o2.value_datetime IS NOT NULL "
-        + "                                ) "
+        + "                              AND ( o2.concept_id = ${165308} "
+        + "                                AND o2.value_coded = ${1256} ) "
         + "                              AND e.encounter_datetime >= "
         + "                                  Date_sub(filt.start_date, "
         + "                                           interval 7 month) "
@@ -754,27 +717,17 @@ public class TPTEligiblePatientsQueries {
         + "                                            ON e.patient_id = p.patient_id "
         + "                                       join obs o "
         + "                                            ON o.encounter_id = e.encounter_id "
-        + "                                       join obs o2 "
-        + "                                            ON o2.encounter_id = e.encounter_id "
-        + "                                       join obs o3 "
-        + "                                            ON o3.encounter_id = e.encounter_id "
         + "                            WHERE  p.voided = 0 "
         + "                                AND o.voided = 0 "
         + "                                AND e.voided = 0 "
-        + "                                AND o2.voided = 0 "
         + "                                AND e.location_id = :location "
-        + "                                AND e.encounter_type = ${6} "
-        + "                                AND ( o.concept_id = ${6122} "
-        + "                                    AND o.value_coded = ${1256} ) "
-        + "                               OR ( ( o2.concept_id = ${23985} "
-        + "                                AND o2.value_coded = ${656} ) "
-        + "                                AND ( o3.concept_id = ${165308} "
-        + "                                    AND o3.value_coded = ${1256} ) "
-        + "                                      ) "
-        + "                                AND e.encounter_datetime >= "
+        + "                                AND e.encounter_type IN ( ${6}, ${9} ) "
+        + "                                AND o.concept_id = ${6128} "
+        + "                                AND o.value_datetime IS NOT NULL "
+        + "                                AND o.value_datetime >= "
         + "                                    Date_sub(filt.start_date, "
         + "                                             interval 7 month) "
-        + "                                AND e.encounter_datetime < "
+        + "                                AND o.value_datetime < "
         + "                                    filt.start_date "
         + "                            UNION "
         + "                            SELECT p.patient_id "
@@ -783,7 +736,7 @@ public class TPTEligiblePatientsQueries {
         + "                                            ON e.patient_id = p.patient_id "
         + "                                       join obs o "
         + "                                            ON o.encounter_id = e.encounter_id "
-        + "                            WHERE  e.encounter_type IN ( ${6}, ${9} ) "
+        + "                            WHERE  e.encounter_type = ${53} "
         + "                              AND o.concept_id = ${6128} "
         + "                              AND o.voided = 0 "
         + "                              AND e.voided = 0 "
