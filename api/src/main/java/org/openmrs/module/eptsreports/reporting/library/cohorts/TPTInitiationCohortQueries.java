@@ -278,7 +278,7 @@ public class TPTInitiationCohortQueries {
    *
    * <p>Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id
    * 23954) and Data Início da Profilaxia TPT(value datetime, concept id 6128) selected in
-   * Ficha Resumo - Mastercard (3HP Start Date) between endDate-4 months and endDate
+   * Ficha Resumo - Mastercard (Encounter type 53) (3HP Start Date) between endDate-4 months and endDate
    *
    * </blockquote>
    *
@@ -422,21 +422,22 @@ public class TPTInitiationCohortQueries {
    * <p>• Select all patients with “Regime de TPT” (concept id 23985) with value coded “3HP” or ”
    * 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento TPT”(concept ID
    * 23987) value coded “continua” or “fim” or no value(concept ID in [1257, 1267, null]) marked on
-   * the first FILT (encounter type 60) and encounter datetime between start date and end date and:
+   * the first FILT (encounter type 60) and encounter datetime between endDate – 4 months and endDate
+   * as “FILT Start Date”  and:
    *
-   * <p>◦ N1o other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
+   * <p>◦ No other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
    * id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the FILT 3HP
    * start date.  ; and
    *
    * <p>◦ No other 3HP start dates marked on Ficha clinica (encounter type 6, encounter datetime)
    * with Profilaxia TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da
    * Profilaxia  (concept id 165308) value coded Início (concept id 1256) or Outras prescrições
-   * (concept id 1719) value coded 3HP or DT-3HP (concept id in [23954,165307])in the 4 months prior
+   * (concept id 1719) value coded DT-3HP (concept id 165307) in the 4 months prior
    * to the FILT 3HP start date.  ; and
    *
    * <p>◦ No other 3HP start dates marked on Ficha Resumo (encounter type 53) with Última
-   * profilaxia(concept id 23985) value coded 3HP(concept id 23954) and Data Início da Profilaxia
-   * TPT(value datetime, concept id 6128) in the 4 months prior to the FILT 3HP start date.  ;
+   * profilaxia(concept id 23985) value coded 3HP(concept id 23954) and Data Início (value datetime)
+   * in the 4 months prior to the FILT 3HP start date.  ;
    *
    * <p>Note: The system will consider the oldest date amongst all sources as the 3HP Start Date
    *
@@ -481,7 +482,7 @@ public class TPTInitiationCohortQueries {
             + "       AND e.encounter_type = ${60} "
             + "       AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
             + "       AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1257}, ${1267} ) OR o2.value_coded IS NULL ) "
-            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 120 DAY) AND :endDate "
             + "       AND p.patient_id NOT IN ( "
             + "           SELECT p.patient_id "
             + "           FROM   patient p "
@@ -497,7 +498,7 @@ public class TPTInitiationCohortQueries {
             + "                             AND e.encounter_type = ${60} "
             + "                             AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
             + "                             AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) ) "
-            + "                             AND e.encounter_datetime BETWEEN :startDate AND :endDate) filt "
+            + "                             AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 120 DAY) AND :endDate ) filt "
             + "                             ON filt.patient_id = p.patient_id "
             + "                  WHERE  p.voided = 0 "
             + "                  AND e.voided = 0 "
@@ -505,7 +506,7 @@ public class TPTInitiationCohortQueries {
             + "                  AND e.location_id = :location "
             + "                  AND e.encounter_type = ${60} "
             + "                  AND o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) "
-            + "                  AND e.encounter_datetime >= Date_sub(filt.start_date, interval 4 month) "
+            + "                  AND e.encounter_datetime <= Date_sub(filt.start_date, interval 120 day) "
             + "                  GROUP  BY p.patient_id "
             + "           UNION "
             + "           SELECT p.patient_id "
@@ -524,22 +525,21 @@ public class TPTInitiationCohortQueries {
             + "                 AND e.encounter_type = ${60} "
             + "                 AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
             + "                 AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) ) "
-            + "                 AND e.encounter_datetime BETWEEN :startDate AND :endDate) filt "
+            + "                 AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 120 DAY) AND :endDate ) filt "
             + "                 ON filt.patient_id = p.patient_id "
             + "           WHERE  p.voided = 0 AND e.voided = 0 AND o3.voided = 0 AND o4.voided = 0 AND o5.voided = 0 "
             + "           AND e.location_id = :location "
             + "           AND e.encounter_type = ${6} "
-            + "           AND ( o3.concept_id = ${23985} AND o3.value_coded = ${23954}   "
-            + "                 AND o4.concept_id = ${165308} AND o4.value_coded = ${1256} ) "
-            + "           OR  ( o5.concept_id = ${1719} AND o5.value_coded IN ( ${23954}, ${165307} ) ) "
-            + "           AND e.encounter_datetime <= Date_sub(filt.start_date, interval 4 month) "
+            + "           AND ( ( o3.concept_id = ${23985} AND o3.value_coded = ${23954} )   "
+            + "                 AND ( o4.concept_id = ${165308} AND o4.value_coded = ${1256} ) ) "
+            + "           OR  ( o5.concept_id = ${1719} AND o5.value_coded = ${165307} ) "
+            + "           AND e.encounter_datetime <= Date_sub(filt.start_date, interval 120 day) "
             + "           GROUP  BY p.patient_id "
             + "           UNION "
             + "           SELECT p.patient_id "
             + "           FROM   patient p "
             + "           inner join encounter e ON e.patient_id = p.patient_id "
             + "           inner join obs o6 ON e.encounter_id = o6.encounter_id "
-            + "           inner join obs o7 ON e.encounter_id = o7.encounter_id "
             + "           inner join (SELECT p.patient_id, "
             + "                 Min(e.encounter_datetime) AS start_date "
             + "                 FROM   patient p "
@@ -550,13 +550,13 @@ public class TPTInitiationCohortQueries {
             + "                 AND e.encounter_type = ${60} "
             + "                 AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
             + "                 AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) ) "
-            + "                 AND e.encounter_datetime BETWEEN :startDate AND :endDate) filt "
+            + "                 AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 120 DAY) AND :endDate ) filt "
             + "                 ON filt.patient_id = p.patient_id "
-            + "           WHERE p.voided = 0 AND e.voided = 0 AND o6.voided = 0 AND o7.voided = 0 "
+            + "           WHERE p.voided = 0 AND e.voided = 0 AND o6.voided = 0 "
             + "           AND e.location_id = :location "
             + "           AND e.encounter_type = ${53} "
             + "           AND o6.concept_id = ${23985} AND o6.value_coded = ${23954} "
-            + "           AND o7.concept_id = ${6128} AND o7.value_datetime <= Date_sub(filt.start_date, interval 4 month) "
+            + "           AND o6.value_datetime <= Date_sub(filt.start_date, interval 120 day) "
             + "           GROUP BY p.patient_id) "
             + "GROUP BY p.patient_id ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
