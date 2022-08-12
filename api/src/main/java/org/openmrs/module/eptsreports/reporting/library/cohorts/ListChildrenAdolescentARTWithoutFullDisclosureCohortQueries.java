@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -14,6 +11,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
@@ -120,6 +121,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             + " INNER JOIN encounter e1 ON p.patient_id=e1.patient_id "
             + " INNER JOIN obs ob ON e1.encounter_id=ob.encounter_id "
             + " WHERE tt.encounter_datetime=e1.encounter_datetime AND p.voided=0 "
+            + " AND e1.encounter_type = ${53} AND e1.location_id=:location "
             + " AND e1.voided=0 AND ob.voided=0 AND ob.value_coded= ${answer} ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -188,7 +190,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             + " INNER JOIN obs ob ON ee.encounter_id=ob.encounter_id "
             + " WHERE ee.voided=0 AND ob.voided=0 AND ee.encounter_datetime <= :endDate "
             + " AND wfd.encounter_datetime=ee.encounter_datetime "
-            + " AND ee.encounter_type = ${35} "
+            + " AND ee.encounter_type = ${35} AND ee.location_id=:location "
             + " AND (ob.value_coded NOT IN(${answer}) OR ob.value_coded IS NULL) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
