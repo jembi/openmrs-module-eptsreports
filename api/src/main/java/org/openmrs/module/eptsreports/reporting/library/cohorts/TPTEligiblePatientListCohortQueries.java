@@ -2486,11 +2486,10 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>C: Select all patients from M and check if: The date from M is registered on Ficha
    *       Clinica - Master Card (encounter type 6) or Ficha Resumo (encounter type 53) and:
-   *   <li>The patient has at least 3 consultations (encounter type 6) with “Outras prescricoes”
-   *       (concept id 1719) with value coded equal to “3HP” (concept id 23954) or with Profilaxia
-   *       TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da Profilaxia
-   *       (concept id 165308) value coded Início/continua (concept id in [1256,1257])during 120
-   *       DAYs from the date from M.1; or
+   *   <li>The patient has at least 3 consultations (encounter type 6) with Profilaxia TPT (concept
+   *       id 23985) value coded 3HP (concept id 23954) and Estado da Profilaxia (concept id 165308)
+   *       value coded Início/continua (concept id in [1256,1257])during 120 DAYs from the date from
+   *       M.1; or
    *   <li>
    * </ul>
    *
@@ -2556,24 +2555,19 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                    ON pp.patient_id = ee.patient_id "
             + "                                  join obs oo "
             + "                                    ON oo.encounter_id = ee.encounter_id "
-            + "                               join obs o3 "
-            + "                                    ON o3.encounter_id = ee.encounter_id "
-            + "                               join obs o4 "
-            + "                                    ON o4.encounter_id = ee.encounter_id "
+            + "                               join obs o2 "
+            + "                                    ON o2.encounter_id = ee.encounter_id "
             + "                          WHERE  pp.voided = 0 "
             + "                                 AND ee.voided = 0 "
             + "                                 AND oo.voided = 0 "
-            + "                                 AND o3.voided = 0 "
-            + "                                 AND o4.voided = 0 "
+            + "                                 AND o2.voided = 0 "
             + "                                 AND p.patient_id = pp.patient_id "
             + "                                 AND ee.encounter_type = ${6} "
             + "                                 AND ee.location_id = :location "
             + "                                 AND ee.voided = 0 "
-            + "                                 AND (oo.concept_id = ${1719} "
-            + "                                 AND oo.value_coded = ${23954}) "
             + "                            AND ( "
-            + "                                (o3.concept_id = ${23985} AND o3.value_coded = ${23954}) "
-            + "                                    AND (o4.concept_id = ${165308} AND o4.value_coded IN (${1256},${1257})) "
+            + "                                (oo.concept_id = ${23985} AND oo.value_coded = ${23954}) "
+            + "                                    AND (o2.concept_id = ${165308} AND o2.value_coded IN (${1256},${1257})) "
             + "                                ) "
             + "                                 AND ee.encounter_datetime BETWEEN "
             + "                                     tabela.encounter_datetime AND "
@@ -2948,9 +2942,8 @@ public class TPTEligiblePatientListCohortQueries {
   /**
    * <B>For each M:</B>
    * <li>Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id
-   *     23954) and Data Fim da Profilaxia TPT(value datetime, concept id 6129) registered on Ficha
-   *     Resumo by end date (Encounter type 53) and with value datetime between 86 days and 365 days
-   *     from the date of M.3
+   *     23954) and Data Fim (value datetime) selected on Ficha Resumo by end date (Encounter type
+   *     53) and with value datetime between 86 days and 365 days from the date of M.3
    *
    * @return {@link CohortDefinition}
    */
@@ -2992,8 +2985,6 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                  ON p.patient_id = e.patient_id "
             + "                          inner join obs o "
             + "                                  ON e.encounter_id = o.encounter_id "
-            + "                          inner join obs o2 "
-            + "                                  ON e.encounter_id = o2.encounter_id "
             + "                          inner join ( "
             + sectionFromM.THREE.getQuery()
             + " ) "
@@ -3002,15 +2993,13 @@ public class TPTEligiblePatientListCohortQueries {
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
-            + "                          AND o2.voided = 0 "
             + "                          AND e.encounter_type = ${53} "
             + "                          AND (o.concept_id = ${23985} "
             + "                          AND o.value_coded = ${23954}) "
             + "                          AND e.location_id = :location "
             + "                          AND e.encounter_datetime <= :endDate "
-            + "                          AND ( o2.concept_id = ${6129} "
-            + "                          AND o2.value_datetime IS NOT NULL "
-            + "                          AND o2.value_datetime BETWEEN "
+            + "                          AND o.value_datetime IS NOT NULL "
+            + "                          AND o.value_datetime BETWEEN "
             + "                              Date_add(m3.encounter_datetime, "
             + "                              interval 86 day) AND "
             + "                              Date_add(m3.encounter_datetime, interval "
