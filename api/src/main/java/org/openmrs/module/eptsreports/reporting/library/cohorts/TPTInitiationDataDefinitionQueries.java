@@ -447,7 +447,6 @@ public class TPTInitiationDataDefinitionQueries {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("12 - 3HP Initiation Date On FIcha Resumo ");
-    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
@@ -466,7 +465,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
-            + "       AND o.value_datetime < CURRENT_DATE() ";
+            + "       AND o.value_datetime <= :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
