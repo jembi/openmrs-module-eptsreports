@@ -109,12 +109,12 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     pdd.addColumn(
         "last_drug_pickup_date_on_fila",
         listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndLastDrugPickUpDateOnFila(),
-        "startDate=${generationDate}, location=${location}",
+        "startDate=${generationDate},location=${location}",
         null);
     pdd.addColumn(
         "next_drug_pickup_date_on_fila",
         listOfPatientsEligibleForVLDataDefinitionQueries.getPatientsAndNextDrugPickUpDateOnFila(),
-        "startDate=${generationDate}, location=${location}",
+        "startDate=${generationDate},location=${location}",
         null);
 
     return pdd;
