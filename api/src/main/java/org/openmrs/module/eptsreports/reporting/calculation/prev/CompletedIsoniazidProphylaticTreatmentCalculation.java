@@ -959,19 +959,6 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
-      // IV
-      CalculationResultMap atLeast3FichaClínicaMastercard3HPUntil4MonthMap =
-          ePTSCalculationService.getObs(
-              c1719,
-              e6,
-              cohort,
-              location,
-              Arrays.asList(c23954),
-              TimeQualifier.ANY,
-              DateUtils.addMonths(onOrAfter, -10),
-              DateUtils.addMonths(onOrBefore, -6),
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
 
       for (Integer patientId : cohort) {
         // ipt start date section
@@ -1467,16 +1454,9 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                 3,
                 4);
 
-        List<Obs> atLeast3FichaClínicaMastercard3HPUntil4Month =
-            getObsListFromResultMap(atLeast3FichaClínicaMastercard3HPUntil4MonthMap, patientId);
-
-        int atleast3FILTS3HPMensalListMensalOccurencies =
-            evaluateOccurrence(atLeast3FichaClínicaMastercard3HPUntil4Month, first3HPDate, 3, 4);
-
         if (first3HPDate != null
             && (atleast1FILT3HPTrimestralsOccurencies1 + atleast1FILT3HPTrimestralsOccurencies2 >= 1
-                || atleast3FILTS3HPMensalOccurencies1 + atleast3FILTS3HPMensalOccurencies2 >= 3
-                || atleast3FILTS3HPMensalListMensalOccurencies >= 3)) {
+                || atleast3FILTS3HPMensalOccurencies1 + atleast3FILTS3HPMensalOccurencies2 >= 3)) {
           map.put(patientId, new BooleanResult(true, this));
         }
       }
