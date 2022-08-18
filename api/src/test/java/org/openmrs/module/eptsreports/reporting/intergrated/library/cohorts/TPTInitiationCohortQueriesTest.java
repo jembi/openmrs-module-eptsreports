@@ -90,7 +90,6 @@ public class TPTInitiationCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cd = tptInitiationCohortQueries.getPatientsWithOutrasPerscricoesDT3HP();
 
     Map<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
     parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
@@ -106,7 +105,6 @@ public class TPTInitiationCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cd = tptInitiationCohortQueries.getPatientsWithRegimeDeTPT3HP();
 
     Map<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
     parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 

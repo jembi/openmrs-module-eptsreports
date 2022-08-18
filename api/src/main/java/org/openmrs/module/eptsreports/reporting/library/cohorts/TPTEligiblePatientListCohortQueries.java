@@ -172,20 +172,20 @@ public class TPTEligiblePatientListCohortQueries {
     compositionCohortDefinition.addSearch(
         "threeHPA4",
         EptsReportUtils.map(
-            tptInitiationCohortQueries.getPatientsWithUltimaProfilaxia3hp(), mappings));
+            tptInitiationCohortQueries.getPatientsWithUltimaProfilaxia3hp(), mapping));
 
     compositionCohortDefinition.addSearch(
         "threeHPA5",
-        EptsReportUtils.map(tptInitiationCohortQueries.getPatientWithProfilaxiaTpt3hp(), mappings));
+        EptsReportUtils.map(tptInitiationCohortQueries.getPatientWithProfilaxiaTpt3hp(), mapping));
 
     compositionCohortDefinition.addSearch(
         "threeHPA6",
         EptsReportUtils.map(
-            tptInitiationCohortQueries.getPatientsWithOutrasPerscricoesDT3HP(), mappings));
+            tptInitiationCohortQueries.getPatientsWithOutrasPerscricoesDT3HP(), mapping));
 
     compositionCohortDefinition.addSearch(
         "threeHPA7",
-        EptsReportUtils.map(tptInitiationCohortQueries.getPatientsWithRegimeDeTPT3HP(), mappings));
+        EptsReportUtils.map(tptInitiationCohortQueries.getPatientsWithRegimeDeTPT3HP(), mapping));
 
     compositionCohortDefinition.addSearch(
         "IPTB1Part2", EptsReportUtils.map(getIPTB1part2(), mappings));
