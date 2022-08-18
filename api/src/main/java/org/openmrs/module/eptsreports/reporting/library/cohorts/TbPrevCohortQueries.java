@@ -664,8 +664,9 @@ public class TbPrevCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
-    String query = " SELECT patient_id FROM ( "
-        + " SELECT p.patient_id, MIN(o2.obs_datetime) "
+    String query =
+        " SELECT patient_id FROM ( "
+            + " SELECT p.patient_id, MIN(o2.obs_datetime) "
             + "FROM patient p "
             + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -691,27 +692,17 @@ public class TbPrevCohortQueries {
    * “Seguimento de Tratamento TPT” with values “Continua” or no value marked on the first pick-up
    * date on Ficha de Levantamento de TPT (FILT) during the previous reporting period (INH Start
    * Date) and
-   *
-   * <li>
-   *     No other INH values (“Isoniazida” or “Isoniazida + Piridoxina”) marked
-   *     in FILT in the 7 months prior to this FILT INH Start Date and
-   * </li>
-   *
-   * <li>
-   *     No other INH Start Dates marked in Ficha Clinica with Profilaxia TPT with the value “Isoniazida
-   *     (INH)” and Estado da Profilaxia with the value “Início (I)” in the 7 months prior to this FILT
-   *     INH Start Date and
-   * </li>
-   *
-   * <li>
-   *    No other INH Start Dates marked on Ficha de Seguimento (Profilaxia TPT with the value “Isoniazida
-   *    (INH)” with Data Início) marked n the 7 months prior to this FILT INH Start Date and
-   * </li>
-   *
-   * <li>
-   *    No other INH Start Dates marked in Ficha Rresumo (Última profilaxia TPT with value “Isoniazida
-   *    (INH)” and  Estado da Profilaxia with the value “Início (I)” ) selected in the 7 months prior to this FILT INH Start Date
-   * </li>
+   * <li>No other INH values (“Isoniazida” or “Isoniazida + Piridoxina”) marked in FILT in the 7
+   *     months prior to this FILT INH Start Date and
+   * <li>No other INH Start Dates marked in Ficha Clinica with Profilaxia TPT with the value
+   *     “Isoniazida (INH)” and Estado da Profilaxia with the value “Início (I)” in the 7 months
+   *     prior to this FILT INH Start Date and
+   * <li>No other INH Start Dates marked on Ficha de Seguimento (Profilaxia TPT with the value
+   *     “Isoniazida (INH)” with Data Início) marked n the 7 months prior to this FILT INH Start
+   *     Date and
+   * <li>No other INH Start Dates marked in Ficha Rresumo (Última profilaxia TPT with value
+   *     “Isoniazida (INH)” and Estado da Profilaxia with the value “Início (I)” ) selected in the 7
+   *     months prior to this FILT INH Start Date
    *
    * @return CohortDefinition
    */
@@ -1027,26 +1018,17 @@ public class TbPrevCohortQueries {
    * Patients who have Regime de TPT with the values “3HP or 3HP + Piridoxina” marked on the first
    * pick-up date on Ficha de Levantamento de TPT (FILT) during the previous reporting period (3HP
    * Start Date) and
-   * <ul>
-   * <li>
-   *     no Outras Prescrições with the value “3HP” marked on Ficha Clínica - Mastercard
-   * in the 4 months prior to this “FILT 3HP Start Date” and
-   * </li>
    *
-   * <li>
-   *     no other Regime de TPT with the values
-   * “3HP or 3HP + Piridoxina” marked on FILT in the 4 months prior to the 3HP Start Date and
-   * </li>
-   * <li>
-   * no other 3HP Start Dates marked on Ficha Clinica ((Profilaxia TPT with the value “3HP” and Estado
-   * da Profilaxia with the value “Inicio (I)”) or (Outras Prescrições with the value “DT-3HP”) in
-   * the 4 months prior to this FILT 3HP Start Date and
-   * </li>
-   * <li>
-   * No other 3HP Start Dates marked on Ficha
-   * Resumo (Última profilaxia TPT with value “3HP” and Data Inicio da Profilaxia TPT) in the 4
-   * months prior to this FILT 3HP Start Date
-   * </li>
+   * <ul>
+   *   <li>no Outras Prescrições with the value “3HP” marked on Ficha Clínica - Mastercard in the 4
+   *       months prior to this “FILT 3HP Start Date” and
+   *   <li>no other Regime de TPT with the values “3HP or 3HP + Piridoxina” marked on FILT in the 4
+   *       months prior to the 3HP Start Date and
+   *   <li>no other 3HP Start Dates marked on Ficha Clinica ((Profilaxia TPT with the value “3HP”
+   *       and Estado da Profilaxia with the value “Inicio (I)”) or (Outras Prescrições with the
+   *       value “DT-3HP”) in the 4 months prior to this FILT 3HP Start Date and
+   *   <li>No other 3HP Start Dates marked on Ficha Resumo (Última profilaxia TPT with value “3HP”
+   *       and Data Inicio da Profilaxia TPT) in the 4 months prior to this FILT 3HP Start Date
    * </ul>
    */
   public CohortDefinition getPatientWhoHaveRegimeTpt3HPor3HP() {
@@ -1231,9 +1213,8 @@ public class TbPrevCohortQueries {
   }
 
   /**
-   * Patients who have Última profilaxia TPT with value “Isoniazida (INH)”
-   * and Estado da profilaxia marked as inicio selected in Ficha Resumo –
-   * Mastercard within previous reporting period
+   * Patients who have Última profilaxia TPT with value “Isoniazida (INH)” and Estado da profilaxia
+   * marked as inicio selected in Ficha Resumo – Mastercard within previous reporting period
    *
    * @return CohortDefinition
    */
@@ -1285,8 +1266,8 @@ public class TbPrevCohortQueries {
 
   /**
    * Patients who have Profilaxia TPT with the value “Isoniazida (INH) and Estado da Profilaxia with
-   * the value “Inicio (I)” marked on Ficha Clínica - Mastercard or Ficha de Seguimento during the previous reporting
-   * period
+   * the value “Inicio (I)” marked on Ficha Clínica - Mastercard or Ficha de Seguimento during the
+   * previous reporting period
    *
    * @return CohortDefinition
    */
@@ -1338,8 +1319,8 @@ public class TbPrevCohortQueries {
   }
 
   /**
-   * Patients who have Última profilaxia TPT with value “3HP” and Data Inicio
-   * selected in Ficha Resumo - Mastercard during the previous reporting period (3HP Start Date)
+   * Patients who have Última profilaxia TPT with value “3HP” and Data Inicio selected in Ficha
+   * Resumo - Mastercard during the previous reporting period (3HP Start Date)
    *
    * @return CohortDefinition
    */
@@ -1359,27 +1340,27 @@ public class TbPrevCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-             "SELECT patient_id "
-                    + "FROM ( "
-                    + "         SELECT p.patient_id, MIN(o2.obs_datetime) "
-                    + "         FROM patient p "
-                    + "                  INNER JOIN encounter e ON p.patient_id = e.patient_id "
-                    + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-                    + "                  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-                    + "       WHERE p.voided = 0 "
-                    + "         AND e.voided = 0 "
-                    + "         AND o.voided = 0 "
-                    + "         AND o2.voided = 0 "
-                    + "         AND e.encounter_type = ${53} "
-                    + "         AND o.concept_id = ${23985} "
-                    + "         AND o.value_coded = ${23954} "
-                    + "         AND o2.concept_id = ${165308} "
-                    + "         AND o2.value_coded = ${1256} "
-                    + "         AND e.location_id = :location "
-                    + "         AND o2.obs_datetime >= :startDate "
-                    + "         AND o2.obs_datetime <= :endDate "
-                    + "       GROUP BY p.patient_id "
-                    + " ) 3hp_start";
+        "SELECT patient_id "
+            + "FROM ( "
+            + "         SELECT p.patient_id, MIN(o2.obs_datetime) "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "       WHERE p.voided = 0 "
+            + "         AND e.voided = 0 "
+            + "         AND o.voided = 0 "
+            + "         AND o2.voided = 0 "
+            + "         AND e.encounter_type = ${53} "
+            + "         AND o.concept_id = ${23985} "
+            + "         AND o.value_coded = ${23954} "
+            + "         AND o2.concept_id = ${165308} "
+            + "         AND o2.value_coded = ${1256} "
+            + "         AND e.location_id = :location "
+            + "         AND o2.obs_datetime >= :startDate "
+            + "         AND o2.obs_datetime <= :endDate "
+            + "       GROUP BY p.patient_id "
+            + " ) 3hp_start";
 
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
 
@@ -1411,7 +1392,7 @@ public class TbPrevCohortQueries {
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
     String query =
-          "SELECT patient_id "
+        "SELECT patient_id "
             + "FROM ( "
             + "         SELECT p.patient_id, MIN(o2.obs_datetime) "
             + "         FROM patient p "

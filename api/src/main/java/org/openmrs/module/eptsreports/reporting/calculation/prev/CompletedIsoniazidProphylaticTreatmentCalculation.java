@@ -274,54 +274,54 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
 
       /** ------ who completed IPT treatment during the reporting period--- */
       // V
-      CalculationResultMap endProfilaxiaObservations6 =
+      //      CalculationResultMap regimeTptObservations6 =
+      //          ePTSCalculationService.getObs(
+      //              c23985,
+      //              e6,
+      //              cohort,
+      //              location,
+      //              Collections.singletonList(c656),
+      //              TimeQualifier.LAST,
+      //              null,
+      //              onOrBefore,
+      //              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+      //              context);
+      CalculationResultMap endProfilaxiaStateObservations53 =
           ePTSCalculationService.getObs(
-              c6129,
-              e6,
-              cohort,
-              location,
-              null,
-              TimeQualifier.LAST,
-              null,
-              onOrBefore,
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
-      CalculationResultMap endProfilaxiaObservations53 =
-          ePTSCalculationService.getObs(
-              c6129,
+              c165308,
               e53,
               cohort,
               location,
-              null,
+              Collections.singletonList(c1267),
               TimeQualifier.LAST,
               null,
               onOrBefore,
-              EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
+              EPTSMetadataDatetimeQualifier.OBS_DATETIME,
               context);
-      CalculationResultMap endProfilaxiaObservations9 =
-          ePTSCalculationService.getObs(
-              c6129,
-              e9,
-              cohort,
-              location,
-              null,
-              TimeQualifier.LAST,
-              null,
-              onOrBefore,
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
-      CalculationResultMap notInINHDateMap5 =
-          ePTSCalculationService.getObs(
-              c23985,
-              e53,
-              cohort,
-              location,
-              null,
-              TimeQualifier.ANY,
-              null,
-              onOrBefore,
-              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-              context);
+      //      CalculationResultMap endProfilaxiaObservations9 =
+      //          ePTSCalculationService.getObs(
+      //              c6129,
+      //              e9,
+      //              cohort,
+      //              location,
+      //              null,
+      //              TimeQualifier.LAST,
+      //              null,
+      //              onOrBefore,
+      //              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+      //              context);
+      //      CalculationResultMap notInINHDateMap5 =
+      //          ePTSCalculationService.getObs(
+      //              c23985,
+      //              e53,
+      //              cohort,
+      //              location,
+      //              null,
+      //              TimeQualifier.ANY,
+      //              null,
+      //              onOrBefore,
+      //              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
+      //              context);
       CalculationResultMap lastProfilaxiaTPTWithINHOn53Map =
           ePTSCalculationService.getObs(
               c23985,
@@ -370,6 +370,19 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               onOrBefore,
               EPTSMetadataDatetimeQualifier.OBS_DATETIME,
               context);
+
+      CalculationResultMap fimEstadoProfilaxiaOn9Map =
+          ePTSCalculationService.getObs(
+              c165308,
+              e9,
+              cohort,
+              location,
+              Arrays.asList(c1267),
+              TimeQualifier.ANY,
+              null,
+              onOrBefore,
+              EPTSMetadataDatetimeQualifier.OBS_DATETIME,
+              context);
       CalculationResultMap inicioOrContinuaEstadoProfilaxiaOn6Map =
           ePTSCalculationService.getObs(
               c165308,
@@ -395,17 +408,17 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               EPTSMetadataDatetimeQualifier.OBS_DATETIME,
               context);
       // VI
-      CalculationResultMap completedDrugsObservations =
-          ePTSCalculationService.getObs(
-              c6122,
-              Arrays.asList(e6),
-              cohort,
-              Arrays.asList(location),
-              Arrays.asList(c1267),
-              TimeQualifier.LAST,
-              null,
-              completionPeriodEndDate,
-              context);
+      //      CalculationResultMap completedDrugsObservations =
+      //          ePTSCalculationService.getObs(
+      //              c6122,
+      //              Arrays.asList(e6),
+      //              cohort,
+      //              Arrays.asList(location),
+      //              Arrays.asList(c1267),
+      //              TimeQualifier.LAST,
+      //              null,
+      //              completionPeriodEndDate,
+      //              context);
 
       /** ------ with IPTStarteDate-IPTEndDate>=173days--- */
       // VI is omitted, actually is: vii.have at least 173 days apart between the IPT Start date
@@ -959,7 +972,6 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
               context);
 
-
       for (Integer patientId : cohort) {
         // ipt start date section
         Obs startProfilaxiaObs =
@@ -985,23 +997,29 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
         List<Obs> notInINHDateObs2 = getObsListFromResultMap(notInINHDateMap2, patientId);
         List<Obs> notInINHDateObs3 = getObsListFromResultMap(notInINHDateMap3, patientId);
         List<Obs> notInINHDateObs4 = getObsListFromResultMap(notInINHDateMap4, patientId);
-        List<Obs> notInINHDateObs5 = getObsListFromResultMap(notInINHDateMap5, patientId);
         List<Obs> inicioOrContinuaEstadoProfilaxiaObs6_2 =
             getObsListFromResultMap(inicioOrContinuaEstadoProfilaxiaOn6Map2, patientId);
         List<Obs> dtINHObs2 = getObsListFromResultMap(dtINHMap2, patientId);
 
-        Obs endProfilaxiaObs6 =
-            EptsCalculationUtils.obsResultForPatient(endProfilaxiaObservations6, patientId);
-        Obs endProfilaxiaObs53 =
-            EptsCalculationUtils.obsResultForPatient(endProfilaxiaObservations53, patientId);
-        Obs endProfilaxiaObs9 =
-            EptsCalculationUtils.obsResultForPatient(endProfilaxiaObservations9, patientId);
-        Obs endDrugsObs =
-            EptsCalculationUtils.obsResultForPatient(completedDrugsObservations, patientId);
+        Obs endProfilaxiaStateObs53 =
+            EptsCalculationUtils.obsResultForPatient(endProfilaxiaStateObservations53, patientId);
         Obs anyProfilaxiaTPTWithINHObs9 =
             EptsCalculationUtils.obsResultForPatient(anyProfilaxiaTPTWithINHOn9Map, patientId);
         Obs lastProfilaxiaTPTWithINHObs53 =
             EptsCalculationUtils.obsResultForPatient(lastProfilaxiaTPTWithINHOn53Map, patientId);
+
+        Obs anyProfilaxiaTPTWithINHOn6 =
+            EptsCalculationUtils.obsResultForPatient(anyProfilaxiaTPTWithINHOn6Map, patientId);
+
+        Obs fimEstadoProfilaxiaOn6 =
+            EptsCalculationUtils.obsResultForPatient(fimEstadoProfilaxiaOn6Map, patientId);
+
+        Obs anyProfilaxiaTPTWithINHOn9 =
+            EptsCalculationUtils.obsResultForPatient(anyProfilaxiaTPTWithINHOn9Map, patientId);
+
+        Obs fimEstadoProfilaxiaObs9 =
+            EptsCalculationUtils.obsResultForPatient(fimEstadoProfilaxiaOn9Map, patientId);
+
         Obs inicioOrContinuaEstadoProfilaxiaObs9 =
             EptsCalculationUtils.obsResultForPatient(
                 inicioOrContinuaEstadoProfilaxiaOn9Map, patientId);
@@ -1131,11 +1149,9 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
         Date iptEndDate =
             getMinOrMaxObsDate(
                 Arrays.asList(
-                    this.exclude(endProfilaxiaObs6, notInINHDateObs5, 0),
-                    this.exclude(endProfilaxiaObs9, notInINHDateObs5, 0),
-                    this.exclude(endProfilaxiaObs53, notInINHDateObs5, 0),
-                    this.sameEncounter(lastProfilaxiaTPTWithINHObs53, endProfilaxiaObs53),
-                    endDrugsObs,
+                    this.sameEncounter(lastProfilaxiaTPTWithINHObs53, endProfilaxiaStateObs53),
+                    this.sameEncounter(anyProfilaxiaTPTWithINHOn6, fimEstadoProfilaxiaObs6),
+                    this.sameEncounter(anyProfilaxiaTPTWithINHOn9, fimEstadoProfilaxiaObs9),
                     this.sameEncounter(anyProfilaxiaTPTWithINHObs6, fimEstadoProfilaxiaObs6),
                     this.sameEncounter(
                         anyProfilaxiaTPTWithINHObs6, inicioOrContinuaEstadoProfilaxiaObs6),
@@ -1150,8 +1166,24 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
         int viii = 0;
         if (iptStartDate != null) {
           // viii
-          viii =
-              calculateNumberOfYesAnswers(isoniazidUsageObservationsList, patientId, iptStartDate);
+          // count regimen
+          int viiia1 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(anyProfilaxiaTPTWithINHOn6Map, patientId),
+                  getObsListFromResultMap(inicioOrContinuaEstadoProfilaxiaOn6Map, patientId),
+                  iptStartDate,
+                  5,
+                  7);
+
+          int viiia2 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(anyProfilaxiaTPTWithINHOn9Map, patientId),
+                  getObsListFromResultMap(inicioOrContinuaEstadoProfilaxiaOn9Map, patientId),
+                  iptStartDate,
+                  5,
+                  7);
+
+          viii = viiia1 + viiia2;
 
           // ix
           int ixa =
