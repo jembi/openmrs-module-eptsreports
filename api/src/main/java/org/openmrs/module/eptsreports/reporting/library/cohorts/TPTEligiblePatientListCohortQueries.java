@@ -3003,7 +3003,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                              Date_add(m3.encounter_datetime, "
             + "                              interval 86 day) AND "
             + "                              Date_add(m3.encounter_datetime, interval "
-            + "                              365 day))) completed3hp "
+            + "                              365 day)) completed3hp "
             + "               ON completed3hp.patient_id = mSection.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
