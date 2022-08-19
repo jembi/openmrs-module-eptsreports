@@ -11,14 +11,6 @@
  */
 package org.openmrs.module.eptsreports.reporting.calculation.generic;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -39,6 +31,8 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 /**
  * Patients Newly Enrolled on ART: The patients from TB_PREV_DENOMINATOR (2 AND 3) who falls under
@@ -383,7 +377,8 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         Obs fichaClinicaMasterCardStartDrugsObs =
             EptsCalculationUtils.resultForPatient(startDrugsObservations, patientId);
         Obs firstINHDateObs = EptsCalculationUtils.obsResultForPatient(firstINHDateMap, patientId);
-        List<Obs> lastINHDateObsList = getObsListFromResultMap(lastINHDateMap, patientId);
+        Obs lastINHDateObservation =
+            EptsCalculationUtils.obsResultForPatient(lastINHDateMap, patientId);
         Obs firstINHDateObs2 =
             EptsCalculationUtils.obsResultForPatient(firstINHDateMap2, patientId);
         Obs firstINHDateObs3 =
@@ -412,7 +407,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
         if ((seguimentoOrFichaResumo == null
                 && fichaClinicaMasterCardStartDrugsObs == null
                 && firstINHDateObs == null
-                && lastINHDateObsList == null
+                && lastINHDateObservation == null
                 && anyINHDateObsList == null
                 && anyINHDateObsList2 == null
                 && anyIsoniazida == null
@@ -436,10 +431,8 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
           anyIsoniazidaaa = anyIsoniazida.get(0);
         }
         Obs lastINHDateObs = null;
-        if (lastINHDateObsList != null
-            && !lastINHDateObsList.isEmpty()
-            && lastINHDateObsList.size() > 0) {
-          lastINHDateObs = lastINHDateObsList.get(0);
+        if (lastINHDateObservation != null) {
+          lastINHDateObs = lastINHDateObservation;
         }
         Obs anyINHDateObs = null;
         if (anyINHDateObsList != null
