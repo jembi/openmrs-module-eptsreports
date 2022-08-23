@@ -2164,6 +2164,22 @@
 			REVELADO
 		</description>
 	</globalProperty>
+	<!-- 6338 -->
+	<globalProperty>
+		<property>eptsreports.partiallyRevealedConcept</property>
+		<defaultValue>63e43b2f-801f-412b-87bb-45db8e0ad21b</defaultValue>
+		<description>
+			PARTIALLY REVEALED
+		</description>
+	</globalProperty>
+	<!-- 6339 -->
+	<globalProperty>
+		<property>eptsreports.notRevealedConcept</property>
+		<defaultValue>8279b6c1-572d-428c-be45-96e05fe6165d</defaultValue>
+		<description>
+			NOT REVEALED OR UNTOLD
+		</description>
+	</globalProperty>
 
 	<!-- 6340 -->
 	<globalProperty>
@@ -3301,6 +3317,14 @@
 		<defaultValue>bcedb8c1-f1d9-48c2-bfe3-9401950f1c16</defaultValue>
 		<description>
 			UUID for DESCENTRALIZED ARV DISPENSATION Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.annualArvDispensationConceptUuid</property>
+		<defaultValue>018ba584-3158-4075-82f7-c84c51f5085c</defaultValue>
+		<description>
+			UUID for ANNUAL ARV DISPENSATION Concept
 		</description>
 	</globalProperty>
 
