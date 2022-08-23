@@ -565,7 +565,7 @@ public class TPTEligiblePatientListCohortQueries {
    *       23985) value coded ‘Isoniazid’ or ‘Isoniazid + piridoxina’ (concept id in [656, 23982])
    *       and “Seguimento de Tratamento TPT” (concept ID 23987) with values “Continua” (concept ID
    *       1257) or no value(null) or concept 23987 does not exist and encounter datetime between
-   *       endDate-7months (210 DAYs) and endDate
+   *       endDate-7months and endDate
    *   <li>and no other INH values (“Isoniazida” or “Isoniazida + Piridoxina”) marked on FILT in the
    *       210 DAYs prior to the INH Start Date and
    *   <li>no Última profilaxia(concept id 23985) value coded INH(concept id 656) Data Início da
@@ -641,7 +641,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                                      AND oo.concept_id = ${23987}) "
             + "                   ) "
             + "               AND e.encounter_datetime BETWEEN Date_sub(:endDate, "
-            + "                                                interval 210 day) "
+            + "                                                interval 7 month) "
             + "                                                AND :endDate "
             + "        GROUP  BY p.patient_id) first_filt "
             + "WHERE  patient_id NOT IN (SELECT pp.patient_id "
@@ -660,7 +660,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                 AND oo.value_coded IN ( ${656}, ${23982} ) "
             + "                                 AND ee.encounter_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, "
-            + "                                                              interval 210 day "
+            + "                                                              interval 7 month "
             + "                                                              ) "
             + "                                 AND ee.encounter_datetime < "
             + "                                     first_filt.first_pickup_date "
@@ -683,7 +683,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                 AND ( oo2.concept_id = ${6128} AND oo2.value_datetime IS NOT NULL "
             + "                                 AND oo2.value_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, interval "
-            + "                                                          210 day "
+            + "                                                          7 month "
             + "                                                          ) "
             + "                                 AND oo2.value_datetime < "
             + "                                     first_filt.first_pickup_date ) "
@@ -707,7 +707,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                   AND (o3.concept_id = ${6128} AND o3.value_datetime IS NOT NULL "
             + "                     AND o3.value_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, "
-            + "                                                              interval 210 day "
+            + "                                                              interval 7 month "
             + "                                                              ) "
             + "                                 AND o3.value_datetime < "
             + "                                     first_filt.first_pickup_date ) "
@@ -730,7 +730,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                       AND oo.value_coded = ${656} ) "
             + "                                 AND ee.encounter_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, "
-            + "                                                              interval 210 day "
+            + "                                                              interval 7 month "
             + "                                                              ) "
             + "                                 AND ee.encounter_datetime < "
             + "                                     first_filt.first_pickup_date "
