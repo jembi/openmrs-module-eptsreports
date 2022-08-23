@@ -273,19 +273,7 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               context);
 
       /** ------ who completed IPT treatment during the reporting period--- */
-      // V
-      //      CalculationResultMap regimeTptObservations6 =
-      //          ePTSCalculationService.getObs(
-      //              c23985,
-      //              e6,
-      //              cohort,
-      //              location,
-      //              Collections.singletonList(c656),
-      //              TimeQualifier.LAST,
-      //              null,
-      //              onOrBefore,
-      //              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-      //              context);
+
       CalculationResultMap endProfilaxiaStateObservations53 =
           ePTSCalculationService.getObs(
               c165308,
@@ -298,30 +286,6 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               onOrBefore,
               EPTSMetadataDatetimeQualifier.OBS_DATETIME,
               context);
-      //      CalculationResultMap endProfilaxiaObservations9 =
-      //          ePTSCalculationService.getObs(
-      //              c6129,
-      //              e9,
-      //              cohort,
-      //              location,
-      //              null,
-      //              TimeQualifier.LAST,
-      //              null,
-      //              onOrBefore,
-      //              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-      //              context);
-      //      CalculationResultMap notInINHDateMap5 =
-      //          ePTSCalculationService.getObs(
-      //              c23985,
-      //              e53,
-      //              cohort,
-      //              location,
-      //              null,
-      //              TimeQualifier.ANY,
-      //              null,
-      //              onOrBefore,
-      //              EPTSMetadataDatetimeQualifier.ENCOUNTER_DATETIME,
-      //              context);
       CalculationResultMap lastProfilaxiaTPTWithINHOn53Map =
           ePTSCalculationService.getObs(
               c23985,
@@ -407,18 +371,6 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               onOrBefore,
               EPTSMetadataDatetimeQualifier.OBS_DATETIME,
               context);
-      // VI
-      //      CalculationResultMap completedDrugsObservations =
-      //          ePTSCalculationService.getObs(
-      //              c6122,
-      //              Arrays.asList(e6),
-      //              cohort,
-      //              Arrays.asList(location),
-      //              Arrays.asList(c1267),
-      //              TimeQualifier.LAST,
-      //              null,
-      //              completionPeriodEndDate,
-      //              context);
 
       /** ------ with IPTStarteDate-IPTEndDate>=173days--- */
       // VI is omitted, actually is: vii.have at least 173 days apart between the IPT Start date
