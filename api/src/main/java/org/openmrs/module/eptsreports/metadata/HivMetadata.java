@@ -4816,4 +4816,65 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.mdcStateConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165315</b>
+   *
+   * <p><b>Name:</b> DESCENTRALIZED ARV DISPENSATION
+   *
+   * <p><b>Description:</b> DESCENTRALIZED ARV DISPENSATION Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getDescentralizedArvDispensationConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.descentralizedArvDispensationConceptUuid");
+    return getConcept(uuid);
+  }
+  /**
+   * <b>concept_id = 6338</b>
+   *
+   * <p><b>Name:</b> PARTIALLY REVEALED
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getPartiallyRevealedConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.partiallyRevealedConcept");
+    return getConcept(uuid);
+  }
+  /**
+   * <b>concept_id = 6339</b>
+   *
+   * <p><b>Name:</b> NOT REVEALED
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNotRevealedConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.notRevealedConcept");
+
+    return getConcept(uuid);
+  }
+  /**
+   * <b>concept_id = 165314</b>
+   *
+   * <p><b>Name:</b> ANNUAL ARV DISPENSATION
+   *
+   * <p><b>Description:</b> ANNUAL ARV DISPENSATION Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getAnnualArvDispensationConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.annualArvDispensationConceptUuid");
+    return getConcept(uuid);
+  }
 }

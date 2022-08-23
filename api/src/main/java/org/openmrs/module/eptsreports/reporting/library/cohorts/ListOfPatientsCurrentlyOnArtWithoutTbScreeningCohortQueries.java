@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,10 +16,6 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
@@ -332,6 +331,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "       AND o.concept_id = ${23866} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
@@ -377,6 +377,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "       AND o.concept_id = ${23866} "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(valuesMap);
@@ -478,6 +479,7 @@ public class ListOfPatientsCurrentlyOnArtWithoutTbScreeningCohortQueries {
             + "                                 AND o.concept_id = ${165174} "
             + "                                 AND e.voided = 0 "
             + "                                 AND p.voided = 0 "
+            + "                                 AND o.voided = 0 "
             + "                          GROUP  BY p.patient_id) most_recent "
             + "                      ON most_recent.patient_id = p.patient_id "
             + "       WHERE  e.encounter_datetime = most_recent.consultation_date "

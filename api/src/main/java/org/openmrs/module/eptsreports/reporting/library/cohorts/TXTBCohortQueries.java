@@ -100,7 +100,7 @@ public class TXTBCohortQueries {
             "markedAsTratamentoTBInicio",
             TXTBQueries.markedAsTratamentoTBInicio(
                 hivMetadata.getAdultoSeguimentoEncounterType().getId(),
-                hivMetadata.getMasterCardEncounterType().getId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getId(),
                 tbMetadata.getTBTreatmentPlanConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId()));
     addGeneralParameters(definition);
@@ -127,11 +127,15 @@ public class TXTBCohortQueries {
    *
    * <blockquote>
    *
-   * Patients with Pulmonary TB Date <b>(concept_id = 41)</b> and Positive Screening "YES"
-   * <b>(concept_id = 1065)</b> in Patient Clinical Record of ART date TB
+   * Patients with Pulmonary TB Date in Patient Clinical Record of ART date TB (Condicoes medicas
+   * importantes – Ficha Resumo Mastercard during reporting period
    *
-   * <p>Registered Ficha Resumo Mastercard <b>(encounterType_id = 53)</b> during the reporting
-   * period
+   * <ul>
+   *   <li>Encounter Type ID = 53
+   *   <li>Concept ID for Other Diagnosis = 1406
+   *   <li>Answer = Pulmonary TB (value_coded 42)
+   *   <li>Obs_datetime >= startDate and <=endDate
+   * </ul>
    *
    * </blockquote>
    *
@@ -143,8 +147,8 @@ public class TXTBCohortQueries {
             "PULMONARYTB",
             TXTBQueries.pulmonaryTB(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                tbMetadata.getPulmonaryTB().getConceptId(),
-                commonMetadata.getYesConcept().getConceptId()));
+                hivMetadata.getOtherDiagnosis().getConceptId(),
+                tbMetadata.getPulmonaryTB().getConceptId()));
     addGeneralParameters(cd);
     return cd;
   }
