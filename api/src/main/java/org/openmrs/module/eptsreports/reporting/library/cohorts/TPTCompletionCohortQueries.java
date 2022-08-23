@@ -37,7 +37,6 @@ public class TPTCompletionCohortQueries {
   private TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries;
 
   private final TPTInitiationCohortQueries tptInitiationCohortQueries;
-  // final significa o que?
   @Autowired
   public TPTCompletionCohortQueries(
       HivMetadata hivMetadata,
@@ -46,7 +45,7 @@ public class TPTCompletionCohortQueries {
       TxCurrCohortQueries txCurrCohortQueries,
       TXTBCohortQueries txTbCohortQueries,
       GenericCohortQueries genericCohortQueries,
-      TPTEligiblePatientListCohortQueries tptElEssigiblePatientListCohortQueries,
+      TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries,
       TPTInitiationCohortQueries tptInitiationCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;

@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -20,6 +17,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class TPTEligiblePatientListCohortQueries {
@@ -852,7 +853,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                 inner join obs oo "
             + "                                         ON oo.encounter_id = ee.encounter_id "
             + "                          WHERE  ee.encounter_type IN ( ${6}, ${9} ) "
-            + "                                 AND oo.concept_id = 6128 "
+            + "                                 AND oo.concept_id = ${6128} "
             + "                                 AND oo.voided = 0 "
             + "                                 AND ee.voided = 0 "
             + "                                 AND pp.voided = 0 "
