@@ -80,7 +80,6 @@ public class TPTEligiblePatientListCohortQueries {
         EptsReportUtils.map(
             getINHStartA1(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
@@ -447,16 +446,14 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>A1.2: Select all patients with Ficha Resumo (encounter type 53) with Última
    *       profilaxia(concept id 23985) value coded INH(concept id 656) and Estado da Profilaxia
-   *       (concept id 165308) value coded Início (concept id 1256) and Data Início da Profilaxia
-   *       TPT(value datetime, concept id 6128) not null and value datetime not null and between
-   *       endDate-7months (210 days) and endDate.
+   *       (concept id 165308) value coded Início (concept id 1256)  and
+   *       obs_datetime for Estado da profilaxia (concept_id = 165308) between endDate-7months and endDate.
    * </ul>
    *
    * @return CohortDefinition
    */
   public CohortDefinition getINHStartA1(
       int masterCardEncounterType,
-      int dataInicioProfilaxiaIsoniazidaConcept,
       int regimenTpt,
       int inhRpt,
       int isoniazidConcept,
@@ -470,7 +467,6 @@ public class TPTEligiblePatientListCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("53", masterCardEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
     map.put("23985", regimenTpt);
     map.put("23954", inhRpt);
     map.put("656", isoniazidConcept);
@@ -483,19 +479,16 @@ public class TPTEligiblePatientListCohortQueries {
             + "                         INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                         INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "                         INNER JOIN obs o3 ON e.encounter_id = o3.encounter_id "
             + "                 WHERE "
             + "                         p.voided = 0 "
             + "                   AND e.voided = 0 "
             + "                   AND o.voided = 0 "
             + "                   AND o2.voided = 0 "
-            + "                   AND o3.voided = 0 "
             + "                   AND e.encounter_type = ${53} "
             + "                   AND e.location_id = :location "
             + "                   AND (o.concept_id = ${23985} AND o.value_coded = ${656}) "
-            + "                   AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256}) "
-            + "                   AND (o3.concept_id = ${6128} AND o3.value_datetime IS NOT NULL "
-            + "                     AND o3.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate) ";
+            + "                   AND ( (o2.concept_id = ${165308} AND o2.value_coded = ${1256}) "
+            + "                     AND (o2.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 7 MONTH) AND :endDate) ) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
