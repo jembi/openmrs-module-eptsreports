@@ -273,7 +273,6 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
               context);
 
       /** ------ who completed IPT treatment during the reporting period--- */
-
       CalculationResultMap endProfilaxiaStateObservations53 =
           ePTSCalculationService.getObs(
               c165308,
@@ -1408,42 +1407,44 @@ public class CompletedIsoniazidProphylaticTreatmentCalculation extends AbstractP
                 Priority.MIN,
                 false);
 
-        int atleast1FILT3HPTrimestralsOccurencies1 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atleast1FILT3HPTrimestralMa1, patientId),
-                getObsListFromResultMap(atleast1FILT3HPTrimestralMa2, patientId),
-                first3HPDate,
-                1,
-                4);
+        if (first3HPDate != null) {
 
-        int atleast1FILT3HPTrimestralsOccurencies2 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atleast1FILT3HPTrimestralMa3, patientId),
-                getObsListFromResultMap(atleast1FILT3HPTrimestralMa4, patientId),
-                first3HPDate,
-                1,
-                4);
+          int atleast1FILT3HPTrimestralsOccurencies1 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atleast1FILT3HPTrimestralMa1, patientId),
+                  getObsListFromResultMap(atleast1FILT3HPTrimestralMa2, patientId),
+                  first3HPDate,
+                  1,
+                  4);
 
-        int atleast3FILTS3HPMensalOccurencies1 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atleast3FILTS3HPMensal1, patientId),
-                getObsListFromResultMap(atleast3FILTS3HPMensal2, patientId),
-                first3HPDate,
-                3,
-                4);
+          int atleast1FILT3HPTrimestralsOccurencies2 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atleast1FILT3HPTrimestralMa3, patientId),
+                  getObsListFromResultMap(atleast1FILT3HPTrimestralMa4, patientId),
+                  first3HPDate,
+                  1,
+                  4);
 
-        int atleast3FILTS3HPMensalOccurencies2 =
-            evaluateOccurrence(
-                getObsListFromResultMap(atleast3FILTS3HPMensal3, patientId),
-                getObsListFromResultMap(atleast3FILTS3HPMensal4, patientId),
-                first3HPDate,
-                3,
-                4);
+          int atleast3FILTS3HPMensalOccurencies1 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atleast3FILTS3HPMensal1, patientId),
+                  getObsListFromResultMap(atleast3FILTS3HPMensal2, patientId),
+                  first3HPDate,
+                  3,
+                  4);
 
-        if (first3HPDate != null
-            && (atleast1FILT3HPTrimestralsOccurencies1 + atleast1FILT3HPTrimestralsOccurencies2 >= 1
-                || atleast3FILTS3HPMensalOccurencies1 + atleast3FILTS3HPMensalOccurencies2 >= 3)) {
-          map.put(patientId, new BooleanResult(true, this));
+          int atleast3FILTS3HPMensalOccurencies2 =
+              evaluateOccurrence(
+                  getObsListFromResultMap(atleast3FILTS3HPMensal3, patientId),
+                  getObsListFromResultMap(atleast3FILTS3HPMensal4, patientId),
+                  first3HPDate,
+                  3,
+                  4);
+
+          if (atleast1FILT3HPTrimestralsOccurencies1 + atleast1FILT3HPTrimestralsOccurencies2 >= 1
+              || atleast3FILTS3HPMensalOccurencies1 + atleast3FILTS3HPMensalOccurencies2 >= 3) {
+            map.put(patientId, new BooleanResult(true, this));
+          }
         }
       }
       return map;
