@@ -136,7 +136,7 @@ public class TbPrevCohortQueries {
         "last-profilaxia-tpt-inh",
         EptsReportUtils.map(
             getPatientsWhoHaveLastProfilaxiaTPTWithINH(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "initiated-profilaxia",
         EptsReportUtils.map(
@@ -146,22 +146,24 @@ public class TbPrevCohortQueries {
         "profilaxia-tpt-inh-marked-inicio",
         EptsReportUtils.map(
             getPatientsWhoHaveProfilaxiaTPTWithINHAndAreMarkedAsInicio(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "profilaxia-tpt-3hp-inicio-ficha-resumo",
         EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWith3HPAndDataInicioOnFichaResumo(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            getPatientsWhoHaveProfilaxiaTPTWith3HPOnFichaResumoOrClinica(
+                hivMetadata.getMasterCardEncounterType()),
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "profilaxia-tpt-3hp-marked-inicio",
         EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWith3HPAndAreMarkedAsInicio(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            getPatientsWhoHaveProfilaxiaTPTWith3HPOnFichaResumoOrClinica(
+                hivMetadata.getAdultoSeguimentoEncounterType()),
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "outras-prescricoes-with-dt-3hp-on-ficha-clinica",
         EptsReportUtils.map(
             getPatientsWhoHaveOutrasPrescricoesWithDT3HPOnFichaClinica(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "transferred-out",
         EptsReportUtils.map(
@@ -257,7 +259,7 @@ public class TbPrevCohortQueries {
         "last-profilaxia-tpt-inh",
         EptsReportUtils.map(
             getPatientsWhoHaveLastProfilaxiaTPTWithINH(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "initiated-profilaxia",
         EptsReportUtils.map(
@@ -267,22 +269,24 @@ public class TbPrevCohortQueries {
         "profilaxia-tpt-inh-marked-inicio",
         EptsReportUtils.map(
             getPatientsWhoHaveProfilaxiaTPTWithINHAndAreMarkedAsInicio(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "profilaxia-tpt-3hp-inicio-ficha-resumo",
         EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWith3HPAndDataInicioOnFichaResumo(),
+            getPatientsWhoHaveProfilaxiaTPTWith3HPOnFichaResumoOrClinica(
+                hivMetadata.getMasterCardEncounterType()),
             "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
     definition.addSearch(
         "profilaxia-tpt-3hp-marked-inicio",
         EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWith3HPAndAreMarkedAsInicio(),
+            getPatientsWhoHaveProfilaxiaTPTWith3HPOnFichaResumoOrClinica(
+                hivMetadata.getAdultoSeguimentoEncounterType()),
             "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
     definition.addSearch(
         "outras-prescricoes-with-dt-3hp-on-ficha-clinica",
         EptsReportUtils.map(
             getPatientsWhoHaveOutrasPrescricoesWithDT3HPOnFichaClinica(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "transferred-out",
         EptsReportUtils.map(
@@ -1008,6 +1012,18 @@ public class TbPrevCohortQueries {
     return cd;
   }
 
+  /**
+   * Patients who have Regime de TPT with the values “3HP or 3HP + Piridoxina” and “Seguimento de
+   * tratamento TPT” = (‘Início’ or ‘Re-Início’) marked in Ficha de Levantamento de TPT (FILT)
+   * during the previous reporting period (3HP Start Date)
+   *
+   * <p>Encounter type = 60 RegimeTPT (Concept 23985) = 3HP (Concept 23954) or “3HP + Piridoxina”
+   * (Concept 23984) and Seguimento de tratamento TPT (concept ID 23987) = “inicio” or
+   * “re-inicio”(concept ID in [1256, 1705]) Obs datetime(First3HPDate) >= startdate – 6 months and
+   * <= enddate – 6 months
+   *
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getPatientWhoHaveRegimeTpt3HP() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -1021,14 +1037,13 @@ public class TbPrevCohortQueries {
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
     valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
-    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
     valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-        " SELECT p.patient_id "
+        " SELECT patient_id FROM (SELECT p.patient_id, MIN(o2.obs_datetime) "
             + " FROM patient p "
             + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1041,7 +1056,7 @@ public class TbPrevCohortQueries {
             + "  AND e.encounter_type = ${60} "
             + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${23954}, ${23984})) "
             + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256}, ${1705})) "
-            + "  AND e.encounter_datetime >= :onOrAfter AND encounter_datetime <= :onOrBefore ";
+            + "  AND o2.obs_datetime >= :onOrAfter AND o2.obs_datetime <= :onOrBefore GROUP BY p.patient_id) regime_3hp ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -1050,15 +1065,15 @@ public class TbPrevCohortQueries {
   }
 
   /**
-   * Patients who have Regime de TPT with the values “3HP or 3HP + Piridoxina” marked on the first
-   * pick-up date on Ficha de Levantamento de TPT (FILT) during the previous reporting period (3HP
-   * Start Date) and
+   * Patients who have Regime de TPT with the values “3HP or 3HP + Piridoxina” and “Seguimento de
+   * Tratamento TPT” with values “Continua” or “Fim” or no value marked on the first pick-up date on
+   * Ficha de Levantamento de TPT (FILT) during the previous reporting period (3HP Start Date) and
    *
    * <ul>
-   *   <li>no Outras Prescrições with the value “3HP” marked on Ficha Clínica - Mastercard in the 4
-   *       months prior to this “FILT 3HP Start Date” and
    *   <li>no other Regime de TPT with the values “3HP or 3HP + Piridoxina” marked on FILT in the 4
    *       months prior to the 3HP Start Date and
+   *   <li>no Outras Prescrições with the value “3HP” marked on Ficha Clínica - Mastercard in the 4
+   *       months prior to this “FILT 3HP Start Date” and
    *   <li>no other 3HP Start Dates marked on Ficha Clinica ((Profilaxia TPT with the value “3HP”
    *       and Estado da Profilaxia with the value “Inicio (I)”) or (Outras Prescrições with the
    *       value “DT-3HP”) in the 4 months prior to this FILT 3HP Start Date and
@@ -1088,16 +1103,18 @@ public class TbPrevCohortQueries {
     valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
         " SELECT DISTINCT p.patient_id "
             + " FROM  patient p "
             + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "          INNER JOIN (SELECT  p.patient_id, MIN(o.obs_datetime) first_pickup_date "
+            + "          INNER JOIN (SELECT  p.patient_id, MIN(o2.obs_datetime) first_pickup_date "
             + "                      FROM    patient p "
             + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "                      WHERE   p.voided = 0 "
             + "                        AND e.voided = 0 "
             + "                        AND o.voided = 0 "
@@ -1105,9 +1122,29 @@ public class TbPrevCohortQueries {
             + "                        AND e.encounter_type = ${60} "
             + "                        AND o.concept_id = ${23985} "
             + "                        AND o.value_coded IN (${23954},${23984}) "
-            + "                        AND o.obs_datetime >= :onOrAfter "
-            + "                        AND o.obs_datetime <= :onOrBefore "
-            + "                      GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
+            + "                        AND ((o2.concept_id =${23987} AND o2.value_coded IN (${1257},${1267})) OR o2.concept_id IS NULL) "
+            + "                        AND o2.obs_datetime >= :onOrAfter "
+            + "                        AND o2.obs_datetime <= :onOrBefore "
+            + "                      GROUP BY p.patient_id "
+            + "                      UNION "
+            + "                      SELECT  p.patient_id, MIN(o2.obs_datetime) first_pickup_date "
+            + "                      FROM    patient p "
+            + "                                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                      WHERE   p.voided = 0 "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.voided = 0 "
+            + "                        AND o2.voided = 0 "
+            + "                        AND e.location_id = :location "
+            + "                        AND e.encounter_type = ${60} "
+            + "                        AND (o.concept_id = ${23985} AND o.value_coded IN (${1257},${1267})) "
+            + "                        AND (o2.concept_id NOT IN (SELECT o.concept_id FROM encounter e "
+            + "                                                      INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                                   WHERE e.patient_id = p.patient_id AND e.encounter_type = ${60} AND  o.concept_id = ${23987})) "
+            + "                        AND o2.obs_datetime >= :onOrAfter "
+            + "                        AND o2.obs_datetime <= :onOrBefore "
+            + "                      GROUP BY p.patient_id ) AS inh  on inh.patient_id = p.patient_id "
             + " WHERE p.voided = 0 "
             + "  and e.voided = 0 "
             + "  and o.voided = 0 "
@@ -1147,20 +1184,8 @@ public class TbPrevCohortQueries {
             + "                                   INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                                   INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "                                   INNER JOIN ( "
-            + "                                       SELECT  p.patient_id, MIN(o.obs_datetime) first_pickup_date "
-            + "                                       FROM    patient p "
-            + "                                           INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                           INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                                       WHERE   p.voided = 0 "
-            + "                                         AND e.voided = 0 "
-            + "                                         AND o.voided = 0 "
-            + "                                         AND e.location_id = :location "
-            + "                                         AND e.encounter_type = ${60} "
-            + "                                         AND o.concept_id = ${23985} "
-            + "                                         AND o.value_coded IN (${23954},${23984}) "
-            + "                                         AND o.obs_datetime >= :onOrAfter "
-            + "                                         AND o.obs_datetime <= :onOrBefore "
-            + "                                       GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
+            + TbPrevQueries.regimeTPT3hpOr3hpPiridoxinaQuery()
+            + " ) AS inh  on inh.patient_id = p.patient_id "
             + "                               WHERE p.voided = 0 "
             + "                                 AND e.voided = 0 "
             + "                                 AND o.voided = 0 "
@@ -1181,20 +1206,8 @@ public class TbPrevCohortQueries {
             + "                                        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                                        INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "                                        INNER JOIN ( "
-            + "                                   SELECT  p.patient_id, MIN(o.obs_datetime) first_pickup_date "
-            + "                                   FROM    patient p "
-            + "                                               INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                                   WHERE   p.voided = 0 "
-            + "                                     AND e.voided = 0 "
-            + "                                     AND o.voided = 0 "
-            + "                                     AND e.location_id = :location "
-            + "                                     AND e.encounter_type = ${60} "
-            + "                                     AND o.concept_id = ${23985} "
-            + "                                     AND o.value_coded IN (${23954},${23984}) "
-            + "                                     AND o.obs_datetime >= :onOrAfter "
-            + "                                     AND o.obs_datetime <= :onOrBefore "
-            + "                                   GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
+            + TbPrevQueries.regimeTPT3hpOr3hpPiridoxinaQuery()
+            + " ) AS inh  on inh.patient_id = p.patient_id "
             + "                               WHERE p.voided = 0 "
             + "                                 AND e.voided = 0 "
             + "                                 AND o.voided = 0 "
@@ -1216,20 +1229,8 @@ public class TbPrevCohortQueries {
             + "                                        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                                        INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
             + "                                        INNER JOIN ( "
-            + "                                   SELECT  p.patient_id, MIN(o.obs_datetime) first_pickup_date "
-            + "                                   FROM    patient p "
-            + "                                               INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                               INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                                   WHERE   p.voided = 0 "
-            + "                                     AND e.voided = 0 "
-            + "                                     AND o.voided = 0 "
-            + "                                     AND e.location_id = :location "
-            + "                                     AND e.encounter_type = ${60} "
-            + "                                     AND o.concept_id = ${23985} "
-            + "                                     AND o.value_coded IN (${23954},${23984}) "
-            + "                                     AND o.obs_datetime >= :onOrAfter "
-            + "                                     AND o.obs_datetime <= :onOrBefore "
-            + "                                   GROUP BY p.patient_id) AS inh  on inh.patient_id = p.patient_id "
+            + TbPrevQueries.regimeTPT3hpOr3hpPiridoxinaQuery()
+            + " ) AS inh  on inh.patient_id = p.patient_id "
             + "                               WHERE p.voided = 0 "
             + "                                 AND e.voided = 0 "
             + "                                 AND o.voided = 0 "
@@ -1257,7 +1258,7 @@ public class TbPrevCohortQueries {
   public CohortDefinition getPatientsWhoHaveLastProfilaxiaTPTWithINH() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
-        "Última profilaxia TPT with value “3HP” and Estado da Profilaxia with the value Início (I) ");
+        "Última profilaxia TPT with value “Isoniazida (INH)” and Estado da Profilaxia with the value Início (I) ");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -1355,73 +1356,27 @@ public class TbPrevCohortQueries {
   }
 
   /**
-   * Patients who have Última profilaxia TPT with value “3HP” and Data Inicio selected in Ficha
+   * <b>Query to implement both specs</b>
+   *
+   * <p>Patients who have Última profilaxia TPT with value “3HP” and Data Inicio selected in Ficha
    * Resumo - Mastercard during the previous reporting period (3HP Start Date)
    *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getPatientsWhoHaveProfilaxiaTPTWith3HPAndDataInicioOnFichaResumo() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
-        "Última profilaxia TPT with value 3HP and Data Inicio da Profilaxia TPT in Ficha Resumo");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-
-    String query =
-        "SELECT patient_id "
-            + "FROM ( "
-            + "         SELECT p.patient_id, MIN(o2.obs_datetime) "
-            + "         FROM patient p "
-            + "                  INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "       WHERE p.voided = 0 "
-            + "         AND e.voided = 0 "
-            + "         AND o.voided = 0 "
-            + "         AND o2.voided = 0 "
-            + "         AND e.encounter_type = ${53} "
-            + "         AND o.concept_id = ${23985} "
-            + "         AND o.value_coded = ${23954} "
-            + "         AND o2.concept_id = ${165308} "
-            + "         AND o2.value_coded = ${1256} "
-            + "         AND e.location_id = :location "
-            + "         AND o2.obs_datetime >= :startDate "
-            + "         AND o2.obs_datetime <= :endDate "
-            + "       GROUP BY p.patient_id "
-            + " ) 3hp_start";
-
-    StringSubstitutor sb = new StringSubstitutor(valuesMap);
-
-    sqlCohortDefinition.setQuery(sb.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
-   * Patients who have Profilaxia TPT with the value “3HP” and Estado da Profilaxia with the value
-   * “Inicio (I)” marked on Ficha Clínica – Mastercard during the previous reporting period (3HP
-   * Start Date)
+   * <p>Patients who have Profilaxia TPT with the value “3HP” and Estado da Profilaxia with the
+   * value “Inicio (I)” marked on Ficha Clínica – Mastercard during the previous reporting period
+   * (3HP Start Date)
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoHaveProfilaxiaTPTWith3HPAndAreMarkedAsInicio() {
+  public CohortDefinition getPatientsWhoHaveProfilaxiaTPTWith3HPOnFichaResumoOrClinica(
+      EncounterType encounterType) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
-        "TPT with 3HP and Estado da Profilaxia with Inicio on Ficha Clínica");
+    sqlCohortDefinition.setName("TPT with 3HP on Ficha Resumo or Ficha Clínica");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("encounterType", encounterType.getEncounterTypeId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
@@ -1439,7 +1394,7 @@ public class TbPrevCohortQueries {
             + "           AND e.voided = 0 "
             + "           AND o.voided = 0 "
             + "           AND o2.voided = 0 "
-            + "           AND e.encounter_type = ${6} "
+            + "           AND e.encounter_type = ${encounterType} "
             + "           AND o.concept_id = ${23985} "
             + "           AND o.value_coded = ${23954} "
             + "           AND o2.concept_id = ${165308} "
