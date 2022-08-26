@@ -403,6 +403,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
             } else if (obs.getValueCoded().equals(hivMetadata.getOtherOrNonCodedConcept())) {
               requiredObs = obs;
+            } else if (obs.getValueCoded().equals(hivMetadata.getKeyPopOtherConcept())) {
+              requiredObs = obs;
             }
           }
         }
@@ -423,6 +425,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
               requiredObs = obs;
 
             } else if (obs.getValueCoded().equals(hivMetadata.getOtherOrNonCodedConcept())) {
+              requiredObs = obs;
+            } else if (obs.getValueCoded().equals(hivMetadata.getKeyPopOtherConcept())) {
               requiredObs = obs;
             }
           }
