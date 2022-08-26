@@ -1986,15 +1986,11 @@ public class TxCurrCohortQueries {
     CohortDefinition monthlyDispensation = getPatientsWithLessThan3MonthlyTypeOfDispensation();
     CohortDefinition semiAnnualDispensation = getPatientsWithSemiAnnualTypeOfDispensation();
 
-    CohortDefinition monthlyDispensationOnLastPickup =
-        getPatientsWithDispensationOnLastConsultationDate(hivMetadata.getMonthlyConcept());
-
     cd.addSearch("quarterly", Mapped.mapStraightThrough(quarterlyDispensation));
     cd.addSearch("monthly", Mapped.mapStraightThrough(monthlyDispensation));
     cd.addSearch("semiAnnual", Mapped.mapStraightThrough(semiAnnualDispensation));
-    cd.addSearch("DM", Mapped.mapStraightThrough(monthlyDispensationOnLastPickup));
 
-    cd.setCompositionString("(monthly OR DM) AND NOT (quarterly OR semiAnnual)");
+    cd.setCompositionString("monthly AND NOT (quarterly OR semiAnnual)");
     return cd;
   }
 
