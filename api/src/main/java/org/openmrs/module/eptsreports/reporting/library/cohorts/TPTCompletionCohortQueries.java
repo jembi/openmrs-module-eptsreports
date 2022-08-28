@@ -162,7 +162,6 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getStartDrugs().getConceptId(),
                 hivMetadata.getCompletedConcept().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
@@ -175,11 +174,9 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB3(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getCompletedConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
@@ -192,11 +189,9 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB4(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getCompletedConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
@@ -210,7 +205,6 @@ public class TPTCompletionCohortQueries {
             tptEligiblePatientListCohortQueries.getIPTB5Part1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
@@ -221,9 +215,8 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB5Part2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDtINHConcept().getConceptId()),
@@ -235,7 +228,7 @@ public class TPTCompletionCohortQueries {
             tptEligiblePatientListCohortQueries.getIPTB5Part3(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDtINHConcept().getConceptId()),

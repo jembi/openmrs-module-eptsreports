@@ -204,8 +204,9 @@ public class TPTInitiationCohortQueries {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -213,12 +214,12 @@ public class TPTInitiationCohortQueries {
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${53} "
-            + "       AND ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
-            + "       AND ( o2.concept_id = ${6128} "
-            + "             AND o2.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate ) ";
+            + "       AND ( (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
+            + "         AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "             AND o2.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate) )";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -265,9 +266,9 @@ public class TPTInitiationCohortQueries {
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${6}"
-            + "       AND ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
-            + "       AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} ) "
-            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate ";
+            + "       AND ( (o.concept_id = ${23985} AND o.value_coded = ${23954})  "
+            + "       AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "        AND o2.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate) )";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -335,17 +336,17 @@ public class TPTInitiationCohortQueries {
    *
    * <p>◦ No other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
    * id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the FILT 3HP
-   * start date.  ; and
+   * start date. and
    *
    * <p>◦ No other 3HP start dates marked on Ficha clinica (encounter type 6, encounter datetime)
    * with Profilaxia TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da
-   * Profilaxia  (concept id 165308) value coded Início (concept id 1256) or Outras prescrições
+   * Profilaxia (concept id 165308) value coded Início (concept id 1256) or Outras prescrições
    * (concept id 1719) value coded DT-3HP (concept id 165307) in the 4 months prior to the FILT 3HP
-   * start date.  ; and
+   * start date. and
    *
    * <p>◦ No other 3HP start dates marked on Ficha Resumo (encounter type 53) with Última
    * profilaxia(concept id 23985) value coded 3HP(concept id 23954) and Data Início (value datetime)
-   * in the 4 months prior to the FILT 3HP start date.  ;
+   * in the 4 months prior to the FILT 3HP start date.
    *
    * <p>Note: The system will consider the oldest date amongst all sources as the 3HP Start Date
    *
@@ -373,7 +374,6 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
     valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
@@ -387,9 +387,9 @@ public class TPTInitiationCohortQueries {
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${60} "
-            + "       AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
-            + "       AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1257}, ${1267} ) OR o2.value_coded IS NULL ) "
-            + "       AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate "
+            + "       AND ( ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
+            + "       AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1257}, ${1267} ) OR o2.value_coded IS NULL "
+            + "       AND o2.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate ) ) "
             + "       AND p.patient_id NOT IN ( "
             + "           SELECT p.patient_id "
             + "           FROM   patient p "
@@ -403,9 +403,9 @@ public class TPTInitiationCohortQueries {
             + "                             inner join obs o2 ON e.encounter_id = o2.encounter_id "
             + "                             WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                             AND e.encounter_type = ${60} "
-            + "                             AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
-            + "                             AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) ) "
-            + "                             AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate ) filt "
+            + "                             AND ( ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
+            + "                             AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) "
+            + "                             AND o2.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate ) ) ) filt "
             + "                             ON filt.patient_id = p.patient_id "
             + "                  WHERE  p.voided = 0 "
             + "                  AND e.voided = 0 "
@@ -430,17 +430,17 @@ public class TPTInitiationCohortQueries {
             + "           inner join obs o2 ON e.encounter_id = o2.encounter_id "
             + "                 WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                 AND e.encounter_type = ${60} "
-            + "                 AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
-            + "                 AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} ) ) "
-            + "                 AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate ) filt "
+            + "                 AND ( ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
+            + "                 AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705} )  "
+            + "                 AND o2.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 4 MONTH) AND :endDate ) ) ) filt "
             + "                 ON filt.patient_id = p.patient_id "
             + "           WHERE  p.voided = 0 AND e.voided = 0 AND o3.voided = 0 AND o4.voided = 0 AND o5.voided = 0 "
             + "           AND e.location_id = :location "
             + "           AND e.encounter_type = ${6} "
             + "           AND ( ( o3.concept_id = ${23985} AND o3.value_coded = ${23954} )   "
-            + "                 AND ( o4.concept_id = ${165308} AND o4.value_coded = ${1256} ) ) "
+            + "                 AND ( o4.concept_id = ${165308} AND o4.value_coded = ${1256} "
+            + "                   AND o4.obs_datetime <= Date_sub(filt.start_date, interval 4 MONTH) ) ) "
             + "           OR  ( o5.concept_id = ${1719} AND o5.value_coded = ${165307} ) "
-            + "           AND e.encounter_datetime <= Date_sub(filt.start_date, interval 4 MONTH) "
             + "           GROUP  BY p.patient_id "
             + "           UNION "
             + "           SELECT p.patient_id "
@@ -463,7 +463,7 @@ public class TPTInitiationCohortQueries {
             + "           AND e.location_id = :location "
             + "           AND e.encounter_type = ${53} "
             + "           AND o6.concept_id = ${23985} AND o6.value_coded = ${23954} "
-            + "           AND o6.value_datetime <= Date_sub(filt.start_date, interval 4 MONTH) "
+            + "           AND e.encounter_datetime <= Date_sub(filt.start_date, interval 4 MONTH) "
             + "           GROUP BY p.patient_id) "
             + "GROUP BY p.patient_id ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
