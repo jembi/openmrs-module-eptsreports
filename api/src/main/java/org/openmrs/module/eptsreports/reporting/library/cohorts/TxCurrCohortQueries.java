@@ -993,8 +993,7 @@ public class TxCurrCohortQueries {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("For <3 months of ARVs dispense to active patient’s on ART ");
     String sqlQuery =
-
-             "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + " 		FROM patient p "
             + "	    INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "	    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1109,8 +1108,7 @@ public class TxCurrCohortQueries {
     patientsWithQuarterlyTypeOfDispensation.setName(
         "Patients marked as (DT) Quartely Dispensation");
     String sqlQuery =
-
-             "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + "FROM patient p "
             + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1245,7 +1243,7 @@ public class TxCurrCohortQueries {
             + "                        ) "
             + "                        OR( "
             + "                            en.encounter_type = 6 "
-            + "                            AND o.concept_id = 23739 "
+            + "                            AND oo.concept_id = 23739 "
             + "                        ) "
             + "                    ) "
             + "                    AND DATE (en.encounter_datetime) = DATE( "
@@ -1300,8 +1298,7 @@ public class TxCurrCohortQueries {
   public SqlCohortDefinition getPatientsWithSemiAnnualTypeOfDispensation() {
     SqlCohortDefinition patientsWithSemiAnnualTypeOfDispensation = new SqlCohortDefinition();
     String sqlQuery =
-
-            "SELECT p.patient_id "
+        "SELECT p.patient_id "
             + "FROM patient p "
             + "    INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "    INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1431,7 +1428,7 @@ public class TxCurrCohortQueries {
             + "                        ) "
             + "                        OR( "
             + "                            en.encounter_type = 6 "
-            + "                            AND o.concept_id = 23739 "
+            + "                            AND oo.concept_id = 23739 "
             + "                        ) "
             + "                    ) "
             + "                    AND DATE (en.encounter_datetime) = DATE( "
@@ -1551,7 +1548,6 @@ public class TxCurrCohortQueries {
                 hivMetadata.getContinueRegimenConcept().getConceptId()));
 
     cd.addSearch("semiAnnual", Mapped.mapStraightThrough(semiAnnualDispensation));
-
 
     cd.setCompositionString("semiAnnual");
     return cd;
@@ -1750,324 +1746,324 @@ public class TxCurrCohortQueries {
     map.put("dispensationTypes", StringUtils.join(dispensationTypes, ","));
     map.put("states", StringUtils.join(states, ","));
 
-    String query = "SELECT    p.patient_id                  FROM            \n" +
-            "                                    (SELECT                     \n" +
-            "                                        p.patient_id, MAX(e.encounter_datetime) AS encounter_date          \n" +
-            "                                    FROM                                    patient p        \n" +
-            "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id       \n" +
-            "                                    WHERE                    \n" +
-            "                                        e.encounter_type = 18 AND p.voided = 0             \n" +
-            "                                            AND e.voided = 0                    \n" +
-            "                                            AND e.location_id = 400       \n" +
-            "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"           \n" +
-            "                                    GROUP BY p.patient_id \n" +
-            "                                    UNION \n" +
-            "                                    SELECT            \n" +
-            "                                        p.patient_id, MAX(e.encounter_datetime) encounter_date       \n" +
-            "                                    FROM                                        patient p           \n" +
-            "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id        \n" +
-            "                                    INNER JOIN obs o ON e.encounter_id = o.encounter_id        \n" +
-            "                                    WHERE                    \n" +
-            "                                        e.encounter_type = 6             \n" +
-            "                                             AND ( o.concept_id = 23739\n" +
-            "                                             \t\tOR\t\t\t\t\t\t\t\t\t\t\t\t\t\n" +
-            "\t\t\t\t\t\t\t\t\t\t\t\t\to.concept_id IN (165174, 165322)                                           \n" +
-            "                                             \t)         \n" +
-            "                                            AND p.voided = 0             \n" +
-            "                                            AND o.voided = 0            \n" +
-            "                                            AND e.voided = 0                 \n" +
-            "                                            AND e.location_id = 400                                                                  \n" +
-            "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                    GROUP BY p.patient_id) AS last_encounter   \n" +
-            "                                    INNER JOIN  patient p on p.patient_id = last_encounter.patient_id         \n" +
-            "                                    INNER JOIN encounter en ON en.patient_id = p.patient_id                         \n" +
-            "                                        AND DATE(en.encounter_datetime) = DATE(last_encounter.encounter_date)              \n" +
-            "                                        INNER JOIN  \tobs ob ON ob.encounter_id = en.encounter_id  \n" +
-            "                                    \tINNER JOIN obs ostate ON ostate.encounter_id = en.encounter_id\n" +
-            "                                WHERE   en.voided = 0 AND ob.voided = 0 and p.voided = 0          \n" +
-            "                                        AND en.location_id = 400             \n" +
-            "                                        AND ((en.encounter_type = 18              \n" +
-            "                                        AND ob.concept_id = 5096              \n" +
-            "                                        AND ob.value_datetime IS NOT NULL              \n" +
-            "                                        AND TIMESTAMPDIFF(DAY,              \n" +
-            "                                        DATE(last_encounter.encounter_date),              \n" +
-            "                                        ob.value_datetime) BETWEEN 83 AND 173       \n" +
-            "                                AND en.encounter_id IN  (SELECT e.encounter_id FROM   \n" +
-            "                            encounter e JOIN          (SELECT   \n" +
-            "                                p.patient_id, max(e.encounter_datetime) as encounter_datetime          FROM  \n" +
-            "                                patient p inner join  encounter e on p.patient_id = e.patient_id \n" +
-            "                                    AND e.encounter_type = 18  \n" +
-            "                                    AND e.location_id = 400 \n" +
-            "                    AND DATE(e.encounter_datetime) <= \"2022-06-20\"  \n" +
-            "                                    GROUP BY p.patient_id) as last_ficha ON e.patient_id = last_ficha.patient_id   \n" +
-            "                    \t\t\t\t\t\tAND DATE(e.encounter_datetime) = DATE(last_ficha.encounter_datetime)  \n" +
-            "                              WHERE DATE(e.encounter_datetime) <= \"2022-06-20\"  \n" +
-            "                    AND e.location_id = 400 AND e.voided = 0  \n" +
-            "                                    AND e.encounter_type = 18  \n" +
-            "                                    AND e.patient_id = p.patient_id  GROUP BY e.patient_id))\n" +
-            "                                        OR (en.encounter_type = 6              \n" +
-            "                                        AND ((ob.concept_id = 23739              \n" +
-            "                                        AND ob.value_coded = 23720)     \n" +
-            "                                        \n" +
-            "                                        OR (\tob.concept_id = 165174             \n" +
-            "                                        \t\tAND ob.value_coded = 23730\n" +
-            "                                        \t\tAND ostate.concept_id = 165322 \n" +
-            "                                        \t\tAND ostate.value_coded IN (1256, 1257)\n" +
-            "                                        \t\tAND ob.obs_group_id = ostate.obs_group_id\n" +
-            "                                        \n" +
-            "                                        \t)              \n" +
-            "                                        AND (en.encounter_id IN (SELECT               \n" +
-            "                                            e.encounter_id              \n" +
-            "                                        FROM                                      encounter e              \n" +
-            "                                                INNER JOIN              \n" +
-            "                                            obs o ON o.encounter_id = e.encounter_id              \n" +
-            "                                        WHERE              \n" +
-            "                                            e.voided = 0 AND o.voided = 0              \n" +
-            "                                                AND e.patient_id = p.patient_id              \n" +
-            "                                                AND ((o.value_coded = 23720) OR (o.concept_id = 165174 AND o.value_coded = 23730))      \n" +
-            "                                                AND e.encounter_type = 6              \n" +
-            "                                                AND e.location_id = 400             \n" +
-            "                                                AND DATE(e.encounter_datetime) = DATE(last_encounter.encounter_date)              \n" +
-            "                                        GROUP BY e.patient_id))    \n" +
-            "                                        AND ob.obs_id NOT IN (SELECT     \n" +
-            "                               same_day.obs_id            FROM                          (SELECT       \n" +
-            "                                   b.patient_id,                         b.encounter_id,          \n" +
-            "                                       b.obs_id, b.encounter_datetime                                      \n" +
-            "                               FROM                              (SELECT         \n" +
-            "                                   p.patient_id,\n" +
-            "                                    e.encounter_datetime,          \n" +
-            "                                       e.encounter_id, \n" +
-            "                                       o.obs_id,          \n" +
-            "                                       o.concept_id,    \t\n" +
-            "                                       o.value_coded          \n" +
-            "                               FROM   patient p inner join  encounter e on p.patient_id = e.patient_id         \n" +
-            "                               INNER JOIN obs o ON e.encounter_id = o.encounter_id         \n" +
-            "                               WHERE  e.voided = 0 AND o.voided = 0  AND p.voided=0       \n" +
-            "                                       AND e.encounter_type = 6         \n" +
-            "                                       AND ( o.concept_id = 165174 AND o.value_coded in (23730,23888,165314) )      \n" +
-            "                                       AND DATE(e.encounter_datetime) <= \"2022-06-20\"      \n" +
-            "                                       AND e.location_id = 400) AS b            \n" +
-            "                               INNER JOIN encounter ex ON ex.patient_id = b.patient_id      \n" +
-            "                                   AND ex.encounter_id = b.encounter_id               \n" +
-            "                               INNER JOIN obs o ON ex.encounter_id = o.encounter_id        \n" +
-            "                               WHERE   ex.voided = 0 AND o.voided = 0          \n" +
-            "                                       AND ex.encounter_type = 6       \n" +
-            "                                       AND o.concept_id = 23739    \n" +
-            "                                       AND DATE(ex.encounter_datetime) <= \"2022-06-20\"        \n" +
-            "                                       AND ex.location_id = 400) AS same_day         \n" +
-            "                           WHERE same_day.patient_id = p.patient_id     \n" +
-            "                    \tAND DATE(same_day.encounter_datetime)=DATE(last_encounter.encounter_date) )    \n" +
-            "                    )) OR ((en.encounter_type = 18              \n" +
-            "                                        AND ob.concept_id = 5096              \n" +
-            "                                        AND ob.value_datetime IS NOT NULL              \n" +
-            "                                AND en.encounter_id IN  (SELECT e.encounter_id FROM   \n" +
-            "                            encounter e JOIN          (SELECT  \n" +
-            "                                p.patient_id, max(e.encounter_datetime) as encounter_datetime          FROM  \n" +
-            "                                patient p INNER JOIN encounter e ON p.patient_id = e.patient_id     \n" +
-            "                                WHERE   e.voided = 0  and p.voided=0\n" +
-            "                                    AND e.encounter_type = 18  \n" +
-            "                                    AND e.location_id = 400 \n" +
-            "                    AND DATE(e.encounter_datetime) <= \"2022-06-20\"  \n" +
-            "                                    GROUP BY p.patient_id) as last_ficha ON e.patient_id = last_ficha.patient_id   \n" +
-            "                    \t\t\t\t\t\tAND DATE(e.encounter_datetime) = DATE(last_ficha.encounter_datetime)  \n" +
-            "                              WHERE DATE(e.encounter_datetime) <= \"2022-06-20\"  \n" +
-            "                    AND e.location_id = 400 AND e.voided = 0  \n" +
-            "                                    AND e.encounter_type = 18  \n" +
-            "                                    AND e.patient_id = p.patient_id  \n" +
-            "                                    GROUP BY e.encounter_id) \n" +
-            "                                        AND TIMESTAMPDIFF(DAY,              \n" +
-            "                                        DATE(last_encounter.encounter_date),              \n" +
-            "                                        (SELECT               \n" +
-            "                                                MAX(o.value_datetime)              \n" +
-            "                                            FROM              \n" +
-            "                                                encounter e              \n" +
-            "                                                    INNER JOIN              \n" +
-            "                                                obs o ON o.encounter_id = e.encounter_id              \n" +
-            "                                            WHERE              \n" +
-            "                                                e.voided = 0 AND o.voided = 0              \n" +
-            "                                                    AND e.patient_id = p.patient_id              \n" +
-            "                                                    AND o.concept_id = 5096              \n" +
-            "                                                    AND o.value_datetime IS NOT NULL              \n" +
-            "                                                    AND e.encounter_type = 18              \n" +
-            "                                                    AND e.location_id = 400             \n" +
-            "                                                    AND DATE(e.encounter_datetime) = DATE(last_encounter.encounter_date)              \n" +
-            "                                            GROUP BY e.patient_id)) BETWEEN 83 AND 173)))              \n" +
-            "                                        AND p.patient_id NOT IN (SELECT               \n" +
-            "                                             pp.patient_id              \n" +
-            "                                                FROM  patient pp             \n" +
-            "                                                    INNER JOIN            \n" +
-            "                                                    encounter list ON pp.patient_id = list.patient_id            \n" +
-            "                                        WHERE              \n" +
-            "                                            list.patient_id = p.patient_id              \n" +
-            "                                                AND DATE(list.encounter_datetime) = DATE(last_encounter.encounter_date)              \n" +
-            "                                                AND TIMESTAMPDIFF(DAY,              \n" +
-            "                                                DATE(last_encounter.encounter_date),              \n" +
-            "                                                (SELECT               \n" +
-            "                                                        MAX(o.value_datetime)              \n" +
-            "                                                    FROM              \n" +
-            "                                                        encounter e              \n" +
-            "                                                            INNER JOIN              \n" +
-            "                                                        obs o ON o.encounter_id = e.encounter_id              \n" +
-            "                                                    WHERE              \n" +
-            "                                                        e.voided = 0 AND o.voided = 0              \n" +
-            "                                                            AND e.patient_id = pp.patient_id              \n" +
-            "                                                            AND o.concept_id = 5096              \n" +
-            "                                                            AND o.value_datetime IS NOT NULL              \n" +
-            "                                                            AND e.encounter_type = 18              \n" +
-            "                                                            AND e.location_id = 400             \n" +
-            "                                                            AND DATE(e.encounter_datetime) = DATE(list.encounter_datetime)              \n" +
-            "                                                    GROUP BY e.patient_id)) > 173)              \n" +
-            "                                        AND en.encounter_id NOT IN (SELECT               \n" +
-            "                                            same_day.encounter_id              \n" +
-            "                                        FROM                                      (SELECT               \n" +
-            "                                                ex.encounter_id,              \n" +
-            "                                                    b.patient_id,              \n" +
-            "                                                    ex.encounter_type,              \n" +
-            "                                                    b.encounter_datetime              \n" +
-            "                                            FROM              \n" +
-            "                                                (SELECT               \n" +
-            "                                                p.patient_id,              \n" +
-            "                                                    e.encounter_datetime,              \n" +
-            "                                                    e.encounter_id,              \n" +
-            "                                                    e.encounter_type,              \n" +
-            "                                                    o.concept_id              \n" +
-            "                                            FROM              \n" +
-            "                                                patient p inner join             \n" +
-            "                                                encounter e on p.patient_id = e.patient_id              \n" +
-            "                                            INNER JOIN obs o ON e.encounter_id = o.encounter_id              \n" +
-            "                                            WHERE              \n" +
-            "                                                e.voided = 0 AND o.voided = 0 AND p.voided = 0            \n" +
-            "                                                    AND e.encounter_type = 6              \n" +
-            "                                                    AND ((o.concept_id = 165322 AND o.value_coded  = 23730) OR o.value_coded = 23720)              \n" +
-            "                                                    AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                                    AND e.location_id = 400) AS b              \n" +
-            "                                            LEFT JOIN encounter ex ON ex.patient_id = b.patient_id              \n" +
-            "                                                AND DATE(ex.encounter_datetime) = DATE(b.encounter_datetime)              \n" +
-            "                                            WHERE              \n" +
-            "                                                ex.voided = 0 AND ex.encounter_type = 18              \n" +
-            "                                                    AND DATE(ex.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                                    AND ex.location_id = 400) AS same_day              \n" +
-            "                                        WHERE              \n" +
-            "                                            same_day.encounter_type = 18              \n" +
-            "                                                AND same_day.encounter_id NOT IN (SELECT               \n" +
-            "                                                    e.encounter_id              \n" +
-            "                                                FROM              \n" +
-            "                                                    encounter e              \n" +
-            "                                                        INNER JOIN              \n" +
-            "                                                    obs o ON e.encounter_id = o.encounter_id              \n" +
-            "                                                WHERE              \n" +
-            "                                                    e.encounter_type = 18              \n" +
-            "                                                        AND o.concept_id = 5096              \n" +
-            "                                                        AND e.voided = 0              \n" +
-            "                                                        AND o.voided = 0              \n" +
-            "                                                        AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                                        AND e.location_id = 400)              \n" +
-            "                                                AND same_day.patient_id = p.patient_id              \n" +
-            "                                                AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date)\n" +
-            "                    UNION                              SELECT               \n" +
-            "                                            same_day.encounter_id              \n" +
-            "                                        FROM                                      (SELECT               \n" +
-            "                                                b.patient_id,              \n" +
-            "                                                    b.encounter_id,              \n" +
-            "                                                    b.encounter_datetime,              \n" +
-            "                                                    b.encounter_type              \n" +
-            "                                            FROM              \n" +
-            "                                                (SELECT               \n" +
-            "                                                p.patient_id,              \n" +
-            "                                                    e.encounter_datetime,              \n" +
-            "                                                    e.encounter_id,              \n" +
-            "                                                    e.encounter_type              \n" +
-            "                                            FROM   patient p inner join            \n" +
-            "                                                encounter e   ON p.patient_id = e.patient_id \n" +
-            "                                            WHERE              \n" +
-            "                                                e.voided = 0              \n" +
-            "                                                    AND e.encounter_type = 6              \n" +
-            "                                                    AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                                    AND e.location_id = 400) AS b              \n" +
-            "                                            LEFT JOIN encounter ex ON ex.patient_id = b.patient_id              \n" +
-            "                                                AND DATE(ex.encounter_datetime) = DATE(b.encounter_datetime)              \n" +
-            "                                            INNER JOIN obs o ON ex.encounter_id = o.encounter_id              \n" +
-            "                                            WHERE ex.voided = 0 AND o.voided = 0              \n" +
-            "                                                    AND ex.encounter_type = 18              \n" +
-            "                                                    AND o.concept_id = 5096              \n" +
-            "                                                    AND DATE(ex.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                                    AND ex.location_id = 400) AS same_day              \n" +
-            "                                        WHERE              \n" +
-            "                                            same_day.encounter_type = 6              \n" +
-            "                                                AND same_day.patient_id = p.patient_id                                               \n" +
-            "                                                AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date)           \n" +
-            "                                            UNION              \n" +
-            "                                SELECT list.encounter_id               \n" +
-            "                                FROM encounter list              \n" +
-            "                                INNER JOIN     \t\t              \n" +
-            "                                (SELECT  p.patient_id, MAX(e.encounter_datetime) AS ficha_date              \n" +
-            "                                    FROM                                  patient p              \n" +
-            "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id              \n" +
-            "                                    INNER JOIN obs o ON e.encounter_id = o.encounter_id              \n" +
-            "                                    WHERE              \n" +
-            "                                        e.encounter_type = 6              \n" +
-            "                                             AND ( \to.concept_id = 23739 \n" +
-            "                                            \t\t OR \n" +
-            "                                            \t\t (o.concept_id = 165174 and o.value_coded IN (23730,23888) )\n" +
-            "                                            \t )          \n" +
-            "                                            AND p.voided = 0              \n" +
-            "                                            AND o.voided = 0              \n" +
-            "                                            AND e.voided = 0              \n" +
-            "                                            AND e.location_id = 400             \n" +
-            "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                    GROUP BY p.patient_id ) last_ficha ON list.patient_id = last_ficha.patient_id              \n" +
-            "                                INNER JOIN              \n" +
-            "                                (SELECT  p.patient_id, MAX(e.encounter_datetime) AS fila_date              \n" +
-            "                                    FROM patient p              \n" +
-            "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id               \n" +
-            "                                 WHERE              \n" +
-            "                                        e.encounter_type = 18              \n" +
-            "                                 AND p.voided = 0              \n" +
-            "                                            AND e.voided = 0              \n" +
-            "                                            AND e.location_id = 400             \n" +
-            "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                    GROUP BY p.patient_id ) last_fila ON list.patient_id = last_fila.patient_id              \n" +
-            "                                WHERE list.encounter_type = 18   \n" +
-            "                                AND DATE(list.encounter_datetime) < DATE(last_ficha.ficha_date)               \n" +
-            "                                AND DATE(list.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                AND list.voided = 0              \n" +
-            "                                AND list.location_id = 400             \n" +
-            "                                AND list.patient_id = p.patient_id              \n" +
-            "                                UNION                         SELECT list.encounter_id               \n" +
-            "                                FROM encounter list              \n" +
-            "                                INNER JOIN     \t\t              \n" +
-            "                                (SELECT  p.patient_id, MAX(e.encounter_datetime) AS ficha_date              \n" +
-            "                                    FROM                                  patient p              \n" +
-            "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id              \n" +
-            "                                    WHERE              \n" +
-            "                                        e.encounter_type = 6                        \n" +
-            "                                            AND p.voided = 0              \n" +
-            "                                            AND e.voided = 0              \n" +
-            "                                            AND e.location_id = 400             \n" +
-            "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                    GROUP BY p.patient_id ) last_ficha ON list.patient_id = last_ficha.patient_id              \n" +
-            "                                INNER JOIN              \n" +
-            "                                (SELECT  p.patient_id, MAX(e.encounter_datetime) AS fila_date              \n" +
-            "                                    FROM patient p              \n" +
-            "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id              \n" +
-            "                                INNER JOIN obs o ON e.encounter_id = o.encounter_id               \n" +
-            "                                 WHERE              \n" +
-            "                                        e.encounter_type = 18              \n" +
-            "                                 AND p.voided = 0              \n" +
-            "                                AND o.concept_id = 5096              \n" +
-            "                                AND o.voided = 0              \n" +
-            "                                            AND e.voided = 0              \n" +
-            "                                            AND e.location_id = 400             \n" +
-            "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                    GROUP BY p.patient_id ) last_fila ON list.patient_id = last_fila.patient_id              \n" +
-            "                                WHERE list.encounter_type = 6             \n" +
-            "                                AND DATE(list.encounter_datetime) <= DATE(last_fila.fila_date)              \n" +
-            "                                AND DATE(list.encounter_datetime) <= \"2022-06-20\"              \n" +
-            "                                AND list.voided = 0              \n" +
-            "                                AND list.location_id = 400             \n" +
-            "                                AND list.patient_id = p.patient_id)             \n" +
-            "                         GROUP BY p.patient_id";
-
+    String query =
+        "SELECT    p.patient_id                  FROM            \n"
+            + "                                    (SELECT                     \n"
+            + "                                        p.patient_id, MAX(e.encounter_datetime) AS encounter_date          \n"
+            + "                                    FROM                                    patient p        \n"
+            + "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id       \n"
+            + "                                    WHERE                    \n"
+            + "                                        e.encounter_type = 18 AND p.voided = 0             \n"
+            + "                                            AND e.voided = 0                    \n"
+            + "                                            AND e.location_id = 400       \n"
+            + "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"           \n"
+            + "                                    GROUP BY p.patient_id \n"
+            + "                                    UNION \n"
+            + "                                    SELECT            \n"
+            + "                                        p.patient_id, MAX(e.encounter_datetime) encounter_date       \n"
+            + "                                    FROM                                        patient p           \n"
+            + "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id        \n"
+            + "                                    INNER JOIN obs o ON e.encounter_id = o.encounter_id        \n"
+            + "                                    WHERE                    \n"
+            + "                                        e.encounter_type = 6             \n"
+            + "                                             AND ( o.concept_id = 23739\n"
+            + "                                             \t\tOR\t\t\t\t\t\t\t\t\t\t\t\t\t\n"
+            + "\t\t\t\t\t\t\t\t\t\t\t\t\to.concept_id IN (165174, 165322)                                           \n"
+            + "                                             \t)         \n"
+            + "                                            AND p.voided = 0             \n"
+            + "                                            AND o.voided = 0            \n"
+            + "                                            AND e.voided = 0                 \n"
+            + "                                            AND e.location_id = 400                                                                  \n"
+            + "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                    GROUP BY p.patient_id) AS last_encounter   \n"
+            + "                                    INNER JOIN  patient p on p.patient_id = last_encounter.patient_id         \n"
+            + "                                    INNER JOIN encounter en ON en.patient_id = p.patient_id                         \n"
+            + "                                        AND DATE(en.encounter_datetime) = DATE(last_encounter.encounter_date)              \n"
+            + "                                        INNER JOIN  \tobs ob ON ob.encounter_id = en.encounter_id  \n"
+            + "                                    \tINNER JOIN obs ostate ON ostate.encounter_id = en.encounter_id\n"
+            + "                                WHERE   en.voided = 0 AND ob.voided = 0 and p.voided = 0          \n"
+            + "                                        AND en.location_id = 400             \n"
+            + "                                        AND ((en.encounter_type = 18              \n"
+            + "                                        AND ob.concept_id = 5096              \n"
+            + "                                        AND ob.value_datetime IS NOT NULL              \n"
+            + "                                        AND TIMESTAMPDIFF(DAY,              \n"
+            + "                                        DATE(last_encounter.encounter_date),              \n"
+            + "                                        ob.value_datetime) BETWEEN 83 AND 173       \n"
+            + "                                AND en.encounter_id IN  (SELECT e.encounter_id FROM   \n"
+            + "                            encounter e JOIN          (SELECT   \n"
+            + "                                p.patient_id, max(e.encounter_datetime) as encounter_datetime          FROM  \n"
+            + "                                patient p inner join  encounter e on p.patient_id = e.patient_id \n"
+            + "                                    AND e.encounter_type = 18  \n"
+            + "                                    AND e.location_id = 400 \n"
+            + "                    AND DATE(e.encounter_datetime) <= \"2022-06-20\"  \n"
+            + "                                    GROUP BY p.patient_id) as last_ficha ON e.patient_id = last_ficha.patient_id   \n"
+            + "                    \t\t\t\t\t\tAND DATE(e.encounter_datetime) = DATE(last_ficha.encounter_datetime)  \n"
+            + "                              WHERE DATE(e.encounter_datetime) <= \"2022-06-20\"  \n"
+            + "                    AND e.location_id = 400 AND e.voided = 0  \n"
+            + "                                    AND e.encounter_type = 18  \n"
+            + "                                    AND e.patient_id = p.patient_id  GROUP BY e.patient_id))\n"
+            + "                                        OR (en.encounter_type = 6              \n"
+            + "                                        AND ((ob.concept_id = 23739              \n"
+            + "                                        AND ob.value_coded = 23720)     \n"
+            + "                                        \n"
+            + "                                        OR (\tob.concept_id = 165174             \n"
+            + "                                        \t\tAND ob.value_coded = 23730\n"
+            + "                                        \t\tAND ostate.concept_id = 165322 \n"
+            + "                                        \t\tAND ostate.value_coded IN (1256, 1257)\n"
+            + "                                        \t\tAND ob.obs_group_id = ostate.obs_group_id\n"
+            + "                                        \n"
+            + "                                        \t)              \n"
+            + "                                        AND (en.encounter_id IN (SELECT               \n"
+            + "                                            e.encounter_id              \n"
+            + "                                        FROM                                      encounter e              \n"
+            + "                                                INNER JOIN              \n"
+            + "                                            obs o ON o.encounter_id = e.encounter_id              \n"
+            + "                                        WHERE              \n"
+            + "                                            e.voided = 0 AND o.voided = 0              \n"
+            + "                                                AND e.patient_id = p.patient_id              \n"
+            + "                                                AND ((o.value_coded = 23720) OR (o.concept_id = 165174 AND o.value_coded = 23730))      \n"
+            + "                                                AND e.encounter_type = 6              \n"
+            + "                                                AND e.location_id = 400             \n"
+            + "                                                AND DATE(e.encounter_datetime) = DATE(last_encounter.encounter_date)              \n"
+            + "                                        GROUP BY e.patient_id))    \n"
+            + "                                        AND ob.obs_id NOT IN (SELECT     \n"
+            + "                               same_day.obs_id            FROM                          (SELECT       \n"
+            + "                                   b.patient_id,                         b.encounter_id,          \n"
+            + "                                       b.obs_id, b.encounter_datetime                                      \n"
+            + "                               FROM                              (SELECT         \n"
+            + "                                   p.patient_id,\n"
+            + "                                    e.encounter_datetime,          \n"
+            + "                                       e.encounter_id, \n"
+            + "                                       o.obs_id,          \n"
+            + "                                       o.concept_id,    \t\n"
+            + "                                       o.value_coded          \n"
+            + "                               FROM   patient p inner join  encounter e on p.patient_id = e.patient_id         \n"
+            + "                               INNER JOIN obs o ON e.encounter_id = o.encounter_id         \n"
+            + "                               WHERE  e.voided = 0 AND o.voided = 0  AND p.voided=0       \n"
+            + "                                       AND e.encounter_type = 6         \n"
+            + "                                       AND ( o.concept_id = 165174 AND o.value_coded in (23730,23888,165314) )      \n"
+            + "                                       AND DATE(e.encounter_datetime) <= \"2022-06-20\"      \n"
+            + "                                       AND e.location_id = 400) AS b            \n"
+            + "                               INNER JOIN encounter ex ON ex.patient_id = b.patient_id      \n"
+            + "                                   AND ex.encounter_id = b.encounter_id               \n"
+            + "                               INNER JOIN obs o ON ex.encounter_id = o.encounter_id        \n"
+            + "                               WHERE   ex.voided = 0 AND o.voided = 0          \n"
+            + "                                       AND ex.encounter_type = 6       \n"
+            + "                                       AND o.concept_id = 23739    \n"
+            + "                                       AND DATE(ex.encounter_datetime) <= \"2022-06-20\"        \n"
+            + "                                       AND ex.location_id = 400) AS same_day         \n"
+            + "                           WHERE same_day.patient_id = p.patient_id     \n"
+            + "                    \tAND DATE(same_day.encounter_datetime)=DATE(last_encounter.encounter_date) )    \n"
+            + "                    )) OR ((en.encounter_type = 18              \n"
+            + "                                        AND ob.concept_id = 5096              \n"
+            + "                                        AND ob.value_datetime IS NOT NULL              \n"
+            + "                                AND en.encounter_id IN  (SELECT e.encounter_id FROM   \n"
+            + "                            encounter e JOIN          (SELECT  \n"
+            + "                                p.patient_id, max(e.encounter_datetime) as encounter_datetime          FROM  \n"
+            + "                                patient p INNER JOIN encounter e ON p.patient_id = e.patient_id     \n"
+            + "                                WHERE   e.voided = 0  and p.voided=0\n"
+            + "                                    AND e.encounter_type = 18  \n"
+            + "                                    AND e.location_id = 400 \n"
+            + "                    AND DATE(e.encounter_datetime) <= \"2022-06-20\"  \n"
+            + "                                    GROUP BY p.patient_id) as last_ficha ON e.patient_id = last_ficha.patient_id   \n"
+            + "                    \t\t\t\t\t\tAND DATE(e.encounter_datetime) = DATE(last_ficha.encounter_datetime)  \n"
+            + "                              WHERE DATE(e.encounter_datetime) <= \"2022-06-20\"  \n"
+            + "                    AND e.location_id = 400 AND e.voided = 0  \n"
+            + "                                    AND e.encounter_type = 18  \n"
+            + "                                    AND e.patient_id = p.patient_id  \n"
+            + "                                    GROUP BY e.encounter_id) \n"
+            + "                                        AND TIMESTAMPDIFF(DAY,              \n"
+            + "                                        DATE(last_encounter.encounter_date),              \n"
+            + "                                        (SELECT               \n"
+            + "                                                MAX(o.value_datetime)              \n"
+            + "                                            FROM              \n"
+            + "                                                encounter e              \n"
+            + "                                                    INNER JOIN              \n"
+            + "                                                obs o ON o.encounter_id = e.encounter_id              \n"
+            + "                                            WHERE              \n"
+            + "                                                e.voided = 0 AND o.voided = 0              \n"
+            + "                                                    AND e.patient_id = p.patient_id              \n"
+            + "                                                    AND o.concept_id = 5096              \n"
+            + "                                                    AND o.value_datetime IS NOT NULL              \n"
+            + "                                                    AND e.encounter_type = 18              \n"
+            + "                                                    AND e.location_id = 400             \n"
+            + "                                                    AND DATE(e.encounter_datetime) = DATE(last_encounter.encounter_date)              \n"
+            + "                                            GROUP BY e.patient_id)) BETWEEN 83 AND 173)))              \n"
+            + "                                        AND p.patient_id NOT IN (SELECT               \n"
+            + "                                             pp.patient_id              \n"
+            + "                                                FROM  patient pp             \n"
+            + "                                                    INNER JOIN            \n"
+            + "                                                    encounter list ON pp.patient_id = list.patient_id            \n"
+            + "                                        WHERE              \n"
+            + "                                            list.patient_id = p.patient_id              \n"
+            + "                                                AND DATE(list.encounter_datetime) = DATE(last_encounter.encounter_date)              \n"
+            + "                                                AND TIMESTAMPDIFF(DAY,              \n"
+            + "                                                DATE(last_encounter.encounter_date),              \n"
+            + "                                                (SELECT               \n"
+            + "                                                        MAX(o.value_datetime)              \n"
+            + "                                                    FROM              \n"
+            + "                                                        encounter e              \n"
+            + "                                                            INNER JOIN              \n"
+            + "                                                        obs o ON o.encounter_id = e.encounter_id              \n"
+            + "                                                    WHERE              \n"
+            + "                                                        e.voided = 0 AND o.voided = 0              \n"
+            + "                                                            AND e.patient_id = pp.patient_id              \n"
+            + "                                                            AND o.concept_id = 5096              \n"
+            + "                                                            AND o.value_datetime IS NOT NULL              \n"
+            + "                                                            AND e.encounter_type = 18              \n"
+            + "                                                            AND e.location_id = 400             \n"
+            + "                                                            AND DATE(e.encounter_datetime) = DATE(list.encounter_datetime)              \n"
+            + "                                                    GROUP BY e.patient_id)) > 173)              \n"
+            + "                                        AND en.encounter_id NOT IN (SELECT               \n"
+            + "                                            same_day.encounter_id              \n"
+            + "                                        FROM                                      (SELECT               \n"
+            + "                                                ex.encounter_id,              \n"
+            + "                                                    b.patient_id,              \n"
+            + "                                                    ex.encounter_type,              \n"
+            + "                                                    b.encounter_datetime              \n"
+            + "                                            FROM              \n"
+            + "                                                (SELECT               \n"
+            + "                                                p.patient_id,              \n"
+            + "                                                    e.encounter_datetime,              \n"
+            + "                                                    e.encounter_id,              \n"
+            + "                                                    e.encounter_type,              \n"
+            + "                                                    o.concept_id              \n"
+            + "                                            FROM              \n"
+            + "                                                patient p inner join             \n"
+            + "                                                encounter e on p.patient_id = e.patient_id              \n"
+            + "                                            INNER JOIN obs o ON e.encounter_id = o.encounter_id              \n"
+            + "                                            WHERE              \n"
+            + "                                                e.voided = 0 AND o.voided = 0 AND p.voided = 0            \n"
+            + "                                                    AND e.encounter_type = 6              \n"
+            + "                                                    AND ((o.concept_id = 165322 AND o.value_coded  = 23730) OR o.value_coded = 23720)              \n"
+            + "                                                    AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                                    AND e.location_id = 400) AS b              \n"
+            + "                                            LEFT JOIN encounter ex ON ex.patient_id = b.patient_id              \n"
+            + "                                                AND DATE(ex.encounter_datetime) = DATE(b.encounter_datetime)              \n"
+            + "                                            WHERE              \n"
+            + "                                                ex.voided = 0 AND ex.encounter_type = 18              \n"
+            + "                                                    AND DATE(ex.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                                    AND ex.location_id = 400) AS same_day              \n"
+            + "                                        WHERE              \n"
+            + "                                            same_day.encounter_type = 18              \n"
+            + "                                                AND same_day.encounter_id NOT IN (SELECT               \n"
+            + "                                                    e.encounter_id              \n"
+            + "                                                FROM              \n"
+            + "                                                    encounter e              \n"
+            + "                                                        INNER JOIN              \n"
+            + "                                                    obs o ON e.encounter_id = o.encounter_id              \n"
+            + "                                                WHERE              \n"
+            + "                                                    e.encounter_type = 18              \n"
+            + "                                                        AND o.concept_id = 5096              \n"
+            + "                                                        AND e.voided = 0              \n"
+            + "                                                        AND o.voided = 0              \n"
+            + "                                                        AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                                        AND e.location_id = 400)              \n"
+            + "                                                AND same_day.patient_id = p.patient_id              \n"
+            + "                                                AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date)\n"
+            + "                    UNION                              SELECT               \n"
+            + "                                            same_day.encounter_id              \n"
+            + "                                        FROM                                      (SELECT               \n"
+            + "                                                b.patient_id,              \n"
+            + "                                                    b.encounter_id,              \n"
+            + "                                                    b.encounter_datetime,              \n"
+            + "                                                    b.encounter_type              \n"
+            + "                                            FROM              \n"
+            + "                                                (SELECT               \n"
+            + "                                                p.patient_id,              \n"
+            + "                                                    e.encounter_datetime,              \n"
+            + "                                                    e.encounter_id,              \n"
+            + "                                                    e.encounter_type              \n"
+            + "                                            FROM   patient p inner join            \n"
+            + "                                                encounter e   ON p.patient_id = e.patient_id \n"
+            + "                                            WHERE              \n"
+            + "                                                e.voided = 0              \n"
+            + "                                                    AND e.encounter_type = 6              \n"
+            + "                                                    AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                                    AND e.location_id = 400) AS b              \n"
+            + "                                            LEFT JOIN encounter ex ON ex.patient_id = b.patient_id              \n"
+            + "                                                AND DATE(ex.encounter_datetime) = DATE(b.encounter_datetime)              \n"
+            + "                                            INNER JOIN obs o ON ex.encounter_id = o.encounter_id              \n"
+            + "                                            WHERE ex.voided = 0 AND o.voided = 0              \n"
+            + "                                                    AND ex.encounter_type = 18              \n"
+            + "                                                    AND o.concept_id = 5096              \n"
+            + "                                                    AND DATE(ex.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                                    AND ex.location_id = 400) AS same_day              \n"
+            + "                                        WHERE              \n"
+            + "                                            same_day.encounter_type = 6              \n"
+            + "                                                AND same_day.patient_id = p.patient_id                                               \n"
+            + "                                                AND DATE(same_day.encounter_datetime) = DATE(last_encounter.encounter_date)           \n"
+            + "                                            UNION              \n"
+            + "                                SELECT list.encounter_id               \n"
+            + "                                FROM encounter list              \n"
+            + "                                INNER JOIN     \t\t              \n"
+            + "                                (SELECT  p.patient_id, MAX(e.encounter_datetime) AS ficha_date              \n"
+            + "                                    FROM                                  patient p              \n"
+            + "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id              \n"
+            + "                                    INNER JOIN obs o ON e.encounter_id = o.encounter_id              \n"
+            + "                                    WHERE              \n"
+            + "                                        e.encounter_type = 6              \n"
+            + "                                             AND ( \to.concept_id = 23739 \n"
+            + "                                            \t\t OR \n"
+            + "                                            \t\t (o.concept_id = 165174 and o.value_coded IN (23730,23888) )\n"
+            + "                                            \t )          \n"
+            + "                                            AND p.voided = 0              \n"
+            + "                                            AND o.voided = 0              \n"
+            + "                                            AND e.voided = 0              \n"
+            + "                                            AND e.location_id = 400             \n"
+            + "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                    GROUP BY p.patient_id ) last_ficha ON list.patient_id = last_ficha.patient_id              \n"
+            + "                                INNER JOIN              \n"
+            + "                                (SELECT  p.patient_id, MAX(e.encounter_datetime) AS fila_date              \n"
+            + "                                    FROM patient p              \n"
+            + "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id               \n"
+            + "                                 WHERE              \n"
+            + "                                        e.encounter_type = 18              \n"
+            + "                                 AND p.voided = 0              \n"
+            + "                                            AND e.voided = 0              \n"
+            + "                                            AND e.location_id = 400             \n"
+            + "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                    GROUP BY p.patient_id ) last_fila ON list.patient_id = last_fila.patient_id              \n"
+            + "                                WHERE list.encounter_type = 18   \n"
+            + "                                AND DATE(list.encounter_datetime) < DATE(last_ficha.ficha_date)               \n"
+            + "                                AND DATE(list.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                AND list.voided = 0              \n"
+            + "                                AND list.location_id = 400             \n"
+            + "                                AND list.patient_id = p.patient_id              \n"
+            + "                                UNION                         SELECT list.encounter_id               \n"
+            + "                                FROM encounter list              \n"
+            + "                                INNER JOIN     \t\t              \n"
+            + "                                (SELECT  p.patient_id, MAX(e.encounter_datetime) AS ficha_date              \n"
+            + "                                    FROM                                  patient p              \n"
+            + "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id              \n"
+            + "                                    WHERE              \n"
+            + "                                        e.encounter_type = 6                        \n"
+            + "                                            AND p.voided = 0              \n"
+            + "                                            AND e.voided = 0              \n"
+            + "                                            AND e.location_id = 400             \n"
+            + "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                    GROUP BY p.patient_id ) last_ficha ON list.patient_id = last_ficha.patient_id              \n"
+            + "                                INNER JOIN              \n"
+            + "                                (SELECT  p.patient_id, MAX(e.encounter_datetime) AS fila_date              \n"
+            + "                                    FROM patient p              \n"
+            + "                                    INNER JOIN encounter e ON p.patient_id = e.patient_id              \n"
+            + "                                INNER JOIN obs o ON e.encounter_id = o.encounter_id               \n"
+            + "                                 WHERE              \n"
+            + "                                        e.encounter_type = 18              \n"
+            + "                                 AND p.voided = 0              \n"
+            + "                                AND o.concept_id = 5096              \n"
+            + "                                AND o.voided = 0              \n"
+            + "                                            AND e.voided = 0              \n"
+            + "                                            AND e.location_id = 400             \n"
+            + "                                            AND DATE(e.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                    GROUP BY p.patient_id ) last_fila ON list.patient_id = last_fila.patient_id              \n"
+            + "                                WHERE list.encounter_type = 6             \n"
+            + "                                AND DATE(list.encounter_datetime) <= DATE(last_fila.fila_date)              \n"
+            + "                                AND DATE(list.encounter_datetime) <= \"2022-06-20\"              \n"
+            + "                                AND list.voided = 0              \n"
+            + "                                AND list.location_id = 400             \n"
+            + "                                AND list.patient_id = p.patient_id)             \n"
+            + "                         GROUP BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
