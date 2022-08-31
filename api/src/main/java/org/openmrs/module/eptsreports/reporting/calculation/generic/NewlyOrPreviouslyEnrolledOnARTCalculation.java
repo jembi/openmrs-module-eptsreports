@@ -15,6 +15,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Months;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
@@ -86,6 +87,12 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
       endDate = (Date) context.getFromCache(ON_OR_BEFORE);
     }
 
+    final List<EncounterType> consultationEncounterTypes =
+            Arrays.asList(
+                    hivMetadata.getAdultoSeguimentoEncounterType(),
+                    hivMetadata.getPediatriaSeguimentoEncounterType(),
+                    hivMetadata.getMasterCardEncounterType());
+
     // Start ART date is always checked against endDate, not endDate - 6m
     parameterValues.put("onOrBefore", addMonths(endDate, 6));
     CalculationResultMap artStartDates =
@@ -94,6 +101,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             cohort,
             parameterValues,
             context);
+    // patients who started IPT in the previous reporting period
     CalculationResultMap startProfilaxiaObservations =
         ePTSCalculationService.firstObs(
             hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept(),
@@ -102,7 +110,7 @@ public class NewlyOrPreviouslyEnrolledOnARTCalculation extends AbstractPatientCa
             false,
             startDate,
             endDate,
-            null,
+                consultationEncounterTypes,
             cohort,
             context);
     CalculationResultMap startDrugsObservations =

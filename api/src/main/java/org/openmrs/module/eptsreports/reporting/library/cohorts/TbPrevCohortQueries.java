@@ -275,13 +275,13 @@ public class TbPrevCohortQueries {
         EptsReportUtils.map(
             getPatientsWhoHaveProfilaxiaTPTWith3HPOnFichaResumoOrClinica(
                 hivMetadata.getMasterCardEncounterType()),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "profilaxia-tpt-3hp-marked-inicio",
         EptsReportUtils.map(
             getPatientsWhoHaveProfilaxiaTPTWith3HPOnFichaResumoOrClinica(
                 hivMetadata.getAdultoSeguimentoEncounterType()),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter-6m},endDate=${onOrBefore-6m},location=${location}"));
     definition.addSearch(
         "outras-prescricoes-with-dt-3hp-on-ficha-clinica",
         EptsReportUtils.map(
@@ -1104,6 +1104,7 @@ public class TbPrevCohortQueries {
     valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
 
     String query =
         " SELECT DISTINCT p.patient_id "
