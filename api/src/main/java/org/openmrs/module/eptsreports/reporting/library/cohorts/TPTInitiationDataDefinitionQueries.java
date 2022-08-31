@@ -1460,12 +1460,8 @@ public class TPTInitiationDataDefinitionQueries {
    * (encounter type 6, 9) during the reporting period with following concepts:
    *
    * <ul>
-   *   <li>with “Profilaxia INH” (concept id 6122) with value code “Inicio” (concept id 1256) and
-   *       encounter datetime between start date and end date
    *   <li>Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
-   *       Profilaxia (concept id 165308) value coded Início (concept id 1256) or
-   *   <li>with “Profilaxia com INH” (concept id 6128) and value datetime is not null and between
-   *       start date and end date
+   *       Profilaxia (concept id 165308) value coded Início (concept id 1256) (Data Inicio)
    * </ul>
    *
    * </blockquote>
@@ -1484,31 +1480,24 @@ public class TPTInitiationDataDefinitionQueries {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, "
-            + "              CASE  WHEN o.concept_id = ${6122}  THEN MIN(e.encounter_datetime) "
-            + "                  WHEN o1.concept_id = ${23985} AND o2.concept_id = ${165308} THEN MIN(e.encounter_datetime) "
-            + "                  WHEN o.concept_id = ${6128}  THEN MIN(o.value_datetime) "
-            + "              END AS initiation_date "
+            + "               MIN(o2.obs_datetime) AS initiation_date"
             + "            FROM patient p "
             + "                  INNER JOIN  encounter e ON p.patient_id = e.patient_id "
             + "                  INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
-            + "                  INNER JOIN obs o1 ON e.encounter_id = o1.encounter_id "
             + "                  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "           WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o1.voided = 0 "
+            + "           WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "                  AND o2.voided = 0 AND e.location_id = :location "
             + "                  AND e.encounter_type IN (${6} , ${9}) "
-            + "                  AND ((o.concept_id = ${6122} AND o.value_coded = ${1256} AND e.encounter_datetime BETWEEN :startDate AND  :endDate) "
-            + "                  OR ((o1.concept_id = ${23985} AND o1.value_coded = ${656} "
-            + "                  AND o2.concept_id = ${165308} AND o2.value_coded = ${1256})) "
-            + "                  OR (o.concept_id = ${6128} AND o.value_datetime IS NOT NULL AND o.value_datetime BETWEEN :startDate AND  :endDate)) "
+            + "                  AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "                  AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                  AND o2.obs_datetime BETWEEN :startDate AND  :endDate ) ) "
             + "           GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -1523,9 +1512,13 @@ public class TPTInitiationDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>The earliest “Ultima profilaxia Isoniazida (Data Inicio)” (concept id 6128) registered on
-   * Ficha Resumo (encounter type 53) and value datetime not null and between start date and end
-   * date
+   * <p>The earliest IPT initiation date registered on Ficha Resumo (encounter type 53) during the
+   * reporting period with following concepts:
+   *
+   * <ul>
+   *   <li>Profilaxia TPT (concept id 23985) value coded INH (concept id 656) Data Inicio (concept
+   *       165308 value 1256)
+   * </ul>
    *
    * </blockquote>
    *
@@ -1541,36 +1534,25 @@ public class TPTInitiationDataDefinitionQueries {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
-    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
         "SELECT p.patient_id, "
-            + "        Min(o.value_datetime) AS encounter_datetime "
-            + " FROM   patient p "
-            + "        INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "        INNER JOIN obs o3 ON e.encounter_id = o3.encounter_id "
-            + " WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "        AND e.location_id = :location "
-            + "        AND e.encounter_type = ${53} "
-            + "        AND o.value_datetime IS NOT NULL "
-            + "        AND o.concept_id = ${6128} "
-            + "        AND o.value_datetime BETWEEN :startDate AND :endDate "
-            + "        OR ( (o2.concept_id = ${23985} AND o2.value_coded = ${656} ) "
-            + "              AND ( o3.concept_id = ${6128} AND o3.value_datetime <= CURRENT_DATE() ) ) "
-            + "        AND p.patient_id NOT IN(SELECT p.patient_id "
-            + "                                FROM   patient p "
-            + "                                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "                                       AND e.location_id = :location "
-            + "                                       AND e.encounter_type = ${53} "
-            + "                                       AND o.concept_id = ${23985} AND o.value_coded = ${23954}) "
-            + " GROUP BY p.patient_id ";
+            + "               MIN(o2.obs_datetime) AS initiation_date"
+            + "            FROM patient p "
+            + "                  INNER JOIN  encounter e ON p.patient_id = e.patient_id "
+            + "                  INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
+            + "                  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "           WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "                  AND o2.voided = 0 AND e.location_id = :location "
+            + "                  AND e.encounter_type = ${53} "
+            + "                  AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "                  AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                  AND o2.obs_datetime BETWEEN :startDate AND  :endDate ) ) "
+            + "           GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
