@@ -423,7 +423,9 @@ public class TPTInitiationCohortQueries {
    * 23987) value coded “continua” or “fim” or no value(concept ID in [1257, 1267, null]) marked on
    * the first FILT (encounter type 60) and encounter datetime between start date and end date and:
    *
-   * <p>◦ N1o other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
+
+   * <p>◦ No other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
+
    * id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the FILT 3HP
    * start date.  ; and
    *
@@ -504,7 +506,7 @@ public class TPTInitiationCohortQueries {
             + "                  AND e.location_id = :location "
             + "                  AND e.encounter_type = ${60} "
             + "                  AND o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) "
-            + "                  AND e.encounter_datetime >= Date_sub(filt.start_date, interval 4 month) "
+            + "                  AND e.encounter_datetime BETWEEN Date_sub(filt.start_date, interval 4 month) AND filt.start_date "
             + "                  GROUP  BY p.patient_id "
             + "           UNION "
             + "           SELECT p.patient_id "
@@ -531,7 +533,7 @@ public class TPTInitiationCohortQueries {
             + "           AND ( o3.concept_id = ${23985} AND o3.value_coded = ${23954}   "
             + "                 AND o4.concept_id = ${165308} AND o4.value_coded = ${1256} ) "
             + "           OR  ( o5.concept_id = ${1719} AND o5.value_coded IN ( ${23954}, ${165307} ) ) "
-            + "           AND e.encounter_datetime <= Date_sub(filt.start_date, interval 4 month) "
+            + "           AND e.encounter_datetime BETWEEN Date_sub(filt.start_date, interval 4 month) AND filt.start_date "
             + "           GROUP  BY p.patient_id "
             + "           UNION "
             + "           SELECT p.patient_id "
@@ -555,7 +557,7 @@ public class TPTInitiationCohortQueries {
             + "           AND e.location_id = :location "
             + "           AND e.encounter_type = ${53} "
             + "           AND o6.concept_id = ${23985} AND o6.value_coded = ${23954} "
-            + "           AND o7.concept_id = ${6128} AND o7.value_datetime <= Date_sub(filt.start_date, interval 4 month) "
+            + "           AND o7.concept_id = ${6128} AND o7.value_datetime BETWEEN Date_sub(filt.start_date, interval 4 month) AND filt.start_date "
             + "           GROUP BY p.patient_id) "
             + "GROUP BY p.patient_id ";
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);

@@ -415,9 +415,9 @@ public class TPTInitiationDataDefinitionQueries {
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 AND o3.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${6} "
-            + "       AND ( o.concept_id = ${1719} AND o.value_coded = ${23954} ) "
-            + "       OR  ( (o2.concept_id = ${23985} AND o2.value_coded = ${23954}) "
-            + "             AND (o3.concept_id = ${165308} AND o3.value_coded = ${1256}) ) "
+            + "       AND ( (o.concept_id = ${1719} AND o.value_coded = ${23954} ) "
+            + "             OR  ( (o2.concept_id = ${23985} AND o2.value_coded = ${23954}) "
+            + "                    AND (o3.concept_id = ${165308} AND o3.value_coded = ${1256}) ) )"
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "GROUP  BY p.patient_id ";
 
@@ -466,7 +466,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${53} "
             + "       AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
-            + "       AND o2.concept_id = ${6128} AND o2.value_datetime < CURRENT_DATE() "
+            + "       AND o2.concept_id = ${6128} AND o2.value_datetime BETWEEN :startDate AND :endDate "
             + "GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
