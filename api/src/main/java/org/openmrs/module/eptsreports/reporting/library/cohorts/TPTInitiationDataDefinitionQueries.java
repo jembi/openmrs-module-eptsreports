@@ -1670,8 +1670,8 @@ public class TPTInitiationDataDefinitionQueries {
    *
    * <p>Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia
    * (concept id 165308) value coded Fim (concept id 1267) (Data Fim) on Ficha Clínica or Ficha
-   * Seguimento (Encounter Type 6, 9) registered between IPT Start Date and report generation date
-   * </>
+   * Seguimento (Encounter Type 6, 9) between the IPT Start Date (obtained in TPT_INI_FR19) and
+   * until the report generation date
    *
    * <p>Note: if more than one Ficha Clínica or Ficha de Seguimento exists the system should
    * consider the most recent date amongst the sources
@@ -1699,7 +1699,6 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
-    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
@@ -1768,10 +1767,10 @@ public class TPTInitiationDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>The most recent “Última Profilaxia Isoniazida (Data Fim)” (Concept ID 6129) or Última
-   * profilaxia(concept id 23985) value coded 3HP(concept id 23954) and Data Fim da Profilaxia
-   * TPT(value datetime, concept id 6129) registered in Ficha Resumo – Mastercard (Encounter Type
-   * 53) until the report generation date </>
+   * <p>The most recent Última profilaxia(concept id 23985) value coded 3HP(concept id 23954) and
+   * Data Fim (concept 165308 value 1267) selected in Ficha Resumo – Mastercard (Encounter Type 53)
+   * between the IPT Start Date (obtained in TPT_INI_FR19) and until the report generation date
+   * until the report generation date </>
    *
    * <p>For 24 and 25: The system will determine the most recent from these sources as the IPT End
    * Date </>
@@ -1796,6 +1795,9 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT p.patient_id, MAX(o2.obs_datetime) AS recent_date "
