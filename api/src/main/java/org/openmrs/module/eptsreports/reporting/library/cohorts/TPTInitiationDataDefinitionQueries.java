@@ -614,16 +614,14 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
-    valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
     valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
         "SELECT p.patient_id, "
-            + "       Max(e.encounter_datetime) AS completion_date "
+            + "       Max(o2.obs_datetime) AS completion_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -641,19 +639,17 @@ public class TPTInitiationDataDefinitionQueries {
             + "                  GROUP  BY p.patient_id "
             + "                  UNION "
             + "                  SELECT p.patient_id, "
-            + "                         Min(e.encounter_datetime) AS start_date "
+            + "                         Min(o2.obs_datetime) AS start_date "
             + "                  FROM   patient p "
             + "                         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                         INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "                         INNER JOIN obs o3 ON e.encounter_id = o3.encounter_id "
-            + "                  WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 AND o3.voided = 0 "
+            + "                  WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "                         AND e.location_id = :location "
             + "                         AND e.encounter_type = ${6} "
-            + "                         AND ( o.concept_id = ${1719} AND o.value_coded = ${23954} ) "
-            + "                          OR ( (o2.concept_id = ${23985} AND o2.value_coded = ${23954}) "
-            + "                               AND (o3.concept_id = ${165308} AND o3.value_coded = ${1256}) )"
-            + "                         AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                         AND ( (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
+            + "                               AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                         AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "                  GROUP  BY p.patient_id "
             + "                  UNION "
             + "                  SELECT p.patient_id, "
@@ -665,15 +661,16 @@ public class TPTInitiationDataDefinitionQueries {
             + "                  WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "                         AND e.location_id = :location "
             + "                         AND e.encounter_type = ${53} "
-            + "                         AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
-            + "                         AND o2.concept_id = ${6128} AND o2.value_datetime < CURRENT_DATE() "
+            + "                         AND ( (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
+            + "                               AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                         AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "                  GROUP  BY p.patient_id) 3hp ON 3hp.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${6} "
-            + "       AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
-            + "       AND o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
-            + "       AND e.encounter_datetime BETWEEN 3hp.start_date AND CURRENT_DATE() "
+            + "       AND ( ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
+            + "       AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + "       AND o2.obs_datetime BETWEEN 3hp.start_date AND CURRENT_DATE() ) ) "
             + "GROUP  BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
