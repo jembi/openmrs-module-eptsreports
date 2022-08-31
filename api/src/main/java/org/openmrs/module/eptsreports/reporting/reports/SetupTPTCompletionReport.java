@@ -40,7 +40,7 @@ public class SetupTPTCompletionReport extends EptsDataExportManager {
 
   @Override
   public String getDescription() {
-    return "The TPT Completion Cascade Report generates the number of patients who are eligible or completed TPT in their lifetime until the end of reporting period.";
+    return "Este relatório gera o número de pacientes elegíveis ou que alguma vez completaram Tratamento Preventivo de Tuberculose até ao fim do período de reporte.";
   }
 
   @Override
