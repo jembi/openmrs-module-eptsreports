@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -20,6 +17,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class TPTEligiblePatientListCohortQueries {
@@ -1032,7 +1033,7 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>B1.2: Select all patients with Última profilaxia(concept id 23985) value coded
-   *       INH(concept id 656) and Data Fim (value datetime) selected by reporting end date in Ficha
+   *       INH(concept id 656) and Data Fim (obs datetime) selected by reporting end date in Ficha
    *       Resumo – Mastercard (encounter type 53) and between 173 days and 365 days from the INH
    *       start date
    * </ul>

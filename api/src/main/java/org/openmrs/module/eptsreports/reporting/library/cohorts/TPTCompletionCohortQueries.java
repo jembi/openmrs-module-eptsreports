@@ -38,14 +38,14 @@ public class TPTCompletionCohortQueries {
   private final TPTInitiationCohortQueries tptInitiationCohortQueries;
   @Autowired
   public TPTCompletionCohortQueries(
-      HivMetadata hivMetadata,
-      TbMetadata tbMetadata,
-      TbPrevCohortQueries tbPrevCohortQueries,
-      TxCurrCohortQueries txCurrCohortQueries,
-      TXTBCohortQueries txTbCohortQueries,
-      GenericCohortQueries genericCohortQueries,
-      TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries,
-      TPTInitiationCohortQueries tptInitiationCohortQueries) {
+          HivMetadata hivMetadata,
+          TbMetadata tbMetadata,
+          TbPrevCohortQueries tbPrevCohortQueries,
+          TxCurrCohortQueries txCurrCohortQueries,
+          TXTBCohortQueries txTbCohortQueries,
+          GenericCohortQueries genericCohortQueries,
+          TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries,
+          TPTInitiationCohortQueries tptInitiationCohortQueries, TPTInitiationCohortQueries tptInitiationCohortQueries1) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.tbPrevCohortQueries = tbPrevCohortQueries;
@@ -53,6 +53,7 @@ public class TPTCompletionCohortQueries {
     this.txTbCohortQueries = txTbCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
     this.tptEligiblePatientListCohortQueries = tptEligiblePatientListCohortQueries;
+    this.tptInitiationCohortQueries = tptInitiationCohortQueries1;
   }
 
   private final String mapping = "endDate=${endDate},location=${location}";
@@ -158,10 +159,8 @@ public class TPTCompletionCohortQueries {
             tptEligiblePatientListCohortQueries.getIPTB2(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
                 hivMetadata.getCompletedConcept().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
@@ -174,11 +173,9 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB3(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getCompletedConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
@@ -191,11 +188,9 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB4(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getCompletedConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
@@ -208,9 +203,7 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB5Part1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
