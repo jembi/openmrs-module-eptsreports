@@ -1493,7 +1493,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "                  INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
             + "                  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "           WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
-            + "                  AND o2.voided = 0 AND e.location_id = :location "
+            + "                  AND e.location_id = :location "
             + "                  AND e.encounter_type IN (${6} , ${9}) "
             + "                  AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
             + "                  AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
@@ -1668,13 +1668,13 @@ public class TPTInitiationDataDefinitionQueries {
    *
    * <p>The most recent date from the following criterias:
    *
-   * <p>Profilaxia (INH) (Concept ID 6122) marked with the value Fim (Concept ID 1267) or Profilaxia
-   * TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id
-   * 165308) value coded Fim (concept id 1267) on Ficha Clínica – Mastercard (Encounter Type 6)
-   * registered between IPT Start Date and report generation date </>
+   * <p>Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia
+   * (concept id 165308) value coded Fim (concept id 1267) (Data Fim) on Ficha Clínica or Ficha
+   * Seguimento (Encounter Type 6, 9) registered between IPT Start Date and report generation date
+   * </>
    *
-   * <p>Profilaxia com INH – TPI (Data Fim) (Concept ID 6129) marked in Ficha de Seguimento until
-   * the report generation date
+   * <p>Note: if more than one Ficha Clínica or Ficha de Seguimento exists the system should
+   * consider the most recent date amongst the sources
    *
    * </blockquote>
    *
@@ -1692,11 +1692,8 @@ public class TPTInitiationDataDefinitionQueries {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
     valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put(
-        "6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
@@ -1708,12 +1705,11 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id, MAX(e.encounter_datetime) AS recent_date "
+        "SELECT p.patient_id, MAX(o2.obs_datetime) AS recent_date "
             + "              FROM   patient p "
             + "                    INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                    INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "                    INNER JOIN obs o3 ON e.encounter_id = o3.encounter_id "
             + "                    INNER JOIN ( "
             + "                            SELECT  p.patient_id, MIN(e.encounter_datetime) AS start_date "
             + "                            FROM  patient p "
@@ -1727,58 +1723,38 @@ public class TPTInitiationDataDefinitionQueries {
             + "                                   GROUP BY p.patient_id "
             + "                     UNION "
             + "                            SELECT p.patient_id, "
-            + "                            CASE  WHEN o.concept_id = ${6122}  THEN MIN(e.encounter_datetime) "
-            + "                                   WHEN o1.concept_id = ${23985} AND o2.concept_id = ${165308} THEN MIN(e.encounter_datetime) "
-            + "                                   WHEN o.concept_id = ${6128} THEN MIN(o.value_datetime) "
-            + "                            END AS start_date "
+            + "                                    MIN(o2.obs_datetime) AS start_date "
             + "                                   FROM patient p "
             + "                                        INNER JOIN  encounter e ON p.patient_id = e.patient_id "
             + "                                        INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
-            + "                                        INNER JOIN obs o1 ON e.encounter_id = o1.encounter_id "
             + "                                        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "                                   WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o1.voided = 0 "
-            + "                                        AND o2.voided = 0 AND e.location_id = :location "
+            + "                                   WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "                                        AND e.location_id = :location "
             + "                                        AND e.encounter_type IN (${6} , ${9}) "
-            + "                                        AND ((o.concept_id = ${6122} AND o.value_coded = ${1256} "
-            + "                                        AND e.encounter_datetime BETWEEN :startDate AND  :endDate) "
-            + "                                        OR ((o1.concept_id = ${23985} AND o1.value_coded = ${656} "
-            + "                                        AND o2.concept_id = ${165308} AND o2.value_coded = ${1256})) "
-            + "                                        OR (o.concept_id = ${6128} AND o.value_datetime IS NOT NULL "
-            + "                                        AND o.value_datetime BETWEEN :startDate AND  :endDate)) "
+            + "                                        AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "                                        AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                                        AND o2.obs_datetime BETWEEN :startDate AND  :endDate ) ) "
             + "                                   GROUP BY p.patient_id "
             + "                     UNION "
             + "                            SELECT p.patient_id, "
-            + "                            MIN(o.value_datetime) AS start_date "
-            + "                            FROM patient p "
-            + "                                   INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                   INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                    MIN(o2.obs_datetime) AS initiation_date"
+            + "                               FROM patient p "
+            + "                                   INNER JOIN  encounter e ON p.patient_id = e.patient_id "
+            + "                                   INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
             + "                                   INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "                                   INNER JOIN obs o3 ON e.encounter_id = o3.encounter_id "
-            + "                            WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "                                   AND e.location_id = :location "
-            + "                                   AND e.encounter_type = ${53} "
-            + "                                   AND o.value_datetime IS NOT NULL "
-            + "                                   AND ( o.concept_id = ${6128} "
-            + "                                          OR ( o2.concept_id = ${23985} AND o2.value_coded = ${656} ) ) "
-            + "                                   AND o3.concept_id = ${6128} AND o3.value_datetime <= CURRENT_DATE() "
-            + "                                   AND o.value_datetime BETWEEN :startDate AND :endDate "
-            + "                                   AND p.patient_id NOT IN(SELECT p.patient_id "
-            + "                                          FROM   patient p "
-            + "                                                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                                 INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                          WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "                                                 AND e.location_id = :location "
-            + "                                                 AND e.encounter_type = ${53} "
-            + "                                                 AND o.concept_id = ${23985} "
-            + "                                                 AND o.value_coded = ${23954}) "
-            + "                            GROUP  BY p.patient_id) AS ipt ON ipt.patient_id = p.patient_id "
-            + "              WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 AND o3.voided = 0 "
-            + "                    AND e.encounter_type = ${6} "
+            + "                               WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "                                        AND o2.voided = 0 AND e.location_id = :location "
+            + "                                        AND e.encounter_type = ${53} "
+            + "                                        AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "                                        AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                                        AND o2.obs_datetime BETWEEN :startDate AND  :endDate ) ) "
+            + "                               GROUP  BY p.patient_id) AS ipt ON ipt.patient_id = p.patient_id "
+            + "              WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "                    AND e.encounter_type IN ( ${6}, ${9} ) "
             + "                    AND e.location_id = :location "
-            + "                    AND o.concept_id = ${6122} AND o.value_coded = ${1267} "
-            + "                    OR  ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
-            + "                           AND (o3.concept_id = ${165308} AND o3.value_coded = ${1267}) )"
-            + "                    AND e.encounter_datetime BETWEEN ipt.start_date AND CURRENT_DATE() ";
+            + "                    AND  ( (o.concept_id = ${23985} AND o.value_coded = ${656}) "
+            + "                           AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + "                    AND o2.obs_datetime BETWEEN ipt.start_date AND CURRENT_DATE()) )";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -1814,35 +1790,64 @@ public class TPTInitiationDataDefinitionQueries {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put(
-        "6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
-    valuesMap.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
-    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-        "SELECT p.patient_id, "
-            + "       CASE WHEN o.concept_id = ${6129} THEN MAX(o.value_datetime) "
-            + "            WHEN o2.concept_id = ${23985} THEN MAX(o2.value_datetime) "
-            + "       END AS most_recent_date "
-            + "       FROM patient p "
-            + "                          	INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                          	INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                            INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "                            WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
-            + "                            AND e.location_id = :location "
-            + "                            AND e.encounter_type = ${53} "
-            + "                            AND (o.concept_id = ${6129} AND o.value_datetime <= CURRENT_DATE()) "
-            + "                            OR  (o2.concept_id = ${23985} AND o2.value_coded = ${23954} AND o2.value_datetime <= CURRENT_DATE()) "
-            + "                            GROUP BY p.patient_id ";
+        "SELECT p.patient_id, MAX(o2.obs_datetime) AS recent_date "
+            + "              FROM   patient p "
+            + "                    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                    INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "                    INNER JOIN ( "
+            + "                            SELECT  p.patient_id, MIN(e.encounter_datetime) AS start_date "
+            + "                            FROM  patient p "
+            + "                                   INNER JOIN  encounter e ON p.patient_id = e.patient_id "
+            + "                                  INNER JOIN   obs o ON e.encounter_id = o.encounter_id "
+            + "                            WHERE   p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                   AND e.encounter_type = ${60} "
+            + "                                   AND o.concept_id = ${23985}   AND e.location_id = :location "
+            + "                                   AND o.value_coded IN (${656},${23982}) "
+            + "                                   AND e.encounter_datetime BETWEEN :startDate AND  :endDate "
+            + "                                   GROUP BY p.patient_id "
+            + "                     UNION "
+            + "                            SELECT p.patient_id, "
+            + "                                    MIN(o2.obs_datetime) AS start_date "
+            + "                                   FROM patient p "
+            + "                                        INNER JOIN  encounter e ON p.patient_id = e.patient_id "
+            + "                                        INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
+            + "                                        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "                                   WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "                                        AND e.location_id = :location "
+            + "                                        AND e.encounter_type IN (${6} , ${9}) "
+            + "                                        AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "                                        AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                                        AND o2.obs_datetime BETWEEN :startDate AND  :endDate ) ) "
+            + "                                   GROUP BY p.patient_id "
+            + "                     UNION "
+            + "                            SELECT p.patient_id, "
+            + "                                    MIN(o2.obs_datetime) AS initiation_date"
+            + "                               FROM patient p "
+            + "                                   INNER JOIN  encounter e ON p.patient_id = e.patient_id "
+            + "                                   INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
+            + "                                   INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "                               WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "                                        AND o2.voided = 0 AND e.location_id = :location "
+            + "                                        AND e.encounter_type = ${53} "
+            + "                                        AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "                                        AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                                        AND o2.obs_datetime BETWEEN :startDate AND  :endDate ) ) "
+            + "                               GROUP  BY p.patient_id) AS ipt ON ipt.patient_id = p.patient_id "
+            + "              WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "                    AND e.encounter_type = ${53} "
+            + "                    AND e.location_id = :location "
+            + "                    AND  ( (o.concept_id = ${23985} AND o.value_coded = ${656}) "
+            + "                           AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + "                    AND o2.obs_datetime BETWEEN ipt.start_date AND CURRENT_DATE()) )";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
