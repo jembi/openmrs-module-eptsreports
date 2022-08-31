@@ -101,6 +101,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
   public CohortDefinition getAdolescentsCurrentlyOnArtWithDisclosures(int valueCoded) {
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put(
         "6340",
         hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());

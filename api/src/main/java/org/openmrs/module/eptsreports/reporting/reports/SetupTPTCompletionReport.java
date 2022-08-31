@@ -62,8 +62,10 @@ public class SetupTPTCompletionReport extends EptsDataExportManager {
     reportDefinition.setParameters(getDataParameters());
     reportDefinition.addDataSetDefinition(
         "ALL", Mapped.mapStraightThrough(tPTCompletionDataSet.constructTPTCompletionDataSet()));
-    reportDefinition.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
-    reportDefinition.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+    reportDefinition.addDataSetDefinition(
+        "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    reportDefinition.addDataSetDefinition(
+        "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
