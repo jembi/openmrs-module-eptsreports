@@ -53,7 +53,6 @@ public class TPTCompletionCohortQueries {
     this.txTbCohortQueries = txTbCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
     this.tptEligiblePatientListCohortQueries = tptEligiblePatientListCohortQueries;
-    this.tptInitiationCohortQueries = tptInitiationCohortQueries;
   }
 
   private final String mapping = "endDate=${endDate},location=${location}";
@@ -222,9 +221,8 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB5Part2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDtINHConcept().getConceptId()),
@@ -235,9 +233,8 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tptEligiblePatientListCohortQueries.getIPTB5Part3(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDtINHConcept().getConceptId()),
@@ -828,7 +825,7 @@ public class TPTCompletionCohortQueries {
       int masterCardEncounterType, int regimeTPTConcept, int threeHPConceptConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
-    sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Data Inicio)");
+    sqlCohortDefinition.setName(" all patients with Profilaxia INH");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -875,7 +872,7 @@ public class TPTCompletionCohortQueries {
       int masterCardEncounterType, int regimeTPTConcept, int isoniazidConcept) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
-    sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Ficha Resumo)");
+    sqlCohortDefinition.setName(" all patients with Ficha Clinica ");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
