@@ -95,7 +95,7 @@ public class SetupTPTInitiationReport extends EptsDataExportManager {
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:5,dataset:TPT");
+      props.put("repeatingSections", "sheet:1,row:9,dataset:TPT");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
