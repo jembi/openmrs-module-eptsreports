@@ -290,7 +290,7 @@ public class TPTCompletionCohortQueries {
 
     compositionCohortDefinition.addSearch(
         "C7",
-        EptsReportUtils.map(tptInitiationCohortQueries.getPatientsWithRegimeDeTPT3HP(), mapping3));
+        EptsReportUtils.map(tptInitiationCohortQueries.getPatientsWithRegimeDeTPT3HP(), mapping));
 
     compositionCohortDefinition.addSearch(
         "D1",
@@ -704,7 +704,7 @@ public class TPTCompletionCohortQueries {
             + "  encounter e ON p.patient_id = e.patient_id"
             + "     INNER JOIN"
             + "  obs o ON e.encounter_id = o.encounter_id"
-            + "  obs o2 ON e.encounter_id = o2.encounter_id"
+            + "  INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id"
             + " WHERE"
             + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
             + " AND e.encounter_type = ${encounterTypes}"
@@ -1351,7 +1351,7 @@ public class TPTCompletionCohortQueries {
                 Collections.singletonList(hivMetadata.getStartDrugs().getConceptId())),
             mapping));
 
-    compositionCohortDefinition.setCompositionString("C4");
+    compositionCohortDefinition.setCompositionString("C5");
 
     return compositionCohortDefinition;
   }
@@ -1796,6 +1796,8 @@ public class TPTCompletionCohortQueries {
     map.put("23984", threeHPPiridoxinaConcept);
     map.put("53", masterCardEncounterType);
     map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id FROM patient p    "
@@ -1855,10 +1857,10 @@ public class TPTCompletionCohortQueries {
             + ") ) AS regimeTPT    "
             + "ON regimeTPT.patient_id = p.patient_id   "
             + "WHERE e.encounter_type = ${53}   "
-            + "AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
-            + "AND e.location_id = :location  AND o2.concept_id = ${165308} AND o2.value_coded = ${1267}"
-            + "AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) <= 365 AND o2.obs_datetime <= :endDate"
-            + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0";
+            + " AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
+            + " AND e.location_id = :location  AND o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + " AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) <= 365 AND o2.obs_datetime <= :endDate"
+            + " AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -1932,7 +1934,7 @@ public class TPTCompletionCohortQueries {
             + "WHERE e.encounter_type = ${6}   "
             + "AND (o.concept_id = ${23985} AND o.value_coded = ${23954})    "
             + "AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267})    "
-            + "AND e.location_id = :location  AND o2.obs_datetime <= endDate "
+            + "AND e.location_id = :location  AND o2.obs_datetime <= :endDate "
             + "AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) <= 365   "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 ";
 
