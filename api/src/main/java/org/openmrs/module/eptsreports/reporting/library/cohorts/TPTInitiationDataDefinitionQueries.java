@@ -686,9 +686,8 @@ public class TPTInitiationDataDefinitionQueries {
    * <blockquote>
    *
    * <p>Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id
-   * 23954) and Data Fim da Profilaxia TPT(value datetime, concept id 6129) registered on Ficha
-   * Resumo (Encounter type 53) with value datetime between the 3HP start date and Report generation
-   * date
+   * 23954) and Data Fim (concep id 165308 value 1267) registered on Ficha Resumo (Encounter type
+   * 53) with value datetime between the 3HP start date and Report generation date
    *
    * <p>The system will determine the most recent from these sources as the 3HP End Date
    *
@@ -813,6 +812,8 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
 
     String query =
         "SELECT patient_id, "
@@ -870,7 +871,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "                AND e.encounter_type =   ${6} "
             + "               AND ( ( o.concept_id =${23985} AND o.value_coded = ${656} ) "
             + "               AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-            + "               AND o2.obs_datetime BETWEEN :startDate AND : endDate ) ) GROUP BY p.patient_id) AS pickup "
+            + "               AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) GROUP BY p.patient_id) AS pickup "
             + "            ON pickup.patient_id = p.patient_id "
             + "    WHERE p.patient_id NOT IN ( "
             + "        SELECT patient_id "
@@ -1065,14 +1066,12 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put(
-        "6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
-    valuesMap.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, DATEDIFF(MAX(union_tbl.encounter_datetime), tbl_17.expected_date) AS result FROM patient p "
@@ -1245,7 +1244,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "                AND e.encounter_type =   ${6} "
             + "               AND ( ( o.concept_id =${23985} AND o.value_coded = ${656} ) "
             + "               AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-            + "               AND o2.obs_datetime BETWEEN :startDate AND : endDate ) ) GROUP BY p.patient_id) AS pickup "
+            + "               AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) GROUP BY p.patient_id) AS pickup "
             + "            ON pickup.patient_id = p.patient_id "
             + "    WHERE p.patient_id NOT IN ( "
             + "        SELECT patient_id "
