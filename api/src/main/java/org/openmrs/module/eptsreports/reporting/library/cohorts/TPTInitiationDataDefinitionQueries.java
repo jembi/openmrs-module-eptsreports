@@ -436,7 +436,10 @@ public class TPTInitiationDataDefinitionQueries {
    *
    * <p>Note: The system will determine the earliest date from these sources as the 3HP Start Date
    *
-   * <p></bloackquote>
+   * <p>
+   *
+   * <p>Note: if there is more than one Ficha Resumo then information from all Ficha Resumo should
+   * be included. </bloackquote>
    *
    * @return {@link DataDefinition}
    */
@@ -444,7 +447,6 @@ public class TPTInitiationDataDefinitionQueries {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("12 - 3HP Initiation Date On FIcha Resumo ");
-    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
@@ -461,8 +463,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type = ${53} "
             + "       AND ( (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
