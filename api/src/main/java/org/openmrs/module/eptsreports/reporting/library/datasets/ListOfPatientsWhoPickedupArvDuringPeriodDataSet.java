@@ -3,7 +3,9 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -26,12 +28,15 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodDataSet extends BaseDataSet
 
   private final TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
 
+  private final ListOfPatientsEligibleForVLDataDefinitionQueries listOfpatientsEligibleForVLDataDefinitionQueries;
+
   @Autowired
   public ListOfPatientsWhoPickedupArvDuringPeriodDataSet(
-      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
-      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet) {
+          ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
+          TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet, ListOfPatientsEligibleForVLDataDefinitionQueries listOfpatientsEligibleForVLDataDefinitionQueries) {
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
+    this.listOfpatientsEligibleForVLDataDefinitionQueries = listOfpatientsEligibleForVLDataDefinitionQueries;
   }
 
   public DataSetDefinition contructDataset() throws EvaluationException {
@@ -73,8 +78,34 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodDataSet extends BaseDataSet
     // 2 - Name - Sheet 1: Column B
     pdd.addColumn("name", nameDef, "");
 
-    // 3 - Sexo - Sheet 1: Column C
+    // 3 - ART start date - Sheet 1: Column C
+    pdd.addColumn(
+            "art_start_date",
+            listOfpatientsEligibleForVLDataDefinitionQueries.getPatientsAndARTStartDate(),
+            "endDate=${endDate},location=${location}",
+            null);
+
+    // 4 - Age - Sheet 1: Column D
+    pdd.addColumn(
+            "age",
+            listOfPatientsArtCohortCohortQueries.getAge(),
+            "evaluationDate=${evaluationDate}",
+            new NotApplicableIfNullConverter());
+
+    // 5 - Gender - Sheet 1: Column E
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
+
+    // 6 - Pregnancy/Lactation (Gestante/Lactante): - Sheet 1: Column F
+    pdd.addColumn(
+            "pregnant_breastfeeding",
+            tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
+            "location=${location}",
+            null);
+
+    // 7 - Last Patient State (Último Estado de Permanência) - Sheet 1: Column G
+
+
+    // Last Patient State Date (Data Último Estado de Permanência) - Sheet 1: Column H
 
     return pdd;
   }
