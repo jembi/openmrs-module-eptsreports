@@ -16,11 +16,8 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.prev.CompletedIsoniazidProphylaticTreatmentCalculation;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
@@ -42,6 +39,8 @@ public class TbPrevCohortQueries {
   @Autowired private TbMetadata tbMetadata;
 
   @Autowired private GenericCohortQueries genericCohortQueries;
+
+  @Autowired private TbPrevQueries tbPrevQueries;
 
   /**
    * <b>Technical Specs</b>
@@ -336,14 +335,30 @@ public class TbPrevCohortQueries {
   }
 
   public CohortDefinition getPatientsThatCompletedIsoniazidProphylacticTreatment() {
-    CalculationCohortDefinition cd =
-        new CalculationCohortDefinition(
-            Context.getRegisteredComponents(CompletedIsoniazidProphylaticTreatmentCalculation.class)
-                .get(0));
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    CohortDefinition completed3hp86 = tbPrevQueries.getPatientsWhoCompleted3HPAtLeast86Days();
+    CohortDefinition atLeast3ConsultationOn = tbPrevQueries.getAtLeast3ConsultationOnFichaClinica();
+    CohortDefinition atLeastOne3HPOnFilt = tbPrevQueries.getAtLeastOne3HPOnFilt();
+    CohortDefinition atLeast3ConsultationDMFilt = tbPrevQueries.getAtLeast3ConsultarionWithDispensaMensalOnFilt();
+    CohortDefinition atLeast1DT3HFichaClinica = tbPrevQueries.getAtLeast1ConsultarionWithDT3HPOnFichaClinica();
+
+    CohortDefinition inhAtLeast173 = tbPrevQueries.getPatientsWhoCompletedINHAtLeast173Days();
+    CohortDefinition atLeast5ConsultationOnFC= tbPrevQueries.getAtLeast5ConsultarionINHOnFichaClinica();
+    CohortDefinition inhDMOnFilt = tbPrevQueries.getAtLeast6ConsultarionWithINHDispensaMensalOnFilt();
+    CohortDefinition atLeast2DTFichaClinica = tbPrevQueries.getAtLeast2ConsultarionOfDTINHOnFichaClinica();
+    CohortDefinition atLeast2DTOnFilt = tbPrevQueries.getAtLeast2ConsultarionWithINHDispensaTrimestralOnFilt();
+    CohortDefinition atLeast3INHOnFichaClinica = tbPrevQueries. getAtLeast3ConsultarionOfINHOnFichaClinica();
+    CohortDefinition atLeast1DTInhFichaClinica = tbPrevQueries.getAtLeast1ConsultarionWithDTINHOnFichaClinica() ;
+    CohortDefinition atLeast3InhDMOnFilt = tbPrevQueries.getAtLeast3ConsultarionWithINHDispensaMensalOnFilt() ;
+    CohortDefinition atLeast3InhDTOnFilt = tbPrevQueries.getAtLeast1ConsultarionWithDTINHDispensaTrimestralOnFilt() ;
+
+
     cd.setName("Patients that completed Isoniazid prophylatic treatment");
     cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "Before Date", Date.class));
     return cd;
   }
 

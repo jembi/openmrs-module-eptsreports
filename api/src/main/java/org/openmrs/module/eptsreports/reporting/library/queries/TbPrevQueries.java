@@ -400,7 +400,7 @@ public class TbPrevQueries {
 
   // Patients with one of the following combinations marked in Ficha Clínica - Mastercard and/or
   // FILT:
-  public CohortDefinition getAtLeast3ConsultarionOnFichaClinica() {
+  public CohortDefinition getAtLeast3ConsultationOnFichaClinica() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 1 consultation registered on Ficha Clínica ");
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));

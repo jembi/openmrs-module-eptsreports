@@ -73,7 +73,7 @@ public class TbPrevDataset extends BaseDataSet {
                 "Denominator Total",
                 EptsReportUtils.map(
                     tbPrevCohortQueries.getDenominator(),
-                    "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}")),
+                    "startDate=${startDate},endDate=${endDate},location=${location}")),
             mappings),
         "");
     addRow(
