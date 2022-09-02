@@ -23,17 +23,20 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
   private final AgeCohortQueries ageCohortQueries;
   private final CommonQueries commonQueries;
   private final HivMetadata hivMetadata;
+  private final ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   @Autowired
   public ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries(
       GenericCohortQueries genericCohortQueries,
       AgeCohortQueries ageCohortQueries,
       CommonQueries commonQueries,
-      HivMetadata hivMetadata) {
+      HivMetadata hivMetadata,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.ageCohortQueries = ageCohortQueries;
     this.commonQueries = commonQueries;
     this.hivMetadata = hivMetadata;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   /**
@@ -60,7 +63,12 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             ageCohortQueries.createXtoYAgeCohort("age", 8, 14), "effectiveDate=${endDate}"));
     cd.addSearch(
         "art", EptsReportUtils.map(getPatientsOnART(), "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("(base AND age AND art)");
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
+            "startDate=${endDate-1m},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("(base AND age AND art) AND B13");
     return cd;
   }
 
