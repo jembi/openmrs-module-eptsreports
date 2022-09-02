@@ -204,8 +204,8 @@ public class TPTInitiationDataDefinitionQueries {
    *
    * <ul>
    *   <li>if patient have Ficha Clinica (encounter type 6) with “Outras Prescricoes” (concept id
-   *       1719) value coded “DT-3HP” (concept id 165307) or “DT-INH” (concept id 23955) in the last
-   *       follow up consultation date before the report generation date (same as field 7); or
+   *       1719) value coded “DT-3HP” (concept id 165307) in the last follow up consultation date
+   *       before the report generation date (same as field 7); or
    *   <li>If patient have Ficha Clinica (encounter_type 6) with Profilaxia TPT (concept id 23985)
    *       value coded INH or 3HP (concept id in [656, 23954]) and Estado da Profilaxia (concept id
    *       165308) value coded Início or continua (concept id [1256, 1257]) in the last follow up
@@ -230,7 +230,6 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    valuesMap.put("23955", tbMetadata.getDtINHConcept().getConceptId());
     valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
@@ -260,7 +259,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "       AND e.voided = 0 "
             + "       AND o.concept_id = ${1719} "
             + "       AND o.voided = 0 "
-            + "       AND o.value_coded IN ( ${165307}, ${23955} ) "
+            + "       AND o.value_coded = ${165307}  "
             + "UNION "
             + "SELECT p.patient_id, "
             + "       last_fu_consultation.followup_date AS followup_date "
