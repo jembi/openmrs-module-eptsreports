@@ -73,8 +73,6 @@ public class EptsCommonDimension {
   @Qualifier("commonAgeDimensionCohort")
   private AgeDimensionCohortInterface ageDimensionCohort;
 
-
-
   @Autowired
   public EptsCommonDimension(
       GenderCohortQueries genderCohortQueries,
@@ -383,12 +381,12 @@ public class EptsCommonDimension {
         "new-on-art",
         EptsReportUtils.map(
             tbPrevQueries.getPatientsWhoStartedTptAndNewOnArt(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     dim.addCohortDefinition(
         "previously-on-art",
         EptsReportUtils.map(
             tbPrevQueries.getPatientsWhoStartedTptPreviouslyOnArt(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     return dim;
   }
 

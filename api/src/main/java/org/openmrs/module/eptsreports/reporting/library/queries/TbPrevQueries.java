@@ -315,6 +315,91 @@ public class TbPrevQueries {
         + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ";
   }
 
+  public String getCompleted3HPOnFichaResumo() {
+    return "SELECT p.patient_id, o2.obs_datetime AS start_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+        + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+        + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
+        + "       AND e.location_id = :location "
+        + "       AND e.encounter_type = 53 "
+        + "       AND ( (o.concept_id = 23985 AND o.value_coded = 23954) "
+        + "        AND (o2.concept_id = 165308 AND o2.value_coded = 1267 "
+        + "        AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ) )";
+  }
+
+  public String getCompletedDateOf3HPOnFichaClinica() {
+    return "SELECT p.patient_id, o2.obs_datetime AS start_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+        + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+        + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+        + "       AND e.location_id = :location "
+        + "       AND e.encounter_type = 6"
+        + "       AND (o.concept_id = 23985 AND o.value_coded = 23954)  "
+        + "       AND (o2.concept_id = 165308 AND o2.value_coded = 1267 "
+        + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ) ";
+  }
+
+  public String getCompletedDateOfDT3HPOnFichaClinica() {
+    return "SELECT p.patient_id, e.encounter_datetime AS start_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+        + "WHERE  p.voided = 0 "
+        + "       AND e.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "       AND e.location_id = :location "
+        + "       AND e.encounter_type = 6 "
+        + "       AND o.concept_id = 1719 "
+        + "       AND o.value_coded = 165307 "
+        + "       AND e.encounter_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ";
+  }
+
+  // Patients with one of the following combinations marked in Ficha Clínica - Mastercard and/or
+  // FILT:
+  public CohortDefinition getAtLeast3ConsultarionOnFichaClinica() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("At least 1 consultation registered on Ficha Clínica ");
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+
+    String query =
+        "SELECT patient_id "
+            + "FROM   (SELECT profilaxy.patient_id,COUNT(encounter_datetime) encounters "
+            + "        FROM   (SELECT p.patient_id,e.encounter_datetime "
+            + "                FROM   patient p "
+            + "                       INNER JOIN encounter e "
+            + "                               ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o "
+            + "                               ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2 "
+            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                WHERE  p.voided = 0 "
+            + "                       AND e.voided = 0 "
+            + "                       AND o.voided = 0 "
+            + "                       AND o2.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = 6 "
+            + "                       AND ( o.concept_id = 23985  AND o.value_coded = 23954 ) "
+            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) )) profilaxy "
+            + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
+            + "                           FROM   ("
+            + getTPTStartDateQuery()
+            + "                                  )tpt "
+            + "                           GROUP  BY tpt.patient_id) tpt_start ON tpt_start.patient_id = profilaxy.patient_id "
+            + "        WHERE  profilaxy.encounter_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 4 MONTH) "
+            + "        GROUP  BY profilaxy.patient_id) three_encounters "
+            + "WHERE  three_encounters.encounters >= 3";
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
   public String getTPTStartDateQuery() {
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
     String tptQuery =
