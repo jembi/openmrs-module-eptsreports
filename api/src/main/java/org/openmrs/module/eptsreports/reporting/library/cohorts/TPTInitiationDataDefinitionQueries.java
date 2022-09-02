@@ -210,7 +210,7 @@ public class TPTInitiationDataDefinitionQueries {
    *       value coded INH or 3HP (concept id in [656, 23954]) and Estado da Profilaxia (concept id
    *       165308) value coded Início or continua (concept id [1256, 1257]) in the last follow up
    *       consultation date before the report generation date (same as field 7);
-   *   <li>or Select all patients with Ficha de Seguimento (encounter type 6 , 9) with “Profilaxia -
+   *   <li>or Select all patients with Ficha de Seguimento (encounter type 9) with “Profilaxia -
    *       TPT with value “Isoniazida (INH)” (Concept 23985 value 656) and Data Início ” (Concept
    *       165308 value 1256) in the last follow up consultation date before the reporting end date;
    * </ul>
@@ -280,7 +280,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "                   GROUP  BY p.patient_id) last_fu_consultation "
             + "               ON last_fu_consultation.patient_id = p.patient_id "
             + "WHERE  e.encounter_datetime = last_fu_consultation.followup_date "
-            + "       AND e.encounter_type IN ( ${6}, ${9} ) "
+            + "       AND e.encounter_type = ${6} "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND o2.voided = 0 "
@@ -309,13 +309,12 @@ public class TPTInitiationDataDefinitionQueries {
             + "                   GROUP  BY p.patient_id) last_fu_consultation "
             + "               ON last_fu_consultation.patient_id = p.patient_id "
             + "WHERE  e.encounter_datetime = last_fu_consultation.followup_date "
-            + "       AND e.encounter_type IN ( ${6}, ${9} ) "
+            + "       AND e.encounter_type = ${9} "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND o2.voided = 0 "
-            + "       AND ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
-            + "       AND ( o2.concept_id = ${165308} AND o.value_coded = ${1256} ) "
-            + "       AND o.voided = 0 ";
+            + "       AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "       AND ( o2.concept_id = ${165308} AND o.value_coded = ${1256} ) ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
