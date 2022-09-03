@@ -66,9 +66,9 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addSearch(
         "B13",
         EptsReportUtils.map(
-            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(true),
-            "startDate=${endDate-1m},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("(base AND age AND art) AND B13");
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("base AND age AND B13");
     return cd;
   }
 
@@ -129,7 +129,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             + " INNER JOIN encounter e1 ON p.patient_id=e1.patient_id "
             + " INNER JOIN obs ob ON e1.encounter_id=ob.encounter_id "
             + " WHERE tt.encounter_datetime=e1.encounter_datetime AND p.voided=0 "
-            + " AND e1.encounter_type = ${53} AND e1.location_id=:location "
+            + " AND e1.encounter_type = ${35} AND e1.location_id=:location "
             + " AND e1.voided=0 AND ob.voided=0 AND ob.value_coded= ${answer} ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
