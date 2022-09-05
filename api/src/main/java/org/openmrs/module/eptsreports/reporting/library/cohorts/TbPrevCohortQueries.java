@@ -19,6 +19,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition.TimeModifier;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -169,7 +170,7 @@ public class TbPrevCohortQueries {
         "completed-isoniazid",
         EptsReportUtils.map(
             getPatientsThatCompletedIsoniazidProphylacticTreatment(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     definition.addSearch(
         "regime-tpt-isoniazid",
         EptsReportUtils.map(
@@ -197,14 +198,13 @@ public class TbPrevCohortQueries {
             getPatientWhoHaveRegimeTpt3HP(),
             "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
 
-    definition.setCompositionString(
-        "started-by-end-previous-reporting-period AND completed-isoniazid  AND  "
-            + "((started-isoniazid OR last-profilaxia-tpt-inh OR initiated-profilaxia "
-            + " OR profilaxia-tpt-inh-marked-inicio OR profilaxia-tpt-3hp-inicio-ficha-resumo "
-            + " OR profilaxia-tpt-3hp-marked-inicio OR outras-prescricoes-with-dt-3hp-on-ficha-clinica "
-            + " OR regime-tpt-isoniazid OR regime-tpt-INH) "
-            + " OR (outras-prescricoes-3hp OR regime-tpt-3hp OR regime-tpt-3hpOrPiridoxina) "
-            + " ) ");
+    definition.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getDenominator(),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    definition.setCompositionString("completed-isoniazid  AND  A");
 
     return definition;
   }
@@ -236,6 +236,20 @@ public class TbPrevCohortQueries {
             genericCohortQueries.getNewlyOrPreviouslyEnrolledOnART(false),
             "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
     definition.setCompositionString("started-by-end-previous-reporting-period");
+    return definition;
+  }
+
+  public CohortDefinition getPatientsStartedTpt() {
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("TB-PREV Previously on ART");
+    definition.addParameter(new Parameter("startDate", "startDate Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "endDate Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        new EptsQueriesUtil()
+            .patientIdQueryBuilder(tbPrevQueries.getTPTStartDateQuery())
+            .getQuery();
+    definition.setQuery(query);
     return definition;
   }
 
@@ -294,7 +308,7 @@ public class TbPrevCohortQueries {
         "completed-isoniazid",
         EptsReportUtils.map(
             getPatientsThatCompletedIsoniazidProphylacticTreatment(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     definition.addSearch(
         "regime-tpt-isoniazid",
         EptsReportUtils.map(
@@ -321,15 +335,13 @@ public class TbPrevCohortQueries {
         EptsReportUtils.map(
             getPatientWhoHaveRegimeTpt3HP(),
             "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-
+    definition.addSearch(
+        "A",
+        EptsReportUtils.map(
+            getPatientsStartedTpt(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     definition.setCompositionString(
-        "started-by-end-previous-reporting-period  AND "
-            + "((started-isoniazid OR last-profilaxia-tpt-inh OR initiated-profilaxia "
-            + " OR profilaxia-tpt-inh-marked-inicio OR profilaxia-tpt-3hp-inicio-ficha-resumo "
-            + " OR profilaxia-tpt-3hp-marked-inicio OR outras-prescricoes-with-dt-3hp-on-ficha-clinica "
-            + " OR regime-tpt-isoniazid OR regime-tpt-INH OR (outras-prescricoes-3hp "
-            + " OR regime-tpt-3hp OR regime-tpt-3hpOrPiridoxina) "
-            + " AND NOT (transferred-out AND NOT completed-isoniazid)) ");
+        "started-by-end-previous-reporting-period AND A AND NOT (transferred-out AND NOT completed-isoniazid)");
 
     return definition;
   }
@@ -337,28 +349,64 @@ public class TbPrevCohortQueries {
   public CohortDefinition getPatientsThatCompletedIsoniazidProphylacticTreatment() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    CohortDefinition completed3hp86 = tbPrevQueries.getPatientsWhoCompleted3HPAtLeast86Days();
-    CohortDefinition atLeast3ConsultationOn = tbPrevQueries.getAtLeast3ConsultationOnFichaClinica();
-    CohortDefinition atLeastOne3HPOnFilt = tbPrevQueries.getAtLeastOne3HPOnFilt();
-    CohortDefinition atLeast3ConsultationDMFilt = tbPrevQueries.getAtLeast3ConsultarionWithDispensaMensalOnFilt();
-    CohortDefinition atLeast1DT3HFichaClinica = tbPrevQueries.getAtLeast1ConsultarionWithDT3HPOnFichaClinica();
-
-    CohortDefinition inhAtLeast173 = tbPrevQueries.getPatientsWhoCompletedINHAtLeast173Days();
-    CohortDefinition atLeast5ConsultationOnFC= tbPrevQueries.getAtLeast5ConsultarionINHOnFichaClinica();
-    CohortDefinition inhDMOnFilt = tbPrevQueries.getAtLeast6ConsultarionWithINHDispensaMensalOnFilt();
-    CohortDefinition atLeast2DTFichaClinica = tbPrevQueries.getAtLeast2ConsultarionOfDTINHOnFichaClinica();
-    CohortDefinition atLeast2DTOnFilt = tbPrevQueries.getAtLeast2ConsultarionWithINHDispensaTrimestralOnFilt();
-    CohortDefinition atLeast3INHOnFichaClinica = tbPrevQueries. getAtLeast3ConsultarionOfINHOnFichaClinica();
-    CohortDefinition atLeast1DTInhFichaClinica = tbPrevQueries.getAtLeast1ConsultarionWithDTINHOnFichaClinica() ;
-    CohortDefinition atLeast3InhDMOnFilt = tbPrevQueries.getAtLeast3ConsultarionWithINHDispensaMensalOnFilt() ;
-    CohortDefinition atLeast3InhDTOnFilt = tbPrevQueries.getAtLeast1ConsultarionWithDTINHDispensaTrimestralOnFilt() ;
-
-
     cd.setName("Patients that completed Isoniazid prophylatic treatment");
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "Before Date", Date.class));
+
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    cd.addSearch(
+        "A",
+        EptsReportUtils.map(tbPrevQueries.getPatientsWhoCompleted3HPAtLeast86Days(), mappings));
+    cd.addSearch(
+        "B", EptsReportUtils.map(tbPrevQueries.getAtLeast3ConsultationOnFichaClinica(), mappings));
+    cd.addSearch("C", EptsReportUtils.map(tbPrevQueries.getAtLeastOne3HPWithDTOnFilt(), mappings));
+    cd.addSearch(
+        "D",
+        EptsReportUtils.map(
+            tbPrevQueries.getAtLeast3ConsultarionWithDispensaMensalOnFilt(), mappings));
+    cd.addSearch(
+        "E",
+        EptsReportUtils.map(
+            tbPrevQueries.getAtLeast1ConsultarionWithDT3HPOnFichaClinica(), mappings));
+    cd.addSearch(
+        "F",
+        EptsReportUtils.map(tbPrevQueries.getPatientsWhoCompletedINHAtLeast173Days(), mappings));
+    cd.addSearch(
+        "G",
+        EptsReportUtils.map(tbPrevQueries.getAtLeast5ConsultarionINHOnFichaClinica(), mappings));
+    cd.addSearch(
+        "H",
+        EptsReportUtils.map(
+            tbPrevQueries.getAtLeast6ConsultarionWithINHDispensaMensalOnFilt(), mappings));
+    cd.addSearch(
+        "I",
+        EptsReportUtils.map(
+            tbPrevQueries.getAtLeast2ConsultarionOfDTINHOnFichaClinica(), mappings));
+    cd.addSearch(
+        "J",
+        EptsReportUtils.map(
+            tbPrevQueries.getAtLeast2ConsultarionWithINHDispensaTrimestralOnFilt(), mappings));
+    cd.addSearch(
+        "K",
+        EptsReportUtils.map(tbPrevQueries.getAtLeast3ConsultarionOfINHOnFichaClinica(), mappings));
+    cd.addSearch(
+        "L",
+        EptsReportUtils.map(
+            tbPrevQueries.getAtLeast1ConsultarionWithDTINHOnFichaClinica(), mappings));
+    cd.addSearch(
+        "M",
+        EptsReportUtils.map(
+            tbPrevQueries.getAtLeast3ConsultarionWithINHDispensaMensalOnFilt(), mappings));
+    cd.addSearch(
+        "N",
+        EptsReportUtils.map(
+            tbPrevQueries.getAtLeast1ConsultarionWithDTINHDispensaTrimestralOnFilt(), mappings));
+
+    cd.setCompositionString(
+        "A OR B OR C OR D OR E OR F OR G OR H OR I OR J OR (K AND L) OR (M AND N)");
+
     return cd;
   }
 
