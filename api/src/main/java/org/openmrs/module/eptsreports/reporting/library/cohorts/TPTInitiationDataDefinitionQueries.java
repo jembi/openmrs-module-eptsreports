@@ -210,9 +210,9 @@ public class TPTInitiationDataDefinitionQueries {
    *       value coded INH or 3HP (concept id in [656, 23954]) and Estado da Profilaxia (concept id
    *       165308) value coded Início or continua (concept id [1256, 1257]) in the last follow up
    *       consultation date before the report generation date (same as field 7);
-   *   <li>or Select all patients with Ficha de Seguimento (encounter type 9) with “Profilaxia -
-   *       TPT with value “Isoniazida (INH)” (Concept 23985 value 656) and Data Início ” (Concept
-   *       165308 value 1256) in the last follow up consultation date before the reporting end date;
+   *   <li>or Select all patients with Ficha de Seguimento (encounter type 9) with “Profilaxia - TPT
+   *       with value “Isoniazida (INH)” (Concept 23985 value 656) and Data Início ” (Concept 165308
+   *       value 1256) in the last follow up consultation date before the reporting end date;
    * </ul>
    *
    * </blockquote>
@@ -950,8 +950,8 @@ public class TPTInitiationDataDefinitionQueries {
             + "            AND e.location_id = :location "
             + "            AND e.encounter_type = ${60} "
             + "            AND ( ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
-            + "            AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1257}, ${1267} ) OR o2.value_coded IS NULL "
-            + "            AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "            AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1257}, ${1267} ) OR o2.value_coded IS NULL ) "
+            + "            AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
             + "            AND p.patient_id NOT IN ( "
             + "                SELECT p.patient_id "
             + "                FROM patient p "
@@ -1210,8 +1210,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "                    INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                    INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                    INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "                    INNER JOIN obs o3 ON e.encounter_id = o3.encounter_id "
-            + "              WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 AND o3.voided = 0 "
+            + "              WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "                     AND e.location_id = :location "
             + "                     AND e.encounter_type = ${6} "
             + "                     AND ( (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
@@ -1323,8 +1322,8 @@ public class TPTInitiationDataDefinitionQueries {
             + "            AND e.location_id = :location "
             + "            AND e.encounter_type = ${60} "
             + "            AND ( ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
-            + "            AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1257}, ${1267} ) OR o2.value_coded IS NULL "
-            + "            AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "            AND ( o2.concept_id = ${23987} AND o2.value_coded IN ( ${1257}, ${1267} ) OR o2.value_coded IS NULL ) "
+            + "            AND o2.obs_datetime BETWEEN :startDate AND :endDate ) "
             + "            AND p.patient_id NOT IN ( "
             + "                SELECT p.patient_id "
             + "                FROM patient p "
