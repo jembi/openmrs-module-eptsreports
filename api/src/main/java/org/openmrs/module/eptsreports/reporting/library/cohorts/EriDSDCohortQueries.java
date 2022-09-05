@@ -187,6 +187,34 @@ public class EriDSDCohortQueries {
   }
 
   /**
+   * <b>Description:</b> Pregnant Women for <b>D2</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoArePregnantD2() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("D2 - who are pregnant");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
+            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "activeAndUnstable",
+        EptsReportUtils.map(
+            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("activeAndUnstable AND pregnant");
+
+    return cd;
+  }
+
+  /**
    * <b>Name: N1</b>
    *
    * <p><b>Description:</b> Number of active on ART whose next ART pick-up is schedule for 83-97
