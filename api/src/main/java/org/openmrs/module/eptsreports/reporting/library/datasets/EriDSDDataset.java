@@ -138,6 +138,16 @@ public class EriDSDDataset extends BaseDataSet {
                 EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnantD2(), mappings)),
             mappings),
         "");
+    dsd.addColumn(
+        "D2BW",
+        "Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "D2BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeedingD2(), mappings)),
+            mappings),
+        "");
 
     addRow(dsd, "N1", N1, mapStraightThrough(getN1()), getDisags());
     addRow(dsd, "N2", N2, mapStraightThrough(getN2()), getDisags());

@@ -215,6 +215,34 @@ public class EriDSDCohortQueries {
   }
 
   /**
+   * <b>Description:</b> Patients who are Breastfeeding for <b>D2</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreBreastfeedingD2() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("D2 - who are Breastfeeding");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
+            "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "activeAndUnstable",
+        EptsReportUtils.map(
+            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("activeAndUnstable AND breastfeeding");
+
+    return cd;
+  }
+  /**
    * <b>Name: N1</b>
    *
    * <p><b>Description:</b> Number of active on ART whose next ART pick-up is schedule for 83-97
