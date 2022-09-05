@@ -6,6 +6,7 @@ import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsWhoPickedupArvDuringPeriodCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -30,13 +31,16 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodDataSet extends BaseDataSet
 
   private final ListOfPatientsEligibleForVLDataDefinitionQueries listOfpatientsEligibleForVLDataDefinitionQueries;
 
+  private final ListOfPatientsWhoPickedupArvDuringPeriodCohortQueries listOfPatientsWhoPickedupArvDuringPeriodCohortQueries;
+
   @Autowired
   public ListOfPatientsWhoPickedupArvDuringPeriodDataSet(
           ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
-          TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet, ListOfPatientsEligibleForVLDataDefinitionQueries listOfpatientsEligibleForVLDataDefinitionQueries) {
+          TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet, ListOfPatientsEligibleForVLDataDefinitionQueries listOfpatientsEligibleForVLDataDefinitionQueries, ListOfPatientsWhoPickedupArvDuringPeriodCohortQueries listOfPatientsWhoPickedupArvDuringPeriodCohortQueries) {
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.listOfpatientsEligibleForVLDataDefinitionQueries = listOfpatientsEligibleForVLDataDefinitionQueries;
+    this.listOfPatientsWhoPickedupArvDuringPeriodCohortQueries = listOfPatientsWhoPickedupArvDuringPeriodCohortQueries;
   }
 
   public DataSetDefinition contructDataset() throws EvaluationException {
@@ -64,7 +68,7 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodDataSet extends BaseDataSet
     pdd.setParameters(getParameters());
 
     pdd.addRowFilter(
-        listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(),
+        listOfPatientsWhoPickedupArvDuringPeriodCohortQueries.getBaseCohort(),
         "startDate=${startDate},endDate=${endDate},location=${location}");
 
     pdd.addColumn("patient_id", new PersonIdDataDefinition(), "");
