@@ -15,6 +15,8 @@ public class StateOfStayArtPatientConverter implements DataConverter {
 
   final String autoTransfer = "Auto Transferência";
 
+  final String negativeDiagnosis = "HIV Negativo";
+
   @Override
   public Object convert(Object obj) {
     if (obj == null) {
@@ -40,6 +42,8 @@ public class StateOfStayArtPatientConverter implements DataConverter {
         return died;
       case "23863":
         return autoTransfer;
+      case "23903":
+        return negativeDiagnosis;
       default:
         return "";
     }
