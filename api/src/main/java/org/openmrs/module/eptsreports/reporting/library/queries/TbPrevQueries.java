@@ -636,13 +636,15 @@ public class TbPrevQueries {
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type IN (6,9) "
             + "                       AND ( o.concept_id = 23985  AND o.value_coded = 656 ) "
-            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) )) profilaxy "
+            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) ) "
+            + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
+            + " ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
             + "                           FROM   ("
             + getIPTStartDateQuery()
             + "                                  )tpt "
             + "                           GROUP  BY tpt.patient_id) tpt_start ON tpt_start.patient_id = profilaxy.patient_id "
-            + "        WHERE  profilaxy.obs_datetime < DATE_ADD(tpt_start.start_date, INTERVAL 7 MONTH) "
+            + "        WHERE profilaxy.obs_datetime > tpt_start.start_date AND  profilaxy.obs_datetime <= DATE_ADD(tpt_start.start_date, INTERVAL 7 MONTH) "
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 5";
 
@@ -676,7 +678,9 @@ public class TbPrevQueries {
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = 60 "
             + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (656, 23982) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 1098 )) profilaxy "
+            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 1098 )"
+            + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
+            + " ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
             + "                           FROM   ("
             + getIPTStartDateQuery()
@@ -763,7 +767,9 @@ public class TbPrevQueries {
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = 60 "
             + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (656, 23982) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 23720 )) profilaxy "
+            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 23720 )"
+            + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
+            + "            ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
             + "                           FROM   ("
             + getIPTStartDateQuery()
@@ -803,7 +809,9 @@ public class TbPrevQueries {
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = 6 "
             + "                       AND ( o.concept_id = 23985  AND o.value_coded = 656 ) "
-            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) )) profilaxy "
+            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) )"
+            + "                   AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
+            + " ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
             + "                           FROM   ("
             + getIPTStartDateQuery()
@@ -882,7 +890,9 @@ public class TbPrevQueries {
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = 60 "
             + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (656, 23982) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 1098 )) profilaxy "
+            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 1098 )"
+            + "                   AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
+            + "                ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
             + "                           FROM   ("
             + getIPTStartDateQuery()
@@ -922,7 +932,9 @@ public class TbPrevQueries {
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = 60 "
             + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (656, 23982) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 23720 )) profilaxy "
+            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 23720 )"
+            + "                   AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
+            + "              ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
             + "                           FROM   ("
             + getIPTStartDateQuery()
@@ -999,7 +1011,7 @@ public class TbPrevQueries {
             + " INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
             + " ) art on art.patient_id = tpt.patient_id "
-            + " WHERE tpt.start_date <= art.first_pickup AND DATE_ADD(art.first_pickup, INTERVAL 6 MONTH) "
+            + " WHERE tpt.start_date <= DATE_ADD(art.first_pickup, INTERVAL 6 MONTH) "
             + "GROUP BY tpt.patient_id ";
 
     sqlCohortDefinition.setQuery(query);
@@ -1024,7 +1036,7 @@ public class TbPrevQueries {
             + " INNER JOIN ( "
             + commonQueries.getARTStartDate(true)
             + " ) art on art.patient_id = tpt.patient_id "
-            + " WHERE tpt.start_date > art.first_pickup AND DATE_ADD(art.first_pickup, INTERVAL 6 MONTH) "
+            + " WHERE tpt.start_date > DATE_ADD(art.first_pickup, INTERVAL 6 MONTH) "
             + "GROUP BY tpt.patient_id ";
 
     sqlCohortDefinition.setQuery(query);
