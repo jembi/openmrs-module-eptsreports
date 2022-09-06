@@ -2029,6 +2029,10 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition b42 = getB4And2();
 
+    CohortDefinition b43 = getB4And3();
+
+    CohortDefinition b44 = getB4And4();
+
     compositionCohortDefinition.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
 
     compositionCohortDefinition.addSearch("B1", EptsReportUtils.map(tbActive, MAPPING));
@@ -2059,20 +2063,24 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("B42", EptsReportUtils.map(b42, MAPPING));
 
+    compositionCohortDefinition.addSearch("B43", EptsReportUtils.map(b43, MAPPING));
+
+    compositionCohortDefinition.addSearch("B44", EptsReportUtils.map(b44, MAPPING));
+
     compositionCohortDefinition.addSearch("GNEW", EptsReportUtils.map(getGNew(), MAPPING1));
 
     if (num == 1 || num == 3) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND  (B41 OR B42)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
+          "(A AND  (B41 OR B42 OR B43 OR B44)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42) AND GNEW) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
+          "(A AND (B41 OR B42 OR B43 OR B44) AND GNEW) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR I OR J)");
     } else if (num == 5) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND C AND (B41 OR B42) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
+          "(A AND C AND (B41 OR B42 OR B43 OR B44) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42) AND C AND GNEW) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
+          "(A AND (B41 OR B42 OR B43 OR B44) AND C AND GNEW) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR I OR J)");
     }
     return compositionCohortDefinition;
   }
