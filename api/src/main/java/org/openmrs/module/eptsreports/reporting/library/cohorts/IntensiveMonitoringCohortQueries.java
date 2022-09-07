@@ -286,6 +286,9 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition tbSymptomsOnPeriod =
         qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms();
 
+    CohortDefinition tbSymptomsOnPeriod3hp =
+        qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms3HP();
+
     CohortDefinition tbTreatmentOnPeriod =
         qualityImprovement2020CohortQueries.getPatientsWithTBTreatment();
 
@@ -356,6 +359,12 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
+        "I1",
+        EptsReportUtils.map(
+            tbSymptomsOnPeriod3hp,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
         "J",
         EptsReportUtils.map(
             tbTreatmentOnPeriod,
@@ -387,10 +396,10 @@ public class IntensiveMonitoringCohortQueries {
 
     if (den == 2 || den == 4) {
       cd.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR J)");
+          "(A AND (B41 OR B42 OR B43 OR B44)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J)");
     } else if (den == 6) {
       cd.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR J)");
+          "(A AND (B41 OR B42 OR B43 OR B44) AND C) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J)");
     }
     return cd;
   }
@@ -669,6 +678,9 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition tbSymptomsOnPeriod =
         qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms();
 
+    CohortDefinition tbSymptomsOnPeriod3hp =
+        qualityImprovement2020CohortQueries.getPatientsWithTBSymtoms3HP();
+
     CohortDefinition tbTreatmentOnPeriod =
         qualityImprovement2020CohortQueries.getPatientsWithTBTreatment();
 
@@ -753,6 +765,12 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
+        "I1",
+        EptsReportUtils.map(
+            tbSymptomsOnPeriod3hp,
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
         "J",
         EptsReportUtils.map(
             tbTreatmentOnPeriod,
@@ -790,10 +808,10 @@ public class IntensiveMonitoringCohortQueries {
 
     if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44) AND GNEW) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR J)");
+          "(A AND (B41 OR B42 OR B43 OR B44) AND GNEW) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J)");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44`f) AND C AND GNEW) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR J)");
+          "(A AND (B41 OR B42 OR B43 OR B44`f) AND C AND GNEW) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J)");
     }
     return compositionCohortDefinition;
   }
