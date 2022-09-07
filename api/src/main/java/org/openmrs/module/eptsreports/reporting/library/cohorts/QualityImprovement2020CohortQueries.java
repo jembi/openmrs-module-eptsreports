@@ -2416,18 +2416,20 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("GNEW", EptsReportUtils.map(getGNew(), MAPPING1));
 
+    compositionCohortDefinition.addSearch("GNEW3HP", EptsReportUtils.map(getGNew3HP(), MAPPING1));
+
     if (num == 1 || num == 3) {
       compositionCohortDefinition.setCompositionString(
           "(A AND  (B41 OR B42 OR B43 OR B44)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
     } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44) AND GNEW) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+          "(A AND (B41 OR B42 OR B43 OR B44) AND GNEW AND GNEW3HP) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (num == 5) {
       compositionCohortDefinition.setCompositionString(
           "(A AND C AND (B41 OR B42 OR B43 OR B44) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44) AND C AND GNEW) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+          "(A AND (B41 OR B42 OR B43 OR B44) AND C AND GNEW AND GNEW3HP) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     }
     return compositionCohortDefinition;
   }
@@ -9199,12 +9201,14 @@ public class QualityImprovement2020CohortQueries {
    *       <ul>
    *         <li>
    *             <p>the most recent clinical consultation(encounter type 6)during the revision
-   *             period(encounter_datetime >= startDateRevision and <= endDateRevision) with
-   *             “PROFILAXIA COM ISONIAZIDA”(concept_id 6122) value coded “Fim” (concept_id 1267)
+   *             period(obs_datetime >= startDateRevision and <= endDateRevision) with “Ultima
+   *             Profilaxia TPT (concept_id 23985) = INH (concept = 656) and “Data Fim” (concept_id
+   *             165308 value 1267)
    *         <li>
-   *             <p>the most recent “Última Profilaxia Isoniazida (Data Fim)” () registered in Ficha
-   *             Resumo (encounter type 53) occurred during the revision period (value_datetime >=
-   *             startDateRevision and <= endDateRevision)
+   *             <p>the most recent “Última Profilaxia = INH" (concept 23985 value 656) and “Data
+   *             Fim” (concept_id 165308 value 1267) registered in Ficha Resumo (encounter type 53)
+   *             occurred during the revision period (obs_datetime >= startDateRevision and <=
+   *             endDateRevision)
    *             <p>and “TPT Start Date” (the most recent date from B4_1 and B4_2) minus “TPT End
    *             Date” is between 170 days and 297 days
    *       </ul>
@@ -9215,7 +9219,7 @@ public class QualityImprovement2020CohortQueries {
   public CohortDefinition getGNew() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("G new ");
+    cd.setName("G new  INH");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -9224,10 +9228,10 @@ public class QualityImprovement2020CohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
-    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
@@ -9237,31 +9241,40 @@ public class QualityImprovement2020CohortQueries {
             + "    INNER JOIN (  "
             + "                SELECT tpt_end.patient_id, MAX(tpt_end.last_encounter) AS tpt_end_date  "
             + "                FROM (  "
-            + "                         SELECT p.patient_id, MAX(o.value_datetime) last_encounter  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
             + "                         FROM patient p  "
             + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
             + "                         WHERE p.voided = 0  "
             + "                           AND e.voided = 0  "
             + "                           AND o.voided = 0  "
-            + "                           AND o.concept_id = ${6129}  "
+            + "                           AND o2.voided = 0  "
+            + "                           AND ((o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${656})  "
+            + "                           AND (o2.concept_id = ${165308}  "
+            + "                           AND o2.value_coded = ${1267}))  "
             + "                           AND e.encounter_type = ${53}  "
             + "                           AND e.location_id = :location  "
-            + "                           AND o.value_datetime BETWEEN :startDate AND :revisionEndDate  "
+            + "                           AND o2.obs_datetime BETWEEN :startDate AND :revisionEndDate  "
             + "                         GROUP BY p.patient_id  "
             + "                         UNION  "
-            + "                         SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
             + "                         FROM patient p  "
             + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
             + "                         WHERE p.voided = 0  "
             + "                           AND e.voided = 0  "
             + "                           AND o.voided = 0  "
-            + "                           AND o.concept_id = ${6122}  "
-            + "                           AND o.value_coded = ${1267}  "
+            + "                           AND o2.voided = 0  "
+            + "                           AND ((o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${656})  "
+            + "                           AND (o2.concept_id = ${165308}  "
+            + "                           AND o2.value_coded = ${1267}))  "
             + "                           AND e.encounter_type = ${6}  "
             + "                           AND e.location_id = :location  "
-            + "                           AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate  "
+            + "                           AND o2.obs_datetime BETWEEN :startDate AND :revisionEndDate  "
             + "                         GROUP BY p.patient_id  "
             + "                     ) AS tpt_end  "
             + "                GROUP BY  tpt_end.patient_id  "
@@ -9269,31 +9282,40 @@ public class QualityImprovement2020CohortQueries {
             + "    INNER JOIN (  "
             + "                SELECT tpt_start.patient_id, MAX(tpt_start.last_encounter) tpt_start_date  "
             + "                FROM (  "
-            + "                         SELECT p.patient_id, MAX(o.value_datetime) last_encounter  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
             + "                         FROM patient p  "
             + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
             + "                         WHERE p.voided = 0  "
             + "                           AND e.voided = 0  "
             + "                           AND o.voided = 0  "
-            + "                           AND o.concept_id = ${6128}  "
+            + "                           AND o2.voided = 0  "
+            + "                           AND ((o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${656})  "
+            + "                           AND (o2.concept_id = ${165308}  "
+            + "                           AND o2.value_coded = ${1256}))  "
             + "                           AND e.encounter_type = ${53}  "
             + "                           AND e.location_id = :location  "
-            + "                           AND o.value_datetime BETWEEN :startDate AND :endDate  "
+            + "                           AND o2.obs_datetime BETWEEN :startDate AND :endDate  "
             + "                         GROUP BY p.patient_id  "
             + "                         UNION  "
-            + "                         SELECT p.patient_id, MAX(e.encounter_datetime) last_encounter  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
             + "                         FROM patient p  "
             + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
             + "                         WHERE p.voided = 0  "
             + "                           AND e.voided = 0  "
             + "                           AND o.voided = 0  "
-            + "                           AND o.concept_id = ${6122}  "
-            + "                           AND o.value_coded = ${1256}  "
+            + "                           AND o2.voided = 0  "
+            + "                           AND ((o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${656})  "
+            + "                           AND (o2.concept_id = ${165308}  "
+            + "                           AND o2.value_coded = ${1256}))  "
             + "                           AND e.encounter_type = ${6}  "
             + "                           AND e.location_id = :location  "
-            + "                           AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
+            + "                           AND o2.obs_datetime BETWEEN :startDate AND :endDate  "
             + "                         GROUP BY p.patient_id  "
             + "                     ) AS tpt_start  "
             + "                GROUP BY tpt_start.patient_id  "
@@ -9302,7 +9324,147 @@ public class QualityImprovement2020CohortQueries {
             + "    AND TIMESTAMPDIFF(DAY, tpt_inicio.tpt_start_date,tpt_fim.tpt_end_date) BETWEEN  170 AND 297 ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
+
     cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  /**
+   *
+   *
+   * <ul>
+   *   <li>G_New: Filter all patients with the most recent date as “TPT end Date” between the
+   *       following::
+   *       <ul>
+   *         <li>
+   *             <p>the most recent clinical consultation(encounter type 6)during the revision
+   *             period(obs_datetime >= startDateRevision and <= endDateRevision) with “Ultima
+   *             Profilaxia TPT (concept_id 23985) = 3HP (concept = 23954) and “Data Fim”
+   *             (concept_id 165308 value 1267)
+   *         <li>
+   *             <p>the most recent “Última Profilaxia = 3HP (concept 23985 value 23954) and “Data
+   *             Fim” (concept_id 165308 value 1267) registered in Ficha Resumo (encounter type 53)
+   *             occurred during the revision period (value_datetime >= startDateRevision and <=
+   *             endDateRevision)
+   *             <p>and “TPT Start Date” (the most recent date from B4_3 and B4_4) minus “TPT End
+   *             Date” is between 170 days and 297 days
+   *       </ul>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getGNew3HP() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("G new 3HP");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+
+    String query =
+        ""
+            + "SELECT p.patient_id  "
+            + "FROM patient p  "
+            + "    INNER JOIN (  "
+            + "                SELECT tpt_end.patient_id, MAX(tpt_end.last_encounter) AS tpt_end_date  "
+            + "                FROM (  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
+            + "                         FROM patient p  "
+            + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
+            + "                         WHERE p.voided = 0  "
+            + "                           AND e.voided = 0  "
+            + "                           AND o.voided = 0  "
+            + "                           AND o2.voided = 0  "
+            + "                           AND ((o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${23954})  "
+            + "                           AND (o2.concept_id = ${165308}  "
+            + "                           AND o2.value_coded = ${1267}))  "
+            + "                           AND e.encounter_type = ${53}  "
+            + "                           AND e.location_id = :location  "
+            + "                           AND o2.obs_datetime BETWEEN :startDate AND :revisionEndDate  "
+            + "                         GROUP BY p.patient_id  "
+            + "                         UNION  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
+            + "                         FROM patient p  "
+            + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
+            + "                         WHERE p.voided = 0  "
+            + "                           AND e.voided = 0  "
+            + "                           AND o.voided = 0  "
+            + "                           AND o2.voided = 0  "
+            + "                           AND ((o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${23954})  "
+            + "                           AND (o2.concept_id = ${165308}  "
+            + "                           AND o2.value_coded = ${1267}))  "
+            + "                           AND e.encounter_type = ${6}  "
+            + "                           AND e.location_id = :location  "
+            + "                           AND o2.obs_datetime BETWEEN :startDate AND :revisionEndDate  "
+            + "                         GROUP BY p.patient_id  "
+            + "                     ) AS tpt_end  "
+            + "                GROUP BY  tpt_end.patient_id  "
+            + "            ) AS tpt_fim ON tpt_fim.patient_id = p.patient_id  "
+            + "    INNER JOIN (  "
+            + "                SELECT tpt_start.patient_id, MAX(tpt_start.last_encounter) tpt_start_date  "
+            + "                FROM (  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
+            + "                         FROM patient p  "
+            + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
+            + "                         WHERE p.voided = 0  "
+            + "                           AND e.voided = 0  "
+            + "                           AND o.voided = 0  "
+            + "                           AND o2.voided = 0  "
+            + "                           AND ((o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${23954})  "
+            + "                           AND (o2.concept_id = ${165308}  "
+            + "                           AND o2.value_coded = ${1256}))  "
+            + "                           AND e.encounter_type = ${53}  "
+            + "                           AND e.location_id = :location  "
+            + "                           AND o2.obs_datetime BETWEEN :startDate AND :endDate  "
+            + "                         GROUP BY p.patient_id  "
+            + "                         UNION  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
+            + "                         FROM patient p  "
+            + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "                                  INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
+            + "                         WHERE p.voided = 0  "
+            + "                           AND e.voided = 0  "
+            + "                           AND o.voided = 0  "
+            + "                           AND o2.voided = 0  "
+            + "                           AND ((o.concept_id = ${23985}  "
+            + "                           AND o.value_coded = ${23954})  "
+            + "                           AND (o2.concept_id = ${165308}  "
+            + "                           AND o2.value_coded = ${1256}))  "
+            + "                           AND e.encounter_type = ${6}  "
+            + "                           AND e.location_id = :location  "
+            + "                           AND o2.obs_datetime BETWEEN :startDate AND :endDate  "
+            + "                         GROUP BY p.patient_id  "
+            + "                     ) AS tpt_start  "
+            + "                GROUP BY tpt_start.patient_id  "
+            + "            ) AS tpt_inicio ON tpt_inicio.patient_id = p.patient_id  "
+            + "WHERE p.voided = 0  "
+            + "    AND TIMESTAMPDIFF(DAY, tpt_inicio.tpt_start_date,tpt_fim.tpt_end_date) BETWEEN  170 AND 297 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    cd.setQuery(sb.replace(query));
+
     return cd;
   }
 

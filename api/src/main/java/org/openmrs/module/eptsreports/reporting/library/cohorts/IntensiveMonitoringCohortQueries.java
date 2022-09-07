@@ -578,6 +578,12 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getGNew(),
             "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "GNEW3HP",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getGNew3HP(),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+
     if (num == 1 || num == 3) {
       compositionCohortDefinition.setCompositionString(
           "(A AND  (B41 OR B42 OR B43 OR B44)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F)");
@@ -824,12 +830,18 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getGNew(),
             "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "GNEW3HP",
+        EptsReportUtils.map(
+            qualityImprovement2020CohortQueries.getGNew3HP(),
+            "startDate=${revisionEndDate-8m+1d},endDate=${revisionEndDate-7m},revisionEndDate=${revisionEndDate},location=${location}"));
+
     if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44) AND GNEW) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+          "(A AND (B41 OR B42 OR B43 OR B44) AND GNEW AND GNEW3HP) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44`f) AND C AND GNEW) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+          "(A AND (B41 OR B42 OR B43 OR B44`f) AND C AND GNEW AND GNEW3HP) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     }
     return compositionCohortDefinition;
   }
