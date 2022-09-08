@@ -91,6 +91,7 @@ public class TbPrevQueries {
     map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
 
     return map;
   }
@@ -277,21 +278,34 @@ public class TbPrevQueries {
     return new StringSubstitutor(getReportMetadata()).replace(query);
   }
 
+  /**
+   * Patients who have (Última Pprofilaxia TPT with value “Isoniazida (INH)” and Data Início da
+   * Profilaxia TPT) registered selected in Ficha Resumo - Mastercard during the previous reporting
+   * period (INH Start Date) or
+   */
   public String getINHStartDateOnFichaResumo() {
-    String query = "SELECT p.patient_id, o2.obs_datetime AS start_date "
-        + "FROM   patient p "
-        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
-        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-        + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-        + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
-        + "       AND e.location_id = :location "
-        + "       AND e.encounter_type = ${53} "
-        + "       AND ( (o.concept_id = ${23985} AND o.value_coded = ${656}) "
-        + "        AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-        + "        AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ) )";
+    String query =
+        "SELECT p.patient_id, o2.obs_datetime AS start_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND ( (o.concept_id = ${23985} AND o.value_coded = ${656}) "
+            + "        AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "        AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ) )";
     return new StringSubstitutor(getReportMetadata()).replace(query);
   }
 
+  /**
+   * Patients who have Profilaxia (INH) with the value “I” (Início) or (Profilaxia TPT with the
+   * value “Isoniazida (INH)” and Estado da Profilaxia with the value “Início (I)”) marked in Ficha
+   * Clínica – Mastercard during the previous reporting period (INH Start Date) or
+   *
+   * @return String
+   */
   public String getStartDateINHOnFichaClinica() {
     String query =
         "SELECT p.patient_id, o2.obs_datetime AS start_date "
@@ -308,86 +322,106 @@ public class TbPrevQueries {
     return new StringSubstitutor(getReportMetadata()).replace(query);
   }
 
+  /**
+   * Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”) and
+   * “Seguimento de Tratamento TPT” with values “Continua” or no value marked on the first pick-up
+   * date in Ficha de Levantamento de TPT (FILT) during the previous reporting period (FILT INH
+   * Start Date) and:
+   *
+   * <ul>
+   *   <li>No other Regime de TPT with the values “Isoniazida” or “Isoniazida + Piridoxina” marked
+   *       in FILT in the 7 months prior to this FILT INH Start Date and
+   *   <li>No other INH Start Dates marked in Ficha Clinica (Profilaxia TPT with the value
+   *       “Isoniazida (INH)” and Estado da Profilaxia with the value “Início (I)”) in the 7 months
+   *       prior to this FILT INH Start Date and
+   *   <li>No other INH Start Dates marked on Ficha de Seguimento (Profilaxia TPT with the value
+   *       “Isoniazida (INH)” with Data Início) marked in the 7 months prior to this FILT INH Start
+   *       Date and
+   *   <li>No other INH Start Dates marked in Ficha Resumo (Última pProfilaxia TPT with value
+   *       “Isoniazida (INH)” and Data Início) selected in the 7 months prior to this FILT INH Start
+   *       Date *
+   * </ul>
+   *
+   * The system will consider the earliest date from the various sources as well as within the same
+   * sources as the INH Start Date
+   *
+   * @return
+   */
   public String getStartDateOfINHOnFilt() {
 
-    return "SELECT filt.patient_id, filt_3hp_start_date AS start_date "
-        + "FROM  (SELECT p.patient_id, "
-        + "              Min(o2.obs_datetime) filt_3hp_start_date "
-        + "       FROM   patient p "
-        + "              INNER JOIN encounter e "
-        + "                      ON p.patient_id = e.patient_id "
-        + "              INNER JOIN obs o "
-        + "                      ON e.encounter_id = o.encounter_id "
-        + "              INNER JOIN obs o2 "
-        + "                      ON e.encounter_id = o2.encounter_id "
-        + "       WHERE  p.voided = 0 "
-        + "              AND e.voided = 0 "
-        + "              AND o.voided = 0 "
-        + "              AND o2.voided = 0 "
-        + "              AND e.location_id = :location "
-        + "              AND e.encounter_type = 60 "
-        + "              AND ( ( o.concept_id = 23985 "
-        + "                      AND o.value_coded IN ( 656, 23982 ) ) "
-        + "                    AND ( o2.concept_id = 23987 "
-        + "                          AND ( o2.value_coded IN ( 1257 ) "
-        + "                                 OR o2.value_coded IS NULL ) "
-        + "                          AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ) ) "
-        + "       GROUP  BY p.patient_id) filt "
-        + "WHERE NOT EXISTS (SELECT ee.encounter_id "
-        + "                       FROM   encounter ee "
-        + "                              INNER JOIN obs o "
-        + "                                      ON ee.encounter_id = o.encounter_id "
-        + "                              INNER JOIN obs o2 "
-        + "                                      ON ee.encounter_id = o2.encounter_id "
-        + "                       WHERE  ee.voided = 0 "
-        + "                              AND o.voided = 0 "
-        + "                              AND ee.encounter_type IN (6,9) "
-        + "                              AND ee.location_id = :location "
-        + "                              AND ee.patient_id = filt.patient_id "
-        + "                              AND o.concept_id = 23985 "
-        + "                              AND o.value_coded = 656 "
-        + "                              AND o2.concept_id = 165308 "
-        + "                              AND o2.value_coded = 1256 "
-        + "                              AND ee.encounter_datetime >= "
-        + "                                  Date_sub(filt.filt_3hp_start_date, "
-        + "                                  INTERVAL "
-        + "                                  7 month "
-        + "                                  ) "
-        + "                              AND ee.encounter_datetime <= "
-        + "                                  filt.filt_3hp_start_date) "
-        + "       AND NOT EXISTS (SELECT ee.encounter_id "
-        + "                       FROM   encounter ee "
-        + "                              INNER JOIN obs o "
-        + "                                      ON ee.encounter_id = o.encounter_id "
-        + "                              INNER JOIN obs oo "
-        + "                                      ON ee.encounter_id = oo.encounter_id "
-        + "                       WHERE  ee.voided = 0 "
-        + "                              AND o.voided = 0 "
-        + "                              AND ee.encounter_type = 53 "
-        + "                              AND ee.location_id = :location "
-        + "                              AND ee.patient_id = filt.patient_id "
-        + "                              AND o.concept_id = 23985 "
-        + "                              AND o.value_coded = 656 "
-        + "                              AND oo.concept_id = 165308 "
-        + "                              AND oo.value_coded = 1256 "
-        + "                              AND oo.obs_datetime >= "
-        + "                                  Date_sub(filt.filt_3hp_start_date, "
-        + "                                  INTERVAL 7 month) "
-        + "                              AND oo.obs_datetime <= filt.filt_3hp_start_date) ";
+    String query =
+        "SELECT filt.patient_id, filt_3hp_start_date AS start_date "
+            + "FROM  (SELECT p.patient_id, "
+            + "              Min(o2.obs_datetime) filt_3hp_start_date "
+            + "       FROM   patient p "
+            + "              INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "              INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "              INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "       WHERE  p.voided = 0 "
+            + "              AND e.voided = 0 "
+            + "              AND o.voided = 0 "
+            + "              AND o2.voided = 0 "
+            + "              AND e.location_id = :location "
+            + "              AND e.encounter_type = ${60} "
+            + "              AND ( ( o.concept_id = ${23985} AND o.value_coded IN ( ${656}, ${23982} ) ) "
+            + "              AND ( o2.concept_id = ${23987} AND ( o2.value_coded IN ( ${1257} ) OR o2.value_coded IS NULL ) "
+            + "              AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ) ) "
+            + "       GROUP  BY p.patient_id) filt "
+            + "WHERE NOT EXISTS (SELECT ee.encounter_id "
+            + "                       FROM   encounter ee "
+            + "                              INNER JOIN obs o ON ee.encounter_id = o.encounter_id "
+            + "                              INNER JOIN obs o2 ON ee.encounter_id = o2.encounter_id "
+            + "                       WHERE  ee.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND ee.encounter_type IN (${6},${9}) "
+            + "                              AND ee.location_id = :location "
+            + "                              AND ee.patient_id = filt.patient_id "
+            + "                              AND o.concept_id = ${23985} "
+            + "                              AND o.value_coded = ${656} "
+            + "                              AND o2.concept_id = ${165308} "
+            + "                              AND o2.value_coded = ${1256} "
+            + "                              AND ee.encounter_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 7 month ) "
+            + "                              AND ee.encounter_datetime <= filt.filt_3hp_start_date) "
+            + "       AND NOT EXISTS (SELECT ee.encounter_id "
+            + "                       FROM   encounter ee "
+            + "                              INNER JOIN obs o ON ee.encounter_id = o.encounter_id "
+            + "                              INNER JOIN obs oo ON ee.encounter_id = oo.encounter_id "
+            + "                       WHERE  ee.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND ee.encounter_type = ${53} "
+            + "                              AND ee.location_id = :location "
+            + "                              AND ee.patient_id = filt.patient_id "
+            + "                              AND o.concept_id = ${23985} "
+            + "                              AND o.value_coded = ${656} "
+            + "                              AND oo.concept_id = ${165308} "
+            + "                              AND oo.value_coded = ${1256} "
+            + "                              AND oo.obs_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 7 month) "
+            + "                              AND oo.obs_datetime <= filt.filt_3hp_start_date) ";
+
+    return new StringSubstitutor(getReportMetadata()).replace(query);
   }
 
+  /**
+   * Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”) and
+   * “Seguimento de tratamento TPT” = (‘Inicío’ or ‘Re-Início’) marked in Ficha de Levantamento de
+   * TPT (FILT) during the previous reporting period (INH Start Date) or
+   *
+   * @return String
+   */
   public String getINHStartDate4InhAndSeguimentoOnFilt() {
-    return "SELECT p.patient_id, o2.obs_datetime AS start_date "
-        + "FROM   patient p "
-        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
-        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-        + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-        + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
-        + "       AND e.location_id = :location "
-        + "       AND e.encounter_type = 60 "
-        + "       AND o.concept_id = 23985 AND o.value_coded IN (656, 23982) "
-        + "       AND o2.concept_id = 23987 AND o2.value_coded IN ( 1256, 1705) "
-        + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ";
+    String query =
+        "SELECT p.patient_id, o2.obs_datetime AS start_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${60} "
+            + "       AND o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982}) "
+            + "       AND o2.concept_id = ${23987} AND o2.value_coded IN ( ${1256}, ${1705}) "
+            + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND DATE_SUB(:endDate, INTERVAL 6 MONTH) ";
+    return new StringSubstitutor(getReportMetadata()).replace(query);
   }
 
   public String getCompleted3HPOnFichaResumo() {
@@ -398,7 +432,7 @@ public class TbPrevQueries {
         + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
         + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
         + "       AND e.location_id = :location "
-        + "       AND e.encounter_type = 53 "
+        + "       AND e.encounter_type = ${53} "
         + "       AND ( (o.concept_id = 23985 AND o.value_coded = 23954) "
         + "        AND (o2.concept_id = 165308 AND o2.value_coded = 1267 "
         + "        AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) )";
