@@ -121,90 +121,20 @@ public class TbPrevCohortQueries {
     definition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
     definition.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     definition.addParameter(new Parameter("location", "Location", Location.class));
-    definition.addSearch(
-        "started-by-end-previous-reporting-period",
-        EptsReportUtils.map(
-            genericCohortQueries.getStartedArtBeforeDate(false),
-            "onOrBefore=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "started-isoniazid",
-        EptsReportUtils.map(
-            getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "last-profilaxia-tpt-inh",
-        EptsReportUtils.map(
-            getPatientsWhoHaveLastProfilaxiaTPTWithINH(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "initiated-profilaxia",
-        EptsReportUtils.map(
-            getPatientsThatInitiatedProfilaxia(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "profilaxia-tpt-inh-marked-inicio",
-        EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWithINHAndAreMarkedAsInicio(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "profilaxia-tpt-3hp-inicio-ficha-resumo",
-        EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWith3HPAndDataInicioOnFichaResumo(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "profilaxia-tpt-3hp-marked-inicio",
-        EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWith3HPAndAreMarkedAsInicio(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "outras-prescricoes-with-dt-3hp-on-ficha-clinica",
-        EptsReportUtils.map(
-            getPatientsWhoHaveOutrasPrescricoesWithDT3HPOnFichaClinica(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "transferred-out",
-        EptsReportUtils.map(
-            getPatientsTransferredOut(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "completed-isoniazid",
-        EptsReportUtils.map(
-            getPatientsThatCompletedIsoniazidProphylacticTreatment(),
-            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "regime-tpt-isoniazid",
-        EptsReportUtils.map(
-            getPatientWhoHaveRegimeTptIsoniazid(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "outras-prescricoes-3hp",
-        EptsReportUtils.map(
-            getPatientWhoHaveOutrasPrescricoes(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "regime-tpt-3hp",
-        EptsReportUtils.map(
-            getPatientWhoHaveRegimeTpt3HPor3HP(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "regime-tpt-INH",
-        EptsReportUtils.map(
-            getPatientWhoHaveRegimeTptINH(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-
-    definition.addSearch(
-        "regime-tpt-3hpOrPiridoxina",
-        EptsReportUtils.map(
-            getPatientWhoHaveRegimeTpt3HP(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
 
     definition.addSearch(
         "A",
         EptsReportUtils.map(
+            getPatientsThatCompletedIsoniazidProphylacticTreatment(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    definition.addSearch(
+        "B",
+        EptsReportUtils.map(
             getDenominator(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
-    definition.setCompositionString("completed-isoniazid  AND  A");
+    definition.setCompositionString("A AND B");
 
     return definition;
   }
@@ -260,88 +190,28 @@ public class TbPrevCohortQueries {
     definition.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     definition.addParameter(new Parameter("location", "Location", Location.class));
     definition.addSearch(
-        "started-by-end-previous-reporting-period",
+        "A",
         EptsReportUtils.map(
             genericCohortQueries.getStartedArtBeforeDate(false),
             "onOrBefore=${onOrBefore},location=${location}"));
+
     definition.addSearch(
-        "started-isoniazid",
-        EptsReportUtils.map(
-            getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "last-profilaxia-tpt-inh",
-        EptsReportUtils.map(
-            getPatientsWhoHaveLastProfilaxiaTPTWithINH(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "initiated-profilaxia",
-        EptsReportUtils.map(
-            getPatientsThatInitiatedProfilaxia(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "profilaxia-tpt-inh-marked-inicio",
-        EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWithINHAndAreMarkedAsInicio(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "profilaxia-tpt-3hp-inicio-ficha-resumo",
-        EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWith3HPAndDataInicioOnFichaResumo(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "profilaxia-tpt-3hp-marked-inicio",
-        EptsReportUtils.map(
-            getPatientsWhoHaveProfilaxiaTPTWith3HPAndAreMarkedAsInicio(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "outras-prescricoes-with-dt-3hp-on-ficha-clinica",
-        EptsReportUtils.map(
-            getPatientsWhoHaveOutrasPrescricoesWithDT3HPOnFichaClinica(),
-            "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "transferred-out",
+        "B",
         EptsReportUtils.map(
             getPatientsTransferredOut(),
             "startDate=${onOrAfter-6m},endDate=${onOrBefore},location=${location}"));
     definition.addSearch(
-        "completed-isoniazid",
+        "C",
         EptsReportUtils.map(
             getPatientsThatCompletedIsoniazidProphylacticTreatment(),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "regime-tpt-isoniazid",
-        EptsReportUtils.map(
-            getPatientWhoHaveRegimeTptIsoniazid(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "outras-prescricoes-3hp",
-        EptsReportUtils.map(
-            getPatientWhoHaveOutrasPrescricoes(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "regime-tpt-3hp",
-        EptsReportUtils.map(
-            getPatientWhoHaveRegimeTpt3HPor3HP(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "regime-tpt-INH",
-        EptsReportUtils.map(
-            getPatientWhoHaveRegimeTptINH(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
 
     definition.addSearch(
-        "regime-tpt-3hpOrPiridoxina",
-        EptsReportUtils.map(
-            getPatientWhoHaveRegimeTpt3HP(),
-            "onOrAfter=${onOrAfter-6m},onOrBefore=${onOrBefore-6m},location=${location}"));
-    definition.addSearch(
-        "A",
+        "D",
         EptsReportUtils.map(
             getPatientsStartedTpt(),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
-    definition.setCompositionString(
-        "started-by-end-previous-reporting-period AND A AND NOT (transferred-out AND NOT completed-isoniazid)");
+    definition.setCompositionString("A AND D AND NOT (B AND NOT C)");
 
     return definition;
   }
