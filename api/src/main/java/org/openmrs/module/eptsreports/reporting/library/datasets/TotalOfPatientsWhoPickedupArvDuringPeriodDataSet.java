@@ -30,6 +30,7 @@ public class TotalOfPatientsWhoPickedupArvDuringPeriodDataSet extends BaseDataSe
 
     CohortIndicatorDataSetDefinition pdd = new CohortIndicatorDataSetDefinition();
     pdd.setName("Total of patients who picked up ARV during the period");
+    pdd.setParameters(getParameters());
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
     // Totals

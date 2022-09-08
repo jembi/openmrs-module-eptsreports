@@ -112,7 +112,7 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodDataSet extends BaseDataSet
     pdd.addColumn(
         "age",
         listOfPatientsArtCohortCohortQueries.getAge(),
-        "evaluationDate=${evaluationDate}",
+        "evaluationDate=${endDate}",
         new NotApplicableIfNullConverter());
 
     // 5 - Gender - Sheet 1: Column E
@@ -154,7 +154,7 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodDataSet extends BaseDataSet
         "last_pickup_fila",
         listOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries.getLastDrugPickupDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new StateOfStaySourceConverter());
+        null);
 
     // 11 - Last ARV Regimen – Sheet 1: Column K
     pdd.addColumn(
