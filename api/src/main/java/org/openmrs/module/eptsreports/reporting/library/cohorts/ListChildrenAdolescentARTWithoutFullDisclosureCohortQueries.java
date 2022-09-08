@@ -205,4 +205,30 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.setQuery(replacedQuery);
     return cd;
   }
+
+  public CohortDefinition getTotalPatientsWithoutDisclosure() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Total patients without full disclosure");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "BL",
+        EptsReportUtils.map(
+            getTotalAdolescentsCurrentlyOnArtWithBlankDisclosures(),
+            "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "NR",
+        EptsReportUtils.map(
+            getAdolescentsCurrentlyOnArtWithDisclosures(
+                hivMetadata.getNotRevealedConcept().getConceptId()),
+            "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "PR",
+        EptsReportUtils.map(
+            getAdolescentsCurrentlyOnArtWithDisclosures(
+                hivMetadata.getPartiallyRevealedConcept().getConceptId()),
+            "endDate=${endDate},location=${location}"));
+    cd.setCompositionString("BL OR NR OR PR");
+    return cd;
+  }
 }
