@@ -92,6 +92,10 @@ public class TbPrevQueries {
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
+    map.put("23986", tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId());
+    map.put("1098", hivMetadata.getMonthlyConcept().getConceptId());
+    map.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
+    map.put("23955", tbMetadata.getDtINHConcept().getConceptId());
 
     return map;
   }
@@ -424,20 +428,60 @@ public class TbPrevQueries {
     return new StringSubstitutor(getReportMetadata()).replace(query);
   }
 
+  /**
+   * Patients who have Última Profilaxia TPT with value “3HP” and Data de Fim da selected in Ficha
+   * Resumo - Mastercard and at least 86 days apart from the 3HP Start Date or
+   *
+   * @return String
+   */
   public String getCompleted3HPOnFichaResumo() {
-    return "SELECT p.patient_id, o2.obs_datetime AS complete_date "
-        + "FROM   patient p "
-        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
-        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-        + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-        + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
-        + "       AND e.location_id = :location "
-        + "       AND e.encounter_type = ${53} "
-        + "       AND ( (o.concept_id = 23985 AND o.value_coded = 23954) "
-        + "        AND (o2.concept_id = 165308 AND o2.value_coded = 1267 "
-        + "        AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) )";
+    String query =
+        "SELECT p.patient_id, o2.obs_datetime AS complete_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND ( (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
+            + "        AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + "        AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) )";
+    return new StringSubstitutor(getReportMetadata()).replace(query);
   }
 
+  /**
+   * Patients who have Profilaxia TPT with the value “3HP” and Estado da Profilaxia with the value
+   * “Fim (F)” marked in Ficha Clínica – Mastercard and at least 86 days apart from the 3HP Start
+   * Date or
+   *
+   * @return String
+   */
+  public String getCompletedDateOf3HPOnFichaClinica() {
+    String query =
+        "SELECT p.patient_id, o2.obs_datetime AS complete_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6}"
+            + "       AND (o.concept_id = ${23985} AND o.value_coded = ${23954})  "
+            + "       AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) ";
+
+    return new StringSubstitutor(getReportMetadata()).replace(query);
+  }
+
+  /**
+   * Patients who have Última Profilaxia TPT with value “3HP” and Data de Fim selected in Ficha
+   * Resumo - Mastercard and at least 86 days apart from the 3HP Start Date or Patients who have
+   * Profilaxia TPT with the value “3HP” and Estado da Profilaxia with the value “Fim (F)” marked in
+   * Ficha Clínica – Mastercard and at least 86 days apart from the 3HP Start Date or
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getPatientsWhoCompleted3HPAtLeast86Days() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who completed 3HP - At Least 86 Days ");
@@ -477,22 +521,13 @@ public class TbPrevQueries {
     return sqlCohortDefinition;
   }
 
-  public String getCompletedDateOf3HPOnFichaClinica() {
-    return "SELECT p.patient_id, o2.obs_datetime AS complete_date "
-        + "FROM   patient p "
-        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
-        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-        + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-        + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
-        + "       AND e.location_id = :location "
-        + "       AND e.encounter_type = 6"
-        + "       AND (o.concept_id = 23985 AND o.value_coded = 23954)  "
-        + "       AND (o2.concept_id = 165308 AND o2.value_coded = 1267 "
-        + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) ";
-  }
-
-  // Patients with one of the following combinations marked in Ficha Clínica - Mastercard and/or
-  // FILT:
+  /**
+   * At least 3 consultations registered on Ficha Clínica – Mastercard with Profilaxia 3HP
+   * (Profilaxia TPT=”3HP” and Estado da Profilaxia=”Início(I)/Continua(C)”) until a 4-month period
+   * from the 3HP Start Date (including the 3HP Start Date)
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast3ConsultationOnFichaClinica() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 1 consultation registered on Ficha Clínica ");
@@ -505,20 +540,17 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 6 "
-            + "                       AND ( o.concept_id = 23985  AND o.value_coded = 23954 ) "
-            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) )"
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND ( o.concept_id = ${23985}  AND o.value_coded = ${23954} ) "
+            + "                       AND ( o2.concept_id = ${165308} AND o2.value_coded IN ( ${1256}, ${1257} ) )"
             + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "                       GROUP BY e.encounter_id "
             + " ) profilaxy "
@@ -531,11 +563,18 @@ public class TbPrevQueries {
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 3";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 1 FILT with 3HP Trimestral (Regime de TPT= 3HP/”3HP + Piridoxina” and Tipo de Dispensa
+   * = Trimestral) or
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeastOne3HPWithDTOnFilt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 1 FILT with 3HP Trimestral ");
@@ -551,17 +590,25 @@ public class TbPrevQueries {
             + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_type = 60"
-            + "       AND (o.concept_id = 23985 AND o.value_coded IN (23954, 23984))  "
-            + "       AND (o2.concept_id = 23986 AND o2.value_coded = 23720 "
+            + "       AND e.encounter_type = ${60}"
+            + "       AND (o.concept_id = ${23985} AND o.value_coded IN (${23954}, ${23984}))  "
+            + "       AND (o2.concept_id = ${23986} AND o2.value_coded = ${23720} "
             + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "GROUP BY p.patient_id ";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 3 FILTs with 3HP Mensal (Regime de TPT= Isoniazida/”Isoniazida + Piridoxina” and Tipo
+   * de Dispensa = Mensal) until a 4-month period from the 3HP Start Date (including the 3HP Start
+   * Date) or
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast3ConsultarionWithDispensaMensalOnFilt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 3 FILTs with 3HP Mensal ");
@@ -574,20 +621,17 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 60 "
-            + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (23954, 23984) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 1098 )"
+            + "                       AND e.encounter_type = ${60} "
+            + "                       AND ( o.concept_id = ${23985} AND o.value_coded IN (${23954}, ${23984}) ) "
+            + "                       AND ( o2.concept_id = ${23986} AND o2.value_coded = ${1098} )"
             + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "               GROUP BY e.encounter_id "
             + " ) profilaxy "
@@ -600,11 +644,19 @@ public class TbPrevQueries {
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 3";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 1 consultation registered on Ficha Clínica – Mastercard with DT-3HP (Outras
+   * Prescrições=“DT-3HP”) until a 4-month period from the 3HP Start Date (including the 3HP Start
+   * Date) or
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast1ConsultarionWithDT3HPOnFichaClinica() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 1 consultation registered on Ficha Clínica ");
@@ -622,8 +674,8 @@ public class TbPrevQueries {
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 6 "
-            + "                       AND o.concept_id = 1719 AND o.value_coded = 165307  "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND o.concept_id = ${1719} AND o.value_coded = ${165307}  "
             + "               GROUP BY e.encounter_id "
             + "                       ) profilaxy "
             + "               INNER JOIN (SELECT patient_id,MIN(start_date) start_date "
@@ -634,42 +686,70 @@ public class TbPrevQueries {
             + "        WHERE  profilaxy.encounter_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 4 MONTH) "
             + "        GROUP  BY profilaxy.patient_id ";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
-  // The system will identify from all patients who started INH Regimen (TB_PREV_FR4) those who
-  // completed the treatment until reporting end date as following:
-
+  /**
+   * Patients who have (Última profilaxia TPT with value “Isoniazida (INH)” and Data de selected)
+   * until reporting end date registered in Ficha Resumo - Mastercard and at least 173 days apart
+   * from the INH start date or
+   *
+   * @return String
+   */
   public String getCompletedIPTOnFichaResumo() {
-    return "SELECT p.patient_id, o2.obs_datetime AS complete_date  "
-        + "FROM   patient p "
-        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
-        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-        + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-        + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
-        + "       AND e.location_id = :location "
-        + "       AND e.encounter_type = 53 "
-        + "       AND ( (o.concept_id = 23985 AND o.value_coded = 656) "
-        + "        AND (o2.concept_id = 165308 AND o2.value_coded = 1267 "
-        + "        AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) )";
+    String query =
+        "SELECT p.patient_id, o2.obs_datetime AS complete_date  "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0"
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${53} "
+            + "       AND ( (o.concept_id = ${23985} AND o.value_coded = ${656}) "
+            + "        AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + "        AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) )";
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    return sb.replace(query);
   }
 
+  /**
+   * Patients who have (Profilaxia TPT with the value “Isoniazida (INH)” and Estado da Profilaxia
+   * with the value “Fim (F)” marked in Ficha Clínica -– Mastercard and at least 173 days apart from
+   * the INH start date or
+   *
+   * @return String
+   */
   public String getCompletedDateOfIPTOnFichaClinica() {
-    return "SELECT p.patient_id, o2.obs_datetime AS complete_date  "
-        + "FROM   patient p "
-        + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
-        + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-        + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-        + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
-        + "       AND e.location_id = :location "
-        + "       AND e.encounter_type = 6 "
-        + "       AND (o.concept_id = 23985 AND o.value_coded = 656)  "
-        + "       AND (o2.concept_id = 165308 AND o2.value_coded = 1267 "
-        + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) ";
+    String query =
+        "SELECT p.patient_id, o2.obs_datetime AS complete_date  "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND (o.concept_id = ${23985} AND o.value_coded = ${656})  "
+            + "       AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + "       AND o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) ";
+
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    return sb.replace(query);
   }
 
+  /**
+   * Patients who have (Última profilaxia TPT with value “Isoniazida (INH)” and Data de selected)
+   * until reporting end date registered in Ficha Resumo - Mastercard and at least 173 days apart
+   * from the INH start date or Patients who have (Profilaxia TPT with the value “Isoniazida (INH)”
+   * and Estado da Profilaxia with the value “Fim (F)” marked in Ficha Clínica -– Mastercard and at
+   * least 173 days apart from the INH start date or
+   *
+   * @return String
+   */
   public CohortDefinition getPatientsWhoCompletedINHAtLeast173Days() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who completed IPT - At Least 173 Days ");
@@ -709,6 +789,14 @@ public class TbPrevQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 5 consultations registered on Ficha Clínica or Ficha de Seguimento (Adulto or
+   * Pediatria) with INH (Profilaxia TPT=” Isoniazida (INH)” and Estado da
+   * Profilaxia=”Início(I)/Continua( C)”) until a 7-month period after the INH Start Date (not
+   * including the INH Start Date) or
+   *
+   * @return
+   */
   public CohortDefinition getAtLeast5ConsultarionINHOnFichaClinica() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 1 consultation registered on Ficha Clínica ");
@@ -721,20 +809,17 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type IN (6,9) "
-            + "                       AND ( o.concept_id = 23985  AND o.value_coded = 656 ) "
-            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) ) "
+            + "                       AND e.encounter_type IN (${6},${9}) "
+            + "                       AND ( o.concept_id = ${23985}  AND o.value_coded = ${656} ) "
+            + "                       AND ( o2.concept_id = ${165308} AND o2.value_coded IN ( ${1256}, ${1257} ) ) "
             + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "              GROUP BY e.encounter_id "
             + " ) profilaxy "
@@ -747,11 +832,19 @@ public class TbPrevQueries {
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 5";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 6 FILT with INH Mensal (Regime de TPT= Isoniazida/’Isoniazida + Piridoxina’ and Tipo
+   * de Dispensa = Mensal) until a 7-month period from the INH Start Date (including the INH Start
+   * Date) or
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast6ConsultarionWithINHDispensaMensalOnFilt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 6 FILT with INH Mensal ");
@@ -764,20 +857,17 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 60 "
-            + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (656, 23982) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 1098 )"
+            + "                       AND e.encounter_type = ${60} "
+            + "                       AND ( o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982}) ) "
+            + "                       AND ( o2.concept_id = ${23986} AND o2.value_coded = ${1098} )"
             + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "               GROUP BY e.encounter_id "
             + " ) profilaxy "
@@ -789,12 +879,20 @@ public class TbPrevQueries {
             + "        WHERE  profilaxy.obs_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 7 MONTH) "
             + "        GROUP  BY profilaxy.patient_id) six_encounters "
             + "WHERE  six_encounters.encounters >= 6";
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
 
-    sqlCohortDefinition.setQuery(query);
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 2 consultations registered on Ficha Clínica with DT-INH or (Profilaxia TPT=”Isoniazida
+   * (INH)” and Estado da Profilaxia=“Início(I)/Continua( C) ” and Outras Prescrições = DT-INH )
+   * until a 5-month period from the INH Start Date (including the INH Start Date) or
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast2ConsultarionOfDTINHOnFichaClinica() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
@@ -808,23 +906,19 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
-            + "                       INNER JOIN obs o3 "
-            + "                               ON e.encounter_id = o3.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN obs o3 ON e.encounter_id = o3.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 6 "
-            + "                       AND ( o.concept_id = 23985  AND o.value_coded = 656 ) "
-            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) )"
-            + "                       AND ( o3.concept_id = 1719 AND o3.value_coded = 23955 )"
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND ( o.concept_id = ${23985}  AND o.value_coded = ${656} ) "
+            + "                       AND ( o2.concept_id = ${165308} AND o2.value_coded IN ( ${1256}, ${1257} ) )"
+            + "                       AND ( o3.concept_id = ${1719} AND o3.value_coded = ${23955} )"
             + "                       AND (e.encounter_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) and :endDate ) "
             + "                       AND (o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) and :endDate ) "
             + "              GROUP BY e.encounter_id "
@@ -837,12 +931,19 @@ public class TbPrevQueries {
             + "        WHERE  profilaxy.obs_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 5 MONTH) "
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 2";
-
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 2 FILT with DT-INH (Regime de TPT= Isoniazida/’Isoniazida + Piridoxina’ and Tipo de
+   * Dispensa = Trimestral) until a 5-month period from the Start Date (including the INH Start
+   * Date): or
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast2ConsultarionWithINHDispensaTrimestralOnFilt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 2 FILT with DT-INH  ");
@@ -855,20 +956,17 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 60 "
-            + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (656, 23982) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 23720 )"
+            + "                       AND e.encounter_type = ${60} "
+            + "                       AND ( o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982}) ) "
+            + "                       AND ( o2.concept_id = ${23986} AND o2.value_coded = ${23720} )"
             + "                       AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "               GROUP BY e.encounter_id "
             + "            ) profilaxy "
@@ -880,12 +978,18 @@ public class TbPrevQueries {
             + "        WHERE  profilaxy.obs_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 5 MONTH) "
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 2";
-
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 3 consultations registered on Ficha Clínica with INH or (Profilaxia TPT=” Isoniazida
+   * (INH)” and Estado da Profilaxia=”Início(I)/Continua( C)”)
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast3ConsultarionOfINHOnFichaClinica() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 3 consultations registered on Ficha Clínica with INH  ");
@@ -898,20 +1002,17 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o  ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2  ON e.encounter_id = o2.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 6 "
-            + "                       AND ( o.concept_id = 23985  AND o.value_coded = 656 ) "
-            + "                       AND ( o2.concept_id = 165308 AND o2.value_coded IN ( 1256, 1257 ) )"
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND ( o.concept_id = ${23985}  AND o.value_coded = ${656} ) "
+            + "                       AND ( o2.concept_id = ${165308} AND o2.value_coded IN ( ${1256}, ${1257} ) )"
             + "                   AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "              GROUP BY e.encounter_id "
             + " ) profilaxy "
@@ -924,11 +1025,19 @@ public class TbPrevQueries {
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 3";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * + 1 Ficha Clínica com DT-INH (Profilaxia TPT=”Isoniazida (INH)” and Estado da
+   * Profilaxia=“Início(I)/Continua( C)” and Outras Prescrições = DT-INH ) until a 7-month period
+   * from the INH Start Date (including INH Start Date) or
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast1ConsultarionWithDTINHOnFichaClinica() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("1 Ficha Clínica com DT-INH ");
@@ -948,10 +1057,10 @@ public class TbPrevQueries {
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 6 "
-            + "                       AND (o.concept_id = 1719 AND o.value_coded = 23955 )"
-            + "                       AND (o2.concept_id = 23985 AND o.value_coded = 656)  "
-            + "                       AND (o3.concept_id = 165308 AND o.value_coded IN (1256, 1257))  "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND (o.concept_id = ${1719} AND o.value_coded = ${23955} )"
+            + "                       AND (o2.concept_id = ${23985} AND o.value_coded = ${656})  "
+            + "                       AND (o3.concept_id = ${165308} AND o.value_coded IN (${1256}, ${1257}))  "
             + "                       AND (e.encounter_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate )  "
             + "                       AND (o3.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate )  "
             + "                GROUP BY e.encounter_id "
@@ -964,11 +1073,19 @@ public class TbPrevQueries {
             + "        WHERE  profilaxy.encounter_datetime BETWEEN tpt_start.start_date AND DATE_ADD(tpt_start.start_date, INTERVAL 7 MONTH) "
             + "        GROUP  BY profilaxy.patient_id ";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * At least 3 FILT with INH Mensal (Regime de TPT= Isoniazida/’Isoniazida + Piridoxina’ and Tipo
+   * de Dispensa = Mensal)
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast3ConsultarionWithINHDispensaMensalOnFilt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("At least 3 FILT with INH Mensal  ");
@@ -981,20 +1098,17 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o  ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2  ON e.encounter_id = o2.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 60 "
-            + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (656, 23982) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 1098 )"
+            + "                       AND e.encounter_type = ${60} "
+            + "                       AND ( o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982}) ) "
+            + "                       AND ( o2.concept_id = ${23986} AND o2.value_coded = ${1098} )"
             + "                   AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "              GROUP BY e.encounter_id "
             + "                ) profilaxy "
@@ -1007,11 +1121,18 @@ public class TbPrevQueries {
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 3";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
 
+  /**
+   * + 1 FILT with DT-INH (Regime de TPT= Isoniazida/’Isoniazida + Piridoxina’ and Tipo de Dispensa
+   * = Trimestral) until a 7-month period from the INH Start Date (including INH Start Date)
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getAtLeast1ConsultarionWithDTINHDispensaTrimestralOnFilt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" 1 FILT with DT-INH  ");
@@ -1024,20 +1145,17 @@ public class TbPrevQueries {
             + "FROM   (SELECT profilaxy.patient_id,COUNT(obs_datetime) encounters "
             + "        FROM   (SELECT p.patient_id, o2.obs_datetime "
             + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = o2.encounter_id "
+            + "                       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN obs o  ON e.encounter_id = o.encounter_id "
+            + "                       INNER JOIN obs o2  ON e.encounter_id = o2.encounter_id "
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
             + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = 60 "
-            + "                       AND ( o.concept_id = 23985 AND o.value_coded IN (656, 23982) ) "
-            + "                       AND ( o2.concept_id = 23986 AND o2.value_coded = 23720 )"
+            + "                       AND e.encounter_type = ${60} "
+            + "                       AND ( o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982}) ) "
+            + "                       AND ( o2.concept_id = ${23986} AND o2.value_coded = ${23720} )"
             + "                   AND ( o2.obs_datetime BETWEEN DATE_SUB(:startDate, INTERVAL 6 MONTH) AND :endDate ) "
             + "                GROUP BY e.encounter_id "
             + "              ) profilaxy "
@@ -1050,7 +1168,8 @@ public class TbPrevQueries {
             + "        GROUP  BY profilaxy.patient_id) three_encounters "
             + "WHERE  three_encounters.encounters >= 3";
 
-    sqlCohortDefinition.setQuery(query);
+    StringSubstitutor sb = new StringSubstitutor(getReportMetadata());
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
@@ -1100,6 +1219,14 @@ public class TbPrevQueries {
     return tptQuery;
   }
 
+  /**
+   * And the system will select patients as New on ART (denominator and numerator) as those who have
+   * the TPT start date within 6 months of initiating treatment on ART. (earliest date among the
+   * above source). The system will include all patients with ART start date greater than TPT start
+   * date
+   *
+   * @return
+   */
   public CohortDefinition getPatientsWhoStartedTptAndNewOnArt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Get Patients Who Started TPT and New on ART ");
@@ -1125,6 +1252,13 @@ public class TbPrevQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * And the system will select patients as Previously on ART (denominator and numerator) as those
+   * who have the TPI start date greater than 6 months of initiating treatment on ART (earliest date
+   * among the above source).
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getPatientsWhoStartedTptPreviouslyOnArt() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Get Patients Who Started TPT and Previously on ART ");
