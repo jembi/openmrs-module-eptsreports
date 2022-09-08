@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -14,6 +11,10 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
@@ -140,16 +141,7 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "            pg.program_id = ${2}   "
             + "            AND ps.state IN ( ${7}, ${8}, ${9}, ${10} )   "
             + "            AND   ps.start_date = states.most_recent   "
-            + "AND NOT EXISTS(   "
-            + "                SELECT p.patient_id   "
-            + "                FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id   "
-            + "                         INNER JOIN obs o2 on e.encounter_id = o2.encounter_id   "
-            + "                where e.encounter_type = ${53}   "
-            + "                  AND o2.concept_id = ${6272}   "
-            + "                  AND o2.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
-            + "                  AND o2.obs_datetime = states.most_recent   "
-            + "                GROUP BY p.patient_id   "
-            + "                UNION   "
+            + "AND pg.patient_id NOT IN (   "
             + "                SELECT p.patient_id   "
             + "                from patient p INNER JOIN encounter e ON p.patient_id = e.patient_id   "
             + "                               INNER JOIN obs o2 on e.encounter_id = o2.encounter_id   "
@@ -157,15 +149,21 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "                  AND o.concept_id = ${6273}   "
             + "                  AND o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
             + "                  AND o2.obs_datetime = states.most_recent   "
+            + "  AND NOT EXISTS( SELECT e.encounter_id from encounter e   "
+            + "                                      INNER JOIN obs o3 on e.encounter_id = o3.encounter_id   "
+            + "                where   "
+            + "                        e.encounter_type = ${53}   "
+            + "                  AND        o3.concept_id = ${6272}   "
+            + "                  AND        o3.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "                  AND        o3.obs_datetime = states.most_recent   "
+            + "                GROUP BY e.encounter_id   ) "
             + "                GROUP BY p.patient_id   "
             + "            )   "
             + "        )   "
             + "    )   "
             + "GROUP BY p.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(new StringSubstitutor(valuesMap).replace(query));
 
     return sqlPatientDataDefinition;
   }
@@ -268,16 +266,7 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "            pg.program_id = ${2}   "
             + "            AND ps.state IN ( ${7}, ${8}, ${9}, ${10} )   "
             + "            AND   ps.start_date = states.most_recent   "
-            + "AND NOT EXISTS(   "
-            + "                SELECT p.patient_id   "
-            + "                FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id   "
-            + "                         INNER JOIN obs o2 on e.encounter_id = o2.encounter_id   "
-            + "                where e.encounter_type = ${53}   "
-            + "                  AND o2.concept_id = ${6272}   "
-            + "                  AND o2.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
-            + "                  AND o2.obs_datetime = states.most_recent   "
-            + "                GROUP BY p.patient_id   "
-            + "                UNION   "
+            + "AND pg.patient_id NOT IN (   "
             + "                SELECT p.patient_id   "
             + "                from patient p INNER JOIN encounter e ON p.patient_id = e.patient_id   "
             + "                               INNER JOIN obs o2 on e.encounter_id = o2.encounter_id   "
@@ -285,15 +274,21 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "                  AND o.concept_id = ${6273}   "
             + "                  AND o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
             + "                  AND o2.obs_datetime = states.most_recent   "
+            + "  AND NOT EXISTS( SELECT e.encounter_id from encounter e   "
+            + "                                      INNER JOIN obs o3 on e.encounter_id = o3.encounter_id   "
+            + "                where   "
+            + "                        e.encounter_type = ${53}   "
+            + "                  AND        o3.concept_id = ${6272}   "
+            + "                  AND        o3.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "                  AND        o3.obs_datetime = states.most_recent   "
+            + "                GROUP BY e.encounter_id   ) "
             + "                GROUP BY p.patient_id   "
             + "            )   "
             + "        )   "
             + "    )   "
             + "GROUP BY p.patient_id ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(new StringSubstitutor(valuesMap).replace(query));
 
     return sqlPatientDataDefinition;
   }
@@ -310,9 +305,12 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Most Recent Drug Pick-Up Date on FILA");
-    addSqlCohortDefinitionParameters(sqlPatientDataDefinition);
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
 
     String query =
         " SELECT p.patient_id, MAX(e.encounter_datetime) as last_pickup_date"
@@ -326,9 +324,7 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "         AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + " GROUP BY p.patient_id  ";
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(new StringSubstitutor(valuesMap).replace(query));
 
     return sqlPatientDataDefinition;
   }

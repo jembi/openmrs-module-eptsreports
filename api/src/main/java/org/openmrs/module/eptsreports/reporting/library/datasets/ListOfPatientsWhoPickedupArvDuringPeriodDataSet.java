@@ -2,10 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStayArtPatientConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.StateOfStaySourceConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsWhoPickedupArvDuringPeriodCohortQueries;
@@ -158,6 +155,45 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodDataSet extends BaseDataSet
         listOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries.getLastDrugPickupDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new StateOfStaySourceConverter());
+
+    // 11 - Last ARV Regimen – Sheet 1: Column K
+    pdd.addColumn(
+        "last_regimen",
+        listChildrenOnARTandFormulationsDataset.getLastARVRegimen(),
+        "endDate=${endDate},location=${location}",
+        new ConceptNameConverter());
+
+    // 12 - Formulation 1 – Sheet 1: Column L
+    pdd.addColumn(
+        "formulation1",
+        listChildrenOnARTandFormulationsDataset.getFormulation(
+            ListChildrenOnARTandFormulationsDataset.Formulation.FORMULATION1),
+        "onOrBefore=${endDate},location=${location}",
+        null);
+
+    // 13 - Formulation 2 – Sheet 1: Column M
+    pdd.addColumn(
+        "formulation2",
+        listChildrenOnARTandFormulationsDataset.getFormulation(
+            ListChildrenOnARTandFormulationsDataset.Formulation.FORMULATION2),
+        "onOrBefore=${endDate},location=${location}",
+        null);
+
+    //  14 - Formulation 3 – Sheet 1: Column N
+    pdd.addColumn(
+        "formulation3",
+        listChildrenOnARTandFormulationsDataset.getFormulation(
+            ListChildrenOnARTandFormulationsDataset.Formulation.FORMULATION3),
+        "onOrBefore=${endDate},location=${location}",
+        null);
+
+    // 15 - Formulation 4 – Sheet 1: Column O
+    pdd.addColumn(
+        "formulation4",
+        listChildrenOnARTandFormulationsDataset.getFormulation(
+            ListChildrenOnARTandFormulationsDataset.Formulation.FORMULATION4),
+        "onOrBefore=${endDate},location=${location}",
+        null);
 
     // 16 - Next Scheduled Drug Pick up – Sheet 1: Column P
     pdd.addColumn(

@@ -804,7 +804,7 @@ public class ListChildrenOnARTandFormulationsDataset extends BaseDataSet {
    *
    * @return
    */
-  private DataDefinition getFormulation(Formulation formulation) {
+  public DataDefinition getFormulation(Formulation formulation) {
 
     CalculationDataDefinition calculationDataDefinition = null;
 
