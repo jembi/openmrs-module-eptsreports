@@ -9045,16 +9045,20 @@ public class QualityImprovement2020CohortQueries {
    *
    *
    * <ul>
-   *   <li>B4_1 - Filter all patients with “Ultima Profilaxia TPT (concept_id 23985) = INH (concept
-   *       = 656) and (Data Início)” (obs_datetime for concept id 165308 value 1256) in Ficha Resumo
-   *       (encounter type 53) during the Inclusion period as following:
-   *       <ul>
-   *         <li>
-   *             <p>Encounter Type 53 (Ficha Resumo) “Última Profilaxia Isoniazida Data Início”
-   *             obs_datetime between startDateInclusion and endDateInclusion
-   *             <p>Note: if there is more than one Ficha Resumo consider the most recent date
-   *             during the inclusion period.
-   *       </ul>
+   *   <li>B4_1 -
+   *       <p>O sistema irá identificar utentes que iniciaram TPT – Isoniazida durante o período de
+   *       inclusão seleccionando os utentes:
+   *   <li>
+   *       <p>com registo de “Última Profilaxia TPT” = “INH” e “Última Profilaxia TPT (Data
+   *       Início)”, no formulário “Ficha Resumo”, durante o período de inclusão (“Última Profilaxia
+   *       TPT (Data Início)” >= “Data Início Inclusão” e <= “Data Fim Inclusão”). Em caso de
+   *       existência de mais que uma Ficha Resumo com registo do “Última Profilaxia (Data Início)”,
+   *       deve-se considerar o a data mais recente durante o período de inclusão.
+   *       <p>sendo a “Data Início TPT - Isoniazida” do utente a data mais recente entre os
+   *       critérios acima listados.
+   *   <li>Nota: em caso de existência de mais que uma “Ficha Resumo” ou “Ficha Clínica” com
+   *       informação sobre diferentes tratamentos de profilaxia (INH ou 3HP) ambos serão
+   *       considerados nos critérios definidos no RF12 e RF12.1
    * </ul>
    *
    * @return CohortDefinition
@@ -9108,16 +9112,23 @@ public class QualityImprovement2020CohortQueries {
    *
    *
    * <ul>
-   *   <li>B4_2 - Filter all patients with a clinical consultation(encounter type 6) during the
-   *       Inclusion period with the following conditions:
-   *       <ul>
-   *         <li>
-   *             <p>Ultima Profilaxia TPT (concept_id 23985) = INH (concept = 656) and (Data
-   *             Início)” (obs_datetime for concept id 165308 value 1256) Encounter_datetime between
-   *             startDateInclusion and endDateInclusion
-   *             <p>Note: if there is more than one Ficha Clinica falling in the above criteria
-   *             consider the most recent one during the inclusion period.
-   *       </ul>
+   *   <li>B4_2 - O sistema irá identificar utentes que iniciaram TPT – Isoniazida durante o período
+   *       de inclusão seleccionando os utentes:
+   *   <li>
+   *       <p>com o registo de “Profilaxia TPT”=”INH” e “Estado da Profilaxia” =“Inicio” numa
+   *       consulta clínica (Ficha Clínica) ocorrida durante o período de inclusão (“Data de
+   *       Consulta”>= “Data Início Inclusão” e <= “Data Fim Inclusão”). Em caso de existência de
+   *       mais que uma Ficha Clínica com registo do “Início”, deve-se considerar o último registo
+   *       durante o período de inclusão.
+   *       <p>sendo a “Data Início TPT - Isoniazida” do utente a data mais recente entre os
+   *       critérios acima listados.
+   *   <li>Nota: em caso de existência de mais que uma “Ficha Resumo” ou “Ficha Clínica” com
+   *       informação sobre diferentes tratamentos de profilaxia (INH ou 3HP) ambos serão
+   *       considerados nos critérios definidos no RF12 e RF12.1
+   * </ul>
+   *
+   * </ul>
+   *
    * </ul>
    *
    * @return CohortDefinition
@@ -9171,17 +9182,18 @@ public class QualityImprovement2020CohortQueries {
    *
    *
    * <ul>
-   *   <li>B4_3 - Filter all patients with “Ultima Profilaxia TPT (concept_id 23985) = 3HP (concept
-   *       = 23954) and (Data Início) (obs_datetime for concept id 165308 value 1256)" in Ficha
-   *       Resumo (encounter type 53) during the Inclusion period as following:
-   *       <ul>
-   *         <li>
-   *             <p>Encounter Type 53 “Ultima Profilaxia TPT (concept_id 23985) = 3HP (concept =
-   *             23954) and (Data Início) (obs_datetime for concept id 165308 value 1256)"
-   *             obs_datetime between startDateInclusion and endDateInclusion
-   *             <p>Note: if there is more than one Ficha Resumo consider the most recent date
-   *             during the inclusion period.
-   *       </ul>
+   *   <li>B4_3 - O sistema irá identificar utentes que iniciaram TPT – 3HP durante o período de
+   *       inclusão seleccionando os utentes:
+   *       <p>com registo de “Última Profilaxia TPT” = “3HP” e “Última Profilaxia TPT (Data
+   *       Início)”, no formulário “Ficha Resumo”, durante o período de inclusão (“Última Profilaxia
+   *       TPT (Data Início)” >= “Data Início Inclusão” e <= “Data Fim Inclusão”). Em caso de
+   *       existência de mais que uma Ficha Resumo com registo do “Última Profilaxia (Data Início)”,
+   *       deve-se considerar o último registo durante o período de inclusão
+   *       <p>sendo a “Data Início TPT – 3HP” do paciente a data mais recente entre os critérios
+   *       acima listados.
+   *   <li>Nota: em caso de existência de mais que uma “Ficha Resumo” ou “Ficha Clínica” com
+   *       informação sobre diferentes tratamentos de profilaxia (INH ou 3HP) ambos serão
+   *       considerados nos critérios definidos no RF12 e RF12.1
    * </ul>
    *
    * @return CohortDefinition
@@ -9235,16 +9247,19 @@ public class QualityImprovement2020CohortQueries {
    *
    *
    * <ul>
-   *   <li>B4_4 - Filter all patients with a clinical consultation(encounter type 6) during the
-   *       Inclusion period with the following conditions:
-   *       <ul>
-   *         <li>
-   *             <p>“Ultima Profilaxia TPT (concept_id 23985) = 3HP * (concept = 23954) and (Data
-   *             Início) (obs_datetime for concept id 165308 value 1256)" obs_datetime between
-   *             startDateInclusion and endDateInclusion
-   *             <p>Note: if there is more than one Ficha Clinica falling in the above criteria
-   *             consider the most recent one during the inclusion period.
-   *       </ul>
+   *   <li>B4_4 - O sistema irá identificar utentes que iniciaram TPT – 3HP durante o período de
+   *       inclusão seleccionando os utentes:
+   *   <li>
+   *       <p>com o registo de “Profilaxia TPT”= ”3HP” e “Estado da Profilaxia” =“Inicio” numa
+   *       consulta clínica (Ficha Clínica) ocorrida durante o período de inclusão (“Data de
+   *       Consulta”>= “Data Início Inclusão” e <= “Data Fim Inclusão”). Em caso de existência de
+   *       mais que uma Ficha Clínica com registo do “Início”, deve-se considerar o último registo
+   *       durante o período de inclusão.
+   *       <p>sendo a “Data Início TPT – 3HP” do paciente a data mais recente entre os critérios
+   *       acima listados.
+   *   <li>Nota: em caso de existência de mais que uma “Ficha Resumo” ou “Ficha Clínica” com
+   *       informação sobre diferentes tratamentos de profilaxia (INH ou 3HP) ambos serão
+   *       considerados nos critérios definidos no RF12 e RF12.1
    * </ul>
    *
    * @return CohortDefinition

@@ -841,7 +841,7 @@ public class IntensiveMonitoringCohortQueries {
           "(A AND (B41 OR B42 OR B43 OR B44) AND GNEW AND GNEW3HP) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (num == 6) {
       compositionCohortDefinition.setCompositionString(
-          "(A AND (B41 OR B42 OR B43 OR B44`f) AND C AND GNEW AND GNEW3HP) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+          "(A AND (B41 OR B42 OR B43 OR B44) AND C AND GNEW AND GNEW3HP) AND NOT (B1 OR B2 OR B3 OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     }
     return compositionCohortDefinition;
   }
