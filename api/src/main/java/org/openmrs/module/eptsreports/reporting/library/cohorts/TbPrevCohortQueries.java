@@ -139,10 +139,6 @@ public class TbPrevCohortQueries {
     return definition;
   }
 
-
-
-
-
   public CohortDefinition getPatientsStartedTpt() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName("TB-PREV Previously on ART");
@@ -548,19 +544,4 @@ public class TbPrevCohortQueries {
 
     return sqlCohortDefinition;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
