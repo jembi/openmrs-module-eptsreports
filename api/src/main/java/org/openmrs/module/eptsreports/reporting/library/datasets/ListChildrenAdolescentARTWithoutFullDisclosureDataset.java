@@ -70,8 +70,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureDataset extends BaseD
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdsd.addRowFilter(
         listChildrenAdolescentARTWithoutFullDisclosureCohortQueries
-            .getAdolescentsCurrentlyOnArtWithoutDisclosures(
-                hivMetadata.getRevealdConcept().getConceptId()),
+            .getTotalPatientsWithoutDisclosure(),
         "endDate=${endDate},location=${location}");
 
     pdsd.addColumn("patient_id", new PersonIdDataDefinition(), "");

@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -14,6 +11,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
@@ -171,18 +172,17 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
    * Number of Children and Adolescent between 8 and 14 currently on ART with RD Value coded value
    * that is NOT "T" Anything else including null
    *
-   * @param valueCoded
    * @return
    */
-  public CohortDefinition getAdolescentsCurrentlyOnArtWithoutDisclosures(int valueCoded) {
+  public CohortDefinition getAdolescentsCurrentlyOnArtWithDisclosuresQuestionFilled() {
     Map<String, Integer> map = new HashMap<>();
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put(
         "6340",
         hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
-    map.put("answer", valueCoded);
+
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Adolescent patients without full disclosure");
+    cd.setName("Adolescent patients without full disclosure question filled");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     String query =
@@ -195,10 +195,10 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             + " AND e.location_id=:location "
             + " GROUP BY p.patient_id) wfd INNER JOIN encounter ee ON wfd.patient_id=ee.patient_id"
             + " INNER JOIN obs ob ON ee.encounter_id=ob.encounter_id "
-            + " WHERE ee.voided=0 AND ob.voided=0 AND ee.encounter_datetime <= :endDate "
+            + " WHERE ee.voided=0 AND ob.voided=0 "
             + " AND wfd.encounter_datetime=ee.encounter_datetime "
             + " AND ee.encounter_type = ${35} AND ee.location_id=:location "
-            + " AND (ob.value_coded NOT IN(${answer}) OR ob.value_coded IS NULL) ";
+            + " AND ob.concept_id=${6340} ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replacedQuery = sb.replace(query);
@@ -212,23 +212,17 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
-        "BL",
+        "ALL",
         EptsReportUtils.map(
-            getTotalAdolescentsCurrentlyOnArtWithBlankDisclosures(),
+            getAdolescentsCurrentlyOnArtWithDisclosuresQuestionFilled(),
             "endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "NR",
+        "R",
         EptsReportUtils.map(
             getAdolescentsCurrentlyOnArtWithDisclosures(
-                hivMetadata.getNotRevealedConcept().getConceptId()),
+                hivMetadata.getRevealdConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "PR",
-        EptsReportUtils.map(
-            getAdolescentsCurrentlyOnArtWithDisclosures(
-                hivMetadata.getPartiallyRevealedConcept().getConceptId()),
-            "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("BL OR NR OR PR");
+    cd.setCompositionString("ALL AND NOT R");
     return cd;
   }
 }
