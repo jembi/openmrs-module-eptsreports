@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -12,10 +15,6 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
 public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
 
@@ -23,17 +22,20 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
   private final AgeCohortQueries ageCohortQueries;
   private final CommonQueries commonQueries;
   private final HivMetadata hivMetadata;
+  private final ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   @Autowired
   public ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries(
       GenericCohortQueries genericCohortQueries,
       AgeCohortQueries ageCohortQueries,
       CommonQueries commonQueries,
-      HivMetadata hivMetadata) {
+      HivMetadata hivMetadata,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.ageCohortQueries = ageCohortQueries;
     this.commonQueries = commonQueries;
     this.hivMetadata = hivMetadata;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   /**
@@ -60,7 +62,12 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             ageCohortQueries.createXtoYAgeCohort("age", 8, 14), "effectiveDate=${endDate}"));
     cd.addSearch(
         "art", EptsReportUtils.map(getPatientsOnART(), "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("(base AND age AND art)");
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("base AND age AND B13");
     return cd;
   }
 
@@ -121,7 +128,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             + " INNER JOIN encounter e1 ON p.patient_id=e1.patient_id "
             + " INNER JOIN obs ob ON e1.encounter_id=ob.encounter_id "
             + " WHERE tt.encounter_datetime=e1.encounter_datetime AND p.voided=0 "
-            + " AND e1.encounter_type = ${53} AND e1.location_id=:location "
+            + " AND e1.encounter_type = ${35} AND e1.location_id=:location "
             + " AND e1.voided=0 AND ob.voided=0 AND ob.value_coded= ${answer} ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
