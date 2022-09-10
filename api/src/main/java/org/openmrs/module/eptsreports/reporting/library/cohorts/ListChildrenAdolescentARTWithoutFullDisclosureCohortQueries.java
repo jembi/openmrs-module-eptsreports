@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -19,22 +18,16 @@ import java.util.Map;
 @Component
 public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
 
-  private final GenericCohortQueries genericCohortQueries;
   private final AgeCohortQueries ageCohortQueries;
-  private final CommonQueries commonQueries;
   private final HivMetadata hivMetadata;
   private final ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   @Autowired
   public ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries(
-      GenericCohortQueries genericCohortQueries,
       AgeCohortQueries ageCohortQueries,
-      CommonQueries commonQueries,
       HivMetadata hivMetadata,
       ResumoMensalCohortQueries resumoMensalCohortQueries) {
-    this.genericCohortQueries = genericCohortQueries;
     this.ageCohortQueries = ageCohortQueries;
-    this.commonQueries = commonQueries;
     this.hivMetadata = hivMetadata;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
