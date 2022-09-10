@@ -56,7 +56,7 @@ public class TotalChildrenAdolescentARTWithoutFullDisclosureDataset extends Base
                 "Crianças e adolescentes 8 - 14 anos activos em TARV com RD em branco",
                 EptsReportUtils.map(
                     listChildrenAdolescentARTWithoutFullDisclosureCohortQueries
-                        .getTotalAdolescentsCurrentlyOnArtWithBlankDisclosures(),
+                        .getAdolescentWithBlankDisclosure(),
                     mappings)),
             mappings),
         "");

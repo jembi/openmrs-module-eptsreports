@@ -54,51 +54,17 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
-        "base",
-        EptsReportUtils.map(
-            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
-    cd.addSearch(
         "age",
         EptsReportUtils.map(
             ageCohortQueries.createXtoYAgeCohort("age", 8, 14), "effectiveDate=${endDate}"));
-    cd.addSearch(
-        "art", EptsReportUtils.map(getPatientsOnART(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B13",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
             "startDate=${endDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("base AND age AND B13");
+    cd.setCompositionString("age AND B13");
     return cd;
   }
-
-  /**
-   * ART Start Date (Data Início Tarv) Patient’s first drugs pick up date set in Pharmacy form
-   * (FILA) by reporting end Date or Date that patient started drugs (ARV PLAN = START DRUGS) during
-   * the pharmacy or clinical visits by reporting end Date or●Patient’s first historical start drugs
-   * date set in Pharmacy Tool (FILA) or Clinical tools (Ficha de Seguimento Adulto and Ficha de
-   * Seguimento Pediatria) or Ficha Resumo - Master Card by reporting end Date or●Date that Patient
-   * was enrolled in ART Program by reporting end Date or Patient’s first drug pick-up date set on
-   * Recepção Levantou ARV – Master Card with “Levantou ARV”= “Sim” by reporting end Date The system
-   * will define the earliest date amongst all sources as the Patients ART Start Date
-   *
-   * @return CohortDefinition
-   */
-  private CohortDefinition getPatientsOnART() {
-    String query = commonQueries.getARTStartDate(true);
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Get patients on ART");
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        "SELECT p.patient_id FROM patient p "
-            + " INNER JOIN( "
-            + query
-            + ") art ON p.patient_id=art.patient_id"
-            + " WHERE p.voided=0 AND art.first_pickup IS NOT NULL ");
-    return cd;
-  }
-
   /**
    * Number of Children and Adolescent between 8 and 14 currently on ART with RD marked as any of
    * “N” (Não) , “P” (Partial) “T”
@@ -138,74 +104,6 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     return cd;
   }
 
-  /**
-   * Number of Children and Adolescent between 8 and 14 currently on ART with RD marked
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getTotalAdolescentsCurrentlyOnArtWithBlankDisclosures() {
-    Map<String, Integer> map = new HashMap<>();
-    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put(
-        "6340",
-        hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Adolescent patients with blank disclosures made");
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    String query =
-        "SELECT pp.patient_id FROM patient pp WHERE pp.voided=0 AND pp.patient_id NOT IN("
-            + " SELECT p.patient_id FROM patient p "
-            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${35} "
-            + " AND o.concept_id=${6340} AND e.encounter_datetime <= :endDate "
-            + " AND e.location_id=:location)";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    String replacedQuery = sb.replace(query);
-    cd.setQuery(replacedQuery);
-    return cd;
-  }
-
-  /**
-   * Number of Children and Adolescent between 8 and 14 currently on ART with RD Value coded value
-   * that is NOT "T" Anything else including null
-   *
-   * @return
-   */
-  public CohortDefinition getAdolescentsCurrentlyOnArtWithDisclosuresQuestionFilled() {
-    Map<String, Integer> map = new HashMap<>();
-    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
-    map.put(
-        "6340",
-        hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
-
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Adolescent patients without full disclosure question filled");
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    String query =
-        "SELECT wfd.patient_id FROM( "
-            + " SELECT p.patient_id, MAX(e.encounter_datetime) AS encounter_datetime FROM patient p "
-            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
-            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${35} "
-            + " AND o.concept_id=${6340} AND e.encounter_datetime <= :endDate "
-            + " AND e.location_id=:location "
-            + " GROUP BY p.patient_id) wfd INNER JOIN encounter ee ON wfd.patient_id=ee.patient_id"
-            + " INNER JOIN obs ob ON ee.encounter_id=ob.encounter_id "
-            + " WHERE ee.voided=0 AND ob.voided=0 "
-            + " AND wfd.encounter_datetime=ee.encounter_datetime "
-            + " AND ee.encounter_type = ${35} AND ee.location_id=:location "
-            + " AND ob.concept_id=${6340} ";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-    String replacedQuery = sb.replace(query);
-    cd.setQuery(replacedQuery);
-    return cd;
-  }
-
   public CohortDefinition getTotalPatientsWithoutDisclosure() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Total patients without full disclosure");
@@ -214,8 +112,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addSearch(
         "ALL",
         EptsReportUtils.map(
-            getAdolescentsCurrentlyOnArtWithDisclosuresQuestionFilled(),
-            "endDate=${endDate},location=${location}"));
+            getBaseCohortForAdolescent(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "R",
         EptsReportUtils.map(
@@ -223,6 +120,38 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
                 hivMetadata.getRevealdConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
     cd.setCompositionString("ALL AND NOT R");
+    return cd;
+  }
+
+  public CohortDefinition getAdolescentWithBlankDisclosure() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Adloscent with blank results");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "ALL",
+        EptsReportUtils.map(
+            getBaseCohortForAdolescent(), "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "R",
+        EptsReportUtils.map(
+            getAdolescentsCurrentlyOnArtWithDisclosures(
+                hivMetadata.getRevealdConcept().getConceptId()),
+            "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "P",
+        EptsReportUtils.map(
+            getAdolescentsCurrentlyOnArtWithDisclosures(
+                hivMetadata.getPartiallyRevealedConcept().getConceptId()),
+            "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "NR",
+        EptsReportUtils.map(
+            getAdolescentsCurrentlyOnArtWithDisclosures(
+                hivMetadata.getNotRevealedConcept().getConceptId()),
+            "endDate=${endDate},location=${location}"));
+    cd.setCompositionString("ALL AND NOT (R OR P OR NR)");
+
     return cd;
   }
 }
