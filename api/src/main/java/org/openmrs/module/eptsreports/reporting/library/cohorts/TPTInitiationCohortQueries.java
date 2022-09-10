@@ -200,6 +200,7 @@ public class TPTInitiationCohortQueries {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
     cd.setName("3HP4 - Patients with Ultima Profilaxia on Resumo");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
@@ -249,6 +250,7 @@ public class TPTInitiationCohortQueries {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
     cd.setName("3HP5 - Patients with Profilaxia TPT on Ficha Clinica ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
@@ -298,6 +300,7 @@ public class TPTInitiationCohortQueries {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
     cd.setName("3HP6 - Patients with Outras Prescricoes on Ficha Clinica ");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
@@ -361,6 +364,7 @@ public class TPTInitiationCohortQueries {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
     cd.setName("3HP7 - Patients with Regime de TPT & Seg.Trat TPT on FILT");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
