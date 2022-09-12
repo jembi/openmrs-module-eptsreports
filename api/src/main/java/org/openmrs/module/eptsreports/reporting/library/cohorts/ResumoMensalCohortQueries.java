@@ -541,6 +541,32 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
+   *O sistema irá produzir B.4) Nº de entradas TARV durante o mês automaticamente calculado através da fórmula: (B.4 = B.1 + B.2 + B.3)
+   * @return CohortDefinition
+   */
+  public CohortDefinition getB4() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("O sistema irá produzir B.4");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    cd.addSearch("B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
+
+    cd.addSearch("B2", map(getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(), "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch("B3", map(getPatientsRestartedTarvtB3(), mapping));
+
+
+    cd.setCompositionString("B1 OR B2 OR B3");
+
+    return cd;
+  }
+
+  /**
    * <b>Name: B3</b>
    *
    * <p><b>Description:</b> Number of patients who restarted the treatment during the current month
