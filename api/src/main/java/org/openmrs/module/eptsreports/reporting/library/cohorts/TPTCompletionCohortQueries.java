@@ -710,8 +710,8 @@ public class TPTCompletionCohortQueries {
             + " AND e.encounter_type = ${encounterTypes}"
             + " AND (o.concept_id = ${23985}"
             + " AND o.value_coded = ${23954})"
-            + " AND (o2.concept_id = ${165308} AND o2.value_coded IN (${states})) "
-            + " AND o2.obs_datetime < :endDate"
+            + " AND (o2.concept_id = ${165308} AND o2.value_coded IN (${states}) "
+            + " AND o2.obs_datetime < :endDate )"
             + " AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -811,8 +811,8 @@ public class TPTCompletionCohortQueries {
             + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
             + "    AND e.encounter_type IN (${encounterTypes})"
             + " AND (o.concept_id = ${23985} AND o.value_coded = ${656})   "
-            + " AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256})   "
-            + "    AND o2.obs_datetime < :endDate "
+            + " AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256}   "
+            + "    AND o2.obs_datetime < :endDate) "
             + "    AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1028,8 +1028,8 @@ public class TPTCompletionCohortQueries {
             + "  AND o.voided = 0 "
             + "  AND e.encounter_type = ${60} "
             + "  AND (o.concept_id = ${23985} AND o.value_coded IN (${656} , ${23982})) "
-            + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705})) "
-            + "  AND o2.obs_datetime < :endDate  "
+            + "  AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256} , ${1705}) "
+            + "  AND o2.obs_datetime < :endDate )  "
             + "  AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1681,8 +1681,8 @@ public class TPTCompletionCohortQueries {
             + "ON regimeTPT.patient_id = p.patient_id   "
             + "WHERE e.encounter_type = ${6}   "
             + "AND (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
-            + "AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256})   "
-            + "OR (o.concept_id = ${1719} AND o.value_coded IN (${23954},${165307})) "
+            + "AND ((o2.concept_id = ${165308} AND o2.value_coded = ${1256})   "
+            + "OR (o.concept_id = ${1719} AND o.value_coded IN (${23954},${165307}))) "
             + "AND e.location_id = :location   "
             + "AND e.encounter_datetime BETWEEN DATE_SUB(regimeTPT.encounter_datetime, INTERVAL 4 MONTH) AND regimeTPT.encounter_datetime   "
             + "AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 ";
@@ -1858,8 +1858,8 @@ public class TPTCompletionCohortQueries {
             + "ON regimeTPT.patient_id = p.patient_id   "
             + "WHERE e.encounter_type = ${53}   "
             + " AND o.concept_id = ${23985} AND o.value_coded = ${23954} "
-            + " AND e.location_id = :location  AND o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
-            + " AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) <= 365 AND o2.obs_datetime <= :endDate"
+            + " AND e.location_id = :location  AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267} "
+            + " AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) >= 86 AND DATEDIFF(o2.obs_datetime, regimeTPT.encounter_datetime) <= 365 AND o2.obs_datetime <= :endDate )"
             + " AND p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0";
 
     StringSubstitutor sb = new StringSubstitutor(map);
