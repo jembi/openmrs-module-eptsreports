@@ -514,7 +514,7 @@ public class ResumoMensalCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition tarvRestartB3() {
+  public CohortDefinition getPatientsRestartedTarvtB3() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Nº de reinícios TARV durante o mês");
