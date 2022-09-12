@@ -505,6 +505,42 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
+   * O sistema irá produzir B.3) Nº de reinícios TARV durante o mês:<br>
+   * Nº de activos em TARV no fim do mês = no Indicador B.13 (: RF21) oue Nº de que sairam do TARV
+   * (saídas TARV) durante o mês = Indicador B9 RF 17<br>
+   * Excluindo os utentes: Nº de utentes activos em TARV até ao fim do mês anterior = Indicador B12
+   * RF20) Nº de utentes que iniciaram TARV nesta unidade sanitária durante o mês = Indicador B1 RF9
+   * Nº de transferidos de outras US em TARV durante o mês = Indicador B2 RF10
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition tarvRestartB3() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Nº de reinícios TARV durante o mês");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    cd.addSearch("B13", map(getActivePatientsInARTByEndOfCurrentMonth(false), mapping));
+
+    cd.addSearch("B9", map(getB9(), mapping));
+
+    cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
+
+    cd.addSearch(
+        "B2",
+        map(
+            getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.setCompositionString("B3 OR B9 AND NOT (B12 OR B2)");
+
+    return cd;
+  }
+
+  /**
    * <b>Name: B3</b>
    *
    * <p><b>Description:</b> Number of patients who restarted the treatment during the current month
