@@ -233,6 +233,34 @@ public class ResumoMensalDataSetDefinition extends BaseDataSet {
             EptsReportUtils.map(b3Indicator, mappings),
             resumoMensalAandBdisaggregations.getAdolescentesColumns());
 
+    // B4
+    CohortIndicator b4Indicator =
+            eptsGeneralIndicator.getIndicator(
+                    "B4", EptsReportUtils.map(resumoMensalCohortQueries.getB4(), mappings));
+    addRow(
+            dsd,
+            "B4TC",
+            "Patients under 15 years",
+            EptsReportUtils.map(b4Indicator, mappings),
+            resumoMensalAandBdisaggregations.getUnder14YearsColumns());
+
+    addRow(
+            dsd,
+            "B4TA",
+            "Patients over 15 years - adults",
+            EptsReportUtils.map(b4Indicator, mappings),
+            resumoMensalAandBdisaggregations.getAdultPatients());
+
+    dsd.addColumn(
+            "B4TP", "Total patients - Total Geral", EptsReportUtils.map(b4Indicator, mappings), "");
+
+    addRow(
+            dsd,
+            "B4TAD",
+            "Adolescentes patients",
+            EptsReportUtils.map(b4Indicator, mappings),
+            resumoMensalAandBdisaggregations.getAdolescentesColumns());
+
     // B5 indicators
     addRow(
         dsd,
