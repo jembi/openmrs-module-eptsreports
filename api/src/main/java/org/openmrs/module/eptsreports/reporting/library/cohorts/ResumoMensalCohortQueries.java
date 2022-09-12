@@ -877,6 +877,44 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
+   * RF 17 - O sistema irá produzir B.9) Nº de saídas TARV durante o mês, calculado automaticamente
+   * através da seguinte fórmula: (B.9 = B.5 + B.6 + B.7 + B.8 )
+   */
+  public CohortDefinition getB9() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Nº de saídas TARV durante o mês");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "end Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "B5",
+        map(
+            getPatientsTransferredOutB5(false),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "B6",
+        map(
+            getPatientsWhoSuspendedTreatmentB6(true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "B7",
+        map(
+            getNumberOfPatientsWhoAbandonedArtDuringCurrentMonthForB7(),
+            "location=${location},onOrBefore=${endDate}"));
+    cd.addSearch(
+        "B8",
+        map(
+            getPatientsWhoDied(true),
+            "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
+
+    cd.setCompositionString("B5 OR B6 OR B7 OR B8");
+
+    return cd;
+  }
+
+  /**
    * <b>Name: B10: Number of cumulative patients who started ART by end of previous month</b>
    *
    * <ol>
