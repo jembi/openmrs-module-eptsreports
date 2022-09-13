@@ -89,18 +89,31 @@ public class CodedObsOnFirstOrSecondEncounterCalculation extends AbstractPatient
     CalculationResultMap map = new CalculationResultMap();
     for (Integer pId : cohort) {
       List<Encounter> encounters = getFirstTwoEncounters(adultSegEncounters, pId);
-      List<Obs> obsFoundList =
+
+      List<Obs> regimeResults =
           EptsCalculationUtils.extractResultValues((ListResult) regimeResult.get(pId));
-      boolean pass = false;
+
+      List<Obs> stateResults =
+              EptsCalculationUtils.extractResultValues((ListResult) profilaxyStateResult.get(pId));
+      boolean hasIsoniazid = false;
+      boolean isStarting = false;
       for (Encounter e : encounters) {
-        for (Obs o : obsFoundList) {
+        for (Obs o : regimeResults) {
           if (e.getEncounterId().equals(o.getEncounter().getEncounterId())) {
-            pass = true;
+            hasIsoniazid = true;
             break;
           }
         }
+
+        for (Obs o :stateResults) {
+          if (e.getEncounterId().equals(o.getEncounter().getEncounterId())) {
+            isStarting = true;
+            break;
+          }
+        }
+
       }
-      map.put(pId, new BooleanResult(pass, this));
+      map.put(pId, new BooleanResult(hasIsoniazid && isStarting, this));
     }
 
     return map;
