@@ -2109,6 +2109,26 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  private CohortDefinition getPatientsWithQuantitativeVLOnFichaResumo() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients with Viral load quantitative on Ficha Resumo");
+    cd.addParameter(new Parameter("startDate", "After Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setQuery(ResumoMensalQueries.getPatientsWithQuantitativeViralLoadResultsOnFichaResumo());
+    return cd;
+  }
+
+  private CohortDefinition getPatientsWithQualitativeVLOnFichaResumo() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients with Viral load qualitative on Ficha Resumo");
+    cd.addParameter(new Parameter("startDate", "After Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setQuery(ResumoMensalQueries.getPatientsWithQualitativeVLOnFichaResumo());
+    return cd;
+  }
+
   /**
    * <b>Description:</b> Combined viral load and viral load qualitative
    *
@@ -2131,6 +2151,26 @@ public class ResumoMensalCohortQueries {
             gePatientsWithvViralLoadQuantitative(hivMetadata.getHivViralLoadQualitative()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString("VL OR VLQ");
+    return cd;
+  }
+
+  private CohortDefinition getViralLoadOrQualitativeOnfichaResumo() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Combined Quantitative and  qualitative on Ficha Resumo");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "QL",
+        map(
+            getPatientsWithQualitativeVLOnFichaResumo(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "QT",
+        map(
+            getPatientsWithQuantitativeVLOnFichaResumo(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.setCompositionString("QL OR QT");
     return cd;
   }
 
@@ -2187,6 +2227,12 @@ public class ResumoMensalCohortQueries {
             getViralLoadOrQualitative(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
+        "VLR",
+        map(
+            getViralLoadOrQualitativeOnfichaResumo(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
         "Ex2",
         map(
             genericCohortQueries.generalSql(
@@ -2203,7 +2249,7 @@ public class ResumoMensalCohortQueries {
             genericCohortQueries.generalSql("R", getPatientsWithVLOn21DecemberOnFichaResumo()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(C AND VL) AND NOT (Ex2 OR R)");
+    cd.setCompositionString("(C AND (VL OR VLR)) AND NOT (Ex2 OR R)");
     return cd;
   }
 

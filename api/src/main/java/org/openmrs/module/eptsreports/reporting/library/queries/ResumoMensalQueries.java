@@ -356,6 +356,24 @@ public class ResumoMensalQueries {
   }
 
   /**
+   * que tiveram um resultado de “Carga Viral qualitativo ou quantitativo” na “Ficha Resumo” com a
+   * data da carga viral ocorrida entre a “Data Início Relatório” e “Data Fim de Relatório” (“Data
+   * da CV” >= “Data Início Relatório” e <= “Data Fim de Relatório”).
+   *
+   * @return String
+   */
+  public static String getPatientsWithQuantitativeViralLoadResultsOnFichaResumo() {
+    String query =
+        "SELECT p.patient_id FROM patient p JOIN encounter e ON p.patient_id=e.patient_id JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.location_id=:location "
+            + " AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + " AND o.value_numeric IS NOT NULL "
+            + " AND o.concept_id=856 "
+            + " AND e.encounter_type= 53 ";
+    return query;
+  }
+
+  /**
    * <b>Description</b>que tiveram um resultado de “Carga Viral qualitativo ou quantitativo” na
    * “Ficha Resumo” com a data da carga viral ocorrida entre a “Data Início Relatório” e “Data Fim
    * de Relatório” (“Data da CV” >= “Data Início Relatório” e <= “Data Fim de Relatório”)
@@ -369,6 +387,22 @@ public class ResumoMensalQueries {
             + " AND e.location_id = :location AND e.encounter_datetime BETWEEN :startDate AND :endDate AND e.encounter_type=%d "
             + " AND o.concept_id=%d AND o.value_coded IS NOT NULL ";
     return String.format(query, encounterType, conceptId);
+  }
+
+  /**
+   * <b>Description</b>que tiveram um resultado de “Carga Viral qualitativo ou quantitativo” na
+   * “Ficha Resumo” com a data da carga viral ocorrida entre a “Data Início Relatório” e “Data Fim
+   * de Relatório” (“Data da CV” >= “Data Início Relatório” e <= “Data Fim de Relatório”).
+   *
+   * @return {@link String}
+   */
+  public static String getPatientsWithQualitativeVLOnFichaResumo() {
+    String query =
+        "SELECT p.patient_id FROM patient p JOIN encounter e ON p.patient_id=e.patient_id JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + " AND e.location_id = :location AND o.obs_datetime BETWEEN :startDate AND :endDate AND e.encounter_type=53 "
+            + " AND o.concept_id=1305 AND o.value_coded IS NOT NULL ";
+    return query;
   }
 
   /**
