@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.queries.ListOfPatientsWithPositiveTbScreeningQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
@@ -11,6 +10,8 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Component
 public class ListOfPatientsWithPositiveTbScreeningCohortQueries {
@@ -92,36 +93,42 @@ public class ListOfPatientsWithPositiveTbScreeningCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    String tbScreeningQuery =
-        new EptsQueriesUtil()
-            .unionBuilder(
-                listOfPatientsWithPositiveTbScreeningQueries
-                    .getPatientWithTbProgramEnrollmentAndDate())
-            .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientWithPulmonaryTbdDate())
-            .union(
-                listOfPatientsWithPositiveTbScreeningQueries
-                    .getPatientMarkedAsTbTreatmentStartAndDate())
-            .union(
-                listOfPatientsWithPositiveTbScreeningQueries
-                    .getPatientWithTuberculosisSymptomsAndDate())
-            .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientsActiveTuberculosisDate())
-            .union(
-                listOfPatientsWithPositiveTbScreeningQueries.getPatientsWithTbObservationsAndDate())
-            .union(
-                listOfPatientsWithPositiveTbScreeningQueries
-                    .getPatientsWithApplicationsForLabResearch())
-            .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientsWithTbGenexpertAndDate())
-            .union(
-                listOfPatientsWithPositiveTbScreeningQueries
-                    .getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
-            .buildQuery();
+    String maxPositiveScreeningDateQuery =
+        new EptsQueriesUtil().max(this.getTbPositiveScreeningFromSourcesQuery()).getQuery();
 
-    String maxPositiveDateQuery = new EptsQueriesUtil().max(tbScreeningQuery).getQuery();
-
-    String query = new EptsQueriesUtil().patientIdQueryBuilder(maxPositiveDateQuery).getQuery();
+    String query =
+        new EptsQueriesUtil().patientIdQueryBuilder(maxPositiveScreeningDateQuery).getQuery();
 
     sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Generate one union separeted query based on the given queries</b>
+   *
+   * @return {@link String}
+   */
+  public String getTbPositiveScreeningFromSourcesQuery() {
+    return new EptsQueriesUtil()
+        .unionBuilder(
+            listOfPatientsWithPositiveTbScreeningQueries.getPatientWithTbProgramEnrollmentAndDate())
+        .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientWithPulmonaryTbdDate())
+        .union(
+            listOfPatientsWithPositiveTbScreeningQueries
+                .getPatientMarkedAsTbTreatmentStartAndDate())
+        .union(
+            listOfPatientsWithPositiveTbScreeningQueries
+                .getPatientWithTuberculosisSymptomsAndDate())
+        .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientsActiveTuberculosisDate())
+        .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientsWithTbObservationsAndDate())
+        .union(
+            listOfPatientsWithPositiveTbScreeningQueries
+                .getPatientsWithApplicationsForLabResearch())
+        .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientsWithTbGenexpertAndDate())
+        .union(
+            listOfPatientsWithPositiveTbScreeningQueries
+                .getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
+        .buildQuery();
   }
 }

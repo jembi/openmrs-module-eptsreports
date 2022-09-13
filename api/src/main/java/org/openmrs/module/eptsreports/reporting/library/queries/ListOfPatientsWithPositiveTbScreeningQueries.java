@@ -1,12 +1,13 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsWithPositiveTbScreeningQueries {
@@ -228,7 +229,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
   }
 
   /**
-   * Patients with at least one response to the following questions in in Ficha Clinica Master Card
+   * Patients with at least one response to the following questions in Ficha Clinica Master Card
    * during the reporting period
    *
    * <p>• TB OBSERVATIONS (obs concept id = 1766) Answers: <br>
@@ -273,7 +274,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
   }
 
   /**
-   * Patients with at least one response to the following questions in in Ficha Clinica Master Card
+   * Patients with at least one response to the following questions in Ficha Clinica Master Card
    * during the reporting period
    *
    * <p>• TB GENEXPERT TEST (id =23723) Answer Positive (id = 703) or Negative (id = 664) <br>

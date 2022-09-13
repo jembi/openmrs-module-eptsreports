@@ -1,10 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsWithPositiveTbScreeningDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
@@ -19,6 +14,12 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SetupListOfPatientsWithPositiveTbScreening extends EptsDataExportManager {
@@ -86,12 +87,12 @@ public class SetupListOfPatientsWithPositiveTbScreening extends EptsDataExportMa
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "",
+              "Template_List_Patients_With_Positive_TB_Screening_v1.0.xls",
               "List of Patients with Positive TB Screening Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:7,dataset:TBPS");
+      props.put("repeatingSections", "sheet:1,row:9,dataset:TBPS");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
