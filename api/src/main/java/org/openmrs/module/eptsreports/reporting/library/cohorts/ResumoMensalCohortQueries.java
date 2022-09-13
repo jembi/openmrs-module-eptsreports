@@ -1605,8 +1605,7 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter("concept", tbMetadata.getActiveTBConcept());
-    cd.addCalculationParameter("valueCoded", hivMetadata.getYesConcept());
+
     return cd;
   }
 
@@ -1615,10 +1614,16 @@ public class ResumoMensalCohortQueries {
    * S.TARV – Adulto Seguimento (encounter id 6)
    *
    * <ul>
-   *   <li>“ISONIAZID PROPYLAXIS” (PT”: “Profilaxia com Isoniazida”) (Concept ID 6122) = (Concept ID
-   *       1256) <b>AND</b>
-   *   <li>Encounter Date >=startDate and <= endDate (ONLY CONSIDER THE FIRST OR SECOND OCCURRENCE
-   *       EVER)
+   *   <li>com o registo de “Profilaxia TPT”=”INH” e “Estado da Profilaxia” =“Inicio” numa consulta
+   *       clínica (Ficha Clínica) durante a 1ª ou a 2ª consulta que ocorreu no período do relatório
+   *       após o início Pré-TARV (“Data 1a Consulta” ou “Data 2a Consulta” >= “Data Início do
+   *       Relatório ” e <=” Data Fim do Relatório” and “Data 1a Consulta” ou “Data 2a Consulta” >=
+   *       “Data Inicio Pre- TARV ”), ou
+   *   <li>com o registo de “Profilaxia TPT”= ”3HP” e “Estado da Profilaxia” =“Inicio” numa consulta
+   *       clínica (Ficha Clínica) ocorrida durante a 1ª ou a 2ª consulta que ocorreu no período do
+   *       relatório após o início Pré-TARV ("Data 1a Consulta” ou “Data 2a Consulta”>= “Data Início
+   *       do Relatório ” e <=” Data Fim do Relatório” and “Data 1a Consulta” ou “Data 2a Consulta”
+   *       >= “Data Inicio Pre-TARV ”)
    * </ul>
    *
    * @return {@link CohortDefinition}
