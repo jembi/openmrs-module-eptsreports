@@ -959,7 +959,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B5",
         map(
-            getPatientsTransferredOutB5(false),
+            getPatientsTransferredOutB5(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "B6",
@@ -970,7 +970,7 @@ public class ResumoMensalCohortQueries {
         "B7",
         map(
             getNumberOfPatientsWhoAbandonedArtDuringCurrentMonthForB7(),
-            "location=${location},onOrBefore=${endDate}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "B8",
         map(
@@ -1628,7 +1628,7 @@ public class ResumoMensalCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  private CohortDefinition getPatientsWhoStartedTPI() {
+  public CohortDefinition getPatientsWhoStartedTPI() {
     CodedObsOnFirstOrSecondEncounterCalculation calculation =
         Context.getRegisteredComponents(CodedObsOnFirstOrSecondEncounterCalculation.class).get(0);
     CalculationCohortDefinition cd = new CalculationCohortDefinition(calculation);
