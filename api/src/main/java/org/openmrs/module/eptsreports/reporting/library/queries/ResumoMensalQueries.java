@@ -324,6 +324,18 @@ public class ResumoMensalQueries {
     return String.format(query, viralLoadConcept, encounterType);
   }
 
+  public static String getPatientsHavingVLSuppressionOnFichaResumo() {
+    String query =
+        "SELECT p.patient_id FROM patient p JOIN encounter e ON p.patient_id=e.patient_id JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.location_id=:location "
+            + " AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + " AND o.value_numeric IS NOT NULL "
+            + " AND o.concept_id=856 "
+            + " AND e.encounter_type=53 "
+            + " AND o.value_numeric < 1000";
+    return query;
+  }
+
   /**
    * <b>Description:</b> Number of Patients With Coded Obs And Answers
    *
@@ -524,6 +536,37 @@ public class ResumoMensalQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * <b>Description: E3</b> que tiveram um registo de “Carga viral Quantitativo” <1000 cópias ou
+   * qualquer registo de “Carga viral Qualitativo” na “Ficha Resumo” entre 21 de Dezembro do ano
+   * anterior ao do relatório e a “Data de CV” [para garantir que apenas a primeira seja
+   * contabilizada) dentro do ano do calendário estatístico
+   *
+   * @return {@link String}
+   */
+  public static String getPatientsWithVLSuppression21DecemberOnFichaResumo() {
+    String query =
+        " SELECT patient_id FROM ( "
+            + " SELECT pat.patient_id AS patient_id, enc.encounter_datetime AS endDate FROM patient pat "
+            + " JOIN encounter enc ON pat.patient_id=enc.patient_id JOIN obs ob ON enc.encounter_id=ob.encounter_id "
+            + " WHERE pat.voided=0 AND enc.voided=0 AND ob.voided=0 AND enc.location_id=:location "
+            + " AND ob.obs_datetime BETWEEN "
+            + " IF(MONTH(:startDate) = 12  && DAY(:startDate) = 21, :startDate, CONCAT(YEAR(:startDate)-1, '-12','-21')) "
+            + " AND DATE_ADD(:startDate, INTERVAL -1 DAY) "
+            + " AND ob.value_numeric IS NOT NULL "
+            + " AND ob.concept_id=856 AND enc.encounter_type=53 AND ob.value_numeric < 1000"
+            + " UNION "
+            + " SELECT pat.patient_id AS patient_id, enc.encounter_datetime AS endDate FROM patient pat "
+            + " JOIN encounter enc ON pat.patient_id=enc.patient_id JOIN obs ob ON enc.encounter_id=ob.encounter_id "
+            + " WHERE pat.voided = 0 AND enc.voided = 0 AND ob.voided = 0 AND enc.location_id = :location AND "
+            + " ob.obs_datetime BETWEEN "
+            + " IF(MONTH(:startDate) = 12  && DAY(:startDate) = 21, :startDate, CONCAT(YEAR(:startDate)-1, '-12','-21')) "
+            + " AND DATE_ADD(:startDate, INTERVAL -1 DAY) "
+            + " AND enc.encounter_type=53 AND ob.concept_id=1305 ) E3exclusion";
+
+    return query;
   }
 
   /**

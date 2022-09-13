@@ -2313,6 +2313,18 @@ public class ResumoMensalCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
+        "QTR",
+        map(
+            getViralLoadSuppressionOnFichaResumo(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "QLR",
+        map(
+            getPatientsWithQualitativeVLOnFichaResumo(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
         "Ex3",
         map(
             genericCohortQueries.generalSql(
@@ -2323,7 +2335,14 @@ public class ResumoMensalCohortQueries {
                     hivMetadata.getHivViralLoadQualitative().getConceptId())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(C AND (SUPP OR QUAL)) AND NOT Ex3");
+    cd.addSearch(
+        "ExR",
+        map(
+            genericCohortQueries.generalSql(
+                "ExR", getPatientsWithVLSuppression21DecemberOnFichaResumo()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(C AND (SUPP OR QUAL OR QTR OR QLR)) AND NOT (Ex3 OR ExR)");
     return cd;
   }
 
@@ -2342,6 +2361,24 @@ public class ResumoMensalCohortQueries {
         getPatientsHavingViralLoadSuppression(
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
+    return cd;
+  }
+
+  /**
+   * que tiveram registo de resultado de “Carga Viral Quantitativo” <1000 cópias ou qualquer registo
+   * de resultado de “Carga Viral Qualitativo” na “Ficha Resumo” com a data da carga viral ocorrida
+   * durante o período de reporte( “Data da CV>= “Data Início Relatório” e <= “Data Fim de
+   * Relatório”
+   *
+   * @return CohortDefinition
+   */
+  private CohortDefinition getViralLoadSuppressionOnFichaResumo() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Viral load suppression on Ficha Resumo");
+    cd.addParameter(new Parameter("startDate", "After Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setQuery(getPatientsHavingVLSuppressionOnFichaResumo());
     return cd;
   }
 
