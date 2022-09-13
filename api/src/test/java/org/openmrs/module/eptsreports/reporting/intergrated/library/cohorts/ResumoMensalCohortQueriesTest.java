@@ -322,7 +322,6 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  @Ignore
   public void getPatientsWhoStartedTPIShouldPass() throws EvaluationException {
 
     CohortDefinition cd =
@@ -439,7 +438,6 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  @Ignore
   public void
       getPatientsWhoInitiatedPreTarvDuringCurrentMonthAndStartedTpiC2ShouldReturnPatientsTpiC2()
           throws EvaluationException {
