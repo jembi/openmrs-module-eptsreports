@@ -535,13 +535,15 @@ public class ResumoMensalCohortQueries {
         map(
             getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.setCompositionString("B3 OR B9 AND NOT (B12 OR B2)");
+    cd.setCompositionString("B13 OR B9 AND NOT (B12 OR B2)");
 
     return cd;
   }
 
   /**
-   *O sistema irá produzir B.4) Nº de entradas TARV durante o mês automaticamente calculado através da fórmula: (B.4 = B.1 + B.2 + B.3)
+   * O sistema irá produzir B.4) Nº de entradas TARV durante o mês automaticamente calculado através
+   * da fórmula: (B.4 = B.1 + B.2 + B.3)
+   *
    * @return CohortDefinition
    */
   public CohortDefinition getB4() {
@@ -554,12 +556,16 @@ public class ResumoMensalCohortQueries {
 
     String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
 
-    cd.addSearch("B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
+    cd.addSearch(
+        "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
 
-    cd.addSearch("B2", map(getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(), "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "B2",
+        map(
+            getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch("B3", map(getPatientsRestartedTarvtB3(), mapping));
-
 
     cd.setCompositionString("B1 OR B2 OR B3");
 
@@ -1625,8 +1631,7 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
-    cd.addCalculationParameter("concept", hivMetadata.getIsoniazidUsageConcept());
-    cd.addCalculationParameter("valueCoded", hivMetadata.getStartDrugs());
+
     return cd;
   }
 
@@ -2084,12 +2089,14 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Number of patients with coded observation
+   * <b>Description:</b> que tiveram um registo de resultado de "Carga viral qualitativo ou
+   * quantitativo ” na “Ficha Clínica” e “Data de Consulta” (Coluna 1, na qual ocorreu o registo da
+   * CV) >= “Data Início Relatório” e <= “Data Fim de Relatório”
    *
    * @param
    * @return {@link CohortDefinition}
    */
-  private CohortDefinition gePatientsWithCodedObs(Concept question) {
+  private CohortDefinition gePatientsWithvViralLoadQuantitative(Concept question) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Patients with Viral load qualitative done");
     cd.addParameter(new Parameter("startDate", "After Date", Date.class));
@@ -2121,7 +2128,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "VLQ",
         map(
-            gePatientsWithCodedObs(hivMetadata.getHivViralLoadQualitative()),
+            gePatientsWithvViralLoadQuantitative(hivMetadata.getHivViralLoadQualitative()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString("VL OR VLQ");
     return cd;
@@ -2190,7 +2197,13 @@ public class ResumoMensalCohortQueries {
                     hivMetadata.getHivViralLoadQualitative().getConceptId())),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(C AND VL) AND NOT Ex2");
+    cd.addSearch(
+        "R",
+        map(
+            genericCohortQueries.generalSql("R", getPatientsWithVLOn21DecemberOnFichaResumo()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(C AND VL) AND NOT (Ex2 OR R)");
     return cd;
   }
 
@@ -2250,7 +2263,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "QUAL",
         map(
-            gePatientsWithCodedObs(hivMetadata.getHivViralLoadQualitative()),
+            gePatientsWithvViralLoadQuantitative(hivMetadata.getHivViralLoadQualitative()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(

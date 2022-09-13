@@ -356,7 +356,9 @@ public class ResumoMensalQueries {
   }
 
   /**
-   * <b>Description</b> Number of patients with any coded obs value
+   * <b>Description</b>que tiveram um resultado de “Carga Viral qualitativo ou quantitativo” na
+   * “Ficha Resumo” com a data da carga viral ocorrida entre a “Data Início Relatório” e “Data Fim
+   * de Relatório” (“Data da CV” >= “Data Início Relatório” e <= “Data Fim de Relatório”)
    *
    * @return {@link String}
    */
@@ -365,7 +367,7 @@ public class ResumoMensalQueries {
         "SELECT p.patient_id FROM patient p JOIN encounter e ON p.patient_id=e.patient_id JOIN obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + " AND e.location_id = :location AND e.encounter_datetime BETWEEN :startDate AND :endDate AND e.encounter_type=%d "
-            + " AND o.concept_id=%d ";
+            + " AND o.concept_id=%d AND o.value_coded IS NOT NULL ";
     return String.format(query, encounterType, conceptId);
   }
 
@@ -428,6 +430,31 @@ public class ResumoMensalQueries {
         viralLoadConcept,
         qualitativeConcept,
         encounterType);
+  }
+
+  /**
+   * <b>Description: E2</b> que tiveram um registo de “Carga viral viral qualitativo ou quantitativo
+   * ” na “Ficha Resumo” entre 21 de Dezembro do ano anterior ao do relatório e a “Data de CV” [para
+   * garantir que apenas a primeira seja contabilizada) dentro do ano do calendário estatístico]
+   *
+   * @return {@link String}
+   */
+  public static String getPatientsWithVLOn21DecemberOnFichaResumo() {
+
+    String query =
+        "SELECT p.patient_id FROM patient p JOIN encounter e ON p.patient_id=e.patient_id JOIN obs o ON e.encounter_id=o.encounter_id "
+            + "JOIN (SELECT pat.patient_id AS patient_id, enc.encounter_datetime AS endDate FROM patient pat JOIN encounter enc ON pat.patient_id=enc.patient_id JOIN obs ob "
+            + " ON enc.encounter_id=ob.encounter_id "
+            + " WHERE pat.voided=0 AND enc.voided=0 AND ob.voided=0 AND enc.location_id=:location AND ob "
+            + " BETWEEN :startDate AND :endDate AND ob.concept_id IN(1305, 856) AND enc.encounter_type= 53) ed "
+            + " ON p.patient_id=ed.patient_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.location_id=:location "
+            + " AND e.encounter_datetime BETWEEN "
+            + " IF(MONTH(:startDate) = 12  && DAY(:startDate) = 21, :startDate, CONCAT(YEAR(:startDate)-1, '-12','-21')) "
+            + " AND DATE_ADD(:startDate, INTERVAL -1 DAY) "
+            + " AND o.concept_id IN (1305, 856)"
+            + " AND e.encounter_type= 53 ";
+    return query;
   }
 
   /**

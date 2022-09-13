@@ -17,6 +17,7 @@ import org.openmrs.calculation.patient.PatientCalculationContext;
 import org.openmrs.calculation.result.CalculationResultMap;
 import org.openmrs.calculation.result.ListResult;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.common.EPTSCalculationService;
 import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
@@ -29,12 +30,16 @@ public class CodedObsOnFirstOrSecondEncounterCalculation extends AbstractPatient
   private EPTSCalculationService eptsCalculationService;
 
   private HivMetadata hivMetadata;
+  private TbMetadata tbMetadata;
 
   @Autowired
   public CodedObsOnFirstOrSecondEncounterCalculation(
-      EPTSCalculationService eptsCalculationService, HivMetadata hivMetadata) {
+      EPTSCalculationService eptsCalculationService,
+      HivMetadata hivMetadata,
+      TbMetadata tbMetadata) {
     this.eptsCalculationService = eptsCalculationService;
     this.hivMetadata = hivMetadata;
+    this.tbMetadata = tbMetadata;
   }
 
   @Override
@@ -48,19 +53,35 @@ public class CodedObsOnFirstOrSecondEncounterCalculation extends AbstractPatient
     Location location = (Location) context.getFromCache("location");
     Date onOrAfter = (Date) context.getFromCache("onOrAfter");
     Date onOrBefore = (Date) context.getFromCache("onOrBefore");
-    Concept concept = (Concept) parameterValues.get("concept");
-    Concept valueCoded = (Concept) parameterValues.get("valueCoded");
+
+    Concept tptRegimeConcept = tbMetadata.getRegimeTPTConcept();
+    Concept isoniazidConcept = tbMetadata.getIsoniazidConcept();
+
+    Concept profilaxyStateConcept = tbMetadata.getDataEstadoDaProfilaxiaConcept();
+    Concept startConcept = hivMetadata.getStartDrugs();
 
     CalculationResultMap adultSegEncounters =
         eptsCalculationService.allEncounters(
             encounterTypes, cohort, location, onOrAfter, onOrBefore, context);
-    CalculationResultMap getObs =
+
+    CalculationResultMap regimeResult =
         eptsCalculationService.getObs(
-            concept,
+            tptRegimeConcept,
             encounterTypes,
             cohort,
             Arrays.asList(location),
-            Arrays.asList(valueCoded),
+            Arrays.asList(isoniazidConcept),
+            TimeQualifier.ANY,
+            null,
+            context);
+
+    CalculationResultMap profilaxyStateResult =
+        eptsCalculationService.getObs(
+            profilaxyStateConcept,
+            encounterTypes,
+            cohort,
+            Arrays.asList(location),
+            Arrays.asList(startConcept),
             TimeQualifier.ANY,
             null,
             context);
@@ -69,7 +90,7 @@ public class CodedObsOnFirstOrSecondEncounterCalculation extends AbstractPatient
     for (Integer pId : cohort) {
       List<Encounter> encounters = getFirstTwoEncounters(adultSegEncounters, pId);
       List<Obs> obsFoundList =
-          EptsCalculationUtils.extractResultValues((ListResult) getObs.get(pId));
+          EptsCalculationUtils.extractResultValues((ListResult) regimeResult.get(pId));
       boolean pass = false;
       for (Encounter e : encounters) {
         for (Obs o : obsFoundList) {
