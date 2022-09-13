@@ -40,6 +40,7 @@ public class EriDSDCohortQueries {
   @Autowired private AgeCohortQueries ageCohortQueries;
   @Autowired private HivCohortQueries hivCohortQueries;
   @Autowired private HivMetadata hivMetadata;
+  @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   /**
    * <b>Name: D1</b>
@@ -57,7 +58,6 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
     cd.addSearch(
         "2",
         EptsReportUtils.map(
@@ -135,7 +135,6 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
-
     cd.addSearch(
         "activeAndStablePatients",
         EptsReportUtils.map(
@@ -242,6 +241,135 @@ public class EriDSDCohortQueries {
 
     return cd;
   }
+
+  /**
+   * <b>Name: D3</b>
+   *
+   * <p><b>Description:</b> D3: Number of all patients currently on ART <b>D3</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getD3() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("D3 - D3: Number of all patients currently on ART");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "activeAndStablePatients",
+        EptsReportUtils.map(
+            getD1(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "pregnantOrBreastfeedingOrTBTreatment",
+        EptsReportUtils.map(
+            getPregnantAndBreastfeedingAndOnTBTreatment(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "B13 AND NOT (activeAndStablePatients OR pregnantOrBreastfeedingOrTBTreatment)");
+
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> Patients who are Non-Pregnant and Non-Breastfeeding for <b>D3</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreNotPregnantAndNotBreastfeedingD3() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("D3 - who are Non-pregnant and Non-Breastfeeding");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
+            "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
+            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "onART",
+        EptsReportUtils.map(
+            getD3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("onART AND NOT pregnant AND NOT breastfeeding");
+
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> Pregnant Women for <b>D3</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoArePregnantD3() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("D3 - who are pregnant");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
+            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "onART",
+        EptsReportUtils.map(
+            getD3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("onART AND pregnant");
+
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> Patients who are Breastfeeding for <b>D3</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoAreBreastfeedingD3() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("D3 - who are Breastfeeding");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
+            "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "onART",
+        EptsReportUtils.map(
+            getD3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("onART AND breastfeeding");
+
+    return cd;
+  }
+
   /**
    * <b>Name: N1</b>
    *

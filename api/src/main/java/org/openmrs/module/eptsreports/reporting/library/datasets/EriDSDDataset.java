@@ -148,6 +148,56 @@ public class EriDSDDataset extends BaseDataSet {
                     eriDSDCohortQueries.getPatientsWhoAreBreastfeedingD2(), mappings)),
             mappings),
         "");
+    dsd.addColumn(
+        "D3T",
+        "DSD D3 Total",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "DSD D3 Total", EptsReportUtils.map(eriDSDCohortQueries.getD3(), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "D3SNPNB",
+        "Non-pregnant and Non-Breastfeeding Adults (>=15)",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "D3SNPNB",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreNotPregnantAndNotBreastfeedingD3(),
+                    mappings)),
+            mappings),
+        "age=15+");
+    addRow(
+        dsd,
+        "D3SNPNBC",
+        "Non-pregnant and Non-Breastfeeding Children By age",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "D3SNPNBC",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreNotPregnantAndNotBreastfeedingD3(),
+                    mappings)),
+            mappings),
+        getChildrenColumn());
+    dsd.addColumn(
+        "D3PW",
+        "Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "D3PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnantD3(), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "D3BW",
+        "Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "D3BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeedingD3(), mappings)),
+            mappings),
+        "");
 
     addRow(dsd, "N1", N1, mapStraightThrough(getN1()), getDisags());
     addRow(dsd, "N2", N2, mapStraightThrough(getN2()), getDisags());
