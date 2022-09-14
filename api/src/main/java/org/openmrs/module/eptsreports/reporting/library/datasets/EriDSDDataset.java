@@ -18,10 +18,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EriDSDDataset extends BaseDataSet {
-
+  /*
+    private static final String N1 =
+        "N1 - Number of active on ART whose next ART pick-up is schedule for 83-97 days after the date of their last ART drug pick-up (DT)";
+  */
   private static final String N1 =
-      "N1 - Number of active on ART whose next ART pick-up is schedule for 83-97 days after the date of their last ART drug pick-up (DT)";
-
+      "Number of Non-pregnant and Non-Breastfeeding patients who are not on TB treatment and elegible for DSD who are in at least one DSD model for stable patients (GA, DT, DS, DA, FR, DCA, DD)";
   private static final String N2 =
       "N2 - Number of active patients on ART whose next clinical consultation is scheduled 175-190 days after the date of the last clinical consultation";
 
@@ -36,9 +38,12 @@ public class EriDSDDataset extends BaseDataSet {
 
   private static final String N7 =
       "N7 Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment) who are in DC";
-
+  /*
+    private static final String N8 =
+        "N8 - Number of active patients on ART who participate in at least one DSD";
+  */
   private static final String N8 =
-      "N8 - Number of active patients on ART who participate in at least one DSD";
+      "N1 - Number of active on ART whose next ART pick-up is schedule for 83-97 days after the date of their last ART drug pick-up (DT)";
 
   private static final String N9 = "N9 : Number of active patients on ART who are on DS";
 
