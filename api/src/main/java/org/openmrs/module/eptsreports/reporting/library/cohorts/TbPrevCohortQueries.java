@@ -353,7 +353,6 @@ public class TbPrevCohortQueries {
             + "        AND p.voided=0   "
             + "        AND pg.program_id= ${artProgram}  "
             + "        AND ps.state = ${transferredOutToAnotherHealthFacilityWorkflowState}   "
-            + "        AND ps.end_date is null   "
             + "        AND ps.start_date BETWEEN :startDate AND :endDate    "
             + "        AND pg.location_id= :location   "
             + "    group by p.patient_id  "
