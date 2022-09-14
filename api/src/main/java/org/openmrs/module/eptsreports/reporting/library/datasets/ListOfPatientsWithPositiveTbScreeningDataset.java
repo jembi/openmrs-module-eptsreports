@@ -3,9 +3,12 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
+import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.TestResultConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsWithPositiveTbScreeningCohortQueries;
@@ -22,6 +25,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Component
@@ -44,17 +48,24 @@ public class ListOfPatientsWithPositiveTbScreeningDataset extends BaseDataSet {
 
   private final TbMetadata tbMetadata;
 
+  private final HivMetadata hivMetadata;
+
+  private final CommonMetadata commonMetadata;
+
   @Autowired
   public ListOfPatientsWithPositiveTbScreeningDataset(
-          TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
-          ListOfPatientsWithPositiveTbScreeningCohortQueries
+      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
+      ListOfPatientsWithPositiveTbScreeningCohortQueries
           listOfPatientsWithPositiveTbScreeningCohortQueries,
-          ListOfPatientsEligibleForVLDataDefinitionQueries
+      ListOfPatientsEligibleForVLDataDefinitionQueries
           listOfpatientsEligibleForVLDataDefinitionQueries,
-          ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
-          ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
-          ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries
-          listOfPatientsWithPositiveTbScreeningDataDefinitionQueries, TbMetadata tbMetadata) {
+      ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
+      ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
+      ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries
+          listOfPatientsWithPositiveTbScreeningDataDefinitionQueries,
+      TbMetadata tbMetadata,
+      HivMetadata hivMetadata,
+      CommonMetadata commonMetadata) {
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.listOfPatientsWithPositiveTbScreeningCohortQueries =
         listOfPatientsWithPositiveTbScreeningCohortQueries;
@@ -65,11 +76,16 @@ public class ListOfPatientsWithPositiveTbScreeningDataset extends BaseDataSet {
     this.listOfPatientsWithPositiveTbScreeningDataDefinitionQueries =
         listOfPatientsWithPositiveTbScreeningDataDefinitionQueries;
     this.tbMetadata = tbMetadata;
+    this.hivMetadata = hivMetadata;
+    this.commonMetadata = commonMetadata;
   }
 
   public DataSetDefinition contructDataset() throws EvaluationException {
 
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
+
+    String mappings =
+        "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}";
 
     pdd.setName("List of Patients With Positive Tb Screening");
 
@@ -152,11 +168,137 @@ public class ListOfPatientsWithPositiveTbScreeningDataset extends BaseDataSet {
 
     // 9 - GeneXpert Request Date Ficha Clínica (Data do Pedido GeneXpert) Sheet 1: Column I
     pdd.addColumn(
-            "genxpert_request_date",
-            listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.
-                    getTbGenexpertRequestDate(Collections.singletonList(tbMetadata.getTBGenexpertTestConcept())),
-            "startDate=${startDate},endDate=${endDate},generationDate=${generationDate},location=${location}",
-            null);
+        "genxpert_request_date_ficha_clinica",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries
+            .getTbLaboratoryResearchRequestDate(
+                Collections.singletonList(tbMetadata.getTBGenexpertTestConcept().getConceptId())),
+        mappings,
+        null);
+
+    // 10 - GeneXpert Result Ficha Clinica - Sheet 1: Column J
+    pdd.addColumn(
+        "genxpert_result_ficha_clinica",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
+            Collections.singletonList(tbMetadata.getTBGenexpertTestConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId())),
+        mappings,
+        new TestResultConverter());
+
+    // 11 - GeneXpert Result Lab Form - Sheet 1: Column K
+    pdd.addColumn(
+        "genxpert_result_laboratorio",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId()),
+            Collections.singletonList(tbMetadata.getTBGenexpertTestConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId())),
+        mappings,
+        new TestResultConverter());
+
+    // 12 - Xpert MTB Result Lab Form - Sheet 1: Column L
+    pdd.addColumn(
+        "xpertmtb_result_laboratorio",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId()),
+            Collections.singletonList(tbMetadata.getTestXpertMtbUuidConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getYesConcept().getConceptId(),
+                commonMetadata.getNoConcept().getConceptId())),
+        mappings,
+        new TestResultConverter());
+    // 13 - Rifampin Resistance Lab Form - Sheet 1: Column M
+    pdd.addColumn(
+        "rifampin_resistance_laboratorio",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getRifampinResistanceResults(
+            Collections.singletonList(
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId()),
+            Collections.singletonList(tbMetadata.getTestXpertMtbUuidConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getYesConcept().getConceptId(),
+                commonMetadata.getNoConcept().getConceptId()),
+            tbMetadata.getRifampinResistanceConcept().getConceptId(),
+            commonMetadata.getIndeterminate().getConceptId()),
+        mappings,
+        new TestResultConverter());
+
+    // 14 - BK Request Date - Sheet 1: Column N
+    pdd.addColumn(
+        "bk_request_date_ficha_clinica",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries
+            .getTbLaboratoryResearchRequestDate(
+                Collections.singletonList(hivMetadata.getResultForBasiloscopia().getConceptId())),
+        mappings,
+        null);
+
+    // 15 - BK Result Ficha Clinica - Sheet 1: Column O
+    pdd.addColumn(
+        "bk_result_ficha_clinica",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
+            Collections.singletonList(hivMetadata.getResultForBasiloscopia().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId())),
+        mappings,
+        new TestResultConverter());
+
+    // 16 - BK Result Lab Form - Sheet 1: Column P
+    pdd.addColumn(
+        "bk_result_laboratorio",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId()),
+            Collections.singletonList(hivMetadata.getResultForBasiloscopia().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                tbMetadata.getNotFoundTestResultConcept().getConceptId())),
+        mappings,
+        new TestResultConverter());
+
+    // 17 - TB LAM Request Date - Sheet 1: Column Q
+    pdd.addColumn(
+        "tblam_request_date_ficha_clinica",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries
+            .getTbLaboratoryResearchRequestDate(
+                Collections.singletonList(tbMetadata.getTestTBLAM().getConceptId())),
+        mappings,
+        null);
+
+    // 18 - TB LAM Result Ficha Clínica - Sheet 1: Column R
+    pdd.addColumn(
+        "tblam_result_ficha_clinica",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
+            Collections.singletonList(tbMetadata.getTestTBLAM().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId())),
+        mappings,
+        new TestResultConverter());
+
+    // 19 - TB LAM Result Lab Form - Sheet 1: Column S
+    pdd.addColumn(
+        "tblam_result_laboratorio",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId()),
+            Collections.singletonList(tbMetadata.getTestTBLAM().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId(),
+                tbMetadata.getIndeterminate().getConceptId())),
+        mappings,
+        new TestResultConverter());
+
     return pdd;
   }
 }
