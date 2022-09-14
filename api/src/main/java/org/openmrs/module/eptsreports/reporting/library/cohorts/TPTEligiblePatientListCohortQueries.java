@@ -200,7 +200,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB3",
@@ -215,7 +215,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB4",
@@ -230,7 +230,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB5Part1",
@@ -241,7 +241,7 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB5Part2",
@@ -253,7 +253,7 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDtINHConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTBPart3",
@@ -265,7 +265,7 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDtINHConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB6Part1",
@@ -277,7 +277,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB6Part2",
@@ -289,7 +289,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB6Part3",
@@ -302,7 +302,7 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getMonthlyConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "threeHPC1",
@@ -332,7 +332,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "threeHPC3",
@@ -344,11 +344,11 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "threeHPC4",
-        EptsReportUtils.map(get3HPLastProfilaxyDuringM3orM1PeriodsComposition(), mapping));
+        EptsReportUtils.map(get3HPLastProfilaxyDuringM3orM1PeriodsComposition(), mappings));
 
     compositionCohortDefinition.addSearch(
         "TBTreatmentPart1",
@@ -433,13 +433,12 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_ELIG_FR5.1</b>:Patients who initiated INH in last 7 months <br>
    *
    * <ul>
-   *   <li>A1.2: Select all patients with Ficha Resumo (encounter type 53) with Última
-   *       profilaxia(concept id 23985) value coded INH(concept id 656) and Estado da Profilaxia
-   *       (concept id 165308) value coded Início (concept id 1256) and obs_datetime for Estado da
-   *       profilaxia (concept_id = 165308) between endDate-7months and endDate.
+   *   <li>A1:
+   *   <li>Patients who have (Última Profilaxia TPT with value “Isoniazida (INH)”, and Data Início
+   *       selected in Ficha Resumo - Mastercard between endDate-7months and endDate or
    * </ul>
    *
    * @return CohortDefinition
@@ -490,13 +489,13 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_ELIG_FR5.1</b>:Patients who initiated INH in last 7 months <br>
    *
    * <ul>
-   *   <li>A2: Select all patients with Ficha clinica or Ficha de Seguimento (encounter type in 6,
-   *       9) Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
-   *       Profilaxia (concept id 165308) value coded Início (concept id 1256) with Data do Estado
-   *       da Profilaxia (obs_datetime) between endDate-7months and endDate.
+   *   <li>A2:
+   *   <li>Patients who have Profilaxia TPT with the value “Isoniazida (INH)” and Data Início marked
+   *       in Ficha de Seguimento (Adulto e Pediatria) and occurred between endDate-7months and
+   *       endDate or
    * </ul>
    *
    * @return CohortDefinition
@@ -543,26 +542,25 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_ELIG_FR5.1</b>:Patients who initiated INH in last 7 months <br>
    *
    * <ul>
-   *   <li>A4: Select all patients with FILT (encounter type 60) with “Regime de TPT” (concept id
-   *       23985) value coded ‘Isoniazid’ or ‘Isoniazid + piridoxina’ (concept id in [656, 23982])
-   *       and “Seguimento de Tratamento TPT” (concept ID 23987) with values “Continua” (concept ID
-   *       1257) or no value(null) or concept 23987 does not exist and encounter datetime between
-   *       endDate-7months and endDate
-   *   <li>and no other INH values (“Isoniazida” or “Isoniazida + Piridoxina”) marked on FILT in the
-   *       7 months prior to the INH Start Date and
-   *   <li>no Última profilaxia(concept id 23985) value coded INH(concept id 656) and Data Início
-   *       registered in Ficha Resumo - Mastercard (Encounter Type ID 53) in the 7 months prior to
-   *       ‘INH Start Date’
-   *   <li>and no Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
-   *       Profilaxia (concept id 165308) value coded Início (concept id 1256) marked on Ficha
-   *       Clínica - Mastercard or Ficha de Seguimento (Encounter Type ID IN 6, 9) in the 7 months
-   *       prior to ‘INH Start Date’
-   *   <li>and No other INH Start Dates marked in Ficha Clinica (Profilaxia (INH) with the value “I”
-   *       (Início) or (Profilaxia TPT with the value “Isoniazida (INH)” and Estado da Profilaxia
-   *       with the value “Início (I)”) in the 7 months prior to this FILT Start Date
+   *   <li>A4:
+   *   <li>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida +
+   *       Piridoxina”) and “Seguimento de tratamento TPT” with Values “Continua/Manutenção” or no
+   *       value marked on the first pick-up in Ficha de Levantamento de TPT (FILT) between
+   *       endDate-7months and endDate as “FILT Start Date” and:
+   *   <li>No other INH Start Dates (with Regime de TPT = “Isoniazida” or “Isoniazida + Piridoxina”)
+   *       marked in FILT in the 7 months prior to “FILT Start Date” and
+   *   <li>No other INH Start Dates marked on in Ficha resumo (Última profilaxia TPT with value
+   *       “Isoniazida (INH)” and Data Início) selected in the 7 months prior to this FILT Start
+   *       Date and
+   *   <li>No other INH Start Dates marked on Ficha de Seguimento (Profilaxia TPT with the value
+   *       “Isoniazida (INH)” and Data Inicio) marked in the 7 months prior to this FILT Start Date
+   *       and
+   *   <li>No other INH Start Dates marked in Ficha Clinica (Profilaxia TPT with the value
+   *       “Isoniazida (INH)” and Estado da Profilaxia with the value “Início (I)”) in the 7 months
+   *       prior to this FILT Start Date
    * </ul>
    *
    * @return CohortDefinition
@@ -731,15 +729,13 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_ELIG_FR5.1</b>:Patients who initiated INH in last 7 months <br>
    *
    * <ul>
-   *   <li>A5:Select all patients with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
-   *       ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Seguimento de tratamento
-   *       TPT”(concept ID 23987) value coded “inicio” or “re-inicio”(concept ID in [1256, 1705])
-   *       “Continua” (concept ID 1257) or no value(null) or concept 23987 does not exist marked on
-   *       FILT (encounter type 60) and encounter datetime between endDate-7months (210 days) and
-   *       end date
+   *   <li>A5:
+   *   <li>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida +
+   *       Piridoxina”) and “Seguimento de tratamento TPT”= (‘Inicio’ or ‘Reinício’) marked in Ficha
+   *       de Levantamento de TPT (FILT) between endDate-7months and endDate
    *
    * @return CohortDefinition
    */
@@ -776,7 +772,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "      AND  e.location_id = :location AND e.encounter_type = ${60}   "
             + "      AND (o.concept_id = ${23985} AND o.value_coded IN (${656},${23982}))    "
             + "      AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256},${1705}))  "
-            + "      AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate ";
+            + "      AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 7 MONTH) AND :endDate ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -1061,6 +1057,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
@@ -1199,6 +1197,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B2");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1215,6 +1214,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id"
@@ -1407,6 +1408,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1423,6 +1425,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id"
@@ -1615,6 +1619,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B4");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1631,6 +1636,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id"
@@ -1801,8 +1808,10 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>B5- If date Y is registered on Ficha Clinica (encounter type 6) OR Ficha de Seguimento
-   *       (encounter type 9) OR Ficha Resumo (encounter type 53) check if the patient has:
+   *   <li>B5 - If the INH Start Date (Y) is registered in Ficha Clinica or Ficha de Seguimento or
+   *       Ficha Resumo, the system will check if the patient has one of the following number of
+   *       consultations in a defined period of months from the INH Start Date to consider the
+   *       patient completed INH treatment:
    *   <li>At least 5 consultations ((encounter type 6) (encounter type 9) Profilaxia TPT (concept
    *       id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id 165308)
    *       value coded Início/continua (concept id in [1256,1257]) until a 7-month period after the
@@ -1823,6 +1832,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B5.1");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1836,6 +1846,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -1913,6 +1925,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B5.2");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1926,6 +1939,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2022,6 +2036,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B5.3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2035,6 +2050,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2143,6 +2159,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT B6.1");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2160,6 +2177,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2242,6 +2261,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT B6.2");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2259,6 +2279,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2343,6 +2365,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with INH Mensal and DT-INH B6.3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2362,6 +2385,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2410,7 +2435,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                       AND ee.encounter_datetime BETWEEN"
             + "                           tabela.datetime AND"
             + "               Date_add(tabela.datetime,"
-            + "               INTERVAL 210 DAY)) >= 3 )"
+            + "               INTERVAL 7 MONTH)) >= 3 )"
             + "             AND ( (SELECT Count(*)"
             + "                    FROM   patient pp"
             + "                           inner join encounter ee"
@@ -2664,6 +2689,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT C2");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2767,6 +2793,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT C3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2915,6 +2942,7 @@ public class TPTEligiblePatientListCohortQueries {
     sqlCohortDefinition.setName(
         " all patients with Última profilaxia 3HP Between 86 days and 365 days from the date of M.3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2992,6 +3020,7 @@ public class TPTEligiblePatientListCohortQueries {
     sqlCohortDefinition.setName(
         " all patients with Estado da Profilaxia = Fim Between 86 days and 365 days from the date of M.1");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3065,9 +3094,12 @@ public class TPTEligiblePatientListCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients who already completed 3HP During M3 OR M1 period");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String mapping = "endDate=${endDate},location=${location}";
+
+    String mappings = "startDate=${endDate-4m},endDate=${endDate},location=${location}";
 
     // M3 period indicators
     cd.addSearch(
@@ -3091,7 +3123,8 @@ public class TPTEligiblePatientListCohortQueries {
         "M37", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.SEVEN), mapping));
 
     cd.addSearch(
-        "M38", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.EIGHT), mapping));
+        "M38",
+        EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.EIGHT), mappings));
 
     // M1 period indicators
     cd.addSearch(
@@ -3120,7 +3153,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     cd.addSearch(
         "M18",
-        EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.EIGHT), mapping));
+        EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.EIGHT), mappings));
 
     cd.setCompositionString(
         "(M31 OR M32 OR M33 OR M34 OR M35 OR M36 OR M37 OR M38) OR (M11 OR M12 OR M13 OR M14 OR M15 OR M16 OR M17 OR M18)");
@@ -3134,7 +3167,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>D: Select all patients with the following conditions: Have Ficha clinica (encounter type
    *       6 or 9) with “DATA DE INICIO DE TRATAMENTO DE TUBERCULOSE” (concept id 1113,
-   *       Value_datetime) between EndDate - 7months (210 days)
+   *       Value_datetime) between EndDate - 7months
    * </ul>
    *
    * @return CohortDefinition
@@ -3171,7 +3204,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "         AND e.location_id = :location   "
             + "         AND e.encounter_type IN (${6},${9})     "
             + "         AND o.concept_id = ${1113}   "
-            + "         AND o.value_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) "
+            + "         AND o.value_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 MONTH) "
             + "         AND :endDate  "
             + "   AND e.encounter_datetime <= :endDate"
             + "    GROUP by p.patient_id";
@@ -3188,8 +3221,8 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>D: On Ficha Resumo (encounter type 53) have “Outros diagnósticos" (concept id 1406) with
-   *       “Tuberculose” (concept id 42) marked and obs datetime between EndDate - 7months (210
-   *       DAYs) and endDate
+   *       “Tuberculose” (concept id 42) marked and obs datetime between EndDate - 7months and
+   *       endDate
    * </ul>
    *
    * @return CohortDefinition
@@ -3221,7 +3254,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND e.encounter_type = ${53}   "
             + "          AND o.concept_id = ${1406} "
             + "          AND o.value_coded = ${42}  "
-            + "          AND o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) AND "
+            + "          AND o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 MONTH) AND "
             + "                                     :endDate "
             + "   GROUP  BY p.patient_id ";
 
@@ -3237,8 +3270,7 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>D: Enrolled on TB program (program id 5) patient state id = 6269 and start date(Date
-   *       enrolled) >= EndDate - 7months (210 DAYs) and endDate(date Completed) <= reporting
-   *       endDate
+   *       enrolled) >= EndDate - 7months and endDate(date Completed) <= reporting endDate
    * </ul>
    *
    * @return CohortDefinition
@@ -3267,7 +3299,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND pp.program_id = ${5}   "
             + "          AND ps.patient_state_id = ${6269}  "
             + "          AND pp.location_id = :location    "
-            + "          AND pp.date_enrolled >= Date_sub(:endDate, INTERVAL 210 DAY)    "
+            + "          AND pp.date_enrolled >= Date_sub(:endDate, INTERVAL 7 MONTH)    "
             + "          AND pp.date_completed <= :endDate "
             + "   GROUP  BY p.patient_id ";
 
@@ -3284,8 +3316,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>D: Select all patients with the following conditions: Have Ficha (encounter type 6) with
    *       “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) with: value coded “Inicio” (concept_id IN
-   *       1256) and obs_datetime between (for encounter type 6) EndDate - 7months (210 days) and
-   *       endDate
+   *       1256) and obs_datetime between (for encounter type 6) EndDate - 7months and endDate
    * </ul>
    *
    * @return CohortDefinition
@@ -3314,7 +3345,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "    AND e.location_id = :location "
             + "    AND e.encounter_type = ${6} "
             + "    AND o.concept_id = ${1268} AND o.value_coded = ${1256} "
-            + "    AND o.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate "
+            + "    AND o.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 7 MONTH) AND :endDate "
             + "    AND e.encounter_datetime <= :endDate ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -3330,7 +3361,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>E: Select all patients from Ficha Clinica (encounter type 6) with the following
    *       conditions: “Diagnótico TB activo” (concept_id 23761) value coded “SIM”(concept id 1065):
-   *       Encounter_datetime between EndDate - 7months (210 DAYs) and endDate
+   *       Encounter_datetime between EndDate - 7months and endDate
    * </ul>
    *
    * @return CohortDefinition
@@ -3362,7 +3393,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${6}    "
             + "       AND o.concept_id = ${23761}    "
             + "       AND o.value_coded = ${1065}    "
-            + "       AND e.encounter_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) "
+            + "       AND e.encounter_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 MONTH) "
             + "       AND  :endDate  "
             + "   GROUP  BY p.patient_id ";
 
