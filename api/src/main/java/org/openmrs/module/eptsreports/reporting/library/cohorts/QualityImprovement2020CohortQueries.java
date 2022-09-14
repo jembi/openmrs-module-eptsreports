@@ -6935,14 +6935,6 @@ public class QualityImprovement2020CohortQueries {
         QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(
             dispensationTypes, states);
 
-    CohortDefinition queryA2 =
-        QualityImprovement2020Queries.getMQ15DenA1orA2(
-            "A2",
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getGaac().getConceptId(),
-            hivMetadata.getQuarterlyDispensation().getConceptId());
-
     List<Integer> quarterlyDispensation =
         Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId());
     CohortDefinition withDT =
@@ -6955,7 +6947,8 @@ public class QualityImprovement2020CohortQueries {
             BaseObsCohortDefinition.TimeModifier.LAST,
             SetComparator.IN,
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
-            Arrays.asList(hivMetadata.getQuarterlyDispensation()));
+            Arrays.asList(
+                hivMetadata.getQuarterlyConcept(), hivMetadata.getSemiannualDispensation()));
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
@@ -6993,12 +6986,6 @@ public class QualityImprovement2020CohortQueries {
         "A1",
         EptsReportUtils.map(
             queryA1,
-            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
-
-    comp.addSearch(
-        "A2",
-        EptsReportUtils.map(
-            queryA2,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
@@ -7067,27 +7054,25 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (den == 1) {
-      comp.setCompositionString("(A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
+      comp.setCompositionString("(A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
     } else if (den == 2) {
-      comp.setCompositionString(
-          "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2");
+      comp.setCompositionString("((A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2");
     } else if (den == 3) {
       comp.setCompositionString(
-          "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS");
+          "((A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2 AND IAMDS");
     } else if (den == 4) {
       comp.setCompositionString(
-          "((A1 OR A2 OR A3 OR NPF83 OR NPF173) AND G2 AND IAMDS AND VLFL AND NOT (CD OR F OR VL)) ");
+          "((A1 OR A3 OR NPF83 OR NPF173) AND G2 AND IAMDS AND VLFL AND NOT (CD OR F OR VL)) ");
     } else if (den == 5 || den == 6) {
-      comp.setCompositionString("(DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
+      comp.setCompositionString("(DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 8) {
-      comp.setCompositionString(
-          "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 ");
+      comp.setCompositionString("((DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 ");
     } else if (den == 11 || den == 12) {
       comp.setCompositionString(
-          "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
+          "((DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
     } else if (den == 9 || den == 10) {
       comp.setCompositionString(
-          "((DT OR A2 OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 IADT");
+          "((DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 IADT");
     }
     return comp;
   }
