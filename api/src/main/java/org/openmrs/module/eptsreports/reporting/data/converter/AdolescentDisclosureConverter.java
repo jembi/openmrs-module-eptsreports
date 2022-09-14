@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.data.converter;
 
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
@@ -19,36 +20,33 @@ public class AdolescentDisclosureConverter implements DataConverter {
       results = "";
     }
     Encounter encounter = (Encounter) obj;
-    Set<Obs> getAllObs = encounter.getAllObs();
-    if (getAllObs == null) {
+    if (!checkIfConceptQuestionWasRecorded(
+        encounter, hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept())) {
       results = "";
     }
-    if (!checkIfConceptQuestionWasRecorded(encounter)) {
-      results = "";
-    } else {
-      if (getAllObs != null) {
-        for (Obs obs : getAllObs) {
-          if (obs.getConcept() != null
-              && obs.getConcept()
-                  .equals(hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept())) {
+    Set<Obs> getAllObs = encounter.getAllObs();
+    if (getAllObs != null) {
+      for (Obs obs : getAllObs) {
+        if (obs.getConcept() != null
+            && obs.getConcept()
+                .equals(hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept())) {
 
-            if (obs.getValueCoded() == null) {
-              results = "";
-            } else {
-              if (obs.getValueCoded()
-                  .equals(
-                      Context.getConceptService()
-                          .getConceptByUuid("63e43b2f-801f-412b-87bb-45db8e0ad21b"))) {
-                return "P";
-              } else if (obs.getValueCoded()
-                  .equals(
-                      Context.getConceptService()
-                          .getConceptByUuid("8279b6c1-572d-428c-be45-96e05fe6165d"))) {
-                return "N";
-              }
+          if (obs.getValueCoded() == null) {
+            results = "";
+          } else {
+            if (obs.getValueCoded()
+                .equals(
+                    Context.getConceptService()
+                        .getConceptByUuid("63e43b2f-801f-412b-87bb-45db8e0ad21b"))) {
+              return "P";
+            } else if (obs.getValueCoded()
+                .equals(
+                    Context.getConceptService()
+                        .getConceptByUuid("8279b6c1-572d-428c-be45-96e05fe6165d"))) {
+              return "N";
             }
-            break;
           }
+          break;
         }
       }
     }
@@ -65,16 +63,15 @@ public class AdolescentDisclosureConverter implements DataConverter {
     return String.class;
   }
 
-  private boolean checkIfConceptQuestionWasRecorded(Encounter encounter) {
+  private boolean checkIfConceptQuestionWasRecorded(Encounter encounter, Concept concept) {
 
     boolean isFound = false;
-
-    for (Obs obs : encounter.getAllObs()) {
-      if (obs.getConcept() != null
-          && obs.getConcept()
-              .equals(hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept())) {
-        isFound = true;
-        break;
+    if (encounter != null && encounter.getAllObs() != null) {
+      for (Obs obs : encounter.getAllObs()) {
+        if (obs != null && obs.getConcept() != null && obs.getConcept().equals(concept)) {
+          isFound = true;
+          break;
+        }
       }
     }
     return isFound;
