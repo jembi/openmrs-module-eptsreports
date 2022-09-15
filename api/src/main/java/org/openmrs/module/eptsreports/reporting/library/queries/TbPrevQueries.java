@@ -224,7 +224,7 @@ public class TbPrevQueries {
             + "                          AND ee.location_id = :location "
             + "                          AND ( ( o.concept_id = ${23985} AND o.value_coded IN ( ${23954}, ${23984} ) ) "
             + "                          AND ( o2.concept_id = ${23987} AND ( o2.value_coded IN ( ${1256}, ${1705} ) OR o2.value_coded IS NULL ) "
-            + "                          AND o2.obs_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 4 month ) AND o2.obs_datetime <= filt.filt_3hp_start_date ) "
+            + "                          AND o2.obs_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 4 month ) AND o2.obs_datetime < filt.filt_3hp_start_date ) "
             + "                              )) "
             + "       AND NOT EXISTS (SELECT ee.encounter_id "
             + "                       FROM   encounter ee "
@@ -238,7 +238,7 @@ public class TbPrevQueries {
             + "                              AND o.concept_id = ${1719} "
             + "                              AND o.value_coded = ${165307} "
             + "                              AND ee.encounter_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 4 month ) "
-            + "                              AND ee.encounter_datetime <= filt.filt_3hp_start_date) "
+            + "                              AND ee.encounter_datetime < filt.filt_3hp_start_date) "
             + "       AND NOT EXISTS (SELECT ee.encounter_id "
             + "                       FROM   encounter ee "
             + "                              INNER JOIN obs o ON ee.encounter_id = o.encounter_id "
@@ -253,7 +253,7 @@ public class TbPrevQueries {
             + "                              AND oo.concept_id = ${165308} "
             + "                              AND oo.value_coded = ${1256} "
             + "                              AND oo.obs_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 4 month) "
-            + "                              AND oo.obs_datetime <= filt.filt_3hp_start_date) ";
+            + "                              AND oo.obs_datetime < filt.filt_3hp_start_date) ";
 
     return new StringSubstitutor(getReportMetadata()).replace(query);
   }
@@ -381,7 +381,7 @@ public class TbPrevQueries {
             + "                              AND ee.patient_id = filt.patient_id "
             + "                              AND ( o.concept_id = ${23985} AND o.value_coded IN ( ${656}, ${23982} ) ) "
             + "                              AND ee.encounter_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 7 month ) "
-            + "                              AND ee.encounter_datetime <= filt.filt_3hp_start_date) "
+            + "                              AND ee.encounter_datetime < filt.filt_3hp_start_date) "
             + "AND NOT EXISTS (SELECT ee.encounter_id "
             + "                       FROM   encounter ee "
             + "                              INNER JOIN obs o ON ee.encounter_id = o.encounter_id "
@@ -396,7 +396,7 @@ public class TbPrevQueries {
             + "                              AND o2.concept_id = ${165308} "
             + "                              AND o2.value_coded = ${1256} "
             + "                              AND ee.encounter_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 7 month ) "
-            + "                              AND ee.encounter_datetime <= filt.filt_3hp_start_date) "
+            + "                              AND ee.encounter_datetime < filt.filt_3hp_start_date) "
             + "       AND NOT EXISTS (SELECT ee.encounter_id "
             + "                       FROM   encounter ee "
             + "                              INNER JOIN obs o ON ee.encounter_id = o.encounter_id "
@@ -411,7 +411,7 @@ public class TbPrevQueries {
             + "                              AND oo.concept_id = ${165308} "
             + "                              AND oo.value_coded = ${1256} "
             + "                              AND oo.obs_datetime >= Date_sub(filt.filt_3hp_start_date, INTERVAL 7 month) "
-            + "                              AND oo.obs_datetime <= filt.filt_3hp_start_date) ";
+            + "                              AND oo.obs_datetime < filt.filt_3hp_start_date) ";
 
     return new StringSubstitutor(getReportMetadata()).replace(query);
   }
