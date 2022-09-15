@@ -51,8 +51,14 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    sqlPatientDataDefinition.setQuery(
-        listOfPatientsWithPositiveTbScreeningQueries.getTbPositiveScreeningFromSourcesQuery());
+    String query =
+        new EptsQueriesUtil()
+            .max(
+                listOfPatientsWithPositiveTbScreeningQueries
+                    .getTbPositiveScreeningFromSourcesQuery())
+            .getQuery();
+
+    sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }
@@ -153,35 +159,38 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
    * identify the most recent GeneXpert result marked in Laboratory form registered between the Last
    * Positive TB Screening Date (Value of Column H) and report generation date.
    *
-   * <b>Xpert MTB Result Lab Form</b>
+   * <p><b>Xpert MTB Result Lab Form</b>
    *
-   * <p>Possible values are Sim/Não or Blank if no result is found
-   * The system will identify and show the most recent XpertMTB result marked in Laboratory form registered
-   * between the Last Positive TB Screening Date (Value of Column H) and report generation date
+   * <p>Possible values are Sim/Não or Blank if no result is found The system will identify and show
+   * the most recent XpertMTB result marked in Laboratory form registered between the Last Positive
+   * TB Screening Date (Value of Column H) and report generation date
    *
-   *  <b>BK Result Ficha Clinica</b>
+   * <p><b>BK Result Ficha Clinica</b>
    *
-   * <p>Possible values are Positivo/Negativo or Blank if no result is found
-   * The system will identify and show the most recent BK result marked in Investigações – Resultados Laboratoriais
-   * section of Ficha Clínica registered between the Last Positive TB Screening Date (Value of Column H) and report generation date.
+   * <p>Possible values are Positivo/Negativo or Blank if no result is found The system will
+   * identify and show the most recent BK result marked in Investigações – Resultados Laboratoriais
+   * section of Ficha Clínica registered between the Last Positive TB Screening Date (Value of
+   * Column H) and report generation date.
    *
-   *  <b>BK Result Lab Form</b>
+   * <p><b>BK Result Lab Form</b>
    *
-   * <p>Possible values are Positivo/Nao Encontrado or Blank if no result is found
-   * The system will identify and show the most recent BK result marked in Laboratory
-   * form registered between the Last Positive TB Screening Date (Value of Column H) and report generation date.
+   * <p>Possible values are Positivo/Nao Encontrado or Blank if no result is found The system will
+   * identify and show the most recent BK result marked in Laboratory form registered between the
+   * Last Positive TB Screening Date (Value of Column H) and report generation date.
    *
-   *   <b>TB LAM Result Ficha Clínica</b>
+   * <p><b>TB LAM Result Ficha Clínica</b>
    *
-   * <p>Possible values are Positivo/Negativo or Blank if no result is found
-   * The system will identify and show the most recent TB LAM result marked in Investigações – Resultados Laboratoriais section of Ficha
-   * Clínica registered between the Last Positive TB Screening Date (Value of Column H) and report generation date.
+   * <p>Possible values are Positivo/Negativo or Blank if no result is found The system will
+   * identify and show the most recent TB LAM result marked in Investigações – Resultados
+   * Laboratoriais section of Ficha Clínica registered between the Last Positive TB Screening Date
+   * (Value of Column H) and report generation date.
    *
-   *    <b>TB LAM Result Lab Form</b>
+   * <p><b>TB LAM Result Lab Form</b>
    *
-   * <p>Possible values are Positivo/Negativo/Indeterminado or Blank if no result is found
-   * The system will identify and show the most recent TB LAM result marked in Laboratory form registered between the Last Positive TB
-   * Screening Date (Value of Column H) and report generation date.
+   * <p>Possible values are Positivo/Negativo/Indeterminado or Blank if no result is found The
+   * system will identify and show the most recent TB LAM result marked in Laboratory form
+   * registered between the Last Positive TB Screening Date (Value of Column H) and report
+   * generation date.
    *
    * @param encounterTypeList EncounterTypes
    * @param examConceptList Exam Concepts
