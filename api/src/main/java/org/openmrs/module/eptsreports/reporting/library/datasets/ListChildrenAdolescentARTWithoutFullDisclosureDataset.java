@@ -8,6 +8,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.AdolescentDisclosureConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.DateOfPatientFirstConsultationConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
@@ -18,6 +20,8 @@ import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.patient.definition.EncountersForPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
@@ -69,14 +73,14 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureDataset extends BaseD
             .getTotalPatientsWithoutDisclosure(),
         "endDate=${endDate},location=${location}");
 
-    // pdsd.addColumn("patient_id", new PersonIdDataDefinition(), "");
+    pdsd.addColumn("patient_id", new PersonIdDataDefinition(), "");
 
-    // pdsd.addColumn("nid", getNID(identifierType.getPatientIdentifierTypeId()), "");
+    pdsd.addColumn("nid", getNID(identifierType.getPatientIdentifierTypeId()), "");
 
-    // pdsd.addColumn("name", nameDef, "");
+    pdsd.addColumn("name", nameDef, "");
 
-    // pdsd.addColumn("sex", new GenderDataDefinition(), "", new GenderConverter());
-    /*pdsd.addColumn(
+    pdsd.addColumn("sex", new GenderDataDefinition(), "", new GenderConverter());
+    pdsd.addColumn(
         "age",
         listOfPatientsArtCohortCohortQueries.getAge(),
         "evaluationDate=${endDate}",
@@ -85,7 +89,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureDataset extends BaseD
         "art",
         getArtStartDate(),
         "endDate=${endDate},location=${location}",
-        new DateOfPatientFirstConsultationConverter("date"));*/
+        new DateOfPatientFirstConsultationConverter("date"));
     pdsd.addColumn(
         "edrF",
         getAdolescentsCurrentlyOnArtWithDisclosures(),
