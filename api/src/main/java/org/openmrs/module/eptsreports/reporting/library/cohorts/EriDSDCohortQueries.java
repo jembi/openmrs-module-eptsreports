@@ -9,14 +9,13 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
-import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.dsd.NextAndPrevDatesCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.dsd.OnArtForAtleastXmonthsCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.DsdQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -370,203 +369,133 @@ public class EriDSDCohortQueries {
   }
 
   /**
-   * <b>Name: N7</b>
-   *
-   * <p><b>Description:</b> N7: Number of all patients currently on ART who are included in DSD
-   * model: <b>Fluxo Rápido (FR)</b>
+   * <b>Description:</b> Pregnant Women for the <b>Numerators</b>
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getN7() {
+  public CohortDefinition getPatientsWhoArePregnant(int indicatorFlag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName(
-        "N7: Number of all patients currently on ART who are included in DSD model: Fluxo Rápido (FR)");
 
+    cd.setName("D3 - who are pregnant");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition patientsScheduled =
-        getPatientsScheduled175to190days(
-            Arrays.asList(
-                hivMetadata.getAdultoSeguimentoEncounterType(),
-                hivMetadata.getPediatriaSeguimentoEncounterType()),
-            hivMetadata.getReturnVisitDateConcept());
-    CohortDefinition rapidFlow =
-        getPatientsWithStartOrContinueOnConcept(hivMetadata.getRapidFlow());
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
-    String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("scheduledN2", EptsReportUtils.map(patientsScheduled, mappings));
-
-    cd.addSearch("rapidFlow", EptsReportUtils.map(rapidFlow, mappings));
-    cd.addSearch("completed", EptsReportUtils.map(getPatientsWhoCompletedRapidFlow(), mappings));
-
-    cd.setCompositionString("(scheduledN2 OR rapidFlow) NOT completed");
-
-    return cd;
-  }
-
-  /**
-   * <b>Name: N8</b>
-   *
-   * <p><b>Description:</b> N8: Number of all patients currently on ART who are included in DSD
-   * model: <b>GAAC (GA)</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getN8() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName(
-        "N8 - Number of all patients currently on ART who are included in DSD model: GAAC (GA)");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition patientsEnrolledOnGaac = getAllPatientsEnrolledOnGaac();
-    CohortDefinition startOrContinueGAAC =
-        getPatientsWithStartOrContinueOnConcept(hivMetadata.getGaac());
-    CohortDefinition completedGAAC = getPatientsWhoCompletedGAAC();
-
-    String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("patientsEnrolledOnGaac", mapStraightThrough(patientsEnrolledOnGaac));
-    cd.addSearch("startOrContinueGAAC", EptsReportUtils.map(startOrContinueGAAC, mappings));
-    cd.addSearch("completedGAAC", EptsReportUtils.map(completedGAAC, mappings));
-
-    cd.setCompositionString("(patientsEnrolledOnGaac OR startOrContinueGAAC) NOT completedGAAC");
-
-    return cd;
-  }
-
-  /**
-   * <b>Name: N12</b>
-   *
-   * <p><b>Description:</b> N12 - Number of all patients currently on ART who are included in DSD
-   * model: <b>Abordagem Familiar (AF)</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getN12() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName(
-        "N12: Number of all patients currently on ART who are included in DSD model: Abordagem Familiar (AF)");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addSearch("masterCardPatients", mapStraightThrough(getPatientsOnMasterCardAF()));
-    cd.setCompositionString("masterCardPatients");
-    return cd;
-  }
-
-  /**
-   * <b>Name: N5</b>
-   *
-   * <p><b>Description:</b> Number of active patients on ART who are in <b>CA</b> (Clubes de Adesao)
-   *
-   * @return {@link CohortDefinition}
-   */
-  /*
-    public CohortDefinition getN5() {
-      CodedObsCohortDefinition cd1 = new CodedObsCohortDefinition();
-      cd1.setName("N5 - Number of active patients on ART who are in CA");
-      cd1.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-      cd1.addParameter(new Parameter("locationList", "Location", Location.class));
-      cd1.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-      cd1.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-      cd1.setQuestion(hivMetadata.getAccessionClubs());
-      cd1.setOperator(SetComparator.IN);
-      cd1.addValue(hivMetadata.getStartDrugsConcept());
-      cd1.addValue(hivMetadata.getContinueRegimenConcept());
-      return new MappedParametersCohortDefinition(
-          cd1, "onOrBefore", "endDate", "locationList", "location");
+    if (indicatorFlag == 2) {
+      cd.addSearch("onART", EptsReportUtils.map(getN2(), mappings));
+    } else if (indicatorFlag == 3) {
+      cd.addSearch("onART", EptsReportUtils.map(getN3(), mappings));
+    } else if (indicatorFlag == 4) {
+      cd.addSearch("onART", EptsReportUtils.map(getN4(), mappings));
+    } else if (indicatorFlag == 5) {
+      cd.addSearch("onART", EptsReportUtils.map(getN5(), mappings));
+    } else if (indicatorFlag == 6) {
+      cd.addSearch("onART", EptsReportUtils.map(getN6(), mappings));
+    } else if (indicatorFlag == 7) {
+      cd.addSearch("onART", EptsReportUtils.map(getN7(), mappings));
+    } else if (indicatorFlag == 8) {
+      cd.addSearch("onART", EptsReportUtils.map(getN8(), mappings));
+    } else if (indicatorFlag == 9) {
+      cd.addSearch("onART", EptsReportUtils.map(getN9(), mappings));
+    } else if (indicatorFlag == 10) {
+      cd.addSearch("onART", EptsReportUtils.map(getN10(), mappings));
+    } else if (indicatorFlag == 11) {
+      cd.addSearch("onART", EptsReportUtils.map(getN11(), mappings));
+    } else if (indicatorFlag == 12) {
+      cd.addSearch("onART", EptsReportUtils.map(getN12(), mappings));
+    } else if (indicatorFlag == 13) {
+      cd.addSearch("onART", EptsReportUtils.map(getN13(), mappings));
+    } else if (indicatorFlag == 14) {
+      cd.addSearch("onART", EptsReportUtils.map(getN14(), mappings));
+    } else if (indicatorFlag == 15) {
+      cd.addSearch("onART", EptsReportUtils.map(getN15(), mappings));
+    } else if (indicatorFlag == 16) {
+      cd.addSearch("onART", EptsReportUtils.map(getN16(), mappings));
+    } else if (indicatorFlag == 17) {
+      cd.addSearch("onART", EptsReportUtils.map(getN17(), mappings));
+    } else if (indicatorFlag == 18) {
+      cd.addSearch("onART", EptsReportUtils.map(getN18(), mappings));
+    } else if (indicatorFlag == 19) {
+      cd.addSearch("onART", EptsReportUtils.map(getN19(), mappings));
     }
-  */
 
-  /**
-   * <b>Name: N5</b>
-   *
-   * <p><b>Description:</b> Number of all patients currently on ART who are included in DSD model:
-   * <b>Dispensa Descentralizada (DD)</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getN5() {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName(
-        "N5: Number of all patients currently on ART who are included in DSD model: Dispensa Descentralizada (DD)");
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
+            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    CohortDefinition startOrContinueDD =
-        getPatientsWithStartOrContinueOnConcept(
-            hivMetadata.getDescentralizedArvDispensationConcept());
-    CohortDefinition typeFARMAC = getPatientsWithFarmacTypeOfDispensation();
-
-    String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("typeFARMAC", EptsReportUtils.map(typeFARMAC, mappings));
-    cd.addSearch("startOrContinueDD", EptsReportUtils.map(startOrContinueDD, mappings));
-
-    cd.setCompositionString("startOrContinueDD OR typeFARMAC");
+    cd.setCompositionString("onART AND pregnant");
 
     return cd;
   }
 
   /**
-   * <b>Name: N6</b>
-   *
-   * <p><b>Description:</b> Number of all patients currently on ART who are included in DSD model:
-   * <b>Dispensa Comunitária através do APE (DCA)</b>
+   * <b>Description:</b> Patients who are Breastfeeding for <b>Numerators</b>
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getN6() {
+  public CohortDefinition getPatientsWhoAreBreastfeeding(int indicatorFlag) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName(
-        "N6: Number of all patients currently on ART who are included in DSD model: Dispensa Comunitária através do APE (DCA)");
 
+    cd.setName("D3 - who are Breastfeeding");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition startOrContinueDCA =
-        getPatientsWithStartOrContinueOnConcept(hivMetadata.getDispensaComunitariaViaApeConcept());
-    CohortDefinition typeDCA =
-        getPatientsWithGivenTypeOfDispensation(hivMetadata.getDispensaComunitariaViaApeConcept());
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
-    String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("typeDCA", EptsReportUtils.map(typeDCA, mappings));
-    cd.addSearch("startOrContinueDCA", EptsReportUtils.map(startOrContinueDCA, mappings));
-
-    cd.setCompositionString("startOrContinueDCA OR typeDCA");
-
-    return cd;
-  }
-
-  /**
-   * <b>Name: N7</b>
-   *
-   * <p><b>Description:</b> Number of active patients on ART who are in <b>DC</b> (Dispensa
-   * Comunitaria)
-   *
-   * @return {@link CohortDefinition}
-   */
-  /*
-    public CohortDefinition getN7() {
-      CodedObsCohortDefinition cd1 = new CodedObsCohortDefinition();
-      cd1.setName("N7 - Active patients in ART marked in last DC as start or continue regimen");
-      cd1.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-      cd1.addParameter(new Parameter("locationList", "Location", Location.class));
-      cd1.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-      cd1.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-      cd1.setQuestion(hivMetadata.getCommunityDispensation());
-      cd1.setOperator(SetComparator.IN);
-      cd1.addValue(hivMetadata.getStartDrugs());
-      cd1.addValue(hivMetadata.getContinueRegimenConcept());
-      return new MappedParametersCohortDefinition(
-          cd1, "endDate", "onOrBefore", "location", "locationList");
+    if (indicatorFlag == 2) {
+      cd.addSearch("onART", EptsReportUtils.map(getN2(), mappings));
+    } else if (indicatorFlag == 3) {
+      cd.addSearch("onART", EptsReportUtils.map(getN3(), mappings));
+    } else if (indicatorFlag == 4) {
+      cd.addSearch("onART", EptsReportUtils.map(getN4(), mappings));
+    } else if (indicatorFlag == 5) {
+      cd.addSearch("onART", EptsReportUtils.map(getN5(), mappings));
+    } else if (indicatorFlag == 6) {
+      cd.addSearch("onART", EptsReportUtils.map(getN6(), mappings));
+    } else if (indicatorFlag == 7) {
+      cd.addSearch("onART", EptsReportUtils.map(getN7(), mappings));
+    } else if (indicatorFlag == 8) {
+      cd.addSearch("onART", EptsReportUtils.map(getN8(), mappings));
+    } else if (indicatorFlag == 9) {
+      cd.addSearch("onART", EptsReportUtils.map(getN9(), mappings));
+    } else if (indicatorFlag == 10) {
+      cd.addSearch("onART", EptsReportUtils.map(getN10(), mappings));
+    } else if (indicatorFlag == 11) {
+      cd.addSearch("onART", EptsReportUtils.map(getN11(), mappings));
+    } else if (indicatorFlag == 12) {
+      cd.addSearch("onART", EptsReportUtils.map(getN12(), mappings));
+    } else if (indicatorFlag == 13) {
+      cd.addSearch("onART", EptsReportUtils.map(getN13(), mappings));
+    } else if (indicatorFlag == 14) {
+      cd.addSearch("onART", EptsReportUtils.map(getN14(), mappings));
+    } else if (indicatorFlag == 15) {
+      cd.addSearch("onART", EptsReportUtils.map(getN15(), mappings));
+    } else if (indicatorFlag == 16) {
+      cd.addSearch("onART", EptsReportUtils.map(getN16(), mappings));
+    } else if (indicatorFlag == 17) {
+      cd.addSearch("onART", EptsReportUtils.map(getN17(), mappings));
+    } else if (indicatorFlag == 18) {
+      cd.addSearch("onART", EptsReportUtils.map(getN18(), mappings));
+    } else if (indicatorFlag == 19) {
+      cd.addSearch("onART", EptsReportUtils.map(getN19(), mappings));
     }
-  */
+
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
+            "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("onART AND breastfeeding");
+
+    return cd;
+  }
+
   /**
    * <b>Name: N1</b>
    *
@@ -610,23 +539,26 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition patientsScheduled =
-        getPatientsScheduled(
-            hivMetadata.getReturnVisitDateForArvDrugConcept(),
-            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()),
-            97,
-            83);
-    CohortDefinition quarterly = getPatientsWithQuarterlyTypeOfDispensation();
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(83, 97);
+
     CohortDefinition startOrContinue =
-        getPatientsWithStartOrContinueOnConcept(hivMetadata.getQuarterlyDispensation());
-    CohortDefinition completed = getPatientsWithCompletedOnQuarterlyDispensation();
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    CohortDefinition quarterlyDispensation =
+        getPatientsWhoHaveModoDeDispensa(
+            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
+            Arrays.asList(hivMetadata.getQuarterlyConcept().getConceptId()));
 
     String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("scheduled", EptsReportUtils.map(patientsScheduled, mappings));
-    cd.addSearch("quarterly", EptsReportUtils.map(quarterly, mappings));
+    cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
+    cd.addSearch("quarterly", EptsReportUtils.map(quarterlyDispensation, mappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
-    cd.addSearch("completed", EptsReportUtils.map(completed, mappings));
 
-    cd.setCompositionString("(scheduled OR quarterly OR startOrContinue) NOT completed");
+    cd.setCompositionString("scheduled OR startOrContinue OR quarterly");
 
     return cd;
   }
@@ -649,20 +581,26 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition patientsScheduled =
-        getPatientsScheduled175to190days(
-            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()),
-            hivMetadata.getReturnVisitDateForArvDrugConcept());
-    CohortDefinition semestralDispensation =
-        getPatientsWithStartOrContinueOnSemestralDispensation();
-    CohortDefinition semestral = getPatientsWithSemestralTypeOfDispensation();
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(175, 190);
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getSemiannualDispensation().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    CohortDefinition semiannualDispensation =
+        getPatientsWhoHaveModoDeDispensa(
+            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
+            Arrays.asList(hivMetadata.getSemiannualDispensation().getConceptId()));
 
     String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("scheduledN3", EptsReportUtils.map(patientsScheduled, mappings));
-    cd.addSearch("semestral", EptsReportUtils.map(semestral, mappings));
-    cd.addSearch("semestralDispensation", EptsReportUtils.map(semestralDispensation, mappings));
-    cd.addSearch("completed", EptsReportUtils.map(getPatientsWhoCompletedRapidFlow(), mappings));
+    cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
+    cd.addSearch("semiannual", EptsReportUtils.map(semiannualDispensation, mappings));
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
 
-    cd.setCompositionString("(scheduledN3 OR semestral OR semestralDispensation) NOT completed");
+    cd.setCompositionString("(scheduled OR startOrContinue OR semiannual)");
 
     return cd;
   }
@@ -685,23 +623,539 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition patientsScheduled =
-        getPatientsScheduled(
-            hivMetadata.getReturnVisitDateForArvDrugConcept(),
-            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()),
-            335,
-            395);
-    CohortDefinition annualDispensation = getPatientsWithAnnualTypeOfDispensation();
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(335, 395);
+
     CohortDefinition startOrContinue =
-        getPatientsWithStartOrContinueOnConcept(hivMetadata.getAnnualArvDispensationConcept());
-    CohortDefinition completed = getPatientsWithCompletedOnAnnualDispensation();
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getAnnualArvDispensationConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
 
     String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("scheduled", EptsReportUtils.map(patientsScheduled, mappings));
-    cd.addSearch("annualDispensation", EptsReportUtils.map(annualDispensation, mappings));
+    cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
-    cd.addSearch("completed", EptsReportUtils.map(completed, mappings));
 
-    cd.setCompositionString("(scheduled OR annualDispensation OR startOrContinue) NOT completed");
+    cd.setCompositionString("scheduled OR startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N5</b>
+   *
+   * <p><b>Description:</b> Number of all patients currently on ART who are included in DSD model:
+   * <b>Dispensa Descentralizada (DD)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN5() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N5: Number of all patients currently on ART who are included in DSD model: Dispensa Descentralizada (DD)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getDescentralizedArvDispensationConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    CohortDefinition farmacDispensation = getPatientsWithFarmacTypeOfDispensation();
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch("farmacDispensation", EptsReportUtils.map(farmacDispensation, mappings));
+
+    cd.setCompositionString("startOrContinue OR farmacDispensation");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N6</b>
+   *
+   * <p><b>Description:</b> Number of all patients currently on ART who are included in DSD model:
+   * <b>Dispensa Comunitária através do APE (DCA)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN6() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N6: Number of all patients currently on ART who are included in DSD model: Dispensa Comunitária através do APE (DCA)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    CohortDefinition dcaDispensation =
+        getPatientsWithGivenTypeOfDispensation(hivMetadata.getDispensaComunitariaViaApeConcept());
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch("dcaDispensation", EptsReportUtils.map(dcaDispensation, mappings));
+
+    cd.setCompositionString("startOrContinue OR dcaDispensation");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N7</b>
+   *
+   * <p><b>Description:</b> N7: Number of all patients currently on ART who are included in DSD
+   * model: <b>Fluxo Rápido (FR)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN7() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N7: Number of all patients currently on ART who are included in DSD model: Fluxo Rápido (FR)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition patientsScheduled =
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(175, 190);
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getRapidFlow().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("scheduled OR startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N8</b>
+   *
+   * <p><b>Description:</b> N8: Number of all patients currently on ART who are included in DSD
+   * model: <b>GAAC (GA)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN8() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N8 - Number of all patients currently on ART who are included in DSD model: GAAC (GA)");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N9</b>
+   *
+   * <p><b>Description:</b> N9: Number of all patients currently on ART who are included in DSD
+   * model: <b> Dispensa Comunitária pelo Provedor (DCP)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN9() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N9: Number of all patients currently on ART who are included in DSD model: Dispensa Comunitária pelo Provedor (DCP)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getDispensaComunitariaViaProvedorConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    CohortDefinition dcpDispensation =
+        getPatientsWhoHaveModoDeDispensa(
+            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId()),
+            Arrays.asList(hivMetadata.getDispensaComunitariaViaProvedorConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("dcpDispensation", EptsReportUtils.map(dcpDispensation, mappings));
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue OR dcpDispensation");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N10</b>
+   *
+   * <p><b>Description:</b> N10: Number of all patients currently on ART who are included in DSD
+   * model: <b>Brigada Móvel (BM)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN10() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N10: Number of all patients currently on ART who are included in DSD model: Brigada Móvel (BM)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getBrigadasMoveisConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    CohortDefinition bmDispensations =
+        getPatientsWhoHaveModoDeDispensa(
+            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId()),
+            Arrays.asList(
+                hivMetadata.getBrigadasMoveisDiurnasConcept().getConceptId(),
+                hivMetadata.getBrigadasMoveisNocturnasConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("bmDispensations", EptsReportUtils.map(bmDispensations, mappings));
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue OR bmDispensations");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N11</b>
+   *
+   * <p><b>Description:</b> N11: Number of all patients currently on ART who are included in DSD
+   * model: <b>Clínica Móvel (CM)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN11() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N11: Number of all patients currently on ART who are included in DSD model: Clínica Móvel (CM)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getClinicasMoveisConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    CohortDefinition cmDispensations =
+        getPatientsWhoHaveModoDeDispensa(
+            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId()),
+            Arrays.asList(
+                hivMetadata.getClinicasMoveisDiurnasConcept().getConceptId(),
+                hivMetadata.getClinicasMoveisNocturnasConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("cmDispensations", EptsReportUtils.map(cmDispensations, mappings));
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue OR cmDispensations");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N12</b>
+   *
+   * <p><b>Description:</b> N12: Number of all patients currently on ART who are included in DSD
+   * model: <b>Abordagem Familiar (AF)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN12() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N12: Number of all patients currently on ART who are included in DSD model: Abordagem Familiar (AF)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getFamilyApproach().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N13</b>
+   *
+   * <p><b>Description:</b> N13: Number of all patients currently on ART who are included in DSD
+   * model: <b>Clube de Adesão (CA)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN13() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N13: Number of all patients currently on ART who are included in DSD model: Clube de Adesão (CA)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getAccessionClubs().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N14</b>
+   *
+   * <p><b>Description:</b> N14: Number of all patients currently on ART who are included in DSD
+   * model: <b>Extensão Horário (EH)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN14() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N14: Number of all patients currently on ART who are included in DSD model: Extensão Horário (EH)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getExtensaoHorarioConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    CohortDefinition ehDispensation =
+        getPatientsWhoHaveModoDeDispensa(
+            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId()),
+            Arrays.asList(hivMetadata.getForaDoHorarioConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("ehDispensation", EptsReportUtils.map(ehDispensation, mappings));
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue OR ehDispensation");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N15</b>
+   *
+   * <p><b>Description:</b> N15: Number of all patients currently on ART who are included in DSD
+   * model: <b>Paragem Única no Sector de Tuberculose (TB)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN15() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N15: Number of all patients currently on ART who are included in DSD model: Paragem Única no Sector de Tuberculose (TB)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getParagemUnicaNoSectorDaTBConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N16</b>
+   *
+   * <p><b>Description:</b> N16: Number of all patients currently on ART who are included in DSD
+   * model: <br>
+   * Paragem Única de nos Serviços TARV (CT)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN16() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N16: Number of all patients currently on ART who are included in DSD model: Paragem Unica de nos Serviços TARV (CT)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getParagemUnicaNosServicosTARVConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N17</b>
+   *
+   * <p><b>Description:</b> N17: Number of all patients currently on ART who are included in DSD
+   * model: <b>Paragem Unica Servicos Amigos de Adolescentes e Jovens (SAAJ)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN17() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N17: Number of all patients currently on ART who are included in DSD model: Paragem Unica Servicos Amigos de Adolescentes e Jovens (SAAJ)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getParagemUnicaNoSAAJConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N18</b>
+   *
+   * <p><b>Description:</b> N18: Number of all patients currently on ART who are included in DSD
+   * model: <b>Paragem Única Saúde Materna-Infantil (SMI)</b>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN18() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N18: Number of all patients currently on ART who are included in DSD model: Paragem Única Saúde Materna-Infantil (SMI)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getParagemUnicaNaSMIConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue");
+
+    return cd;
+  }
+
+  /**
+   * <b>Name: N19</b>
+   *
+   * <p><b>Description:</b> N19: Number of all patients currently on ART who are included in DSD
+   * model: <b>Doença Avançada por HIV (DAH)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN19() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N19: Number of all patients currently on ART who are included in DSD model: Doença Avançada por HIV (DAH)");
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition startOrContinue =
+        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
+            Arrays.asList(hivMetadata.getDoencaAvancadaPorHIVConcept().getConceptId()),
+            Arrays.asList(
+                hivMetadata.getStartDrugs().getConceptId(),
+                hivMetadata.getContinueRegimenConcept().getConceptId()));
+
+    String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+
+    cd.setCompositionString("startOrContinue");
 
     return cd;
   }
@@ -1018,36 +1472,7 @@ public class EriDSDCohortQueries {
 
     return cd;
   }
-  /**
-   * <b>Description:</b> LAST CD4 result > 200 cels/mm3 in last ART year (if patients age >=5)
-   *
-   * <p><b>Technical Specs</b>
-   *
-   * <blockquote>
-   *
-   * <ol>
-   *   <li>Get the most recent encounter between A and B: <div>A. The last Encounter of type 6,9,13
-   *       or 51 occurred (Encounter_date) between reporting end date and (reporting end date–12
-   *       months) which contains one of the following concept:
-   *       <p>
-   *       <ul>
-   *         <li>CD4 Abs Result <b>(Concept id 1695 or Concept id 5497)</b>
-   *       </ul>
-   *       <div>B. The last obs.datetime of obs concept id 1695 occurred between reporting end date
-   *       and (reporting end date – 12 months) recorded in Encounter of type 53.
-   *   <li>Check If the most recent encounter between A and B contains:
-   *       <ul>
-   *         <li>CD4 Abs Result <b>(Concept id 1695 or Concept id 5497) >200</b> or
-   *             <ul>
-   *               <li>No active clinical condition of WHO stage III or IV in last clinical
-   *                   appointment and
-   *               <li>No adverse reactions to medications in last six months that require regular
-   *                   monitoring
-   *             </ol>
-   *             </blockquote>
-   *
-   * @return {@link CohortDefinition}
-   */
+
   private CohortDefinition getCD4CountAndCD4Percent2Part1() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("LAST CD4 result > 200 cels/mm3 in last ART year (if patients age >=5");
@@ -1144,38 +1569,6 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
-  /**
-   * <b>Name: 5B </b>
-   *
-   * <p><b>Description:</b> Patients with LAST Viral Load Result < 1000 copies/ml in last ART year
-   * (only if VL exists)
-   *
-   * <p><b>Technical Specs</b>
-   *
-   * <blockquote>
-   *
-   * <ol>
-   *   <li>Get the most recent encounter between A and B: <div>A. The last Encounter of type 6,9,13
-   *       or 51 occurred (Encounter_date) between reporting end date and (reporting end date – 12
-   *       months) which contains one of the following concept:
-   *       <p>
-   *       <ul>
-   *         <li>HIV VIRAL LOAD OBS Concept id = 856</b>or
-   *         <li>HIV VIRAL LOAD OBS Concept id = 1305</b>
-   *       </ul>
-   *       <div>B. The last obs.datetime of obs concept id 1695 occurred between reporting end date
-   *       and (reporting end date – 12 months) recorded in Encounter of type 53.
-   *   <li>Check If the most recent encounter between A and B contains:
-   *       <ul>
-   *         <li><b>Concept id 856 and OBS VALUE_NUMERIC is > 1000</b> or
-   *         <li><b>Concept id 1305 and value_coded in</b> { See in Specs DSD D1 Indicator}
-   *       </ul>
-   * </ol>
-   *
-   * </blockquote>
-   *
-   * @return {@link CohortDefinition}
-   */
   private CohortDefinition getPatientsWithViralLoadLessThan1000Within12Months() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
@@ -1279,251 +1672,24 @@ public class EriDSDCohortQueries {
 
     return cd;
   }
-
   /**
-   * <b>Description:</b> Patients whose next drugs pickup appointment is scheduled for a given
-   * interval after the date of their last drugs pickup
+   * <b>Description:</b> Patients who have X given Modos de Dispensa on Y given Encounter Types
    *
-   * @return {@link CohortDefinition}
+   * @param encounterTypes
+   * @param typesOfDispensation
+   * @return
    */
-  private CohortDefinition getPatientsScheduled(
-      Concept conceptId,
-      List<EncounterType> encounterTypes,
-      Integer upperBound,
-      Integer lowerBound) {
-    CalculationCohortDefinition cd =
-        new CalculationCohortDefinition(
-            "scheduledPatients",
-            Context.getRegisteredComponents(NextAndPrevDatesCalculation.class).get(0));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addCalculationParameter("conceptId", conceptId);
-    cd.addCalculationParameter("encounterTypes", encounterTypes);
-    cd.addCalculationParameter("upperBound", upperBound);
-    cd.addCalculationParameter("lowerBound", lowerBound);
-
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients who are marked <b>Completed</b> for their last <b>Rapid Flow</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWhoCompletedRapidFlow() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setName("Patients who are completed for their rapid flow");
-    cd.setQuery(
-        GenericCohortQueries.getLastCodedObsBeforeDate(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
-            hivMetadata.getRapidFlow().getConceptId(),
-            Arrays.asList(hivMetadata.getCompletedConcept().getConceptId())));
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients marked in last <b>Rapid Flow</b> as <b>Start Drugs or Continue
-   * Regimen</b> on (ficha clinica - Master Card)
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWithStartOrContinueOnConcept(Concept answerConcept) {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setName("Patients who marked start or continue on the given concept");
-    cd.setQuery(
-        GenericCohortQueries.getLastCodedObsBeforeDate(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
-            answerConcept.getConceptId(),
-            Arrays.asList(
-                hivMetadata.getStartDrugsConcept().getConceptId(),
-                hivMetadata.getContinueRegimenConcept().getConceptId())));
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients whose next clinical appointment is scheduled for 175-190 days
-   * after the date of their last clinical consultant
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsScheduled175to190days(
-      List<EncounterType> encounterTypes, Concept concept) {
-    int lowerBound = 175;
-    int upperBound = 190;
-    return getPatientsScheduled(concept, encounterTypes, upperBound, lowerBound);
-  }
-
-  /**
-   * <b>Description:</b> Active patients on ART MasterCard who are in AF (Abordagem Familiar)
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsOnMasterCardAF() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-
-    cd.setName("Active patients on ART MasterCard who are in AF Query");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-
-    cd.setQuery(
-        DsdQueries.getPatientsOnMasterCardAF(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getFamilyApproach().getConceptId(),
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getContinueRegimenConcept().getConceptId()));
-
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients who have been enrolled in the <b>GAAC</b> program
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getAllPatientsEnrolledOnGaac() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("All Patients Enrolled On GAAC");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(DsdQueries.getPatientsEnrolledOnGAAC());
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients who are marked <b>Completed</b> for their last <b>GAAC</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWhoCompletedGAAC() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        GenericCohortQueries.getLastCodedObsBeforeDate(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
-            hivMetadata.getGaac().getConceptId(),
-            Arrays.asList(hivMetadata.getCompletedConcept().getConceptId())));
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients who are marked <b>Completed</b> for their last <b>Quartely
-   * Dispensation</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWithCompletedOnQuarterlyDispensation() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("patientsWithCompletedOnQuarterlyDispensation");
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        GenericCohortQueries.getLastCodedObservationBeforeDate(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
-            hivMetadata.getQuarterlyDispensation().getConceptId(),
-            Arrays.asList(hivMetadata.getCompletedConcept().getConceptId())));
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients marked as <b>Quartely Dispensation</b> on Tipo de Levantamento
-   * (ficha clinica - Master Card)
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWithQuarterlyTypeOfDispensation() {
+  private CohortDefinition getPatientsWhoHaveModoDeDispensa(
+      List<Integer> encounterTypes, List<Integer> typesOfDispensation) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("patientsWithQuarterlyTypeOfDispensation");
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.setQuery(
         GenericCohortQueries.getLastCodedObservationBeforeDate(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
+            encounterTypes,
             hivMetadata.getTypeOfDispensationConcept().getConceptId(),
-            Arrays.asList(hivMetadata.getQuarterlyConcept().getConceptId())));
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients marked in last <b>Semestral Dispensation</b> as <b>Start Drugs</b>
-   * or <b>Continue Regimen</b> on (ficha clinica - Master Card)
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWithStartOrContinueOnSemestralDispensation() {
-    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-    cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-    cd.setQuestion(hivMetadata.getSemiannualDispensation());
-    cd.setOperator(SetComparator.IN);
-    cd.addValue(hivMetadata.getStartDrugsConcept());
-    cd.addValue(hivMetadata.getContinueRegimenConcept());
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients who are marked <b>Completed</b> for their last <b>Semestral
-   * Dispensation</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWithSemestralTypeOfDispensation() {
-    CodedObsCohortDefinition cd = new CodedObsCohortDefinition();
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addEncounterType(hivMetadata.getAdultoSeguimentoEncounterType());
-    cd.setTimeModifier(BaseObsCohortDefinition.TimeModifier.LAST);
-    cd.setQuestion(hivMetadata.getTypeOfDispensationConcept());
-    cd.setOperator(SetComparator.IN);
-    cd.addValue(hivMetadata.getSemiannualDispensation());
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients marked as <b>Annual Dispensation</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWithAnnualTypeOfDispensation() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("patientsWithAnnualTypeOfDispensation");
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        GenericCohortQueries.getLastCodedObservationBeforeDate(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
-            hivMetadata.getTypeOfDispensationConcept().getConceptId(),
-            Arrays.asList(hivMetadata.getAnnualArvDispensationConcept().getConceptId())));
-    return cd;
-  }
-
-  /**
-   * <b>Description:</b> Patients who are marked <b>Completed</b> for their last
-   * <b>AnnualDispensation</b>
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsWithCompletedOnAnnualDispensation() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients With Completed On Annual Dispensation");
-    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.setQuery(
-        GenericCohortQueries.getLastCodedObservationBeforeDate(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
-            hivMetadata.getAnnualArvDispensationConcept().getConceptId(),
-            Arrays.asList(hivMetadata.getCompletedConcept().getConceptId())));
+            typesOfDispensation));
     return cd;
   }
 
