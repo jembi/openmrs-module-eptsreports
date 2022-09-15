@@ -531,11 +531,14 @@ public class ResumoMensalCohortQueries {
     cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
 
     cd.addSearch(
+        "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
+
+    cd.addSearch(
         "B2",
         map(
             getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-    cd.setCompositionString("B13 OR B9 AND NOT (B12 OR B2)");
+    cd.setCompositionString("B13 OR B9 AND NOT (B12 OR B2 OR B1)");
 
     return cd;
   }
