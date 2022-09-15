@@ -115,7 +115,7 @@ public class ListOfPatientsWithPositiveTbScreeningDataset extends BaseDataSet {
             new PersonAttributeDataDefinition(contactAttributeType.getName(), contactAttributeType),
             null);
 
-    pdd.setParameters(getParameters());
+    pdd.addParameters(getParameters());
 
     pdd.addRowFilter(
         listOfPatientsWithPositiveTbScreeningCohortQueries.getBaseCohort(),
@@ -298,6 +298,14 @@ public class ListOfPatientsWithPositiveTbScreeningDataset extends BaseDataSet {
                 tbMetadata.getIndeterminate().getConceptId())),
         mappings,
         new TestResultConverter());
+
+    // 20 - TB Treatment Start Date – Sheet 1: Column T
+    pdd.addColumn(
+        "tb_start_date",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries
+            .getTbTreatmentStartDateFromSources(),
+        mappings,
+        null);
 
     return pdd;
   }

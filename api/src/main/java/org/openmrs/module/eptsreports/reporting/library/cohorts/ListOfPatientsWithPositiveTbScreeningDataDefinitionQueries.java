@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.library.queries.ListOfPatientsWithPositiveTbScreeningQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -19,17 +21,16 @@ import java.util.Map;
 public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
 
   private final HivMetadata hivMetadata;
-  private final ListOfPatientsWithPositiveTbScreeningCohortQueries
-      listOfPatientsWithPositiveTbScreeningCohortQueries;
+  private final ListOfPatientsWithPositiveTbScreeningQueries
+      listOfPatientsWithPositiveTbScreeningQueries;
 
   @Autowired
   public ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries(
       HivMetadata hivMetadata,
-      ListOfPatientsWithPositiveTbScreeningCohortQueries
-          listOfPatientsWithPositiveTbScreeningCohortQueries) {
+      ListOfPatientsWithPositiveTbScreeningQueries listOfPatientsWithPositiveTbScreeningQueries) {
     this.hivMetadata = hivMetadata;
-    this.listOfPatientsWithPositiveTbScreeningCohortQueries =
-        listOfPatientsWithPositiveTbScreeningCohortQueries;
+    this.listOfPatientsWithPositiveTbScreeningQueries =
+        listOfPatientsWithPositiveTbScreeningQueries;
   }
 
   /**
@@ -51,8 +52,7 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     sqlPatientDataDefinition.setQuery(
-        listOfPatientsWithPositiveTbScreeningCohortQueries
-            .getTbPositiveScreeningFromSourcesQuery());
+        listOfPatientsWithPositiveTbScreeningQueries.getTbPositiveScreeningFromSourcesQuery());
 
     return sqlPatientDataDefinition;
   }
@@ -111,9 +111,8 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "      INNER JOIN ( "
             + " SELECT positive.patient_id, MAX(positive.recent_date) as recent_date FROM ( "
-            + listOfPatientsWithPositiveTbScreeningCohortQueries
-                .getTbPositiveScreeningFromSourcesQuery()
-            + " ) positive GROUP BY positive.patient_id ) as positiveScreening ON positiveScreening.patient_id = p.patient_id "
+            + listOfPatientsWithPositiveTbScreeningQueries.getTbPositiveScreeningFromSourcesQuery()
+            + " ) positive GROUP BY positive.patient_id ) positiveScreening ON positiveScreening.patient_id = p.patient_id "
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${23722} "
@@ -135,9 +134,10 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
    * <b>This method will be used for the following TB Requests: </b>
    *
    * <ul>
-   *   <li>GeneXpert Request Date
    *   <li>GeneXpert Result Ficha Clinica / Lab Form
    *   <li>Xpert MTB Result Lab Form
+   *   <li>BK Result Ficha Clinica / Lab Form
+   *   <li>TB LAM Result Ficha Clinica / Lab Form
    * </ul>
    *
    * <b>GeneXpert Result Ficha Clinica </b>
@@ -153,9 +153,35 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
    * identify the most recent GeneXpert result marked in Laboratory form registered between the Last
    * Positive TB Screening Date (Value of Column H) and report generation date.
    *
-   * <p><b></b>
+   * <b>Xpert MTB Result Lab Form</b>
    *
-   * <p>
+   * <p>Possible values are Sim/Não or Blank if no result is found
+   * The system will identify and show the most recent XpertMTB result marked in Laboratory form registered
+   * between the Last Positive TB Screening Date (Value of Column H) and report generation date
+   *
+   *  <b>BK Result Ficha Clinica</b>
+   *
+   * <p>Possible values are Positivo/Negativo or Blank if no result is found
+   * The system will identify and show the most recent BK result marked in Investigações – Resultados Laboratoriais
+   * section of Ficha Clínica registered between the Last Positive TB Screening Date (Value of Column H) and report generation date.
+   *
+   *  <b>BK Result Lab Form</b>
+   *
+   * <p>Possible values are Positivo/Nao Encontrado or Blank if no result is found
+   * The system will identify and show the most recent BK result marked in Laboratory
+   * form registered between the Last Positive TB Screening Date (Value of Column H) and report generation date.
+   *
+   *   <b>TB LAM Result Ficha Clínica</b>
+   *
+   * <p>Possible values are Positivo/Negativo or Blank if no result is found
+   * The system will identify and show the most recent TB LAM result marked in Investigações – Resultados Laboratoriais section of Ficha
+   * Clínica registered between the Last Positive TB Screening Date (Value of Column H) and report generation date.
+   *
+   *    <b>TB LAM Result Lab Form</b>
+   *
+   * <p>Possible values are Positivo/Negativo/Indeterminado or Blank if no result is found
+   * The system will identify and show the most recent TB LAM result marked in Laboratory form registered between the Last Positive TB
+   * Screening Date (Value of Column H) and report generation date.
    *
    * @param encounterTypeList EncounterTypes
    * @param examConceptList Exam Concepts
@@ -190,9 +216,8 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "      INNER JOIN ( "
             + " SELECT positive.patient_id, MAX(positive.recent_date) as recent_date FROM ( "
-            + listOfPatientsWithPositiveTbScreeningCohortQueries
-                .getTbPositiveScreeningFromSourcesQuery()
-            + " ) positive GROUP BY positive.patient_id ) as positiveScreening ON positiveScreening.patient_id = p.patient_id "
+            + listOfPatientsWithPositiveTbScreeningQueries.getTbPositiveScreeningFromSourcesQuery()
+            + " ) positive GROUP BY positive.patient_id ) positiveScreening ON positiveScreening.patient_id = p.patient_id "
             + "WHERE  e.encounter_type IN ( ${encounterType} ) "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id IN ( ${examConcept} ) "
@@ -264,9 +289,8 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
             + "               ON o.encounter_id = e.encounter_id "
             + "      INNER JOIN ( "
             + " SELECT positive.patient_id, MAX(positive.recent_date) as recent_date FROM ( "
-            + listOfPatientsWithPositiveTbScreeningCohortQueries
-                .getTbPositiveScreeningFromSourcesQuery()
-            + " ) positive GROUP BY positive.patient_id ) as positiveScreening ON positiveScreening.patient_id = p.patient_id "
+            + listOfPatientsWithPositiveTbScreeningQueries.getTbPositiveScreeningFromSourcesQuery()
+            + " ) positive GROUP BY positive.patient_id ) positiveScreening ON positiveScreening.patient_id = p.patient_id "
             + "WHERE  e.encounter_type IN ( ${encounterType} ) "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id IN ( ${examConcept} ) "
@@ -289,6 +313,45 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>The system will identify patients who started on anti-TB treatment after the Positive TB
+   * Screening and by reporting generation date as follows:</b>
+   * <li>All patients marked with Tratamento TB = Início (I) in Ficha Clínica Master Card registered
+   *     between the Last Positive TB Screening Date (Value of Column H) and report generation date
+   * <li>All patients with TB Date registered in Condições Médicas Importantes – Ficha Resumo Master
+   *     Card, falling between the Last Positive TB Screening Date (Value of Column H) and report
+   *     generation date.
+   * <li>All patients who are enrolled in TB Program with enrollment Date (Data de Admissão) between
+   *     the Last Positive TB Screening Date (Value of Column H) and report generation date.
+   * <li>All patients marked with diagnosis active TB = Yes (Diagnóstico TB active=S) in Ficha
+   *     Clínica Master Card registered between the Last Positive TB Screening Date (Value of Column
+   *     H) and report generation date
+   *
+   *     <p>The system will obtain the most recent date from the various sources identified above as
+   *     TB Treatment Start Date.
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getTbTreatmentStartDateFromSources() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Anti-TB treatment start Date");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("generationDate", "generationDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String query =
+        new EptsQueriesUtil()
+            .max(listOfPatientsWithPositiveTbScreeningQueries.getAntiTbTreatmentFromSourcesQuery())
+            .getQuery();
+
+    sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }

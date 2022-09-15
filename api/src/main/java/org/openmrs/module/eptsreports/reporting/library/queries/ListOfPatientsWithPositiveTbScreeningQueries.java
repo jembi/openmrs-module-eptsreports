@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.queries;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
 
   /**
    * Patients with Pulmonary TB Date in Patient Clinical Record of ART date TB (Condicoes medicas
-   * importantes – Ficha Resumo Mastercard during reporting period
+   * importantes) – Ficha Resumo Mastercard during reporting period
    *
    * <p>• Encounter Type ID = 53<br>
    * • Concept ID for Pulmonary TB = 421406 <br>
@@ -112,7 +113,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
   }
 
   /**
-   * Patients with at least one response to the following questions in in Ficha Clinica Master Card
+   * Patients with at least one response to the following questions in Ficha Clinica Master Card
    * during the reporting period
    *
    * <p>• Encounter Type ID = 6 <br>
@@ -356,5 +357,185 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
 
     StringSubstitutor sb = new StringSubstitutor(map);
     return sb.replace(query);
+  }
+
+  /**
+   * Patients marked as “Tratamento TB= Inicio (I) ” in Ficha Clinica Master Card between the Last
+   * Positive TB Screening Date (Value of Column H) and report generation date
+   *
+   * <p>Encounter Type ID = 6 <br>
+   * TB Treament Plan ID = 1268 <br>
+   * Answer = START (value_coded 1256) <br>
+   * obs_datetime >= Last Positive TB Screening Date and <= report generation date <br>
+   *
+   * @return {@link String}
+   */
+  public String getTbTreatmentStartDateFichaClinica() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    String query =
+        " SELECT p.patient_id, o.obs_datetime AS start_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN ( "
+            + " SELECT positive.patient_id, MAX(positive.recent_date) as recent_date FROM ( "
+            + getTbPositiveScreeningFromSourcesQuery()
+            + " ) positive GROUP BY positive.patient_id ) positiveScreening ON positiveScreening.patient_id = p.patient_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.obs_datetime >= positiveScreening.recent_date AND o.obs_datetime <= :generationDate "
+            + "       AND o.concept_id = ${1268} "
+            + "       AND o.value_coded = ${1256} "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+  /**
+   * Patients with Pulmonary TB Date in Patient Clinical Record of ART date TB (Condicoes medicas
+   * importantes) – Ficha Resumo Mastercard between the Last Positive TB Screening Date (Value of
+   * Column H) and report generation date
+   *
+   * <p>• Encounter Type ID = 53<br>
+   * Concept ID for Pulmonary TB = 421406 <br>
+   * Answer = Yes (value_coded 106542) <br>
+   * Obs_datetime >= Last Positive TB Screening Date and <= report generation date
+   *
+   * @return {@link String}
+   */
+  public String getPulmonaryTbDateFichaResumo() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+    String query =
+        " SELECT p.patient_id,o.obs_datetime AS start_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN ( "
+            + " SELECT positive.patient_id, MAX(positive.recent_date) as recent_date FROM ( "
+            + getTbPositiveScreeningFromSourcesQuery()
+            + " ) positive GROUP BY positive.patient_id ) positiveScreening ON positiveScreening.patient_id = p.patient_id "
+            + "WHERE  e.encounter_type = ${53} "
+            + "       AND e.location_id = :location "
+            + "       AND o.obs_datetime >= positiveScreening.recent_date AND o.obs_datetime <= :generationDate "
+            + "       AND o.concept_id = ${1406} "
+            + "       AND o.value_coded = ${42} "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+  /**
+   * “TB Program Enrollment Date” (Data de Admissão) In SESP – Program Enrollment between the Last
+   * Positive TB Screening Date (Value of Column H) and report generation date
+   *
+   * @return {@link String}
+   */
+  public String getTbProgramEnrollmentStartDate() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("5", tbMetadata.getTBProgram().getProgramId());
+    String query =
+        " SELECT pg.patient_id,pg.date_enrolled AS start_date "
+            + "FROM   patient p "
+            + "       INNER JOIN patient_program pg "
+            + "               ON pg.patient_id = p.patient_id "
+            + "       INNER JOIN ( "
+            + " SELECT positive.patient_id, MAX(positive.recent_date) as recent_date FROM ( "
+            + getTbPositiveScreeningFromSourcesQuery()
+            + " ) positive GROUP BY positive.patient_id ) positiveScreening ON positiveScreening.patient_id = pg.patient_id "
+            + "WHERE  pg.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND pg.program_id = ${5} "
+            + "       AND pg.date_enrolled  >= positiveScreening.recent_date AND pg.date_enrolled <= :generationDate "
+            + "       AND pg.location_id = :location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+  /**
+   * Patients with at least one response to the following questions in Ficha Clinica Master Card
+   * between the Last Positive TB Screening Date (Value of Column H) and report generation date
+   *
+   * <p>Encounter Type ID = 6 <br>
+   * TUBERCULOSIS SYMPTOMS (concept_id = 23758) Answers YES (id = 1065) or NO (id = 1066)
+   *
+   * @return {@link String}
+   */
+  public String getTuberculosisSymptomsDateFichaClinica() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    String query =
+        " SELECT p.patient_id,e.encounter_datetime AS start_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN ( "
+            + " SELECT positive.patient_id, MAX(positive.recent_date) as recent_date FROM ( "
+            + getTbPositiveScreeningFromSourcesQuery()
+            + " ) positive GROUP BY positive.patient_id ) positiveScreening ON positiveScreening.patient_id = p.patient_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime >= positiveScreening.recent_date AND e.encounter_datetime <= :generationDate "
+            + "       AND  o.concept_id = ${23758} "
+            + "       AND o.value_coded IN( ${1065}, ${1066} )  "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
+
+  /**
+   * @see #getTbPositiveScreeningFromSourcesQuery()
+   * @return {@link String}
+   */
+  public String getAntiTbTreatmentFromSourcesQuery() {
+    return new EptsQueriesUtil()
+        .unionBuilder(getTbTreatmentStartDateFichaClinica())
+        .union(getTbProgramEnrollmentStartDate())
+        .union(getPulmonaryTbDateFichaResumo())
+        .union(getTuberculosisSymptomsDateFichaClinica())
+        .buildQuery();
+  }
+
+  /**
+   * <b>Generate one union separeted query based on the given queries</b>
+   *
+   * @return {@link String}
+   */
+  public String getTbPositiveScreeningFromSourcesQuery() {
+    return new EptsQueriesUtil()
+        .unionBuilder(getPatientWithTbProgramEnrollmentAndDate())
+        .union(getPatientWithPulmonaryTbdDate())
+        .union(getPatientMarkedAsTbTreatmentStartAndDate())
+        .union(getPatientWithTuberculosisSymptomsAndDate())
+        .union(getPatientsActiveTuberculosisDate())
+        .union(getPatientsWithTbObservationsAndDate())
+        .union(getPatientsWithApplicationsForLabResearch())
+        .union(getPatientsWithTbGenexpertAndDate())
+        .union(getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
+        .buildQuery();
   }
 }

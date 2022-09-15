@@ -94,7 +94,11 @@ public class ListOfPatientsWithPositiveTbScreeningCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
     String maxPositiveScreeningDateQuery =
-        new EptsQueriesUtil().max(this.getTbPositiveScreeningFromSourcesQuery()).getQuery();
+        new EptsQueriesUtil()
+            .max(
+                listOfPatientsWithPositiveTbScreeningQueries
+                    .getTbPositiveScreeningFromSourcesQuery())
+            .getQuery();
 
     String query =
         new EptsQueriesUtil().patientIdQueryBuilder(maxPositiveScreeningDateQuery).getQuery();
@@ -102,33 +106,5 @@ public class ListOfPatientsWithPositiveTbScreeningCohortQueries {
     sqlCohortDefinition.setQuery(query);
 
     return sqlCohortDefinition;
-  }
-
-  /**
-   * <b>Generate one union separeted query based on the given queries</b>
-   *
-   * @return {@link String}
-   */
-  public String getTbPositiveScreeningFromSourcesQuery() {
-    return new EptsQueriesUtil()
-        .unionBuilder(
-            listOfPatientsWithPositiveTbScreeningQueries.getPatientWithTbProgramEnrollmentAndDate())
-        .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientWithPulmonaryTbdDate())
-        .union(
-            listOfPatientsWithPositiveTbScreeningQueries
-                .getPatientMarkedAsTbTreatmentStartAndDate())
-        .union(
-            listOfPatientsWithPositiveTbScreeningQueries
-                .getPatientWithTuberculosisSymptomsAndDate())
-        .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientsActiveTuberculosisDate())
-        .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientsWithTbObservationsAndDate())
-        .union(
-            listOfPatientsWithPositiveTbScreeningQueries
-                .getPatientsWithApplicationsForLabResearch())
-        .union(listOfPatientsWithPositiveTbScreeningQueries.getPatientsWithTbGenexpertAndDate())
-        .union(
-            listOfPatientsWithPositiveTbScreeningQueries
-                .getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
-        .buildQuery();
   }
 }
