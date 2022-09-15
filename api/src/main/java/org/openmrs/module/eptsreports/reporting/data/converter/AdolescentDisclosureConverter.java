@@ -6,27 +6,27 @@ import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.data.converter.DataConverter;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Set;
 
 public class AdolescentDisclosureConverter implements DataConverter {
   String results = "";
-  @Autowired private HivMetadata hivMetadata;
 
   @Override
   public Object convert(Object obj) {
+    HivMetadata hivMetadata = Context.getRegisteredComponents(HivMetadata.class).get(0);
     if (obj == null) {
       results = "";
     }
     Encounter encounter = (Encounter) obj;
-    if (!checkIfConceptQuestionWasRecorded(
-        encounter, hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept())) {
+    if (encounter == null) {
       results = "";
     }
-    Set<Obs> getAllObs = encounter.getAllObs();
-    if (getAllObs != null) {
-      for (Obs obs : getAllObs) {
+    if (encounter != null
+        && !checkIfConceptQuestionWasRecorded(
+            encounter, hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept())) {
+      results = "";
+    }
+    if (encounter != null && encounter.getAllObs() != null) {
+      for (Obs obs : encounter.getAllObs()) {
         if (obs.getConcept() != null
             && obs.getConcept()
                 .equals(hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept())) {
