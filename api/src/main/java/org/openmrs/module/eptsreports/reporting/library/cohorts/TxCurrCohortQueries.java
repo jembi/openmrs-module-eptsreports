@@ -14,7 +14,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -1024,7 +1023,25 @@ public class TxCurrCohortQueries {
             + "		                         AND e.voided = 0 "
             + "		                         AND e.location_id = :location "
             + "		                         AND DATE(e.encounter_datetime) <= :onOrBefore "
-            + "		                 GROUP BY p.patient_id) AS last_encounter GROUP BY last_encounter.patient_id "
+            + "		                 GROUP BY p.patient_id"
+            + "                UNION                                   "
+            + "                SELECT p.patient_id, MAX(e.encounter_datetime) encounter_date "
+            + "                FROM patient p "
+            + "                    INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                    INNER JOIN obs ot ON e.encounter_id = ot.encounter_id "
+            + "                    INNER JOIN obs os ON e.encounter_id = os.encounter_id "
+            + "                WHERE "
+            + "                    e.encounter_type = ${6} "
+            + "                    AND ot.concept_id = ${165174} "
+            + "                    AND os.concept_id = ${165322} "
+            + "                    AND p.voided = 0 "
+            + "                    AND ot.voided = 0 "
+            + "                    AND os.voided = 0 "
+            + "                    AND e.voided = 0 "
+            + "                    AND e.location_id = :location "
+            + "                    AND DATE(e.encounter_datetime) <= :onOrBefore "
+            + "                GROUP BY  p.patient_id "
+            + ") AS last_encounter GROUP BY last_encounter.patient_id "
             + "		           ) recent_dispensation ON recent_dispensation.patient_id = p.patient_id "
             + "                   WHERE  DATE(e.encounter_datetime) <= :onOrBefore "
             + "						AND e.voided = 0 "
@@ -1067,6 +1084,8 @@ public class TxCurrCohortQueries {
     valuesMap.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId());
     valuesMap.put("23888", hivMetadata.getSemiannualDispensation().getConceptId());
     valuesMap.put("1098", hivMetadata.getMonthlyConcept().getConceptId());
+    valuesMap.put("165322", hivMetadata.getMdcState().getConceptId());
+    valuesMap.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     cd.setQuery(sub.replace(sqlQuery));
@@ -1579,5 +1598,4 @@ public class TxCurrCohortQueries {
 
     return definition;
   }
-
 }
