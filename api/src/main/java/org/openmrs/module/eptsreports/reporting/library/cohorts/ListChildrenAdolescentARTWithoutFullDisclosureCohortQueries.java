@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -13,6 +10,10 @@ import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
@@ -139,7 +140,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addSearch(
         "NR",
         EptsReportUtils.map(
-            getAdolescentsCurrentlyOnArtWithDisclosures(
+                getAdolescentsWithRdMarkedAnyWhereByEndDate(
                 hivMetadata.getNotRevealedConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
     cd.setCompositionString("ALL AND NOT (R OR P OR NR)");
