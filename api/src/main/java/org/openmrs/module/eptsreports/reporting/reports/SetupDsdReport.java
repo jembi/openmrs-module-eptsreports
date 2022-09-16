@@ -15,8 +15,10 @@ package org.openmrs.module.eptsreports.reporting.reports;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.EriDSDDataset;
@@ -25,6 +27,7 @@ import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportMa
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +73,7 @@ public class SetupDsdReport extends EptsDataExportManager {
     rd.setUuid(getUuid());
     rd.setName(getName());
     rd.setDescription(getDescription());
-    rd.setParameters(eriDSDDataset.getParameters());
+    rd.setParameters(getParameters());
 
     rd.addDataSetDefinition(
         "ERIDSD", Mapped.mapStraightThrough(eriDSDDataset.constructEriDSDDataset()));
@@ -102,5 +105,12 @@ public class SetupDsdReport extends EptsDataExportManager {
     }
 
     return Arrays.asList(reportDesign);
+  }
+
+  @Override
+  public List<Parameter> getParameters() {
+    return Arrays.asList(
+        new Parameter("endDate", "End date", Date.class),
+        new Parameter("location", "Location", Location.class));
   }
 }
