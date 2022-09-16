@@ -108,7 +108,7 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addSearch(
         "R",
         EptsReportUtils.map(
-            getAdolescentsCurrentlyOnArtWithDisclosures(
+            getAdolescentsWithRdMarkedAnyWhereByEndDate(
                 hivMetadata.getRevealdConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
     cd.setCompositionString("ALL AND NOT R");
@@ -127,13 +127,13 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
     cd.addSearch(
         "R",
         EptsReportUtils.map(
-            getAdolescentsCurrentlyOnArtWithDisclosures(
+            getAdolescentsWithRdMarkedAnyWhereByEndDate(
                 hivMetadata.getRevealdConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "P",
         EptsReportUtils.map(
-            getAdolescentsCurrentlyOnArtWithDisclosures(
+            getAdolescentsWithRdMarkedAnyWhereByEndDate(
                 hivMetadata.getPartiallyRevealedConcept().getConceptId()),
             "endDate=${endDate},location=${location}"));
     cd.addSearch(
@@ -144,6 +144,38 @@ public class ListChildrenAdolescentARTWithoutFullDisclosureCohortQueries {
             "endDate=${endDate},location=${location}"));
     cd.setCompositionString("ALL AND NOT (R OR P OR NR)");
 
+    return cd;
+  }
+
+  /**
+   * Number of Children and Adolescent between 8 and 14 currently on ART with RD marked as any of
+   * “N” (Não) , “P” (Partial) “T” Any results that will appear on encounter 35 and question 6340
+   *
+   * @param valueCoded
+   * @return CohortDefinition
+   */
+  public CohortDefinition getAdolescentsWithRdMarkedAnyWhereByEndDate(int valueCoded) {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put(
+        "6340",
+        hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
+    map.put("answer", valueCoded);
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Adolescent patients with disclosures filled by end of the reporting period");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String query =
+        " SELECT p.patient_id FROM patient p "
+            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND e.encounter_type = ${35} "
+            + " AND o.concept_id=${6340} AND e.encounter_datetime <= :endDate "
+            + " AND e.location_id=:location AND o.value_coded= ${answer}";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    String replacedQuery = sb.replace(query);
+    cd.setQuery(replacedQuery);
     return cd;
   }
 }
