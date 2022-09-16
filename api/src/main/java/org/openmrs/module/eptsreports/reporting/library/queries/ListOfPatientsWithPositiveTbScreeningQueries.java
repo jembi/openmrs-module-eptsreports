@@ -117,7 +117,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
    * during the reporting period
    *
    * <p>• Encounter Type ID = 6 <br>
-   * • TUBERCULOSIS SYMPTOMS (concept_id = 23758) Answers YES (id = 1065) or NO (id = 1066)
+   * • TUBERCULOSIS SYMPTOMS (concept_id = 23758) Answers YES (id = 1065)
    *
    * @return {@link String}
    */
@@ -126,7 +126,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+
     String query =
         "SELECT p.patient_id,e.encounter_datetime AS recent_date "
             + "FROM   patient p "
@@ -138,7 +138,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate "
             + "       AND  o.concept_id = ${23758} "
-            + "       AND o.value_coded IN( ${1065}, ${1066} )  "
+            + "       AND o.value_coded IN( ${1065})  "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
@@ -230,17 +230,11 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
   }
 
   /**
-   * Patients with at least one response to the following questions in Ficha Clinica Master Card
-   * during the reporting period
+   * ○If Investigações - Pedidos Laboratoriais requests are marked for ‘TB LAM’, ‘GeneXpert’,
+   * ‘Cultura’, ‘BK’ or ‘Raio-X’; or
    *
-   * <p>• TB OBSERVATIONS (obs concept id = 1766) Answers: <br>
-   * a. FEVER LASTING MORE THAN 3 WEEKS (id = 1763) or <br>
-   * b. WEIGHT LOSS OF MORE THAN 3 KG IN LAST MONTH (id = 1764) or <br>
-   * c. NIGHTSWEATS LASTING MORE THAN 3 WEEKS ( id = 1762) or <br>
-   * d. COUGH LASTING MORE THAN 3 WEEKS ( id = 1760) or <br>
-   * e. ASTHENIA ( id =23760) or <br>
-   * f. COHABITANT BEING TREATED FOR TB (id = 1765) or <br>
-   * g. LYMPHADENOPATHY (id = 161)
+   * <p>• (GENEXPERT TEST (id =23723) or CULTURE TEST (id = 23774) or TB LAM TEST (id = 23951) or
+   * EXAME BACILOSCOPIA (id=307) or Raio-X Torax(id=12)) for concept_id=23722 <br>
    *
    * @return {@link String}
    */
@@ -473,16 +467,16 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
    * between the Last Positive TB Screening Date (Value of Column H) and report generation date
    *
    * <p>Encounter Type ID = 6 <br>
-   * TUBERCULOSIS SYMPTOMS (concept_id = 23758) Answers YES (id = 1065) or NO (id = 1066)
+   * TUBERCULOSIS SYMPTOMS (concept_id = 23761) Answers YES (id = 1065)
    *
    * @return {@link String}
    */
-  public String getTuberculosisSymptomsDateFichaClinica() {
+  public String getActiveTuberculosisDateFichaClinica() {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
+    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+
     String query =
         " SELECT p.patient_id,e.encounter_datetime AS start_date "
             + "FROM   patient p "
@@ -497,8 +491,8 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
             + "WHERE  e.encounter_type = ${6} "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= positiveScreening.recent_date AND e.encounter_datetime <= :generationDate "
-            + "       AND  o.concept_id = ${23758} "
-            + "       AND o.value_coded IN( ${1065}, ${1066} )  "
+            + "       AND  o.concept_id = ${23761} "
+            + "       AND o.value_coded IN( ${1065} )  "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
@@ -516,7 +510,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
         .unionBuilder(getTbTreatmentStartDateFichaClinica())
         .union(getTbProgramEnrollmentStartDate())
         .union(getPulmonaryTbDateFichaResumo())
-        .union(getTuberculosisSymptomsDateFichaClinica())
+        .union(getActiveTuberculosisDateFichaClinica())
         .buildQuery();
   }
 
