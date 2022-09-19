@@ -1196,7 +1196,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         "   SELECT result.patient_id "
-            + "         FROM (SELECT p.patient_id,tabela.datetime   "
+            + "         FROM (SELECT p.patient_id,tabela.start_date   "
             + "            FROM   patient p   "
             + "            INNER JOIN encounter e "
             + "                    ON e.patient_id = p.patient_id "
@@ -1221,10 +1221,10 @@ public class TPTEligiblePatientListCohortQueries {
             + "AND (ee.encounter_type IN (${6},${9}) AND "
             + "  ( (oo.concept_id = ${23985} and oo.value_coded = ${656}) and "
             + "    (o2.concept_id = ${165308} and o2.value_coded in (${1256},${1257})"
-            + "                            AND o2.obs_datetime BETWEEN  "
-            + "                                result.datetime AND  "
-            + "                    Date_add(result.datetime,    "
-            + "                    INTERVAL 7 MONTH) ) ) "
+            + "                            AND o2.obs_datetime >  result.start_date "
+            + "                          AND o2.obs_datetime <=  Date_add(result.start_date, INTERVAL 7 MONTH)"
+            + "                          AND o2.obs_datetime <= :endDate"
+            + "  ) ) "
             + " )) >= 5 )) "
             + "      GROUP  BY result.patient_id ";
 
@@ -1288,7 +1288,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         "   SELECT result.patient_id    "
-            + "                FROM (SELECT p.patient_id,tabela.datetime    "
+            + "                FROM (SELECT p.patient_id,tabela.start_date    "
             + "                   FROM   patient p    "
             + "                   INNER JOIN encounter e  "
             + "                           ON e.patient_id = p.patient_id  "
@@ -1331,8 +1331,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                       ) "
             + "                                   )"
             + "                                 AND ee.encounter_datetime BETWEEN "
-            + "                                     result.datetime AND "
-            + "                         Date_add(result.datetime,   "
+            + "                                     result.start_date AND "
+            + "                         Date_add(result.start_date,   "
             + "                         INTERVAL 5 MONTH)) >= 2 ) "
             + "               GROUP  BY result.patient_id";
 
@@ -1399,7 +1399,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         " SELECT result.patient_id    "
-            + "            FROM (SELECT p.patient_id,tabela.datetime    "
+            + "            FROM (SELECT p.patient_id,tabela.start_date    "
             + "               FROM   patient p    "
             + "               INNER JOIN encounter e  "
             + "                       ON e.patient_id = p.patient_id  "
@@ -1431,8 +1431,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                              AND        ( "
             + "                                                    o2.concept_id = ${165308} "
             + "                                         AND        o2.value_coded IN (${1256}, ${1257}) ) ) "
-            + "                   AND   o2.obs_datetime BETWEEN result.datetime AND  "
-            + "      date_add(result.datetime, interval 7 MONTH)) >= 3 "
+            + "                   AND   o2.obs_datetime BETWEEN result.start_date AND  "
+            + "      date_add(result.start_date, interval 7 MONTH)) >= 3 "
             + "                AND "
             + "                ( "
             + "                           SELECT     count(ee.patient_id) "
@@ -1457,8 +1457,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                                            o3.concept_id = ${1719} "
             + "                                                 AND        o3.value_coded = ${23955}) ) "
             + "                           AND        result.patient_id = ee.patient_id "
-            + "                           AND        ee.encounter_datetime BETWEEN result.datetime AND "
-            + "       date_add(result.datetime, interval 7 MONTH)) >= 1 ) "
+            + "                           AND        ee.encounter_datetime BETWEEN result.start_date AND "
+            + "       date_add(result.start_date, interval 7 MONTH)) >= 1 ) "
             + "            GROUP  BY result.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1560,8 +1560,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                              AND oo.concept_id = ${23986}"
             + "                                              AND oo.value_coded IN ( ${1098} )) )"
             + "                      AND ee.encounter_datetime BETWEEN"
-            + "                          tabela.datetime AND"
-            + "              Date_add(tabela.datetime,"
+            + "                          tabela.start_date AND"
+            + "              Date_add(tabela.start_date,"
             + "              INTERVAL 7 MONTH)) >= 6 ))"
             + "   GROUP  BY p.patient_id  ";
 
@@ -1662,8 +1662,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                              AND oo.concept_id = ${23986}    "
             + "                                              AND oo.value_coded IN ( ${23720} )) )   "
             + "                      AND ee.encounter_datetime BETWEEN    "
-            + "                          tabela.datetime AND    "
-            + "              Date_add(tabela.datetime,  "
+            + "                          tabela.start_date AND    "
+            + "              Date_add(tabela.start_date,  "
             + "              INTERVAL 7 MONTH)) >= 2 ))   "
             + " GROUP  BY p.patient_id  ";
 
@@ -1768,8 +1768,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                               AND oo.concept_id = ${23986}"
             + "                                               AND oo.value_coded IN ( ${1098} )) )"
             + "                       AND ee.encounter_datetime BETWEEN"
-            + "                           tabela.datetime AND"
-            + "               Date_add(tabela.datetime,"
+            + "                           tabela.start_date AND"
+            + "               Date_add(tabela.start_date,"
             + "               INTERVAL 7 MONTH)) >= 3 )"
             + "             AND ( (SELECT Count(*)"
             + "                    FROM   patient pp"
@@ -1793,8 +1793,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                                   AND oo.value_coded IN ( ${23720}"
             + "                                                       )) )"
             + "                           AND ee.encounter_datetime BETWEEN"
-            + "                               tabela.datetime AND"
-            + "                   Date_add(tabela.datetime,"
+            + "                               tabela.start_date AND"
+            + "                   Date_add(tabela.start_date,"
             + "                   INTERVAL 7 MONTH)) >= 1 ) )"
             + "   GROUP  BY p.patient_id  ";
 
@@ -2439,7 +2439,7 @@ public class TPTEligiblePatientListCohortQueries {
     cd.addSearch("M3", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(), mapping));
 
     // M1 period indicators
-    cd.addSearch("M11", EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(), mapping));
+    cd.addSearch("M1", EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(), mapping));
 
     cd.setCompositionString("M1 OR M3");
 

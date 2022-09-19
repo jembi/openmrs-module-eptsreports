@@ -340,7 +340,7 @@ public class TPTEligiblePatientsQueries {
    * @return {@link String}
    */
   public static String getY1QueryWithPatientIdForB5() {
-    return "SELECT ee.patient_id, o3.obs_datetime AS datetime "
+    return "SELECT ee.patient_id, o3.obs_datetime AS start_date "
         + "FROM   encounter ee "
         + "       JOIN obs o2 "
         + "         ON o2.encounter_id = ee.encounter_id "
@@ -391,7 +391,7 @@ public class TPTEligiblePatientsQueries {
    */
   public static String getY2QueryWithPatientIdForB5() {
     return "SELECT "
-        + "    ee.patient_id, o3.obs_datetime AS datetime "
+        + "    ee.patient_id, o3.obs_datetime AS start_date "
         + "FROM "
         + "    encounter ee "
         + "        JOIN "
@@ -441,7 +441,7 @@ public class TPTEligiblePatientsQueries {
    * @return {@link String}
    */
   public static String getY3QueryWithPatientIdForB5() {
-    return "SELECT ee.patient_id, oo2.obs_datetime AS datetime "
+    return "SELECT ee.patient_id, oo2.obs_datetime AS start_date "
         + "FROM   encounter ee "
         + "           JOIN obs oo "
         + "                ON oo.encounter_id = ee.encounter_id "
@@ -486,7 +486,7 @@ public class TPTEligiblePatientsQueries {
    * @return {@link String}
    */
   public static String getY4QueryWithPatientIdForB5() {
-    return "SELECT ee.patient_id, ee.encounter_datetime AS datetime "
+    return "SELECT ee.patient_id, ee.encounter_datetime AS start_date "
         + "FROM   encounter ee "
         + "       INNER JOIN obs oo "
         + "               ON ee.encounter_id = oo.encounter_id "
@@ -533,7 +533,7 @@ public class TPTEligiblePatientsQueries {
    * @return {@link String}
    */
   public static String getY5QueryWithPatientIdForB5() {
-    return "SELECT ee.patient_id, o2.obs_datetime AS datetime "
+    return "SELECT ee.patient_id, o2.obs_datetime AS start_date "
         + "FROM       encounter ee "
         + "INNER JOIN obs oo "
         + "ON         ee.encounter_id = oo.encounter_id "
@@ -645,7 +645,7 @@ public class TPTEligiblePatientsQueries {
    * @return {@link String}
    */
   public static String getY6QueryWithPatientIdForB5() {
-    return "SELECT filt.patient_id, filt.start_date AS datetime "
+    return "SELECT filt.patient_id, filt.start_date AS start_date "
         + "FROM   patient pp "
         + "       INNER JOIN encounter e "
         + "               ON pp.patient_id = e.patient_id "
