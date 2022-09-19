@@ -1,11 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
@@ -24,6 +18,13 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
 
 @Component
 public class TXTBCohortQueries {
@@ -1894,9 +1895,11 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "applicationForLaboratoryResearchCohort",
         EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
+    definition.addSearch(
+        "tb-xpert-mtb", EptsReportUtils.map(getXpertMtbTestCohort(), generalParameterMapping));
 
     definition.setCompositionString(
-        "basiloscopiaExamCohort OR basiloscopiaLabExamCohort OR genexpertTestCohort OR genexpertLabTestCohort OR tbLamTestCohort OR tbLamLabTestCohort OR cultureTestCohort OR cultureLabTestCohort OR applicationForLaboratoryResearchCohort");
+        "basiloscopiaExamCohort OR basiloscopiaLabExamCohort OR genexpertTestCohort OR genexpertLabTestCohort OR tbLamTestCohort OR tbLamLabTestCohort OR cultureTestCohort OR cultureLabTestCohort OR applicationForLaboratoryResearchCohort OR tb-xpert-mtb");
     return definition;
   }
 
@@ -1948,9 +1951,11 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "applicationForLaboratoryResearchCohort",
         EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
+    definition.addSearch(
+        "tb-xpert-mtb", EptsReportUtils.map(getXpertMtbTestCohort(), generalParameterMapping));
 
     definition.setCompositionString(
-        "genexpertTestCohort OR genexpertLabTestCohort OR applicationForLaboratoryResearchCohort");
+        "genexpertTestCohort OR genexpertLabTestCohort OR applicationForLaboratoryResearchCohort OR tb-xpert-mtb");
     return definition;
   }
 
