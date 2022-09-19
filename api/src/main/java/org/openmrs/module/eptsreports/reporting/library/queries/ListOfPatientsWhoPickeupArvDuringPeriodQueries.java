@@ -34,7 +34,7 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodQueries {
         + "AND        e.location_id = :location "
         + "AND        e.encounter_type = ${53} "
         + "AND        o.concept_id = ${6272} "
-        + "AND        o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}) "
+        + "AND        o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369}) "
         + "AND        o.obs_datetime = recent_state.most_recent";
   }
 
@@ -67,7 +67,7 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodQueries {
         + "AND        e.location_id = :location "
         + "AND        e.encounter_type = ${6} "
         + "AND        o.concept_id = ${6273} "
-        + "AND        o.value_coded IN (${1706}, ${1709} ,${1707}, ${1366}, ${23903}) "
+        + "AND        o.value_coded IN (${1706}, ${1709} ,${1707}, ${1366}, ${23903}, ${1369}) "
         + "AND        e.encounter_datetime = recent_state.most_recent";
   }
 
@@ -99,7 +99,7 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodQueries {
         + "               ON most_recent.patient_id = p.patient_id "
         + " WHERE  ps.start_date = most_recent.start_date "
         + "       AND pg.location_id= :location AND pg.voided = 0 AND ps.voided = 0 "
-        + "                          AND ps.state IN ( ${7}, ${8}, ${9}, ${10} )"
+        + "                          AND ps.state IN ( ${7}, ${8}, ${9}, ${10}, ${1369}, ${6269} )"
         + "       AND pg.program_id = ${2}";
   }
 }

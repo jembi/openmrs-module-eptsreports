@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -11,6 +8,10 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsEligibleForVLDataDefinitionQueries {
@@ -92,11 +93,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
             + "  "
             + " UNION "
             + "  "
-            + " SELECT p.patient_id, historical.min_date AS art_date FROM patient p  "
-            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "     INNER JOIN( "
-            + " SELECT p.patient_id,e.encounter_id,  MIN(o.value_datetime) min_date FROM patient p "
+            + " SELECT p.patient_id, MIN(o.value_datetime) min_date FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + " WHERE e.encounter_type IN(${6},${9},${18},${53}) "
@@ -106,17 +103,6 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
             + "  "
-            + " GROUP BY p.patient_id "
-            + "                 ) historical "
-            + " ON historical.patient_id = p.patient_id "
-            + " WHERE e.encounter_type IN(${6},${9},${18},${53}) "
-            + " AND o.concept_id = ${1190} "
-            + " AND e.location_id = :location "
-            + "                 AND o.value_datetime <= :endDate "
-            + " AND e.voided = 0 "
-            + " AND p.voided = 0 "
-            + "                 AND historical.encounter_id = e.encounter_id "
-            + "                 AND o.value_datetime = historical.min_date "
             + " GROUP BY p.patient_id "
             + "                  "
             + " UNION "

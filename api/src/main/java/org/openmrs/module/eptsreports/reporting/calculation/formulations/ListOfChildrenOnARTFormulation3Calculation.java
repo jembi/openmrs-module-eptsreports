@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.calculation.formulations;
 
-import java.util.*;
 import org.openmrs.Drug;
 import org.openmrs.Location;
 import org.openmrs.Obs;
@@ -16,6 +15,8 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsCalculationUtils;
 import org.openmrs.module.reporting.common.TimeQualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.*;
+
 @Component
 public class ListOfChildrenOnARTFormulation3Calculation extends AbstractPatientCalculation {
 
@@ -30,20 +31,7 @@ public class ListOfChildrenOnARTFormulation3Calculation extends AbstractPatientC
     EPTSCalculationService ePTSCalculationService =
         Context.getRegisteredComponents(EPTSCalculationService.class).get(0);
     Location location = (Location) context.getFromCache("location");
-
-    CalculationResultMap formulation1 =
-        calculate(
-            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation1Calculation.class)
-                .get(0),
-            cohort,
-            context);
-
-    CalculationResultMap formulation2 =
-        calculate(
-            Context.getRegisteredComponents(ListOfChildrenOnARTFormulation2Calculation.class)
-                .get(0),
-            cohort,
-            context);
+    Date onOrBefore = (Date) context.getFromCache("onOrBefore");
 
     CalculationResultMap formulation3 =
         ePTSCalculationService.getObs(
@@ -54,6 +42,7 @@ public class ListOfChildrenOnARTFormulation3Calculation extends AbstractPatientC
             null,
             TimeQualifier.ANY,
             null,
+            onOrBefore,
             context);
 
     for (Integer patientId : cohort) {
@@ -61,10 +50,23 @@ public class ListOfChildrenOnARTFormulation3Calculation extends AbstractPatientC
       List<Obs> obsList = EptsCalculationUtils.extractResultValues(listResult);
       Drug drug = null;
 
-      if (obsList.size() >= 3) {
-        drug = obsList.get(2).getValueDrug();
+      if (obsList == null || obsList.size() == 0) {
+        continue;
+      }
 
-        if (drug != null) {
+      Obs lastObs = obsList.get(obsList.size() - 1);
+      List<Obs> onLastEncounter = new ArrayList<>();
+
+      for (Obs o : obsList) {
+        if (o.getEncounter().getEncounterId() == lastObs.getEncounter().getEncounterId()) {
+          onLastEncounter.add(o);
+        }
+      }
+
+      if (onLastEncounter.size() >= 3) {
+        Obs thirdFormulation = onLastEncounter.get(2);
+        if (thirdFormulation.getValueDrug() != null) {
+          drug = thirdFormulation.getValueDrug();
           map.put(patientId, new SimpleResult(drug.getDisplayName(), this));
         }
       }

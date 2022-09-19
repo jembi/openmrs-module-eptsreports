@@ -5,7 +5,10 @@ import org.openmrs.module.reporting.data.converter.DataConverter;
 /** Converter to return the state of stay for ART patients */
 public class StateOfStayArtPatientConverter implements DataConverter {
 
+  final String activoPrograma = "Activo no Programa";
   final String transferred = "Transferido para";
+
+  final String transferredIn = "Transferido de";
 
   final String suspended = "Suspensão";
 
@@ -44,6 +47,10 @@ public class StateOfStayArtPatientConverter implements DataConverter {
         return autoTransfer;
       case "23903":
         return negativeDiagnosis;
+      case "1369":
+        return transferredIn;
+      case "6269":
+        return activoPrograma;
       default:
         return "";
     }

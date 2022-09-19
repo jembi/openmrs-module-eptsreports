@@ -2,6 +2,7 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.ListOfPatientsWhoPickeupArvDuringPeriodQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
@@ -21,9 +22,13 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
 
   private final HivMetadata hivMetadata;
 
+  private final CommonMetadata commonMetadata;
+
   @Autowired
-  public ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries(HivMetadata hivMetadata) {
+  public ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries(
+      HivMetadata hivMetadata, CommonMetadata commonMetadata) {
     this.hivMetadata = hivMetadata;
+    this.commonMetadata = commonMetadata;
   }
 
   /**
@@ -73,7 +78,8 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
     valuesMap.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
     valuesMap.put(
         "8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
-
+    valuesMap.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    valuesMap.put("6269", hivMetadata.getActiveOnProgramConcept().getConceptId());
     String stateColumn =
         " CASE "
             + "   WHEN (o.value_coded IS NULL AND ps.state IS NULL) THEN ''   "
@@ -117,14 +123,14 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "    (   "
             + "                e.encounter_type = ${53}   "
             + "            AND        o.concept_id = ${6272}   "
-            + "            AND        o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "            AND        o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369})   "
             + "            AND        o.obs_datetime = states.most_recent   "
             + "        )   "
             + "    OR   "
             + "    (   "
             + "                e.encounter_type = ${6}   "
             + "            AND        o.concept_id = ${6273}   "
-            + "            AND        o.value_coded IN (${1706}, ${1709} ,${1707}, ${1366}, ${23903})   "
+            + "            AND        o.value_coded IN (${1706}, ${1709} ,${1707}, ${1366}, ${23903}, ${1369})   "
             + "            AND        e.encounter_datetime = states.most_recent   "
             + "            AND NOT EXISTS(   "
             + "                SELECT e.encounter_id from encounter e   "
@@ -132,14 +138,14 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "                where   "
             + "                        e.encounter_type = ${53}   "
             + "                  AND        o2.concept_id = ${6272}   "
-            + "                  AND        o2.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "                  AND        o2.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369})   "
             + "                  AND        o2.obs_datetime = states.most_recent   "
             + "                group by e.encounter_id   "
             + "            )   "
             + "        )   "
             + "    OR (   "
             + "            pg.program_id = ${2}   "
-            + "            AND ps.state IN ( ${7}, ${8}, ${9}, ${10} )   "
+            + "            AND ps.state IN ( ${7}, ${8}, ${9}, ${10}, ${1369}, ${6269} )   "
             + "            AND   ps.start_date = states.most_recent   "
             + "AND pg.patient_id NOT IN (   "
             + "                SELECT p.patient_id   "
@@ -147,14 +153,14 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "                               INNER JOIN obs o2 on e.encounter_id = o2.encounter_id   "
             + "                where e.encounter_type = ${6}   "
             + "                  AND o.concept_id = ${6273}   "
-            + "                  AND o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "                  AND o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369})   "
             + "                  AND o2.obs_datetime = states.most_recent   "
             + "  AND NOT EXISTS( SELECT e.encounter_id from encounter e   "
             + "                                      INNER JOIN obs o3 on e.encounter_id = o3.encounter_id   "
             + "                where   "
             + "                        e.encounter_type = ${53}   "
             + "                  AND        o3.concept_id = ${6272}   "
-            + "                  AND        o3.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "                  AND        o3.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369})   "
             + "                  AND        o3.obs_datetime = states.most_recent   "
             + "                GROUP BY e.encounter_id   ) "
             + "                GROUP BY p.patient_id   "
@@ -211,7 +217,8 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
     valuesMap.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
     valuesMap.put(
         "8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
-
+    valuesMap.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    valuesMap.put("6269", hivMetadata.getActiveOnProgramConcept().getConceptId());
     String query =
         " SELECT p.patient_id,  CASE "
             + "   WHEN (o.value_coded IS NULL AND ps.state IS NULL) THEN ''   "
@@ -242,14 +249,14 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "    (   "
             + "                e.encounter_type = ${53}   "
             + "            AND        o.concept_id = ${6272}   "
-            + "            AND        o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "            AND        o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369})   "
             + "            AND        o.obs_datetime = states.most_recent   "
             + "        )   "
             + "    OR   "
             + "    (   "
             + "                e.encounter_type = ${6}   "
             + "            AND        o.concept_id = ${6273}   "
-            + "            AND        o.value_coded IN (${1706}, ${1709} ,${1707}, ${1366}, ${23903})   "
+            + "            AND        o.value_coded IN (${1706}, ${1709} ,${1707}, ${1366}, ${23903}, ${1369})   "
             + "            AND        e.encounter_datetime = states.most_recent   "
             + "            AND NOT EXISTS(   "
             + "                SELECT e.encounter_id from encounter e   "
@@ -257,14 +264,14 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "                where   "
             + "                        e.encounter_type = ${53}   "
             + "                  AND        o2.concept_id = ${6272}   "
-            + "                  AND        o2.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "                  AND        o2.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369})   "
             + "                  AND        o2.obs_datetime = states.most_recent   "
             + "                group by e.encounter_id   "
             + "            )   "
             + "        )   "
             + "    OR (   "
             + "            pg.program_id = ${2}   "
-            + "            AND ps.state IN ( ${7}, ${8}, ${9}, ${10} )   "
+            + "            AND ps.state IN ( ${7}, ${8}, ${9}, ${10} , ${1369}, ${6269})   "
             + "            AND   ps.start_date = states.most_recent   "
             + "AND pg.patient_id NOT IN (   "
             + "                SELECT p.patient_id   "
@@ -272,14 +279,14 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "                               INNER JOIN obs o2 on e.encounter_id = o2.encounter_id   "
             + "                where e.encounter_type = ${6}   "
             + "                  AND o.concept_id = ${6273}   "
-            + "                  AND o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "                  AND o.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369})   "
             + "                  AND o2.obs_datetime = states.most_recent   "
             + "  AND NOT EXISTS( SELECT e.encounter_id from encounter e   "
             + "                                      INNER JOIN obs o3 on e.encounter_id = o3.encounter_id   "
             + "                where   "
             + "                        e.encounter_type = ${53}   "
             + "                  AND        o3.concept_id = ${6272}   "
-            + "                  AND        o3.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903})   "
+            + "                  AND        o3.value_coded IN (${1706}, ${1709}, ${1707}, ${1366}, ${23903}, ${1369})   "
             + "                  AND        o3.obs_datetime = states.most_recent   "
             + "                GROUP BY e.encounter_id   ) "
             + "                GROUP BY p.patient_id   "
