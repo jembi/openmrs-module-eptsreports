@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.EriDSDDataset;
@@ -39,11 +40,16 @@ public class SetupDsdReport extends EptsDataExportManager {
   private EriDSDDataset eriDSDDataset;
 
   private TxCurrCohortQueries txCurrCohortQueries;
+  private GenericCohortQueries genericCohortQueries;
 
   @Autowired
-  public SetupDsdReport(EriDSDDataset eriDSDDataset, TxCurrCohortQueries txCurrCohortQueries) {
+  public SetupDsdReport(
+      EriDSDDataset eriDSDDataset,
+      TxCurrCohortQueries txCurrCohortQueries,
+      GenericCohortQueries genericCohortQueries) {
     this.eriDSDDataset = eriDSDDataset;
     this.txCurrCohortQueries = txCurrCohortQueries;
+    this.genericCohortQueries = genericCohortQueries;
   }
 
   @Override
@@ -81,7 +87,7 @@ public class SetupDsdReport extends EptsDataExportManager {
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
-            txCurrCohortQueries.getTxCurrBaseCohort(), "endDate=${endDate},location=${location}"));
+            genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
     return rd;
   }
 

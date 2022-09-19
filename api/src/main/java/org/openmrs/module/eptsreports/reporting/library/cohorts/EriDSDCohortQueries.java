@@ -57,7 +57,7 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
-        "2",
+        "moreThan2years",
         EptsReportUtils.map(
             ageCohortQueries.createXtoYAgeCohort("moreThanOrEqual2Years", 2, 200),
             "effectiveDate=${endDate}"));
@@ -75,12 +75,19 @@ public class EriDSDCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "7",
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "stable",
         EptsReportUtils.map(
             getPatientsWhoAreStable(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(2 AND NOT (pregnantBreastfeedingTB OR sarcomaKarposi) AND 7)");
+    cd.setCompositionString(
+        "(D3 AND moreThan2years AND stable AND NOT (pregnantBreastfeedingTB OR sarcomaKarposi))");
 
     return cd;
   }
@@ -144,8 +151,13 @@ public class EriDSDCohortQueries {
             getPregnantAndBreastfeedingAndOnTBTreatment(),
             "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "NOT (activeAndStablePatients OR pregnantOrBreastfeedingOrTBTreatment)");
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("B13 AND NOT activeAndStablePatients");
 
     return cd;
   }
@@ -271,8 +283,7 @@ public class EriDSDCohortQueries {
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
             "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "B13 AND NOT (activeAndStablePatients OR pregnantOrBreastfeedingOrTBTreatment)");
+    cd.setCompositionString("B13");
 
     return cd;
   }
