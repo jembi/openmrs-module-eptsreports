@@ -206,6 +206,77 @@ public class DsdQueries {
     return cd;
   }
 
+  public static SqlCohortDefinition getTranferredInPatients() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+
+    cd.setName("Transferred in patients");
+    cd.addParameter(new Parameter("onOrBefore", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    HivMetadata hivMetadata = new HivMetadata();
+
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("1369", hivMetadata.getTransferredFromOtherFacilityConcept().getConceptId());
+    valuesMap.put("1065", hivMetadata.getYesConcept().getConceptId());
+    valuesMap.put("6276", hivMetadata.getArtStatus().getConceptId());
+    valuesMap.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    valuesMap.put("23891", hivMetadata.getDateOfMasterCardFileOpeningConcept().getConceptId());
+    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
+    valuesMap.put(
+        "29",
+        hivMetadata
+            .getArtTransferredFromOtherHealthFacilityWorkflowState()
+            .getProgramWorkflowStateId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "    FROM   patient p "
+            + "           JOIN encounter e ON p.patient_id = e.patient_id "
+            + "           JOIN obs transf ON transf.encounter_id = e.encounter_id "
+            + "           JOIN obs type  ON type.encounter_id = e.encounter_id "
+            + "           JOIN obs opening ON opening.encounter_id = e.encounter_id "
+            + "    WHERE  p.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND e.encounter_type = ${53} "
+            + "           AND e.location_id = :location "
+            + "           AND transf.voided = 0 "
+            + "           AND transf.concept_id = ${1369} "
+            + "           AND transf.value_coded = ${1065} "
+            + "           AND type.voided = 0 "
+            + "           AND type.concept_id = ${6300} "
+            + "		   AND type.value_coded = ${6276} "
+            + "           AND opening.voided = 0 "
+            + "           AND opening.concept_id = ${23891} "
+            + "           AND opening.value_datetime <= :onOrBefore "
+            + "	UNION "
+            + "     "
+            + "    SELECT pgEnrollment.patient_id "
+            + "          FROM( "
+            + "          SELECT p.patient_id, min(ps.start_date) as pgEnrollmentDate "
+            + "			FROM patient p "
+            + "          JOIN patient_program pp on p.patient_id=pp.patient_id "
+            + "          JOIN patient_state ps on pp.patient_program_id=ps.patient_program_id "
+            + "          WHERE  pp.voided=0 "
+            + "			  AND ps.voided=0 "
+            + "			  AND p.voided=0 "
+            + "			  AND pp.program_id=${2} "
+            + "			  AND location_id= :location "
+            + "			  AND ps.start_date<= :onOrBefore "
+            + "		 GROUP BY p.patient_id "
+            + "      ) pgEnrollment "
+            + "      JOIN patient_state ps on ps.patient_program_id=pgEnrollment.patient_id "
+            + "	WHERE ps.start_date=pgEnrollment.pgEnrollmentDate "
+            + "	AND ps.state = ${29} "
+            + "	AND ps.voided=0";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
   public static SqlCohortDefinition getNextScheduledPickUpDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
