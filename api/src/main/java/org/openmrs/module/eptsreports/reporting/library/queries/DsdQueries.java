@@ -314,6 +314,7 @@ public class DsdQueries {
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId().toString());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId().toString());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId().toString());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId().toString());
     map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId().toString());
     map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
     map.put("165180", hivMetadata.getBrigadasMoveisDiurnasConcept().getConceptId().toString());
@@ -342,7 +343,7 @@ public class DsdQueries {
             + "                   AND e.voided = 0 "
             + "                   AND e.location_id = :location "
             + "                   AND e.encounter_type = ${6} "
-            + "                   AND e.encounter_datetime <= :onOrBefore "
+            + "                   AND e.encounter_datetime <= :endDate "
             + "                 GROUP BY p.patient_id "
             + "             ) last_ficha ON p.patient_id = last_ficha.patient_id "
             + "             WHERE p.voided = 0 "
@@ -375,7 +376,7 @@ public class DsdQueries {
             + "                                      AND e.voided = 0 "
             + "                                      AND e.location_id = :location "
             + "                                      AND e.encounter_type = ${18} "
-            + "                                      AND e.encounter_datetime <= :onOrBefore "
+            + "                                      AND e.encounter_datetime <= :endDate "
             + "                                    GROUP BY p.patient_id "
             + "             ) last_fila ON p.patient_id = last_fila.patient_id "
             + "             WHERE "
