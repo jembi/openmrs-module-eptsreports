@@ -572,11 +572,16 @@ public class EriDSDCohortQueries {
             Arrays.asList(hivMetadata.getQuarterlyConcept().getConceptId()));
 
     String mappings = "onOrBefore=${endDate},location=${location}";
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
     cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
     cd.addSearch("quarterly", EptsReportUtils.map(quarterlyDispensation, mappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
-
-    cd.setCompositionString("scheduled OR startOrContinue OR quarterly");
+    // ! TODO by Paulo e Pinki
+    cd.setCompositionString("D3 "); //AND aNovaQueryN2 => scheduled OR startOrContinue OR quarterly");
 
     return cd;
   }
@@ -617,8 +622,13 @@ public class EriDSDCohortQueries {
     cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
     cd.addSearch("semiannual", EptsReportUtils.map(semiannualDispensation, mappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(scheduled OR startOrContinue OR semiannual)");
+    cd.setCompositionString("D3 AND (scheduled OR startOrContinue OR semiannual)");
 
     return cd;
   }
@@ -653,8 +663,13 @@ public class EriDSDCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("scheduled OR startOrContinue");
+    cd.setCompositionString("D3 AND (scheduled OR startOrContinue)");
 
     return cd;
   }
@@ -688,8 +703,13 @@ public class EriDSDCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
     cd.addSearch("farmacDispensation", EptsReportUtils.map(farmacDispensation, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue OR farmacDispensation");
+    cd.setCompositionString("D3 AND (startOrContinue OR farmacDispensation)");
 
     return cd;
   }
@@ -724,8 +744,13 @@ public class EriDSDCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
     cd.addSearch("dcaDispensation", EptsReportUtils.map(dcaDispensation, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue OR dcaDispensation");
+    cd.setCompositionString("D3 AND (startOrContinue OR dcaDispensation)");
 
     return cd;
   }
@@ -760,8 +785,13 @@ public class EriDSDCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("scheduled OR startOrContinue");
+    cd.setCompositionString("D3 AND (scheduled OR startOrContinue)");
 
     return cd;
   }
@@ -791,8 +821,13 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue");
+    cd.setCompositionString("D3 AND startOrContinue");
 
     return cd;
   }
@@ -829,8 +864,13 @@ public class EriDSDCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("dcpDispensation", EptsReportUtils.map(dcpDispensation, mappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue OR dcpDispensation");
+    cd.setCompositionString("D3 AND (startOrContinue OR dcpDispensation)");
 
     return cd;
   }
@@ -869,8 +909,13 @@ public class EriDSDCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("bmDispensations", EptsReportUtils.map(bmDispensations, mappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue OR bmDispensations");
+    cd.setCompositionString("D3 AND (startOrContinue OR bmDispensations)");
 
     return cd;
   }
@@ -935,8 +980,13 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue");
+    cd.setCompositionString("D3 AND startOrContinue");
 
     return cd;
   }
@@ -967,8 +1017,13 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue");
+    cd.setCompositionString("D3 AND startOrContinue");
 
     return cd;
   }
@@ -1005,8 +1060,13 @@ public class EriDSDCohortQueries {
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("ehDispensation", EptsReportUtils.map(ehDispensation, mappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue OR ehDispensation");
+    cd.setCompositionString("D3 AND (startOrContinue OR ehDispensation)");
 
     return cd;
   }
@@ -1037,8 +1097,13 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue");
+    cd.setCompositionString("D3 AND startOrContinue");
 
     return cd;
   }
@@ -1070,8 +1135,13 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue");
+    cd.setCompositionString("D3 AND startOrContinue");
 
     return cd;
   }
@@ -1102,8 +1172,13 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue");
+    cd.setCompositionString("D3 AND startOrContinue");
 
     return cd;
   }
@@ -1134,8 +1209,13 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue");
+    cd.setCompositionString("D3 AND startOrContinue");
 
     return cd;
   }
@@ -1166,8 +1246,13 @@ public class EriDSDCohortQueries {
 
     String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
+    cd.addSearch(
+        "D3",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
+            "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("startOrContinue");
+    cd.setCompositionString("D3 AND startOrContinue");
 
     return cd;
   }
