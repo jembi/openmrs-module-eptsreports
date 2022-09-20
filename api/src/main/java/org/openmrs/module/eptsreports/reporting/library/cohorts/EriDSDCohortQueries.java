@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 public class EriDSDCohortQueries {
 
   @Autowired private TxNewCohortQueries txNewCohortQueries;
+  @Autowired private TxRttCohortQueries txRttCohortQueries;
   @Autowired private GenericCohortQueries genericCohortQueries;
   @Autowired private CommonCohortQueries commonCohortQueries;
 
@@ -86,8 +87,14 @@ public class EriDSDCohortQueries {
             getPatientsWhoAreStable(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
+    cd.addSearch(
+            "returned",
+            EptsReportUtils.map(
+              getPatientsWhoReturned(),
+                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+
     cd.setCompositionString(
-        "(D3 AND moreThan2years AND stable AND NOT (pregnantBreastfeedingTB OR sarcomaKarposi))");
+        "(D3 AND moreThan2years AND stable AND NOT (pregnantBreastfeedingTB OR sarcomaKarposi OR returned))");
 
     return cd;
   }
@@ -1737,6 +1744,153 @@ public class EriDSDCohortQueries {
     cd.setQuestion(hivMetadata.getTypeOfDispensationConcept());
     cd.setOperator(SetComparator.IN);
     cd.addValue(answerConcept);
+    return cd;
+  }
+
+  /**
+   * DSD_FR10
+   * 
+   * <b>Description:</b> “Interruption In Treatment for <3 months” will have the following
+   * combination: ((A OR B) AND C1) AND NOT DEAD AND NOT TRANSFERRED OUT AND NOT REFUSED
+   * Patients who returned to treatment as follows:
+   * From all patients currently on ART by reporting end date (DSD_FR9), the system will include:
+   * 
+   * <blockquote>
+   *
+   * <ol>
+   *   <li>Patients who experienced interruption in treatment 3 months before 
+   *      reporting end date (report end date – 3 months) (DSD_FR11) and
+   * 
+   *   <li>Patients who have at least one drug-pick up registered in FILA or 
+   *        Ficha Recepção - Levantou ARV in the last 3 months 
+   *        (report end date – 3 months and report end date)
+   * </ol>
+   * </blockquote>
+   *  
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoReturned() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("DSD_FR10 Patients who returned to treatment");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String dsdMappings = "startDate=${endDate-3m},endDate=${endDate},location=${location}";
+    CohortDefinition transferredIn = commonCohortQueries.getMohTransferredInPatients();
+
+    cd.addSearch(
+        "treatmentInterruption",
+        EptsReportUtils.map(
+            getPatientsWhoExperiencedInterruptionInTreatment(),
+            "endDate=${endDate-3m},location=${location}"));
+    
+    cd.addSearch(
+        "filaOrDrugPickup",
+        EptsReportUtils.map(
+            getFilaOrDrugPickup(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch("transferredIn",
+        EptsReportUtils.map(
+            transferredIn,
+            dsdMappings));
+
+    cd.setCompositionString("treatmentInterruption AND filaOrDrugPickup AND NOT transferredIn");
+
+    return cd;
+  }
+
+  /**
+   * DSD_FR11
+   * 
+   * <b>Description:</b> Patients who experienced interruption in treatment
+   * 
+   * <blockquote>
+   *
+   * <ol>
+   *   <li> All patients having the most recent date (by reporting period end date-3 months) 
+   *        between last scheduled drug pickup date registered on their last drug pick-up registered in FILA 
+   *        and 30 days after the last ART pickup date registered in Ficha Recepção – Levantou ARV 
+   *        and adding 59 days and this date being less than reporting period end date-3 months
+   * 
+   *   <li> All patients who do not have the next scheduled drug pick up date registered in FILA 
+   *        and any ART Pickup date registered in Ficha Recepção – Levantou ARV, by reporting period end date-3 months.
+   * </ol>
+   * </blockquote>
+   *  
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsWhoExperiencedInterruptionInTreatment() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("DSD_FR11 Patients who experienced interruption in treatment");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "interruption3Months",
+        EptsReportUtils.map(
+            DsdQueries.getPatientsWhoExperiencedInterruptionIn3MonthsBeforeReportingEndDate(
+              hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId(),
+              hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
+              hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
+              hivMetadata.getArtDatePickupMasterCard().getConceptId()),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "nextScheduledPickUpDate",
+        EptsReportUtils.map(
+            DsdQueries.getNextScheduledPickUpDate(),
+            "endDate=${endDate-3m},location=${location}"));
+
+    cd.addSearch(
+        "anyArtPickup",
+        EptsReportUtils.map(
+            DsdQueries.getAnyArtPickup(),
+            "endDate=${endDate-3m},location=${location}"));
+
+    cd.setCompositionString("interruption3Months AND NOT (nextScheduledPickUpDate AND anyArtPickup)");
+
+    return cd;
+  }
+
+  /**
+   * DSD_FR10 bullet 2
+   * Patients who have at least one drug-pick up registered in FILA 
+   * OR 
+   * Ficha Recepção - Levantou ARV in the last 3 months 
+   * (report end date – 3 months and report end date)
+   *
+   *
+   * @return CohortDefinition
+   */
+  private CohortDefinition getFilaOrDrugPickup() {
+    String dsdMappings = "startDate=${endDate-3m},endDate=${endDate},location=${location}";
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition fila =
+        txRttCohortQueries.getPatientsWithFilaOrFichaOrMasterCardPickup(
+            Arrays.asList(hivMetadata.getARVPharmaciaEncounterType()));
+
+    CohortDefinition drugPickUp =
+        txRttCohortQueries.getPatientsWithFilaOrFichaOrMasterCardPickup(
+            Arrays.asList(hivMetadata.getMasterCardDrugPickupEncounterType()),
+            hivMetadata.getArtPickupConcept(),
+            hivMetadata.getYesConcept(),
+            hivMetadata.getArtDatePickupMasterCard());
+
+    cd.addSearch("fila", EptsReportUtils.map(fila, dsdMappings));
+
+    cd.addSearch("drugPickUp", EptsReportUtils.map(drugPickUp, dsdMappings));
+
+    cd.setCompositionString("fila OR drugPickUp");
+
     return cd;
   }
 }

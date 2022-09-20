@@ -7,134 +7,15 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
+import org.openmrs.cohort.CohortDefinition;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.data.DataDefinition;
+import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 
 public class DsdQueries {
 
-  public static String getPatientsEnrolledOnGAAC() {
-    String query =
-        "SELECT gm.member_id FROM gaac g "
-            + "INNER JOIN gaac_member gm "
-            + "ON g.gaac_id=gm.gaac_id "
-            + "WHERE gm.start_date < :endDate "
-            + "AND gm.voided = 0 "
-            + "AND g.voided = 0 "
-            + "AND ((leaving is null) OR (leaving = 0) OR (leaving = 1 AND gm.end_date > :endDate)) "
-            + "AND location_id = :location";
-    return query;
-  }
-
-  /*
-   * Get Patients who participate in at least one of the following measured DSD model (AF, CA, PU, DC)
-   *
-   * @return String
-   * */
-  public static String getPatientsParticipatingInAfCaPuFrDcDsdModels() {
-
-    String query =
-        ""
-            + "SELECT "
-            + "	p.patient_id "
-            + "FROM patient p INNER JOIN encounter e ON p.patient_id=e.patient_id "
-            + "INNER JOIN obs o ON p.patient_id=o.person_id "
-            + "WHERE e.encounter_id = %d "
-            + "	AND o.concept_id IN (%d, %d, %d) "
-            + "	AND o.value_coded IN (%d, %d) "
-            + " AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "	AND e.location_id = :location";
-
-    return String.format(
-        query,
-        new HivMetadata().getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-        new HivMetadata().getFamilyApproach().getConceptId(), // fa
-        new HivMetadata().getAccessionClubs().getConceptId(), // ca
-        new HivMetadata().getCommunityDispensation().getConceptId(), // dc
-        new HivMetadata().getStartDrugs().getConceptId(),
-        new HivMetadata().getContinueRegimenConcept().getConceptId());
-  }
-
-  /**
-   * N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment)
-   * who are in AF
-   *
-   * @param encounterTypeId - encounterType
-   * @param lastCommunityConceptId - last Community Concept
-   * @param startDrugsConceptId - start Drugs Concept
-   * @param continueRegimenConceptId - continue Regimen Concept
-   * @return String
-   */
-  public static String getPatientsWithDispense(
-      int encounterTypeId,
-      int lastCommunityConceptId,
-      int startDrugsConceptId,
-      int continueRegimenConceptId) {
-    String query =
-        "select "
-            + " p.patient_id FROM patient p "
-            + " JOIN  "
-            + " encounter e ON "
-            + "    p.patient_id = e.patient_id "
-            + " JOIN "
-            + " obs o  ON "
-            + "    p.patient_id = o.person_id "
-            + " WHERE "
-            + " e.encounter_type=%d "
-            + "    AND o.concept_id=%d "
-            + "    AND o.value_coded in (%d,%d) AND e.location_id= :location  "
-            + "    AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + "    AND e.voided=0 AND o.voided=0 AND p.voided=0";
-
-    return String.format(
-        query,
-        encounterTypeId,
-        lastCommunityConceptId,
-        startDrugsConceptId,
-        continueRegimenConceptId);
-  }
-  /**
-   * N5: Number of active patients on ART (Non-pregnant and Non-Breastfeeding not on TB treatment)
-   * who are in AF
-   *
-   * @param adultSeguimentoEncounterTypeId {@link HivMetadata#getAdultoSeguimentoEncounterType()}
-   * @param lastFamilyApproachConceptId - last Family Approach ConceptId
-   * @param startDrugsConceptId - start Drugs ConceptId
-   * @param continueRegimenConceptId - continue Regimen ConceptId
-   * @return String
-   */
-  public static String getPatientsOnMasterCardAF(
-      int adultSeguimentoEncounterTypeId,
-      int lastFamilyApproachConceptId,
-      int startDrugsConceptId,
-      int continueRegimenConceptId) {
-    Map<String, Integer> map = new HashMap<>();
-    map.put("adultSeguimentoEncounterTypeId", adultSeguimentoEncounterTypeId);
-    map.put("lastFamilyApproachConceptId", lastFamilyApproachConceptId);
-    map.put("startDrugsConceptId", startDrugsConceptId);
-    map.put("continueRegimenConceptId", continueRegimenConceptId);
-    String query =
-        "SELECT last_abordagem_familiar.patient_id "
-            + "FROM ( "
-            + "      SELECT p.patient_id, max(e.encounter_datetime)  "
-            + "      FROM patient p  "
-            + "        JOIN encounter e ON p.patient_id=e.patient_id  "
-            + "        JOIN obs o ON e.encounter_id = o.encounter_id  "
-            + "      WHERE e.encounter_type= ${adultSeguimentoEncounterTypeId}  "
-            + "        AND o.concept_id= ${lastFamilyApproachConceptId}  "
-            + "        AND o.value_coded IN (${startDrugsConceptId},${continueRegimenConceptId})  "
-            + "        AND e.location_id= :location  "
-            + "        AND e.encounter_datetime <= :endDate   "
-            + "        AND e.voided=0  "
-            + "        AND o.voided=0  "
-            + "        AND p.voided=0  "
-            + "      GROUP BY p.patient_id "
-            + "      ) last_abordagem_familiar";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    return sb.replace(query);
-  }
   /**
    * Get All Patients On Sarcoma Karposi
    *
@@ -235,6 +116,168 @@ public class DsdQueries {
             + "  AND ostate.voided = 0    ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   * DSD_FR11 bullet 1
+   * 
+   * <b>Description:</b> All patients who missed the last scheduled drugs pick up in FILA 
+   * and 30 days after the last ART pickup date registered in Ficha Recepção - Levantou ARV
+   * and adding 59 days and this date being less than reporting period endDate - 3 months
+   *
+   * @return {@link String}
+   */
+  public static SqlCohortDefinition getPatientsWhoExperiencedInterruptionIn3MonthsBeforeReportingEndDate(
+    int returnVisitDateForDrugsConcept,
+    int pharmacyEncounterType,
+    int masterCardDrugPickupEncounterType,
+    int artPickupDateMasterCardConcept) {
+      SqlCohortDefinition cd = new SqlCohortDefinition();
+      
+      cd.setName("DSD_FR11 bullet 1");
+      cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+      cd.addParameter(new Parameter("location", "Location", Location.class));
+
+  Map<String, Integer> valuesMap = new HashMap<>();
+  valuesMap.put("returnVisitDateForArvDrug", returnVisitDateForDrugsConcept);
+  valuesMap.put("aRVPharmaciaEncounterType", pharmacyEncounterType);
+  valuesMap.put("artDatePickupMasterCard", artPickupDateMasterCardConcept);
+  valuesMap.put("masterCardDrugPickupEncounterType", masterCardDrugPickupEncounterType);
+  String query =
+      " SELECT final.patient_id    "
+          + "             from(    "
+          + "                SELECT   patient_id,"
+          + "                     Greatest(COALESCE(return_date_fila,0),COALESCE(return_date_master,0)) AS return_date"
+          + "                FROM     ("
+          + "                         SELECT p.patient_id,"
+          + "                         ("
+          + "                                SELECT   o.value_datetime"
+          + "                                FROM     encounter e"
+          + "                                JOIN     obs o"
+          + "                                ON       e.encounter_id = o.encounter_id"
+          + "                                WHERE    p.patient_id = e.patient_id"
+          + "                                AND      e.location_id = :location"
+          + "                                AND      e.encounter_type = ${aRVPharmaciaEncounterType}"
+          + "                                AND      o.concept_id = ${returnVisitDateForArvDrug}"
+          + "                                AND      e.voided = 0"
+          + "                                AND      o.voided = 0"
+          + "                                AND      e.encounter_datetime ="
+          + "                                         ("
+          + "                                                    SELECT     e.encounter_datetime AS return_date"
+          + "                                                    FROM       encounter e"
+          + "                                                    INNER JOIN obs o"
+          + "                                                    ON         e.encounter_id = o.encounter_id"
+          + "                                                    WHERE      p.patient_id = e.patient_id"
+          + "                                                    AND        e.voided = 0"
+          + "                                                    AND        o.voided = 0"
+          + "                                                    AND        e.encounter_type = ${aRVPharmaciaEncounterType} "
+          + "                                                    AND        e.location_id = :location"
+          + "                                                    AND        e.encounter_datetime <= :endDate "
+          + "                                                    ORDER BY   e.encounter_datetime DESC LIMIT 1) "
+          + "                                ORDER BY o.value_datetime DESC LIMIT 1) AS return_date_fila, "
+          + "                                 ("
+          + "                                  SELECT     date_add(o.value_datetime, interval 30 day) AS return_date"
+          + "                                  FROM       encounter e"
+          + "                                  INNER JOIN obs o"
+          + "                                  ON         e.encounter_id = o.encounter_id"
+          + "                                  WHERE      p.patient_id = e.patient_id"
+          + "                                  AND        e.voided = 0"
+          + "                                  AND        o.voided = 0"
+          + "                                  AND        e.encounter_type = ${masterCardDrugPickupEncounterType} "
+          + "                                  AND        e.location_id = :location"
+          + "                                  AND        o.concept_id = ${artDatePickupMasterCard}"
+          + "                                  AND        o.value_datetime <= :endDate"
+          + "                                  ORDER BY   o.value_datetime DESC LIMIT 1) AS return_date_master"
+          + "                FROM   patient p"
+          + "                WHERE  p.voided=0) e"
+          + " GROUP BY e.patient_id "
+          + "                HAVING  DATE_ADD(return_date, INTERVAL 59 DAY) < :endDate "
+          + "             ) final "
+          + "             GROUP BY final.patient_id;";
+
+    StringSubstitutor sub = new StringSubstitutor(valuesMap);
+
+    cd.setQuery(sub.replace(query));
+
+    return cd;
+  }
+
+  public static SqlCohortDefinition getNextScheduledPickUpDate() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+
+    cd.setName("DSD_FR11 bullet 2 part 1");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    HivMetadata hivMetadata = new HivMetadata();
+    
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    String query =
+      " SELECT p.patient_id   "
+            + " FROM patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${18} "
+            + "       AND p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o.concept_id = ${5096} "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND o.value_datetime IS NOT NULL "
+            + "GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+  /**
+   *
+   * Patients who have any ART Pickup date registered in Ficha Recepção - Levantou ARV
+   * by reporting period end date-3 months
+   *
+   * @return {@link DataDefinition}
+   */
+  public static SqlCohortDefinition getAnyArtPickup() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    
+    cd.setName("DSD_FR11 bullet 2 part 2");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    HivMetadata hivMetadata = new HivMetadata();
+    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${52} "
+            + "       AND e.location_id = :location "
+            + "       AND o.value_datetime <= :endDate "
+            + "       AND o.concept_id = ${23866} "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     cd.setQuery(stringSubstitutor.replace(query));
 
