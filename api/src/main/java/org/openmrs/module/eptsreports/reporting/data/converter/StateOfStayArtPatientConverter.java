@@ -6,9 +6,14 @@ import org.openmrs.module.reporting.data.converter.DataConverter;
 public class StateOfStayArtPatientConverter implements DataConverter {
 
   final String activoPrograma = "Activo no Programa";
-  final String transferred = "Transferido para";
+
+  final String activoProgramaForPrograms = "Activo no Programa";
+
+  final String transferredOut = "Transferido para";
 
   final String transferredIn = "Transferido de";
+
+  final String transferredInForPrograms = "Transferido de";
 
   final String suspended = "Suspensão";
 
@@ -17,6 +22,8 @@ public class StateOfStayArtPatientConverter implements DataConverter {
   final String died = "Óbito";
 
   final String autoTransfer = "Auto Transferência";
+
+  final String restart = "Re-inicio";
 
   final String negativeDiagnosis = "HIV Negativo";
 
@@ -28,7 +35,7 @@ public class StateOfStayArtPatientConverter implements DataConverter {
 
     switch (obj.toString()) {
       case "7":
-        return transferred;
+        return transferredOut;
       case "8":
         return suspended;
       case "9":
@@ -36,7 +43,7 @@ public class StateOfStayArtPatientConverter implements DataConverter {
       case "10":
         return died;
       case "1706":
-        return transferred;
+        return transferredOut;
       case "1709":
         return suspended;
       case "1707":
@@ -51,6 +58,12 @@ public class StateOfStayArtPatientConverter implements DataConverter {
         return transferredIn;
       case "6269":
         return activoPrograma;
+      case "6":
+        return activoProgramaForPrograms;
+      case "29":
+        return transferredInForPrograms;
+      case "1705":
+        return restart;
       default:
         return "";
     }
