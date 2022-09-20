@@ -411,26 +411,25 @@ public class EriDSDDataset extends BaseDataSet {
     //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(10), mappings)),
     //            mappings),
     //        "");
-    //    dsd.addColumn(
-    //        "N11PW",
-    //        "N11 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N11PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(11),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N11BW",
-    //        "N11 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N11BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(11), mappings)),
-    //            mappings),
-    //        "");
+    dsd.addColumn(
+        "N11PW",
+        "N11 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N11PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(11), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N11BW",
+        "N11 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N11BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(11), mappings)),
+            mappings),
+        "");
     //    dsd.addColumn(
     //        "N12PW",
     //        "N12 Pregnant Women",
@@ -602,7 +601,7 @@ public class EriDSDDataset extends BaseDataSet {
     //    addRow(dsd, "N8", N8, mapStraightThrough(getN8()), getDisags());
     //    addRow(dsd, "N9", N9, mapStraightThrough(getN9()), getDisags());
     //    addRow(dsd, "N10", N10, mapStraightThrough(getN10()), getDisags());
-    //    addRow(dsd, "N11", N11, mapStraightThrough(getN11()), getDisags());
+    addRow(dsd, "N11", N11, mapStraightThrough(getN11()), getDisags());
     //    addRow(dsd, "N12", N12, mapStraightThrough(getN12()), getDisags());
     //    addRow(dsd, "N13", N13, mapStraightThrough(getN13()), getDisags());
     //    addRow(dsd, "N14", N14, mapStraightThrough(getN14()), getDisags());
