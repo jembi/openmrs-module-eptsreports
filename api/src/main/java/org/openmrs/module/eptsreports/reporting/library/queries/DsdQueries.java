@@ -386,10 +386,10 @@ public class DsdQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId().toString());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId().toString());
     map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId().toString());
-    map.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId().toString());
     map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
     map.put("165180", hivMetadata.getBrigadasMoveisDiurnasConcept().getConceptId().toString());
     map.put("165181", hivMetadata.getBrigadasMoveisNocturnasConcept().getConceptId().toString());
+    map.put("165265", hivMetadata.getClinicasMoveisConcept().getConceptId().toString());
     map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
 
     String query =
@@ -476,7 +476,7 @@ public class DsdQueries {
             + "       (e.encounter_type = ${6} "
             + "           AND e.encounter_datetime = last_mdc.last_encounter "
             + "           AND otype.concept_id = ${165174} "
-            + "           AND otype.value_coded = ${23730} "
+            + "           AND otype.value_coded = ${165265} "
             + "           AND ostate.concept_id = ${165322} "
             + "           AND otype.obs_group_id = ostate.obs_group_id "
             + "           AND ostate.value_coded IN (${1256}, ${1257}) "
