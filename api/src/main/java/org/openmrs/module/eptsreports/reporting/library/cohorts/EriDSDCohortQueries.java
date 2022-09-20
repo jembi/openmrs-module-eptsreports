@@ -581,7 +581,8 @@ public class EriDSDCohortQueries {
     cd.addSearch("quarterly", EptsReportUtils.map(quarterlyDispensation, mappings));
     cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
     // ! TODO by Paulo e Pinki
-    cd.setCompositionString("D3 "); //AND aNovaQueryN2 => scheduled OR startOrContinue OR quarterly");
+    cd.setCompositionString(
+        "D3 "); // AND aNovaQueryN2 => scheduled OR startOrContinue OR quarterly");
 
     return cd;
   }
@@ -1855,10 +1856,6 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    String dsdMappings = "onOrAfter=${endDate-3m},onOrBefore=${endDate},location=${location}";
-    CohortDefinition transferredIn =
-        commonCohortQueries.getMohTransferredInPatients(); // ! To Analyze
-
     cd.addSearch(
         "treatmentInterruption",
         EptsReportUtils.map(
@@ -1868,8 +1865,10 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "filaOrDrugPickup",
         EptsReportUtils.map(getFilaOrDrugPickup(), "endDate=${endDate},location=${location}"));
-
-    cd.addSearch("transferredIn", EptsReportUtils.map(transferredIn, dsdMappings));
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            DsdQueries.getTranferredInPatients(), "onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("treatmentInterruption AND filaOrDrugPickup AND NOT transferredIn");
 
@@ -1917,12 +1916,12 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "nextScheduledPickUpDate",
         EptsReportUtils.map(
-            DsdQueries.getNextScheduledPickUpDate(), "endDate=${endDate-3m},location=${location}"));
+            DsdQueries.getNextScheduledPickUpDate(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "anyArtPickup",
         EptsReportUtils.map(
-            DsdQueries.getAnyArtPickup(), "endDate=${endDate-3m},location=${location}"));
+            DsdQueries.getAnyArtPickup(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "interruption3Months AND NOT (nextScheduledPickUpDate AND anyArtPickup)");
