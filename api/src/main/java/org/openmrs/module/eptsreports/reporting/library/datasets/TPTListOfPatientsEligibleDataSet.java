@@ -12,7 +12,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.EncounterDatetimeConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
@@ -101,9 +100,10 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
         new ObsValueConverter());
     pdd.addColumn(
         "date_last_segment",
-        getLastEncounterDate(),
-        "onOrBefore=${endDate},locationList=${location}",
-        new EncounterDatetimeConverter());
+        listOfPatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndLastFollowUpConsultationDate(),
+        "startDate=${endDate},location=${location}",
+        null);
     pdd.addColumn(
         "pregnant_or_breastfeeding", pregnantBreasfeediDefinition(), "location=${location}", null);
     pdd.addColumn(

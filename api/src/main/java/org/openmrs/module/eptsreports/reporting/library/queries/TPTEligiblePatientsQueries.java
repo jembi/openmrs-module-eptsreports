@@ -62,7 +62,7 @@ public class TPTEligiblePatientsQueries {
    */
   public static String getMpart3() {
 
-    return " SELECT p.patient_id, o2.value_datetime AS encounter_datetime "
+    return " SELECT p.patient_id, o2.obs_datetime AS encounter_datetime "
         + "FROM   patient p "
         + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
         + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -608,12 +608,10 @@ public class TPTEligiblePatientsQueries {
         + "                       FROM   encounter ee "
         + "                              INNER JOIN obs oo  ON ee.encounter_id = oo.encounter_id "
         + "                              INNER JOIN obs oo2 ON ee.encounter_id = oo2.encounter_id "
-        + "                              INNER JOIN obs oo3 ON ee.encounter_id = oo3.encounter_id "
         + "                       WHERE   ee.voided = 0 "
         + "                              AND oo.voided = 0 "
         + "                              AND ee.patient_id = p.patient_id "
         + "                              AND oo2.voided = 0 "
-        + "                              AND oo3.voided = 0 "
         + "                              AND ee.location_id = :location "
         + "                              AND ee.encounter_type IN ( ${6}, ${9} ) "
         + "                              AND ( ( ( oo.concept_id = ${23985} AND oo.value_coded = ${656} ) "
