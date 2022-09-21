@@ -182,7 +182,7 @@ public class TPTInitiationCohortQueries {
             + "      AND e.encounter_type=  ${60}    "
             + "      AND ( (o.concept_id=  ${23985}   AND o.value_coded IN ( ${23954}  , ${23984} ) )   "
             + "      AND   (o2.concept_id=  ${23987}   AND o2.value_coded IN ( ${1256} , ${1705} )   "
-            + "      AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "      AND o.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "      GROUP BY p.patient_id   ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -199,7 +199,7 @@ public class TPTInitiationCohortQueries {
    *
    * <p>Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id
    * 23954) and Data Início selected in Ficha Resumo - Mastercard (Encounter type 53) (3HP Start
-   * Date) between endDate-4 months and endDate
+   * Date) during the reporting period
    *
    * </blockquote>
    *
