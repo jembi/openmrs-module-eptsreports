@@ -1803,12 +1803,10 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>C: Select all patients from M and check if: The date from M is registered on Ficha
-   *       Clinica - Master Card (encounter type 6) or Ficha Resumo (encounter type 53) and:
-   *   <li>The patient has at least 3 consultations in Ficha Clonica - Mastercard (encounter type 6)
-   *       with Profilaxia TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da
-   *       Profilaxia (concept id 165308) value coded Início/continua (concept id in [1256,1257])
-   *       until 4-Month period from the 3HP Start Date (date from M.1;) or
+   *   <li>At least 3 consultations registered on in Ficha Clínica – Mastercard with with Outras
+   *       Prescrições = “3HP” or Profilaxia 3HP (Profilaxia TPT=”3HP” and Estado da
+   *       Profilaxia=”InicioInício(I)/Continua(C)”) until a 4-month period from the 3HP Start Date
+   *       (including the 3HP Start Date)
    *   <li>
    * </ul>
    *
@@ -1889,7 +1887,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                 AND o2.obs_datetime BETWEEN "
             + "                                     tabela.encounter_datetime AND "
             + "                         Date_add(tabela.encounter_datetime, "
-            + "                         INTERVAL 7 MONTH)))) >= 3 ) "
+            + "                         INTERVAL 4 MONTH)))) >= 3 ) "
             + "             GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
