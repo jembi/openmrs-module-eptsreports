@@ -1893,8 +1893,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             DsdQueries.getAnyArtPickup(), "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString(
-        "interruption3Months AND NOT (nextScheduledPickUpDate AND anyArtPickup)");
+    cd.setCompositionString("interruption3Months OR (anyArtPickup AND nextScheduledPickUpDate)");
 
     return cd;
   }

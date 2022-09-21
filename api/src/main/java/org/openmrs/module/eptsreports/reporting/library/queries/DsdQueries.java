@@ -290,7 +290,11 @@ public class DsdQueries {
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     String query =
-        " SELECT p.patient_id   "
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + " WHERE p.voided = 0 "
+            + " AND p.patient_id NOT IN ("
+            + " SELECT p.patient_id   "
             + " FROM patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
@@ -304,7 +308,7 @@ public class DsdQueries {
             + "       AND o.concept_id = ${5096} "
             + "       AND e.encounter_datetime <= :endDate "
             + "       AND o.value_datetime IS NOT NULL "
-            + "GROUP  BY p.patient_id ";
+            + "GROUP  BY p.patient_id )";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -333,6 +337,10 @@ public class DsdQueries {
 
     String query =
         "SELECT p.patient_id "
+            + "FROM patient p "
+            + " WHERE p.voided = 0 "
+            + " AND p.patient_id NOT IN ("
+            + "     SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
@@ -345,7 +353,7 @@ public class DsdQueries {
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "GROUP  BY p.patient_id";
+            + "GROUP  BY p.patient_id )";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -546,7 +554,7 @@ public class DsdQueries {
             + "                   AND e.voided = 0 "
             + "                   AND e.location_id = :location "
             + "                   AND e.encounter_type = ${6} "
-            + "                   AND e.encounter_datetime <= :onOrBefore "
+            + "                   AND e.encounter_datetime <= :endDate "
             + "                 GROUP BY p.patient_id "
             + "             ) last_ficha ON p.patient_id = last_ficha.patient_id "
             + "             WHERE p.voided = 0 "
