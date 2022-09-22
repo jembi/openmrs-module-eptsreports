@@ -383,31 +383,12 @@ public class TPTInitiationDataDefinitionQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-
     String query =
-        "SELECT p.patient_id, "
-            + "       MIN(o2.obs_datetime) AS earliest_date "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "       INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE  p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
-            + "       AND e.location_id = :location "
-            + "       AND e.encounter_type = ${6} "
-            + "       AND ( (o.concept_id = ${23985} AND o.value_coded = ${23954}) "
-            + "             AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-            + "       AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
-            + "GROUP  BY p.patient_id ";
+        new EptsQueriesUtil()
+            .min(tptInitiationCohortQueries.getPatientWithProfilaxiaTpt3hpDate())
+            .getQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }
