@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.calculation.formulations;
 
 import org.openmrs.Drug;
+import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
@@ -33,6 +34,15 @@ public class ListOfChildrenOnARTFormulation3Calculation extends AbstractPatientC
     Location location = (Location) context.getFromCache("location");
     Date onOrBefore = (Date) context.getFromCache("onOrBefore");
 
+    CalculationResultMap lastPickupFila =
+        ePTSCalculationService.getEncounter(
+            Collections.singletonList(hivMetadata.getARVPharmaciaEncounterType()),
+            TimeQualifier.LAST,
+            cohort,
+            location,
+            onOrBefore,
+            context);
+
     CalculationResultMap formulation3 =
         ePTSCalculationService.getObs(
             hivMetadata.getArtDrugFormulationConcept(),
@@ -48,17 +58,18 @@ public class ListOfChildrenOnARTFormulation3Calculation extends AbstractPatientC
     for (Integer patientId : cohort) {
       ListResult listResult = (ListResult) formulation3.get(patientId);
       List<Obs> obsList = EptsCalculationUtils.extractResultValues(listResult);
+      Encounter lastEncounterFila =
+          EptsCalculationUtils.resultForPatient(lastPickupFila, patientId);
       Drug drug = null;
 
-      if (obsList == null || obsList.size() == 0) {
+      if (obsList == null || obsList.size() == 0 || lastEncounterFila == null) {
         continue;
       }
 
-      Obs lastObs = obsList.get(obsList.size() - 1);
       List<Obs> onLastEncounter = new ArrayList<>();
 
       for (Obs o : obsList) {
-        if (o.getEncounter().getEncounterId() == lastObs.getEncounter().getEncounterId()) {
+        if (o.getEncounter().getEncounterId() == lastEncounterFila.getEncounterId()) {
           onLastEncounter.add(o);
         }
       }
