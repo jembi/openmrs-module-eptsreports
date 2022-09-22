@@ -717,12 +717,34 @@ public class TPTInitiationCohortQueries {
    */
   public CohortDefinition getPatientsWithFichaClinicaProfilaxiaINH() {
 
-    SqlCohortDefinition cd = new SqlCohortDefinition();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("BIPT2 - Patients with Profilaxia TPT value INH on Ficha Clinica ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("BIPT2 - Patients with Profilaxia TPT value INH on Ficha Clinica ");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    String query = new PatientIdBuilder(getPatientsWithFichaClinicaProfilaxiaINHDate()).getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b> Technical Specs </b>
+   *
+   * <blockquote>
+   *
+   * <p>2: Select all patients (and Dates) with Ficha clinica (encounter type 6) with Profilaxia TPT
+   * (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id
+   * 165308) value coded Início (concept id 1256) during the reporting period (obs datetime between
+   * start date and end date).
+   *
+   * </blockquote>
+   *
+   * @return {@link String}
+   */
+  public String getPatientsWithFichaClinicaProfilaxiaINHDate() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -732,7 +754,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-        "SELECT     p.patient_id "
+        "SELECT     p.patient_id, o2.obs_datetime AS tpt_date "
             + "        FROM       patient p "
             + "        INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -747,9 +769,7 @@ public class TPTInitiationCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
+    return stringSubstitutor.replace(query);
   }
 
   /**
