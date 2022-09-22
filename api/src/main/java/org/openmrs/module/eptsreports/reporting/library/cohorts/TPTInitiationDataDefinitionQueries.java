@@ -9,6 +9,7 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -23,17 +24,21 @@ public class TPTInitiationDataDefinitionQueries {
   private CommonMetadata commonMetadata;
   private CommonQueries commonQueries;
 
+  private TPTInitiationCohortQueries tptInitiationCohortQueries;
+
   @Autowired
   public TPTInitiationDataDefinitionQueries(
       HivMetadata hivMetadata,
       TbMetadata tbMetadata,
       CommonMetadata commonMetadata,
-      CommonQueries commonQueries) {
+      CommonQueries commonQueries,
+      TPTInitiationCohortQueries tptInitiationCohortQueries) {
 
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.commonMetadata = commonMetadata;
     this.commonQueries = commonQueries;
+    this.tptInitiationCohortQueries = tptInitiationCohortQueries;
   }
 
   /**
@@ -344,35 +349,14 @@ public class TPTInitiationDataDefinitionQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
-    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    valuesMap.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
-    valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
-    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
-
     String query =
-        "           SELECT  p.patient_id, MIN(o.obs_datetime) AS earliest_date   "
-            + "                FROM   patient p   "
-            + "         INNER JOIN  encounter e ON p.patient_id = e.patient_id "
-            + "         INNER JOIN  obs o ON e.encounter_id = o.encounter_id "
-            + "         INNER JOIN  obs o2 ON e.encounter_id = o2.encounter_id "
-            + "                WHERE   p.voided = 0 AND e.voided = 0 "
-            + "         AND o.voided = 0  AND o2.voided = 0 "
-            + "         AND e.encounter_type = ${60}  "
-            + "         AND e.location_id = :location "
-            + "         AND ( (o.concept_id = ${23985} "
-            + "         AND o.value_coded IN ( ${23954}  ,  ${23984} ) ) "
-            + "         AND (o2.concept_id = ${23987} "
-            + "         AND o2.value_coded IN ( ${1256}  ,  ${1705} ) ) "
-            + "         AND o.obs_datetime BETWEEN :startDate AND :endDate )   "
-            + "         GROUP BY p.patient_id ";
+        new EptsQueriesUtil()
+            .min(
+                tptInitiationCohortQueries
+                    .getPatientsWith3HP3RegimeTPTAndSeguimentoDeTratamentoDate())
+            .getQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }
