@@ -1031,12 +1031,36 @@ public class TPTInitiationCohortQueries {
    */
   public CohortDefinition getpatientswithRegimeTPTIsoniazid() {
 
-    SqlCohortDefinition cd = new SqlCohortDefinition();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "BIPT5 - Patients with Regime de TPT Isoniazid / Isoniazid + Piridoxina");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("BIPT5 - Patients with Regime de TPT Isoniazid / Isoniazid + Piridoxina");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    String query = new PatientIdBuilder(getpatientswithRegimeTPTIsoniazidDate()).getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b> Technical Specs </b>
+   *
+   * <blockquote>
+   *
+   * <p>5: Select all patients (and Dates) with “Regime de TPT” (concept id 23985) value coded
+   * ‘Isoniazid’ or ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Seguimento de
+   * tratamento TPT”(concept ID 23987) value coded “inicio” or “re-inicio”(concept ID in [1256,
+   * 1705]) marked on FILT (encounter type 60) during the reporting period (between startDate and
+   * endDate) (obs datetime for 23987).
+   *
+   * </blockquote>
+   *
+   * @return {@link String}
+   */
+  public String getpatientswithRegimeTPTIsoniazidDate() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
@@ -1048,7 +1072,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT p.patient_id "
+        "SELECT p.patient_id, o2.obs_datetime AS tpt_date "
             + "FROM patient p "
             + "INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -1063,8 +1087,6 @@ public class TPTInitiationCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
+    return stringSubstitutor.replace(query);
   }
 }
