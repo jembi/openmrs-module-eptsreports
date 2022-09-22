@@ -8,6 +8,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.eptsreports.reporting.utils.queries.PatientIdBuilder;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -162,6 +163,31 @@ public class TPTInitiationCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    String query =
+        new PatientIdBuilder(getPatientsWith3HP3RegimeTPTAndSeguimentoDeTratamentoDate())
+            .getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Select all patients (And DATES) with “Regime de TPT” (concept id 23985) with value coded “3HP” or ”
+   * 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento TPT”(concept ID
+   * 23987) value coded “inicio” or “re-inicio” (concept ID in [1256, 1705]) marked on FILT
+   * (encounter type 60) and encounter datetime between start date and end date
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public String getPatientsWith3HP3RegimeTPTAndSeguimentoDeTratamentoDate() {
+
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
@@ -172,7 +198,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id   "
+        " SELECT p.patient_id, o2.obs_datetime AS tpt_date "
             + "  FROM patient p   "
             + "      INNER JOIN encounter e ON p.patient_id = e.patient_id   "
             + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id   "
@@ -182,14 +208,11 @@ public class TPTInitiationCohortQueries {
             + "      AND e.encounter_type=  ${60}    "
             + "      AND ( (o.concept_id=  ${23985}   AND o.value_coded IN ( ${23954}  , ${23984} ) )   "
             + "      AND   (o2.concept_id=  ${23987}   AND o2.value_coded IN ( ${1256} , ${1705} )   "
-            + "      AND o.obs_datetime BETWEEN :startDate AND :endDate ) ) "
-            + "      GROUP BY p.patient_id   ";
+            + "      AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlCohortDefinition;
+    return stringSubstitutor.replace(query);
   }
 
   /**
@@ -207,12 +230,33 @@ public class TPTInitiationCohortQueries {
    */
   public CohortDefinition getPatientsWithUltimaProfilaxia3hp() {
 
-    SqlCohortDefinition cd = new SqlCohortDefinition();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("3HP4 - Patients with Ultima Profilaxia on Resumo");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("3HP4 - Patients with Ultima Profilaxia on Resumo");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    String query = new PatientIdBuilder(getPatientsWithUltimaProfilaxia3hpDate()).getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Select all patients (And DATES) with Última profilaxia(concept id 23985) value coded
+   * 3HP(concept id 23954) and Data Início selected in Ficha Resumo - Mastercard (Encounter type 53)
+   * (3HP Start Date) during the reporting period
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public String getPatientsWithUltimaProfilaxia3hpDate() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
@@ -222,7 +266,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
+        "SELECT p.patient_id, o2.obs_datetime AS tpt_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -236,9 +280,7 @@ public class TPTInitiationCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
+    return stringSubstitutor.replace(query);
   }
 
   /**
