@@ -879,12 +879,53 @@ public class TPTInitiationCohortQueries {
    */
   public CohortDefinition getPatientsWithFirstFiltRegimeTpt() {
 
-    SqlCohortDefinition cd = new SqlCohortDefinition();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("BIPT4 - Patients with the First Filt with regime de TPT");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("BIPT4 - Patients with the First Filt with regime de TPT");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    String query = new PatientIdBuilder(getPatientsWithFirstFiltRegimeTptDate()).getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b> Technical Specs </b>
+   *
+   * <blockquote>
+   *
+   * <p>4: Patients (and Dates) who have Regime de TPT with the values (“Isoniazida” or “Isoniazida
+   * + Piridoxina”) and “Seguimento de Tratamento TPT” with values “Continua” or no value marked on
+   * the first pick- up on Ficha de Levantamento de TPT (FILT) during the reporting period as FILT
+   * INH Start Date and:
+   *
+   * <ul>
+   *   <li>No other INH values [Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
+   *       ‘Isoniazid + piridoxina’ (concept id in [656, 23982])] marked on FILT in the 7 months
+   *       prior to ‘INH Start Date’; and
+   *   <li>No other INH Start Dates marked on Ficha resumo (Encounter Type ID 53) Última profilaxia
+   *       TPT with value “Isoniazida (INH)” (concept id 23985 value 656) and Data Inicio (obs
+   *       datetime for concept 165308 value 1256) selected in the 7 months prior to this FILT INH
+   *       Start Date and
+   *   <li>No other INH Start Dates marked on Ficha Clinica (Encounter Type ID 6) (Profilaxia TPT
+   *       with the value “Isoniazida (INH)” (concept id 23985 value 656) and Estado da Profilaxia
+   *       with the value “Inicio (I)” (concept 165308 value 1256) in the 7 months prior to this
+   *       FILT INH Start Date and; and
+   *   <li>No other INH Start Dates marked on Ficha de Seguimento (Encounter Type ID 9) Profilaxia
+   *       TPT with the value “Isoniazida (INH)” (concept id 23985 value 656) and Data Início (obs
+   *       datetime for concept 165308 value 1256) in the 7 months prior to this FILT INH Start Date
+   * </ul>
+   *
+   * </blockquote>
+   *
+   * </blockquote>
+   *
+   * @return {@link String}
+   */
+  public String getPatientsWithFirstFiltRegimeTptDate() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
@@ -900,7 +941,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT p.patient_id "
+        "SELECT p.patient_id, filt.start_date AS tpt_date "
             + "                FROM  patient p "
             + "                        INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                        INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -970,9 +1011,7 @@ public class TPTInitiationCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
+    return stringSubstitutor.replace(query);
   }
 
   /**
