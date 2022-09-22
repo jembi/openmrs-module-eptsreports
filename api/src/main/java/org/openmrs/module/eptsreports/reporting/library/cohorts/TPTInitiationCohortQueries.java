@@ -184,7 +184,7 @@ public class TPTInitiationCohortQueries {
    *
    * </blockquote>
    *
-   * @return {@link CohortDefinition}
+   * @return {@link String}
    */
   public String getPatientsWith3HP3RegimeTPTAndSeguimentoDeTratamentoDate() {
 
@@ -198,7 +198,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id, o2.obs_datetime AS tpt_date "
+        " SELECT p.patient_id, o.obs_datetime AS tpt_date "
             + "  FROM patient p   "
             + "      INNER JOIN encounter e ON p.patient_id = e.patient_id   "
             + "      INNER JOIN obs o ON e.encounter_id = o.encounter_id   "
@@ -208,7 +208,7 @@ public class TPTInitiationCohortQueries {
             + "      AND e.encounter_type=  ${60}    "
             + "      AND ( (o.concept_id=  ${23985}   AND o.value_coded IN ( ${23954}  , ${23984} ) )   "
             + "      AND   (o2.concept_id=  ${23987}   AND o2.value_coded IN ( ${1256} , ${1705} )   "
-            + "      AND o2.obs_datetime BETWEEN :startDate AND :endDate ) ) ";
+            + "      AND o.obs_datetime BETWEEN :startDate AND :endDate ) ) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -254,7 +254,7 @@ public class TPTInitiationCohortQueries {
    *
    * </blockquote>
    *
-   * @return {@link CohortDefinition}
+   * @return {@link String}
    */
   public String getPatientsWithUltimaProfilaxia3hpDate() {
 
@@ -324,7 +324,7 @@ public class TPTInitiationCohortQueries {
    *
    * </blockquote>
    *
-   * @return {@link CohortDefinition}
+   * @return {@link String}
    */
   public String getPatientWithProfilaxiaTpt3hpDate() {
 
@@ -392,7 +392,7 @@ public class TPTInitiationCohortQueries {
    *
    * </blockquote>
    *
-   * @return {@link CohortDefinition}
+   * @return {@link String}
    */
   public String getPatientsWithOutrasPerscricoesDT3HPDate() {
 
@@ -494,7 +494,7 @@ public class TPTInitiationCohortQueries {
    *
    * </blockquote>
    *
-   * @return {@link CohortDefinition}
+   * @return {@link String}
    */
   public String getPatientsWithRegimeDeTPT3HPDate() {
 
@@ -644,12 +644,36 @@ public class TPTInitiationCohortQueries {
    */
   public CohortDefinition getPatientsWithFichaResumoUltimaProfilaxia() {
 
-    SqlCohortDefinition cd = new SqlCohortDefinition();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "BIPT1 - Patients on Ficha Resumo with Ultima profilaxia Isoniazida");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("BIPT1 - Patients on Ficha Resumo with Ultima profilaxia Isoniazida");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    String query =
+        new PatientIdBuilder(getPatientsWithFichaResumoUltimaProfilaxiaDate()).getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b> Technical Specs <b>
+   *
+   * <blockquote>
+   *
+   * <p>1: Select all patients (And Dates) selected in Ficha Resumo - Mastercard (encounter type 53)
+   * with Última Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Data Início
+   * (concept id 165308 value 1256) occured during the reporting period (obs datetime between start
+   * date and end date).
+   *
+   * </blockquote>
+   *
+   * @return {@link String}
+   */
+  public String getPatientsWithFichaResumoUltimaProfilaxiaDate() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
@@ -659,7 +683,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
+        "SELECT p.patient_id, o2.obs_datetime AS tpt_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -674,9 +698,7 @@ public class TPTInitiationCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
+    return stringSubstitutor.replace(query);
   }
 
   /**
