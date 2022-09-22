@@ -164,6 +164,7 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
             + "  AND   ps.start_date = states.most_recent"
             + "  AND pg.voided = 0"
             + "  AND ps.voided = 0"
+            + "  AND ps.end_date is null "
             + "  AND NOT EXISTS ("
             + "        SELECT ee.encounter_id"
             + "        FROM encounter ee"
