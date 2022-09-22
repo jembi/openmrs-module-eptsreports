@@ -61,6 +61,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
 
     String query =
         " SELECT art.patient_id, MIN(art.art_date) min_art_date FROM ( "
@@ -102,7 +103,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
             + "                 AND o.value_datetime <= :endDate "
             + " AND e.voided = 0 "
             + " AND p.voided = 0 "
-            + "  "
+            + " AND o.voided = 0 "
             + " GROUP BY p.patient_id "
             + "                  "
             + " UNION "
@@ -114,7 +115,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
             + "        INNER JOIN patient_state ps  "
             + "                   ON pg.patient_program_id = ps.patient_program_id  "
             + "     WHERE  pg.location_id = :location "
-            + "    AND pg.program_id = 2 and pg.date_enrolled <= :endDate "
+            + "    AND pg.program_id = ${2} and pg.date_enrolled <= :endDate "
             + "     "
             + "    UNION "
             + "     "
@@ -123,7 +124,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
             + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "                         INNER JOIN obs oyes ON oyes.encounter_id = e.encounter_id  "
             + "                         AND o.person_id = oyes.person_id "
-            + " WHERE e.encounter_type = 52 "
+            + " WHERE e.encounter_type = ${52} "
             + " AND o.concept_id = ${23866} "
             + "                 AND o.value_datetime <= :endDate "
             + "                 AND o.voided = 0 "
