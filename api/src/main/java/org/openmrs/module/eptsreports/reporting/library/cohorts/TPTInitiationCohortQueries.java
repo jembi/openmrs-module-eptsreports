@@ -452,6 +452,52 @@ public class TPTInitiationCohortQueries {
    */
   public CohortDefinition getPatientsWithRegimeDeTPT3HP() {
 
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("3HP7 - Patients with Regime de TPT & Seg.Trat TPT on FILT");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String query = new PatientIdBuilder(getPatientsWithRegimeDeTPT3HPDate()).getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>• Select all patients (And DATES) with “Regime de TPT” (concept id 23985) with value coded
+   * “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento
+   * TPT”(concept ID 23987) value coded “continua” or “fim” or no value(concept ID in [1257, 1267,
+   * null]) marked on the first FILT (encounter type 60) during the reporting period as “FILT Start
+   * Date” and:
+   *
+   * <p>◦ No other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
+   * id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the FILT 3HP
+   * start date. and
+   *
+   * <p>◦ No other 3HP start dates marked on Ficha clinica (encounter type 6, encounter datetime)
+   * with Profilaxia TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da
+   * Profilaxia (concept id 165308) value coded Início (concept id 1256) or Outras prescrições
+   * (concept id 1719) value coded DT-3HP (concept id 165307) in the 4 months prior to the FILT 3HP
+   * start date. and
+   *
+   * <p>◦ No other 3HP start dates marked on Ficha Resumo (encounter type 53) with Última
+   * profilaxia(concept id 23985) value coded 3HP(concept id 23954) and Data Início (value datetime)
+   * in the 4 months prior to the FILT 3HP start date.
+   *
+   * <p>Note: The system will consider the oldest date amongst all sources as the 3HP Start Date
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public String getPatientsWithRegimeDeTPT3HPDate() {
+
     SqlCohortDefinition cd = new SqlCohortDefinition();
 
     cd.setName("3HP7 - Patients with Regime de TPT & Seg.Trat TPT on FILT");
@@ -476,7 +522,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id "
+        "SELECT p.patient_id, filt.start_date AS tpt_date "
             + "             FROM   patient p "
             + "                    INNER JOIN (SELECT p.patient_id, "
             + "                                       Min(o2.obs_datetime) AS start_date "
@@ -579,9 +625,7 @@ public class TPTInitiationCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
+    return stringSubstitutor.replace(query);
   }
 
   /**
