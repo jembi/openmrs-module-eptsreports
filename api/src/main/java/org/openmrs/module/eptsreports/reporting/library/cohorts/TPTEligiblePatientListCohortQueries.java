@@ -1841,11 +1841,11 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separeted query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(sectionFromM.ONE.getQuery())
-            .union(sectionFromM.THREE.getQuery())
-            .union(sectionFromM.FOUR.getQuery())
-            .union(sectionFromM.FIVE.getQuery())
-            .union(sectionFromM.SIX.getQuery())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart1())
+            .union(TPTEligiblePatientsQueries.getMpart3())
+            .union(TPTEligiblePatientsQueries.getMpart4())
+            .union(TPTEligiblePatientsQueries.getMpart5())
+            .union(TPTEligiblePatientsQueries.getMpart6())
             .buildQuery();
 
     String query =
@@ -1939,11 +1939,11 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separeted query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(sectionFromM.ONE.getQuery())
-            .union(sectionFromM.THREE.getQuery())
-            .union(sectionFromM.FOUR.getQuery())
-            .union(sectionFromM.FIVE.getQuery())
-            .union(sectionFromM.SIX.getQuery())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart1())
+            .union(TPTEligiblePatientsQueries.getMpart3())
+            .union(TPTEligiblePatientsQueries.getMpart4())
+            .union(TPTEligiblePatientsQueries.getMpart5())
+            .union(TPTEligiblePatientsQueries.getMpart6())
             .buildQuery();
 
     String query =
@@ -2042,9 +2042,9 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separeted query based on the given queries
     String unionFiltQuery =
         unionBuilder
-            .unionBuilder(sectionFromM.TWO.getQuery())
-            .union(sectionFromM.SEVEN.getQuery())
-            .union(sectionFromM.EIGHT.getQuery())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart2())
+            .union(TPTEligiblePatientsQueries.getMpart7())
+            .union(TPTEligiblePatientsQueries.getMpart8())
             .buildQuery();
 
     String query =
@@ -2146,9 +2146,9 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separeted query based on the given queries
     String unionFiltQuery =
         unionBuilder
-            .unionBuilder(sectionFromM.TWO.getQuery())
-            .union(sectionFromM.SEVEN.getQuery())
-            .union(sectionFromM.EIGHT.getQuery())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart2())
+            .union(TPTEligiblePatientsQueries.getMpart7())
+            .union(TPTEligiblePatientsQueries.getMpart8())
             .buildQuery();
 
     String query =
@@ -2200,59 +2200,6 @@ public class TPTEligiblePatientListCohortQueries {
     sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
-  }
-
-  public enum sectionFromM {
-    ONE {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart1();
-      }
-    },
-    TWO {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart2();
-      }
-    },
-    THREE {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart3();
-      }
-    },
-    FOUR {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart4();
-      }
-    },
-    FIVE {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart5();
-      }
-    },
-    SIX {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart6();
-      }
-    },
-    SEVEN {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart7();
-      }
-    },
-    EIGHT {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart8();
-      }
-    };
-
-    public abstract String getQuery();
   }
 
   /**
