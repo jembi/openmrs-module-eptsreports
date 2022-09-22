@@ -177,10 +177,10 @@ public class TPTInitiationCohortQueries {
    *
    * <blockquote>
    *
-   * <p>Select all patients (And DATES) with “Regime de TPT” (concept id 23985) with value coded “3HP” or ”
-   * 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento TPT”(concept ID
-   * 23987) value coded “inicio” or “re-inicio” (concept ID in [1256, 1705]) marked on FILT
-   * (encounter type 60) and encounter datetime between start date and end date
+   * <p>Select all patients (And DATES) with “Regime de TPT” (concept id 23985) with value coded
+   * “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento
+   * TPT”(concept ID 23987) value coded “inicio” or “re-inicio” (concept ID in [1256, 1705]) marked
+   * on FILT (encounter type 60) and encounter datetime between start date and end date
    *
    * </blockquote>
    *
@@ -299,12 +299,34 @@ public class TPTInitiationCohortQueries {
    */
   public CohortDefinition getPatientWithProfilaxiaTpt3hp() {
 
-    SqlCohortDefinition cd = new SqlCohortDefinition();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("3HP5 - Patients with Profilaxia TPT on Ficha Clinica ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("3HP5 - Patients with Profilaxia TPT on Ficha Clinica ");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    String query = new PatientIdBuilder(getPatientWithProfilaxiaTpt3hpDate()).getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Select all patients (And Dates) with Profilaxia TPT (concept id 23985) value coded 3HP
+   * (concept id 23954) and Estado da Profilaxia (concept id 165308) value coded Início (concept id
+   * 1256) marked on Ficha Clínica – Mastercard (Encounter type 6) (3HP Start Date) during the
+   * reporting period or
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public String getPatientWithProfilaxiaTpt3hpDate() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
@@ -314,7 +336,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT p.patient_id "
+        "SELECT p.patient_id, o2.obs_datetime AS tpt_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -328,9 +350,7 @@ public class TPTInitiationCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
+    return stringSubstitutor.replace(query);
   }
 
   /**
