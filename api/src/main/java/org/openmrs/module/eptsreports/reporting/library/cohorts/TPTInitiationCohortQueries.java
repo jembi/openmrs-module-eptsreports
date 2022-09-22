@@ -794,8 +794,31 @@ public class TPTInitiationCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
+    String query =
+        new PatientIdBuilder(getPatientsIPTStart3WithFichaClinicaOrFichaPediatricaDate())
+            .getQuery();
 
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>3: Select all patients (and Dates) with Ficha Seguimento (encounter type 9) with Profilaxia
+   * TPT (concept id 23985) value coded INH (concept id 656) and Data Início (concept id 165308
+   * value 1256) occured during the reporting period (obs datetime between start date and end date).
+   *
+   * </blockquote>
+   *
+   * @return {@link String}
+   */
+  public String getPatientsIPTStart3WithFichaClinicaOrFichaPediatricaDate() {
+
+    Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
@@ -803,7 +826,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-        "SELECT     p.patient_id "
+        "SELECT     p.patient_id, o2.obs_datetime AS tpt_date "
             + "        FROM       patient p "
             + "        INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -818,9 +841,7 @@ public class TPTInitiationCohortQueries {
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlCohortDefinition;
+    return stringSubstitutor.replace(query);
   }
 
   /**
