@@ -368,12 +368,33 @@ public class TPTInitiationCohortQueries {
    */
   public CohortDefinition getPatientsWithOutrasPerscricoesDT3HP() {
 
-    SqlCohortDefinition cd = new SqlCohortDefinition();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("3HP6 - Patients with Outras Prescricoes on Ficha Clinica ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    cd.setName("3HP6 - Patients with Outras Prescricoes on Ficha Clinica ");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    String query = new PatientIdBuilder(getPatientsWithOutrasPerscricoesDT3HPDate()).getQuery();
+
+    sqlCohortDefinition.setQuery(query);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>Select all patients (and DATES) with Outras prescricoes(concept id 1719) value coded DT-3HP
+   * (concept id 165307) marked in Ficha Clínica – Mastercard (Encounter type 6) (3HP Start Date)
+   * during the reporting period or
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public String getPatientsWithOutrasPerscricoesDT3HPDate() {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
@@ -381,7 +402,7 @@ public class TPTInitiationCohortQueries {
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT p.patient_id "
+        "SELECT p.patient_id, e.encounter_datetime AS tpt_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -393,11 +414,10 @@ public class TPTInitiationCohortQueries {
             + "       AND o.concept_id = ${1719} "
             + "       AND o.value_coded = ${165307} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate ";
+
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
+    return stringSubstitutor.replace(query);
   }
 
   /**
