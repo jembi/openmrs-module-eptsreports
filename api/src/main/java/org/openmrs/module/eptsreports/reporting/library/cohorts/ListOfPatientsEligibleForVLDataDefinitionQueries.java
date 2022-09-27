@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -8,10 +11,6 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListOfPatientsEligibleForVLDataDefinitionQueries {
@@ -61,6 +60,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
 
     String query =
         " SELECT art.patient_id, MIN(art.art_date) min_art_date FROM ( "
@@ -107,14 +107,14 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
             + "                  "
             + " UNION "
             + "  "
-            + " SELECT p.patient_id, ps.start_date AS art_date "
+            + " SELECT p.patient_id, pg.date_enrolled AS art_date "
             + "     FROM   patient p   "
             + "           INNER JOIN patient_program pg  "
             + "                ON p.patient_id = pg.patient_id  "
             + "        INNER JOIN patient_state ps  "
             + "                   ON pg.patient_program_id = ps.patient_program_id  "
             + "     WHERE  pg.location_id = :location "
-            + "    AND pg.program_id = 2 and ps.start_date <= :endDate "
+            + "    AND pg.program_id = ${2} and pg.date_enrolled <= :endDate "
             + "     "
             + "    UNION "
             + "     "
