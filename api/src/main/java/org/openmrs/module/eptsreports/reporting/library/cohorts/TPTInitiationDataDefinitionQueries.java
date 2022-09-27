@@ -733,7 +733,23 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
 
-    String query = "";
+    String threeHPStart =
+        new EptsQueriesUtil()
+            .unionBuilder(
+                tptInitiationCohortQueries
+                    .getPatientsWith3HP3RegimeTPTAndSeguimentoDeTratamentoDate())
+            .union(tptInitiationCohortQueries.getPatientWithProfilaxiaTpt3hpDate())
+            .union(tptInitiationCohortQueries.getPatientsWithUltimaProfilaxia3hpDate())
+            .buildQuery();
+
+    String query =
+        "SELECT patient_id, DATE_ADD(MIN(tpt_start), INTERVAL 86 DAY) AS expected_date "
+            + "                                       FROM ( "
+            + "             "
+            + threeHPStart
+            + " "
+            + "             ) threeHP "
+            + "        GROUP BY threeHP.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
