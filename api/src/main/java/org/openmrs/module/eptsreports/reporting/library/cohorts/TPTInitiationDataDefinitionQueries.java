@@ -329,13 +329,14 @@ public class TPTInitiationDataDefinitionQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR14: Report:3HP Initiation Dates (Sheet 1: Columns I, J, K)</b>
    *
    * <blockquote>
    *
-   * <p>The earliest date (encounter_datetime) on FILT (encounter type 60) with “Regime de TPT”
-   * (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and
-   * encounter datetime between start date and end date
+   * <p>3HP Initiation Date on FILT – Sheet 1: Column I
+   *
+   * <p>The earliest 3HP drug-pick up date registered on FILT (Regime de TPT = 3HP or 3HP +
+   * Piridoxina) that falls during the reporting period (TPT_INI_FR4)
    *
    * </blockquote>
    *
@@ -362,14 +363,15 @@ public class TPTInitiationDataDefinitionQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR14: Report:3HP Initiation Dates (Sheet 1: Columns I, J, K)</b>
    *
    * <blockquote>
    *
-   * <p>The earliest 3HP initiation date (obs_datetime for 165308) on Ficha Clinica - Master Card
-   * (encounter type 6) with TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da
-   * Profilaxia (concept id 165308) value coded Início (concept id 1256) and encounter datetime
-   * between start date and end date; </>
+   * <p>3HP Initiation Date on Ficha Clínica – Sheet 1: Column J
+   *
+   * <p>The earliest 3HP initiation date registered on Ficha Clínica Profilaxia TPT with the value
+   * “3HP” and Estado da Profilaxia with the value “Inicio (I)” that falls during the reporting
+   * period (TPT_INI_FR4)
    *
    * </blockquote>
    *
@@ -394,21 +396,16 @@ public class TPTInitiationDataDefinitionQueries {
   }
 
   /**
-   * <b>Technical Specs<b>
+   * <b>TPT_INI_FR14: Report:3HP Initiation Dates (Sheet 1: Columns I, J, K)</b>
    *
    * <blockquote>
    *
-   * <p>The earliest 3HP Initiation date(obs datetime for 165308) registered in Ficha Resumo –
-   * Mastercard (encounter type 53) with Última profilaxia(concept id 23985) value coded 3HP(concept
-   * id 23954) and Data Início (concept 165308 value 1256) that falls during the reporting period
-   * (TPT_INI_FR4).
+   * <p>3HP Initiation Date on Ficha Resumo – Sheet 1: Column K
    *
-   * <p>Note: The system will determine the earliest date from these sources as the 3HP Start Date
+   * <p>The earliest 3HP Initiation date registered in Ficha Resumo – Mastercard (Última profilaxia
+   * TPT with value “3HP” with Data Inicio that falls during the reporting period (TPT_INI_FR4)
    *
-   * <p>
-   *
-   * <p>Note: if there is more than one Ficha Resumo then information from all Ficha Resumo should
-   * be included. </bloackquote>
+   * <p>The system will determine the earliest date from these sources as the 3HP Start Date
    *
    * @return {@link DataDefinition}
    */
@@ -431,13 +428,14 @@ public class TPTInitiationDataDefinitionQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR15: Report: Last FILT Dispensation with 3HP(Sheet 1: Columns L, M)</b>
    *
    * <blockquote>
    *
-   * <p>Most recent FILT (encounter type 60) that has Regime de TPT (concept id 23985) with the
-   * values (3HP or 3HP + Piridoxina) (concept id in [23954, 23984]) marked until the report
-   * generation dat
+   * <p>Last 3HP FILT: Date – Sheet 1: Column L
+   *
+   * <p>Most recent FILT that has Regime de TPT with the values (3HP or 3HP + Piridoxina) marked
+   * until the report generation date
    *
    * </blockquote>
    *
@@ -477,14 +475,13 @@ public class TPTInitiationDataDefinitionQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR15: Report: Last FILT Dispensation with 3HP(Sheet 1: Columns L, M)</b>
    *
    * <blockquote>
    *
-   * <p>Tipo de Dispensa (concept id 23986) with value coded Mensal or Trimestral (concept id IN
-   * [1098, 23720]) on the most recent FILT (encounter type 60) that has Regime de TPT (concept id
-   * 23985) with the values (3HP or 3HP + Piridoxina) (concept id in [23954, 23984]) marked until
-   * the report generation date
+   * <p>Last 3HP FILT: Type of Dispensation – Sheet 1: Column M Value of Tipo de Dispensa (Mensal or
+   * Trimestral) on the most recent FILT that has Regime de TPT with the values (3HP or 3HP +
+   * Piridoxina) marked until the report generation date. Possible values are: Mensal or Trimestral
    *
    * <p>Note: If a patient has more than one FILTs registered on the same most recent date the
    * system will show information from the most recently entered FILT in the system on that specific
@@ -537,7 +534,7 @@ public class TPTInitiationDataDefinitionQueries {
   }
 
   /**
-   * <b>Technical Specs<b>
+   * <b>TPT_INI_FR16: Report: 3HP Completion Dates (Sheet 1: Columns N, O)<b>
    *
    * <blockquote>
    *
@@ -593,7 +590,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "                   INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                   INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "                   INNER JOIN ( "
-            + "                          SELECT patient_id, MIN(tpt_start) AS earliest_date "
+            + "                          SELECT patient_id, MIN(tpt_date) AS earliest_date "
             + "                          FROM ( "
             + threeHPStart
             + ") threeHP "
@@ -618,7 +615,7 @@ public class TPTInitiationDataDefinitionQueries {
   }
 
   /**
-   * <b>Technical Specs<b>
+   * <b>TPT_INI_FR16: Report: 3HP Completion Dates (Sheet 1: Columns N, O)<b>
    *
    * <blockquote>
    *
@@ -673,7 +670,7 @@ public class TPTInitiationDataDefinitionQueries {
             + "                            INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                            INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "                            INNER JOIN ( "
-            + "                            SELECT patient_id, MIN(tpt_start) AS earliest_date "
+            + "                            SELECT patient_id, MIN(tpt_date) AS earliest_date "
             + "                            FROM ( "
             + threeHPStart
             + " ) threeHP "
@@ -743,7 +740,7 @@ public class TPTInitiationDataDefinitionQueries {
             .buildQuery();
 
     String query =
-        "SELECT patient_id, DATE_ADD(MIN(tpt_start), INTERVAL 86 DAY) AS expected_date "
+        "SELECT patient_id, DATE_ADD(MIN(tpt_date), INTERVAL 86 DAY) AS expected_date "
             + "                                       FROM ( "
             + "             "
             + threeHPStart
@@ -763,9 +760,11 @@ public class TPTInitiationDataDefinitionQueries {
    *
    * <blockquote>
    *
-   * <p>18 - Difference between Registered vs Expected 3HP Completion Date – Sheet 1: Column Q
-   * Difference between Registered vs Expected 3HP Completion Date (In Number of Days) = 3HP End
-   * Date (column N or O) – Expected Completion Date (column P)
+   * <p>18 - Only for patients who initiated 3HP (TPT_INI_FR4) the system will calculate the
+   * difference between Registered Completion Date and Expected Completion Date as follows:
+   * Difference between Registered vs Expected 3HP Completion Date – Sheet 1: Column Q Difference
+   * between Registered vs Expected 3HP Completion Date (In Number of Days) = 3HP End Date
+   * (TPT_INI_FR16) – Expected Completion Date (TPT_INI_FR17)
    *
    * </blockquote>
    *
@@ -807,14 +806,13 @@ public class TPTInitiationDataDefinitionQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR19: Report: IPT Initiation Dates (Sheet 1: Columns R, S, T) </b>
    *
    * <blockquote>
    *
-   * <p>The earliest IPT drug pick-up date registered on FILT (encounter type 60) during the
-   * reporting period with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or ‘Isoniazid
-   * + piridoxina’ (concept id in [656, 23982]) and encounter datetime between start date and end
-   * date
+   * <p>IPT Initiation Date on FILT – Sheet 1: Column R The earliest IPT drug pick-up date
+   * registered on FILT (Regime TPT = “Isoniazida” or “Isoniazida + Piridoxina”) that falls during
+   * the reporting period (TPT_INI_FR5)
    *
    * </blockquote>
    *
@@ -828,280 +826,26 @@ public class TPTInitiationDataDefinitionQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
-    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
-    valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
-    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
-    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-
     String query =
-        "SELECT     p.patient_id, "
-            + "           Min(e.encounter_datetime) AS pickup_date "
-            + "FROM       patient p "
-            + "               INNER JOIN encounter e "
-            + "                          ON         p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                          ON         e.encounter_id = o.encounter_id "
-            + "               INNER JOIN "
-            + "           ( "
-            + "               SELECT     p.patient_id, "
-            + "                          Min(o2.obs_datetime) AS start_date "
-            + "               FROM       patient p "
-            + "                              INNER JOIN encounter e "
-            + "                                         ON         p.patient_id = e.patient_id "
-            + "                              INNER JOIN obs o "
-            + "                                         ON         e.encounter_id = o.encounter_id "
-            + "                              INNER JOIN obs o2 "
-            + "                                         ON         e.encounter_id = o2.encounter_id "
-            + "               WHERE      p.voided = 0 "
-            + "                 AND        e.voided = 0 "
-            + "                 AND        o.voided = 0 "
-            + "                 AND        o2.voided = 0 "
-            + "                 AND        e.location_id = :location "
-            + "                 AND        e.encounter_type = ${53} "
-            + "                 AND        ( ( "
-            + "                                          o.concept_id = ${23985} "
-            + "                                      AND        o.value_coded = ${656} ) "
-            + "                   AND        ( "
-            + "                                          o2.concept_id = ${165308} "
-            + "                                      AND        o2.value_coded = ${1256} "
-            + "                                      AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "               GROUP BY   p.patient_id "
-            + "               UNION "
-            + "               SELECT     p.patient_id, "
-            + "                          Min(o2.obs_datetime) AS start_date "
-            + "               FROM       patient p "
-            + "                              INNER JOIN encounter e "
-            + "                                         ON         p.patient_id = e.patient_id "
-            + "                              INNER JOIN obs o "
-            + "                                         ON         e.encounter_id = o.encounter_id "
-            + "                              INNER JOIN obs o2 "
-            + "                                         ON         e.encounter_id = o2.encounter_id "
-            + "               WHERE      p.voided = 0 "
-            + "                 AND        e.voided = 0 "
-            + "                 AND        o.voided = 0 "
-            + "                 AND        o2.voided = 0 "
-            + "                 AND        e.location_id = :location "
-            + "                 AND        e.encounter_type = ${6} "
-            + "                 AND        ( ( "
-            + "                                          o.concept_id = ${23985} "
-            + "                                      AND        o.value_coded = ${656} ) "
-            + "                   AND        ( "
-            + "                                          o2.concept_id = ${165308} "
-            + "                                      AND        o2.value_coded = ${1256} "
-            + "                                      AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "               GROUP BY   p.patient_id "
-            + "               UNION "
-            + "               SELECT     p.patient_id, "
-            + "                          Min(o2.obs_datetime) AS start_date "
-            + "               FROM       patient p "
-            + "                              INNER JOIN encounter e "
-            + "                                         ON         p.patient_id = e.patient_id "
-            + "                              INNER JOIN obs o "
-            + "                                         ON         e.encounter_id = o.encounter_id "
-            + "                              INNER JOIN obs o2 "
-            + "                                         ON         e.encounter_id = o2.encounter_id "
-            + "               WHERE      p.voided = 0 "
-            + "                 AND        e.voided = 0 "
-            + "                 AND        o.voided = 0 "
-            + "                 AND        o2.voided = 0 "
-            + "                 AND        e.location_id = :location "
-            + "                 AND        e.encounter_type = ${9} "
-            + "                 AND        ( ( "
-            + "                                          o.concept_id = ${23985} "
-            + "                                      AND        o.value_coded = ${656} ) "
-            + "                   AND        ( "
-            + "                                          o2.concept_id = ${165308} "
-            + "                                      AND        o2.value_coded = ${1256} "
-            + "                                      AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "               GROUP BY   p.patient_id "
-            + "               UNION "
-            + "               SELECT     p.patient_id, "
-            + "                          Min(o2.obs_datetime) AS start_date "
-            + "               FROM       patient p "
-            + "                              INNER JOIN encounter e "
-            + "                                         ON         p.patient_id = e.patient_id "
-            + "                              INNER JOIN obs o "
-            + "                                         ON         e.encounter_id = o.encounter_id "
-            + "                              INNER JOIN obs o2 "
-            + "                                         ON         e.encounter_id = o2.encounter_id "
-            + "               WHERE      p.voided = 0 "
-            + "                 AND        e.voided = 0 "
-            + "                 AND        o.voided = 0 "
-            + "                 AND        o2.voided = 0 "
-            + "                 AND        e.location_id = :location "
-            + "                 AND        e.encounter_type = 60 "
-            + "                 AND        ( ( "
-            + "                                          o.concept_id = ${23985} "
-            + "                                      AND        o.value_coded IN( ${656}, "
-            + "                                                                   ${23982} ) ) "
-            + "                   AND        ( "
-            + "                                          o2.concept_id = ${23987} "
-            + "                                      AND        o2.value_coded IN( ${1256}, "
-            + "                                                                    ${1705} ) "
-            + "                                      AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "               GROUP BY   p.patient_id "
-            + "               UNION "
-            + "               SELECT     p.patient_id, "
-            + "                          filt.start_date AS start_date "
-            + "               FROM       patient p "
-            + "                              INNER JOIN encounter e "
-            + "                                         ON         e.patient_id = p.patient_id "
-            + "                              INNER JOIN obs o "
-            + "                                         ON         o.encounter_id = e.encounter_id "
-            + "                              INNER JOIN "
-            + "                          ( "
-            + "                              SELECT     p.patient_id, "
-            + "                                         Min(o2.obs_datetime) start_date "
-            + "                              FROM       patient p "
-            + "                                             INNER JOIN encounter e "
-            + "                                                        ON         e.patient_id = p.patient_id "
-            + "                                             INNER JOIN obs o "
-            + "                                                        ON         o.encounter_id = e.encounter_id "
-            + "                                             INNER JOIN obs o2 "
-            + "                                                        ON         o2.encounter_id = e.encounter_id "
-            + "                              WHERE      p.voided = 0 "
-            + "                                AND        e.voided = 0 "
-            + "                                AND        o.voided = 0 "
-            + "                                AND        e.location_id = :location "
-            + "                                AND        e.encounter_type = 60 "
-            + "                                AND        ( ( "
-            + "                                                         o.concept_id = ${23985} "
-            + "                                                     AND        o.value_coded IN (${656}, "
-            + "                                                                                  ${23982}) ) "
-            + "                                  AND        ( "
-            + "                                                         o2.concept_id = ${23987} "
-            + "                                                     AND        ( "
-            + "                                                                     o2.value_coded = ${1257} "
-            + "                                                                 OR         o2.value_coded IS NULL) ) "
-            + "                                  AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) "
-            + "                              GROUP BY   p.patient_id ) AS filt "
-            + "                          ON         filt.patient_id = p.patient_id "
-            + "               WHERE      p.patient_id NOT IN "
-            + "                          ( "
-            + "                              SELECT     pp.patient_id "
-            + "                              FROM       patient pp "
-            + "                                             INNER JOIN encounter ee "
-            + "                                                        ON         ee.patient_id = pp.patient_id "
-            + "                                             INNER JOIN obs oo "
-            + "                                                        ON         oo.encounter_id = ee.encounter_id "
-            + "                              WHERE      pp.voided = 0 "
-            + "                                AND        p.patient_id = pp.patient_id "
-            + "                                AND        ee.voided = 0 "
-            + "                                AND        oo.voided = 0 "
-            + "                                AND        ee.location_id = :location "
-            + "                                AND        ee.encounter_type = ${60} "
-            + "                                AND        oo.concept_id = ${23985} "
-            + "                                AND        oo.value_coded IN ( ${656} , "
-            + "                                                               ${23982} ) "
-            + "                                AND        ee.encounter_datetime >= Date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                AND        ee.encounter_datetime < filt.start_date "
-            + "                              GROUP BY   p.patient_id "
-            + "                              UNION "
-            + "                              SELECT p.patient_id "
-            + "                              FROM   patient p "
-            + "                                         JOIN   encounter e "
-            + "                                                ON     e.patient_id = p.patient_id "
-            + "                                         JOIN   obs o "
-            + "                                                ON     o.encounter_id = e.encounter_id "
-            + "                                         JOIN   obs o2 "
-            + "                                                ON     o2.encounter_id = e.encounter_id "
-            + "                              WHERE  o.voided = 0 "
-            + "                                AND    e.voided = 0 "
-            + "                                AND    p.voided = 0 "
-            + "                                AND    e.location_id = :location "
-            + "                                AND    e.encounter_type = ${53} "
-            + "                                AND    ( ( "
-            + "                                                     o.concept_id = ${23985} "
-            + "                                                 AND    o.value_coded = ${656} ) "
-            + "                                  AND    ( "
-            + "                                                     o2.concept_id = ${165308} "
-            + "                                                 AND    o2.value_coded = ${1256} "
-            + "                                                 AND    o2.obs_datetime >= Date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                 AND    o2.obs_datetime < filt.start_date ) ) "
-            + "                              UNION "
-            + "                              SELECT p.patient_id "
-            + "                              FROM   patient p "
-            + "                                         JOIN   encounter e "
-            + "                                                ON     e.patient_id = p.patient_id "
-            + "                                         JOIN   obs o "
-            + "                                                ON     o.encounter_id = e.encounter_id "
-            + "                                         JOIN   obs o2 "
-            + "                                                ON     o2.encounter_id = e.encounter_id "
-            + "                              WHERE  p.voided = 0 "
-            + "                                AND    e.voided = 0 "
-            + "                                AND    o.voided = 0 "
-            + "                                AND    o2.voided = 0 "
-            + "                                AND    e.location_id = :location "
-            + "                                AND    e.encounter_type = ${6} "
-            + "                                AND    ( ( "
-            + "                                                     o.concept_id = ${23985} "
-            + "                                                 AND    o.value_coded = ${656} ) "
-            + "                                  AND    ( "
-            + "                                                     o2.concept_id = ${165308} "
-            + "                                                 AND    o2.value_coded = ${1256} "
-            + "                                                 AND    o2.obs_datetime >= Date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                 AND    o2.obs_datetime < filt.start_date ) ) "
-            + "                              UNION "
-            + "                              SELECT p.patient_id "
-            + "                              FROM   patient p "
-            + "                                         JOIN   encounter e "
-            + "                                                ON     e.patient_id = p.patient_id "
-            + "                                         JOIN   obs o "
-            + "                                                ON     o.encounter_id = e.encounter_id "
-            + "                                         JOIN   obs o2 "
-            + "                                                ON     o2.encounter_id = e.encounter_id "
-            + "                              WHERE  p.voided = 0 "
-            + "                                AND    e.voided = 0 "
-            + "                                AND    o.voided = 0 "
-            + "                                AND    o2.voided = 0 "
-            + "                                AND    e.encounter_type = ${9} "
-            + "                                AND    ( ( "
-            + "                                                     o.concept_id = ${23985} "
-            + "                                                 AND    o.value_coded = ${656} ) "
-            + "                                  AND    ( "
-            + "                                                     o2.concept_id = ${165308} "
-            + "                                                 AND    o2.value_coded = ${1256} "
-            + "                                                 AND    o2.obs_datetime >= Date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                 AND    o2.obs_datetime < filt.start_date ) ) ) "
-            + "               GROUP BY   p.patient_id) AS INHFilt "
-            + "               ON INHFilt.patient_id = p.patient_id  "
-            + "WHERE      p.voided = 0 "
-            + "  AND        e.voided = 0 "
-            + "  AND        o.voided = 0 "
-            + "  AND        e.encounter_type = ${60} "
-            + "  AND        o.concept_id = ${23985} "
-            + "  AND        e.location_id = :location "
-            + "  AND        o.value_coded IN (${656},${23982}) "
-            + "  AND        e.encounter_datetime BETWEEN INHFilt.start_date AND        :endDate "
-            + "GROUP BY   p.patient_id";
+        new EptsQueriesUtil()
+            .min(tptInitiationCohortQueries.getpatientswithRegimeTPTIsoniazidDate())
+            .getQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR19: Report: IPT Initiation Dates (Sheet 1: Columns R, S, T) </b>
    *
    * <blockquote>
    *
-   * <p>The earliest IPT initiation date registered on Ficha Clínica or Ficha de Seguimento
-   * (encounter type 6, 9) during the reporting period with following concepts:
-   *
-   * <ul>
-   *   <li>Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
-   *       Profilaxia (concept id 165308) value coded Início (concept id 1256) (Data Inicio)
-   * </ul>
+   * <p>IPT Initiation Date on Ficha Clínica or Ficha de Seguimento – Sheet 1: Column S The earliest
+   * IPT initiation date (Data Início) registered on Ficha Clínica Profilaxia TPT with the value
+   * “Isoniazida (INH)” and Estado da Profilaxia with the value “Inicio (I)”) or Ficha de Seguimento
+   * Profilaxia TPT with the value “Isoniazida (INH)” and with Data Fim) that falls during the
+   * reporting period (TPT_INI_FR5)
    *
    * </blockquote>
    *
@@ -1116,287 +860,27 @@ public class TPTInitiationDataDefinitionQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
-    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
-    valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
-    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
-    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-
     String query =
-        "SELECT     p.patient_id, "
-            + "           Min(e.encounter_datetime) AS pickup_date "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e "
-            + "ON         p.patient_id = e.patient_id "
-            + "INNER JOIN obs o "
-            + "ON         e.encounter_id = o.encounter_id "
-            + "INNER JOIN obs o2 "
-            + "ON         e.encounter_id = o2.encounter_id "
-            + "INNER JOIN "
-            + "           ( "
-            + "                      SELECT     p.patient_id, "
-            + "                                 Min(o2.obs_datetime) AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         e.encounter_id = o.encounter_id "
-            + "                      INNER JOIN obs o2 "
-            + "                      ON         e.encounter_id = o2.encounter_id "
-            + "                      WHERE      p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      AND        o2.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_type = ${53} "
-            + "                      AND        ( ( "
-            + "                                                       o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded = ${656} ) "
-            + "                                 AND        ( "
-            + "                                                       o2.concept_id = ${165308} "
-            + "                                            AND        o2.value_coded = ${1256} "
-            + "                                            AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "                      GROUP BY   p.patient_id "
-            + "                      UNION "
-            + "                      SELECT     p.patient_id, "
-            + "                                 min(o2.obs_datetime) AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         e.encounter_id = o.encounter_id "
-            + "                      INNER JOIN obs o2 "
-            + "                      ON         e.encounter_id = o2.encounter_id "
-            + "                      WHERE      p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      AND        o2.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_type = ${6} "
-            + "                      AND        ( ( "
-            + "                                                       o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded = ${656} ) "
-            + "                                 AND        ( "
-            + "                                                       o2.concept_id = ${165308} "
-            + "                                            AND        o2.value_coded = ${1256} "
-            + "                                            AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "                      GROUP BY   p.patient_id "
-            + "                      UNION "
-            + "                      SELECT     p.patient_id, "
-            + "                                 min(o2.obs_datetime) AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         e.encounter_id = o.encounter_id "
-            + "                      INNER JOIN obs o2 "
-            + "                      ON         e.encounter_id = o2.encounter_id "
-            + "                      WHERE      p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      AND        o2.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_type = ${9} "
-            + "                      AND        ( ( "
-            + "                                                       o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded = ${656} ) "
-            + "                                 AND        ( "
-            + "                                                       o2.concept_id = ${165308} "
-            + "                                            AND        o2.value_coded = ${1256} "
-            + "                                            AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "                      GROUP BY   p.patient_id "
-            + "                      UNION "
-            + "                      SELECT     p.patient_id, "
-            + "                                 min(o2.obs_datetime) AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         e.encounter_id = o.encounter_id "
-            + "                      INNER JOIN obs o2 "
-            + "                      ON         e.encounter_id = o2.encounter_id "
-            + "                      WHERE      p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      AND        o2.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_type = 60 "
-            + "                      AND        ( ( "
-            + "                                                       o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded IN( ${656}, "
-            + "                                                                        ${23982} ) ) "
-            + "                                 AND        ( "
-            + "                                                       o2.concept_id = ${23987} "
-            + "                                            AND        o2.value_coded IN( ${1256}, "
-            + "                                                                         ${1705} ) "
-            + "                                            AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "                      GROUP BY   p.patient_id "
-            + "                      UNION "
-            + "                      SELECT     p.patient_id, "
-            + "                                 filt.start_date AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         e.patient_id = p.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         o.encounter_id = e.encounter_id "
-            + "                      INNER JOIN "
-            + "                                 ( "
-            + "                                            SELECT     p.patient_id, "
-            + "                                                       min(o2.obs_datetime) start_date "
-            + "                                            FROM       patient p "
-            + "                                            INNER JOIN encounter e "
-            + "                                            ON         e.patient_id = p.patient_id "
-            + "                                            INNER JOIN obs o "
-            + "                                            ON         o.encounter_id = e.encounter_id "
-            + "                                            INNER JOIN obs o2 "
-            + "                                            ON         o2.encounter_id = e.encounter_id "
-            + "                                            WHERE      p.voided = 0 "
-            + "                                            AND        e.voided = 0 "
-            + "                                            AND        o.voided = 0 "
-            + "                                            AND        e.location_id = :location "
-            + "                                            AND        e.encounter_type = 60 "
-            + "                                            AND        ( ( "
-            + "                                                                             o.concept_id = ${23985} "
-            + "                                                                  AND        o.value_coded IN (${656}, "
-            + "                                                                                               ${23982}) ) "
-            + "                                                       AND        ( "
-            + "                                                                             o2.concept_id = ${23987} "
-            + "                                                                  AND        ( "
-            + "                                                                                        o2.value_coded = ${1257} "
-            + "                                                                             OR         o2.value_coded IS NULL) ) "
-            + "                                                       AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) "
-            + "                                            GROUP BY   p.patient_id ) AS filt "
-            + "                      ON         filt.patient_id = p.patient_id "
-            + "                      WHERE      p.patient_id NOT IN "
-            + "                                 ( "
-            + "                                            SELECT     pp.patient_id "
-            + "                                            FROM       patient pp "
-            + "                                            INNER JOIN encounter ee "
-            + "                                            ON         ee.patient_id = pp.patient_id "
-            + "                                            INNER JOIN obs oo "
-            + "                                            ON         oo.encounter_id = ee.encounter_id "
-            + "                                            WHERE      pp.voided = 0 "
-            + "                                            AND        p.patient_id = pp.patient_id "
-            + "                                            AND        ee.voided = 0 "
-            + "                                            AND        oo.voided = 0 "
-            + "                                            AND        ee.location_id = :location "
-            + "                                            AND        ee.encounter_type = ${60} "
-            + "                                            AND        oo.concept_id = ${23985} "
-            + "                                            AND        oo.value_coded IN ( ${656} , "
-            + "                                                                          ${23982} ) "
-            + "                                            AND        ee.encounter_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                            AND        ee.encounter_datetime < filt.start_date "
-            + "                                            GROUP BY   p.patient_id "
-            + "                                            UNION "
-            + "                                            SELECT p.patient_id "
-            + "                                            FROM   patient p "
-            + "                                            JOIN   encounter e "
-            + "                                            ON     e.patient_id = p.patient_id "
-            + "                                            JOIN   obs o "
-            + "                                            ON     o.encounter_id = e.encounter_id "
-            + "                                            JOIN   obs o2 "
-            + "                                            ON     o2.encounter_id = e.encounter_id "
-            + "                                            WHERE  o.voided = 0 "
-            + "                                            AND    e.voided = 0 "
-            + "                                            AND    p.voided = 0 "
-            + "                                            AND    e.location_id = :location "
-            + "                                            AND    e.encounter_type = ${53} "
-            + "                                            AND    ( ( "
-            + "                                                                 o.concept_id = ${23985} "
-            + "                                                          AND    o.value_coded = ${656} ) "
-            + "                                                   AND    ( "
-            + "                                                                 o2.concept_id = ${165308} "
-            + "                                                          AND    o2.value_coded = ${1256} "
-            + "                                                          AND    o2.obs_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                          AND    o2.obs_datetime < filt.start_date ) ) "
-            + "                                            UNION "
-            + "                                            SELECT p.patient_id "
-            + "                                            FROM   patient p "
-            + "                                            JOIN   encounter e "
-            + "                                            ON     e.patient_id = p.patient_id "
-            + "                                            JOIN   obs o "
-            + "                                            ON     o.encounter_id = e.encounter_id "
-            + "                                            JOIN   obs o2 "
-            + "                                            ON     o2.encounter_id = e.encounter_id "
-            + "                                            WHERE  p.voided = 0 "
-            + "                                            AND    e.voided = 0 "
-            + "                                            AND    o.voided = 0 "
-            + "                                            AND    o2.voided = 0 "
-            + "                                            AND    e.location_id = :location "
-            + "                                            AND    e.encounter_type = ${6} "
-            + "                                            AND    ( ( "
-            + "                                                                 o.concept_id = ${23985} "
-            + "                                                          AND    o.value_coded = ${656} ) "
-            + "                                                   AND    ( "
-            + "                                                                 o2.concept_id = ${165308} "
-            + "                                                          AND    o2.value_coded = ${1256} "
-            + "                                                          AND    o2.obs_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                          AND    o2.obs_datetime < filt.start_date ) ) "
-            + "                                            UNION "
-            + "                                            SELECT p.patient_id "
-            + "                                            FROM   patient p "
-            + "                                            JOIN   encounter e "
-            + "                                            ON     e.patient_id = p.patient_id "
-            + "                                            JOIN   obs o "
-            + "                                            ON     o.encounter_id = e.encounter_id "
-            + "                                            JOIN   obs o2 "
-            + "                                            ON     o2.encounter_id = e.encounter_id "
-            + "                                            WHERE  p.voided = 0 "
-            + "                                            AND    e.voided = 0 "
-            + "                                            AND    o.voided = 0 "
-            + "                                            AND    o2.voided = 0 "
-            + "                                            AND    e.encounter_type = ${9} "
-            + "                                            AND    ( ( "
-            + "                                                                 o.concept_id = ${23985} "
-            + "                                                          AND    o.value_coded = ${656} ) "
-            + "                                                   AND    ( "
-            + "                                                                 o2.concept_id = ${165308} "
-            + "                                                          AND    o2.value_coded = ${1256} "
-            + "                                                          AND    o2.obs_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                          AND    o2.obs_datetime < filt.start_date ) ) ) "
-            + "                      GROUP BY   p.patient_id) AS INHClinica "
-            + "							ON INHClinica.patient_id = p.patient_id "
-            + "WHERE      p.voided = 0 "
-            + "AND        e.voided = 0 "
-            + "AND        o.voided = 0 "
-            + "AND        o2.voided = 0 "
-            + "AND        e.location_id = :location "
-            + "AND        e.encounter_type IN (${6} , "
-            + "                                ${9}) "
-            + "AND        ( ( "
-            + "                                 o.concept_id = ${23985} "
-            + "                      AND        o.value_coded = ${656} ) "
-            + "           AND        ( "
-            + "                                 o2.concept_id = ${165308} "
-            + "                      AND        o2.value_coded = ${1256} "
-            + "                      AND        o2.obs_datetime BETWEEN INHClinica.start_date AND        :endDate ) ) "
-            + "GROUP BY   p.patient_id";
+        new EptsQueriesUtil()
+            .min(tptInitiationCohortQueries.getPatientsWithFichaClinicaProfilaxiaINHDate())
+            .getQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR19: Report: IPT Initiation Dates (Sheet 1: Columns R, S, T) </b>
    *
    * <blockquote>
    *
-   * <p>The earliest IPT initiation date registered on Ficha Resumo (encounter type 53) during the
-   * reporting period with following concepts:
+   * <p>IPT Initiation Date on Ficha Resumo – Sheet 1: Column T The earliest IPT initiation date
+   * registered in Ficha Resumo – Mastercard Última profilaxia TPT with value “Isoniazida (INH)” and
+   * with Data Inicio that falls during the reporting period (TPT_INI_FR5)
    *
    * <ul>
-   *   <li>Profilaxia TPT (concept id 23985) value coded INH (concept id 656) Data Inicio (concept
-   *       165308 value 1256)
+   *   <li>The system will determine the earliest date from these sources as the IPT Start Date
    * </ul>
    *
    * </blockquote>
@@ -1411,271 +895,12 @@ public class TPTInitiationDataDefinitionQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Location.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Location.class));
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
-    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
-    valuesMap.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
-    valuesMap.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
-    valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
-
     String query =
-        "SELECT     p.patient_id, "
-            + "           Min(e.encounter_datetime) AS pickup_date "
-            + "FROM       patient p "
-            + "INNER JOIN encounter e "
-            + "ON         p.patient_id = e.patient_id "
-            + "INNER JOIN obs o "
-            + "ON         e.encounter_id = o.encounter_id "
-            + "INNER JOIN obs o2 "
-            + "ON         e.encounter_id = o2.encounter_id "
-            + "INNER JOIN "
-            + "           ( "
-            + "                      SELECT     p.patient_id, "
-            + "                                 Min(o2.obs_datetime) AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         e.encounter_id = o.encounter_id "
-            + "                      INNER JOIN obs o2 "
-            + "                      ON         e.encounter_id = o2.encounter_id "
-            + "                      WHERE      p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      AND        o2.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_type = ${53} "
-            + "                      AND        ( ( "
-            + "                                                       o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded = ${656} ) "
-            + "                                 AND        ( "
-            + "                                                       o2.concept_id = ${165308} "
-            + "                                            AND        o2.value_coded = ${1256} "
-            + "                                            AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "                      GROUP BY   p.patient_id "
-            + "                      UNION "
-            + "                      SELECT     p.patient_id, "
-            + "                                 min(o2.obs_datetime) AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         e.encounter_id = o.encounter_id "
-            + "                      INNER JOIN obs o2 "
-            + "                      ON         e.encounter_id = o2.encounter_id "
-            + "                      WHERE      p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      AND        o2.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_type = ${6} "
-            + "                      AND        ( ( "
-            + "                                                       o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded = ${656} ) "
-            + "                                 AND        ( "
-            + "                                                       o2.concept_id = ${165308} "
-            + "                                            AND        o2.value_coded = ${1256} "
-            + "                                            AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "                      GROUP BY   p.patient_id "
-            + "                      UNION "
-            + "                      SELECT     p.patient_id, "
-            + "                                 min(o2.obs_datetime) AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         e.encounter_id = o.encounter_id "
-            + "                      INNER JOIN obs o2 "
-            + "                      ON         e.encounter_id = o2.encounter_id "
-            + "                      WHERE      p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      AND        o2.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_type = ${9} "
-            + "                      AND        ( ( "
-            + "                                                       o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded = ${656} ) "
-            + "                                 AND        ( "
-            + "                                                       o2.concept_id = ${165308} "
-            + "                                            AND        o2.value_coded = ${1256} "
-            + "                                            AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "                      GROUP BY   p.patient_id "
-            + "                      UNION "
-            + "                      SELECT     p.patient_id, "
-            + "                                 min(o2.obs_datetime) AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         p.patient_id = e.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         e.encounter_id = o.encounter_id "
-            + "                      INNER JOIN obs o2 "
-            + "                      ON         e.encounter_id = o2.encounter_id "
-            + "                      WHERE      p.voided = 0 "
-            + "                      AND        e.voided = 0 "
-            + "                      AND        o.voided = 0 "
-            + "                      AND        o2.voided = 0 "
-            + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_type = 60 "
-            + "                      AND        ( ( "
-            + "                                                       o.concept_id = ${23985} "
-            + "                                            AND        o.value_coded IN( ${656}, "
-            + "                                                                        ${23982} ) ) "
-            + "                                 AND        ( "
-            + "                                                       o2.concept_id = ${23987} "
-            + "                                            AND        o2.value_coded IN( ${1256}, "
-            + "                                                                         ${1705} ) "
-            + "                                            AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) ) "
-            + "                      GROUP BY   p.patient_id "
-            + "                      UNION "
-            + "                      SELECT     p.patient_id, "
-            + "                                 filt.start_date AS start_date "
-            + "                      FROM       patient p "
-            + "                      INNER JOIN encounter e "
-            + "                      ON         e.patient_id = p.patient_id "
-            + "                      INNER JOIN obs o "
-            + "                      ON         o.encounter_id = e.encounter_id "
-            + "                      INNER JOIN "
-            + "                                 ( "
-            + "                                            SELECT     p.patient_id, "
-            + "                                                       min(o2.obs_datetime) start_date "
-            + "                                            FROM       patient p "
-            + "                                            INNER JOIN encounter e "
-            + "                                            ON         e.patient_id = p.patient_id "
-            + "                                            INNER JOIN obs o "
-            + "                                            ON         o.encounter_id = e.encounter_id "
-            + "                                            INNER JOIN obs o2 "
-            + "                                            ON         o2.encounter_id = e.encounter_id "
-            + "                                            WHERE      p.voided = 0 "
-            + "                                            AND        e.voided = 0 "
-            + "                                            AND        o.voided = 0 "
-            + "                                            AND        e.location_id = :location "
-            + "                                            AND        e.encounter_type = 60 "
-            + "                                            AND        ( ( "
-            + "                                                                             o.concept_id = ${23985} "
-            + "                                                                  AND        o.value_coded IN (${656}, "
-            + "                                                                                               ${23982}) ) "
-            + "                                                       AND        ( "
-            + "                                                                             o2.concept_id = ${23987} "
-            + "                                                                  AND        ( "
-            + "                                                                                        o2.value_coded = ${1257} "
-            + "                                                                             OR         o2.value_coded IS NULL) ) "
-            + "                                                       AND        o2.obs_datetime BETWEEN :startDate AND        :endDate ) "
-            + "                                            GROUP BY   p.patient_id ) AS filt "
-            + "                      ON         filt.patient_id = p.patient_id "
-            + "                      WHERE      p.patient_id NOT IN "
-            + "                                 ( "
-            + "                                            SELECT     pp.patient_id "
-            + "                                            FROM       patient pp "
-            + "                                            INNER JOIN encounter ee "
-            + "                                            ON         ee.patient_id = pp.patient_id "
-            + "                                            INNER JOIN obs oo "
-            + "                                            ON         oo.encounter_id = ee.encounter_id "
-            + "                                            WHERE      pp.voided = 0 "
-            + "                                            AND        p.patient_id = pp.patient_id "
-            + "                                            AND        ee.voided = 0 "
-            + "                                            AND        oo.voided = 0 "
-            + "                                            AND        ee.location_id = :location "
-            + "                                            AND        ee.encounter_type = ${60} "
-            + "                                            AND        oo.concept_id = ${23985} "
-            + "                                            AND        oo.value_coded IN ( ${656} , "
-            + "                                                                          ${23982} ) "
-            + "                                            AND        ee.encounter_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                            AND        ee.encounter_datetime < filt.start_date "
-            + "                                            GROUP BY   p.patient_id "
-            + "                                            UNION "
-            + "                                            SELECT p.patient_id "
-            + "                                            FROM   patient p "
-            + "                                            JOIN   encounter e "
-            + "                                            ON     e.patient_id = p.patient_id "
-            + "                                            JOIN   obs o "
-            + "                                            ON     o.encounter_id = e.encounter_id "
-            + "                                            JOIN   obs o2 "
-            + "                                            ON     o2.encounter_id = e.encounter_id "
-            + "                                            WHERE  o.voided = 0 "
-            + "                                            AND    e.voided = 0 "
-            + "                                            AND    p.voided = 0 "
-            + "                                            AND    e.location_id = :location "
-            + "                                            AND    e.encounter_type = ${53} "
-            + "                                            AND    ( ( "
-            + "                                                                 o.concept_id = ${23985} "
-            + "                                                          AND    o.value_coded = ${656} ) "
-            + "                                                   AND    ( "
-            + "                                                                 o2.concept_id = ${165308} "
-            + "                                                          AND    o2.value_coded = ${1256} "
-            + "                                                          AND    o2.obs_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                          AND    o2.obs_datetime < filt.start_date ) ) "
-            + "                                            UNION "
-            + "                                            SELECT p.patient_id "
-            + "                                            FROM   patient p "
-            + "                                            JOIN   encounter e "
-            + "                                            ON     e.patient_id = p.patient_id "
-            + "                                            JOIN   obs o "
-            + "                                            ON     o.encounter_id = e.encounter_id "
-            + "                                            JOIN   obs o2 "
-            + "                                            ON     o2.encounter_id = e.encounter_id "
-            + "                                            WHERE  p.voided = 0 "
-            + "                                            AND    e.voided = 0 "
-            + "                                            AND    o.voided = 0 "
-            + "                                            AND    o2.voided = 0 "
-            + "                                            AND    e.location_id = :location "
-            + "                                            AND    e.encounter_type = ${6} "
-            + "                                            AND    ( ( "
-            + "                                                                 o.concept_id = ${23985} "
-            + "                                                          AND    o.value_coded = ${656} ) "
-            + "                                                   AND    ( "
-            + "                                                                 o2.concept_id = ${165308} "
-            + "                                                          AND    o2.value_coded = ${1256} "
-            + "                                                          AND    o2.obs_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                          AND    o2.obs_datetime < filt.start_date ) ) "
-            + "                                            UNION "
-            + "                                            SELECT p.patient_id "
-            + "                                            FROM   patient p "
-            + "                                            JOIN   encounter e "
-            + "                                            ON     e.patient_id = p.patient_id "
-            + "                                            JOIN   obs o "
-            + "                                            ON     o.encounter_id = e.encounter_id "
-            + "                                            JOIN   obs o2 "
-            + "                                            ON     o2.encounter_id = e.encounter_id "
-            + "                                            WHERE  p.voided = 0 "
-            + "                                            AND    e.voided = 0 "
-            + "                                            AND    o.voided = 0 "
-            + "                                            AND    o2.voided = 0 "
-            + "                                            AND    e.encounter_type = ${9} "
-            + "                                            AND    ( ( "
-            + "                                                                 o.concept_id = ${23985} "
-            + "                                                          AND    o.value_coded = ${656} ) "
-            + "                                                   AND    ( "
-            + "                                                                 o2.concept_id = ${165308} "
-            + "                                                          AND    o2.value_coded = ${1256} "
-            + "                                                          AND    o2.obs_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-            + "                                                          AND    o2.obs_datetime < filt.start_date ) ) ) "
-            + "                      GROUP BY   p.patient_id) AS inhresumo "
-            + "ON         inhresumo.patient_id = p.patient_id "
-            + "WHERE      p.voided = 0 "
-            + "AND        e.voided = 0 "
-            + "AND        o.voided = 0 "
-            + "AND        o2.voided = 0 "
-            + "AND        e.location_id = :location "
-            + "AND        e.encounter_type = ${53} "
-            + "AND        ( ( "
-            + "                                 o.concept_id = ${23985} "
-            + "                      AND        o.value_coded = ${656} ) "
-            + "           AND        ( "
-            + "                                 o2.concept_id = ${165308} "
-            + "                      AND        o2.value_coded = ${1256} "
-            + "                      AND        o2.obs_datetime BETWEEN inhresumo.start_date AND        :endDate ) ) "
-            + "GROUP BY   p.patient_id";
+        new EptsQueriesUtil()
+            .min(tptInitiationCohortQueries.getPatientsWithFichaResumoUltimaProfilaxiaDate())
+            .getQuery();
 
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+    sqlPatientDataDefinition.setQuery(query);
 
     return sqlPatientDataDefinition;
   }

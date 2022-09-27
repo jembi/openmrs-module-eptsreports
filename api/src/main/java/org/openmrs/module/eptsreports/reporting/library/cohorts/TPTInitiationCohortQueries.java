@@ -102,14 +102,13 @@ public class TPTInitiationCohortQueries {
   public CohortDefinition getIPTStartCohort() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("B - IPT start 1 or 2 or 3 or 4 or 5 Cohort");
+    cd.setName("B - IPT start 1 or 2 or 4 or 5 Cohort");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition BIPT1 = getPatientsWithFichaResumoUltimaProfilaxia();
     CohortDefinition BIPT2 = getPatientsWithFichaClinicaProfilaxiaINH();
-    CohortDefinition BIPT3 = getPatientsIPTStart3WithFichaClinicaOrFichaPediatrica();
     CohortDefinition BIPT4 = getPatientsWithFirstFiltRegimeTpt();
     CohortDefinition BIPT5 = getpatientswithRegimeTPTIsoniazid();
 
@@ -122,34 +121,27 @@ public class TPTInitiationCohortQueries {
         EptsReportUtils.map(
             BIPT2, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "BIPT3",
-        EptsReportUtils.map(
-            BIPT3, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
         "BIPT4",
         EptsReportUtils.map(
             BIPT4, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
     cd.addSearch(
         "BIPT5",
         EptsReportUtils.map(
             BIPT5, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(BIPT1 OR BIPT2 OR BIPT3 OR BIPT4 OR BIPT5)");
+    cd.setCompositionString("(BIPT1 OR BIPT2 OR BIPT4 OR BIPT5)");
 
     return cd;
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>Select all patients with “Regime de TPT” (concept id 23985) with value coded “3HP” or ”
-   * 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento TPT”(concept ID
-   * 23987) value coded “inicio” or “re-inicio” (concept ID in [1256, 1705]) marked on FILT
-   * (encounter type 60) and encounter datetime between start date and end date
+   * <p>Patients who have Regime de TPT with the values “3HP or 3HP + Piridoxina” and “Seguimento de
+   * tratamento TPT” = (‘Inicio’ or ‘Re-Inicio’) marked on Ficha de Levantamento de TPT (FILT)
+   * during the reporting period or;
    *
    * </blockquote>
    *
@@ -173,14 +165,13 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>Select all patients (And DATES) with “Regime de TPT” (concept id 23985) with value coded
-   * “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento
-   * TPT”(concept ID 23987) value coded “inicio” or “re-inicio” (concept ID in [1256, 1705]) marked
-   * on FILT (encounter type 60) and encounter datetime between start date and end date
+   * <p>Patients who have Regime de TPT with the values “3HP or 3HP + Piridoxina” and “Seguimento de
+   * tratamento TPT” = (‘Inicio’ or ‘Re-Inicio’) marked on Ficha de Levantamento de TPT (FILT)
+   * during the reporting period or;
    *
    * </blockquote>
    *
@@ -216,13 +207,12 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id
-   * 23954) and Data Início selected in Ficha Resumo - Mastercard (Encounter type 53) (3HP Start
-   * Date) during the reporting period
+   * <p>Patients who have Última Profilaxia TPT with value “3HP” and Data Inicio selected in Ficha
+   * Resumo - Mastercard (3HP Start Date) during the reporting period or
    *
    * </blockquote>
    *
@@ -244,13 +234,12 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>Select all patients (And DATES) with Última profilaxia(concept id 23985) value coded
-   * 3HP(concept id 23954) and Data Início selected in Ficha Resumo - Mastercard (Encounter type 53)
-   * (3HP Start Date) during the reporting period
+   * <p>Patients who have Última Profilaxia TPT with value “3HP” and Data Inicio selected in Ficha
+   * Resumo - Mastercard (3HP Start Date) during the reporting period or
    *
    * </blockquote>
    *
@@ -284,14 +273,13 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>Select all patients with Profilaxia TPT (concept id 23985) value coded 3HP (concept id
-   * 23954) and Estado da Profilaxia (concept id 165308) value coded Início (concept id 1256) marked
-   * on Ficha Clínica – Mastercard (Encounter type 6) (3HP Start Date) during the reporting period
-   * or
+   * <p>Patients who have Profilaxia TPT with the value “3HP” and Estado da Profilaxia with the
+   * value “Inicio (I)” marked on Ficha Clínica – Mastercard (3HP Start Date) during the reporting
+   * period or
    *
    * </blockquote>
    *
@@ -313,14 +301,13 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>Select all patients (And Dates) with Profilaxia TPT (concept id 23985) value coded 3HP
-   * (concept id 23954) and Estado da Profilaxia (concept id 165308) value coded Início (concept id
-   * 1256) marked on Ficha Clínica – Mastercard (Encounter type 6) (3HP Start Date) during the
-   * reporting period or
+   * <p>Patients who have Profilaxia TPT with the value “3HP” and Estado da Profilaxia with the
+   * value “Inicio (I)” marked on Ficha Clínica – Mastercard (3HP Start Date) during the reporting
+   * period or
    *
    * </blockquote>
    *
@@ -354,13 +341,12 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>Select all patients with Outras prescricoes(concept id 1719) value coded DT-3HP (concept id
-   * 165307) marked in Ficha Clínica – Mastercard (Encounter type 6) (3HP Start Date) during the
-   * reporting period or
+   * <p>Patients who have Outras Prescrições with the value “DT-3HP” marked on Ficha Clínica –
+   * Mastercard (3HP Start Date) during the reporting period or
    *
    * </blockquote>
    *
@@ -382,13 +368,12 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>Select all patients (and DATES) with Outras prescricoes(concept id 1719) value coded DT-3HP
-   * (concept id 165307) marked in Ficha Clínica – Mastercard (Encounter type 6) (3HP Start Date)
-   * during the reporting period or
+   * <p>Patients who have Outras Prescrições with the value “DT-3HP” marked on Ficha Clínica –
+   * Mastercard (3HP Start Date) during the reporting period or
    *
    * </blockquote>
    *
@@ -421,30 +406,23 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>• Select all patients with “Regime de TPT” (concept id 23985) with value coded “3HP” or ”
-   * 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento TPT”(concept ID
-   * 23987) value coded “continua” or “fim” or no value(concept ID in [1257, 1267, null]) marked on
-   * the first FILT (encounter type 60) during the reporting period as “FILT Start Date” and:
-   *
-   * <p>◦ No other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
-   * id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the FILT 3HP
-   * start date. and
-   *
-   * <p>◦ No other 3HP start dates marked on Ficha clinica (encounter type 6, encounter datetime)
-   * with Profilaxia TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da
-   * Profilaxia (concept id 165308) value coded Início (concept id 1256) or Outras prescrições
-   * (concept id 1719) value coded DT-3HP (concept id 165307) in the 4 months prior to the FILT 3HP
-   * start date. and
-   *
-   * <p>◦ No other 3HP start dates marked on Ficha Resumo (encounter type 53) with Última
-   * profilaxia(concept id 23985) value coded 3HP(concept id 23954) and Data Início (value datetime)
-   * in the 4 months prior to the FILT 3HP start date.
-   *
-   * <p>Note: The system will consider the oldest date amongst all sources as the 3HP Start Date
+   * <ul>
+   *   <li>Patients who have Regime de TPT with the values (3HP or 3HP + Piridoxina) and “Seguimento
+   *       de Tratamento TPT” with values “Continua” or “Fim” or no value marked on the first
+   *       pick-up on Ficha de Levantamento de TPT (FILT) during the reporting period (3HP FILT
+   *       Start Date) and:
+   *   <li>No other Regime de TPT = 3HP or 3HP + Piridoxina marked on FILT in the 4 months prior to
+   *       the 3HP FILT Start Date and
+   *   <li>No other 3HP Start Dates marked on Ficha Clinica (Profilaxia TPT with the value “3HP” and
+   *       Estado da Profilaxia with the value “Inicio (I)”) or (Outras Prescrições with the value
+   *       DT-3HP”) in the 4 months prior to this FILT 3HP Start Date and
+   *   <li>No other 3HP Start Dates marked on Ficha Resumo (Última profilaxia TPT with value “3HP”
+   *       and Data Inicio selected in the 4 months prior to this FILT 3HP Start Date:
+   * </ul>
    *
    * </blockquote>
    *
@@ -466,31 +444,23 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b>Technical Specs</b>
+   * <b>TPT_INI_FR4 : Patients who initiated 3HP therapy</b>
    *
    * <blockquote>
    *
-   * <p>• Select all patients (And DATES) with “Regime de TPT” (concept id 23985) with value coded
-   * “3HP” or ” 3HP+Piridoxina” (concept id in [23954, 23984]) and “Seguimento de tratamento
-   * TPT”(concept ID 23987) value coded “continua” or “fim” or no value(concept ID in [1257, 1267,
-   * null]) marked on the first FILT (encounter type 60) during the reporting period as “FILT Start
-   * Date” and:
-   *
-   * <p>◦ No other Regime de TPT (concept id 23985) value coded “3HP” or ” 3HP+Piridoxina” (concept
-   * id in [23954, 23984]) marked on FILT (encounter type 60) in the 4 months prior to the FILT 3HP
-   * start date. and
-   *
-   * <p>◦ No other 3HP start dates marked on Ficha clinica (encounter type 6, encounter datetime)
-   * with Profilaxia TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da
-   * Profilaxia (concept id 165308) value coded Início (concept id 1256) or Outras prescrições
-   * (concept id 1719) value coded DT-3HP (concept id 165307) in the 4 months prior to the FILT 3HP
-   * start date. and
-   *
-   * <p>◦ No other 3HP start dates marked on Ficha Resumo (encounter type 53) with Última
-   * profilaxia(concept id 23985) value coded 3HP(concept id 23954) and Data Início (value datetime)
-   * in the 4 months prior to the FILT 3HP start date.
-   *
-   * <p>Note: The system will consider the oldest date amongst all sources as the 3HP Start Date
+   * <ul>
+   *   <li>Patients who have Regime de TPT with the values (3HP or 3HP + Piridoxina) and “Seguimento
+   *       de Tratamento TPT” with values “Continua” or “Fim” or no value marked on the first
+   *       pick-up on Ficha de Levantamento de TPT (FILT) during the reporting period (3HP FILT
+   *       Start Date) and:
+   *   <li>No other Regime de TPT = 3HP or 3HP + Piridoxina marked on FILT in the 4 months prior to
+   *       the 3HP FILT Start Date and
+   *   <li>No other 3HP Start Dates marked on Ficha Clinica (Profilaxia TPT with the value “3HP” and
+   *       Estado da Profilaxia with the value “Inicio (I)”) or (Outras Prescrições with the value
+   *       DT-3HP”) in the 4 months prior to this FILT 3HP Start Date and
+   *   <li>No other 3HP Start Dates marked on Ficha Resumo (Última profilaxia TPT with value “3HP”
+   *       and Data Inicio selected in the 4 months prior to this FILT 3HP Start Date:
+   * </ul>
    *
    * </blockquote>
    *
@@ -629,14 +599,12 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b> Technical Specs <b>
+   * <b> TPT_INI_FR5 : Patients who initiated IPT <b>
    *
    * <blockquote>
    *
-   * <p>1: Select all patients selected in Ficha Resumo - Mastercard (encounter type 53) with Última
-   * Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Data Início (concept id
-   * 165308 value 1256) occured during the reporting period (obs datetime between start date and end
-   * date).
+   * <p>Patients who have (Última profilaxia TPT with value “Isoniazida (INH)” and Data Inicio
+   * selected in Ficha Resumo - Mastercard during the reporting period or
    *
    * </blockquote>
    *
@@ -660,14 +628,12 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b> Technical Specs <b>
+   * <b> TPT_INI_FR5 : Patients who initiated IPT <b>
    *
    * <blockquote>
    *
-   * <p>1: Select all patients (And Dates) selected in Ficha Resumo - Mastercard (encounter type 53)
-   * with Última Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Data Início
-   * (concept id 165308 value 1256) occured during the reporting period (obs datetime between start
-   * date and end date).
+   * <p>Patients who have (Última profilaxia TPT with value “Isoniazida (INH)” and Data Inicio
+   * selected in Ficha Resumo - Mastercard during the reporting period or
    *
    * </blockquote>
    *
@@ -702,14 +668,16 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b> Technical Specs </b>
+   * <b> TPT_INI_FR5 : Patients who initiated IPT <b>
    *
    * <blockquote>
    *
-   * <p>2: Select all patients with Ficha clinica (encounter type 6) with Profilaxia TPT (concept id
-   * 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id 165308) value
-   * coded Início (concept id 1256) during the reporting period (obs datetime between start date and
-   * end date).
+   * <p>Patients who have Profilaxia TPT with the value “Isoniazida (INH)” and Estado da Profilaxia
+   * with the value “Inicio (I)”) marked on Ficha Clínica -– Mastercard during the reporting period
+   * or
+   *
+   * <p>Patients who have (Profilaxia TPT with the value “Isoniazida (INH)” and Data Início)
+   * registered in Ficha de Seguimento and occurred during the reporting period or
    *
    * </blockquote>
    *
@@ -731,14 +699,16 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b> Technical Specs </b>
+   * <b> TPT_INI_FR5 : Patients who initiated IPT <b>
    *
    * <blockquote>
    *
-   * <p>2: Select all patients (and Dates) with Ficha clinica (encounter type 6) with Profilaxia TPT
-   * (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id
-   * 165308) value coded Início (concept id 1256) during the reporting period (obs datetime between
-   * start date and end date).
+   * <p>Patients who have Profilaxia TPT with the value “Isoniazida (INH)” and Estado da Profilaxia
+   * with the value “Inicio (I)”) marked on Ficha Clínica -– Mastercard during the reporting period
+   * or
+   *
+   * <p>Patients who have (Profilaxia TPT with the value “Isoniazida (INH)” and Data Início)
+   * registered in Ficha de Seguimento and occurred during the reporting period or
    *
    * </blockquote>
    *
@@ -748,77 +718,6 @@ public class TPTInitiationCohortQueries {
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
-    valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-
-    String query =
-        "SELECT     p.patient_id, o2.obs_datetime AS tpt_date "
-            + "        FROM       patient p "
-            + "        INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "        INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
-            + "        AND   e.location_id = :location "
-            + "        AND   e.encounter_type = ${6} "
-            + "        AND   ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
-            + "        AND     ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-            + "        AND       o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
-            + "        GROUP BY p.patient_id ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
-
-    return stringSubstitutor.replace(query);
-  }
-
-  /**
-   * <b>Technical Specs</b>
-   *
-   * <blockquote>
-   *
-   * <p>3: Select all patients with Ficha Seguimento (encounter type 9) with Profilaxia TPT (concept
-   * id 23985) value coded INH (concept id 656) and Data Início (concept id 165308 value 1256)
-   * occured during the reporting period (obs datetime between start date and end date).
-   *
-   * </blockquote>
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsIPTStart3WithFichaClinicaOrFichaPediatrica() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
-        "BIPT3 - Patients with Profilaxia TPT value INH and Data Inicio in Ficha Seguimento");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    String query =
-        new PatientIdBuilder(getPatientsIPTStart3WithFichaClinicaOrFichaPediatricaDate())
-            .getQuery();
-
-    sqlCohortDefinition.setQuery(query);
-
-    return sqlCohortDefinition;
-  }
-
-  /**
-   * <b>Technical Specs</b>
-   *
-   * <blockquote>
-   *
-   * <p>3: Select all patients (and Dates) with Ficha Seguimento (encounter type 9) with Profilaxia
-   * TPT (concept id 23985) value coded INH (concept id 656) and Data Início (concept id 165308
-   * value 1256) occured during the reporting period (obs datetime between start date and end date).
-   *
-   * </blockquote>
-   *
-   * @return {@link String}
-   */
-  public String getPatientsIPTStart3WithFichaClinicaOrFichaPediatricaDate() {
-
-    Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
@@ -833,7 +732,7 @@ public class TPTInitiationCohortQueries {
             + "        INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 AND o2.voided = 0 "
             + "        AND   e.location_id = :location "
-            + "        AND   e.encounter_type = ${9} "
+            + "        AND   e.encounter_type IN ( ${6}, ${9} ) "
             + "        AND   ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
             + "        AND     ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
             + "        AND       o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
@@ -845,14 +744,14 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b> Technical Specs </b>
+   * <b> TPT_INI_FR5 : Patients who initiated IPT <b>
    *
    * <blockquote>
    *
-   * <p>4: Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida +
-   * Piridoxina”) and “Seguimento de Tratamento TPT” with values “Continua” or no value marked on
-   * the first pick- up on Ficha de Levantamento de TPT (FILT) during the reporting period as FILT
-   * INH Start Date and:
+   * <p>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”)
+   * and “Seguimento de Tratamento TPT” with values “Continua” or no value marked on the first pick-
+   * up on Ficha de Levantamento de TPT (FILT) during the reporting period as FILT INH Start Date
+   * and:
    *
    * <ul>
    *   <li>No other INH values [Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
@@ -893,14 +792,14 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b> Technical Specs </b>
+   * <b> TPT_INI_FR5 : Patients who initiated IPT <b>
    *
    * <blockquote>
    *
-   * <p>4: Patients (and Dates) who have Regime de TPT with the values (“Isoniazida” or “Isoniazida
-   * + Piridoxina”) and “Seguimento de Tratamento TPT” with values “Continua” or no value marked on
-   * the first pick- up on Ficha de Levantamento de TPT (FILT) during the reporting period as FILT
-   * INH Start Date and:
+   * <p>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”)
+   * and “Seguimento de Tratamento TPT” with values “Continua” or no value marked on the first pick-
+   * up on Ficha de Levantamento de TPT (FILT) during the reporting period as FILT INH Start Date
+   * and:
    *
    * <ul>
    *   <li>No other INH values [Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
@@ -1015,15 +914,13 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b> Technical Specs </b>
+   * <b> TPT_INI_FR5 : Patients who initiated IPT <b>
    *
    * <blockquote>
    *
-   * <p>5: Select all patients with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
-   * ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Seguimento de tratamento
-   * TPT”(concept ID 23987) value coded “inicio” or “re-inicio”(concept ID in [1256, 1705]) marked
-   * on FILT (encounter type 60) during the reporting period (between startDate and endDate) (obs
-   * datetime for 23987).
+   * <p>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”)
+   * and “Seguimento de tratamento TPT” = (‘Inicio’ or ‘Re-Inicio’) marked on Ficha de Levantamento
+   * de TPT (FILT) during the reporting period or
    *
    * </blockquote>
    *
@@ -1046,15 +943,13 @@ public class TPTInitiationCohortQueries {
   }
 
   /**
-   * <b> Technical Specs </b>
+   * <b> TPT_INI_FR5 : Patients who initiated IPT <b>
    *
    * <blockquote>
    *
-   * <p>5: Select all patients (and Dates) with “Regime de TPT” (concept id 23985) value coded
-   * ‘Isoniazid’ or ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Seguimento de
-   * tratamento TPT”(concept ID 23987) value coded “inicio” or “re-inicio”(concept ID in [1256,
-   * 1705]) marked on FILT (encounter type 60) during the reporting period (between startDate and
-   * endDate) (obs datetime for 23987).
+   * <p>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”)
+   * and “Seguimento de tratamento TPT” = (‘Inicio’ or ‘Re-Inicio’) marked on Ficha de Levantamento
+   * de TPT (FILT) during the reporting period or
    *
    * </blockquote>
    *

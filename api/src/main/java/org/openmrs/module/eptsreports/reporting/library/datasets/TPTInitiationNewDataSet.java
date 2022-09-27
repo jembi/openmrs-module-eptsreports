@@ -151,12 +151,12 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
         "startDate=${startDate},location=${location}",
         null);
 
-    pdd.addColumn(
-        "Difference_between_Registered_vs_Expected_3HP_Completion_Date",
-        tPTInitiationDataDefinitionQueries
-            .getDifferencebetweenRegisteredvsExpected3HPCompletionDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+    //    pdd.addColumn(
+    //        "Difference_between_Registered_vs_Expected_3HP_Completion_Date",
+    //        tPTInitiationDataDefinitionQueries
+    //            .getDifferencebetweenRegisteredvsExpected3HPCompletionDate(),
+    //        "startDate=${startDate},endDate=${endDate},location=${location}",
+    //        null);
 
     pdd.addColumn(
         "IPT_FILT_start_date",
