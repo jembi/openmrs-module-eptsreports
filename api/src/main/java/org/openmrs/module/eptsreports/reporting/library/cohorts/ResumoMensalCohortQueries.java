@@ -493,7 +493,7 @@ public class ResumoMensalCohortQueries {
 
     cd.addSearch(
         "B2Exlcusion",
-        map(getTransferredInPatients(true), "onOrAfter=${onOrAfter-1},location=${location}"));
+        map(getTransferredInPatients(true), "onOrAfter=${onOrAfter},location=${location}"));
 
     CohortDefinition transferredOut = getPatientsTransferredOutB5(false);
 
