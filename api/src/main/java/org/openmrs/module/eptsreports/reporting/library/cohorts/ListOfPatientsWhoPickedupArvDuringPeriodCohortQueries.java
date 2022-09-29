@@ -46,7 +46,7 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodCohortQueries {
 
     CohortDefinition txcurr = this.txCurrCohortQueries.getTxCurrCompositionCohort("txcurr", true);
 
-    CohortDefinition lastPickupFila = this.getLastDrugPickup();
+    CohortDefinition lastPickupFila = this.getPatientsWithDrugPickupOnFila();
 
     cd.addSearch(
         "txcurr", EptsReportUtils.map(txcurr, "onOrBefore=${endDate},location=${location}"));
@@ -61,16 +61,14 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodCohortQueries {
   }
 
   /**
-   * <b>Patient’s Most Recent Drug Pick-Up on FILA</b>
-   *
-   * <p>Art Pickup: MAX(encounter.encounter_datetime) between the selected report start date and end
-   * date of S.TARV: FARMACIA (ID=18) as Last ARV Pick-Up Date on FILA
+   * <p>Patients with ARV drug pick-up registered on FILA between the
+   * selected report start date and end date;
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getLastDrugPickup() {
+  public CohortDefinition getPatientsWithDrugPickupOnFila() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Most Recent Drug Pick-Up on FILA");
+    cd.setName("Patients with ARV drug pick-up registered on FILA");
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -79,7 +77,7 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodCohortQueries {
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
 
     String sql =
-        " SELECT patient_id FROM ( SELECT p.patient_id, MAX(e.encounter_datetime) as last_pickup_date"
+        " SELECT p.patient_id "
             + " FROM   patient p  "
             + "          INNER JOIN encounter e  "
             + "                          ON p.patient_id = e.patient_id  "
@@ -88,7 +86,7 @@ public class ListOfPatientsWhoPickedupArvDuringPeriodCohortQueries {
             + "          AND e.location_id = :location "
             + "          AND e.encounter_type = ${18} "
             + "         AND e.encounter_datetime BETWEEN :startDate AND :endDate "
-            + " GROUP BY p.patient_id ) pickup_fila ";
+            + " GROUP BY p.patient_id ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
