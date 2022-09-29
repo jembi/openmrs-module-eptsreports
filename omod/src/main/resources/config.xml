@@ -3337,6 +3337,14 @@
 	</globalProperty>
 
 	<globalProperty>
+		<property>@MODULE_ID@.negativeDiagnosisConceptUuid</property>
+		<defaultValue>3cafb15a-7aed-4fc5-b91d-86f7211087fa</defaultValue>
+		<description>
+			UUID for NEGATIVE DIAGNOSIS Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
 		<property>@MODULE_ID@.rifampinResistanceConceptUuid</property>
 		<defaultValue>cc7e60cc-b9e6-4083-bb6d-8b9caa070f26</defaultValue>
 		<description>
@@ -3351,15 +3359,6 @@
 			UUID for NOT FOUND Test Result Concept
 		</description>
 	</globalProperty>
-
-	<globalProperty>
-		<property>@MODULE_ID@.negativeDiagnosisConceptUuid</property>
-		<defaultValue>3cafb15a-7aed-4fc5-b91d-86f7211087fa</defaultValue>
-		<description>
-			UUID for NEGATIVE DIAGNOSIS Concept
-		</description>
-	</globalProperty>
-
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

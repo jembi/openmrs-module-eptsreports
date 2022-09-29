@@ -60,7 +60,6 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
     valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    valuesMap.put("2", hivMetadata.getARTProgram().getProgramId());
 
     String query =
         " SELECT art.patient_id, MIN(art.art_date) min_art_date FROM ( "
