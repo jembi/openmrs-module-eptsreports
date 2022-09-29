@@ -304,7 +304,7 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= :startDate AND e.encounter_datetime <= :endDate "
             + "       AND ( ( o.concept_id IN ( ${23723}, ${23774}, ${23951}, ${307}, ${12} ) "
-            + "               AND o.value_coded IN( ${703}, ${664} ) ) OR o.concept_id = ${12} AND o.value_coded = ${1138} ) "
+            + "               AND o.value_coded IN( ${703}, ${664} ) ) OR (o.concept_id = ${12} AND o.value_coded = ${1138}) ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 ";
