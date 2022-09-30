@@ -231,186 +231,177 @@ public class EriDSDDataset extends BaseDataSet {
                     eriDSDCohortQueries.getPatientsWhoAreBreastfeedingD3(), mappings)),
             mappings),
         "");
-    //    dsd.addColumn(
-    //        "N2PW",
-    //        "N2 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N2PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(2),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N2BW",
-    //        "N2 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N2BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(2), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N3PW",
-    //        "N3 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N3PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(3),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N3BW",
-    //        "N3 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N3BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(3), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N4PW",
-    //        "N4 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N4PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(4),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N4BW",
-    //        "N4 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N4BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(4), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N5PW",
-    //        "N5 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N5PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(5),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N5BW",
-    //        "N5 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N5BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(5), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N6PW",
-    //        "N6 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N6PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(6),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N6BW",
-    //        "N6 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N6BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(6), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N7PW",
-    //        "N7 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N7PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(7),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N7BW",
-    //        "N7 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N7BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(7), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N8PW",
-    //        "N8 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N8PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(8),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N8BW",
-    //        "N8 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N8BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(8), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N9PW",
-    //        "N9 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N9PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(9),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N9BW",
-    //        "N9 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N9BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(9), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N10PW",
-    //        "N10 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N10PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(10),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N10BW",
-    //        "N10 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N10BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(10), mappings)),
-    //            mappings),
-    //        "");
+    dsd.addColumn(
+        "N2PW",
+        "N2 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N2PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(2), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N2BW",
+        "N2 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N2BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(2), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N3PW",
+        "N3 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N3PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(3), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N3BW",
+        "N3 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N3BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(3), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N4PW",
+        "N4 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N4PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(4), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N4BW",
+        "N4 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N4BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(4), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N5PW",
+        "N5 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N5PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(5), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N5BW",
+        "N5 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N5BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(5), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N6PW",
+        "N6 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N6PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(6), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N6BW",
+        "N6 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N6BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(6), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N7PW",
+        "N7 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N7PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(7), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N7BW",
+        "N7 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N7BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(7), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N8PW",
+        "N8 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N8PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(8), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N8BW",
+        "N8 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N8BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(8), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N9PW",
+        "N9 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N9PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(9), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N9BW",
+        "N9 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N9BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(9), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N10PW",
+        "N10 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N10PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(10), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N10BW",
+        "N10 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N10BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(10), mappings)),
+            mappings),
+        "");
     dsd.addColumn(
         "N11PW",
         "N11 Pregnant Women",
@@ -430,186 +421,178 @@ public class EriDSDDataset extends BaseDataSet {
                     eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(11), mappings)),
             mappings),
         "");
-    //    dsd.addColumn(
-    //        "N12PW",
-    //        "N12 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N12PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(12),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N12BW",
-    //        "N12 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N12BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(12), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N13PW",
-    //        "N13 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N13PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(13),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N13BW",
-    //        "N13 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N13BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(13), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N14PW",
-    //        "N14 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N14PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(14),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N14BW",
-    //        "N14 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N14BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(14), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N15PW",
-    //        "N15 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N15PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(15),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N15BW",
-    //        "N15 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N15BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(15), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N16PW",
-    //        "N16 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N16PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(16),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N16BW",
-    //        "N16 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N16BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(16), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N17PW",
-    //        "N17 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N17PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(17),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N17BW",
-    //        "N17 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N17BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(17), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N18PW",
-    //        "N18 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N18PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(18),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N18BW",
-    //        "N18 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N18BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(18), mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N19PW",
-    //        "N19 Pregnant Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N19PW",
-    //                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(19),
-    // mappings)),
-    //            mappings),
-    //        "");
-    //    dsd.addColumn(
-    //        "N19BW",
-    //        "N19 Breastfeeding Women",
-    //        EptsReportUtils.map(
-    //            eptsGeneralIndicator.getIndicator(
-    //                "N19BW",
-    //                EptsReportUtils.map(
-    //                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(19), mappings)),
-    //            mappings),
-    //        "");
-    //
-    //    addRow(dsd, "N1", N1, mapStraightThrough(getN1()), getDisags());
-    //    addRow(dsd, "N2", N2, mapStraightThrough(getN2()), getDisags());
-    //    addRow(dsd, "N3", N3, mapStraightThrough(getN3()), getDisags());
-    //    addRow(dsd, "N4", N4, mapStraightThrough(getN4()), getDisags());
-    //    addRow(dsd, "N5", N5, mapStraightThrough(getN5()), getDisags());
-    //    addRow(dsd, "N6", N6, mapStraightThrough(getN6()), getDisags());
-    //    addRow(dsd, "N7", N7, mapStraightThrough(getN7()), getDisags());
-    //    addRow(dsd, "N8", N8, mapStraightThrough(getN8()), getDisags());
-    //    addRow(dsd, "N9", N9, mapStraightThrough(getN9()), getDisags());
-    //    addRow(dsd, "N10", N10, mapStraightThrough(getN10()), getDisags());
+    dsd.addColumn(
+        "N12PW",
+        "N12 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N12PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(12), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N12BW",
+        "N12 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N12BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(12), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N13PW",
+        "N13 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N13PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(13), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N13BW",
+        "N13 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N13BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(13), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N14PW",
+        "N14 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N14PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(14), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N14BW",
+        "N14 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N14BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(14), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N15PW",
+        "N15 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N15PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(15), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N15BW",
+        "N15 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N15BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(15), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N16PW",
+        "N16 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N16PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(16), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N16BW",
+        "N16 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N16BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(16), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N17PW",
+        "N17 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N17PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(17), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N17BW",
+        "N17 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N17BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(17), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N18PW",
+        "N18 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N18PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(18), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N18BW",
+        "N18 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N18BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(18), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N19PW",
+        "N19 Pregnant Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N19PW",
+                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(19), mappings)),
+            mappings),
+        "");
+    dsd.addColumn(
+        "N19BW",
+        "N19 Breastfeeding Women",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "N19BW",
+                EptsReportUtils.map(
+                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(19), mappings)),
+            mappings),
+        "");
+
+    addRow(dsd, "N1", N1, mapStraightThrough(getN1()), getDisags());
+    addRow(dsd, "N2", N2, mapStraightThrough(getN2()), getDisags());
+    addRow(dsd, "N3", N3, mapStraightThrough(getN3()), getDisags());
+    addRow(dsd, "N4", N4, mapStraightThrough(getN4()), getDisags());
+    addRow(dsd, "N5", N5, mapStraightThrough(getN5()), getDisags());
+    addRow(dsd, "N6", N6, mapStraightThrough(getN6()), getDisags());
+    addRow(dsd, "N7", N7, mapStraightThrough(getN7()), getDisags());
+    addRow(dsd, "N8", N8, mapStraightThrough(getN8()), getDisags());
+    addRow(dsd, "N9", N9, mapStraightThrough(getN9()), getDisags());
+    addRow(dsd, "N10", N10, mapStraightThrough(getN10()), getDisags());
     addRow(dsd, "N11", N11, mapStraightThrough(getN11()), getDisags());
-    //    addRow(dsd, "N12", N12, mapStraightThrough(getN12()), getDisags());
-    //    addRow(dsd, "N13", N13, mapStraightThrough(getN13()), getDisags());
-    //    addRow(dsd, "N14", N14, mapStraightThrough(getN14()), getDisags());
-    //    addRow(dsd, "N15", N15, mapStraightThrough(getN15()), getDisags());
-    //    addRow(dsd, "N16", N16, mapStraightThrough(getN16()), getDisags());
-    //    addRow(dsd, "N17", N17, mapStraightThrough(getN17()), getDisags());
-    //    addRow(dsd, "N18", N18, mapStraightThrough(getN18()), getDisags());
-    //    addRow(dsd, "N19", N19, mapStraightThrough(getN19()), getDisags());
+    addRow(dsd, "N12", N12, mapStraightThrough(getN12()), getDisags());
+    addRow(dsd, "N13", N13, mapStraightThrough(getN13()), getDisags());
+    addRow(dsd, "N14", N14, mapStraightThrough(getN14()), getDisags());
+    addRow(dsd, "N15", N15, mapStraightThrough(getN15()), getDisags());
+    addRow(dsd, "N16", N16, mapStraightThrough(getN16()), getDisags());
+    addRow(dsd, "N17", N17, mapStraightThrough(getN17()), getDisags());
+    addRow(dsd, "N18", N18, mapStraightThrough(getN18()), getDisags());
+    addRow(dsd, "N19", N19, mapStraightThrough(getN19()), getDisags());
 
     return dsd;
   }
@@ -716,7 +699,8 @@ public class EriDSDDataset extends BaseDataSet {
 
   private List<ColumnParameters> getDisags() {
     return Arrays.asList(
-        new ColumnParameters("Total", "Total", "pregnantBreastfeedingTb=NPNBNTB", "01"),
+        // !        new ColumnParameters("Total", "Total", "pregnantBreastfeedingTb=NPNBNTB", "01"),
+        new ColumnParameters("Total", "Total", "", "01"),
         new ColumnParameters("Eligible Sub-Total", "Eligible Sub-Total", "eligible=E", "02"),
         new ColumnParameters(
             "Eligible Adults",
