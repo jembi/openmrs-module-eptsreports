@@ -863,6 +863,7 @@ public class CommonQueries {
             + " AND pg.voided = 0"
             + "    AND pg.program_id = ${2} and pg.date_enrolled <='"
             + endDate
+            + "'"
             + " UNION "
             + " SELECT p.patient_id, MIN(ob.value_datetime) first_pickup  "
             + "                                 FROM patient p  "
