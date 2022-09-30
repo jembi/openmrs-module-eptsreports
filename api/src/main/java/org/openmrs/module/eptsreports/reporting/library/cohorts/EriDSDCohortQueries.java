@@ -15,7 +15,6 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.dsd.OnArtForAtleastXmonthsCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.DsdQueries;
-import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.BaseObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
@@ -54,7 +53,6 @@ public class EriDSDCohortQueries {
   public CohortDefinition getD1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("D1 - Number of active, stable, patients on ART. Combination of Criteria 1,2,3,4,5");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
@@ -72,26 +70,21 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "sarcomaKarposi",
         EptsReportUtils.map(
-            getAllPatientsOnSarcomaKarposi(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getAllPatientsOnSarcomaKarposi(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "D3",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${endDate},endDate=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "stable",
-        EptsReportUtils.map(
-            getPatientsWhoAreStable(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getPatientsWhoAreStable(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "returned",
-        EptsReportUtils.map(
-            getPatientsWhoReturned(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getPatientsWhoReturned(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
         "(D3 AND moreThan2years AND stable AND NOT (pregnantBreastfeedingTB OR sarcomaKarposi OR returned))");
@@ -124,9 +117,7 @@ public class EriDSDCohortQueries {
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(false),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "activeAndStable",
-        EptsReportUtils.map(
-            getD1(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "activeAndStable", EptsReportUtils.map(getD1(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("activeAndStable AND NOT pregnant AND NOT breastfeeding");
 
@@ -149,8 +140,7 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
         "activeAndStablePatients",
-        EptsReportUtils.map(
-            getD1(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getD1(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "pregnantOrBreastfeedingOrTBTreatment",
@@ -162,7 +152,7 @@ public class EriDSDCohortQueries {
         "B13",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${endDate},endDate=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("B13 AND NOT activeAndStablePatients");
 
@@ -194,8 +184,7 @@ public class EriDSDCohortQueries {
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "activeAndUnstable",
-        EptsReportUtils.map(
-            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("activeAndUnstable AND NOT pregnant AND NOT breastfeeding");
 
@@ -211,7 +200,6 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("D2 - who are pregnant");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -222,8 +210,7 @@ public class EriDSDCohortQueries {
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "activeAndUnstable",
-        EptsReportUtils.map(
-            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("activeAndUnstable AND pregnant");
 
@@ -239,7 +226,6 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("D2 - who are Breastfeeding");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -251,8 +237,7 @@ public class EriDSDCohortQueries {
 
     cd.addSearch(
         "activeAndUnstable",
-        EptsReportUtils.map(
-            getD2(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("activeAndUnstable AND breastfeeding");
 
@@ -270,13 +255,11 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("D3 - D3: Number of all patients currently on ART");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
         "activeAndStablePatients",
-        EptsReportUtils.map(
-            getD1(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getD1(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "pregnantOrBreastfeedingOrTBTreatment",
@@ -288,7 +271,7 @@ public class EriDSDCohortQueries {
         "B13",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${endDate},endDate=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("B13");
 
@@ -304,7 +287,6 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("D3 - who are Non-pregnant and Non-Breastfeeding");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
@@ -319,10 +301,7 @@ public class EriDSDCohortQueries {
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "onART",
-        EptsReportUtils.map(
-            getD3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("onART", EptsReportUtils.map(getD3(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("onART AND NOT pregnant AND NOT breastfeeding");
 
@@ -338,7 +317,6 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("D3 - who are pregnant");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -347,10 +325,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "onART",
-        EptsReportUtils.map(
-            getD3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("onART", EptsReportUtils.map(getD3(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("onART AND pregnant");
 
@@ -366,7 +341,6 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("D3 - who are Breastfeeding");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -376,10 +350,7 @@ public class EriDSDCohortQueries {
             txNewCohortQueries.getTxNewBreastfeedingComposition(true),
             "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "onART",
-        EptsReportUtils.map(
-            getD3(), "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("onART", EptsReportUtils.map(getD3(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("onART AND breastfeeding");
 
@@ -395,11 +366,10 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("D3 - who are pregnant");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mappings = "endDate=${endDate},location=${location}";
 
     if (indicatorFlag == 2) {
       cd.addSearch("onART", EptsReportUtils.map(getN2(), mappings));
@@ -459,11 +429,10 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("D3 - who are Breastfeeding");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mappings = "endDate=${endDate},location=${location}";
 
     if (indicatorFlag == 2) {
       cd.addSearch("onART", EptsReportUtils.map(getN2(), mappings));
@@ -526,7 +495,6 @@ public class EriDSDCohortQueries {
   public CohortDefinition getN1() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("participatingInDsdModel");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch("N2", mapStraightThrough(getN2()));
@@ -552,37 +520,26 @@ public class EriDSDCohortQueries {
     cd.setName(
         "Number of all patients currently on ART who are included in DSD model: Dispensa Trimestral (DT)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition patientsScheduled =
-        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(83, 97);
+    CohortDefinition nextArtPickUpScheduledORdispensaTrimestral =
+        DsdQueries
+            .getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaOrWithPickupOnFilaBetween(
+                83, 97, Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId()));
 
-    CohortDefinition startOrContinue =
-        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
-            Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId()),
-            Arrays.asList(
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getContinueRegimenConcept().getConceptId()));
+    cd.addSearch(
+        "nextArtPickUpScheduledORdispensaTrimestral",
+        EptsReportUtils.map(
+            nextArtPickUpScheduledORdispensaTrimestral, "endDate=${endDate},location=${location}"));
 
-    CohortDefinition quarterlyDispensation =
-        getPatientsWhoHaveModoDeDispensa(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
-            Arrays.asList(hivMetadata.getQuarterlyConcept().getConceptId()));
-
-    String mappings = "onOrBefore=${endDate},location=${location}";
     cd.addSearch(
         "D3",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${endDate},endDate=${endDate},location=${location}"));
-    cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
-    cd.addSearch("quarterly", EptsReportUtils.map(quarterlyDispensation, mappings));
-    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
-    // ! TODO by Paulo e Pinki
-    cd.setCompositionString(
-        "D3 "); // AND aNovaQueryN2 => scheduled OR startOrContinue OR quarterly");
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("D3 AND nextArtPickUpScheduledORdispensaTrimestral");
 
     return cd;
   }
@@ -600,36 +557,26 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N3: Number of all patients currently on ART who are included in DSD model: Dispensa Semestral (DS)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition patientsScheduled =
-        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(175, 190);
+    CohortDefinition nextArtPickUpScheduledORdispensaSemestral =
+        DsdQueries
+            .getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaOrWithPickupOnFilaBetween(
+                175, 190, Arrays.asList(hivMetadata.getSemiannualDispensation().getConceptId()));
 
-    CohortDefinition startOrContinue =
-        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
-            Arrays.asList(hivMetadata.getSemiannualDispensation().getConceptId()),
-            Arrays.asList(
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getContinueRegimenConcept().getConceptId()));
+    cd.addSearch(
+        "nextArtPickUpScheduledORdispensaSemestral",
+        EptsReportUtils.map(
+            nextArtPickUpScheduledORdispensaSemestral, "endDate=${endDate},location=${location}"));
 
-    CohortDefinition semiannualDispensation =
-        getPatientsWhoHaveModoDeDispensa(
-            Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()),
-            Arrays.asList(hivMetadata.getSemiannualDispensation().getConceptId()));
-
-    String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
-    cd.addSearch("semiannual", EptsReportUtils.map(semiannualDispensation, mappings));
-    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
     cd.addSearch(
         "D3",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${endDate},endDate=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("D3 AND (scheduled OR startOrContinue OR semiannual)");
+    cd.setCompositionString("D3 AND nextArtPickUpScheduledORdispensaSemestral");
 
     return cd;
   }
@@ -647,30 +594,28 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N4: Number of all patients currently on ART who are included in DSD model: Dispensa Anual (DA)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition patientsScheduled =
-        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(335, 395);
+    CohortDefinition nextArtPickUpScheduledORdispensaAnual =
+        DsdQueries
+            .getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaOrWithPickupOnFilaBetween(
+                335,
+                395,
+                Arrays.asList(hivMetadata.getAnnualArvDispensationConcept().getConceptId()));
 
-    CohortDefinition startOrContinue =
-        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
-            Arrays.asList(hivMetadata.getAnnualArvDispensationConcept().getConceptId()),
-            Arrays.asList(
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getContinueRegimenConcept().getConceptId()));
+    cd.addSearch(
+        "nextArtPickUpScheduledORdispensaAnual",
+        EptsReportUtils.map(
+            nextArtPickUpScheduledORdispensaAnual, "endDate=${endDate},location=${location}"));
 
-    String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
-    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
     cd.addSearch(
         "D3",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
             "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("D3 AND (scheduled OR startOrContinue)");
+    cd.setCompositionString("D3 AND nextArtPickUpScheduledORdispensaAnual");
 
     return cd;
   }
@@ -688,7 +633,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N5: Number of all patients currently on ART who are included in DSD model: Dispensa Descentralizada (DD)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -725,7 +669,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N6: Number of all patients currently on ART who are included in DSD model: Dispensa Comunitária através do APE (DCA)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -762,30 +705,26 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N7: Number of all patients currently on ART who are included in DSD model: Fluxo Rápido (FR)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition patientsScheduled =
-        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(175, 190);
+    CohortDefinition nextArtPickUpScheduledORfluxoRapido =
+        DsdQueries
+            .getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaOrWithPickupOnFilaBetween(
+                175, 190, Arrays.asList(hivMetadata.getRapidFlow().getConceptId()));
 
-    CohortDefinition startOrContinue =
-        DsdQueries.getPatientsWithTypeOfDispensationOnLastMdcRecord(
-            Arrays.asList(hivMetadata.getRapidFlow().getConceptId()),
-            Arrays.asList(
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getContinueRegimenConcept().getConceptId()));
+    cd.addSearch(
+        "nextArtPickUpScheduledORfluxoRapido",
+        EptsReportUtils.map(
+            nextArtPickUpScheduledORfluxoRapido, "endDate=${endDate},location=${location}"));
 
-    String mappings = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("scheduled", mapStraightThrough(patientsScheduled));
-    cd.addSearch("startOrContinue", EptsReportUtils.map(startOrContinue, mappings));
     cd.addSearch(
         "D3",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
             "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("D3 AND (scheduled OR startOrContinue)");
+    cd.setCompositionString("D3 AND nextArtPickUpScheduledORfluxoRapido");
 
     return cd;
   }
@@ -802,7 +741,6 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName(
         "N8 - Number of all patients currently on ART who are included in DSD model: GAAC (GA)");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -836,7 +774,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N9: Number of all patients currently on ART who are included in DSD model: Dispensa Comunitária pelo Provedor (DCP)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -874,7 +811,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N10: Number of all patients currently on ART who are included in DSD model: Brigada Móvel (BM)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -912,7 +848,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N11: Number of all patients currently on ART who are included in DSD model: Clínica Móvel (CM)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -951,7 +886,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N12: Number of all patients currently on ART who are included in DSD model: Abordagem Familiar (AF)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -987,7 +921,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N13: Number of all patients currently on ART who are included in DSD model: Clube de Adesão (CA)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1023,7 +956,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N14: Number of all patients currently on ART who are included in DSD model: Extensão Horário (EH)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1040,7 +972,7 @@ public class EriDSDCohortQueries {
         "D3",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${endDate},endDate=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("D3 AND extensaoHorario");
 
@@ -1060,7 +992,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N15: Number of all patients currently on ART who are included in DSD model: Paragem Única no Sector de Tuberculose (TB)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1097,7 +1028,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N16: Number of all patients currently on ART who are included in DSD model: Paragem Unica de nos Serviços TARV (CT)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1133,7 +1063,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N17: Number of all patients currently on ART who are included in DSD model: Paragem Unica Servicos Amigos de Adolescentes e Jovens (SAAJ)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1169,7 +1098,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N18: Number of all patients currently on ART who are included in DSD model: Paragem Única Saúde Materna-Infantil (SMI)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1205,7 +1133,6 @@ public class EriDSDCohortQueries {
     cd.setName(
         "N19: Number of all patients currently on ART who are included in DSD model: Doença Avançada por HIV (DAH)");
 
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1278,7 +1205,6 @@ public class EriDSDCohortQueries {
   private CohortDefinition getAllPatientsOnSarcomaKarposi() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("sarcomaKarposiPatients");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1302,7 +1228,6 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("Patients who are stable");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1314,7 +1239,7 @@ public class EriDSDCohortQueries {
         "B",
         EptsReportUtils.map(
             getPatientsWithViralLoadLessThan1000Within12Months(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "C",
         EptsReportUtils.map(
@@ -1344,7 +1269,7 @@ public class EriDSDCohortQueries {
         "patientsWithViralLoad",
         EptsReportUtils.map(
             hivCohortQueries.getPatientsViralLoadWithin12Months(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("A AND (B OR (C AND NOT patientsWithViralLoad)) AND NOT F");
 
     return cd;
@@ -1642,7 +1567,6 @@ public class EriDSDCohortQueries {
 
     cd.setName(
         "Patients with LAST Viral Load Result < 1000 copies/ml in last ART year (only if VL exists)");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1822,7 +1746,6 @@ public class EriDSDCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName("DSD_FR10 Patients who returned to treatment");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1908,7 +1831,6 @@ public class EriDSDCohortQueries {
     String dsdMappings = "startDate=${endDate-3m},endDate=${endDate},location=${location}";
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
