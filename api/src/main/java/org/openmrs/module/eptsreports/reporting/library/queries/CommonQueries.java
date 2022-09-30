@@ -863,21 +863,6 @@ public class CommonQueries {
             + " AND pg.voided = 0"
             + "    AND pg.program_id = ${2} and pg.date_enrolled <='"
             + endDate
-            + "'"
-            + " UNION "
-            + " SELECT p.patient_id, MIN(ob.value_datetime) first_pickup  "
-            + "                                 FROM patient p  "
-            + "                           INNER JOIN obs ob  "
-            + "                               ON p.patient_id = ob.person_id  "
-            + "                       WHERE  p.voided = 0  "
-            + "                           AND ob.voided = 0  "
-            + "                           AND ob.concept_id = ${1190}  "
-            + "                           AND ob.obs_datetime <= '"
-            + endDate
-            + "'"
-            + "                           AND ob.location_id =  "
-            + location
-            + "                       GROUP  BY p.patient_id  "
             + " UNION "
             + " SELECT p.patient_id, MIN(ob.value_datetime) first_pickup  "
             + "                                 FROM patient p  "
@@ -887,7 +872,7 @@ public class CommonQueries {
             + "                               ON e.encounter_id = ob.encounter_id  "
             + "                       WHERE  p.voided = 0  "
             + "                           AND ob.voided = 0  "
-            + "                           AND e.encounter_type = ${53}  "
+            + "                           AND  e.encounter_type IN(${6},${9},${18},${53}) "
             + "                           AND ob.concept_id = ${1190}  "
             + "                           AND ob.value_datetime <= '"
             + endDate
