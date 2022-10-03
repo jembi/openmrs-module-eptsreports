@@ -468,13 +468,6 @@ public class TPTInitiationCohortQueries {
    */
   public String getPatientsWithRegimeDeTPT3HPDate() {
 
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-
-    cd.setName("3HP7 - Patients with Regime de TPT & Seg.Trat TPT on FILT");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     valuesMap.put("23954", tbMetadata.get3HPConcept().getConceptId());

@@ -148,15 +148,15 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
     pdd.addColumn(
         "Expected_3HP_Completion_Date",
         tPTInitiationDataDefinitionQueries.getExpected3HPCompletionDate(),
-        "startDate=${startDate},location=${location}",
+        "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
-    //    pdd.addColumn(
-    //        "Difference_between_Registered_vs_Expected_3HP_Completion_Date",
-    //        tPTInitiationDataDefinitionQueries
-    //            .getDifferencebetweenRegisteredvsExpected3HPCompletionDate(),
-    //        "startDate=${startDate},endDate=${endDate},location=${location}",
-    //        null);
+    pdd.addColumn(
+        "Difference_between_Registered_vs_Expected_3HP_Completion_Date",
+        tPTInitiationDataDefinitionQueries
+            .getDifferencebetweenRegisteredvsExpected3HPCompletionDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
     pdd.addColumn(
         "IPT_FILT_start_date",
@@ -194,13 +194,13 @@ public class TPTInitiationNewDataSet extends BaseDataSet {
         "IPT_end_date",
         tPTInitiationDataDefinitionQueries
             .getPatientsAndIPTCompletioDateOnFichaClinicaOrFichaSeguimento(),
-        "location=${location}",
+        "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     pdd.addColumn(
         "IPT_mastercard_end_date",
         tPTInitiationDataDefinitionQueries.getPatientsAndIPTCompetionDateOnFichaResumo(),
-        "location=${location}",
+        "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     pdd.addColumn(
