@@ -1159,6 +1159,7 @@ public class TbPrevQueries {
             + "                WHERE  p.voided = 0 "
             + "                       AND e.voided = 0 "
             + "                       AND o.voided = 0 "
+            + "                       AND o2.voided = 0 "
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = ${60} "
             + "                       AND ( o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982}) ) "
