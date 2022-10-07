@@ -77,22 +77,10 @@ public class TPTInitiationCohortQueries {
         "A3HP3",
         EptsReportUtils.map(
             A3HP3, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "A3HP4",
-        EptsReportUtils.map(
-            A3HP4, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "A3HP5",
-        EptsReportUtils.map(
-            A3HP5, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "A3HP6",
-        EptsReportUtils.map(
-            A3HP6, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "A3HP7",
-        EptsReportUtils.map(
-            A3HP7, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    cd.addSearch("A3HP4", EptsReportUtils.map(A3HP4, "endDate=${endDate},location=${location}"));
+    cd.addSearch("A3HP5", EptsReportUtils.map(A3HP5, "endDate=${endDate},location=${location}"));
+    cd.addSearch("A3HP6", EptsReportUtils.map(A3HP6, "endDate=${endDate},location=${location}"));
+    cd.addSearch("A3HP7", EptsReportUtils.map(A3HP7, "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(A3HP3 OR A3HP4 OR A3HP5 OR A3HP6 OR A3HP7)");
 
@@ -400,6 +388,7 @@ public class TPTInitiationCohortQueries {
             + "       AND o.concept_id = ${1719} "
             + "       AND o.value_coded = ${165307} "
             + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate ";
+
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
