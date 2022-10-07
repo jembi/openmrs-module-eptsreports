@@ -741,7 +741,6 @@ public class TPTInitiationDataDefinitionQueries {
     valuesMap.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
     valuesMap.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     valuesMap.put("1267", hivMetadata.getCompletedConcept().getConceptId());
-    valuesMap.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
     valuesMap.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
 
     String threeHPStart =
