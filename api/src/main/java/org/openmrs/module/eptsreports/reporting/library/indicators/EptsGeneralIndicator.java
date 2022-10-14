@@ -14,12 +14,16 @@
 
 package org.openmrs.module.eptsreports.reporting.library.indicators;
 
-import java.util.List;
+import org.openmrs.Location;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
+import org.openmrs.module.reporting.indicator.Indicator;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class EptsGeneralIndicator extends BaseIndicators {
@@ -43,5 +47,17 @@ public class EptsGeneralIndicator extends BaseIndicators {
     CohortIndicator cI = getIndicator(name, cd);
     cI.addParameters(parameters);
     return cI;
+  }
+
+  /**
+   * Non cohort indicators done here
+   * @return the indicator
+   */
+  public Indicator nonCohortIndicators() {
+    NonCohortIndicator ind = new NonCohortIndicator();
+    ind.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    ind.addParameter(new Parameter("endDate", "End Date", Date.class));
+    ind.addParameter(new Parameter("locations", "Location", Location.class));
+    return ind;
   }
 }

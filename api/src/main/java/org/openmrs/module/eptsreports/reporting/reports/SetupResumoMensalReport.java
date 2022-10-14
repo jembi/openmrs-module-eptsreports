@@ -13,14 +13,9 @@
  */
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
+import org.openmrs.module.eptsreports.reporting.library.datasets.resumo.NonCohortIndicatorsDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.resumo.ResumoMensalDataSetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -30,6 +25,13 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
 @Component
 public class SetupResumoMensalReport extends EptsDataExportManager {
 
@@ -37,12 +39,15 @@ public class SetupResumoMensalReport extends EptsDataExportManager {
 
   private GenericCohortQueries genericCohortQueries;
 
+  private final NonCohortIndicatorsDatasetDefinition nonCohortIndicatorsDatasetDefinition;
+
   @Autowired
   public SetupResumoMensalReport(
-      ResumoMensalDataSetDefinition resumoMensalDataSetDefinition,
-      GenericCohortQueries genericCohortQueries) {
+          ResumoMensalDataSetDefinition resumoMensalDataSetDefinition,
+          GenericCohortQueries genericCohortQueries, NonCohortIndicatorsDatasetDefinition nonCohortIndicatorsDatasetDefinition) {
     this.resumoMensalDataSetDefinition = resumoMensalDataSetDefinition;
     this.genericCohortQueries = genericCohortQueries;
+    this.nonCohortIndicatorsDatasetDefinition = nonCohortIndicatorsDatasetDefinition;
   }
 
   @Override
@@ -75,6 +80,8 @@ public class SetupResumoMensalReport extends EptsDataExportManager {
     rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition(
         "R", mapStraightThrough(resumoMensalDataSetDefinition.constructResumoMensalDataset()));
+    rd.addDataSetDefinition(
+            "NON", mapStraightThrough(nonCohortIndicatorsDatasetDefinition.constructNonCohortDataset()));
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
