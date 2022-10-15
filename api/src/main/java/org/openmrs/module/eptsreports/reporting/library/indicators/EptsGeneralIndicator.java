@@ -57,7 +57,7 @@ public class EptsGeneralIndicator extends BaseIndicators {
     NonCohortIndicator ind = new NonCohortIndicator();
     ind.addParameter(new Parameter("startDate", "Start Date", Date.class));
     ind.addParameter(new Parameter("endDate", "End Date", Date.class));
-    ind.addParameter(new Parameter("locations", "Location", Location.class));
+    ind.addParameter(new Parameter("location", "Location", Location.class));
     return ind;
   }
 }
