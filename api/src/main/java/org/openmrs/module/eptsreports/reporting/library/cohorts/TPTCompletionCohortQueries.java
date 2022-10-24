@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -46,8 +45,7 @@ public class TPTCompletionCohortQueries {
       TXTBCohortQueries txTbCohortQueries,
       GenericCohortQueries genericCohortQueries,
       TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries,
-      TPTInitiationCohortQueries tptInitiationCohortQueries,
-      TPTInitiationCohortQueries tptInitiationCohortQueries1) {
+      TPTInitiationCohortQueries tptInitiationCohortQueries) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.tbPrevCohortQueries = tbPrevCohortQueries;
@@ -55,7 +53,7 @@ public class TPTCompletionCohortQueries {
     this.txTbCohortQueries = txTbCohortQueries;
     this.genericCohortQueries = genericCohortQueries;
     this.tptEligiblePatientListCohortQueries = tptEligiblePatientListCohortQueries;
-    this.tptInitiationCohortQueries = tptInitiationCohortQueries1;
+    this.tptInitiationCohortQueries = tptInitiationCohortQueries;
   }
 
   private final String mapping = "endDate=${endDate},location=${location}";
