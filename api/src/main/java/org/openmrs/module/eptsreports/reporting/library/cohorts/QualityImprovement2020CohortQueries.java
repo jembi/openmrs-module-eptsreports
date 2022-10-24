@@ -10582,6 +10582,7 @@ public class QualityImprovement2020CohortQueries {
             + "AND        ostate.concept_id = ${165322} "
             + "AND        ostate.value_coded IN (${states}) "
             + "AND        e.encounter_datetime < consultation.consultation_date "
+            + "AND        e.encounter_datetime >= :startDate "
             + "AND        otype.obs_group_id = ostate.obs_group_id "
             + "AND        e.voided = 0 "
             + "AND        p.voided = 0 "
