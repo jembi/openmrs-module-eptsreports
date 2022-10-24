@@ -14,7 +14,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
-import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -1067,6 +1066,8 @@ public class TxCurrCohortQueries {
     valuesMap.put("23730", hivMetadata.getQuarterlyDispensation().getConceptId());
     valuesMap.put("23888", hivMetadata.getSemiannualDispensation().getConceptId());
     valuesMap.put("1098", hivMetadata.getMonthlyConcept().getConceptId());
+    valuesMap.put("165322", hivMetadata.getMdcState().getConceptId());
+    valuesMap.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     cd.setQuery(sub.replace(sqlQuery));

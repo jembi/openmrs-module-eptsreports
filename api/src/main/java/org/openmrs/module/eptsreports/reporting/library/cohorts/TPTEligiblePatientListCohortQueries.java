@@ -14,6 +14,7 @@ import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCoh
 import org.openmrs.module.eptsreports.reporting.library.queries.TPTEligiblePatientsQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
+import org.openmrs.module.eptsreports.reporting.utils.queries.UnionBuilder;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -80,10 +81,11 @@ public class TPTEligiblePatientListCohortQueries {
         EptsReportUtils.map(
             getINHStartA1(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId()),
+                tbMetadata.getIsoniazidConcept().getConceptId(),
+                tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
+                hivMetadata.getStartDrugs().getConceptId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -91,20 +93,11 @@ public class TPTEligiblePatientListCohortQueries {
         EptsReportUtils.map(
             getINHStartA2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId()),
-            mapping));
-
-    compositionCohortDefinition.addSearch(
-        "A3",
-        EptsReportUtils.map(
-            getINHStartA3(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId()),
             mapping));
 
     compositionCohortDefinition.addSearch(
@@ -116,12 +109,10 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentFollowUpTPTConcept().getConceptId(),
                 hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugsConcept().getConceptId(),
                 tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId()),
             mapping));
@@ -195,25 +186,8 @@ public class TPTEligiblePatientListCohortQueries {
         EptsReportUtils.map(tptInitiationCohortQueries.getPatientsWithRegimeDeTPT3HP(), mappings));
 
     compositionCohortDefinition.addSearch(
-        "IPTB1",
-        EptsReportUtils.map(
-            getIPTB1(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getCompletedConcept().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
-                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
-
-    compositionCohortDefinition.addSearch(
-        "IPTB1Part2", EptsReportUtils.map(getIPTB1part2(), mappings));
+        "IPTB1Part2",
+        EptsReportUtils.map(getIPTB1part2(), "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "IPTB2",
@@ -221,89 +195,49 @@ public class TPTEligiblePatientListCohortQueries {
             getIPTB2(
                 hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
                 hivMetadata.getCompletedConcept().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
                 tbMetadata.getRegimeTPTConcept().getConceptId(),
                 tbMetadata.getIsoniazidConcept().getConceptId(),
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
-
-    compositionCohortDefinition.addSearch(
-        "IPTB3",
-        EptsReportUtils.map(
-            getIPTB3(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
-                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
-
-    compositionCohortDefinition.addSearch(
-        "IPTB4",
-        EptsReportUtils.map(
-            getIPTB4(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId(),
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
-                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
+            "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "IPTB5Part1",
         EptsReportUtils.map(
             getIPTB5Part1(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
                 hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            mapping));
+            "endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "IPTB5Part2",
         EptsReportUtils.map(
             getIPTB5Part2(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDtINHConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTBPart3",
         EptsReportUtils.map(
             getIPTB5Part3(
                 hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getIsoniazidUsageConcept().getConceptId(),
                 hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
                 hivMetadata.getContinueRegimenConcept().getConceptId(),
                 tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
                 tbMetadata.getDtINHConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB6Part1",
@@ -315,7 +249,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB6Part2",
@@ -327,7 +261,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "IPTB6Part3",
@@ -340,7 +274,7 @@ public class TPTEligiblePatientListCohortQueries {
                 hivMetadata.getMonthlyConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "threeHPC1",
@@ -370,7 +304,7 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "threeHPC3",
@@ -382,11 +316,11 @@ public class TPTEligiblePatientListCohortQueries {
                 tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId()),
-            mapping));
+            mappings));
 
     compositionCohortDefinition.addSearch(
         "threeHPC4",
-        EptsReportUtils.map(get3HPLastProfilaxyDuringM3orM1PeriodsComposition(), mapping));
+        EptsReportUtils.map(get3HPLastProfilaxyDuringM3orM1PeriodsComposition(), mappings));
 
     compositionCohortDefinition.addSearch(
         "TBTreatmentPart1",
@@ -466,33 +400,28 @@ public class TPTEligiblePatientListCohortQueries {
             mapping));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND NOT (A1 OR A2 OR A3 OR A4 OR A5 OR threeHPA1 OR threeHPA2 OR threeHPA3 OR threeHPA4 OR threeHPA5 OR threeHPA6 OR threeHPA7 OR IPTB1 OR IPTB1Part2 OR IPTB2 OR IPTB3 OR IPTB4 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR threeHPC1 OR threeHPC2 OR threeHPC3 OR threeHPC4 OR threeHPC1part2 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR TBTreatmentPart4 OR E1 OR F)");
+        "txcurr AND NOT (A1 OR A2 OR A4 OR A5 OR threeHPA1 OR threeHPA2 OR threeHPA3 OR threeHPA4 OR threeHPA5 OR threeHPA6 OR threeHPA7 OR IPTB1Part2 OR IPTB2 OR IPTB5Part1 OR IPTB5Part2 OR IPTBPart3 OR IPTB6Part1 OR IPTB6Part2 OR IPTB6Part3 OR threeHPC1 OR threeHPC2 OR threeHPC3 OR threeHPC4 OR threeHPC1part2 OR TBTreatmentPart1 OR TBTreatmentPart2 OR TBTreatmentPart3 OR TBTreatmentPart4 OR E1 OR F)");
     return compositionCohortDefinition;
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_ELIG_FR5.1</b>:Patients who initiated INH in last 7 months <br>
    *
    * <ul>
-   *   <li>A1.1:Select all patients with Ficha Resumo (encounter type 53) with “Ultima profilaxia
-   *       Isoniazida (Data Inicio)” (concept id 6128) and value datetime not null and exclude all
-   *       patients with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954) and
-   *       between endDate-7months (210 DAYs) and endDate. or
-   *   <li>
-   *   <li>A1.2: Select all patients with Ficha Resumo (encounter type 53) with Última
-   *       profilaxia(concept id 23985) value coded INH(concept id 656) and Data Início da
-   *       Profilaxia TPT(value datetime, concept id 6128) not null and value datetime not null and
-   *       between endDate-7months (210 days) and endDate.
+   *   <li>A1:
+   *   <li>Patients who have (Última Profilaxia TPT with value “Isoniazida (INH)”, and Data Início
+   *       selected in Ficha Resumo - Mastercard between endDate-7months and endDate or
    * </ul>
    *
    * @return CohortDefinition
    */
   public CohortDefinition getINHStartA1(
       int masterCardEncounterType,
-      int dataInicioProfilaxiaIsoniazidaConcept,
       int regimenTpt,
       int inhRpt,
-      int isoniazidConcept) {
+      int isoniazidConcept,
+      int proflaxisStatus,
+      int startDrugsConcept) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Data Inicio)");
@@ -501,57 +430,28 @@ public class TPTEligiblePatientListCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("53", masterCardEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
     map.put("23985", regimenTpt);
     map.put("23954", inhRpt);
     map.put("656", isoniazidConcept);
+    map.put("165308", proflaxisStatus);
+    map.put("1256", startDrugsConcept);
 
     String query =
-        "SELECT p.patient_id "
-            + "     FROM "
-            + "         patient p "
-            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "     WHERE "
-            + "             p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND e.location_id = :location "
-            + "       AND e.encounter_type = ${53} "
-            + "       AND o.concept_id = ${6128} "
-            + "       AND o.value_datetime IS NOT NULL "
-            + "       AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate "
-            + "AND p.patient_id NOT IN( "
-            + "         SELECT p.patient_id "
-            + "         FROM "
-            + "             patient p "
-            + "                 INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                 INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "         WHERE "
-            + "                 p.voided = 0 "
-            + "           AND e.voided = 0 "
-            + "           AND o.voided = 0 "
-            + "           AND e.encounter_type = ${53} "
-            + "           AND o.concept_id = ${23985} "
-            + "           AND o.value_coded = ${23954} "
-            + "           AND e.location_id = :location "
-            + "           AND e.encounter_datetime <= :endDate "
-            + "     ) "
-            + "     UNION "
-            + "     SELECT p.patient_id AS patient_id FROM "
-            + "         patient p "
-            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "             INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "     WHERE "
-            + "             p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND o2.voided = 0 "
-            + "       AND e.encounter_type = ${53} "
-            + "       AND (o.concept_id = ${23985} AND o.concept_id = ${656}) "
-            + "       AND (o2.concept_id = ${6128} AND o.value_datetime IS NOT NULL "
-            + "         AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate) ";
+        "SELECT p.patient_id FROM "
+            + "                     patient p "
+            + "                         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                         INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + "                 WHERE "
+            + "                         p.voided = 0 "
+            + "                   AND e.voided = 0 "
+            + "                   AND o.voided = 0 "
+            + "                   AND o2.voided = 0 "
+            + "                   AND e.encounter_type = ${53} "
+            + "                   AND e.location_id = :location "
+            + "                   AND (o.concept_id = ${23985} AND o.value_coded = ${656}) "
+            + "                   AND ( (o2.concept_id = ${165308} AND o2.value_coded = ${1256}) "
+            + "                     AND (o2.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 7 MONTH) AND :endDate) ) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -561,22 +461,21 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_ELIG_FR5.1</b>:Patients who initiated INH in last 7 months <br>
    *
    * <ul>
-   *   <li>A2: Select all patients with Ficha clinica (encounter type 6) with “Profilaxia INH”
-   *       (concept id 6122) with value code “Inicio” (concept id 1256) or Profilaxia TPT (concept
-   *       id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id 165308)
-   *       value coded Início (concept id 1256) and encounter datetime between endDate-7months (210
-   *       DAYs) and endDate. or
+   *   <li>A2:
+   *   <li>Patients who have Profilaxia TPT with the value “Isoniazida (INH)” and Data Início marked
+   *       in Ficha de Seguimento (Adulto e Pediatria) and occurred between endDate-7months and
+   *       endDate or
    * </ul>
    *
    * @return CohortDefinition
    */
   public CohortDefinition getINHStartA2(
       int adultoSeguimentoEncounterType,
+      int pediatriaSeguimentoEncounterType,
       int startDrugsConcept,
-      int isoniazidUsageConcept,
       int regimenTpt,
       int isoniazid,
       int proflaxisStatus) {
@@ -589,30 +488,23 @@ public class TPTEligiblePatientListCohortQueries {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", adultoSeguimentoEncounterType);
-    map.put("6122", isoniazidUsageConcept);
+    map.put("9", pediatriaSeguimentoEncounterType);
     map.put("1256", startDrugsConcept);
     map.put("23985", regimenTpt);
     map.put("656", isoniazid);
     map.put("165308", proflaxisStatus);
 
     String query =
-        " SELECT p.patient_id FROM patient p  "
-            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "          WHERE e.encounter_type = ${6} AND o.concept_id = ${6122} "
-            + "          AND o.voided = 0 AND e.voided = 0  "
-            + "          AND p.voided = 0 AND e.location_id = :location "
-            + "          AND o.value_coded = ${1256} "
-            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate"
-            + " UNION "
-            + " SELECT p.patient_id FROM patient p  "
-            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "          WHERE e.encounter_type = ${6} AND (o.concept_id = ${23985} AND o.concept_id = ${165308} ) "
-            + "          AND (o.value_coded = ${656} AND o.value_coded = ${1256} )  "
-            + "          AND o.voided = 0 AND e.voided = 0  "
-            + "          AND p.voided = 0 AND e.location_id = :location "
-            + "          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
+        " SELECT p.patient_id FROM patient p "
+            + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                       INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                       WHERE e.encounter_type IN (${6}, ${9}) "
+            + "                       AND o.voided = 0 AND e.voided = 0 AND p.voided = 0 AND o2.voided = 0 "
+            + "                       AND e.location_id = :location "
+            + "                       AND (o.concept_id = ${23985} AND o.value_coded = ${656} ) "
+            + "                       AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                            AND o2.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 7 MONTH) AND :endDate )";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -622,70 +514,25 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_ELIG_FR5.1</b>:Patients who initiated INH in last 7 months <br>
    *
    * <ul>
-   *   <li>A3: Select all patients with Ficha clinica or Ficha Pediatrica (encounter type 6,9) with
-   *       “Profilaxia com INH” (concept id 6128) and value datetime is not null and
-   *       betweenendDate-7months (210 DAYs) and endDate. or
-   * </ul>
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getINHStartA3(
-      int pediatriaSeguimentoEncounterType,
-      int dataInicioProfilaxiaIsoniazidaConcept,
-      int adultoSeguimentoEncounterType) {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" all patients with Ficha clinica or Ficha Pediatrica A3");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("9", pediatriaSeguimentoEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
-
-    String query =
-        "SELECT p.patient_id FROM patient p  "
-            + "          INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "          WHERE e.encounter_type IN (${6}, ${9}) AND o.concept_id = ${6128} "
-            + "          AND o.voided = 0 AND e.voided = 0  "
-            + "          AND p.voided = 0 AND e.location_id = :location "
-            + "          AND o.value_datetime IS NOT NULL "
-            + "          AND o.value_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(sb.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
-   *
-   * <ul>
-   *   <li>A4: Select all patients with FILT (encounter type 60) with “Regime de TPT” (concept id
-   *       23985) value coded ‘Isoniazid’ or ‘Isoniazid + piridoxina’ (concept id in [656, 23982])
-   *       and “Seguimento de Tratamento TPT” (concept ID 23987) with values “Continua” (concept ID
-   *       1257) or no value(null) or concept 23987 does not exist and encounter datetime between
-   *       endDate-7months (210 DAYs) and endDate
-   *   <li>and no other INH values (“Isoniazida” or “Isoniazida + Piridoxina”) marked on FILT in the
-   *       210 DAYs prior to the INH Start Date and
-   *   <li>no Última profilaxia Isoniazida (Data Início) (Concept ID 6128, value_datetime) or Última
-   *       profilaxia(concept id 23985) value coded INH(concept id 656) and Data Início da
-   *       Profilaxia TPT(value datetime, concept id 6128) registered in Ficha Resumo - Mastercard
-   *       (Encounter Type ID 53) in the 7 months prior to ‘INH Start Date’
-   *   <li>and no Profilaxia (INH) (Concept ID 6122) with the value “I” (Início) (Concept ID 1256)
-   *       or Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
-   *       Profilaxia (concept id 165308) value coded Início (concept id 1256) marked on Ficha
-   *       Clínica - Mastercard (Encounter Type ID 6) in the 7 months prior to ‘INH Start Date’
-   *   <li>and no Profilaxia com INH – TPI (Data Início) (Concept ID 6128, value_datetime) marked in
-   *       Ficha de Seguimento (Adulto e Pediatria) (Encounter Type ID 6,9) in the 7 months prior to
-   *       ‘INH Start Date’
+   *   <li>A4:
+   *   <li>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida +
+   *       Piridoxina”) and “Seguimento de tratamento TPT” with Values “Continua/Manutenção” or no
+   *       value marked on the first pick-up in Ficha de Levantamento de TPT (FILT) between
+   *       endDate-7months and endDate as “FILT Start Date” and:
+   *   <li>No other INH Start Dates (with Regime de TPT = “Isoniazida” or “Isoniazida + Piridoxina”)
+   *       marked in FILT in the 7 months prior to “FILT Start Date” and
+   *   <li>No other INH Start Dates marked on in Ficha resumo (Última profilaxia TPT with value
+   *       “Isoniazida (INH)” and Data Início) selected in the 7 months prior to this FILT Start
+   *       Date and
+   *   <li>No other INH Start Dates marked on Ficha de Seguimento (Profilaxia TPT with the value
+   *       “Isoniazida (INH)” and Data Inicio) marked in the 7 months prior to this FILT Start Date
+   *       and
+   *   <li>No other INH Start Dates marked in Ficha Clinica (Profilaxia TPT with the value
+   *       “Isoniazida (INH)” and Estado da Profilaxia with the value “Início (I)”) in the 7 months
+   *       prior to this FILT Start Date
    * </ul>
    *
    * @return CohortDefinition
@@ -699,9 +546,7 @@ public class TPTEligiblePatientListCohortQueries {
       int isoniazidePiridoxinaConcept,
       int continuaConcept,
       int treatmentFollowUpTPTConcept,
-      int dataInicioProfilaxiaIsoniazidaConcept,
       int masterCardEncounterType,
-      int isoniazidUsageConcept,
       int startDrugsConcept,
       int proflaxisStatus) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
@@ -719,9 +564,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23982", isoniazidePiridoxinaConcept);
     map.put("1257", continuaConcept);
     map.put("23987", treatmentFollowUpTPTConcept);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
     map.put("53", masterCardEncounterType);
-    map.put("6122", isoniazidUsageConcept);
     map.put("1256", startDrugsConcept);
     map.put("165308", proflaxisStatus);
 
@@ -753,8 +596,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                                          e.encounter_id "
             + "                                                      AND oo.concept_id = ${23987}) "
             + "                   ) "
-            + "               AND e.encounter_datetime BETWEEN Date_sub(:endDate, "
-            + "                                                interval 210 day) "
+            + "               AND o2.obs_datetime BETWEEN Date_sub(:endDate, "
+            + "                                                interval 7 month) "
             + "                                                AND :endDate "
             + "        GROUP  BY p.patient_id) first_filt "
             + "WHERE  patient_id NOT IN (SELECT pp.patient_id "
@@ -773,7 +616,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                 AND oo.value_coded IN ( ${656}, ${23982} ) "
             + "                                 AND ee.encounter_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, "
-            + "                                                              interval 210 day "
+            + "                                                              interval 7 month "
             + "                                                              ) "
             + "                                 AND ee.encounter_datetime < "
             + "                                     first_filt.first_pickup_date "
@@ -784,43 +627,44 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                         ON ee.patient_id = pp.patient_id "
             + "                                 inner join obs oo "
             + "                                         ON oo.encounter_id = ee.encounter_id "
+            + "                                 inner join obs oo2 "
+            + "                                         ON oo2.encounter_id = ee.encounter_id "
             + "                          WHERE  ee.encounter_type = ${53} "
-            + "                                 AND ( oo.concept_id = ${6128} "
-            + "                                       AND oo.concept_id = ${23985} ) "
+            + "                                 AND ( oo.concept_id = ${23985} AND oo.value_coded = ${656} ) "
             + "                                 AND oo.voided = 0 "
             + "                                 AND ee.voided = 0 "
-            + "                                 AND oo.value_coded = ${656} "
             + "                                 AND pp.voided = 0 "
             + "                                 AND ee.location_id = :location "
             + "                                 AND first_filt.patient_id = pp.patient_id "
-            + "                                 AND oo.value_datetime IS NOT NULL "
-            + "                                 AND oo.value_datetime >= Date_sub( "
+            + "                                 AND ( oo2.concept_id = ${165308} AND oo2.value_coded = ${1256} "
+            + "                                 AND oo2.obs_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, interval "
-            + "                                                          210 day "
+            + "                                                          7 month "
             + "                                                          ) "
-            + "                                 AND oo.value_datetime < "
-            + "                                     first_filt.first_pickup_date "
+            + "                                 AND oo2.obs_datetime < "
+            + "                                     first_filt.first_pickup_date ) "
             + "                          UNION "
-            + "                          SELECT pp.patient_id "
-            + "                          FROM   patient pp "
-            + "                                 inner join encounter ee "
-            + "                                         ON ee.patient_id = pp.patient_id "
-            + "                                 inner join obs oo "
-            + "                                         ON oo.encounter_id = ee.encounter_id "
-            + "                          WHERE  ee.encounter_type = ${6} "
-            + "                                 AND oo.concept_id = ${6122} "
-            + "                                 AND oo.voided = 0 "
-            + "                                 AND ee.voided = 0 "
-            + "                                 AND pp.voided = 0 "
-            + "                                 AND ee.location_id = :location "
-            + "                                 AND first_filt.patient_id = pp.patient_id "
-            + "                                 AND oo.value_coded = ${1256} "
-            + "                                 AND ee.encounter_datetime >= Date_sub( "
+            + "                           SELECT pp.patient_id FROM"
+            + "                     patient pp"
+            + "                         INNER JOIN encounter ee ON ee.patient_id = pp.patient_id"
+            + "                         INNER JOIN obs o ON ee.encounter_id = o.encounter_id"
+            + "                         INNER JOIN obs o2 ON ee.encounter_id = o2.encounter_id"
+            + "                 WHERE"
+            + "                         pp.voided = 0"
+            + "                   AND ee.voided = 0"
+            + "                   AND o.voided = 0"
+            + "                   AND o2.voided = 0"
+            + "                   AND ee.encounter_type IN (${6}, ${9})"
+            + "                   AND ee.location_id = :location"
+            + "                   AND first_filt.patient_id = pp.patient_id "
+            + "                   AND (o.concept_id = ${23985} AND o.value_coded = ${656}) "
+            + "                   AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                     AND o2.obs_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, "
-            + "                                                              interval 210 day "
+            + "                                                              interval 7 month "
             + "                                                              ) "
-            + "                                 AND ee.encounter_datetime < "
-            + "                                     first_filt.first_pickup_date "
+            + "                                 AND o2.obs_datetime < "
+            + "                                     first_filt.first_pickup_date ) "
             + "                          UNION "
             + "                          SELECT pp.patient_id "
             + "                          FROM   patient pp "
@@ -828,44 +672,26 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                         ON ee.patient_id = pp.patient_id "
             + "                                 inner join obs oo "
             + "                                         ON oo.encounter_id = ee.encounter_id "
+            + "                                 inner join obs oo2 "
+            + "                                         ON oo2.encounter_id = ee.encounter_id "
             + "                          WHERE  ee.encounter_type = ${6} "
             + "                                 AND ( oo.concept_id = ${23985} "
-            + "                                       AND oo.concept_id = ${165308} ) "
+            + "                                       AND oo.value_coded = ${656} )  "
+            + "                                 AND ( oo2.concept_id = ${165308} "
+            + "                                       AND oo2.value_coded = ${1256} ) "
             + "                                 AND oo.voided = 0 "
+            + "                                 AND oo2.voided = 0 "
             + "                                 AND ee.voided = 0 "
             + "                                 AND pp.voided = 0 "
             + "                                 AND ee.location_id = :location "
             + "                                 AND first_filt.patient_id = pp.patient_id "
-            + "                                 AND ( oo.value_coded = ${1256} "
-            + "                                       AND oo.value_coded = ${656} ) "
-            + "                                 AND ee.encounter_datetime >= Date_sub( "
+            + "                                 AND oo2.obs_datetime >= Date_sub( "
             + "                                     first_filt.first_pickup_date, "
-            + "                                                              interval 210 day "
+            + "                                                              interval 7 month "
             + "                                                              ) "
-            + "                                 AND ee.encounter_datetime < "
+            + "                                 AND oo2.obs_datetime < "
             + "                                     first_filt.first_pickup_date "
-            + "                          UNION "
-            + "                          SELECT pp.patient_id "
-            + "                          FROM   patient pp "
-            + "                                 inner join encounter ee "
-            + "                                         ON ee.patient_id = pp.patient_id "
-            + "                                 inner join obs oo "
-            + "                                         ON oo.encounter_id = ee.encounter_id "
-            + "                          WHERE  ee.encounter_type IN ( ${6}, ${9} ) "
-            + "                                 AND oo.concept_id = 6128 "
-            + "                                 AND oo.voided = 0 "
-            + "                                 AND ee.voided = 0 "
-            + "                                 AND pp.voided = 0 "
-            + "                                 AND ee.location_id = :location "
-            + "                                 AND first_filt.patient_id = pp.patient_id "
-            + "                                 AND oo.value_datetime IS NOT NULL "
-            + "                                 AND oo.value_datetime >= Date_sub( "
-            + "                                     first_filt.first_pickup_date, interval "
-            + "                                                          210 day "
-            + "                                                          ) "
-            + "                                 AND oo.value_datetime < "
-            + "                                     first_filt.first_pickup_date) "
-            + "GROUP  BY patient_id";
+            + "GROUP  BY patient_id) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -875,15 +701,13 @@ public class TPTEligiblePatientListCohortQueries {
   }
 
   /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
+   * <b>TPT_ELIG_FR5.1</b>:Patients who initiated INH in last 7 months <br>
    *
    * <ul>
-   *   <li>A5:Select all patients with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
-   *       ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Seguimento de tratamento
-   *       TPT”(concept ID 23987) value coded “inicio” or “re-inicio”(concept ID in [1256, 1705])
-   *       “Continua” (concept ID 1257) or no value(null) or concept 23987 does not exist marked on
-   *       FILT (encounter type 60) and encounter datetime between endDate-7months (210 days) and
-   *       end date
+   *   <li>A5:
+   *   <li>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida +
+   *       Piridoxina”) and “Seguimento de tratamento TPT”= (‘Inicio’ or ‘Reinício’) marked in Ficha
+   *       de Levantamento de TPT (FILT) between endDate-7months and endDate
    *
    * @return CohortDefinition
    */
@@ -920,7 +744,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "      AND  e.location_id = :location AND e.encounter_type = ${60}   "
             + "      AND (o.concept_id = ${23985} AND o.value_coded IN (${656},${23982}))    "
             + "      AND (o2.concept_id = ${23987} AND o2.value_coded IN (${1256},${1705}))  "
-            + "      AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate ";
+            + "      AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 7 MONTH) AND :endDate ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -1175,257 +999,10 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>B1.1: Select all patients with Ficha Resumo (encounter type 53) with “Ultima profilaxia
-   *       Isoniazida (Data Fim)” (concept id 6129) value datetime not null and exclude all patients
-   *       with with Última profilaxia(concept id 23985) value coded 3HP(concept id 23954) and
-   *       between (date from Y+ 173 DAYs) and (date from Y + 365 DAYs)
-   *   <li>
-   * </ul>
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getIPTB1(
-      int masterCardEncounterType,
-      int dataFinalizacaoProfilaxiaIsoniazidaConcept,
-      int adultoSeguimentoEncounterType,
-      int isoniazidUsageConcept,
-      int startDrugsConcept,
-      int completedConcept,
-      int dataInicioProfilaxiaIsoniazidaConcept,
-      int pediatriaSeguimentoEncounterType,
-      int regimeTPTEncounterType,
-      int regimeTPTConcept,
-      int isoniazidConcept,
-      int isoniazidePiridoxinaConcept) {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Data Fim) B1");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("53", masterCardEncounterType);
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("9", pediatriaSeguimentoEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
-    map.put("6129", dataFinalizacaoProfilaxiaIsoniazidaConcept);
-    map.put("6122", isoniazidUsageConcept);
-    map.put("1256", startDrugsConcept);
-    map.put("1267", completedConcept);
-    map.put("60", regimeTPTEncounterType);
-    map.put("23985", regimeTPTConcept);
-    map.put("656", isoniazidConcept);
-    map.put("23982", isoniazidePiridoxinaConcept);
-    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
-    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
-    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
-
-    String query =
-        "SELECT "
-            + "                            p.patient_id "
-            + "                        FROM "
-            + "                            patient p "
-            + "                             INNER JOIN "
-            + "                         encounter e ON e.patient_id = p.patient_id "
-            + "                             INNER JOIN "
-            + "                         obs o ON o.encounter_id = e.encounter_id "
-            + "                     WHERE "
-            + "                         p.voided = 0 AND e.voided = 0 "
-            + "                             AND o.voided = 0 "
-            + "                             AND e.location_id = :location "
-            + "                            AND e.encounter_type = ${53} "
-            + "                            AND o.concept_id = ${6129} "
-            + "                            AND o.value_datetime IS NOT NULL "
-            + "                            AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "                                     LIMIT 1) "
-            + "                                 AS DATE), "
-            + "                             INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "                                         LIMIT 1) AS DATE), "
-            + "                             INTERVAL 365 DAY) "
-            + "                         AND p.patient_id NOT IN ( "
-            + "                         SELECT pp.patient_id FROM patient pp INNER JOIN encounter e2 ON pp.patient_id = e2.patient_id "
-            + "                                             INNER JOIN obs o4 ON e2.encounter_id = o4.encounter_id "
-            + "                                             WHERE pp.voided =0 AND e2.voided = 0 AND o4.voided=0 "
-            + "                                             AND e2.encounter_type = ${53} AND o4.concept_id = ${23985} AND o4.value_coded = ${23954} "
-            + "                         ) "
-            + "                     GROUP BY p.patient_id "
-            + "                 UNION "
-            + "                     SELECT "
-            + "                         p.patient_id "
-            + "                   FROM "
-            + "                          patient p "
-            + "                              INNER JOIN "
-            + "                         encounter e ON e.patient_id = p.patient_id "
-            + "                             INNER JOIN "
-            + "                         obs o ON o.encounter_id = e.encounter_id "
-            + "                  WHERE "
-            + "                      p.voided = 0 AND e.voided = 0 "
-            + "                          AND o.voided = 0 "
-            + "                             AND e.location_id = :location "
-            + "                            AND e.encounter_type = ${53} "
-            + "                            AND o.concept_id = ${6129} "
-            + "                            AND o.value_datetime IS NOT NULL "
-            + "                            AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                                     LIMIT 1) "
-            + "                                 AS DATE), "
-            + "                             INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                                         LIMIT 1) AS DATE), "
-            + "                             INTERVAL 365 DAY) "
-            + "                         AND p.patient_id NOT IN ( "
-            + "                         SELECT pp.patient_id FROM patient pp INNER JOIN encounter e2 ON pp.patient_id = e2.patient_id "
-            + "                                             INNER JOIN obs o4 ON e2.encounter_id = o4.encounter_id "
-            + "                                             WHERE pp.voided =0 AND e2.voided = 0 AND o4.voided=0 "
-            + "                                             AND e2.encounter_type = ${53} AND o4.concept_id = ${23985} AND o4.value_coded = ${23954} "
-            + "                         ) "
-            + "                     GROUP BY p.patient_id "
-            + "                 UNION "
-            + "                     SELECT "
-            + "                         p.patient_id "
-            + "                     FROM "
-            + "                         patient p "
-            + "                             INNER JOIN "
-            + "                         encounter e ON e.patient_id = p.patient_id "
-            + "                             INNER JOIN "
-            + "                         obs o ON o.encounter_id = e.encounter_id "
-            + "                     WHERE "
-            + "                         p.voided = 0 AND e.voided = 0 "
-            + "                             AND o.voided = 0 "
-            + "                             AND e.location_id = :location "
-            + "                            AND e.encounter_type = ${53} "
-            + "                            AND o.concept_id = ${6129} "
-            + "                            AND o.value_datetime IS NOT NULL "
-            + "                            AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                                     LIMIT 1) "
-            + "                                 AS DATE), "
-            + "                             INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                                     LIMIT 1) "
-            + "                                 AS DATE), "
-            + "                             INTERVAL 365 DAY) "
-            + "                         AND p.patient_id NOT IN ( "
-            + "                         SELECT pp.patient_id FROM patient pp INNER JOIN encounter e2 ON pp.patient_id = e2.patient_id "
-            + "                                             INNER JOIN obs o4 ON e2.encounter_id = o4.encounter_id "
-            + "                                             WHERE pp.voided =0 AND e2.voided = 0 AND o4.voided=0 "
-            + "                                             AND e2.encounter_type = ${53} AND o4.concept_id = ${23985} AND o4.value_coded = ${23954} "
-            + "                         ) "
-            + "                     GROUP BY p.patient_id "
-            + "                 UNION "
-            + "                     SELECT "
-            + "                         p.patient_id "
-            + "                     FROM "
-            + "                         patient p "
-            + "                             INNER JOIN "
-            + "                         encounter e ON e.patient_id = p.patient_id "
-            + "                             INNER JOIN "
-            + "                         obs o ON o.encounter_id = e.encounter_id "
-            + "                     WHERE "
-            + "                         p.voided = 0 AND e.voided = 0 "
-            + "                             AND o.voided = 0 "
-            + "                             AND e.location_id = :location "
-            + "                            AND e.encounter_type = ${53} "
-            + "                            AND o.concept_id = ${6129} "
-            + "                            AND o.value_datetime IS NOT NULL "
-            + "                            AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                                     LIMIT 1) "
-            + "                                 AS DATE), "
-            + "                             INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                                        LIMIT 1) "
-            + "                                    AS DATE), "
-            + "                                INTERVAL 365 DAY) "
-            + "                         AND p.patient_id NOT IN ( "
-            + "                         SELECT pp.patient_id FROM patient pp INNER JOIN encounter e2 ON pp.patient_id = e2.patient_id "
-            + "                                             INNER JOIN obs o4 ON e2.encounter_id = o4.encounter_id "
-            + "                                             WHERE pp.voided =0 AND e2.voided = 0 AND o4.voided=0 "
-            + "                                             AND e2.encounter_type = ${53} AND o4.concept_id = ${23985} AND o4.value_coded = ${23954} "
-            + "                         ) "
-            + "                     GROUP BY p.patient_id "
-            + "                   UNION "
-            + "                    SELECT "
-            + "                       p.patient_id "
-            + "                   FROM "
-            + "                       patient p "
-            + "                           INNER JOIN "
-            + "                       encounter e ON e.patient_id = p.patient_id "
-            + "                           INNER JOIN "
-            + "                       obs o ON o.encounter_id = e.encounter_id "
-            + "                   WHERE "
-            + "                           p.voided = 0 AND e.voided = 0 "
-            + "                     AND o.voided = 0 "
-            + "                     AND e.location_id = :location "
-            + "                     AND e.encounter_type = ${53} "
-            + "                     AND o.concept_id = ${6129} "
-            + "                     AND o.value_datetime IS NOT NULL "
-            + "                     AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                                              LIMIT 1) "
-            + "                                            AS DATE), "
-            + "                                        INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                                             LIMIT 1) "
-            + "                                           AS DATE), "
-            + "                                       INTERVAL 365 DAY) "
-            + "  AND p.patient_id NOT IN ( "
-            + "    SELECT pp.patient_id FROM patient pp INNER JOIN encounter e2 ON pp.patient_id = e2.patient_id "
-            + "                                         INNER JOIN obs o4 ON e2.encounter_id = o4.encounter_id "
-            + "    WHERE pp.voided =0 AND e2.voided = 0 AND o4.voided=0 "
-            + "      AND e2.encounter_type = ${53} AND o4.concept_id = ${23985} AND o4.value_coded = ${23954} "
-            + ") "
-            + "GROUP BY p.patient_id "
-            + " UNION "
-            + "SELECT   p.patient_id "
-            + "FROM "
-            + "    patient p "
-            + "        INNER JOIN "
-            + "    encounter e ON e.patient_id = p.patient_id "
-            + "        INNER JOIN "
-            + "    obs o ON o.encounter_id = e.encounter_id "
-            + "WHERE "
-            + "        p.voided = 0 AND e.voided = 0 "
-            + "  AND o.voided = 0 "
-            + "  AND e.location_id = :location "
-            + "  AND e.encounter_type = ${53} "
-            + "  AND o.concept_id = ${6129} "
-            + "  AND o.value_datetime IS NOT NULL "
-            + "  AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                              LIMIT 1) "
-            + "                            AS DATE), "
-            + "      INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                                      LIMIT 1) "
-            + "                                        AS DATE), "
-            + "                                    INTERVAL 365 DAY) "
-            + "                         AND p.patient_id NOT IN ( "
-            + "                         SELECT pp.patient_id FROM patient pp INNER JOIN encounter e2 ON pp.patient_id = e2.patient_id "
-            + "                                             INNER JOIN obs o4 ON e2.encounter_id = o4.encounter_id "
-            + "                                             WHERE pp.voided =0 AND e2.voided = 0 AND o4.voided=0 "
-            + "                                             AND e2.encounter_type = ${53} AND o4.concept_id = ${23985} AND o4.value_coded = ${23954}) "
-            + "GROUP BY p.patient_id";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(sb.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
-   *
-   * <ul>
-   *   <li>B1.2: Select all patients with Ficha Resumo (encounter type 53) with Última
-   *       profilaxia(concept id 23985) value coded INH(concept id 656) and Data Fim da Profilaxia
-   *       TPT(value datetime, concept id 6129) and value datetime not null and and between (date
-   *       from Y+ 173 DAYs) and (date from Y + 365 DAYs)
+   *   <li>Patient has Última profilaxia TPT with value “Isoniazida (INH)” and Estado da Profilaxia
+   *       with the value “Fim (F)” and Data de Fim da Profilaxia TPT registered by reporting end
+   *       date in Ficha Resumo – Mastercard and between 173 days and 365 days from the INH start
+   *       date
    * </ul>
    *
    * @return CohortDefinition
@@ -1435,19 +1012,16 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Ultima profilaxia Isoniazida (Data Fim) B1.2");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
-    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6122", tbMetadata.getIsoniazidConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
@@ -1455,109 +1029,31 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
 
+    String Y =
+        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query())
+            .union(TPTEligiblePatientsQueries.getY2Query())
+            .union(TPTEligiblePatientsQueries.getY3Query())
+            .union(TPTEligiblePatientsQueries.getY4Query())
+            .union(TPTEligiblePatientsQueries.getY5Query())
+            .union(TPTEligiblePatientsQueries.getY6Query())
+            .buildQuery();
+
     String query =
-        "SELECT p.patient_id FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                     INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
-            + "  AND e.encounter_type = ${53} "
-            + "  AND o.concept_id = ${23985} AND o.value_coded = ${656} "
-            + "  AND o2.concept_id = ${6129} AND o2.value_datetime IS NOT NULL "
-            + "  AND o2.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "                                               LIMIT 1) "
-            + "                                             AS DATE), "
-            + "                                         INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + " LIMIT 1) AS DATE), "
-            + "                                           INTERVAL 365 DAY) "
-            + "GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                     INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
-            + "  AND e.encounter_type = ${53} "
-            + "  AND o.concept_id = ${23985} AND o.value_coded = ${656} "
-            + "  AND o2.concept_id = ${6129} AND o2.value_datetime IS NOT NULL "
-            + "  AND o2.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                                               LIMIT 1) "
-            + "                                             AS DATE), "
-            + "                                         INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                                              LIMIT 1) AS DATE), "
-            + "                                        INTERVAL 365 DAY) "
-            + "GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                     INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
-            + "  AND e.encounter_type = ${53} "
-            + "  AND o.concept_id = ${23985} AND o.value_coded = ${656} "
-            + "  AND o2.concept_id = ${6129} AND o2.value_datetime IS NOT NULL "
-            + "  AND o2.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                                               LIMIT 1) "
-            + "                                             AS DATE), "
-            + "                                         INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                                                                              LIMIT 1) AS DATE), "
-            + "                                                                        INTERVAL 365 DAY) "
-            + "GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                     INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
-            + "  AND e.encounter_type = ${53} "
-            + "  AND o.concept_id = ${23985} AND o.value_coded = ${656} "
-            + "  AND o2.concept_id = ${6129} AND o2.value_datetime IS NOT NULL "
-            + "  AND o2.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                                               LIMIT 1) "
-            + "                                             AS DATE), "
-            + "                                         INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                                                                              LIMIT 1) AS DATE), "
-            + "                                                                        INTERVAL 365 DAY) "
-            + "GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                     INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
-            + "  AND e.encounter_type = ${53} "
-            + "  AND o.concept_id = ${23985} AND o.value_coded = ${656} "
-            + "  AND o2.concept_id = ${6129} AND o2.value_datetime IS NOT NULL "
-            + "  AND o2.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                                               LIMIT 1) "
-            + "                                             AS DATE), "
-            + "                                         INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                                                                              LIMIT 1) AS DATE), "
-            + "                                                                        INTERVAL 365 DAY) "
-            + "GROUP BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "                                     INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "                                     INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
-            + "WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
-            + "  AND e.encounter_type = ${53} "
-            + "  AND o.concept_id = ${23985} AND o.value_coded = ${656} "
-            + "  AND o2.concept_id = ${6129} AND o2.value_datetime IS NOT NULL "
-            + "  AND o2.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                                               LIMIT 1) "
-            + "                                             AS DATE), "
-            + "                                         INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                                                                              LIMIT 1) "
-            + "                                                                            AS DATE), "
-            + "                                                                        INTERVAL 365 DAY) "
-            + "GROUP BY p.patient_id";
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + " INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + " INNER JOIN ( "
+            + Y
+            + " ) inh_start ON inh_start.patient_id = p.patient_id "
+            + "       WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
+            + "             AND e.encounter_type = ${53} "
+            + "             AND  (o.concept_id = ${23985} AND o.value_coded = ${656}) "
+            + "             AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267}) "
+            + "             AND o2.obs_datetime BETWEEN DATE_ADD(inh_start.start_date, interval 173 day) "
+            + "            AND DATE_ADD(inh_start.start_date, interval 365 day) "
+            + " GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -1570,11 +1066,10 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>B2: Select all patients with Ficha clinica - Master Card (encounter type 6) with
-   *       “Profilaxia INH” (concept id 6122) with value code “Fim” (concept id 1267) or Profilaxia
-   *       TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept
-   *       id 165308) value coded FIm (concept id 1267) and encounter datetime between (date from Y
-   *       + 173 DAYs) and (date from Y + 365 DAYs)
+   *   <li>Patient has Profilaxia TPT with the value “Isoniazida (INH)” and Estado da Profilaxia
+   *       with the value “Fim (F)”) marked in Ficha Clínica - Mastercard or Ficha de Seguimento
+   *       with Data do Estado da Profilaxia by reporting end date and between 173 days and 365 days
+   *       from the INH start date or
    *   <li>
    * </ul>
    *
@@ -1583,10 +1078,8 @@ public class TPTEligiblePatientListCohortQueries {
   public CohortDefinition getIPTB2(
       int masterCardEncounterType,
       int adultoSeguimentoEncounterType,
-      int isoniazidUsageConcept,
       int startDrugsConcept,
       int completedConcept,
-      int dataInicioProfilaxiaIsoniazidaConcept,
       int pediatriaSeguimentoEncounterType,
       int regimeTPTEncounterType,
       int regimeTPTConcept,
@@ -1602,8 +1095,6 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("53", masterCardEncounterType);
     map.put("6", adultoSeguimentoEncounterType);
     map.put("9", pediatriaSeguimentoEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
-    map.put("6122", isoniazidUsageConcept);
     map.put("1256", startDrugsConcept);
     map.put("1267", completedConcept);
     map.put("60", regimeTPTEncounterType);
@@ -1614,188 +1105,33 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
+    String Y =
+        new UnionBuilder(TPTEligiblePatientsQueries.getY1Query())
+            .union(TPTEligiblePatientsQueries.getY2Query())
+            .union(TPTEligiblePatientsQueries.getY3Query())
+            .union(TPTEligiblePatientsQueries.getY4Query())
+            .union(TPTEligiblePatientsQueries.getY5Query())
+            .union(TPTEligiblePatientsQueries.getY6Query())
+            .buildQuery();
     String query =
-        " SELECT p.patient_id"
-            + "     FROM   patient p"
-            + "       INNER JOIN encounter e"
-            + "               ON e.patient_id = p.patient_id"
-            + "       INNER JOIN obs o"
-            + "               ON o.encounter_id = e.encounter_id"
-            + " INNER JOIN obs o2 "
-            + "       ON o2.encounter_id = e.encounter_id "
-            + " INNER JOIN obs o3 "
-            + "       ON o3.encounter_id = e.encounter_id "
-            + "     WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6122}"
-            + "       AND o.value_coded = ${1267} "
-            + " OR ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
-            + " AND (o3.concept_id = ${165308} AND o3.value_coded = ${1267}) ) "
-            + "       AND e.encounter_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "           LIMIT 1) AS"
-            + "                date), INTERVAL 173 DAY) AND"
-            + "           Date_add("
-            + "               Cast(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "                   LIMIT 1) AS"
-            + "               date), INTERVAL 365 DAY)"
-            + "     GROUP  BY p.patient_id"
-            + "     UNION"
-            + "     SELECT p.patient_id"
-            + "     FROM   patient p"
-            + "            INNER JOIN encounter e"
-            + "                    ON e.patient_id = p.patient_id"
-            + "            INNER JOIN obs o"
-            + "                    ON o.encounter_id = e.encounter_id"
-            + " INNER JOIN obs o2 "
-            + "       ON o2.encounter_id = e.encounter_id "
-            + " INNER JOIN obs o3 "
-            + "       ON o3.encounter_id = e.encounter_id "
-            + "     WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6122}"
-            + "       AND o.value_coded = ${1267}"
-            + " OR ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
-            + " AND (o3.concept_id = ${165308} AND o3.value_coded = ${1267}) ) "
-            + "       AND e.encounter_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "           LIMIT 1)"
-            + "                AS date), INTERVAL 173 DAY) AND Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                      LIMIT 1)"
-            + "           AS date), INTERVAL 365 DAY)"
-            + "     GROUP  BY p.patient_id"
-            + "     UNION"
-            + "     SELECT p.patient_id"
-            + "     FROM   patient p"
-            + "            INNER JOIN encounter e"
-            + "                    ON e.patient_id = p.patient_id"
-            + "            INNER JOIN obs o"
-            + "                    ON o.encounter_id = e.encounter_id"
-            + " INNER JOIN obs o2 "
-            + "       ON o2.encounter_id = e.encounter_id "
-            + " INNER JOIN obs o3 "
-            + "       ON o3.encounter_id = e.encounter_id "
-            + "     WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6122}"
-            + "       AND o.value_coded = ${1267}"
-            + " OR ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
-            + " AND (o3.concept_id = ${165308} AND o3.value_coded = ${1267}) ) "
-            + "       AND e.encounter_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                LIMIT 1) AS date), INTERVAL 173 DAY)"
-            + "                                        AND"
-            + "                                            Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                    LIMIT 1) AS date), INTERVAL 365 DAY)"
-            + "   GROUP  BY p.patient_id"
-            + "   UNION"
-            + "   SELECT p.patient_id"
-            + "   FROM   patient p"
-            + "          INNER JOIN encounter e"
-            + "                  ON e.patient_id = p.patient_id"
-            + "          INNER JOIN obs o"
-            + "                  ON o.encounter_id = e.encounter_id"
-            + " INNER JOIN obs o2 "
-            + "       ON o2.encounter_id = e.encounter_id "
-            + " INNER JOIN obs o3 "
-            + "       ON o3.encounter_id = e.encounter_id "
-            + "   WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6122}"
-            + "       AND o.value_coded = ${1267} "
-            + " OR ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
-            + " AND (o3.concept_id = ${165308} AND o3.value_coded = ${1267}) ) "
-            + "       AND e.encounter_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                LIMIT 1) AS date), INTERVAL 173 DAY)"
-            + "                                        AND"
-            + "                                            Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                    LIMIT 1) AS date), INTERVAL 365 DAY)"
-            + "         GROUP  BY p.patient_id"
-            + " UNION "
-            + "   SELECT p.patient_id"
-            + "   FROM   patient p"
-            + "          INNER JOIN encounter e"
-            + "                  ON e.patient_id = p.patient_id"
-            + "          INNER JOIN obs o"
-            + "                  ON o.encounter_id = e.encounter_id"
-            + " INNER JOIN obs o2 "
-            + "       ON o2.encounter_id = e.encounter_id "
-            + " INNER JOIN obs o3 "
-            + "       ON o3.encounter_id = e.encounter_id "
-            + "   WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6122}"
-            + "       AND o.value_coded = ${1267} "
-            + " OR ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
-            + " AND (o3.concept_id = ${165308} AND o3.value_coded = ${1267}) ) "
-            + "       AND e.encounter_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                LIMIT 1) AS date), INTERVAL 173 DAY)"
-            + "                                        AND"
-            + "                                            Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                    LIMIT 1) AS date), INTERVAL 365 DAY)"
-            + "         GROUP  BY p.patient_id"
-            + " UNION "
-            + "   SELECT p.patient_id"
-            + "   FROM   patient p"
-            + "          INNER JOIN encounter e"
-            + "                  ON e.patient_id = p.patient_id"
-            + "          INNER JOIN obs o"
-            + "                  ON o.encounter_id = e.encounter_id"
-            + " INNER JOIN obs o2 "
-            + "       ON o2.encounter_id = e.encounter_id "
-            + " INNER JOIN obs o3 "
-            + "       ON o3.encounter_id = e.encounter_id "
-            + "   WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6122}"
-            + "       AND o.value_coded = ${1267} "
-            + " OR ( (o2.concept_id = ${23985} AND o2.value_coded = ${656}) "
-            + " AND (o3.concept_id = ${165308} AND o3.value_coded = ${1267}) ) "
-            + "       AND e.encounter_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                LIMIT 1) AS date), INTERVAL 173 DAY)"
-            + "                                        AND"
-            + "                                            Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                    LIMIT 1) AS date), INTERVAL 365 DAY)"
-            + "         GROUP  BY p.patient_id";
+        "SELECT p.patient_id "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + " INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+            + " INNER JOIN ( "
+            + Y
+            + " ) inh_start ON inh_start.patient_id = p.patient_id "
+            + "       WHERE p.voided =0 AND e.voided = 0 AND o.voided=0 AND o2.voided=0 "
+            + "             AND e.encounter_type IN (${6}, ${9}) "
+            + "             AND  (o.concept_id = ${23985} AND o.value_coded = ${656}) "
+            + "             AND (o2.concept_id = ${165308} AND o2.value_coded = ${1267}) "
+            + "             AND o2.obs_datetime BETWEEN DATE_ADD(inh_start.start_date, interval 173 day) "
+            + "            AND DATE_ADD(inh_start.start_date, interval 365 day) "
+            + " GROUP BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -1808,420 +1144,14 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>B3: Select all patients with Ficha de Seguimento - Adulto (encounter type 6) with
-   *       “Profilaxia com INH” (concept id 6129) value datetime between (date from Y + 173 DAYs)
-   *       and (date from Y + 365 DAYs)
-   *   <li>
-   * </ul>
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getIPTB3(
-      int masterCardEncounterType,
-      int dataFinalizacaoProfilaxiaIsoniazidaConcept,
-      int adultoSeguimentoEncounterType,
-      int isoniazidUsageConcept,
-      int startDrugsConcept,
-      int dataInicioProfilaxiaIsoniazidaConcept,
-      int pediatriaSeguimentoEncounterType,
-      int regimeTPTEncounterType,
-      int regimeTPTConcept,
-      int isoniazidConcept,
-      int isoniazidePiridoxinaConcept) {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" all patients with Profilaxia com INH B3");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("53", masterCardEncounterType);
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("9", pediatriaSeguimentoEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
-    map.put("6129", dataFinalizacaoProfilaxiaIsoniazidaConcept);
-    map.put("6122", isoniazidUsageConcept);
-    map.put("1256", startDrugsConcept);
-    map.put("60", regimeTPTEncounterType);
-    map.put("23985", regimeTPTConcept);
-    map.put("656", isoniazidConcept);
-    map.put("23982", isoniazidePiridoxinaConcept);
-    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
-    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
-    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
-
-    String query =
-        "   SELECT p.patient_id"
-            + " FROM   patient p"
-            + "       INNER JOIN encounter e"
-            + "               ON e.patient_id = p.patient_id"
-            + "       INNER JOIN obs o"
-            + "               ON o.encounter_id = e.encounter_id"
-            + " WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6129}"
-            + "       AND o.value_datetime IS NOT NULL"
-            + "       AND o.value_datetime BETWEEN Date_add("
-            + "               Cast(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "                                                                          LIMIT"
-            + "               1) AS"
-            + "                                             date), INTERVAL 173 DAY) AND"
-            + "                                        Date_add(Cast(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "                                                     LIMIT 1) AS"
-            + "                                                 date), INTERVAL 365 DAY)"
-            + "   GROUP  BY p.patient_id"
-            + "   UNION"
-            + "   SELECT p.patient_id"
-            + "   FROM   patient p"
-            + "       INNER JOIN encounter e"
-            + "                  ON e.patient_id = p.patient_id"
-            + "          INNER JOIN obs o"
-            + "                  ON o.encounter_id = e.encounter_id"
-            + "   WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6129}"
-            + "       AND o.value_datetime IS NOT NULL"
-            + "       AND o.value_datetime BETWEEN Date_add("
-            + "               Cast(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                                                                          LIMIT"
-            + "               1)"
-            + "                                             AS date), INTERVAL 173 DAY) AND"
-            + "                                        Date_add(Cast(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                                                            LIMIT 1)"
-            + "                                                 AS date), INTERVAL 365 DAY)"
-            + "    GROUP  BY p.patient_id"
-            + "    UNION"
-            + "    SELECT p.patient_id"
-            + "    FROM   patient p"
-            + "       INNER JOIN encounter e"
-            + "                  ON e.patient_id = p.patient_id"
-            + "          INNER JOIN obs o"
-            + "                  ON o.encounter_id = e.encounter_id"
-            + "   WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6129}"
-            + "       AND o.value_datetime IS NOT NULL"
-            + "       AND o.value_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "           LIMIT 1) AS date), INTERVAL 173 DAY) AND"
-            + "                                        Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                    LIMIT 1) AS date), INTERVAL 365 DAY)"
-            + "   GROUP  BY p.patient_id"
-            + "   UNION"
-            + "   SELECT p.patient_id"
-            + "   FROM   patient p"
-            + "       INNER JOIN encounter e"
-            + "                  ON e.patient_id = p.patient_id"
-            + "          INNER JOIN obs o"
-            + "                  ON o.encounter_id = e.encounter_id"
-            + "   WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6129}"
-            + "       AND o.value_datetime IS NOT NULL"
-            + "       AND o.value_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "           LIMIT 1) AS date), INTERVAL 173 DAY) AND"
-            + "                                        Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                 LIMIT 1) AS date), INTERVAL 365 DAY)"
-            + "          GROUP  BY p.patient_id "
-            + "   UNION"
-            + "   SELECT p.patient_id"
-            + "   FROM   patient p"
-            + "       INNER JOIN encounter e"
-            + "                  ON e.patient_id = p.patient_id"
-            + "          INNER JOIN obs o"
-            + "                  ON o.encounter_id = e.encounter_id"
-            + "   WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6129}"
-            + "       AND o.value_datetime IS NOT NULL"
-            + "       AND o.value_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "           LIMIT 1) AS date), INTERVAL 173 DAY) AND"
-            + "                                        Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                 LIMIT 1) AS date), INTERVAL 365 DAY)"
-            + "          GROUP  BY p.patient_id "
-            + "   UNION"
-            + "   SELECT p.patient_id"
-            + "   FROM   patient p"
-            + "       INNER JOIN encounter e"
-            + "                  ON e.patient_id = p.patient_id"
-            + "          INNER JOIN obs o"
-            + "                  ON o.encounter_id = e.encounter_id"
-            + "   WHERE  p.voided = 0"
-            + "       AND e.voided = 0"
-            + "       AND o.voided = 0"
-            + "       AND e.location_id = :location"
-            + "       AND e.encounter_type = ${6}"
-            + "       AND o.concept_id = ${6129}"
-            + "       AND o.value_datetime IS NOT NULL"
-            + "       AND o.value_datetime BETWEEN Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "           LIMIT 1) AS date), INTERVAL 173 DAY) AND"
-            + "                                        Date_add("
-            + "           Cast(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                 LIMIT 1) AS date), INTERVAL 365 DAY)"
-            + "          GROUP  BY p.patient_id ";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(sb.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
-   *
-   * <ul>
-   *   <li>B4: Select all patients with Ficha de Seguimento - Pediatrico (encounter type 9) with
-   *       “Profilaxia com INH” (concept id 6129) value datetime between (date from Y+173 DAYs) and
-   *       (date from Y + 365 DAYs)
-   *   <li>
-   * </ul>
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getIPTB4(
-      int masterCardEncounterType,
-      int dataFinalizacaoProfilaxiaIsoniazidaConcept,
-      int adultoSeguimentoEncounterType,
-      int isoniazidUsageConcept,
-      int startDrugsConcept,
-      int dataInicioProfilaxiaIsoniazidaConcept,
-      int pediatriaSeguimentoEncounterType,
-      int regimeTPTEncounterType,
-      int regimeTPTConcept,
-      int isoniazidConcept,
-      int isoniazidePiridoxinaConcept) {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" all patients with Profilaxia com INH B4");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("53", masterCardEncounterType);
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("9", pediatriaSeguimentoEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
-    map.put("6129", dataFinalizacaoProfilaxiaIsoniazidaConcept);
-    map.put("6122", isoniazidUsageConcept);
-    map.put("1256", startDrugsConcept);
-    map.put("60", regimeTPTEncounterType);
-    map.put("23985", regimeTPTConcept);
-    map.put("656", isoniazidConcept);
-    map.put("23982", isoniazidePiridoxinaConcept);
-    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
-    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
-    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
-
-    String query =
-        "   SELECT"
-            + "            p.patient_id"
-            + "        FROM"
-            + "            patient p"
-            + "                INNER JOIN"
-            + "            encounter e ON e.patient_id = p.patient_id"
-            + "                INNER JOIN"
-            + "            obs o ON o.encounter_id = e.encounter_id"
-            + "        WHERE"
-            + "            p.voided = 0 AND e.voided = 0"
-            + "                AND o.voided = 0"
-            + "                AND e.location_id = :location"
-            + "                AND e.encounter_type = ${9}"
-            + "                AND o.concept_id = ${6129}"
-            + "                AND o.value_datetime IS NOT NULL"
-            + "                AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY1Query()
-            + "                            LIMIT 1) AS DATE),"
-            + "                INTERVAL 365 DAY)"
-            + "        GROUP BY p.patient_id"
-            + "     UNION"
-            + "        SELECT"
-            + "            p.patient_id"
-            + "        FROM"
-            + "            patient p"
-            + "                INNER JOIN"
-            + "            encounter e ON e.patient_id = p.patient_id"
-            + "                INNER JOIN"
-            + "            obs o ON o.encounter_id = e.encounter_id"
-            + "        WHERE"
-            + "            p.voided = 0 AND e.voided = 0"
-            + "                AND o.voided = 0"
-            + "                AND e.location_id = :location"
-            + "                AND e.encounter_type = ${9}"
-            + "                AND o.concept_id = ${6129}"
-            + "                AND o.value_datetime IS NOT NULL"
-            + "                AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY2Query()
-            + "                            LIMIT 1) AS DATE),"
-            + "                INTERVAL 365 DAY)"
-            + "        GROUP BY p.patient_id"
-            + "     UNION"
-            + "        SELECT"
-            + "            p.patient_id"
-            + "        FROM"
-            + "            patient p"
-            + "                INNER JOIN"
-            + "            encounter e ON e.patient_id = p.patient_id"
-            + "                INNER JOIN"
-            + "            obs o ON o.encounter_id = e.encounter_id"
-            + "        WHERE"
-            + "            p.voided = 0 AND e.voided = 0"
-            + "                AND o.voided = 0"
-            + "                AND e.location_id = :location"
-            + "                AND e.encounter_type = ${9}"
-            + "                AND o.concept_id = ${6129}"
-            + "                AND o.value_datetime IS NOT NULL"
-            + "                AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY3Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 365 DAY)"
-            + "        GROUP BY p.patient_id"
-            + "     UNION"
-            + "        SELECT"
-            + "            p.patient_id"
-            + "        FROM"
-            + "            patient p"
-            + "                INNER JOIN"
-            + "            encounter e ON e.patient_id = p.patient_id"
-            + "                INNER JOIN"
-            + "            obs o ON o.encounter_id = e.encounter_id"
-            + "        WHERE"
-            + "            p.voided = 0 AND e.voided = 0"
-            + "                AND o.voided = 0"
-            + "                AND e.location_id = :location"
-            + "                AND e.encounter_type = ${9}"
-            + "                AND o.concept_id = ${6129}"
-            + "                AND o.value_datetime IS NOT NULL"
-            + "                AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY4Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 365 DAY)"
-            + "        GROUP BY p.patient_id"
-            + "   UNION "
-            + "        SELECT"
-            + "            p.patient_id"
-            + "        FROM"
-            + "            patient p"
-            + "                INNER JOIN"
-            + "            encounter e ON e.patient_id = p.patient_id"
-            + "                INNER JOIN"
-            + "            obs o ON o.encounter_id = e.encounter_id"
-            + "        WHERE"
-            + "            p.voided = 0 AND e.voided = 0"
-            + "                AND o.voided = 0"
-            + "                AND e.location_id = :location"
-            + "                AND e.encounter_type = ${9}"
-            + "                AND o.concept_id = ${6129}"
-            + "                AND o.value_datetime IS NOT NULL"
-            + "                AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY5Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 365 DAY)"
-            + "        GROUP BY p.patient_id"
-            + "     UNION"
-            + "        SELECT"
-            + "            p.patient_id"
-            + "        FROM"
-            + "            patient p"
-            + "                INNER JOIN"
-            + "            encounter e ON e.patient_id = p.patient_id"
-            + "                INNER JOIN"
-            + "            obs o ON o.encounter_id = e.encounter_id"
-            + "        WHERE"
-            + "            p.voided = 0 AND e.voided = 0"
-            + "                AND o.voided = 0"
-            + "                AND e.location_id = :location"
-            + "                AND e.encounter_type = ${9}"
-            + "                AND o.concept_id = ${6129}"
-            + "                AND o.value_datetime IS NOT NULL"
-            + "                AND o.value_datetime BETWEEN DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 173 DAY) AND DATE_ADD(CAST(( "
-            + TPTEligiblePatientsQueries.getY6Query()
-            + "                        LIMIT 1)"
-            + "                    AS DATE),"
-            + "                INTERVAL 365 DAY)"
-            + "        GROUP BY p.patient_id";
-
-    StringSubstitutor sb = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(sb.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
-   * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
-   *
-   * <ul>
-   *   <li>B5- If date Y is registered on Ficha Clinica (encounter type 6) OR Ficha Resumo
-   *       (encounter type 53) check if the patient has:
-   *   <li>At least 5 consultations (((encounter type 6) with (profilaxia INH (6122)= inicio(I) or
-   *       Continua(C) (concept id in [1256, 1257])) or ((encounter type 9) “Profilaxia com INH-TPI”
-   *       (concept id 6122) with value coded “YES” (concept id 1065))) or Profilaxia TPT (concept
+   *   <li>B5 - If the INH Start Date (Y) is registered in Ficha Clinica or Ficha de Seguimento or
+   *       Ficha Resumo, the system will check if the patient has one of the following number of
+   *       consultations in a defined period of months from the INH Start Date to consider the
+   *       patient completed INH treatment:
+   *   <li>At least 5 consultations ((encounter type 6) (encounter type 9) Profilaxia TPT (concept
    *       id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id 165308)
-   *       value coded Início/continua (concept id in [1256,1257]) during 210 DAYs from the date
-   *       Y2,3 or
+   *       value coded Início/continua (concept id in [1256,1257]) until a 7-month period after the
+   *       INH Start Date from the date Y2,3 or
    *   <li>
    *   <li>
    * </ul>
@@ -2230,9 +1160,7 @@ public class TPTEligiblePatientListCohortQueries {
    */
   public CohortDefinition getIPTB5Part1(
       int adultoSeguimentoEncounterType,
-      int isoniazidUsageConcept,
       int startDrugsConcept,
-      int dataInicioProfilaxiaIsoniazidaConcept,
       int pediatriaSeguimentoEncounterType,
       int continuaConcept,
       int yesConcept) {
@@ -2245,8 +1173,6 @@ public class TPTEligiblePatientListCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", adultoSeguimentoEncounterType);
     map.put("9", pediatriaSeguimentoEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
-    map.put("6122", isoniazidUsageConcept);
     map.put("1256", startDrugsConcept);
     map.put("1257", continuaConcept);
     map.put("1065", yesConcept);
@@ -2255,6 +1181,8 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2267,43 +1195,32 @@ public class TPTEligiblePatientListCohortQueries {
             .buildQuery();
 
     String query =
-        "   SELECT result.patient_id "
-            + "         FROM (SELECT p.patient_id,tabela.datetime   "
+        " SELECT p.patient_id   "
             + "            FROM   patient p   "
-            + "            INNER JOIN encounter e "
-            + "                    ON e.patient_id = p.patient_id "
-            + "            INNER JOIN obs o   "
-            + "                    ON o.encounter_id = e.encounter_id "
+            + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "            INNER JOIN(   "
             + unionQuery
-            + " ) AS tabela    "
-            + "                    ON tabela.patient_id = p.patient_id    "
-            + "                    WHERE e.location_id= :location AND e.encounter_type IN  (${6}, ${53}) AND e.voided= 0 AND o.voided= 0   "
-            + "                    GROUP BY p.patient_id) result  "
-            + "      WHERE   (( (SELECT Count(ee.patient_id)  "
+            + " ) AS tabela  ON tabela.patient_id = p.patient_id    "
+            + "                    WHERE e.location_id= :location AND e.encounter_type IN  (${6}, ${9}, ${53})  "
+            + "                    AND "
+            + "                    (SELECT Count(ee.patient_id)  "
             + "                     FROM   encounter ee   "
-            + "                            INNER JOIN obs oo  "
-            + "                                    ON oo.encounter_id = ee.encounter_id   "
-            + "                            INNER JOIN obs o2  "
-            + "                                    ON o2.encounter_id = ee.encounter_id   "
+            + "                            INNER JOIN obs oo  ON oo.encounter_id = ee.encounter_id   "
+            + "                            INNER JOIN obs o2  ON o2.encounter_id = ee.encounter_id   "
             + "                     WHERE  ee.voided = 0  "
-            + "                            AND result.patient_id = ee.patient_id  "
+            + "                            AND p.patient_id = ee.patient_id  "
             + "                            AND oo.voided = 0  "
             + "                            AND ee.location_id = :location   "
-            + "                            AND oo.concept_id = ${6122}   "
-            + "                            AND ee.encounter_datetime BETWEEN  "
-            + "                                result.datetime AND  "
-            + "                    Date_add(result.datetime,    "
-            + "                    INTERVAL 210 DAY)  "
-            + "                    AND ( ( ee.encounter_type = ${6}  "
-            + "                    AND oo.value_coded IN ( ${1256}, ${1257} ) ) "
-            + "                    OR ( ee.encounter_type = ${9} "
-            + "                    AND oo.value_coded = ${1065} ) "
-            + "OR (ee.encounter_type IN (${6},${9}) AND "
-            + "  (oo.concept_id = ${23985} and oo.value_coded = ${656}) and "
-            + "  (o2.concept_id = ${165308} and o2.value_coded in (${1256},${1257})))"
-            + " )) >= 5 )) "
-            + "      GROUP  BY result.patient_id ";
+            + "                            AND ee.encounter_type IN (${6},${9}) "
+            + "              AND (oo.concept_id = ${23985} and oo.value_coded = ${656}) "
+            + "              AND "
+            + "                (o2.concept_id = ${165308} and o2.value_coded in (${1256},${1257}) "
+            + "                               AND o2.obs_datetime >  tabela.start_date "
+            + "                               AND o2.obs_datetime <=  Date_add(tabela.start_date, INTERVAL 7 MONTH) "
+            + "                               AND o2.obs_datetime <= :endDate "
+            + "                  )"
+            + "                           ) >= 5  "
+            + "      GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -2316,13 +1233,11 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>B5: At least 2 consultations (encounter type 6) (with profilaxia INH (concept id 6122) =
-   *       inicio(I) or Continua(C) (concept id in [1256, 1257]) and has “Outras prescricoes”
-   *       (concept id 1719) with value coded equal to “DT-INH” (concept id 23955) ) or (Profilaxia
-   *       TPT (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept
-   *       id 165308) value coded Início/continua (concept id in [1256,1257]) and Outras
-   *       prescricoes(concept id 1719) value coded DT-INH (concept id 23955) during 150 DAYs from
-   *       the date from Y2,3 or
+   *   <li>B5: At least 2 consultations registered in Ficha Clinca (encounter type 6) with
+   *       (Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
+   *       Profilaxia (concept id 165308) value coded Início/continua (concept id in [1256,1257])
+   *       and Outras prescricoes(concept id 1719) value coded DT-INH (concept id 23955) until a
+   *       5-month period from the INH Start Date (from Y2,3) or
    *   <li>
    * </ul>
    *
@@ -2330,9 +1245,8 @@ public class TPTEligiblePatientListCohortQueries {
    */
   public CohortDefinition getIPTB5Part2(
       int adultoSeguimentoEncounterType,
-      int isoniazidUsageConcept,
       int startDrugsConcept,
-      int dataInicioProfilaxiaIsoniazidaConcept,
+      int pediatriaSeguimentoEncounterType,
       int continuaConcept,
       int treatmentPrescribedConcept,
       int dtINHConcept) {
@@ -2340,12 +1254,12 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B5.2");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", adultoSeguimentoEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
-    map.put("6122", isoniazidUsageConcept);
+    map.put("9", pediatriaSeguimentoEncounterType);
     map.put("1256", startDrugsConcept);
     map.put("1257", continuaConcept);
     map.put("1719", treatmentPrescribedConcept);
@@ -2354,6 +1268,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2367,7 +1282,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         "   SELECT result.patient_id    "
-            + "                FROM (SELECT p.patient_id,tabela.datetime    "
+            + "                FROM (SELECT p.patient_id,tabela.start_date    "
             + "                   FROM   patient p    "
             + "                   INNER JOIN encounter e  "
             + "                           ON e.patient_id = p.patient_id  "
@@ -2377,7 +1292,7 @@ public class TPTEligiblePatientListCohortQueries {
             + unionQuery
             + "  ) AS tabela "
             + "                           ON tabela.patient_id = p.patient_id "
-            + "                           WHERE e.location_id= :location AND e.encounter_type IN (${6}, ${53}) AND e.voided=0 AND o.voided=0    "
+            + "                           WHERE e.location_id= :location AND e.encounter_type IN (${6}, ${9}, ${53}) AND e.voided=0 AND o.voided=0    "
             + "                           GROUP BY p.patient_id) result   "
             + "               WHERE   ( (SELECT Count(*)  "
             + "                          FROM   patient pp    "
@@ -2389,17 +1304,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                 AND ee.encounter_type = ${6} "
             + "                                 AND ee.location_id = :location  "
             + "                                 AND ee.voided = 0 "
-            + "                                 AND ( EXISTS (SELECT oo.obs_id    "
-            + "                                               FROM obs oo "
-            + "                                               WHERE  oo.encounter_id = ee.encounter_id    "
-            + "                                                      AND oo.concept_id = ${6122} "
-            + "                                                      AND oo.value_coded IN(${1256}, ${1257} ))  "
-            + "                                       AND EXISTS (SELECT oo.obs_id    "
-            + "                                                   FROM   obs oo   "
-            + "                                                   WHERE  oo.encounter_id = ee.encounter_id    "
-            + "                                                          AND oo.concept_id = ${1719} "
-            + "                                                          AND oo.value_coded IN( ${23955} )) )    "
-            + "                                 OR ( EXISTS( "
+            + "                                 AND ( EXISTS( "
             + "                                       SELECT oo.obs_id "
             + "                                       FROM obs oo "
             + "                                       WHERE oo.encounter_id = ee.encounter_id "
@@ -2420,9 +1325,9 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                       ) "
             + "                                   )"
             + "                                 AND ee.encounter_datetime BETWEEN "
-            + "                                     result.datetime AND "
-            + "                         Date_add(result.datetime,   "
-            + "                         INTERVAL 150 DAY)) >= 2 ) "
+            + "                                     result.start_date AND "
+            + "                         Date_add(result.start_date,   "
+            + "                         INTERVAL 5 MONTH)) >= 2 ) "
             + "               GROUP  BY result.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -2436,15 +1341,14 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>B5: ((At least 3 consultations registered on Ficha Clínica (encounter type 6) with INH =
-   *       Iniício or Continua (concept ID 6122, value_coded in [1257, 1256]) ) OR (Profilaxia TPT
-   *       (concept id 23985) value coded INH (concept id 656) and Estado da Profilaxia (concept id
-   *       165308) value coded Início/continua (concept id in [1256,1257]) ) AND ( at least 1
-   *       consultation registered on Ficha Clínica (encounter type 6) with DT-INH (concept ID 1719,
-   *       value_coded =23955) OR (Profilaxia TPT (concept id 23985) value coded INH (concept id
-   *       656) and Estado da Profilaxia (concept id 165308) value coded Início/continua (concept id
-   *       in [1256,1257]) and Outras prescricoes(concept id 1719) value coded DT-INH (concept id
-   *       23955) ) )until a 7-month (210 DAYs) period from the date from Y2,3. OR
+   *   <li>B5: ((At least 3 consultations registered on Ficha Clínica (encounter type 6) with
+   *       (Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
+   *       Profilaxia (concept id 165308) value coded Início/continua (concept id in [1256,1257]) )
+   *       AND ( at least 1 consultation registered on Ficha Clínica (encounter type 6) with
+   *       (Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
+   *       Profilaxia (concept id 165308) value coded Início/continua (concept id in [1256,1257])
+   *       and Outras prescricoes(concept id 1719) value coded DT-INH (concept id 23955) ) ) until a
+   *       7-month period from the INH Start Date (date from Y2,3.) OR
    *   <li>
    * </ul>
    *
@@ -2452,9 +1356,8 @@ public class TPTEligiblePatientListCohortQueries {
    */
   public CohortDefinition getIPTB5Part3(
       int adultoSeguimentoEncounterType,
-      int isoniazidUsageConcept,
       int startDrugsConcept,
-      int dataInicioProfilaxiaIsoniazidaConcept,
+      int pediatriaSeguimentoEncounterType,
       int continuaConcept,
       int treatmentPrescribedConcept,
       int dtINHConcept) {
@@ -2462,12 +1365,12 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Profilaxia com INH B5.3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", adultoSeguimentoEncounterType);
-    map.put("6128", dataInicioProfilaxiaIsoniazidaConcept);
-    map.put("6122", isoniazidUsageConcept);
+    map.put("9", pediatriaSeguimentoEncounterType);
     map.put("1256", startDrugsConcept);
     map.put("1257", continuaConcept);
     map.put("1719", treatmentPrescribedConcept);
@@ -2476,6 +1379,7 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2489,7 +1393,7 @@ public class TPTEligiblePatientListCohortQueries {
 
     String query =
         " SELECT result.patient_id    "
-            + "            FROM (SELECT p.patient_id,tabela.datetime    "
+            + "            FROM (SELECT p.patient_id,tabela.start_date    "
             + "               FROM   patient p    "
             + "               INNER JOIN encounter e  "
             + "                       ON e.patient_id = p.patient_id  "
@@ -2499,7 +1403,7 @@ public class TPTEligiblePatientListCohortQueries {
             + unionQuery
             + " ) AS tabela "
             + "                       ON tabela.patient_id = p.patient_id "
-            + "                       WHERE e.location_id= :location AND e.encounter_type IN (${6}, ${53}) AND e.voided=0 AND o.voided=0    "
+            + "                       WHERE e.location_id= :location AND e.encounter_type IN (${6}, ${9}, ${53}) AND e.voided=0 AND o.voided=0    "
             + "                       GROUP BY p.patient_id) result   "
             + "            WHERE  "
             + "                 ( ( "
@@ -2515,16 +1419,14 @@ public class TPTEligiblePatientListCohortQueries {
             + "                   AND        o2.voided = 0 "
             + "                   AND        ee.location_id = :location "
             + "                   AND        ee.encounter_type = ${6} "
-            + "                   AND        ( "
-            + "                                         oo.concept_id = ${6122}  AND oo.value_coded IN ( ${1256}, ${1257} )) "
-            + "                   OR         ( ( "
+            + "                   AND         ( ( "
             + "                                                    oo.concept_id= ${23985} "
             + "                                         AND        oo.value_coded = ${656}) "
             + "                              AND        ( "
             + "                                                    o2.concept_id = ${165308} "
             + "                                         AND        o2.value_coded IN (${1256}, ${1257}) ) ) "
-            + "                   AND   ee.encounter_datetime BETWEEN result.datetime AND  "
-            + "      date_add(result.datetime, interval 210 day)) >= 3 "
+            + "                   AND   o2.obs_datetime BETWEEN result.start_date AND  "
+            + "      date_add(result.start_date, interval 7 MONTH)) >= 3 "
             + "                AND "
             + "                ( "
             + "                           SELECT     count(ee.patient_id) "
@@ -2539,10 +1441,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                           AND        oo.voided = 0 "
             + "                           AND        ee.location_id = :location "
             + "                           AND        ee.encounter_type = ${6} "
-            + "                           AND        ( "
-            + "                                                 oo.concept_id = ${1719} "
-            + "                                      AND        oo.value_coded = ${23955} ) "
-            + "                           OR         ( ( "
+            + "                           AND         ( ( "
             + "                                                            oo.concept_id= ${23985} "
             + "                                                 AND        oo.value_coded = ${656}) "
             + "                                      AND        ( "
@@ -2552,8 +1451,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                                            o3.concept_id = ${1719} "
             + "                                                 AND        o3.value_coded = ${23955}) ) "
             + "                           AND        result.patient_id = ee.patient_id "
-            + "                           AND        ee.encounter_datetime BETWEEN result.datetime AND "
-            + "       date_add(result.datetime, interval 210 day)) >= 1 ) "
+            + "                           AND        ee.encounter_datetime BETWEEN result.start_date AND "
+            + "       date_add(result.start_date, interval 7 MONTH)) >= 1 ) "
             + "            GROUP  BY result.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -2570,8 +1469,8 @@ public class TPTEligiblePatientListCohortQueries {
    *   <li>B6: If date from Y is registered on FILT (encounter type 60) check if the patient has:
    *   <li>At least 6 drug pick-ups with “Regime de TPT” (concept id 23985) value coded ‘Isoniazid’
    *       or ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Tipo de dispensa” (concept
-   *       id 23986) with value coded “Mensal” (concept id 1098) during 210 DAYs from the date from
-   *       or
+   *       id 23986) with value coded “Mensal” (concept id 1098) until a 7-Month period from the
+   *       date from the INH Start Date or
    *   <li>
    *   <li>
    * </ul>
@@ -2589,6 +1488,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT B6.1");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2604,10 +1504,10 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2654,9 +1554,9 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                              AND oo.concept_id = ${23986}"
             + "                                              AND oo.value_coded IN ( ${1098} )) )"
             + "                      AND ee.encounter_datetime BETWEEN"
-            + "                          tabela.datetime AND"
-            + "              Date_add(tabela.datetime,"
-            + "              INTERVAL 210 DAY)) >= 6 ))"
+            + "                          tabela.start_date AND"
+            + "              Date_add(tabela.start_date,"
+            + "              INTERVAL 7 MONTH)) >= 6 ))"
             + "   GROUP  BY p.patient_id  ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -2672,8 +1572,8 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>B6: At least 2 drug pick-ups with “Regime de TPT” (concept id 23985) value coded
    *       ‘Isoniazid’ or ‘Isoniazid + piridoxina’ (concept id in [656, 23982]) and “Tipo de
-   *       dispensa” (concept id 23986) with value coded “Trimestral” (concept id 23720) during 210
-   *       DAYs from the date from Y4 or
+   *       dispensa” (concept id 23986) with value coded “Trimestral” (concept id 23720) until a 5
+   *       Month Period from the INH Start Date (date from Y4) or
    *   <li>
    * </ul>
    *
@@ -2690,6 +1590,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT B6.2");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2705,10 +1606,10 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2755,9 +1656,9 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                              AND oo.concept_id = ${23986}    "
             + "                                              AND oo.value_coded IN ( ${23720} )) )   "
             + "                      AND ee.encounter_datetime BETWEEN    "
-            + "                          tabela.datetime AND    "
-            + "              Date_add(tabela.datetime,  "
-            + "              INTERVAL 210 DAY)) >= 2 ))   "
+            + "                          tabela.start_date AND    "
+            + "              Date_add(tabela.start_date,  "
+            + "              INTERVAL 7 MONTH)) >= 2 ))   "
             + " GROUP  BY p.patient_id  ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -2775,7 +1676,7 @@ public class TPTEligiblePatientListCohortQueries {
    *       (concept ID 23986, value_coded 1098 and concept id 23985 value_coded in (656, 23982) )
    *       AND (at least 1 drug pick-up on FILT (encounter type 60) with DT-INH (concept ID 23986,
    *       value_coded 23720 and concept id 23985 value_coded in (656, 23982))) until a 7-month
-   *       period (210 DAYs) from the date from Y4
+   *       period from the INH Start Date (date from Y4)
    *   <li>
    * </ul>
    *
@@ -2793,6 +1694,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with INH Mensal and DT-INH B6.3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -2810,10 +1712,10 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6122", hivMetadata.getIsoniazidUsageConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     EptsQueriesUtil unionBuilder = new EptsQueriesUtil();
 
@@ -2860,9 +1762,9 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                               AND oo.concept_id = ${23986}"
             + "                                               AND oo.value_coded IN ( ${1098} )) )"
             + "                       AND ee.encounter_datetime BETWEEN"
-            + "                           tabela.datetime AND"
-            + "               Date_add(tabela.datetime,"
-            + "               INTERVAL 210 DAY)) >= 3 )"
+            + "                           tabela.start_date AND"
+            + "               Date_add(tabela.start_date,"
+            + "               INTERVAL 7 MONTH)) >= 3 )"
             + "             AND ( (SELECT Count(*)"
             + "                    FROM   patient pp"
             + "                           inner join encounter ee"
@@ -2885,9 +1787,9 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                                   AND oo.value_coded IN ( ${23720}"
             + "                                                       )) )"
             + "                           AND ee.encounter_datetime BETWEEN"
-            + "                               tabela.datetime AND"
-            + "                   Date_add(tabela.datetime,"
-            + "                   INTERVAL 210 DAY)) >= 1 ) )"
+            + "                               tabela.start_date AND"
+            + "                   Date_add(tabela.start_date,"
+            + "                   INTERVAL 7 MONTH)) >= 1 ) )"
             + "   GROUP  BY p.patient_id  ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -2901,13 +1803,10 @@ public class TPTEligiblePatientListCohortQueries {
    * <b>IMER1</b>:User Story TPT Eligible Patient List <br>
    *
    * <ul>
-   *   <li>C: Select all patients from M and check if: The date from M is registered on Ficha
-   *       Clinica - Master Card (encounter type 6) or Ficha Resumo (encounter type 53) and:
-   *   <li>The patient has at least 3 consultations (encounter type 6) with “Outras prescricoes”
-   *       (concept id 1719) with value coded equal to “3HP” (concept id 23954) or with Profilaxia
-   *       TPT (concept id 23985) value coded 3HP (concept id 23954) and Estado da Profilaxia
-   *       (concept id 165308) value coded Início/continua (concept id in [1256,1257])during 120
-   *       DAYs from the date from M.1; or
+   *   <li>At least 3 consultations registered on in Ficha Clínica – Mastercard with with Outras
+   *       Prescrições = “3HP” or Profilaxia 3HP (Profilaxia TPT=”3HP” and Estado da
+   *       Profilaxia=”InicioInício(I)/Continua(C)”) until a 4-month period from the 3HP Start Date
+   *       (including the 3HP Start Date)
    *   <li>
    * </ul>
    *
@@ -2928,7 +1827,6 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
     map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
@@ -2943,11 +1841,11 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separeted query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(sectionFromM.ONE.getQuery())
-            .union(sectionFromM.THREE.getQuery())
-            .union(sectionFromM.FOUR.getQuery())
-            .union(sectionFromM.FIVE.getQuery())
-            .union(sectionFromM.SIX.getQuery())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart1())
+            .union(TPTEligiblePatientsQueries.getMpart3())
+            .union(TPTEligiblePatientsQueries.getMpart4())
+            .union(TPTEligiblePatientsQueries.getMpart5())
+            .union(TPTEligiblePatientsQueries.getMpart6())
             .buildQuery();
 
     String query =
@@ -2973,29 +1871,23 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                    ON pp.patient_id = ee.patient_id "
             + "                                  join obs oo "
             + "                                    ON oo.encounter_id = ee.encounter_id "
-            + "                               join obs o3 "
-            + "                                    ON o3.encounter_id = ee.encounter_id "
-            + "                               join obs o4 "
-            + "                                    ON o4.encounter_id = ee.encounter_id "
+            + "                               join obs o2 "
+            + "                                    ON o2.encounter_id = ee.encounter_id "
             + "                          WHERE  pp.voided = 0 "
             + "                                 AND ee.voided = 0 "
             + "                                 AND oo.voided = 0 "
-            + "                                 AND o3.voided = 0 "
-            + "                                 AND o4.voided = 0 "
+            + "                                 AND o2.voided = 0 "
             + "                                 AND p.patient_id = pp.patient_id "
             + "                                 AND ee.encounter_type = ${6} "
             + "                                 AND ee.location_id = :location "
             + "                                 AND ee.voided = 0 "
-            + "                                 AND (oo.concept_id = ${1719} "
-            + "                                 AND oo.value_coded = ${23954}) "
             + "                            AND ( "
-            + "                                (o3.concept_id = ${23985} AND o3.value_coded = ${23954}) "
-            + "                                    AND (o4.concept_id = ${165308} AND o4.value_coded IN (${1256},${1257})) "
-            + "                                ) "
-            + "                                 AND ee.encounter_datetime BETWEEN "
+            + "                                (oo.concept_id = ${23985} AND oo.value_coded = ${23954}) "
+            + "                                    AND (o2.concept_id = ${165308} AND o2.value_coded IN (${1256},${1257}) "
+            + "                                 AND o2.obs_datetime BETWEEN "
             + "                                     tabela.encounter_datetime AND "
             + "                         Date_add(tabela.encounter_datetime, "
-            + "                         INTERVAL 120 DAY)) >= 3 ) "
+            + "                         INTERVAL 4 MONTH)))) >= 3 ) "
             + "             GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -3012,7 +1904,8 @@ public class TPTEligiblePatientListCohortQueries {
    *   <li>C: Select all patients from M and check if: The date from M is registered on Ficha
    *       Clinica - Master Card (encounter type 6) or Ficha Resumo (encounter type 53) and:
    *   <li>At least 1 consultation registered on Ficha Clínica (encounter type 6) with DT-3HP
-   *       (concept ID 1719, value_coded =165307) during 120 days from the date from M.1; or
+   *       (concept ID 1719, value_coded =165307) until a 4-month period from the 3HP Strat Date
+   *       (date from M.1;) or
    * </ul>
    *
    * @return CohortDefinition
@@ -3032,7 +1925,6 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
     map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
@@ -3047,11 +1939,11 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separeted query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(sectionFromM.ONE.getQuery())
-            .union(sectionFromM.THREE.getQuery())
-            .union(sectionFromM.FOUR.getQuery())
-            .union(sectionFromM.FIVE.getQuery())
-            .union(sectionFromM.SIX.getQuery())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart1())
+            .union(TPTEligiblePatientsQueries.getMpart3())
+            .union(TPTEligiblePatientsQueries.getMpart4())
+            .union(TPTEligiblePatientsQueries.getMpart5())
+            .union(TPTEligiblePatientsQueries.getMpart6())
             .buildQuery();
 
     String query =
@@ -3089,7 +1981,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                 AND ee.encounter_datetime BETWEEN "
             + "                                     tabela.encounter_datetime AND "
             + "                         Date_add(tabela.encounter_datetime, "
-            + "                         INTERVAL 120 DAY)) >= 1 ) "
+            + "                         INTERVAL 4 MONTH)) >= 1 ) "
             + "             GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -3107,8 +1999,8 @@ public class TPTEligiblePatientListCohortQueries {
    *       enddate) and:
    *   <li>The patient has at least 1 drug pick-up on FILT (encounter type 60) with “Regime de TPT”
    *       (concept id 23985) value coded “3HP” doxina” (concept id in [23954, 23984]) and “Tipo de
-   *       dispensa” (concept id 23986) with value coded “Trimestral” (concept id 23720) during 120
-   *       DAYs from the date from M.2; or
+   *       dispensa” (concept id 23986) with value coded “Trimestral” (concept id 23720) until a
+   *       4-month period from the 3HP Strat Date (date from M.2;) or
    * </ul>
    *
    * @return CohortDefinition
@@ -3124,6 +2016,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT C2");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3134,7 +2027,6 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23986", typeDispensationTPTConceptUuid);
     map.put("23720", quarterlyConcept);
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
@@ -3150,9 +2042,9 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separeted query based on the given queries
     String unionFiltQuery =
         unionBuilder
-            .unionBuilder(sectionFromM.TWO.getQuery())
-            .union(sectionFromM.SEVEN.getQuery())
-            .union(sectionFromM.EIGHT.getQuery())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart2())
+            .union(TPTEligiblePatientsQueries.getMpart7())
+            .union(TPTEligiblePatientsQueries.getMpart8())
             .buildQuery();
 
     String query =
@@ -3195,7 +2087,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "                     AND ee.encounter_datetime BETWEEN "
             + "                         tabela.encounter_datetime AND "
             + "             Date_add(tabela.encounter_datetime,   "
-            + "             INTERVAL 120 DAY)) >= 1 ) "
+            + "             INTERVAL 7 MONTH)) >= 1 ) "
             + " GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -3210,9 +2102,9 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>C: The patient has at least 3 drug pick-up on FILT (encounter type 60) with “Regime de
-   *       TPT” (concept id 23985) value coded “3HP” doxina” (concept id -in [23954, 23984]) and
-   *       “Tipo de dispensa” (concept id 23986) with value coded “Mensal” (concept id 1098) during
-   *       120 DAYs from the date from M.2.
+   *       TPT” (concept id 23985) value coded “3HP” or “3HP+Pridoxina” (concept id -in [23954,
+   *       23984]) and “Tipo de dispensa” (concept id 23986) with value coded “Mensal” (concept id
+   *       1098) until a 4-month period from the FILT 3HP Start Date (date from M.2.)
    * </ul>
    *
    * @return CohortDefinition
@@ -3228,6 +2120,7 @@ public class TPTEligiblePatientListCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Regime de TPT C3");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -3238,7 +2131,6 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("23986", typeDispensationTPTConceptUuid);
     map.put("1098", monthlyConcept);
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
@@ -3254,9 +2146,9 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separeted query based on the given queries
     String unionFiltQuery =
         unionBuilder
-            .unionBuilder(sectionFromM.TWO.getQuery())
-            .union(sectionFromM.SEVEN.getQuery())
-            .union(sectionFromM.EIGHT.getQuery())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart2())
+            .union(TPTEligiblePatientsQueries.getMpart7())
+            .union(TPTEligiblePatientsQueries.getMpart8())
             .buildQuery();
 
     String query =
@@ -3290,16 +2182,17 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                   FROM   obs o    "
             + "                                   WHERE  o.encounter_id = ee.encounter_id "
             + "                                          AND o.concept_id = ${23985} "
-            + "                                          AND o.value_coded IN ( ${23954}, ${23984} ))   "
+            + "                                          AND o.value_coded IN ( ${23954}, ${23984} ) "
+            + "                                          AND o.obs_datetime BETWEEN "
+            + "                                            tabela.encounter_datetime AND "
+            + "                                Date_add(tabela.encounter_datetime, "
+            + "                                INTERVAL 4 MONTH))) "
             + "                           AND EXISTS (SELECT o.person_id  "
             + "                                       FROM   obs o    "
             + "                                       WHERE  o.encounter_id = ee.encounter_id "
             + "                                              AND o.concept_id = ${23986} "
             + "                                              AND o.value_coded IN ( ${1098} )) ) "
-            + "                     AND ee.encounter_datetime BETWEEN "
-            + "                         tabela.encounter_datetime AND "
-            + "             Date_add(tabela.encounter_datetime,   "
-            + "             INTERVAL 120 DAY)) >= 3 ) "
+            + "                       >= 3 ) "
             + " GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -3309,69 +2202,15 @@ public class TPTEligiblePatientListCohortQueries {
     return sqlCohortDefinition;
   }
 
-  public enum sectionFromM {
-    ONE {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart1();
-      }
-    },
-    TWO {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart2();
-      }
-    },
-    THREE {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart3();
-      }
-    },
-    FOUR {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart4();
-      }
-    },
-    FIVE {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart5();
-      }
-    },
-    SIX {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart6();
-      }
-    },
-    SEVEN {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart7();
-      }
-    },
-    EIGHT {
-      @Override
-      public String getQuery() {
-        return TPTEligiblePatientsQueries.getMpart8();
-      }
-    };
-
-    public abstract String getQuery();
-  }
-
   /**
    * <B>For each M:</B>
    * <li>Select all patients with Última profilaxia(concept id 23985) value coded 3HP(concept id
-   *     23954) and Data Fim da Profilaxia TPT(value datetime, concept id 6129) registered on Ficha
-   *     Resumo by end date (Encounter type 53) and with value datetime between 86 days and 365 days
-   *     from the date of M.3
+   *     23954) and Data Fim (value datetime) selected on Ficha Resumo by end date (Encounter type
+   *     53) and with value datetime between 86 days and 365 days from the date of M.3
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition get3HPLastProfilaxyDuringM3Period(sectionFromM section) {
+  public CohortDefinition get3HPLastProfilaxyDuringM3Period() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
@@ -3382,8 +2221,6 @@ public class TPTEligiblePatientListCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
     map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
@@ -3398,41 +2235,38 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
+    String threeHPStart =
+        new UnionBuilder(TPTEligiblePatientsQueries.getMpart1())
+            .union(TPTEligiblePatientsQueries.getMpart2())
+            .union(TPTEligiblePatientsQueries.getMpart3())
+            .union(TPTEligiblePatientsQueries.getMpart4())
+            .union(TPTEligiblePatientsQueries.getMpart5())
+            .union(TPTEligiblePatientsQueries.getMpart6())
+            .union(TPTEligiblePatientsQueries.getMpart7())
+            .union(TPTEligiblePatientsQueries.getMpart8())
+            .buildQuery();
+
     String query =
-        "SELECT mSection.patient_id "
-            + "FROM   ( "
-            + section.getQuery()
-            + " ) AS mSection "
-            + "       inner join (SELECT p.patient_id "
-            + "                   FROM   patient p "
-            + "                          inner join encounter e "
-            + "                                  ON p.patient_id = e.patient_id "
-            + "                          inner join obs o "
-            + "                                  ON e.encounter_id = o.encounter_id "
-            + "                          inner join obs o2 "
-            + "                                  ON e.encounter_id = o2.encounter_id "
+        "                        SELECT p.patient_id "
+            + "                   FROM   patient p  "
+            + "                          inner join encounter e ON p.patient_id = e.patient_id "
+            + "                          inner join obs o ON e.encounter_id = o.encounter_id "
+            + "                          inner join obs o2 ON e.encounter_id = o2.encounter_id "
             + "                          inner join ( "
-            + sectionFromM.THREE.getQuery()
-            + " ) "
-            + "                                     m3 "
-            + "                                  ON m3.patient_id = p.patient_id "
+            + threeHPStart
+            + "  ) m3 ON m3.patient_id = p.patient_id "
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0 "
             + "                          AND o2.voided = 0 "
-            + "                          AND e.encounter_type = ${53} "
-            + "                          AND (o.concept_id = ${23985} "
-            + "                          AND o.value_coded = ${23954}) "
             + "                          AND e.location_id = :location "
-            + "                          AND e.encounter_datetime <= :endDate "
-            + "                          AND ( o2.concept_id = ${6129} "
-            + "                          AND o2.value_datetime IS NOT NULL "
-            + "                          AND o2.value_datetime BETWEEN "
-            + "                              Date_add(m3.encounter_datetime, "
-            + "                              interval 86 day) AND "
-            + "                              Date_add(m3.encounter_datetime, interval "
-            + "                              365 day))) completed3hp "
-            + "               ON completed3hp.patient_id = mSection.patient_id ";
+            + "                          AND e.encounter_type = ${53} "
+            + "                          AND o.concept_id = ${23985} "
+            + "                          AND o.value_coded = ${23954} "
+            + "                          AND o2.concept_id = ${165308} "
+            + "                          AND o2.value_coded = ${1267} "
+            + "                          AND o2.obs_datetime <= :endDate "
+            + "                          AND o2.obs_datetime BETWEEN Date_add(m3.encounter_datetime, interval 86 day) AND Date_add(m3.encounter_datetime, interval 365 day)";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -3450,19 +2284,18 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition get3HPProfilaxyStatusDuringM1Period(sectionFromM section) {
+  public CohortDefinition get3HPProfilaxyStatusDuringM1Period() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         " all patients with Estado da Profilaxia = Fim Between 86 days and 365 days from the date of M.1");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
-    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
     map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
     map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
@@ -3477,12 +2310,19 @@ public class TPTEligiblePatientListCohortQueries {
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
+    String threeHPStart =
+        new UnionBuilder(TPTEligiblePatientsQueries.getMpart1())
+            .union(TPTEligiblePatientsQueries.getMpart2())
+            .union(TPTEligiblePatientsQueries.getMpart3())
+            .union(TPTEligiblePatientsQueries.getMpart4())
+            .union(TPTEligiblePatientsQueries.getMpart5())
+            .union(TPTEligiblePatientsQueries.getMpart6())
+            .union(TPTEligiblePatientsQueries.getMpart7())
+            .union(TPTEligiblePatientsQueries.getMpart8())
+            .buildQuery();
+
     String query =
-        "SELECT mSection.patient_id "
-            + "     FROM   ( "
-            + section.getQuery()
-            + "            ) AS mSection "
-            + "                inner join (SELECT p.patient_id "
+        "                               SELECT p.patient_id "
             + "                            FROM   patient p "
             + "                                       inner join encounter e "
             + "                                                  ON p.patient_id = e.patient_id "
@@ -3491,26 +2331,22 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                       inner join obs o2 "
             + "                                                  ON e.encounter_id = o2.encounter_id "
             + "                                       inner join ( "
-            + sectionFromM.ONE.getQuery()
+            + threeHPStart
             + "                                             ) m1     ON m1.patient_id = p.patient_id "
             + "                            WHERE  p.voided = 0 "
             + "                              AND e.voided = 0 "
             + "                              AND o.voided = 0 "
             + "                              AND o2.voided = 0 "
-            + "                              AND e.encounter_type = ${6} "
-            + "                              AND ( o.concept_id = ${23985} "
-            + "                                AND o.value_coded = ${23954} ) "
             + "                              AND e.location_id = :location "
-            + "                              AND ( o2.concept_id = ${165308} "
-            + "                                AND o2.value_coded = ${1267}) "
-            + "                              AND e.encounter_datetime <= :endDate "
-            + "                              AND e.encounter_datetime BETWEEN "
-            + "                                Date_add(m1.encounter_datetime, "
-            + "                                         interval 86 day) "
-            + "                                AND "
-            + "                                Date_add(m1.encounter_datetime, "
-            + "                                         interval 365 day) ) profStatus "
-            + "                           ON profStatus.patient_id = mSection.patient_id ";
+            + "                              AND e.encounter_type = ${6} "
+            + "                              AND ( "
+            + "                                  ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
+            + "                                    AND ( o2.concept_id = ${165308}  AND o2.value_coded = ${1267} "
+            + "                                          AND o2.obs_datetime <= :endDate "
+            + "                                          AND o2.obs_datetime BETWEEN Date_add(m1.encounter_datetime, interval 86 day) "
+            + "                                          AND Date_add(m1.encounter_datetime, interval 365 day) "
+            + "                                       )"
+            + "                                ) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -3522,8 +2358,8 @@ public class TPTEligiblePatientListCohortQueries {
   /**
    * Composition for patients who already completed 3hp during M3 OR M1 period
    *
-   * @see #get3HPLastProfilaxyDuringM3Period(sectionFromM)
-   * @see #get3HPProfilaxyStatusDuringM1Period(sectionFromM)
+   * @see #get3HPLastProfilaxyDuringM3Period()
+   * @see #get3HPProfilaxyStatusDuringM1Period()
    * @return {@link CompositionCohortDefinition}
    */
   public CohortDefinition get3HPLastProfilaxyDuringM3orM1PeriodsComposition() {
@@ -3531,65 +2367,20 @@ public class TPTEligiblePatientListCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Patients who already completed 3HP During M3 OR M1 period");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String mapping = "endDate=${endDate},location=${location}";
 
+    String mappings = "startDate=${endDate-4m},endDate=${endDate},location=${location}";
+
     // M3 period indicators
-    cd.addSearch(
-        "M31", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.ONE), mapping));
-    cd.addSearch(
-        "M32", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.TWO), mapping));
-
-    cd.addSearch(
-        "M33", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.THREE), mapping));
-
-    cd.addSearch(
-        "M34", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.FOUR), mapping));
-
-    cd.addSearch(
-        "M35", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.FIVE), mapping));
-
-    cd.addSearch(
-        "M36", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.SIX), mapping));
-
-    cd.addSearch(
-        "M37", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.SEVEN), mapping));
-
-    cd.addSearch(
-        "M38", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(sectionFromM.EIGHT), mapping));
+    cd.addSearch("M3", EptsReportUtils.map(get3HPLastProfilaxyDuringM3Period(), mapping));
 
     // M1 period indicators
-    cd.addSearch(
-        "M11", EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.ONE), mapping));
-    cd.addSearch(
-        "M12", EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.TWO), mapping));
+    cd.addSearch("M1", EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(), mapping));
 
-    cd.addSearch(
-        "M13",
-        EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.THREE), mapping));
-
-    cd.addSearch(
-        "M14",
-        EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.FOUR), mapping));
-
-    cd.addSearch(
-        "M15",
-        EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.FIVE), mapping));
-
-    cd.addSearch(
-        "M16", EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.SIX), mapping));
-
-    cd.addSearch(
-        "M17",
-        EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.SEVEN), mapping));
-
-    cd.addSearch(
-        "M18",
-        EptsReportUtils.map(get3HPProfilaxyStatusDuringM1Period(sectionFromM.EIGHT), mapping));
-
-    cd.setCompositionString(
-        "(M31 OR M32 OR M33 OR M34 OR M35 OR M36 OR M37 OR M38) OR (M11 OR M12 OR M13 OR M14 OR M15 OR M16 OR M17 OR M18)");
+    cd.setCompositionString("M1 OR M3");
 
     return cd;
   }
@@ -3600,7 +2391,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>D: Select all patients with the following conditions: Have Ficha clinica (encounter type
    *       6 or 9) with “DATA DE INICIO DE TRATAMENTO DE TUBERCULOSE” (concept id 1113,
-   *       Value_datetime) between EndDate - 7months (210 days)
+   *       Value_datetime) between EndDate - 7months
    * </ul>
    *
    * @return CohortDefinition
@@ -3637,7 +2428,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "         AND e.location_id = :location   "
             + "         AND e.encounter_type IN (${6},${9})     "
             + "         AND o.concept_id = ${1113}   "
-            + "         AND o.value_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) "
+            + "         AND o.value_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 MONTH) "
             + "         AND :endDate  "
             + "   AND e.encounter_datetime <= :endDate"
             + "    GROUP by p.patient_id";
@@ -3654,8 +2445,8 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>D: On Ficha Resumo (encounter type 53) have “Outros diagnósticos" (concept id 1406) with
-   *       “Tuberculose” (concept id 42) marked and obs datetime between EndDate - 7months (210
-   *       DAYs) and endDate
+   *       “Tuberculose” (concept id 42) marked and obs datetime between EndDate - 7months and
+   *       endDate
    * </ul>
    *
    * @return CohortDefinition
@@ -3687,7 +2478,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND e.encounter_type = ${53}   "
             + "          AND o.concept_id = ${1406} "
             + "          AND o.value_coded = ${42}  "
-            + "          AND o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) AND "
+            + "          AND o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 MONTH) AND "
             + "                                     :endDate "
             + "   GROUP  BY p.patient_id ";
 
@@ -3703,8 +2494,7 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>D: Enrolled on TB program (program id 5) patient state id = 6269 and start date(Date
-   *       enrolled) >= EndDate - 7months (210 DAYs) and endDate(date Completed) <= reporting
-   *       endDate
+   *       enrolled) >= EndDate - 7months and endDate(date Completed) <= reporting endDate
    * </ul>
    *
    * @return CohortDefinition
@@ -3733,7 +2523,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "          AND pp.program_id = ${5}   "
             + "          AND ps.patient_state_id = ${6269}  "
             + "          AND pp.location_id = :location    "
-            + "          AND pp.date_enrolled >= Date_sub(:endDate, INTERVAL 210 DAY)    "
+            + "          AND pp.date_enrolled >= Date_sub(:endDate, INTERVAL 7 MONTH)    "
             + "          AND pp.date_completed <= :endDate "
             + "   GROUP  BY p.patient_id ";
 
@@ -3750,8 +2540,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>D: Select all patients with the following conditions: Have Ficha (encounter type 6) with
    *       “TRATAMENTO DE TUBERCULOSE”(concept_id 1268) with: value coded “Inicio” (concept_id IN
-   *       1256) and obs_datetime between (for encounter type 6) EndDate - 7months (210 days) and
-   *       endDate
+   *       1256) and obs_datetime between (for encounter type 6) EndDate - 7months and endDate
    * </ul>
    *
    * @return CohortDefinition
@@ -3780,7 +2569,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "    AND e.location_id = :location "
             + "    AND e.encounter_type = ${6} "
             + "    AND o.concept_id = ${1268} AND o.value_coded = ${1256} "
-            + "    AND o.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 210 DAY) AND :endDate "
+            + "    AND o.obs_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 7 MONTH) AND :endDate "
             + "    AND e.encounter_datetime <= :endDate ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -3796,7 +2585,7 @@ public class TPTEligiblePatientListCohortQueries {
    * <ul>
    *   <li>E: Select all patients from Ficha Clinica (encounter type 6) with the following
    *       conditions: “Diagnótico TB activo” (concept_id 23761) value coded “SIM”(concept id 1065):
-   *       Encounter_datetime between EndDate - 7months (210 DAYs) and endDate
+   *       Encounter_datetime between EndDate - 7months and endDate
    * </ul>
    *
    * @return CohortDefinition
@@ -3828,7 +2617,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "       AND e.encounter_type = ${6}    "
             + "       AND o.concept_id = ${23761}    "
             + "       AND o.value_coded = ${1065}    "
-            + "       AND e.encounter_datetime BETWEEN Date_sub(:endDate, INTERVAL 210 DAY) "
+            + "       AND e.encounter_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 MONTH) "
             + "       AND  :endDate  "
             + "   GROUP  BY p.patient_id ";
 
