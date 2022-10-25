@@ -1,5 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -117,7 +118,7 @@ public class TPTCompletionCohortQueries {
             mapping));
 
     compositionCohortDefinition.addSearch(
-        "B1B", EptsReportUtils.map(tptEligiblePatientListCohortQueries.getIPTB1part2(), mapping3));
+        "B1B", EptsReportUtils.map(tptEligiblePatientListCohortQueries.getIPTB1part2(), mapping));
 
     compositionCohortDefinition.addSearch(
         "B2",
@@ -134,35 +135,35 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
             mapping));
 
-    compositionCohortDefinition.addSearch(
-        "B3",
-        EptsReportUtils.map(
-            tptEligiblePatientListCohortQueries.getIPTB3(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getCompletedConcept().getConceptId(),
-                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
-
-    compositionCohortDefinition.addSearch(
-        "B4",
-        EptsReportUtils.map(
-            tptEligiblePatientListCohortQueries.getIPTB4(
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getCompletedConcept().getConceptId(),
-                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
-            mapping));
+    //    compositionCohortDefinition.addSearch(
+    //        "B3",
+    //        EptsReportUtils.map(
+    //            tptEligiblePatientListCohortQueries.getIPTB3(
+    //                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+    //                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+    //                hivMetadata.getStartDrugs().getConceptId(),
+    //                hivMetadata.getCompletedConcept().getConceptId(),
+    //                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+    //                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+    //                tbMetadata.getRegimeTPTConcept().getConceptId(),
+    //                tbMetadata.getIsoniazidConcept().getConceptId(),
+    //                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
+    //            mapping));
+    //
+    //    compositionCohortDefinition.addSearch(
+    //        "B4",
+    //        EptsReportUtils.map(
+    //            tptEligiblePatientListCohortQueries.getIPTB4(
+    //                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+    //                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+    //                hivMetadata.getStartDrugs().getConceptId(),
+    //                hivMetadata.getCompletedConcept().getConceptId(),
+    //                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
+    //                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
+    //                tbMetadata.getRegimeTPTConcept().getConceptId(),
+    //                tbMetadata.getIsoniazidConcept().getConceptId(),
+    //                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId()),
+    //            mapping));
 
     compositionCohortDefinition.addSearch(
         "B5Part1",
@@ -209,7 +210,7 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 hivMetadata.getMonthlyConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId()),
-            mapping));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "B6Part2",
@@ -221,7 +222,7 @@ public class TPTCompletionCohortQueries {
                 tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "B6Part3",
@@ -234,7 +235,7 @@ public class TPTCompletionCohortQueries {
                 hivMetadata.getMonthlyConcept().getConceptId(),
                 tbMetadata.getTypeDispensationTPTConceptUuid().getConceptId(),
                 hivMetadata.getQuarterlyConcept().getConceptId()),
-            mapping));
+            mapping3));
 
     compositionCohortDefinition.addSearch(
         "C1",
@@ -288,7 +289,7 @@ public class TPTCompletionCohortQueries {
 
     compositionCohortDefinition.addSearch(
         "C7",
-        EptsReportUtils.map(tptInitiationCohortQueries.getPatientsWithRegimeDeTPT3HP(), mapping));
+        EptsReportUtils.map(tptInitiationCohortQueries.getPatientsWithRegimeDeTPT3HP(), mapping3));
 
     compositionCohortDefinition.addSearch(
         "D1",
@@ -321,7 +322,10 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addSearch("D4", EptsReportUtils.map(get3HPD4(), mapping));
 
     compositionCohortDefinition.setCompositionString(
-        "txcurr AND (((A1 OR A2 OR A5 OR A6) AND (B1B OR B2 OR B3 OR B4 OR (B5Part1 OR B5Part3 OR B5Part3) OR (B6Part1 OR B6Part3 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5 OR C6 OR C7) AND (D1 OR D2 OR D3 OR D4)))");
+        "txcurr AND (((A1 OR A2 OR A5 OR A6) AND (B1B OR B2 OR (B5Part1 OR B5Part2 OR B5Part3) OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5 OR C6 OR C7) AND (D1 OR D2 OR D3 OR D4)))");
+    //        "txcurr AND (((A1 OR A2 OR A5 OR A6) AND (B1B OR B2 OR B3 OR B4 OR (B5Part1 OR B5Part2
+    // OR B5Part3) OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5 OR C6 OR C7)
+    // AND (D1 OR D2 OR D3 OR D4)))");
 
     return compositionCohortDefinition;
   }
@@ -489,7 +493,8 @@ public class TPTCompletionCohortQueries {
         "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
 
     compositionCohortDefinition.addSearch(
-        "G", EptsReportUtils.map(getTBPrevDenominator(), generalParameterMapping));
+        "G", EptsReportUtils.map(tbPrevCohortQueries.getDenominator(), generalParameterMapping));
+    //        "G", EptsReportUtils.map(getTBPrevDenominator(), generalParameterMapping));
 
     compositionCohortDefinition.setCompositionString("tpt1 AND G");
 
@@ -809,8 +814,8 @@ public class TPTCompletionCohortQueries {
             + " p.voided = 0 AND e.voided = 0 AND o.voided = 0"
             + "    AND e.encounter_type IN (${encounterTypes})"
             + " AND (o.concept_id = ${23985} AND o.value_coded = ${656})   "
-            + " AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256})   "
-            + "    AND o2.obs_datetime < :endDate "
+            + " AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256}   "
+            + "    AND o2.obs_datetime < :endDate) "
             + "    AND e.location_id = :location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1058,7 +1063,7 @@ public class TPTCompletionCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Ficha Clinica Master Card ");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    //    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1212,7 +1217,7 @@ public class TPTCompletionCohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Ficha Clinica Master Card ");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+    //    sqlCohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -2257,6 +2262,7 @@ public class TPTCompletionCohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(sb.replace(query));
+    System.out.println(sqlCohortDefinition.getQuery());
 
     return sqlCohortDefinition;
   }
