@@ -1,10 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
@@ -12,7 +7,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.generic.InitialArtStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.EncounterDatetimeConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.definition.CalculationDataDefinition;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
@@ -22,23 +16,19 @@ import org.openmrs.module.reporting.common.TimeQualifier;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.converter.ObsValueConverter;
 import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.EncountersForPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.AgeDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.ObsForPersonDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.*;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
@@ -96,14 +86,16 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
         new CalculationResultConverter());
     pdd.addColumn(
         "date_next_consultation",
-        getObsForPersonData("e1e2efd8-1d5f-11e0-b929-000c29ad1d07"),
-        "onOrBefore=${endDate},locationList=${location}",
-        new ObsValueConverter());
+        listOfPatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndNextFollowUpConsultationDate(),
+        "startDate=${endDate},location=${location}",
+        null);
     pdd.addColumn(
         "date_last_segment",
-        getLastEncounterDate(),
-        "onOrBefore=${endDate},locationList=${location}",
-        new EncounterDatetimeConverter());
+        listOfPatientsEligibleForVLDataDefinitionQueries
+            .getPatientsAndLastFollowUpConsultationDate(),
+        "startDate=${endDate},location=${location}",
+        null);
     pdd.addColumn(
         "pregnant_or_breastfeeding", pregnantBreasfeediDefinition(), "location=${location}", null);
     pdd.addColumn(
@@ -167,7 +159,7 @@ public class TPTListOfPatientsEligibleDataSet extends BaseDataSet {
     String sql =
         " SELECT p.patient_id,pi.identifier  FROM patient p INNER JOIN patient_identifier pi ON p.patient_id=pi.patient_id "
             + " INNER JOIN patient_identifier_type pit ON pit.patient_identifier_type_id=pi.identifier_type "
-            + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pit.patient_identifier_type_id ="
+            + " WHERE p.voided=0 AND pi.voided=0 AND pit.retired=0 AND pi.preferred = 1 AND pit.patient_identifier_type_id ="
             + identifierType;
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
