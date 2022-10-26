@@ -8,6 +8,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.tpt.CompletedIsoniazidTPTCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -36,6 +37,8 @@ public class TPTCompletionCohortQueries {
   private TPTEligiblePatientListCohortQueries tptEligiblePatientListCohortQueries;
 
   private final TPTInitiationCohortQueries tptInitiationCohortQueries;
+
+  @Autowired private TbPrevQueries tbPrevQueries;
 
   @Autowired
   public TPTCompletionCohortQueries(
@@ -493,8 +496,8 @@ public class TPTCompletionCohortQueries {
         "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
 
     compositionCohortDefinition.addSearch(
-        "G", EptsReportUtils.map(tbPrevCohortQueries.getDenominator(), generalParameterMapping));
-    //        "G", EptsReportUtils.map(getTBPrevDenominator(), generalParameterMapping));
+//        "G", EptsReportUtils.map(tbPrevCohortQueries.getDenominator(), generalParameterMapping));
+            "G", EptsReportUtils.map(getTBPrevDenominator(), generalParameterMapping));
 
     compositionCohortDefinition.setCompositionString("tpt1 AND G");
 
@@ -2540,15 +2543,30 @@ public class TPTCompletionCohortQueries {
             genericCohortQueries.getStartedArtBeforeDate(false),
             "onOrBefore=${onOrBefore},location=${location}"));
     definition.addSearch(
-        "started-isoniazid",
+            "A",
+            EptsReportUtils.map(tbPrevQueries.getPatientsWhoCompleted3HPAtLeast86Days(), mapping3));
+definition.addSearch(
+        "B",
         EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+                tbPrevQueries.getAtLeast1ConsultarionWithDT3HPOnFichaClinica(), mapping3));
     definition.addSearch(
-        "initiated-profilaxia",
-        EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsThatInitiatedProfilaxia(),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            "C", EptsReportUtils.map(tbPrevQueries.getAtLeast3ConsultationOnFichaClinica(), mapping3));
+
+
+
+
+
+    definition.addSearch("D", EptsReportUtils.map(tbPrevQueries.getAtLeastOne3HPWithDTOnFilt(), mapping3));
+
+    definition.addSearch(
+            "E",
+            EptsReportUtils.map(
+                    tbPrevQueries.getAtLeast3ConsultarionWithINHDispensaMensalOnFilt(), mapping3));
+//    definition.addSearch(
+//        "initiated-profilaxia",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsThatInitiatedProfilaxia(),
+//            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
     definition.addSearch(
         "transferred-out",
         EptsReportUtils.map(
@@ -2559,29 +2577,86 @@ public class TPTCompletionCohortQueries {
         EptsReportUtils.map(
             tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "regime-tpt-isoniazid",
-        EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsWhoHaveRegimeTPTWithINHMarkedOnFirstPickUpDateOnFILT(),
-            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "outras-prescricoes-3hp",
-        EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsWhoHaveOutrasPrescricoesWith3HPMarkedOnFichaClinica(),
-            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
-    definition.addSearch(
-        "regime-tpt-3hp",
-        EptsReportUtils.map(
-            tbPrevCohortQueries.getPatientsWhoHaveRegimeTPTWith3HPMarkedOnFirstPickUpDateOnFILT(),
-            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "regime-tpt-isoniazid",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsWhoHaveRegimeTPTWithINHMarkedOnFirstPickUpDateOnFILT(),
+//            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "outras-prescricoes-3hp",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsWhoHaveOutrasPrescricoesWith3HPMarkedOnFichaClinica(),
+//            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "regime-tpt-3hp",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsWhoHaveRegimeTPTWith3HPMarkedOnFirstPickUpDateOnFILT(),
+//            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
     definition.setCompositionString(
         "started-by-end-previous-reporting-period "
             + " AND ("
-            + "            (started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid) "
-            + "         OR (outras-prescricoes-3hp OR regime-tpt-3hp) "
+            + "            (started-isoniazid OR A ) "
+            + "         OR (B OR C) or (D OR E)"
             + "    AND NOT (transferred-out AND NOT completed-isoniazid)"
             + "     ) ");
 
     return definition;
   }
+
+//  public CohortDefinition getTBPrevDenominator() {
+//    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+//    definition.setName("TB-PREV Denominator Query");
+//    definition.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+//    definition.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+//    definition.addParameter(new Parameter("location", "Location", Location.class));
+//    definition.addSearch(
+//        "started-by-end-previous-reporting-period",
+//        EptsReportUtils.map(
+//            genericCohortQueries.getStartedArtBeforeDate(false),
+//            "onOrBefore=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "started-isoniazid",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsThatStartedProfilaxiaIsoniazidaOnPeriod(),
+//            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "initiated-profilaxia",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsThatInitiatedProfilaxia(),
+//            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "transferred-out",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsTransferredOut(),
+//            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "completed-isoniazid",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
+//            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "regime-tpt-isoniazid",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsWhoHaveRegimeTPTWithINHMarkedOnFirstPickUpDateOnFILT(),
+//            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "outras-prescricoes-3hp",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsWhoHaveOutrasPrescricoesWith3HPMarkedOnFichaClinica(),
+//            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+//    definition.addSearch(
+//        "regime-tpt-3hp",
+//        EptsReportUtils.map(
+//            tbPrevCohortQueries.getPatientsWhoHaveRegimeTPTWith3HPMarkedOnFirstPickUpDateOnFILT(),
+//            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+//    definition.setCompositionString(
+//        "started-by-end-previous-reporting-period "
+//            + " AND ("
+//            + "            (started-isoniazid OR initiated-profilaxia OR regime-tpt-isoniazid) "
+//            + "         OR (outras-prescricoes-3hp OR regime-tpt-3hp) "
+//            + "    AND NOT (transferred-out AND NOT completed-isoniazid)"
+//            + "     ) ");
+//
+//    return definition;
+//  }
 }
