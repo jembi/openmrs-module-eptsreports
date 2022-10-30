@@ -460,35 +460,4 @@ public class ListOfPatientsWhoPickeupArvDuringPeriodDataDefinitionQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
   }
-
-  private String getLastStates() {
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getPateintActiveArtWorkflowState().getProgramWorkflowStateId());
-    valuesMap.put(
-        "7",
-        hivMetadata
-            .getTransferredOutToAnotherHealthFacilityWorkflowState()
-            .getProgramWorkflowStateId());
-    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("10", hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId());
-    valuesMap.put(
-        "8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
-    valuesMap.put(
-        "29",
-        hivMetadata
-            .getPateintTransferedFromOtherFacilityWorkflowState()
-            .getProgramWorkflowStateId());
-    String sql =
-        "SELECT state FROM( "
-            + " SELECT p.patient_id, ps.state FROM patient p INNER JOIN patient_program pg ON p.patient_id=pg.patient_id INNER JOIN patient_state ps ON pg.patient_program_id=ps.patient_program_id "
-            + " INNER JOIN ( "
-            + "SELECT pg.patient_id AS patient_id, MAX(ps.start_date) AS max_date FROM patient_program pg inner join patient_state ps on pg.patient_program_id=ps.patient_program_id "
-            + " WHERE ps.state IN( ${6}, ${7}, ${8} ,${9}, ${10}, ${29}) "
-            + " GROUP BY pg.patient_id "
-            + ") state_max ON p.patient_id=state_max.patient_id "
-            + " WHERE ps.start_date=state_max.max_date "
-            + " pg.location_id = :location AND ps.start_date <= :endDate)fn_tbl ";
-
-    return new StringSubstitutor(valuesMap).replace(sql);
-  }
 }
