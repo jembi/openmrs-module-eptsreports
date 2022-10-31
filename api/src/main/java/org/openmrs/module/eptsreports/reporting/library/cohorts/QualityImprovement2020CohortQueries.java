@@ -2556,7 +2556,6 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     boolean useE53 = false;
 
-    setMapping4(reportSource);
     compositionCohortDefinition.setName(
         "% adultos em TARV com o mínimo de 3 consultas de seguimento de adesão na FM-ficha de APSS/PP");
 
@@ -2675,18 +2674,6 @@ public class QualityImprovement2020CohortQueries {
     }
 
     return compositionCohortDefinition;
-  }
-
-  private void setMapping4(MIMQ reportSource) {
-    switch (reportSource) {
-      case MQ:
-        MAPPING4 = "startDate=${startDate},endDate=${endDate},location=${location}";
-        break;
-      case MI:
-        MAPPING4 =
-            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
-        break;
-    }
   }
 
   /**
@@ -3288,7 +3275,7 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-  private <T extends AbstractPatientCalculation>
+  public <T extends AbstractPatientCalculation>
       CohortDefinition getApssConsultationAfterARTstartDateOrAfterApssConsultation(
           int lowerBoundary, int upperBoundary, Class<T> clazz) {
 
@@ -3664,8 +3651,6 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    setMapping4(reportResource);
-
     CohortDefinition a = getMOHArtStartDate();
 
     CohortDefinition c =
@@ -3793,8 +3778,6 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    setMapping4(reportSource);
 
     CohortDefinition a = getMOHArtStartDate();
 
@@ -3925,7 +3908,6 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    setMapping4(reportSource);
     CohortDefinition a = getMOHArtStartDate();
     CohortDefinition c =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
