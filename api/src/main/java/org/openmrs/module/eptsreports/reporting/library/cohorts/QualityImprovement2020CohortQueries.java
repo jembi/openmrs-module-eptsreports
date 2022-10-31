@@ -2678,15 +2678,14 @@ public class QualityImprovement2020CohortQueries {
   }
 
   private void setMapping4(MIMQ reportSource) {
-    switch (reportSource){
-
+    switch (reportSource) {
       case MQ:
         MAPPING4 = "startDate=${startDate},endDate=${endDate},location=${location}";
         break;
       case MI:
-        MAPPING4 = "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
+        MAPPING4 =
+            "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
         break;
-
     }
   }
 
@@ -3795,6 +3794,8 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    setMapping4(reportSource);
+
     CohortDefinition a = getMOHArtStartDate();
 
     CohortDefinition c =
@@ -3924,6 +3925,7 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
+    setMapping4(reportSource);
     CohortDefinition a = getMOHArtStartDate();
     CohortDefinition c =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
