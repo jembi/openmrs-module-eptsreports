@@ -3275,7 +3275,7 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-  public <T extends AbstractPatientCalculation>
+  private <T extends AbstractPatientCalculation>
       CohortDefinition getApssConsultationAfterARTstartDateOrAfterApssConsultation(
           int lowerBoundary, int upperBoundary, Class<T> clazz) {
 
