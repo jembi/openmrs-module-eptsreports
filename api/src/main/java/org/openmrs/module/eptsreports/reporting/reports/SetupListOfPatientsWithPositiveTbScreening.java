@@ -1,10 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsWithPositiveTbScreeningDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
@@ -19,6 +14,12 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 public class SetupListOfPatientsWithPositiveTbScreening extends EptsDataExportManager {
