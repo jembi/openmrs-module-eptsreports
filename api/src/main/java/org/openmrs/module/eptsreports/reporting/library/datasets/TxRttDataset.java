@@ -146,8 +146,15 @@ public class TxRttDataset extends BaseDataSet {
         new ColumnParameters("foutyTo44M", "40 - 44 male", "gender=M|age=40-44", "10");
     ColumnParameters fouty5To49M =
         new ColumnParameters("fouty5To49M", "45 - 49 male", "gender=M|age=45-49", "11");
-    ColumnParameters above50M =
-        new ColumnParameters("above50M", "50+ male", "gender=M|age=50+", "12");
+    // 50-54, 55-59, 60-64, 65+ male
+    ColumnParameters fiftyTo54M =
+        new ColumnParameters("fiftyTo54M", "50 - 54 male", "gender=M|age=50-54", "fiftyTo54M");
+    ColumnParameters fifty5To59M =
+        new ColumnParameters("fifty5To59M", "55 - 59 male", "gender=M|age=55-59", "fifty5To59M");
+    ColumnParameters sixtyTo64M =
+        new ColumnParameters("sixtyTo64M", "60 - 64 male", "gender=M|age=60-64", "sixtyTo64M");
+    ColumnParameters above65M =
+        new ColumnParameters("above65M", "65+ male", "gender=M|age=65+", "above65M");
     ColumnParameters unknownM =
         new ColumnParameters("unknownM", "Unknown age male", "gender=M|age=UK", "13");
     ColumnParameters totalM = new ColumnParameters("totalM", "Total  male", "gender=M", "32");
@@ -178,8 +185,15 @@ public class TxRttDataset extends BaseDataSet {
         new ColumnParameters("foutyTo44F", "40 - 44 female", "gender=F|age=40-44", "23");
     ColumnParameters fouty5To49F =
         new ColumnParameters("fouty5To49F", "45 - 49 female", "gender=F|age=45-49", "24");
-    ColumnParameters above50F =
-        new ColumnParameters("above50F", "50+ female", "gender=F|age=50+", "25");
+    // 50-54, 55-59, 60-64, 65+ female
+    ColumnParameters fiftyTo54F =
+        new ColumnParameters("fiftyTo54F", "50 - 54 female", "gender=F|age=50-54", "fiftyTo54F");
+    ColumnParameters fifty5To59F =
+        new ColumnParameters("fifty5To59F", "55 - 59 female", "gender=F|age=55-59", "fifty5To59F");
+    ColumnParameters sixtyTo64F =
+        new ColumnParameters("sixtyTo64F", "60 - 64 female", "gender=F|age=60-64", "sixtyTo64F");
+    ColumnParameters above65F =
+        new ColumnParameters("above65F", "65+ female", "gender=F|age=65+", "above65F");
     ColumnParameters unknownF =
         new ColumnParameters("unknownF", "Unknown age female", "gender=F|age=UK", "26");
     ColumnParameters totalF = new ColumnParameters("totalF", "Total  female", "gender=F", "33");
@@ -209,7 +223,10 @@ public class TxRttDataset extends BaseDataSet {
         thirty5To39M,
         foutyTo44M,
         fouty5To49M,
-        above50M,
+        fiftyTo54M,
+        fifty5To59M,
+        sixtyTo64M,
+        above65M,
         unknownM,
         fifteenTo19YearsF,
         twentyTo24YearsF,
@@ -218,7 +235,10 @@ public class TxRttDataset extends BaseDataSet {
         thirty5To39F,
         foutyTo44F,
         fouty5To49F,
-        above50F,
+        fiftyTo54F,
+        fifty5To59F,
+        sixtyTo64F,
+        above65F,
         unknownF,
         pid,
         msm,
