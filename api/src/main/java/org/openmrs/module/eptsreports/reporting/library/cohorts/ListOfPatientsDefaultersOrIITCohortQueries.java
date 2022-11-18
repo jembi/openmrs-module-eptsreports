@@ -1,8 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
@@ -21,6 +18,10 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsDefaultersOrIITCohortQueries {
@@ -52,8 +53,12 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    * Transferred-out (Concept ID 1706) Encounter_datetime <= Report Generation Date OR Encounter
    * Type ID= 53 Estado de Permanencia (Concept Id 6272) = Transferred-out (Concept ID 1706)
    * obs_datetime <= Report Generation Date
+   * <p>
+   * <b>1.3</b> - Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA - concept id 2016)
+   * as “Transferido para outra US” or “Auto-transferência” ( 1706 OR 23863) marked in the last Home
+   * Visit Card by the report generation date</p>
    *
-   * <p><b>1.3</b> - Exclude all patients who after the most recent date from 1.1 to 1.2, have a
+   * <p><b>1.4</b> - Exclude all patients who after the most recent date from 1.1 to 1.2, have a
    * drugs pick up or Consultation: Encounter Type ID= 6, 9, 18 and encounter_datetime> the most
    * recent date and <= Report Generation Date or Encounter Type ID = 52 and “Data de Levantamento”
    * (Concept Id 23866 value_datetime) > the most recent date and <= Report Generation Date
@@ -162,9 +167,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    * Patient_program.program_id =2 = SERVICO TARV-TRATAMENTO and Patient_State.state = 10 (Died) *
    * Patient_State.start_date <= Report Generation Date Patient_state.end_date is null
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
-  public SqlCohortDefinition getE21() {
+  public CohortDefinition getE21() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" All patients that started ART during inclusion period ");
@@ -196,9 +201,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    * <b>2.2</b> - All deaths registered in Patient Demographics by reporting end date *
    * Person.Dead=1 and death_date <= Report Generation Date
    *
-   * @return
+   * @return {@link CohortDefinition}
    */
-  public SqlCohortDefinition getE22() {
+  public CohortDefinition getE22() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" All patients that started ART during inclusion period ");
@@ -579,6 +584,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("21", hivMetadata.getBuscaActivaEncounterType().getEncounterTypeId());
+    map.put("23863", hivMetadata.getAutoTransferConcept().getConceptId());
+    map.put("2016", hivMetadata.getDefaultingMotiveConcept().getConceptId());
 
     String query =
         "  SELECT patient_id  "
@@ -617,7 +625,23 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                                  AND o.concept_id =  ${6272}   "
             + "                                  AND o.value_coded =  ${1706}   "
             + "                           GROUP  BY p.patient_id"
-            + "                           "
+            + "                            UNION "
+            + "                           SELECT p.patient_id, "
+            + "                                  Max(e.encounter_datetime) AS transferout_date "
+            + "                           FROM   patient p "
+            + "                                  INNER JOIN encounter e "
+            + "                                          ON p.patient_id = e.patient_id "
+            + "                                  INNER JOIN obs o "
+            + "                                          ON e.encounter_id = o.encounter_id "
+            + "                           WHERE  p.voided = 0 "
+            + "                                  AND o.voided = 0 "
+            + "                                  AND e.voided = 0 "
+            + "                                  AND e.encounter_type = ${21} "
+            + "                                  AND o.concept_id = ${2016} "
+            + "                                  AND o.value_coded IN ( ${1706}, ${23863} ) "
+            + "                                  AND e.encounter_datetime <= CURRENT_DATE() "
+            + "                                  AND e.location_id = :location "
+            + "                           GROUP  BY p.patient_id "
             + "                           UNION"
             + "                           "
             + "                           SELECT p.patient_id, Max(ps.start_date) AS transferout_date"
@@ -1821,6 +1845,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("23720", hivMetadata.getQuarterlyConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    map.put("165322", hivMetadata.getMdcState().getConceptId());
+
 
     String query =
         "SELECT result.patient_id,result.dispensa "
@@ -1854,8 +1881,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + " "
             + "         UNION "
             + " "
-            + "         SELECT    en.patient_id, 'Dispensa Trimestral'  AS dispensa "
-            + "         FROM "
+            + "         SELECT    dispensa_trimestral.patient_id, 'Dispensa Trimestral'  AS dispensa FROM ( "
+            + "           SELECT    en.patient_id "
+            + "            FROM "
             + "             (SELECT "
             + "                  e.patient_id, MAX(e.encounter_datetime) AS encounter_date "
             + "              FROM "
@@ -1866,7 +1894,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                AND e.voided = 0 "
             + "                AND e.location_id = :location "
             + "                AND DATE(e.encounter_datetime) <= :endDate "
-            + "              GROUP BY p.patient_id UNION SELECT "
+            + "              GROUP BY p.patient_id " +
+                "UNION " +
+                "SELECT "
             + "                                              e.patient_id, MAX(e.encounter_datetime) encounter_date "
             + "              FROM "
             + "                  patient p "
@@ -1895,10 +1925,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                               DATE(last_encounter.encounter_date), "
             + "                               ob.value_datetime) BETWEEN 83 AND 173) "
             + "             OR (en.encounter_type =  ${6} "
-            + "                 AND ((ob.concept_id =  ${23739} "
-            + "                     AND ob.value_coded =  ${23720} ) "
-            + "                     OR (ob.concept_id =  ${23730} "
-            + "                         AND ob.value_coded IN ( ${1256}  ,  ${1257} )))) "
+            + "                 AND (ob.concept_id =  ${23739} "
+            + "                     AND ob.value_coded =  ${23720} )) "
             + "                    AND en.patient_id NOT IN (SELECT "
             + "                                                  list.patient_id "
             + "                                              FROM "
@@ -1948,7 +1976,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                                                                     AND DATE(e.encounter_datetime) = DATE(list.encounter_datetime) "
             + "                                                                   GROUP BY e.patient_id)) < 173)) "
             + "         GROUP BY en.patient_id "
-            + " "
+            + "         UNION "
+            + getDispensationTypeOnMDCQuery(hivMetadata.getQuarterlyDispensation())
+            + "          ) dispensa GROUP BY dispensa.patient_id "
             + "         UNION "
             + "         SELECT en.patient_id , 'Dispensa Semestral' AS dispensa "
             + "         FROM "
@@ -1992,10 +2022,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                               DATE(last_encounter.encounter_date), "
             + "                               ob.value_datetime) > 173) "
             + "             OR (en.encounter_type =  ${6} "
-            + "                 AND ((ob.concept_id =  ${23739} "
+            + "                 AND (ob.concept_id =  ${23739} "
             + "                     AND ob.value_coded =  ${23888} ) "
-            + "                     OR (ob.concept_id =  ${23888} "
-            + "                         AND ob.value_coded IN ( ${1256}  ,  ${1257} ))))) "
+            + "                     )) "
             + "         GROUP BY en.patient_id "
             + " "
             + " "
@@ -2030,17 +2059,72 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     CohortDefinition E3 = getE3();
     CohortDefinition X = getLastARVRegimen();
     CohortDefinition A = getArtStartDate();
-    CohortDefinition B = getPatientsTransferredInTarv();
+//    CohortDefinition B = getPatientsTransferredInTarv();
 
     cd.addSearch("E1", EptsReportUtils.map(E1, MAPPING));
     cd.addSearch("E2", EptsReportUtils.map(E2, MAPPING));
     cd.addSearch("E3", EptsReportUtils.map(E3, MAPPING));
     cd.addSearch("X", EptsReportUtils.map(X, MAPPING3));
     cd.addSearch("A", EptsReportUtils.map(A, MAPPING2));
-    cd.addSearch("B", EptsReportUtils.map(B, MAPPING));
+//    cd.addSearch("B", EptsReportUtils.map(B, MAPPING));
 
-    cd.setCompositionString("((A OR B) AND X AND NOT (E1 OR E2 OR E3))");
+    cd.setCompositionString("((A AND X) AND NOT (E1 OR E2 OR E3))");
 
     return cd;
+  }
+
+
+
+  private String getDispensationTypeOnMDCQuery(Concept dispensationType){
+
+
+    return " SELECT     p.patient_id "
+            + "         FROM       patient p "
+            + "         INNER JOIN encounter e "
+            + "         ON         e.patient_id = p.patient_id "
+            + "         INNER JOIN obs otype "
+            + "         ON         otype.encounter_id = e.encounter_id "
+            + "         INNER JOIN obs ostate "
+            + "         ON         ostate.encounter_id = e.encounter_id "
+            + "         INNER JOIN "
+            + "                    ( "
+            + "                               SELECT     p.patient_id, "
+            + "                                          max(e.encounter_datetime) AS last_encounter_datetime "
+            + "                               FROM       patient p "
+            + "                               INNER JOIN encounter e "
+            + "                               ON         p.patient_id = e.patient_id "
+            + "                               INNER JOIN obs otype "
+            + "                               ON         otype.encounter_id = e.encounter_id "
+            + "                               INNER JOIN obs ostate "
+            + "                               ON         ostate.encounter_id = e.encounter_id "
+            + "                               WHERE      p.voided = 0 "
+            + "                               AND        e.voided = 0 "
+            + "                               AND        otype.voided = 0 "
+            + "                               AND        ostate.voided = 0 "
+            + "                               AND        e.encounter_type = ${6} "
+            + "                               AND        otype.concept_id = ${165174} "
+            + "                               AND        otype.value_coded IS NOT NULL "
+            + "                               AND        ostate.concept_id = ${165322} "
+            + "                               AND        ostate.value_coded IS NOT NULL "
+            + "                               AND        otype.obs_group_id = ostate.obs_group_id "
+            + "                               AND        e.encounter_datetime <= :endDate "
+            + "                               AND        e.location_id = :location "
+            + "                               GROUP BY   p.patient_id ) last_mdc_record "
+            + "         ON         last_mdc_record.patient_id = p.patient_id "
+            + "         WHERE      e.encounter_type = ${6} "
+            + "         AND        e.location_id = :location "
+            + "         AND        otype.concept_id = ${165174} "
+            + "         AND        otype.value_coded = ${23730} "
+            + "         AND        ostate.concept_id = ${" + dispensationType.getConceptId() + " } "
+            + "         AND        ostate.value_coded IN (${1256},  ${1257}) "
+            + "         AND        e.encounter_datetime = last_mdc_record.last_encounter_datetime "
+            + "         AND        otype.obs_group_id = ostate.obs_group_id "
+            + "         AND        e.voided = 0 "
+            + "         AND        p.voided = 0 "
+            + "         AND        otype.voided = 0 "
+            + "         AND        ostate.voided = 0 "
+            + "         GROUP BY   p.patient_id ";
+
+
   }
 }
