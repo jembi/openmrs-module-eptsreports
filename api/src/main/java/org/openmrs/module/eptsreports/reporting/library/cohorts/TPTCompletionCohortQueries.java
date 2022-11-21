@@ -435,8 +435,19 @@ public class TPTCompletionCohortQueries {
    * <h4>TX_CURR with TPT in last 7 months</h4>
    *
    * <ul>
-   *   <li>
-   *   <li>
+   *   <li>From all patients currently receiving ART who do not have a documented TPT Completion
+   *       (TPT_FR8), the system will identify those who have initiated TPT in the past 7 months as
+   *       follows: Patients who have Initiated TPT (TB_PREV - Denominator) in a 7-month period
+   *       before the end date.
+   *       <p>
+   *       <p>For the 7-month period:
+   *       <p>Start Date = Selected End Date – 210 days
+   *       <p>End Date = Selected End Date
+   *       <p>
+   *   <li>For the complete requirements definition to identify patients who initiated TPT therapy
+   *       please refer to the TB_PREV Indicator Requirements and Specification (Denominator –
+   *       TB_PREV_FR2), using the 7-month period start and end date instead of the previous
+   *       reporting period.
    * </ul>
    *
    * @return CohortDefinition
@@ -448,7 +459,7 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     String generalParameterMapping =
-        "onOrAfter=${endDate-1m},onOrBefore=${endDate},location=${location}";
+        "onOrAfter=${endDate-1m},onOrBefore=${endDate+6m},location=${location}";
 
     compositionCohortDefinition.addSearch(
         "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
