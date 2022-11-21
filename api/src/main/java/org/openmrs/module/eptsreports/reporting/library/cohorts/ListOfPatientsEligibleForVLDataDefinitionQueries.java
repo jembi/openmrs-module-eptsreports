@@ -1,5 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -8,10 +11,6 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ListOfPatientsEligibleForVLDataDefinitionQueries {
@@ -114,7 +113,7 @@ public class ListOfPatientsEligibleForVLDataDefinitionQueries {
             + "                ON p.patient_id = pg.patient_id  "
             + "        INNER JOIN patient_state ps  "
             + "                   ON pg.patient_program_id = ps.patient_program_id  "
-            + "     WHERE  pg.location_id = :location "
+            + "     WHERE  pg.location_id = :location AND pg.voided = 0 AND p.voided = 0"
             + "    AND pg.program_id = ${2} and pg.date_enrolled <= :endDate "
             + "     "
             + "    UNION "
