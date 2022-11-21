@@ -69,7 +69,7 @@ public class TxNewDataset extends BaseDataSet {
         "keypop", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), keyPopMappings));
 
     dataSetDefinition.addColumn(
-        "1All",
+        "totalAll",
         "TX_NEW: New on ART",
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "");
