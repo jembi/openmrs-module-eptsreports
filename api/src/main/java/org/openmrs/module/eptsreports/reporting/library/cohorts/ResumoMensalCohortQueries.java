@@ -483,27 +483,14 @@ public class ResumoMensalCohortQueries {
    * month. Composition to exclude <b>B5 ({@link #getPatientsTransferredOutB5})</b>
    *
    * <ul>
-   *   <li>B2i - Select all patients registered in encounter “Master Card – Ficha Resumo” (encounter
-   *       id 53) who have the following conditions:
-   *       <ol>
-   *         <li>Transfer from other HF” (PT:“Transferido de outra US”) (Concept ID 1369) is equal
-   *             to “YES” (Concept ID 1065); AND
-   *         <li>Type of Patient Transferred From (PT”: “Tipo de Paciente Transferido”) (Concept ID
-   *             6300) = “TARV” (Concept ID 6276) AND
-   *         <li>Date of MasterCard File Opening (PT”: “Data de Abertura da Ficha na US”) (Concept
-   *             ID 23891 value_datetime) >=startDate and <= endDate
-   *       </ol>
-   *       OR
-   *   <li>B2ii - Select all patients registered as transferred-in in Program Enrollment
-   *       <p>Technical Specs: <i>Table: patient_program</i> <b>Criterias:</b> <code>
-   *       program_id=2, patient_state_id=29 and start_date >=startDate and <=endDate
-   * </code>
-   *   <li>Exclude all Transferred-in registered by end of previous month (B2i [< startDate] OR B2ii
-   *       [>startDate]) except transferred-out patients by end of previous month (B5 inclusion
-   *       criterias for < startDate) according to 13 MOH Transferred-out patients by end of the
-   *       period (Any State) defined in the common queries <a
-   *       href="https://docs.google.com/document/d/1EtpeIn-6seD5skZJteCdANhxkKXQye9RckGV2eoYj6c/edit?pli=1#">link</a>
+   *   <li>Inscritos como “Transferido de” no serviço TARV-TRATAMENTO (inscrição programa TARV) com
+   *       “Data de Transferência” >= “Data Início do Relatório” e “<= “Data Fim do Relatório”; ou
+   *   <li>Registados no formulário “Ficha de Resumo” como “Transferido de outra US”, opção “TARV”
+   *       seleccionada e com “Data de Abertura de Ficha na US”>= “Data Início do Relatório” e “<=
+   *       “Data Fim do Relatório”;
    * </ul>
+   *
+   * <p>Excluindo todos os utentes activos em TARV no fim do mês anterior (Indicador B12)
    *
    * @return {@link CohortDefinition}
    */
@@ -523,14 +510,12 @@ public class ResumoMensalCohortQueries {
     cd.addSearch("B2", map(getTransferredInPatients(false), mapping));
 
     cd.addSearch(
-        "B2Exlcusion",
-        map(getTransferredInPatients(true), "onOrAfter=${onOrAfter},location=${location}"));
+        "B12",
+        map(
+            getPatientsWhoWereActiveByEndOfPreviousMonthB12(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
-    CohortDefinition transferredOut = getPatientsTransferredOutB5(false);
-
-    cd.addSearch("B5", map(transferredOut, "onOrBefore=${onOrAfter},location=${location}"));
-
-    cd.setCompositionString("B2 AND NOT ( B2Exlcusion AND NOT B5)");
+    cd.setCompositionString("B2 AND NOT B12");
 
     return cd;
   }
