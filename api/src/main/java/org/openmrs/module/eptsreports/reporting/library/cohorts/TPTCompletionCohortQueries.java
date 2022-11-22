@@ -291,6 +291,39 @@ public class TPTCompletionCohortQueries {
     return compositionCohortDefinition;
   }
 
+  public CohortDefinition getTbPrevDenominatorForTPTCompletion() {
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+    definition.setName("TB-PREV Denominator Query");
+    definition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    definition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    definition.addParameter(new Parameter("location", "Location", Location.class));
+    definition.addSearch(
+        "A",
+        EptsReportUtils.map(
+            genericCohortQueries.getStartedArtBeforeDate(false),
+            "onOrBefore=${endDate},location=${location}"));
+
+    definition.addSearch(
+        "B",
+        EptsReportUtils.map(
+            tbPrevCohortQueries.getPatientsTransferredOut(),
+            "startDate=${startDate-6m},endDate=${endDate},location=${location}"));
+    definition.addSearch(
+        "C",
+        EptsReportUtils.map(
+            tbPrevCohortQueries.getPatientsThatCompletedIsoniazidProphylacticTreatment(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    definition.addSearch(
+        "D",
+        EptsReportUtils.map(
+            tbPrevCohortQueries.getPatientsStartedTpt(),
+            "startDate=${startDate+6m},endDate=${endDate+6m},location=${location}"));
+    definition.setCompositionString("A AND D AND NOT (B AND NOT C)");
+
+    return definition;
+  }
+
   /**
    *
    *
@@ -459,13 +492,13 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     String generalParameterMapping =
-        "onOrAfter=${endDate-1m},onOrBefore=${endDate+6m},location=${location}";
+        "startDate=${endDate-7m},endDate=${endDate},location=${location}";
 
     compositionCohortDefinition.addSearch(
         "tpt1", EptsReportUtils.map(getTxCurrWithoutTPTCompletion(), mapping));
 
     compositionCohortDefinition.addSearch(
-        "G", EptsReportUtils.map(tbPrevCohortQueries.getDenominator(), generalParameterMapping));
+        "G", EptsReportUtils.map(getTbPrevDenominatorForTPTCompletion(), generalParameterMapping));
 
     compositionCohortDefinition.setCompositionString("tpt1 AND G");
 
