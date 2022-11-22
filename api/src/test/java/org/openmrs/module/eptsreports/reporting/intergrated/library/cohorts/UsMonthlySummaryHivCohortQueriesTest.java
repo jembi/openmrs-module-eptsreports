@@ -105,7 +105,7 @@ public class UsMonthlySummaryHivCohortQueriesTest extends DefinitionsTest {
 
     assertEquals(0, evaluatedCohort.getMemberIds().size());
 
-    assertTrue(evaluatedCohort.getMemberIds().contains(1005));
+    // assertTrue(evaluatedCohort.getMemberIds().contains(1005));
   }
 
   @Test
