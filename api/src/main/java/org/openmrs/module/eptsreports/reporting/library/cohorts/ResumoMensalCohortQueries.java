@@ -338,47 +338,18 @@ public class ResumoMensalCohortQueries {
    * <p><b>Description:</b> Number of patients who initiated TARV at this HF during the current
    * month
    *
+   * <ul>
+   *   <li>Incluindo todos os utentes: que tenham tido 1o levantamento de ARVs registado no FILA ou
+   *   <li>o 1o levantamento de ARVs registado na “Ficha Recepção/ Levantou ARVs?” com “Levantou
+   *       ARV” = Sim (“Data de Levantamento”) *
+   *   <li>sendo a data mais antiga dos critérios acima dentro do período (“>= “Data Início do
+   *       Relatório” e “<= “Data Fim do Relatório”)
+   * </ul>
+   *
    * <p>Excludes All transfered In
    *
    * <ul>
-   *   <li>Select all patients with the earliest ART Start Date from the following criterias:
-   *       <ol>
-   *         <li>All patients who have their first drugs pick-up date (first encounter_datetime) by
-   *             reporting end date in Pharmacy form FILA (Encounter Type ID 18): <code>
-   * first occurrence of encounter datetime
-   *                 Encounter Type Ids = 18
-   * *</code> *
-   *         <li>All patients who have initiated the ARV drugs [ ARV PLAN (Concept ID 1255) = START
-   *             DRUGS (Concept ID 1256) at the pharmacy or clinical visits (Encounter Type IDs
-   *             6,9,18) <code>
-   * first occurrence of encounter datetime
-   *                     Encounter Type Ids = 6,9,18
-   *                     ARV PLAN (Concept Id 1255) = START DRUGS (Concept ID 1256)
-   * </code>
-   *         <li>All patients who have the first historical start drugs date (earliest concept ID
-   *             1190) set in pharmacy or in clinical forms (Encounter Type IDs 6, 9, 18, 53)
-   *             earliest “historical start date” <code>Encounter Type Ids = 6,9,18,53
-   *             The earliest “Historical Start Date” (Concept Id 1190)
-   * </code>
-   *         <li>
-   *             <p>All patients enrolled in ART Program (date_enrolled in program_id 2, from
-   *             patient program table)
-   *             <p><code>
-   * program_enrollment date
-   * program_id=2, patient_state_id=29 and date_enrolled
-   * </code>
-   *         <li>
-   *             <p>All patients with first drugs pick up date (earliest concept ID 23866
-   *             value_datetime) set in mastercard pharmacy form “Recepção/Levantou ARV” (Encounter
-   *             Type ID 52) with Levantou ARV (concept id 23865) = Yes (concept id 1065)
-   *             <p><code>
-   * earliest “Date of Pick up”
-   *                        Encounter Type Ids = 52
-   *                        The earliest “Data de Levantamento” (Concept Id 23866 value_datetime) <= endDate
-   *                        Levantou ARV (concept id 23865) = SIm (1065)
-   *
-   * </code>
-   *       </ol>
+   *   <li>
    *   <li>and check if the selected ART Start Date falls in the reporting period (>= startDate and
    *       <= endDate)
    *   <li>Exclude all patients transferred-in
@@ -416,6 +387,62 @@ public class ResumoMensalCohortQueries {
     cd.addSearch("transferredIn", map(transferredIn, mappingsEndDate));
 
     cd.setCompositionString("startedArt AND NOT transferredIn");
+    return cd;
+  }
+
+  /**
+   * <ul>
+   *   <li>Incluindo todos os utentes: que tenham tido 1o levantamento de ARVs registado no FILA ou
+   *   <li>o 1o levantamento de ARVs registado na “Ficha Recepção/ Levantou ARVs?” com “Levantou
+   *       ARV” = Sim (“Data de Levantamento”) *
+   *   <li>sendo a data mais antiga dos critérios acima dentro do período (“>= “Data Início do
+   *       Relatório” e “<= “Data Fim do Relatório”)
+   * </ul>
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsStartedArtOnFilaOrArvPickup() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + " FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "   WHERE e.encounter_type = ${18} "
+            + "   AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "   AND e.voided = 0 "
+            + "   AND p.voided = 0 "
+            + "   AND e.location_id = :location"
+            + " GROUP BY p.patient_id "
+            + " UNION "
+            + " SELECT p.patient_id"
+            + " FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + " INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
+            + "     WHERE e.encounter_type = ${52} "
+            + "     AND o.concept_id = ${23865} "
+            + "     AND o.value_coded = ${1065} "
+            + "     AND o2.concept_id = ${23866} "
+            + "     AND o2.value_datetime BETWEEN :startDate AND :endDate "
+            + "     AND o.voided = 0 "
+            + "     AND o2.voided = 0 "
+            + "     AND e.location_id = :location"
+            + "     AND e.voided = 0 "
+            + "     AND p.voided = 0 "
+            + " GROUP BY p.patient_id ";
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
     return cd;
   }
 
