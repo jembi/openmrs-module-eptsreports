@@ -154,7 +154,7 @@ public class TxMlDataset25 extends BaseDataSet {
         getColumnsForAgeAndGenderAndKeyPop());
 
     dsd.addColumn(
-        "M9",
+        "totalIIT",
         "Total IIT",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
@@ -185,7 +185,7 @@ public class TxMlDataset25 extends BaseDataSet {
     ColumnParameters twentyTo24M =
         new ColumnParameters("twentyTo24M", "20 - 24 male", "gender=M|age=20-24", "twentyTo24M");
     ColumnParameters twenty5To29M =
-        new ColumnParameters("twenty4To29M", "25 - 29 male", "gender=M|age=25-29", "twenty4To29M");
+        new ColumnParameters("twenty5To29M", "25 - 29 male", "gender=M|age=25-29", "twenty5To29M");
     ColumnParameters thirtyTo34M =
         new ColumnParameters("thirtyTo34M", "30 - 34 male", "gender=M|age=30-34", "thirtyTo34M");
     ColumnParameters thirty5To39M =
@@ -223,7 +223,7 @@ public class TxMlDataset25 extends BaseDataSet {
         new ColumnParameters("twentyTo24F", "20 - 24 female", "gender=F|age=20-24", "twentyTo24F");
     ColumnParameters twenty5To29F =
         new ColumnParameters(
-            "twenty4To29F", "25 - 29 female", "gender=F|age=25-29", "twenty4To29F");
+            "twenty5To29F", "25 - 29 female", "gender=F|age=25-29", "twenty5To29F");
     ColumnParameters thirtyTo34F =
         new ColumnParameters("thirtyTo34F", "30 - 34 female", "gender=F|age=30-34", "thirtyTo34F");
     ColumnParameters thirty5To39F =
