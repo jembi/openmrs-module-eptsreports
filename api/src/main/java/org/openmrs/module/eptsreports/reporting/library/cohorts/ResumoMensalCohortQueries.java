@@ -375,14 +375,15 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition startedArt = genericCohortQueries.getStartedArtOnPeriod(false, true);
+    CohortDefinition startedArt = getPatientsStartedArtOnFilaOrArvPickup();
 
     CohortDefinition transferredIn =
         getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2E();
 
-    String mappings = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
     String mappingsEndDate = "onOrBefore=${endDate},location=${location}";
-    cd.addSearch("startedArt", map(startedArt, mappings));
+    cd.addSearch(
+        "startedArt",
+        map(startedArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch("transferredIn", map(transferredIn, mappingsEndDate));
 
@@ -391,6 +392,8 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
+   *
+   *
    * <ul>
    *   <li>Incluindo todos os utentes: que tenham tido 1o levantamento de ARVs registado no FILA ou
    *   <li>o 1o levantamento de ARVs registado na “Ficha Recepção/ Levantou ARVs?” com “Levantou
@@ -398,6 +401,7 @@ public class ResumoMensalCohortQueries {
    *   <li>sendo a data mais antiga dos critérios acima dentro do período (“>= “Data Início do
    *       Relatório” e “<= “Data Fim do Relatório”)
    * </ul>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsStartedArtOnFilaOrArvPickup() {
