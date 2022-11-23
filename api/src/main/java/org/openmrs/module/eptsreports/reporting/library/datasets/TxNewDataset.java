@@ -73,7 +73,6 @@ public class TxNewDataset extends BaseDataSet {
         "TX_NEW: New on ART",
         EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
         "");
-    /*
         dataSetDefinition.addColumn(
             "ANC",
             "TX_NEW: Breastfeeding Started ART",
@@ -103,7 +102,6 @@ public class TxNewDataset extends BaseDataSet {
             "TX_NEW: People in prison and other closed settings",
             EptsReportUtils.map(patientEnrolledInHIVStartedARTIndicator, mappings),
             "keypop=PRI");
-    */
     addRow(
         dataSetDefinition,
         "males",

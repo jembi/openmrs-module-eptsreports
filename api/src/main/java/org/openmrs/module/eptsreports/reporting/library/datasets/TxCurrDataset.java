@@ -84,7 +84,6 @@ public class TxCurrDataset extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "C1All", "TX_CURR: Currently on ART", EptsReportUtils.map(txCurrIndicator, mappings), "");
-    /*
         dataSetDefinition.addColumn(
             "PID",
             "TX_CURR: People who inject drugs",
@@ -147,7 +146,6 @@ public class TxCurrDataset extends BaseDataSet {
             "6 Months",
             EptsReportUtils.map(txCurrIndicator, mappings),
             getDispensationColumnsMoreThan6Months());
-    */
     return dataSetDefinition;
   }
 
