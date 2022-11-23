@@ -68,23 +68,22 @@ public class TxCurrDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txCurrCompositionCohort, "onOrBefore=${endDate},location=${location}"));
 
-    // addRow(
-    //     dataSetDefinition,
-    //     "C1",
-    //     "Children",
-    //     EptsReportUtils.map(txCurrIndicator, mappings),
-    //     getColumnsForChildren());
+    addRow(
+        dataSetDefinition,
+        "C1",
+        "Children",
+        EptsReportUtils.map(txCurrIndicator, mappings),
+        getColumnsForChildren());
 
-    // addRow(
-    //     dataSetDefinition,
-    //     "C2",
-    //     "Adults",
-    //     EptsReportUtils.map(txCurrIndicator, mappings),
-    //     getColumnsForAdults());
+    addRow(
+        dataSetDefinition,
+        "C2",
+        "Adults",
+        EptsReportUtils.map(txCurrIndicator, mappings),
+        getColumnsForAdults());
 
-    // dataSetDefinition.addColumn(
-    //     "C1All", "TX_CURR: Currently on ART", EptsReportUtils.map(txCurrIndicator, mappings),
-    // "");
+    dataSetDefinition.addColumn(
+        "C1All", "TX_CURR: Currently on ART", EptsReportUtils.map(txCurrIndicator, mappings), "");
 
     dataSetDefinition.addColumn(
         "PID",
@@ -110,44 +109,44 @@ public class TxCurrDataset extends BaseDataSet {
         EptsReportUtils.map(txCurrIndicator, mappings),
         "keypop=PRI");
 
-    // dataSetDefinition.addColumn(
-    //     "C3All",
-    //     "TX_CURR: <3 months of ARVs dispense",
-    //     EptsReportUtils.map(txCurrIndicator, mappings),
-    //     "disp=<3m");
+    dataSetDefinition.addColumn(
+        "C3All",
+        "TX_CURR: <3 months of ARVs dispense",
+        EptsReportUtils.map(txCurrIndicator, mappings),
+        "disp=<3m");
 
-    // addRow(
-    //     dataSetDefinition,
-    //     "C3",
-    //     "<3 Months",
-    //     EptsReportUtils.map(txCurrIndicator, mappings),
-    //     getDispensationColumnsLessThan3Months());
+    addRow(
+        dataSetDefinition,
+        "C3",
+        "<3 Months",
+        EptsReportUtils.map(txCurrIndicator, mappings),
+        getDispensationColumnsLessThan3Months());
 
-    // dataSetDefinition.addColumn(
-    //     "C4All",
-    //     "TX_CURR: 3-5 months of ARVs dispense",
-    //     EptsReportUtils.map(txCurrIndicator, mappings),
-    //     "disp=3-5m");
+    dataSetDefinition.addColumn(
+        "C4All",
+        "TX_CURR: 3-5 months of ARVs dispense",
+        EptsReportUtils.map(txCurrIndicator, mappings),
+        "disp=3-5m");
 
-    // addRow(
-    //     dataSetDefinition,
-    //     "C4",
-    //     "3-5 Months",
-    //     EptsReportUtils.map(txCurrIndicator, mappings),
-    //     getDispensationColumns3To5Months());
+    addRow(
+        dataSetDefinition,
+        "C4",
+        "3-5 Months",
+        EptsReportUtils.map(txCurrIndicator, mappings),
+        getDispensationColumns3To5Months());
 
-    // dataSetDefinition.addColumn(
-    //     "C5All",
-    //     "TX_CURR: More than 6 months of ARVs dispense",
-    //     EptsReportUtils.map(txCurrIndicator, mappings),
-    //     "disp=>6m");
+    dataSetDefinition.addColumn(
+        "C5All",
+        "TX_CURR: More than 6 months of ARVs dispense",
+        EptsReportUtils.map(txCurrIndicator, mappings),
+        "disp=>6m");
 
-    // addRow(
-    //     dataSetDefinition,
-    //     "C5",
-    //     "6 Months",
-    //     EptsReportUtils.map(txCurrIndicator, mappings),
-    //     getDispensationColumnsMoreThan6Months());
+    addRow(
+        dataSetDefinition,
+        "C5",
+        "6 Months",
+        EptsReportUtils.map(txCurrIndicator, mappings),
+        getDispensationColumnsMoreThan6Months());
 
     return dataSetDefinition;
   }
