@@ -14,6 +14,7 @@ import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTes
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.DateUtil;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -202,21 +203,25 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  public void getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2Should()
-      throws EvaluationException {
-    CohortDefinition cd =
-        resumoMensalCohortQueries
-            .getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2();
+  public void getPatientsStartedArtOnFilaOrArvPickupShouldPass()  throws EvaluationException {
+    CohortDefinition cd = resumoMensalCohortQueries.getPatientsStartedArtOnFilaOrArvPickup();
 
     HashMap<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("onOrAfter", "Start Date", Date.class), this.getStartDate());
-    parameters.put(new Parameter("onOrBefore", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(1, evaluatedCohort.getMemberIds().size());
-    assertTrue(evaluatedCohort.getMemberIds().contains(12475));
+    assertEquals(2, evaluatedCohort.getMemberships().size());
+    long patientId =
+        evaluatedCohort.getMemberships().stream()
+            .filter(member -> member.getPatientId() == 12475)
+            .findFirst()
+            .get()
+            .getPatientId();
+
+    assertEquals(patientId, 12475);
   }
 
   @Test
