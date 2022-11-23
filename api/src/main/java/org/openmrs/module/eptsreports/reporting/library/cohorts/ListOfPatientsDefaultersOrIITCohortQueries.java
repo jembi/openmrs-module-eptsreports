@@ -3,7 +3,6 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
-import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -2178,7 +2177,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
         + "         GROUP BY   p.patient_id ";
   }
 
-  public DataDefinition getSupportGroupsOnFichaClinicaOrSeguimento(List<EncounterType> encounterTypes) {
+  public DataDefinition getSupportGroupsOnFichaClinicaOrSeguimento(List<Integer> encounterTypes, List<Integer> supportGroupConcepts) {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
 
@@ -2194,11 +2193,12 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("1257", String.valueOf(hivMetadata.getContinueRegimenConcept().getConceptId()));
     map.put("1267", String.valueOf(hivMetadata.getCompletedConcept().getConceptId()));
     map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
+    map.put("supportGroupConcepts", StringUtils.join(supportGroupConcepts, ","));
 
 
 
 
-    String query = "SELECT p.patient_id, "
+    String query = " SELECT p.patient_id, "
             + "       o.concept_id AS support_group "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
@@ -2212,7 +2212,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                                  ON p.patient_id = e.patient_id "
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
-            + "                          AND e.location_id = 400 "
+            + "                          AND e.location_id = :location "
             + "                          AND e.encounter_datetime <= :endDate "
             + "                          AND e.encounter_type IN ( ${6}, ${9} ) "
             + "                   GROUP  BY p.patient_id) max_encounter "
@@ -2222,7 +2222,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_type IN ( ${encounterTypes} ) "
-            + "       AND o.concept_id IN ( ${16524}, ${165325}, ${24031} ) "
+            + "       AND o.concept_id IN ( ${supportGroupConcepts} ) "
             + "       AND o.value_coded IN ( ${1256}, ${1257}, ${1267}, NULL ) "
             + "       AND e.encounter_datetime <= :endDate "
             + "       AND e.encounter_datetime = max_encounter.encounter_datetime "

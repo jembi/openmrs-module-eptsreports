@@ -3471,6 +3471,30 @@
 			UUID for NOT FOUND Test Result Concept
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.mentoringMotherConceptUuid</property>
+		<defaultValue>89c199aa-67b7-417c-a377-410ace312628</defaultValue>
+		<description>
+			UUID for Mentoring Mother Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.youthAndTeenageMenthorConceptUuid</property>
+		<defaultValue>7f3648d4-6b12-4e5d-80ac-2fe437f9ce30</defaultValue>
+		<description>
+			UUID for YOUTH AND TEENAGE MENTHOR Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.champioManConceptUuid</property>
+		<defaultValue>6465ce28-9f6b-4c53-93bd-e39f9cbb2229</defaultValue>
+		<description>
+			UUID for CHAMPION MAN Concept
+		</description>
+	</globalProperty>
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 
