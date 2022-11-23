@@ -14,7 +14,6 @@ import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTes
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.DateUtil;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -203,7 +202,7 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  public void getPatientsStartedArtOnFilaOrArvPickupShouldPass()  throws EvaluationException {
+  public void getPatientsStartedArtOnFilaOrArvPickupShouldPass() throws EvaluationException {
     CohortDefinition cd = resumoMensalCohortQueries.getPatientsStartedArtOnFilaOrArvPickup();
 
     HashMap<Parameter, Object> parameters = new HashMap<>();
@@ -236,7 +235,7 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(2, evaluatedCohort.getMemberIds().size());
+    assertEquals(1, evaluatedCohort.getMemberships().size());
     assertTrue(evaluatedCohort.getMemberIds().contains(12304));
   }
 
