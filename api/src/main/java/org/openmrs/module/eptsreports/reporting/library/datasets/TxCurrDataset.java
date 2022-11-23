@@ -83,74 +83,71 @@ public class TxCurrDataset extends BaseDataSet {
         getColumnsForAdults());
 
     dataSetDefinition.addColumn(
-        "totalAll",
-        "TX_CURR: Currently on ART",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        "");
+        "C1All", "TX_CURR: Currently on ART", EptsReportUtils.map(txCurrIndicator, mappings), "");
+    /*
+        dataSetDefinition.addColumn(
+            "PID",
+            "TX_CURR: People who inject drugs",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            "keypop=PID");
 
-    dataSetDefinition.addColumn(
-        "PID",
-        "TX_CURR: People who inject drugs",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        "keypop=PID");
+        dataSetDefinition.addColumn(
+            "MSM",
+            "TX_CURR: Men who have sex with men",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            "keypop=MSM");
 
-    dataSetDefinition.addColumn(
-        "MSM",
-        "TX_CURR: Men who have sex with men",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        "keypop=MSM");
+        dataSetDefinition.addColumn(
+            "CSW",
+            "TX_CURR: Female sex workers",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            "keypop=CSW");
 
-    dataSetDefinition.addColumn(
-        "CSW",
-        "TX_CURR: Female sex workers",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        "keypop=CSW");
+        dataSetDefinition.addColumn(
+            "PRI",
+            "TX_CURR: People in prison and other closed settings",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            "keypop=PRI");
 
-    dataSetDefinition.addColumn(
-        "PRI",
-        "TX_CURR: People in prison and other closed settings",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        "keypop=PRI");
+        dataSetDefinition.addColumn(
+            "C3All",
+            "TX_CURR: <3 months of ARVs dispense",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            "disp=<3m");
 
-    dataSetDefinition.addColumn(
-        "C3All",
-        "TX_CURR: <3 months of ARVs dispense",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        "disp=<3m");
+        addRow(
+            dataSetDefinition,
+            "C3",
+            "<3 Months",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            getDispensationColumnsLessThan3Months());
 
-    addRow(
-        dataSetDefinition,
-        "C3",
-        "<3 Months",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        getDispensationColumnsLessThan3Months());
+        dataSetDefinition.addColumn(
+            "C4All",
+            "TX_CURR: 3-5 months of ARVs dispense",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            "disp=3-5m");
 
-    dataSetDefinition.addColumn(
-        "C4All",
-        "TX_CURR: 3-5 months of ARVs dispense",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        "disp=3-5m");
+        addRow(
+            dataSetDefinition,
+            "C4",
+            "3-5 Months",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            getDispensationColumns3To5Months());
 
-    addRow(
-        dataSetDefinition,
-        "C4",
-        "3-5 Months",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        getDispensationColumns3To5Months());
+        dataSetDefinition.addColumn(
+            "C5All",
+            "TX_CURR: More than 6 months of ARVs dispense",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            "disp=>6m");
 
-    dataSetDefinition.addColumn(
-        "C5All",
-        "TX_CURR: More than 6 months of ARVs dispense",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        "disp=>6m");
-
-    addRow(
-        dataSetDefinition,
-        "C5",
-        "6 Months",
-        EptsReportUtils.map(txCurrIndicator, mappings),
-        getDispensationColumnsMoreThan6Months());
-
+        addRow(
+            dataSetDefinition,
+            "C5",
+            "6 Months",
+            EptsReportUtils.map(txCurrIndicator, mappings),
+            getDispensationColumnsMoreThan6Months());
+    */
     return dataSetDefinition;
   }
 
