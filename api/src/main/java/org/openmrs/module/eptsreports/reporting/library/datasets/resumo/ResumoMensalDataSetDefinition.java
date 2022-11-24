@@ -643,7 +643,7 @@ public class ResumoMensalDataSetDefinition extends BaseDataSet {
   private Mapped<CohortIndicator> getPatientsTransferredOutDuringCurrentMonth() {
     String name = "Patients transferred out during the current month";
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
-    CohortDefinition cohort = resumoMensalCohortQueries.getPatientsTransferedOutB5();
+    CohortDefinition cohort = resumoMensalCohortQueries.getPatientsTransferedOutRF13B5(true);
     CohortIndicator indicator = eptsGeneralIndicator.getIndicator(name, map(cohort, mappings));
     return mapStraightThrough(indicator);
   }
