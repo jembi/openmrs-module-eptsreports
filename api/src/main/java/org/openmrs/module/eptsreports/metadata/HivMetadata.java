@@ -5143,8 +5143,7 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getChampioManConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.champioManConceptUuid");
+        Context.getAdministrationService().getGlobalProperty("eptsreports.champioManConceptUuid");
     return getConcept(uuid);
   }
 
@@ -5159,8 +5158,8 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getYouthAndTeenageMenthorConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.youthAndTeenageMenthorConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.youthAndTeenageMenthorConceptUuid");
     return getConcept(uuid);
   }
 
@@ -5175,8 +5174,24 @@ public class HivMetadata extends ProgramsMetadata {
    */
   public Concept getMentoringMotherConcept() {
     String uuid =
-            Context.getAdministrationService()
-                    .getGlobalProperty("eptsreports.mentoringMotherConceptUuid");
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.mentoringMotherConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 6310</b>
+   *
+   * <p><b>Name:</b> DATE OF NEXT COUNSELING
+   *
+   * <p><b>Description:</b> DATE OF NEXT COUNSELING Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getDateOfNextCounselingConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.dateOfNextCounselingConceptUuid");
     return getConcept(uuid);
   }
 }

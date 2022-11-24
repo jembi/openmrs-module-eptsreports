@@ -3490,7 +3490,15 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.champioManConceptUuid</property>
-		<defaultValue>6465ce28-9f6b-4c53-93bd-e39f9cbb2229</defaultValue>
+		<defaultValue>b1a53471-e087-4000-be68-123c509fb856</defaultValue>
+		<description>
+			UUID for CHAMPION MAN Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.dateOfNextCounselingConceptUuid</property>
+		<defaultValue>4e10a119-c6f0-4ecb-8b3f-72d86ac2d59e</defaultValue>
 		<description>
 			UUID for CHAMPION MAN Concept
 		</description>

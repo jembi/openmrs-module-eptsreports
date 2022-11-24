@@ -1642,7 +1642,6 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
-    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
     map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
@@ -1806,7 +1805,10 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    * Levantamento” (concept_id=23739) is marked as “DM” (concept_id=1098) on the most recent
    * consultation on FICHA CLINICA ( encounter type 6, max encounter_datetime <= endDate) Encounter
    * Type Id = 6 Max encounter_datetime <= endDate Last TYPE OF DISPENSATION (id=23739) Value.coded
-   * = MONTHLY (id=1098)
+   * = MONTHLY (id=1098) OR
+   *
+   * <p>with one of the MDCs is marked as “DT - Dispensa Trimestral de ARV” with Estado do MDC as *
+   * Iniciar (I) or Continuar (C) in the last Ficha Clinica with MDCs registered
    *
    * <p>Print Dispensa Trimestral if “Tipo de Levantamento” (concept_id=23739) is marked as “DT”
    * (concept_id=23720) on the most recent consultation on FICHA CLINICA ( encounter type 6, max
@@ -1825,8 +1827,19 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
    * (concept_id=1257) in Ficha Clinica Mastercard ( encounter type 6, max encounter_datetime <=
    * endDate) Encounter Type Id = 6 Max encounter_datetime <= endDate Last SEMESTRAL DISPENSATION
    * (DT) (id=23888) Value.coded= START DRUGS (id=1256) OR Value.coded= (CONTINUE REGIMEN id=1257)
+   * OR
    *
-   * @return sqlPatientDataDefinition
+   * <p>with one of the MDCs is marked as “DS - Dispensa Semestral de ARV” with Estado do MDC as *
+   * Iniciar (I) or Continuar (C) in the last Ficha Clinica with MDCs registered <b>Print Dispensa
+   * Anual </b>
+   *
+   * <p>next ART pick-up is scheduled for >334 days after the date of their last ART drug pick-up
+   * (FILA) or
+   *
+   * <p>owith one of the MDCs is marked as “DA - Dispensa Anual de ARV” with Estado do MDC as
+   * Iniciar (I) or Continuar (C) in the last Ficha Clinica with MDCs registered
+   *
+   * @return {@link DataDefinition}
    */
   public DataDefinition getTypeOfDispensation() {
 
@@ -2111,20 +2124,25 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     CohortDefinition E3 = getE3();
     CohortDefinition X = getLastARVRegimen();
     CohortDefinition A = getArtStartDate();
-    //    CohortDefinition B = getPatientsTransferredInTarv();
 
     cd.addSearch("E1", EptsReportUtils.map(E1, MAPPING));
     cd.addSearch("E2", EptsReportUtils.map(E2, MAPPING));
     cd.addSearch("E3", EptsReportUtils.map(E3, MAPPING));
     cd.addSearch("X", EptsReportUtils.map(X, MAPPING3));
     cd.addSearch("A", EptsReportUtils.map(A, MAPPING2));
-    //    cd.addSearch("B", EptsReportUtils.map(B, MAPPING));
 
     cd.setCompositionString("((A AND X) AND NOT (E1 OR E2 OR E3))");
 
     return cd;
   }
 
+  /**
+   * Patients with one of the MDCs is marked as “ @param dispensationType ” with Estado do MDC as
+   * Iniciar (I) or Continuar (C) in the last Ficha Clinica with MDCs registered
+   *
+   * @param dispensationType The type of dispensation required
+   * @return {@link String}
+   */
   private String getDispensationTypeOnMDCQuery(Concept dispensationType) {
 
     return " SELECT     p.patient_id "
@@ -2177,7 +2195,32 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
         + "         GROUP BY   p.patient_id ";
   }
 
-  public DataDefinition getSupportGroupsOnFichaClinicaOrSeguimento(List<Integer> encounterTypes, List<Integer> supportGroupConcepts) {
+  /**
+   * <b>The system will show the Support Groups informed in the Last APSS/PP consultation by report
+   * end date as follows:</b> <b>This implementation works for both encountertypes (Ficha clinica
+   * and APSS)</b>
+   *
+   * <ul>
+   *   <li>Mães Mentoras (MM) Value of the Support Group field “Mães Mentoras (MM)” marked on the
+   *       Last APSS/PP Consultation Date / Last Clinical Consultation Date. Possible values are
+   *       “Início”, “Continua”, “Fim”. If no value is marked the column should be left Blank.
+   *   <li>Adolescentes e Jovens Mentores (AJM) Value of the Support Group field “Adolescentes e
+   *       Jovens Mentores (AJM)” marked on the Last APSS/PP Consultation Date/ Last Clinical
+   *       Consultation Date. Possible values are “Início”, “Continua”, “Fim”. If no value is marked
+   *       the column should be left Blank
+   *   <li>omem Campeão (HC) Value of the Support Group field “Homem Campeão (HC)” marked on the
+   *       Last APSS/PP Consultation Date / Last Clinical Consultation Date. Possible values are
+   *       “Início”, “Continua”, “Fim”. If no value is marked the column should be left Blank.
+   * </ul>
+   *
+   * @param encounterTypes List of desired encounters
+   * @param supportGroupConcepts List of desired Support Groups
+   * @param apssConsultation Apss most recent consultation date flag (True/false to use FC or APSS
+   *     most recent date)
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getSupportGroupsOnFichaClinicaOrSeguimento(
+      List<Integer> encounterTypes, List<Integer> supportGroupConcepts, Boolean apssConsultation) {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
 
@@ -2187,18 +2230,23 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
 
     Map<String, String> map = new HashMap<>();
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-    map.put("6", String.valueOf(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
-    map.put("9", String.valueOf(hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId()));
+    map.put(
+        "6", String.valueOf(hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
+    map.put(
+        "9",
+        String.valueOf(hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId()));
+    map.put(
+        "35",
+        String.valueOf(
+            hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId()));
     map.put("1256", String.valueOf(hivMetadata.getStartDrugsConcept().getConceptId()));
     map.put("1257", String.valueOf(hivMetadata.getContinueRegimenConcept().getConceptId()));
     map.put("1267", String.valueOf(hivMetadata.getCompletedConcept().getConceptId()));
     map.put("encounterTypes", StringUtils.join(encounterTypes, ","));
     map.put("supportGroupConcepts", StringUtils.join(supportGroupConcepts, ","));
 
-
-
-
-    String query = " SELECT p.patient_id, "
+    String query =
+        " SELECT p.patient_id, "
             + "       o.concept_id AS support_group "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
@@ -2213,9 +2261,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                   WHERE  p.voided = 0 "
             + "                          AND e.voided = 0 "
             + "                          AND e.location_id = :location "
-            + "                          AND e.encounter_datetime <= :endDate "
-            + "                          AND e.encounter_type IN ( ${6}, ${9} ) "
-            + "                   GROUP  BY p.patient_id) max_encounter "
+            + "                          AND e.encounter_datetime <= :endDate ";
+    if (apssConsultation) {
+      query += "                          AND e.encounter_type = ${35} ";
+    } else {
+      query += "                          AND e.encounter_type IN ( ${6}, ${9} ) ";
+    }
+    query +=
+        "                   GROUP  BY p.patient_id) max_encounter "
             + "               ON p.patient_id = max_encounter.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
@@ -2227,6 +2280,107 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "       AND e.encounter_datetime <= :endDate "
             + "       AND e.encounter_datetime = max_encounter.encounter_datetime "
             + "GROUP  BY p.patient_id ";
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * Last APSS/PP Consultation Date – Sheet 1: Column T Date of the most recent consultation
+   * registered on Ficha APSS/PP by report end date.
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastApssConsultationDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Get Last APSS/PP Consultation Date");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "  SELECT p.patient_id, e.encounter_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN ( "
+            + "                   SELECT p.patient_id, "
+            + "                          Max(e.encounter_datetime) AS encounter_datetime "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON p.patient_id = e.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime <= :endDate "
+            + "                          AND e.encounter_type = ${35} "
+            + "                   GROUP  BY p.patient_id "
+            + "                               ) most_recent ON p.patient_id = most_recent.patient_id   "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type = ${35} "
+            + "                 AND e.encounter_datetime = most_recent.encounter_datetime "
+            + "             GROUP BY p.patient_id";
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * Next scheduled APSS/PP consultation Date marked on the last APSS/PP consultation (Column T)
+   * occurred by the report end date
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getNextApssConsultationDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+
+    sqlPatientDataDefinition.setName("Get Next Scheduled APSS/PP Consultation Date");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6310", hivMetadata.getDateOfNextCounselingConcept().getConceptId());
+
+    String query =
+        "  SELECT p.patient_id, o.value_datetime "
+            + "             FROM   patient p  "
+            + "                 INNER JOIN encounter e  "
+            + "                     ON p.patient_id = e.patient_id  "
+            + "                 INNER JOIN obs o  "
+            + "                     ON e.encounter_id = o.encounter_id  "
+            + "                 INNER JOIN ( "
+            + "                   SELECT p.patient_id, "
+            + "                          Max(e.encounter_datetime) AS encounter_datetime "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON p.patient_id = e.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime <= :endDate "
+            + "                          AND e.encounter_type = ${35} "
+            + "                   GROUP  BY p.patient_id "
+            + "                           ) most_recent ON p.patient_id = most_recent.patient_id   "
+            + "             WHERE  p.voided = 0  "
+            + "                 AND e.voided = 0  "
+            + "                 AND o.voided = 0  "
+            + "                 AND e.location_id = :location "
+            + "                 AND e.encounter_type = ${35} "
+            + "                 AND o.concept_id = ${6310} "
+            + "                 AND e.encounter_datetime = most_recent.encounter_datetime "
+            + "            GROUP BY p.patient_id";
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
