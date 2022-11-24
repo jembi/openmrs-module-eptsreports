@@ -795,7 +795,7 @@ public class ResumoMensalCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoSuspendedTreatmentB6() {
+  public CohortDefinition getPatientsWhoSuspendedTreatmentRF14B6(boolean useBothDates) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("B6 - Nº de suspensos TARV durante o mês");
@@ -805,8 +805,15 @@ public class ResumoMensalCohortQueries {
     String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
     String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
 
-    cd.addSearch("S", map(getPatientsWhoSuspendedTreatmentB6(true), mapping2));
-
+    if (useBothDates) {
+      cd.addSearch("S", map(getPatientsWhoSuspendedTreatmentB6(true), mapping2));
+    } else {
+      cd.addSearch(
+          "S",
+          map(
+              getPatientsWhoSuspendedTreatmentB6(false),
+              " onOrBefore=${startDate-1d},location=${location}"));
+    }
     cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
     cd.addSearch(
         "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
@@ -1145,7 +1152,7 @@ public class ResumoMensalCohortQueries {
   public CohortDefinition getPatientsWhoDiedB8(boolean useBothDates) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("B6 - Nº de suspensos TARV durante o mês");
+    cd.setName("B8 - Nº de óbitos TARV durante o mês");
     cd.addParameter(new Parameter("onOrAfter", "startDate", Date.class));
     cd.addParameter(new Parameter("onOrBefore", "endDate", Date.class));
     cd.addParameter(new Parameter("locationList", "location", Location.class));
@@ -1170,7 +1177,7 @@ public class ResumoMensalCohortQueries {
         "B2",
         map(
             getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
-            mapping2));
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${locationList}"));
     cd.addSearch("B3", map(getPatientsRestartedTarvtB3(), mapping));
 
     cd.setCompositionString("D AND (B12 OR B1 OR B2 OR B3)");
@@ -1198,8 +1205,8 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B6",
         map(
-            getPatientsWhoSuspendedTreatmentB6(true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            getPatientsWhoSuspendedTreatmentRF14B6(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B7",
         map(
@@ -1209,7 +1216,7 @@ public class ResumoMensalCohortQueries {
         "B8",
         map(
             getPatientsWhoDiedB8(true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
 
     cd.setCompositionString("B5 OR B6 OR B7 OR B8");
 
@@ -1398,9 +1405,7 @@ public class ResumoMensalCohortQueries {
             "location=${location},date=${startDate-1d}"));
     cd.addSearch(
         "B8A",
-        map(
-            getPatientsWhoDiedB8(false),
-            "onOrAfter=${startDate}onOrBefore=${onOrBefore},locationList=${location}"));
+        map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
 
     cd.addSearch(
         "drugPick",
@@ -2254,8 +2259,8 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B6",
         map(
-            getPatientsWhoSuspendedTreatmentB6(true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+            getPatientsWhoSuspendedTreatmentRF14B6(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B7",
         map(
@@ -2872,7 +2877,7 @@ public class ResumoMensalCohortQueries {
     ccd.addSearch(
         "B6",
         map(
-            getPatientsWhoSuspendedTreatmentB6(),
+            getPatientsWhoSuspendedTreatmentRF14B6(true),
             "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
 
     ccd.addSearch(

@@ -15,7 +15,7 @@ import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Deprecated
+@Component
 public class TotalListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
 
   @Autowired ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
