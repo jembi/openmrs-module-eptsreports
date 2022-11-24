@@ -6935,7 +6935,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
-    CohortDefinition dead = resumoMensalCohortQueries.getPatientsWhoDiedPartial(false);
+    CohortDefinition dead = resumoMensalCohortQueries.getPatientsWhoDied(false);
 
     CohortDefinition nextPickupBetween83And97 =
         QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(83, 97);
@@ -8282,7 +8282,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
-            resumoMensalCohortQueries.getPatientsWhoDiedPartial(false),
+            resumoMensalCohortQueries.getPatientsWhoDied(false),
             "onOrBefore=${revisionEndDate},locationList=${location}"));
     cd.addSearch(
         "TO",

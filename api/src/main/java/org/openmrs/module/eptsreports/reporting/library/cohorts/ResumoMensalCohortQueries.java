@@ -1000,7 +1000,7 @@ public class ResumoMensalCohortQueries {
    * @param
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoDiedPartial(Boolean hasStartDate) {
+  public CohortDefinition getPatientsWhoDied(Boolean hasStartDate) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
@@ -1141,7 +1141,7 @@ public class ResumoMensalCohortQueries {
    * </ul>
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoDied(boolean useBothDates) {
+  public CohortDefinition getPatientsWhoDiedB8(boolean useBothDates) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("B6 - Nº de suspensos TARV durante o mês");
@@ -1153,9 +1153,9 @@ public class ResumoMensalCohortQueries {
     String mapping = "startDate=${onOrAfter},endDate=${onOrBefore},location=${locationList}";
 
     if (useBothDates) {
-      cd.addSearch("D", map(getPatientsWhoDiedPartial(true), mapping2));
+      cd.addSearch("D", map(getPatientsWhoDied(true), mapping2));
     } else {
-      cd.addSearch("D", map(getPatientsWhoDiedPartial(false), "onOrBefore=${onOrAfter-1d},locationList=${locationList}"));
+      cd.addSearch("D", map(getPatientsWhoDied(false), "onOrBefore=${onOrAfter-1d},locationList=${locationList}"));
     }
     cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
     cd.addSearch(
@@ -1202,7 +1202,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B8",
         map(
-            getPatientsWhoDied(true),
+            getPatientsWhoDiedB8(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("B5 OR B6 OR B7 OR B8");
@@ -1392,7 +1392,7 @@ public class ResumoMensalCohortQueries {
             "location=${location},date=${startDate-1d}"));
     cd.addSearch(
         "B8A",
-        map(getPatientsWhoDied(false), "onOrAfter=${startDate}onOrBefore=${onOrBefore},locationList=${location}"));
+        map(getPatientsWhoDiedB8(false), "onOrAfter=${startDate}onOrBefore=${onOrBefore},locationList=${location}"));
 
     cd.addSearch(
         "drugPick",
@@ -2256,7 +2256,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B8",
         map(
-            getPatientsWhoDied(true),
+            getPatientsWhoDiedB8(true),
             "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
     cd.setCompositionString("B13 AND NOT(B1 OR B2 OR B3 OR B5 OR B6 OR B7 OR B8)");
     return cd;
@@ -2870,7 +2870,7 @@ public class ResumoMensalCohortQueries {
     ccd.addSearch(
         "B8",
         map(
-            getPatientsWhoDied(true),
+            getPatientsWhoDiedB8(true),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},locationList=${location}"));
 
     ccd.addSearch(
@@ -3067,7 +3067,7 @@ public class ResumoMensalCohortQueries {
 
     CohortDefinition B7E = getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7();
 
-    CohortDefinition B8E = getPatientsWhoDied(false);
+    CohortDefinition B8E = getPatientsWhoDiedB8(false);
 
     String mappingsOnDate = "onOrBefore=${endDate},location=${location}";
     String mappingsOnOrBeforeLocationList = "onOrBefore=${endDate},locationList=${location}";
