@@ -2784,41 +2784,16 @@ public class ResumoMensalCohortQueries {
    * abandonos TARV durante o mês)</b>
    *
    * <ul>
-   *   <li>All patients having the most recent date between last scheduled drug pickup date (Fila)
-   *       or 30 days after last ART pickup date (Recepção – Levantou ARV) and adding 60 days and
-   *       this date being less than reporting end Date.
-   *       <ol>
-   *         <li>Select the most recent date from:
-   *             <ul>
-   *               <li>a.Last record of Next Drugs Pick Up Appointment (Concept ID 5096
-   *                   value_datetime – not empty/null) from encounters of type 18 registered by
-   *                   endDate
-   *               <li>The most recent “Data de Levantamento” (Concept Id 23866 value_datetime-not
-   *                   empty/null) occurred by endDate from encounters of type 52 , plus(+) 30 days
-   *             </ul>
-   *         <li>And add 60 days and this date should be < endDate
-   *       </ol>
-   *   <li>Except all patients who abandoned the ART by previous month:
-   *       <ol>
-   *         <li>Select the most recent date from:
-   *             <ul>
-   *               <li>Last record of Next Drugs Pick Up Appointment (Concept ID 5096 value_datetime
-   *                   – not empty/null) from encounters of type 18 registered by startDate
-   *               <li>d.The most recent “Data de Levantamento” (Concept Id 23866 value_datetime-not
-   *                   empty/null) occurred by startDate from encounters of type 52 , plus(+) 30
-   *                   days
-   *             </ul>
-   *         <li>And add 60 days and this date should be < startDate
-   *       </ol>
-   *   <li>Except all patients who were transferred-out by reporting endDate: Same criterias as
-   *       defined in B5, but instead of during the period (>=startDate and <=endDate), it should be
-   *       by reporting endDate (<=endDate)
-   *   <li>Except all patients who were suspended by reporting endDate: Same criterias as defined in
-   *       B6, but instead of during the period (>=startDate and <=endDate), it should be by
-   *       reporting endDate (<=endDate)
-   *   <li>Except all patients who died by reporting endDate: Same criterias as defined in B8, but
-   *       instead of during the period (>=startDate and <=endDate), it should be by reporting
-   *       endDate (<=endDate)
+   *   <li>incluindo os utentes activos em TARV no fim do mês anterior (Indicador B12 – RF20) e
+   *       filtrando os utentes: com a data mais recente entre
+   *   <li>a Data do Último Levantamento registada, até o fim do mês de reporte, na “Ficha
+   *       Recepção/Levantou ARVs?” com “Levantou ARV” = “S”, adicionando 30 dias, e
+   *   <li>a Data do Último Agendamento de Levantamento registado no FILA até o fim do mês de
+   *       reporte;
+   *   <li>Esta data adicionando 60 dias é menor que a “Data Fim do Relatório”;
+   *   <li>excluindo os utentes: suspensos durante o mês de reporte (Indicador B6 – RF14)
+   *   <li>óbitos durante o mês de reporte (Indicador B8 – RF16)
+   *   <li>transferidos para durante o mês de reporte ( Indicador B5 – RF13)
    * </ul>
    *
    * @return {@link CohortDefinition}
@@ -2836,23 +2811,32 @@ public class ResumoMensalCohortQueries {
         map(
             getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
             "date=${onOrBefore},location=${location}"));
-    ccd.addSearch(
-        "B7II",
-        map(
-            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
-            "date=${onOrAfter-1},location=${location}"));
 
     ccd.addSearch(
-        "B7III",
-        map(getPatientsTransferredOutB5(true), "onOrBefore=${onOrBefore},location=${location}"));
-    ccd.addSearch(
-        "B7IV",
+        "B12",
         map(
-            getPatientsWhoSuspendedTreatmentB6(false),
-            "onOrBefore=${onOrBefore},location=${location}"));
+            getPatientsWhoWereActiveByEndOfPreviousMonthB12(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
     ccd.addSearch(
-        "B7V", map(getPatientsWhoDied(false), "onOrBefore=${onOrBefore},locationList=${location}"));
-    ccd.setCompositionString("B7I AND NOT (B7II OR B7III OR B7IV OR B7V)");
+        "B6",
+        map(
+            getPatientsWhoSuspendedTreatmentB6(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    ccd.addSearch(
+        "B8",
+        map(
+            getPatientsWhoDied(true),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    ccd.addSearch(
+        "B5",
+        map(
+            getPatientsTransferedOutB5(),
+            "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}"));
+
+    ccd.setCompositionString("(B7I AND B12) NOT (B6 OR B8 OR B5)");
 
     return ccd;
   }
