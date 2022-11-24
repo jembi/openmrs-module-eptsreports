@@ -1,25 +1,25 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Collections;
-import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.reporting.data.converter.CalculationResultConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.SupportGroupsConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
-import org.openmrs.module.reporting.data.person.definition.ConvertedPersonDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PersonIdDataDefinition;
-import org.openmrs.module.reporting.data.person.definition.PreferredNameDataDefinition;
+import org.openmrs.module.reporting.data.person.definition.*;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.Date;
 
 @Component
 public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
@@ -76,52 +76,52 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
     pdd.setParameters(getParameters());
 
-    // 2 - Name - Sheet 1: Column B */
-    //    pdd.addColumn("name", nameDef, "");
-    //
-    //    // 3 - ART Start Date - Sheet 1: Column C */
-    //    pdd.addColumn(
-    //        "inicio_tarv",
-    //        listChildrenOnARTandFormulationsDataset.getArtStartDate(),
-    //        "onOrBefore=${endDate},location=${location}",
-    //        new CalculationResultConverter());
-    //
-    //    // 5 - Age - Sheet 1: Column E */
-    //    pdd.addColumn(
-    //        "age", listChildrenOnARTandFormulationsDataset.getAge(), "endDate=${endDate}", null);
-    //
-    //    // 4 - Sex - Sheet 1: Column D */
-    //    pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
-    //
-    //    // 6 - Pregnancy/Breastfeeding status (Grávida/Lactante) – Sheet 1: Column F */
-    //    pdd.addColumn(
-    //        "pregnant_or_breastfeeding",
-    //        tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
-    //        "location=${location}",
-    //        null);
-    //
-    //    // 7 - Patients active on TB Treatment - Sheet 1: Column G */
-    //    pdd.addColumn(
-    //        "tb_treatment",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getPatientsActiveOnTB(),
-    //        "location=${location}",
-    //        null);
-    //
-    //    // 8 -· Consentimento Informado – Sheet 1: Column H */
-    //    pdd.addColumn(
-    //        "patient_informed_consent",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getPatientsConfidentConcent(
-    //            hivMetadata.getAcceptContactConcept()),
-    //        "location=${location}",
-    //        null);
-    //
-    //    // PRINT ‘N’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS: */
-    //    pdd.addColumn(
-    //        "confidant_informed_consent",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getPatientsConfidentConcent(
-    //            hivMetadata.getConfidentAcceptContact()),
-    //        "location=${location}",
-    //        null);
+    //     2 - Name - Sheet 1: Column B */
+    pdd.addColumn("name", nameDef, "");
+
+    // 3 - ART Start Date - Sheet 1: Column C */
+    pdd.addColumn(
+        "inicio_tarv",
+        listChildrenOnARTandFormulationsDataset.getArtStartDate(),
+        "onOrBefore=${endDate},location=${location}",
+        new CalculationResultConverter());
+
+    // 5 - Age - Sheet 1: Column E */
+    pdd.addColumn(
+        "age", listChildrenOnARTandFormulationsDataset.getAge(), "endDate=${endDate}", null);
+
+    // 4 - Sex - Sheet 1: Column D */
+    pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
+
+    // 6 - Pregnancy/Breastfeeding status (Grávida/Lactante) – Sheet 1: Column F */
+    pdd.addColumn(
+        "pregnant_or_breastfeeding",
+        tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
+        "location=${location}",
+        null);
+
+    // 7 - Patients active on TB Treatment - Sheet 1: Column G */
+    pdd.addColumn(
+        "tb_treatment",
+        listOfPatientsDefaultersOrIITCohortQueries.getPatientsActiveOnTB(),
+        "location=${location}",
+        null);
+
+    // 8 -· Consentimento Informado – Sheet 1: Column H */
+    pdd.addColumn(
+        "patient_informed_consent",
+        listOfPatientsDefaultersOrIITCohortQueries.getPatientsConfidentConcent(
+            hivMetadata.getAcceptContactConcept()),
+        "location=${location}",
+        null);
+
+    // PRINT ‘N’ IF THE PATIENT HAS ONE OF THE FOLLOWING OPTIONS: */
+    pdd.addColumn(
+        "confidant_informed_consent",
+        listOfPatientsDefaultersOrIITCohortQueries.getPatientsConfidentConcent(
+            hivMetadata.getConfidentAcceptContact()),
+        "location=${location}",
+        null);
 
     // 10 -· Tipo de Dispensa – Sheet 1: Column J */
     pdd.addColumn(
@@ -130,43 +130,43 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         null);
 
-    //    // 11 Contacto – Sheet 1: Column K */
-    //    pdd.addColumn("contact", conctactDef, "", null);
+    // 11 Contacto – Sheet 1: Column K */
+    pdd.addColumn("contact", conctactDef, "", null);
+
+    // 12 Address (Localidade) – Sheet 1: Column L */
+    pdd.addColumn(
+        "location",
+        listOfPatientsDefaultersOrIITCohortQueries.getLocation(),
+        "location=${location}",
+        null);
+
+    // 13 Address (Bairro) – Sheet 1: Column M */
+    pdd.addColumn(
+        "neighborhood",
+        listOfPatientsDefaultersOrIITCohortQueries.getNeighborhood(),
+        "location=${location}",
+        null);
+
+    // 14 Address (Ponto de Referencia) – Sheet 1: Column N */
+    pdd.addColumn(
+        "reference_point",
+        listOfPatientsDefaultersOrIITCohortQueries.getReferencePoint(),
+        "location=${location}",
+        null);
+
+    // 15 - Last Follow up Consultation Date - Sheet 1: Column O */
+    pdd.addColumn(
+        "last_consultation_date",
+        listChildrenOnARTandFormulationsDataset.getLastFollowupConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
     //
-    //    // 12 Address (Localidade) – Sheet 1: Column L */
-    //    pdd.addColumn(
-    //        "location",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getLocation(),
-    //        "location=${location}",
-    //        null);
-    //
-    //    // 13 Address (Bairro) – Sheet 1: Column M */
-    //    pdd.addColumn(
-    //        "neighborhood",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getNeighborhood(),
-    //        "location=${location}",
-    //        null);
-    //
-    //    // 14 Address (Ponto de Referencia) – Sheet 1: Column N */
-    //    pdd.addColumn(
-    //        "reference_point",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getReferencePoint(),
-    //        "location=${location}",
-    //        null);
-    //
-    //    // 15 - Last Follow up Consultation Date - Sheet 1: Column O */
-    //    pdd.addColumn(
-    //        "last_consultation_date",
-    //        listChildrenOnARTandFormulationsDataset.getLastFollowupConsultationDate(),
-    //        "endDate=${endDate},location=${location}",
-    //        null);
-    ////
-    //    // 16 - Next Follow up Consultation Date - Sheet 1: Column P */
-    //    pdd.addColumn(
-    //        "next_consultation_date",
-    //        listChildrenOnARTandFormulationsDataset.getNextFollowUpConsultationDate(),
-    //        "endDate=${endDate},location=${location}",
-    //        null);
+    // 16 - Next Follow up Consultation Date - Sheet 1: Column P */
+    pdd.addColumn(
+        "next_consultation_date",
+        listChildrenOnARTandFormulationsDataset.getNextFollowUpConsultationDate(),
+        "endDate=${endDate},location=${location}",
+        null);
 
     // 17 - Mães Mentoras (MM) for Ficha clinica – Sheet 1: Columns Q
     pdd.addColumn(
@@ -250,40 +250,40 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new SupportGroupsConverter());
 
-    //    // 25 - Last Drug Pick-up Date - Sheet 1: Column Y */
-    //    pdd.addColumn(
-    //        "date_of_last_survey_fila",
-    //        listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
-    //        "endDate=${endDate},location=${location}",
-    //        null);
-    //
-    //    // 26 - Last Drug Pick-up Date - Sheet 1: Column Z */
-    //    pdd.addColumn(
-    //        "date_of_last_survey_reception_raised_ARV",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
-    //        "endDate=${endDate},location=${location}",
-    //        null);
-    //
-    //    // 27 - Next Drug pick-up Date - Sheet 1: Column AA */
-    //    pdd.addColumn(
-    //        "next_date_survey_fila",
-    //        listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
-    //        "endDate=${endDate},location=${location}",
-    //        null);
-    //
-    //    // 28 - Next Drug pick-up Date - Sheet 1: Column AB */
-    //    pdd.addColumn(
-    //        "next_date_survey _reception_raised_ARV",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getNextDrugPickUpDateARV(),
-    //        "endDate=${endDate},location=${location}",
-    //        null);
-    //
-    //    // 28 - Days of Delay - Sheet 1: Column AC */
-    //    pdd.addColumn(
-    //        "days_of_absence_to_survey",
-    //        listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
-    //        "endDate=${endDate},location=${location}",
-    //        null);
+    // 25 - Last Drug Pick-up Date - Sheet 1: Column Y */
+    pdd.addColumn(
+        "date_of_last_survey_fila",
+        listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    // 26 - Last Drug Pick-up Date - Sheet 1: Column Z */
+    pdd.addColumn(
+        "date_of_last_survey_reception_raised_ARV",
+        listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    // 27 - Next Drug pick-up Date - Sheet 1: Column AA */
+    pdd.addColumn(
+        "next_date_survey_fila",
+        listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    // 28 - Next Drug pick-up Date - Sheet 1: Column AB */
+    pdd.addColumn(
+        "next_date_survey _reception_raised_ARV",
+        listOfPatientsDefaultersOrIITCohortQueries.getNextDrugPickUpDateARV(),
+        "endDate=${endDate},location=${location}",
+        null);
+
+    // 28 - Days of Delay - Sheet 1: Column AC */
+    pdd.addColumn(
+        "days_of_absence_to_survey",
+        listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
+        "endDate=${endDate},location=${location}",
+        null);
 
     return pdd;
   }

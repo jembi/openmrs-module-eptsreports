@@ -3474,7 +3474,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.mentoringMotherConceptUuid</property>
-		<defaultValue>89c199aa-67b7-417c-a377-410ace312628</defaultValue>
+		<defaultValue>a1d858ea-3a19-41e1-879d-2457440e1d36</defaultValue>
 		<description>
 			UUID for Mentoring Mother Concept
 		</description>
@@ -3482,7 +3482,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.youthAndTeenageMenthorConceptUuid</property>
-		<defaultValue>7f3648d4-6b12-4e5d-80ac-2fe437f9ce30</defaultValue>
+		<defaultValue>4387180e-695f-4c99-8182-33e51907062a</defaultValue>
 		<description>
 			UUID for YOUTH AND TEENAGE MENTHOR Concept
 		</description>
@@ -3490,7 +3490,7 @@
 
 	<globalProperty>
 		<property>@MODULE_ID@.champioManConceptUuid</property>
-		<defaultValue>b1a53471-e087-4000-be68-123c509fb856</defaultValue>
+		<defaultValue>b856b79b-2e8e-4764-ae8b-c8b509cdda76</defaultValue>
 		<description>
 			UUID for CHAMPION MAN Concept
 		</description>
@@ -3500,7 +3500,7 @@
 		<property>@MODULE_ID@.dateOfNextCounselingConceptUuid</property>
 		<defaultValue>4e10a119-c6f0-4ecb-8b3f-72d86ac2d59e</defaultValue>
 		<description>
-			UUID for CHAMPION MAN Concept
+			UUID for DATE OF NEXT COUNSELING Concept
 		</description>
 	</globalProperty>
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
