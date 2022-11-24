@@ -721,6 +721,30 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>incluindo os utentes activos em TARV no fim do mês anterior (Indicador B12 – RF20) ou os
+   *       utentes que iniciaram TARV durante o mês ( Indicador B1 – RF9) ou os utentes transferidos
+   *       de em TARV durante o mês ( Indicador B2 – RF10) ou os utentes que reiniciaram TARV
+   *       durante o mês ( Indicador B3 – RF11)
+   *   <li>filtrando os utentes: inscritos como ‘Transferido para’ (último estado de inscrição) no
+   *       programa SERVIÇO TARV TRATAMENTO durante o mês de reporte com “Data de Transferência” >=
+   *       “Data Início do Relatório” e <= Data Fim do Relatório”; ou
+   *       <p>*
+   *   <li>registados como [“Mudança Estado Permanência TARV” (Coluna 21) = “T” (Transferido Para)
+   *       na Ficha Clínica com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo
+   *       da mudança do estado de permanência TARV) >= “Data Início do Relatório” e <= Data Fim do
+   *       Relatório”; ou
+   *   <li>como “Mudança Estado Permanência TARV” = “Transferido Para” na Ficha Resumo com “Data da
+   *       Transferência” >= “Data Início do Relatório” e <= “Data Fim do Relatório”
+   *   <li>excluindo os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou levantamento
+   *       de ARV (FILA, Ficha Mestre – Recepção/Levantou ARVS) após a “Data de Transferência” (a
+   *       data mais recente entre os critérios acima identificados) e até o fim do mês de reporte
+   *       (“Data Fim do Relatório”)
+   * </ul>
+   */
   public CohortDefinition getPatientsTransferedOutB5() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
