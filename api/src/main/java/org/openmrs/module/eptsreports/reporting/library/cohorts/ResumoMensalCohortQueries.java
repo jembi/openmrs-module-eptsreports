@@ -1000,7 +1000,7 @@ public class ResumoMensalCohortQueries {
    * @param
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoDied(Boolean hasStartDate) {
+  public CohortDefinition getPatientsWhoDiedPartial(Boolean hasStartDate) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
@@ -1130,6 +1130,49 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
+   * <ul>
+   *     <li>
+   *         incluindo os utentes registados activos em TARV no fim do mês anterior (Indicador B12 – RF20) ou os utentes que iniciaram TARV durante o mês ( Indicador B1 – RF9) ou os utentes transferidos de em TARV durante o mês ( Indicador B2 – RF10) ou os utentes que reiniciaram TARV durante o mês ( Indicador B3 – RF11)
+   *     </li>
+   *     <li>
+   *         e filtrando os utentes
+   *     </li>
+   *
+   * </ul>
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoDied(boolean useBothDates) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("B6 - Nº de suspensos TARV durante o mês");
+    cd.addParameter(new Parameter("onOrAfter", "startDate", Date.class));
+    cd.addParameter(new Parameter("onOrBefore", "endDate", Date.class));
+    cd.addParameter(new Parameter("locationList", "location", Location.class));
+
+    String mapping2 = "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},locationList=${locationList}";
+    String mapping = "startDate=${onOrAfter},endDate=${onOrBefore},location=${locationList}";
+
+    if (useBothDates) {
+      cd.addSearch("D", map(getPatientsWhoDiedPartial(true), mapping2));
+    } else {
+      cd.addSearch("D", map(getPatientsWhoDiedPartial(false), "onOrBefore=${onOrAfter-1d},locationList=${locationList}"));
+    }
+    cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
+    cd.addSearch(
+            "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
+    cd.addSearch(
+            "B2",
+            map(
+                    getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
+                    mapping2));
+    cd.addSearch("B3", map(getPatientsRestartedTarvtB3(), mapping));
+
+    cd.setCompositionString("D AND (B12 OR B1 OR B2 OR B3)");
+
+    return cd;
+  }
+
+  /**
    * RF 17 - O sistema irá produzir B.9) Nº de saídas TARV durante o mês, calculado automaticamente
    * através da seguinte fórmula: (B.9 = B.5 + B.6 + B.7 + B.8 )
    */
@@ -1160,7 +1203,7 @@ public class ResumoMensalCohortQueries {
         "B8",
         map(
             getPatientsWhoDied(true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("B5 OR B6 OR B7 OR B8");
 
@@ -1349,7 +1392,7 @@ public class ResumoMensalCohortQueries {
             "location=${location},date=${startDate-1d}"));
     cd.addSearch(
         "B8A",
-        map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
+        map(getPatientsWhoDied(false), "onOrAfter=${startDate}onOrBefore=${onOrBefore},locationList=${location}"));
 
     cd.addSearch(
         "drugPick",
@@ -2828,7 +2871,7 @@ public class ResumoMensalCohortQueries {
         "B8",
         map(
             getPatientsWhoDied(true),
-            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},locationList=${location}"));
 
     ccd.addSearch(
         "B5",
@@ -3042,7 +3085,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch("B5E", map(B5E, mappingsOnDate));
     cd.addSearch("B6E", map(B6E, mappingsOnDate));
     cd.addSearch("B7E", map(B7E, "date=${endDate},location=${location}"));
-    cd.addSearch("B8E", map(B8E, mappingsOnOrBeforeLocationList));
+    cd.addSearch("B8E", map(B8E, "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
 
     cd.setCompositionString(
         "startedArt AND (fila OR masterCardPickup) AND NOT (B5E OR B6E  OR B7E OR B8E )");
