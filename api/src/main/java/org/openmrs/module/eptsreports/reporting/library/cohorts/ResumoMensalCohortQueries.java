@@ -773,6 +773,56 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
+   *
+   *
+   * <ul>
+   *   <li>incluindo os utentes activos em TARV no fim do mês anterior (Indicador B12 – RF20) ou os
+   *       utentes que iniciaram TARV durante o mês ( Indicador B1 – RF9) ou os utentes transferidos
+   *       de em TARV durante o mês ( Indicador B2 – RF10) ou os utentes que reiniciaram TARV
+   *       durante o mês ( Indicador B3 – RF11)
+   *   <li>filtrando os utentes registados: como ‘Suspensos’ no programa SERVIÇO TARV TRATAMENTO
+   *       durante o mês de reporte com “Data de Suspensão” >= “Data Início do Relatório” e <= Data
+   *       Fim do Relatório”; ou
+   *   <li>como [“Mudança Estado Permanência TARV” (Coluna 21) = “S” (Suspenso) na Ficha Clínica com
+   *       “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo da mudança do estado
+   *       de permanência TARV) >= “Data Início do Relatório” e <= “Data Fim do Relatório” ou
+   *   <li>como “Mudança Estado Permanência TARV” = “Suspensão” na Ficha Resumo com “Data da
+   *       Suspensão” >= “Data Início do Relatório” e <= “Data Fim do Relatório”;
+   *   <li>excluindo os utentes que tenham tido um levantamento de ARV (FILA, Ficha Mestre –
+   *       Recepção/Levantou ARVS) após a “Data de Suspensão” (a data mais recente entre os
+   *       critérios acima identificados) e até o fim do mês de reporte (“Data Fim do Relatório”)
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoSuspendedTreatmentB6() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("B6 - Nº de suspensos TARV durante o mês");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+
+    cd.addSearch("S", map(getPatientsWhoSuspendedTreatmentB6(true), mapping2));
+
+    cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
+    cd.addSearch(
+        "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
+    cd.addSearch(
+        "B2",
+        map(
+            getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
+            mapping2));
+    cd.addSearch("B3", map(getPatientsRestartedTarvtB3(), mapping));
+
+    cd.setCompositionString("S AND (B12 OR B1 OR B2 OR B3)");
+
+    return cd;
+  }
+
+  /**
    * <b>Name: B6: Number of patientes with ART suspension during the current month. (PT: Nº de
    * suspensos TARV durante o mês)</b>
    *
