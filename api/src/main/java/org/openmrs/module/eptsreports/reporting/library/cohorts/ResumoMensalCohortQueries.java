@@ -1130,15 +1130,16 @@ public class ResumoMensalCohortQueries {
   }
 
   /**
-   * <ul>
-   *     <li>
-   *         incluindo os utentes registados activos em TARV no fim do mês anterior (Indicador B12 – RF20) ou os utentes que iniciaram TARV durante o mês ( Indicador B1 – RF9) ou os utentes transferidos de em TARV durante o mês ( Indicador B2 – RF10) ou os utentes que reiniciaram TARV durante o mês ( Indicador B3 – RF11)
-   *     </li>
-   *     <li>
-   *         e filtrando os utentes
-   *     </li>
    *
+   *
+   * <ul>
+   *   <li>incluindo os utentes registados activos em TARV no fim do mês anterior (Indicador B12 –
+   *       RF20) ou os utentes que iniciaram TARV durante o mês ( Indicador B1 – RF9) ou os utentes
+   *       transferidos de em TARV durante o mês ( Indicador B2 – RF10) ou os utentes que
+   *       reiniciaram TARV durante o mês ( Indicador B3 – RF11)
+   *   <li>e filtrando os utentes
    * </ul>
+   *
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsWhoDiedB8(boolean useBothDates) {
@@ -1149,22 +1150,27 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("onOrBefore", "endDate", Date.class));
     cd.addParameter(new Parameter("locationList", "location", Location.class));
 
-    String mapping2 = "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},locationList=${locationList}";
+    String mapping2 =
+        "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},locationList=${locationList}";
     String mapping = "startDate=${onOrAfter},endDate=${onOrBefore},location=${locationList}";
 
     if (useBothDates) {
       cd.addSearch("D", map(getPatientsWhoDied(true), mapping2));
     } else {
-      cd.addSearch("D", map(getPatientsWhoDied(false), "onOrBefore=${onOrAfter-1d},locationList=${locationList}"));
+      cd.addSearch(
+          "D",
+          map(
+              getPatientsWhoDied(false),
+              "onOrBefore=${onOrAfter-1d},locationList=${locationList}"));
     }
     cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
     cd.addSearch(
-            "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
+        "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
     cd.addSearch(
-            "B2",
-            map(
-                    getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
-                    mapping2));
+        "B2",
+        map(
+            getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
+            mapping2));
     cd.addSearch("B3", map(getPatientsRestartedTarvtB3(), mapping));
 
     cd.setCompositionString("D AND (B12 OR B1 OR B2 OR B3)");
@@ -1392,7 +1398,9 @@ public class ResumoMensalCohortQueries {
             "location=${location},date=${startDate-1d}"));
     cd.addSearch(
         "B8A",
-        map(getPatientsWhoDiedB8(false), "onOrAfter=${startDate}onOrBefore=${onOrBefore},locationList=${location}"));
+        map(
+            getPatientsWhoDiedB8(false),
+            "onOrAfter=${startDate}onOrBefore=${onOrBefore},locationList=${location}"));
 
     cd.addSearch(
         "drugPick",
@@ -3085,7 +3093,8 @@ public class ResumoMensalCohortQueries {
     cd.addSearch("B5E", map(B5E, mappingsOnDate));
     cd.addSearch("B6E", map(B6E, mappingsOnDate));
     cd.addSearch("B7E", map(B7E, "date=${endDate},location=${location}"));
-    cd.addSearch("B8E", map(B8E, "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
+    cd.addSearch(
+        "B8E", map(B8E, "onOrAfter=${startDate},onOrBefore=${endDate},locationList=${location}"));
 
     cd.setCompositionString(
         "startedArt AND (fila OR masterCardPickup) AND NOT (B5E OR B6E  OR B7E OR B8E )");
