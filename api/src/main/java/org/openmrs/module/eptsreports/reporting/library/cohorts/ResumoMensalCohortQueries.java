@@ -721,6 +721,33 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsTransferedOutB5() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("B5 - Nº de transferidos para outras US em TARV durante o mês");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping2 = "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}";
+
+    cd.addSearch("T", map(getPatientsTransferredOutB5(true), mapping2));
+
+    cd.addSearch("B12", map(getPatientsWhoWereActiveByEndOfPreviousMonthB12(), mapping));
+    cd.addSearch(
+        "B1", map(getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mapping));
+    cd.addSearch(
+        "B2",
+        map(
+            getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthB2(),
+            mapping2));
+    cd.addSearch("B3", map(getPatientsRestartedTarvtB3(), mapping));
+
+    cd.setCompositionString("T AND (B12 OR B1 OR B2 OR B3)");
+
+    return cd;
+  }
+
   /**
    * <b>Name: B6: Number of patientes with ART suspension during the current month. (PT: Nº de
    * suspensos TARV durante o mês)</b>
