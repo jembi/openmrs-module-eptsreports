@@ -408,8 +408,8 @@ public class ResumoMensalCohortQueries {
   public CohortDefinition getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -434,7 +434,6 @@ public class ResumoMensalCohortQueries {
   public CohortDefinition getPatientsStartedArtOnFilaOrArvPickupBeforeDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patientes who initiated TARV Before a date - Fila and ARV Pickup");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -493,7 +492,6 @@ public class ResumoMensalCohortQueries {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
