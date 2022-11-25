@@ -203,7 +203,8 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
   @Test
   public void getPatientsStartedArtOnFilaOrArvPickupShouldPass() throws EvaluationException {
-    CohortDefinition cd = resumoMensalCohortQueries.getPatientsStartedArtOnFilaOrArvPickup();
+    CohortDefinition cd =
+        resumoMensalCohortQueries.getPatientsStartedArtOnFilaOrArvPickupDuringThePeriod();
 
     HashMap<Parameter, Object> parameters = new HashMap<>();
     parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
