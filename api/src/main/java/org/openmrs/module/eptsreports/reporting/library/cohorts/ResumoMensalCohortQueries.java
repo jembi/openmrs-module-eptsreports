@@ -2625,17 +2625,7 @@ public class ResumoMensalCohortQueries {
             gePatientsWithvViralLoadQuantitative(hivMetadata.getHivViralLoadQualitative()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "QTR",
-        map(
-            getViralLoadSuppressionOnFichaResumo(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.addSearch(
-        "QLR",
-        map(
-            getPatientsWithQualitativeVLOnFichaResumo(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "Ex3",
@@ -2655,7 +2645,7 @@ public class ResumoMensalCohortQueries {
                 "ExR", getPatientsWithVLSuppression21DecemberOnFichaResumo()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(C AND (SUPP OR QUAL OR QTR OR QLR)) AND NOT (Ex3 OR ExR)");
+    cd.setCompositionString("(C AND (SUPP OR QUAL)) AND NOT (Ex3 OR ExR)");
     return cd;
   }
 
