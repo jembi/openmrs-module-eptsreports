@@ -377,9 +377,13 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(5, evaluatedCohort.getMemberIds().size());
-    assertTrue(evaluatedCohort.getMemberIds().contains(1022));
-    assertTrue(evaluatedCohort.getMemberIds().contains(1023));
+    assertEquals(1, evaluatedCohort.getMemberships().size());
+    List<Integer> members =
+        evaluatedCohort.getMemberships().stream()
+            .map(member -> member.getPatientId())
+            .collect(Collectors.toList());
+    assertFalse(members.contains(1021));
+    assertTrue(members.contains(5642));
   }
 
   @Ignore("Query using DATE_ADD not available in H2")

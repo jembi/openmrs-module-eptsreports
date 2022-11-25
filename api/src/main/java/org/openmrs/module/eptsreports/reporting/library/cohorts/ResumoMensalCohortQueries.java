@@ -2554,7 +2554,6 @@ public class ResumoMensalCohortQueries {
             getViralLoadOrQualitative(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-
     cd.addSearch(
         "Ex2",
         map(
