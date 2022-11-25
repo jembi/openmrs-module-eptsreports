@@ -1472,6 +1472,40 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsWhoWereActiveByEndOfMonthB13() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of active patients in ART by end of month");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "RF33",
+        map(
+            getPatientsWhoStartedArtOnAnyHeathFacilityRf33(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B5A",
+        map(getPatientsTransferredOutB5(true), "onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B6A",
+        map(
+            getPatientsWhoSuspendedTreatmentB6(false),
+            "onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "B7A",
+        map(
+            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
+            "location=${location},date=${endDate}"));
+    cd.addSearch(
+        "B8A", map(getPatientsWhoDied(false), "onOrBefore=${endDate},locationList=${location}"));
+
+    cd.setCompositionString("(RF33 AND NOT (B5A OR B6A OR B7A OR B8A)");
+
+    return cd;
+  }
+
   /**
    * <b>Description:</b> Patients who had a drug pick up as Levantamento de ARV Master Card and FILA
    *
@@ -2245,9 +2279,7 @@ public class ResumoMensalCohortQueries {
 
     cd.addSearch(
         "common",
-        map(
-            getActivePatientsInARTByEndOfCurrentMonth(isMOH),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        map(getPatientsWhoWereActiveByEndOfMonthB13(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "F",
@@ -2288,9 +2320,7 @@ public class ResumoMensalCohortQueries {
 
     cd.addSearch(
         "B13",
-        map(
-            getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        map(getPatientsWhoWereActiveByEndOfMonthB13(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "B1",
         map(
@@ -2519,9 +2549,7 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
         "C",
-        map(
-            getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        map(getPatientsWhoWereActiveByEndOfMonthB13(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "VL",
         map(
@@ -2566,8 +2594,7 @@ public class ResumoMensalCohortQueries {
    * anual!) B13=B12+B4-B9)
    *
    * <ul>
-   *   <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}
-   *       <b>AND</b>
+   *   <li>B13: <b>AND</b>
    *   <li>Filter all patients registered in encounter “S.TARV – Adulto Seguimento” (encounter id 6)
    *       with the following information:
    *       <ul>
@@ -2599,9 +2626,7 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
         "C",
-        map(
-            getActivePatientsInARTByEndOfCurrentMonth(false),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        map(getPatientsWhoWereActiveByEndOfMonthB13(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "SUPP",
         map(

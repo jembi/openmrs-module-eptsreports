@@ -269,6 +269,54 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
+  public void getPatientsStartedArtOnAnyFacilityBeforeTheEndOfMonth() throws EvaluationException {
+    CohortDefinition cd =
+        resumoMensalCohortQueries.getPatientsWhoStartedArtOnAnyHeathFacilityRf33();
+
+    HashMap<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+    assertEquals(5, evaluatedCohort.getMemberships().size());
+
+    List<Integer> members =
+        evaluatedCohort.getMemberships().stream()
+            .map(member -> member.getPatientId())
+            .collect(Collectors.toList());
+
+    assertTrue(members.contains(1021));
+    assertTrue(members.contains(12475));
+    assertTrue(members.contains(1009));
+    assertTrue(members.contains(1001));
+  }
+
+  @Test
+  public void getPatientsStartedArtOnAnyFacilityBeforeStartDateOnSpecifiedFacility()
+      throws EvaluationException {
+    CohortDefinition cd =
+        resumoMensalCohortQueries.getPatientsStartedArtOnFilaOrArvPickupBeforeDate();
+
+    HashMap<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+    assertEquals(3, evaluatedCohort.getMemberships().size());
+
+    List<Integer> members =
+        evaluatedCohort.getMemberships().stream()
+            .map(member -> member.getPatientId())
+            .collect(Collectors.toList());
+
+    System.out.println(members);
+    assertTrue(members.contains(5642));
+    assertTrue(members.contains(1021));
+    assertTrue(members.contains(12475));
+  }
+
+  @Test
   public void getPatientsTransferredOutB5ShouldReturnPatientsTransferredOut()
       throws EvaluationException {
     CohortDefinition cd = resumoMensalCohortQueries.getPatientsTransferredOutB5(true);

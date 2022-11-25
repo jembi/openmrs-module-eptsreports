@@ -700,11 +700,10 @@ public class ResumoMensalDataSetDefinition extends BaseDataSet {
   }
 
   private Mapped<CohortIndicator> getActivePatientsInARTByEndOfCurrentMonth() {
-    String name = "";
+    String name = "B13 - Activos em TARV no Fim do Mês";
 
     Mapped<CohortDefinition> cohort =
-        mapStraightThrough(
-            resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false));
+        mapStraightThrough(resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13());
 
     return mapStraightThrough(eptsGeneralIndicator.getIndicator(name, cohort));
   }
