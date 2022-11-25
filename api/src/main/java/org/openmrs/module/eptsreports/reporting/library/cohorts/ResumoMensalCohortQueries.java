@@ -1448,8 +1448,6 @@ public class ResumoMensalCohortQueries {
         map(
             getPatientsWhoStartedArtOnAnyHeathFacilityRf33(),
             "endDate=${startDate-1d},location=${location}"));
-    cd.addSearch(
-        "B2A", map(getTransferredInForB10(), "onOrAfter=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "B5A",
@@ -1469,12 +1467,7 @@ public class ResumoMensalCohortQueries {
         "B8A",
         map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
 
-    cd.addSearch(
-        "drugPick",
-        map(
-            getPatientsWhoHadAtLeastDrugPickUp(),
-            "startDate=${startDate-1d},location=${location}"));
-    cd.setCompositionString("((RF33 OR B2A) AND drugPick) AND NOT (B5A OR B6A OR B7A OR B8A)");
+    cd.setCompositionString("(RF33 AND NOT (B5A OR B6A OR B7A OR B8A)");
 
     return cd;
   }
