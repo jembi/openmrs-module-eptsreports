@@ -34,6 +34,7 @@ import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferre
 import org.openmrs.module.eptsreports.reporting.cohort.definition.ResumoMensalTransferredOutCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.evaluator.ResumoMensalTransferredOutCohortDefinitionEvaluator;
 import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.reporting.cohort.definition.*;
 import org.openmrs.module.reporting.common.RangeComparator;
 import org.openmrs.module.reporting.common.SetComparator;
@@ -421,8 +422,7 @@ public class ResumoMensalCohortQueries {
     String query =
         "       SELECT patient_id "
             + " FROM ( "
-            + "       "
-            + getPatientStartedTarvBeforeQuery()
+            + getPatientStartedTarvBeforeQuery(true)
             + "       ) start "
             + "WHERE start.first_pickup BETWEEN :startDate AND :endDate ";
 
@@ -431,7 +431,32 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
-  private String getPatientStartedTarvBeforeQuery() {
+  public CohortDefinition getPatientsStartedArtOnFilaOrArvPickupBeforeDate() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of patientes who initiated TARV Before a date - Fila and ARV Pickup");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        new EptsQueriesUtil()
+            .patientIdQueryBuilder(getPatientStartedTarvBeforeQuery(true))
+            .getQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  private String getPatientStartedTarvBeforeQuery(boolean specificLocation) {
+
     return "       SELECT first.patient_id, MIN(first.pickup_date) first_pickup "
         + "       FROM ( "
         + "             SELECT p.patient_id, MIN(e.encounter_datetime) AS pickup_date "
@@ -441,7 +466,7 @@ public class ResumoMensalCohortQueries {
         + "                 AND e.encounter_datetime <= :endDate "
         + "                 AND e.voided = 0 "
         + "                 AND p.voided = 0 "
-        + "                 AND e.location_id = :location "
+            .concat(specificLocation ? " AND e.location_id = :location " : " ")
         + "       GROUP BY p.patient_id "
         + "       UNION "
         + "       SELECT p.patient_id, MIN(o2.value_datetime) AS pickup_date "
@@ -456,12 +481,37 @@ public class ResumoMensalCohortQueries {
         + "           AND o2.value_datetime <= :endDate "
         + "           AND o.voided = 0 "
         + "           AND o2.voided = 0 "
-        + "           AND e.location_id = :location "
+            .concat(specificLocation ? " AND e.location_id = :location " : " ")
         + "           AND e.voided = 0 "
         + "           AND p.voided = 0 "
         + "       GROUP BY p.patient_id "
         + "        ) first "
         + "     GROUP BY first.patient_id ";
+  }
+
+  public CohortDefinition getPatientsWhoStartedArtOnAnyHeathFacilityRf33() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of patientes who initiated TARV - Fila and ARV Pickup");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+    String query =
+        new EptsQueriesUtil()
+            .patientIdQueryBuilder(getPatientStartedTarvBeforeQuery(false))
+            .getQuery();
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(query));
+    return cd;
   }
 
   /**
@@ -1296,8 +1346,8 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "artStartDate",
         map(
-            genericCohortQueries.getStartedArtBeforeDate(false),
-            "onOrBefore=${startDate-1d},location=${location}"));
+            getPatientsStartedArtOnFilaOrArvPickupBeforeDate(),
+            "endDate=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "transferredIn",
@@ -1394,10 +1444,10 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "B10",
+        "RF33",
         map(
-            getPatientsWhoStartedArtByEndOfPreviousMonthB10(),
-            "startDate=${startDate},location=${location}"));
+            getPatientsWhoStartedArtOnAnyHeathFacilityRf33(),
+            "endDate=${startDate-1d},location=${location}"));
     cd.addSearch(
         "B2A", map(getTransferredInForB10(), "onOrAfter=${startDate-1d},location=${location}"));
 
@@ -1424,7 +1474,7 @@ public class ResumoMensalCohortQueries {
         map(
             getPatientsWhoHadAtLeastDrugPickUp(),
             "startDate=${startDate-1d},location=${location}"));
-    cd.setCompositionString("((B10 OR B2A) AND drugPick) AND NOT (B5A OR B6A OR B7A OR B8A)");
+    cd.setCompositionString("((RF33 OR B2A) AND drugPick) AND NOT (B5A OR B6A OR B7A OR B8A)");
 
     return cd;
   }
