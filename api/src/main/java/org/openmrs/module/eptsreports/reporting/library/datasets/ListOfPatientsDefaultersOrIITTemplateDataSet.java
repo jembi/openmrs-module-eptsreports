@@ -250,40 +250,40 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new SupportGroupsConverter());
 
-    // 25 - Last Drug Pick-up Date - Sheet 1: Column Y */
-    pdd.addColumn(
-        "date_of_last_survey_fila",
-        listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
-        "endDate=${endDate},location=${location}",
-        null);
-
-    // 26 - Last Drug Pick-up Date - Sheet 1: Column Z */
-    pdd.addColumn(
-        "date_of_last_survey_reception_raised_ARV",
-        listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
-        "endDate=${endDate},location=${location}",
-        null);
-
-    // 27 - Next Drug pick-up Date - Sheet 1: Column AA */
-    pdd.addColumn(
-        "next_date_survey_fila",
-        listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
-        "endDate=${endDate},location=${location}",
-        null);
-
-    // 28 - Next Drug pick-up Date - Sheet 1: Column AB */
-    pdd.addColumn(
-        "next_date_survey _reception_raised_ARV",
-        listOfPatientsDefaultersOrIITCohortQueries.getNextDrugPickUpDateARV(),
-        "endDate=${endDate},location=${location}",
-        null);
-
-    // 28 - Days of Delay - Sheet 1: Column AC */
-    pdd.addColumn(
-        "days_of_absence_to_survey",
-        listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
-        "endDate=${endDate},location=${location}",
-        null);
+    //    // 25 - Last Drug Pick-up Date - Sheet 1: Column Y */
+    //    pdd.addColumn(
+    //        "date_of_last_survey_fila",
+    //        listChildrenOnARTandFormulationsDataset.getLastDrugPickupDate(),
+    //        "endDate=${endDate},location=${location}",
+    //        null);
+    //
+    //    // 26 - Last Drug Pick-up Date - Sheet 1: Column Z */
+    //    pdd.addColumn(
+    //        "date_of_last_survey_reception_raised_ARV",
+    //        listOfPatientsDefaultersOrIITCohortQueries.getLastDrugPickUpDate(),
+    //        "endDate=${endDate},location=${location}",
+    //        null);
+    //
+    //    // 27 - Next Drug pick-up Date - Sheet 1: Column AA */
+    //    pdd.addColumn(
+    //        "next_date_survey_fila",
+    //        listChildrenOnARTandFormulationsDataset.getNextDrugPickupDate(),
+    //        "endDate=${endDate},location=${location}",
+    //        null);
+    //
+    //    // 28 - Next Drug pick-up Date - Sheet 1: Column AB */
+    //    pdd.addColumn(
+    //        "next_date_survey _reception_raised_ARV",
+    //        listOfPatientsDefaultersOrIITCohortQueries.getNextDrugPickUpDateARV(),
+    //        "endDate=${endDate},location=${location}",
+    //        null);
+    //
+    //    // 28 - Days of Delay - Sheet 1: Column AC */
+    //    pdd.addColumn(
+    //        "days_of_absence_to_survey",
+    //        listOfPatientsDefaultersOrIITCohortQueries.getNumberOfDaysOfDelay(),
+    //        "endDate=${endDate},location=${location}",
+    //        null);
 
     return pdd;
   }
