@@ -1650,7 +1650,7 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "RF33",
+        "RF34",
         map(
             getPatientsWhoStartedArtOnAnyHeathFacilityRf33(),
             "endDate=${endDate},location=${location}"));
@@ -1672,7 +1672,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "B8A", map(getPatientsWhoDied(false), "onOrBefore=${endDate},locationList=${location}"));
 
-    cd.setCompositionString("(RF33 AND NOT (B5A OR B6A OR B7A OR B8A)");
+    cd.setCompositionString("(RF34 AND NOT (B5A OR B6A OR B7A OR B8A)");
 
     return cd;
   }
