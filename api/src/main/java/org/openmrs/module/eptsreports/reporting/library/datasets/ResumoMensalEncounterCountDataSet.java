@@ -30,7 +30,7 @@ public class ResumoMensalEncounterCountDataSet extends BaseDataSet {
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
     sidsd.addColumn(
         "F1",
-        "Count Of Clinical Visits",
+        "Count of Clinical Visits",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Count Clinical Visits",
@@ -39,7 +39,7 @@ public class ResumoMensalEncounterCountDataSet extends BaseDataSet {
 
     sidsd.addColumn(
         "F2",
-        "Encounters With TB Screenings",
+        "Count of Encounters With TB Screenings",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
                 "Count Of Encounters With TB Screenings",

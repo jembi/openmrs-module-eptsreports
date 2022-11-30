@@ -552,7 +552,6 @@ public class ResumoMensalDataSetDefinition extends BaseDataSet {
             mappings),
         resumoMensalAandBdisaggregations.disAggForE());
 
-
     // F3
     dsd.addColumn(
         "F3",
