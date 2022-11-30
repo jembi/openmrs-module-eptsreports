@@ -37,6 +37,15 @@ public class ResumoMensalEncounterCountDataSet extends BaseDataSet {
                 resumoMensalCohortQueries.getNumberOfVisitsDuringTheReportingMonthF1()),
             mappings));
 
+    sidsd.addColumn(
+        "F2",
+        "Encounters With TB Screenings",
+        EptsReportUtils.map(
+            eptsGeneralIndicator.getIndicator(
+                "Count Of Encounters With TB Screenings",
+                resumoMensalCohortQueries.getNumberOfEncountersWithTbScreeningsDuringTheReportingMonthF2() ),
+            mappings));
+
     return sidsd;
   }
 }

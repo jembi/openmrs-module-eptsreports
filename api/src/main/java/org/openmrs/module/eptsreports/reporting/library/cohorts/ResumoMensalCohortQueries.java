@@ -2882,6 +2882,23 @@ public class ResumoMensalCohortQueries {
     return cd;
   }
 
+  /**
+   * F.2 - Dos utentes que vieram à consulta durante o mês, subgrupo que foi rastreado para TB:
+   *
+   * <ul>
+   *   <li>Incluindo todas as consultas clínicas registadas os na “Ficha Clínica” com “Data de
+   *       Consulta” (Coluna 1) >= “Data de Início de Relatório” e <= “Data Fim de Relatório” e com
+   *       “Tuberculose – Tem Sintomas?” (Coluna 9) - = “S” ou “N” e com “Tratamento de TB – I-C-F”
+   *       (Coluna 10) sem informação (para não contar os utentes que estão em Tratamento de TB e
+   *       podem ter sintomas)
+   *   <li>Nota: este indicador F2 refere-se ao número de rastreios de TB efectuados durante o mês,
+   *       ou seja, por exemplo, caso um utente tenha tido duas consultas clínicas durante o mês com
+   *       rastreio para TB em ambas as consultas, serão consideradas as duas consultas e os dois
+   *       rastreios correspondentes neste indicador
+   * </ul>
+   *
+   * @return SqlEncounterQuery
+   */
   public SqlEncounterQuery getNumberOfVisitsDuringTheReportingMonthF1() {
     SqlEncounterQuery sqlEncounterQuery = new SqlEncounterQuery();
     sqlEncounterQuery.setName("F1: Number clinical appointment during the reporting month");
@@ -2901,6 +2918,54 @@ public class ResumoMensalCohortQueries {
             + "AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "AND e.voided = 0 "
             + "AND p.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlEncounterQuery.setQuery(sb.replace(query));
+    return sqlEncounterQuery;
+  }
+
+  public SqlEncounterQuery getNumberOfEncountersWithTbScreeningsDuringTheReportingMonthF2() {
+    SqlEncounterQuery sqlEncounterQuery = new SqlEncounterQuery();
+    sqlEncounterQuery.setName("F1: Number clinical appointment during the reporting month");
+    sqlEncounterQuery.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlEncounterQuery.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlEncounterQuery.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23758", tbMetadata.getHasTbSymptomsConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("1268", tbMetadata.getTBTreatmentPlanConcept().getConceptId());
+
+    String query =
+        "SELECT e.encounter_id "
+            + "FROM   encounter e "
+            + "       INNER JOIN patient p "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "       AND o.concept_id = ${23758} "
+            + "       AND o.value_coded IN ( ${1066}, ${1065} ) "
+            + "       AND e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND NOT EXISTS(SELECT en.encounter_id "
+            + "                      FROM   encounter en "
+            + "                             INNER JOIN obs o2 "
+            + "                                     ON o2.encounter_id = en.encounter_id "
+            + "                      WHERE  en.encounter_type = ${6} "
+            + "                             AND en.location_id = :location "
+            + "                             AND en.encounter_datetime = e.encounter_datetime "
+            + "                             AND en.patient_id = p.patient_id "
+            + "                             AND o2.concept_id = ${1268} "
+            + "                             AND o2.value_coded IS NOT NULL "
+            + "                             AND en.voided = 0 "
+            + "                             AND o2.voided = 0)";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 

@@ -77,7 +77,7 @@ public class SetupResumoMensalReport extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(resumoMensalDataSetDefinition.getParameters());
-      rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
+    rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition(
         "R", mapStraightThrough(resumoMensalDataSetDefinition.constructResumoMensalDataset()));
     rd.addDataSetDefinition(
