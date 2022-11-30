@@ -4,7 +4,7 @@ import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCoho
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.dataset.definition.SimpleIndicatorDataSetDefinition;
-import org.openmrs.report.DataSetDefinition;
+import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
