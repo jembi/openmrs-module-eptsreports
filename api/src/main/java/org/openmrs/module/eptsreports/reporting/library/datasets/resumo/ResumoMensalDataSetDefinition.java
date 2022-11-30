@@ -552,32 +552,7 @@ public class ResumoMensalDataSetDefinition extends BaseDataSet {
             mappings),
         resumoMensalAandBdisaggregations.disAggForE());
 
-    // F1
-    dsd.addColumn(
-        "F1",
-        "Number of patients who had clinical appointment during the reporting month",
-        map(
-            eptsGeneralIndicator.getIndicator(
-                "F1",
-                map(
-                    resumoMensalCohortQueries
-                        .getNumberOfPatientsWhoHadClinicalAppointmentDuringTheReportingMonthF1(),
-                    mappings)),
-            mappings),
-        "");
-    // F2
-    dsd.addColumn(
-        "F2",
-        "Number of patients who had clinical appointment during the reporting month and were screened for TB",
-        map(
-            eptsGeneralIndicator.getIndicator(
-                "F2",
-                map(
-                    resumoMensalCohortQueries
-                        .getNumberOfPatientsWhoHadClinicalAppointmentDuringTheReportingMonthAndScreenedForTbF2(),
-                    mappings)),
-            mappings),
-        "");
+
     // F3
     dsd.addColumn(
         "F3",
