@@ -40,6 +40,7 @@ import org.openmrs.module.reporting.common.RangeComparator;
 import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.openmrs.module.reporting.query.encounter.definition.SqlEncounterQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -2879,6 +2880,32 @@ public class ResumoMensalCohortQueries {
         getPatientsWithGivenEncounterType(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId()));
     return cd;
+  }
+
+  public SqlEncounterQuery getNumberOfVisitsDuringTheReportingMonthF1() {
+    SqlEncounterQuery sqlEncounterQuery = new SqlEncounterQuery();
+    sqlEncounterQuery.setName("F1: Number clinical appointment during the reporting month");
+    sqlEncounterQuery.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sqlEncounterQuery.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlEncounterQuery.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT e.encounter_id "
+            + "FROM encounter e "
+            + "INNER JOIN patient p ON p.patient_id = e.patient_id "
+            + "WHERE e.encounter_type = ${6} "
+            + "AND e.location_id = :location "
+            + "AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "AND e.voided = 0 "
+            + "AND p.voided = 0 ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+
+    sqlEncounterQuery.setQuery(sb.replace(query));
+    return sqlEncounterQuery;
   }
 
   /**
