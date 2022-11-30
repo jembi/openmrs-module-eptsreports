@@ -361,9 +361,9 @@ public class ResumoMensalCohortQueries {
             + "                          AND o2.voided = 0 "
             + "                          AND e.encounter_type = ${6} "
             + "                          AND e.encounter_datetime < DATE_SUB(:endDate, INTERVAL 1 MONTH) "
-            + "                          AND ( ( o1.concept_id = ${23985} AND o1.value_coded = ${656} ) "
-            + "                                AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} ) "
-            + "                                 OR ( o1.concept_id = ${23985} AND o1.value_coded = ${23954} ) AND ( o2.concept_id = ${165308}  AND o2.value_coded = ${1256} ) )"
+            + "                          AND ( (( o1.concept_id = ${23985} AND o1.value_coded = ${656} )  AND ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} )) "
+            + "                                 OR ( ( o1.concept_id = ${23985} AND o1.value_coded = ${23954} ) AND ( o2.concept_id = ${165308}  AND o2.value_coded = ${1256} ))"
+            + "                              )"
             + " ) tpt "
             + "         ON tpt.patient_id = res.patient_id "
             + " WHERE  res.enrollment_date BETWEEN :startDate AND :endDate AND tpt.tpt_date >= res.enrollment_date"
@@ -392,6 +392,7 @@ public class ResumoMensalCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
 
     String query =
         "SELECT res.patient_id "
@@ -438,7 +439,7 @@ public class ResumoMensalCohortQueries {
             + "                          AND o.voided = 0 "
             + "                          AND e.encounter_type = ${6} "
             + "                          AND e.encounter_datetime < DATE_SUB(:endDate, INTERVAL 1 MONTH) "
-            + "                          AND o.concept_id = ${23761} AND o.value_coded = ${1065}  "
+            + "                          AND o.concept_id = ${23761} AND o.value_coded IN (${1065}, ${1066})  "
             + "       ) tb ON tb.patient_id = res.patient_id "
             + " WHERE  res.enrollment_date BETWEEN :startDate AND :endDate AND tb.tb_date >= res.enrollment_date"
             + " GROUP BY res.patient_id ";
