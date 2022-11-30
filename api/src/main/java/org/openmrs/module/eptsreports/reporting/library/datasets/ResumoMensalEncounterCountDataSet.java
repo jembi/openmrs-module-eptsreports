@@ -3,8 +3,8 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
-import org.openmrs.module.reporting.dataset.definition.SimpleIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
+import org.openmrs.module.reporting.dataset.definition.SimpleIndicatorDataSetDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,8 +16,11 @@ public class ResumoMensalEncounterCountDataSet extends BaseDataSet {
   private EptsGeneralIndicator eptsGeneralIndicator;
 
   @Autowired
-  public ResumoMensalEncounterCountDataSet(ResumoMensalCohortQueries resumoMensalCohortQueries) {
+  public ResumoMensalEncounterCountDataSet(
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      EptsGeneralIndicator eptsGeneralIndicator) {
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.eptsGeneralIndicator = eptsGeneralIndicator;
   }
 
   public DataSetDefinition constructEncounterCountDataset() {

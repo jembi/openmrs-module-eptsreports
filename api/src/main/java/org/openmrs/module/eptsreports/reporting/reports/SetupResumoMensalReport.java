@@ -42,8 +42,9 @@ public class SetupResumoMensalReport extends EptsDataExportManager {
 
   @Autowired
   public SetupResumoMensalReport(
-          ResumoMensalDataSetDefinition resumoMensalDataSetDefinition,
-          GenericCohortQueries genericCohortQueries, ResumoMensalEncounterCountDataSet resumoMensalEncounterCountDataSet) {
+      ResumoMensalDataSetDefinition resumoMensalDataSetDefinition,
+      GenericCohortQueries genericCohortQueries,
+      ResumoMensalEncounterCountDataSet resumoMensalEncounterCountDataSet) {
     this.resumoMensalDataSetDefinition = resumoMensalDataSetDefinition;
     this.genericCohortQueries = genericCohortQueries;
     this.resumoMensalEncounterCountDataSet = resumoMensalEncounterCountDataSet;
@@ -76,11 +77,12 @@ public class SetupResumoMensalReport extends EptsDataExportManager {
     rd.setName(getName());
     rd.setDescription(getDescription());
     rd.addParameters(resumoMensalDataSetDefinition.getParameters());
-    rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
+      rd.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
     rd.addDataSetDefinition(
         "R", mapStraightThrough(resumoMensalDataSetDefinition.constructResumoMensalDataset()));
     rd.addDataSetDefinition(
-            "F", mapStraightThrough(resumoMensalEncounterCountDataSet.constructEncounterCountDataset()));
+        "F",
+        mapStraightThrough(resumoMensalEncounterCountDataSet.constructEncounterCountDataset()));
     rd.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));
