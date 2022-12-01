@@ -1,9 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -23,6 +19,11 @@ import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefini
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class ListOfPatientsDefaultersOrIITCohortQueries {
@@ -1992,7 +1993,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "         GROUP BY en.patient_id "
             + "         UNION "
             + getDispensationTypeOnMDCQuery(hivMetadata.getQuarterlyDispensation())
-            + "          ) dispensa GROUP BY dispensa.patient_id "
+            + "          ) dispensa_trimestral GROUP BY dispensa_trimestral.patient_id "
             + "         UNION "
             + "         SELECT dispensa_semestral.patient_id , 'Dispensa Semestral' AS dispensa FROM ( "
             + "         SELECT en.patient_id "
@@ -2045,7 +2046,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + getDispensationTypeOnMDCQuery(hivMetadata.getSemiannualDispensation())
             + " ) dispensa_semestral GROUP BY dispensa_semestral.patient_id "
             + " UNION "
-            + "         SELECT dispensa_semestral.patient_id , 'Dispensa Anual' AS dispensa FROM ( "
+            + "         SELECT dispensa_anual.patient_id , 'Dispensa Anual' AS dispensa FROM ( "
             + "         SELECT en.patient_id "
             + "         FROM "
             + "             (SELECT "
@@ -2090,7 +2091,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "         GROUP BY en.patient_id "
             + "         UNION "
             + getDispensationTypeOnMDCQuery(hivMetadata.getAnnualArvDispensationConcept())
-            + " ) dispensa_semestral GROUP BY dispensa_semestral.patient_id "
+            + " ) dispensa_anual GROUP BY dispensa_anual.patient_id "
             + "     ) AS result  GROUP BY result.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -2180,10 +2181,9 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
         + "         WHERE      e.encounter_type = ${6} "
         + "         AND        e.location_id = :location "
         + "         AND        otype.concept_id = ${165174} "
-        + "         AND        otype.value_coded = ${23730} "
-        + "         AND        ostate.concept_id = ${"
+        + "         AND        otype.value_coded = "
         + dispensationType.getConceptId()
-        + " } "
+        + "         AND        ostate.concept_id = ${165322} "
         + "         AND        ostate.value_coded IN (${1256},  ${1257}) "
         + "         AND        e.encounter_datetime = last_mdc_record.last_encounter_datetime "
         + "         AND        otype.obs_group_id = ostate.obs_group_id "
