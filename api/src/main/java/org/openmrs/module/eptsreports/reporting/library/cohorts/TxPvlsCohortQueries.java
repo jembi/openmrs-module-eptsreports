@@ -84,7 +84,7 @@ public class TxPvlsCohortQueries {
         EptsReportUtils.map(
             getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "suppression",
