@@ -117,7 +117,8 @@ public class DQACargaViralCohortQueries {
 
     CohortDefinition baseCohort = genericCohortQueries.getBaseCohort();
 
-    compositionCohortDefinition.addSearch("SISMA", EptsReportUtils.map(ART_SISMA, mappings));
+    compositionCohortDefinition.addSearch(
+        "SISMA", EptsReportUtils.map(ART_SISMA, "endDate=${endDate},location=${location}"));
     compositionCohortDefinition.addSearch(
         "ARTDATIM", EptsReportUtils.map(ART_DATIM, "onOrBefore=${endDate},location=${location}"));
     compositionCohortDefinition.addSearch("B1M3", EptsReportUtils.map(ART_B1_M3, mappingM3));
