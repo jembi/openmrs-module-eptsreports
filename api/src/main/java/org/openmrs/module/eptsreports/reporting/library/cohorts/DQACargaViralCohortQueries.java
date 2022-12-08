@@ -89,7 +89,7 @@ public class DQACargaViralCohortQueries {
     String mappingM3 = "startDate=${startDate+2m},endDate=${endDate},location=${location}";
 
     CohortDefinition ART_SISMA =
-        resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false);
+        resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     CohortDefinition ART_DATIM =
         txCurrCohortQueries.getTxCurrCompositionCohort("compositionCohort", true);
