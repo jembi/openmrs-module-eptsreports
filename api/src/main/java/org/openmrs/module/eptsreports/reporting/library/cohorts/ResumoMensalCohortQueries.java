@@ -2028,6 +2028,7 @@ public class ResumoMensalCohortQueries {
         hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("activeTBConcept", tbMetadata.getActiveTBConcept().getConceptId());
     map.put("yesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("noConcept", hivMetadata.getNoConcept().getConceptId());
     String query =
         " SELECT pt.patient_id "
             + "FROM patient pt  "
@@ -2076,7 +2077,7 @@ public class ResumoMensalCohortQueries {
             + "                  AND enc.encounter_type = ${adultoSeguimentoEncounterType}  "
             + "                  AND pt.voided = 0  "
             + "                  AND o.concept_id   = ${activeTBConcept}  "
-            + "                  AND o.value_coded  =  ${yesConcept} "
+            + "                  AND o.value_coded  IN ( ${yesConcept}, ${noConcept} )"
             + "                  GROUP BY pt.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);

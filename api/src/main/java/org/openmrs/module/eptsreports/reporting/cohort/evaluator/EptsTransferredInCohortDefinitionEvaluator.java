@@ -83,7 +83,7 @@ public class EptsTransferredInCohortDefinitionEvaluator implements CohortDefinit
     if (cd.getProgramEnrolled2() == null) {
       q.append("select pgEnrollment.patient_id ");
       q.append("FROM(SELECT p.patient_id, pp.patient_program_id,");
-      q.append(" max(ps.start_date) as pgEnrollmentDate ");
+      q.append(" min(ps.start_date) as pgEnrollmentDate ");
       q.append("FROM patient p ");
       q.append("    JOIN patient_program pp ");
       q.append("    ON p.patient_id=pp.patient_id ");
