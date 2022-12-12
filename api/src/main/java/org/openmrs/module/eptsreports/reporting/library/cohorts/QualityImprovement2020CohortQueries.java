@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -30,6 +29,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -8918,14 +8919,14 @@ public class QualityImprovement2020CohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-        ""
-            + "SELECT  final.patient_id "
+        "SELECT  final.patient_id "
             + "FROM "
             + "( "
-            + "   SELECT p.patient_id, MAX(o2.value_datetime) last_encounter "
+            + "   SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter "
             + "   FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -8937,8 +8938,8 @@ public class QualityImprovement2020CohortQueries {
             + "     AND e.location_id = :location "
             + "     AND e.encounter_type = ${53} "
             + "     AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656}) "
-            + "     AND   ( o2.concept_id = ${6128} "
-            + "     AND     o2.value_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "     AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "     AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "   GROUP BY p.patient_id "
             + ") AS  final";
 
@@ -9041,14 +9042,14 @@ public class QualityImprovement2020CohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
-
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     String query =
         ""
             + "SELECT  final.patient_id "
             + "FROM "
             + "( "
-            + "   SELECT p.patient_id, MAX(o2.value_datetime) last_encounter "
+            + "   SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter "
             + "   FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -9060,8 +9061,8 @@ public class QualityImprovement2020CohortQueries {
             + "     AND e.location_id = :location "
             + "     AND e.encounter_type = ${53} "
             + "     AND ( ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
-            + "     AND   ( o2.concept_id = ${6128} "
-            + "     AND     o2.value_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "     AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "     AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "   GROUP BY p.patient_id "
             + ") AS  final";
 
@@ -9176,8 +9177,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
-    map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
 
     String query =
         ""
@@ -9204,7 +9203,7 @@ public class QualityImprovement2020CohortQueries {
             + "                           AND     o2.obs_datetime BETWEEN :startDate AND :revisionEndDate ) ) "
             + "                         GROUP BY p.patient_id  "
             + "                         UNION  "
-            + "                         SELECT p.patient_id, MAX(o2.value_datetime) last_encounter  "
+            + "                         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter  "
             + "                         FROM patient p  "
             + "                                  INNER JOIN encounter e ON p.patient_id = e.patient_id  "
             + "                                  INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
@@ -9216,8 +9215,8 @@ public class QualityImprovement2020CohortQueries {
             + "                           AND e.location_id = :location  "
             + "                           AND e.encounter_type = ${53}  "
             + "                           AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} )  "
-            + "                           AND   ( o2.concept_id = ${6129}  "
-            + "                           AND     o2.value_datetime BETWEEN :startDate AND :revisionEndDate ) )  "
+            + "                           AND   ( o2.concept_id = ${165308}  AND o2.value_coded = ${1267} "
+            + "                           AND     o2.obs_datetime BETWEEN :startDate AND :revisionEndDate ) )  "
             + "                         GROUP BY p.patient_id  "
             + "                     ) AS tpt_end  "
             + "                GROUP BY  tpt_end.patient_id  "
@@ -9255,8 +9254,8 @@ public class QualityImprovement2020CohortQueries {
             + "                           AND e.location_id = :location  "
             + "                           AND e.encounter_type = ${53}  "
             + "                           AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} )  "
-            + "                           AND   ( o2.concept_id = ${6128}  "
-            + "                           AND     o2.value_datetime BETWEEN :startDate AND :endDate ) )  "
+            + "                           AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                           AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) )  "
             + "                         GROUP BY p.patient_id  "
             + "                     ) AS tpt_start  "
             + "                GROUP BY tpt_start.patient_id  "
