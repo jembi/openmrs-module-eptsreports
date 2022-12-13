@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -30,6 +29,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -1106,7 +1107,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
 
     String query =
         ""
@@ -1134,7 +1134,7 @@ public class QualityImprovement2020CohortQueries {
             + "           AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "         GROUP BY p.patient_id "
             + "         UNION "
-            + "         SELECT p.patient_id, MAX(o2.value_datetime) last_encounter "
+            + "         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter "
             + "         FROM patient p "
             + "                  INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1146,8 +1146,8 @@ public class QualityImprovement2020CohortQueries {
             + "           AND e.location_id = :location "
             + "           AND e.encounter_type = ${53} "
             + "           AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
-            + "           AND   ( o2.concept_id = ${6128}  "
-            + "           AND     o2.value_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "           AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256}  "
+            + "           AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "         GROUP BY p.patient_id "
             + "     ) AS tpt_start "
             + "GROUP BY tpt_start.patient_id) AS last ON p.patient_id = last.patient_id "
@@ -1199,7 +1199,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("23761", tbMetadata.getActiveTBConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
 
     String query =
         ""
@@ -1227,7 +1226,7 @@ public class QualityImprovement2020CohortQueries {
             + "           AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "         GROUP BY p.patient_id "
             + "         UNION "
-            + "         SELECT p.patient_id, MAX(o2.value_datetime) last_encounter "
+            + "         SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter "
             + "         FROM patient p "
             + "                  INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                  INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1239,8 +1238,8 @@ public class QualityImprovement2020CohortQueries {
             + "           AND e.location_id = :location "
             + "           AND e.encounter_type = ${53} "
             + "           AND ( ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
-            + "           AND   ( o2.concept_id = ${6128} "
-            + "           AND     o2.value_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "           AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256}  "
+            + "           AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "         GROUP BY p.patient_id "
             + "     ) AS tpt_start "
             + "GROUP BY tpt_start.patient_id) AS last ON p.patient_id = last.patient_id "
@@ -1294,7 +1293,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("1256", hivMetadata.getStartDrugsConcept().getConceptId());
     map.put("23758", tbMetadata.getHasTbSymptomsConcept().getConceptId());
     map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id "
@@ -1321,7 +1319,7 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "                     GROUP BY p.patient_id "
             + "                     UNION "
-            + "                     SELECT p.patient_id, MAX(o2.value_datetime) last_encounter "
+            + "                     SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter "
             + "                     FROM patient p "
             + "                              INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                              INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1333,8 +1331,8 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND e.location_id = :location "
             + "                       AND e.encounter_type = ${53} "
             + "                       AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
-            + "                       AND   ( o2.concept_id = ${6128} "
-            + "                       AND     o2.value_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "                       AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256}  "
+            + "                       AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "                     GROUP BY p.patient_id "
             + "                 ) AS tpt_start "
             + "            GROUP BY tpt_start.patient_id ) AS last ON p.patient_id = last.patient_id "
@@ -1481,7 +1479,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("1268", tbMetadata.getTBTreatmentPlanConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
 
     String query =
         " SELECT  p.patient_id  "
@@ -1508,7 +1505,7 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "                     GROUP BY p.patient_id "
             + "                     UNION "
-            + "                     SELECT p.patient_id, MAX(o2.value_datetime) last_encounter "
+            + "                     SELECT p.patient_id, MAX(o2.obs_datetime) last_encounter "
             + "                     FROM patient p "
             + "                              INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                              INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -1520,8 +1517,8 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND e.encounter_type = ${53} "
             + "                       AND e.location_id = :location "
             + "                       AND ( ( o.concept_id = ${23985} AND o.value_coded = ${656} ) "
-            + "                       AND   ( o2.concept_id = ${6128} "
-            + "                       AND     o2.value_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "                       AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256}  "
+            + "                       AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "                     GROUP BY p.patient_id "
             + "                 ) AS tpt_start "
             + "            GROUP BY tpt_start.patient_id ) AS last ON last.patient_id = p.patient_id  "
@@ -1574,7 +1571,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("1268", tbMetadata.getTBTreatmentPlanConcept().getConceptId());
     map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
-    map.put("6128", hivMetadata.getDataInicioProfilaxiaIsoniazidaConcept().getConceptId());
 
     String query =
         " SELECT  p.patient_id  "
@@ -1613,8 +1609,8 @@ public class QualityImprovement2020CohortQueries {
             + "                       AND e.encounter_type = ${53} "
             + "                       AND e.location_id = :location "
             + "                       AND ( ( o.concept_id = ${23985} AND o.value_coded = ${23954} ) "
-            + "                       AND   ( o2.concept_id = ${6128} "
-            + "                       AND     o2.value_datetime BETWEEN :startDate AND :endDate ) ) "
+            + "                       AND   ( o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
+            + "                       AND     o2.obs_datetime BETWEEN :startDate AND :endDate ) ) "
             + "                     GROUP BY p.patient_id "
             + "                 ) AS tpt_start "
             + "            GROUP BY tpt_start.patient_id ) AS last ON last.patient_id = p.patient_id  "
@@ -2509,6 +2505,8 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 2 || num == 4) {
       compositionCohortDefinition.setCompositionString(
           "(A AND (B41 OR B42 OR B51 OR B52) AND (GNEW OR L)) AND NOT (B1 OR B2 OR B3 OR C OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
+      //          "(A AND (B41 OR B42 OR B51 OR B52) AND (GNEW OR L)) AND NOT (B1 OR B2 OR B3 OR C
+      // OR D OR E OR F OR H OR H1 OR I OR I1 OR J OR J1)");
     } else if (num == 5) {
       compositionCohortDefinition.setCompositionString(
           "(A AND C AND (B41 OR B42 OR B51 OR B52) ) AND NOT (B1 OR B2 OR B3 OR D OR E OR F)");
