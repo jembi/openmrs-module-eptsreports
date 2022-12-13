@@ -784,6 +784,12 @@ public class ResumoMensalCohortQueries {
         map(
             getPatientsWhoSuspendedTreatmentB6(false),
             "onOrBefore=${startDate-1d},location=${location}"));
+    cd.addSearch(
+        "D", map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
+
+    cd.addSearch(
+        "T",
+        map(getPatientsTransferredOutB5(true), "onOrBefore=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "B7",
@@ -795,7 +801,7 @@ public class ResumoMensalCohortQueries {
         map(
             getPatientsWhoRestartedArtOnFilaOrArvPickup(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("(B7 OR S) AND P");
+    cd.setCompositionString("((B7 NOT (D OR T)) OR S) AND P");
 
     return cd;
   }
