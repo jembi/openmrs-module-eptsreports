@@ -801,7 +801,7 @@ public class ResumoMensalCohortQueries {
         map(
             getPatientsWhoRestartedArtOnFilaOrArvPickup(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.setCompositionString("((B7 NOT (D OR T)) OR S) AND P");
+    cd.setCompositionString("((B7 NOT (D OR T OR S)) OR S) AND P");
 
     return cd;
   }
