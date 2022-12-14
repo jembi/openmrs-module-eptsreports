@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
@@ -30,6 +29,8 @@ import org.openmrs.module.reporting.common.SetComparator;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class QualityImprovement2020CohortQueries {
@@ -7514,13 +7515,13 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "A2",
         EptsReportUtils.map(
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString(preposition.getCompositionString());
 
@@ -7635,13 +7636,13 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
             txPvls.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter4MQ(
                 EptsReportConstants.PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString(preposition.getCompositionString());
 
     return cd;
