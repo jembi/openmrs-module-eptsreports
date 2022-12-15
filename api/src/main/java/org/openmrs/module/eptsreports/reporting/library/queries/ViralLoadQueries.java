@@ -129,7 +129,7 @@ public class ViralLoadQueries {
             + " WHERE p.voided=0 "
             + " AND e.voided=0 "
             + " AND o.voided=0 "
-            + " AND e.encounter_type IN (${6}, ${9}, ${13}, ${51}, ${53}) "
+            + " AND e.encounter_type IN (${6}, ${9}, ${13}, ${51}) "
             + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
             + " AND DATE(e.encounter_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate AND "
             + " e.location_id=:location "
@@ -141,8 +141,8 @@ public class ViralLoadQueries {
             + " AND e.voided=0 "
             + " AND o.voided=0 "
             + " AND e.encounter_type IN (${53}) "
-            + " AND o.concept_id=${856} AND o.value_numeric IS NOT NULL AND "
-            + " DATE(o.obs_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate "
+            + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
+            + "AND DATE(o.obs_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate "
             + " AND e.location_id=:location ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
