@@ -8557,7 +8557,7 @@ public class QualityImprovement2020CohortQueries {
         "MDC",
         EptsReportUtils.map(
             alreadyMdc,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "B2",
         EptsReportUtils.map(
@@ -10388,7 +10388,7 @@ public class QualityImprovement2020CohortQueries {
             + "AND        ostate.concept_id = ${165322} "
             + "AND        ostate.value_coded IN (${states}) "
             + "AND        e.encounter_datetime < consultation.consultation_date "
-            + "AND        e.encounter_datetime >= :startDate "
+            + "AND        e.encounter_datetime >= DATE_SUB(:endDate, INTERVAL 12 MONTH) "
             + "AND        otype.obs_group_id = ostate.obs_group_id "
             + "AND        e.voided = 0 "
             + "AND        p.voided = 0 "
