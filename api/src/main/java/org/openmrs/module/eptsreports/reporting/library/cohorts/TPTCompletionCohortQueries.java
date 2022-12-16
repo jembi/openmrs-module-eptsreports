@@ -106,8 +106,6 @@ public class TPTCompletionCohortQueries {
             tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
             hivMetadata.getStartDrugs().getConceptId());
 
-    compositionCohortDefinition.addSearch("A1", EptsReportUtils.map(A1Inh, mapping));
-
     CohortDefinition A2Inh =
         getINHStartA2Part2(
             Arrays.asList(
@@ -118,22 +116,13 @@ public class TPTCompletionCohortQueries {
             tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
             hivMetadata.getStartDrugs().getConceptId());
 
+    compositionCohortDefinition.addSearch("A1", EptsReportUtils.map(A1Inh, mapping));
+
     compositionCohortDefinition.addSearch("A2", EptsReportUtils.map(A2Inh, mapping));
 
     compositionCohortDefinition.addSearch("A3", EptsReportUtils.map(getINHStartA4(), mapping));
 
-    compositionCohortDefinition.addSearch(
-        "A4",
-        EptsReportUtils.map(
-            getINHStartA6(
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId(),
-                hivMetadata.getPatientTreatmentFollowUp().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getRestartConcept().getConceptId()),
-            mapping));
+    compositionCohortDefinition.addSearch("A4", EptsReportUtils.map(getINHStartA6(), mapping));
 
     compositionCohortDefinition.addSearch(
         "B1B", EptsReportUtils.map(tptEligiblePatientListCohortQueries.getIPTB1part2(), mapping));
@@ -227,30 +216,9 @@ public class TPTCompletionCohortQueries {
 
     compositionCohortDefinition.addSearch("C1", EptsReportUtils.map(get3HPStartC1(), mapping));
 
-    compositionCohortDefinition.addSearch(
-        "C2",
-        EptsReportUtils.map(
-            get3HPStartC2(
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
-                hivMetadata.getPatientTreatmentFollowUp().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getRestartConcept().getConceptId()),
-            mapping));
+    compositionCohortDefinition.addSearch("C2", EptsReportUtils.map(get3HPStartC2(), mapping));
 
-    compositionCohortDefinition.addSearch(
-        "C3",
-        EptsReportUtils.map(
-            get3HPStartC3(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
-            mapping));
+    compositionCohortDefinition.addSearch("C3", EptsReportUtils.map(get3HPStartC3(), mapping));
 
     compositionCohortDefinition.addSearch("C4", EptsReportUtils.map(get3HPStartC4(), mapping));
 
@@ -1039,14 +1007,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartA6(
-      int regimeTPTEncounterType,
-      int regimeTPTConcept,
-      int isoniazidConcept,
-      int isoniazidePiridoxinaConcept,
-      int seguimentoTPTConcept,
-      int inicioConcept,
-      int reinicioConcept) {
+  public CohortDefinition getINHStartA6() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName("all patients with Regime de TPT and Seguimento de tratamento TPT");
@@ -1054,13 +1015,13 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("60", regimeTPTEncounterType);
-    map.put("23985", regimeTPTConcept);
-    map.put("656", isoniazidConcept);
-    map.put("23982", isoniazidePiridoxinaConcept);
-    map.put("23987", seguimentoTPTConcept);
-    map.put("1256", inicioConcept);
-    map.put("1705", reinicioConcept);
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("23982", tbMetadata.getIsoniazidePiridoxinaConcept().getConceptId());
+    map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     String query =
         " SELECT "
@@ -1142,14 +1103,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPStartC2(
-      int fILT,
-      int regimeTPTConcept,
-      int hPConcept,
-      int hPPiridoxinaConcept,
-      int seguimentoTPTConcept,
-      int inicioConcept,
-      int reinicioConcept) {
+  public CohortDefinition get3HPStartC2() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with FILT ");
@@ -1157,13 +1111,13 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("60", fILT);
-    map.put("23985", regimeTPTConcept);
-    map.put("23954", hPConcept);
-    map.put("23984", hPPiridoxinaConcept);
-    map.put("23987", seguimentoTPTConcept);
-    map.put("1256", inicioConcept);
-    map.put("1705", reinicioConcept);
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     String query =
         " SELECT  p.patient_id FROM patient p   "
@@ -1202,13 +1156,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPStartC3(
-      int encounterType,
-      int treatmentPrescribedConcept,
-      int threeHPConcept,
-      int filtEncounterType,
-      int regimedeTPConcept,
-      int threeHPPiridoxinaConcept) {
+  public CohortDefinition get3HPStartC3() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName(" all patients with Ficha Clinica Master Card ");
@@ -1216,12 +1164,12 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", encounterType);
-    map.put("1719", treatmentPrescribedConcept);
-    map.put("23954", threeHPConcept);
-    map.put("60", filtEncounterType);
-    map.put("23985", regimedeTPConcept);
-    map.put("23984", threeHPPiridoxinaConcept);
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
     map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
@@ -1404,49 +1352,16 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     compositionCohortDefinition.addSearch(
-        "C4Part1",
-        EptsReportUtils.map(
-            getINHStartC7Part1Query(
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
-                tbMetadata.getTreatmentFollowUpTPTConcept().getConceptId(),
-                hivMetadata.getContinueRegimenConcept().getConceptId(),
-                hivMetadata.getCompletedConcept().getConceptId()),
-            mapping));
+        "C4Part1", EptsReportUtils.map(getINHStartC7Part1Query(), mapping));
+
     compositionCohortDefinition.addSearch(
-        "C4Part2",
-        EptsReportUtils.map(
-            getINHStartC7Part2Query(
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId()),
-            mapping));
+        "C4Part2", EptsReportUtils.map(getINHStartC7Part2Query(), mapping));
+
     compositionCohortDefinition.addSearch(
-        "C4Part3",
-        EptsReportUtils.map(
-            getINHStartC7Part3Query(
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
-                tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getDT3HPConcept().getConceptId()),
-            mapping));
+        "C4Part3", EptsReportUtils.map(getINHStartC7Part3Query(), mapping));
+
     compositionCohortDefinition.addSearch(
-        "C4Part4",
-        EptsReportUtils.map(
-            getINHStartC7Part4Query(
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPConcept().getConceptId()),
-            mapping));
+        "C4Part4", EptsReportUtils.map(getINHStartC7Part4Query(), mapping));
 
     compositionCohortDefinition.setCompositionString("C4Part1 AND C4Part2 AND C4Part3 AND C4Part4");
 
@@ -1466,29 +1381,22 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartC7Part1Query(
-      int regimeTPTEncounterType,
-      int regimeTPTConcept,
-      int threeHPConcept,
-      int threeHPPiridoxinaConcept,
-      int treatmentFollowUpTPTConcept,
-      int continueRegimenConcept,
-      int completedConcept) {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+  public CohortDefinition getINHStartC7Part1Query() {
 
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         "C7 Part 1 Query: all patients with Regime de TPT and Seguimento de tratamento TPT");
     sqlCohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("60", regimeTPTEncounterType);
-    map.put("23985", regimeTPTConcept);
-    map.put("23954", threeHPConcept);
-    map.put("23984", threeHPPiridoxinaConcept);
-    map.put("23987", treatmentFollowUpTPTConcept);
-    map.put("1257", continueRegimenConcept);
-    map.put("1267", completedConcept);
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    map.put("23987", hivMetadata.getPatientTreatmentFollowUp().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
         " SELECT     p.patient_id "
@@ -1547,11 +1455,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartC7Part2Query(
-      int regimeTPTEncounterType,
-      int regimeTPTConcept,
-      int threeHPConcept,
-      int threeHPPiridoxinaConcept) {
+  public CohortDefinition getINHStartC7Part2Query() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName("C7 Part 2 Query: all patients with Regime de TPT marked on FILT");
@@ -1559,10 +1463,10 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("60", regimeTPTEncounterType);
-    map.put("23985", regimeTPTConcept);
-    map.put("23954", threeHPConcept);
-    map.put("23984", threeHPPiridoxinaConcept);
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id FROM patient p    "
@@ -1605,16 +1509,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartC7Part3Query(
-      int regimeTPTEncounterType,
-      int adultoSeguimentoEncounterType,
-      int regimeTPTConcept,
-      int threeHPConcept,
-      int threeHPPiridoxinaConcept,
-      int dataEstadoDaProfilaxiaConcept,
-      int startDrugsConcept,
-      int treatmentPrescribedConcept,
-      int DT3HPConcept) {
+  public CohortDefinition getINHStartC7Part3Query() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName("C7 Part 3 Query: all patients with Regime de TPT marked on FILT");
@@ -1622,15 +1517,15 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("60", regimeTPTEncounterType);
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("23985", regimeTPTConcept);
-    map.put("23954", threeHPConcept);
-    map.put("23984", threeHPPiridoxinaConcept);
-    map.put("165308", dataEstadoDaProfilaxiaConcept);
-    map.put("1256", startDrugsConcept);
-    map.put("1719", treatmentPrescribedConcept);
-    map.put("165307", DT3HPConcept);
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id FROM patient p    "
@@ -1675,11 +1570,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getINHStartC7Part4Query(
-      int regimeTPTEncounterType,
-      int masterCardEncounterType,
-      int regimeTPTConcept,
-      int threeHPConcept) {
+  public CohortDefinition getINHStartC7Part4Query() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
 
     sqlCohortDefinition.setName("C7 Part 4 Query: all patients with Regime de TPT marked on FILT");
@@ -1687,10 +1578,10 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("60", regimeTPTEncounterType);
-    map.put("53", masterCardEncounterType);
-    map.put("23985", regimeTPTConcept);
-    map.put("23954", threeHPConcept);
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id FROM patient p    "
@@ -1742,14 +1633,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPD1(
-      int encounterType,
-      int treatmentPrescribedConcept,
-      int threeHPConcept,
-      int filtEncounterType,
-      int regimedeTPConcept,
-      int threeHPPiridoxinaConcept,
-      int masterCardEncounterType) {
+  public CohortDefinition get3HPD1() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes D1");
@@ -1757,13 +1641,13 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", encounterType);
-    map.put("1719", treatmentPrescribedConcept);
-    map.put("23954", threeHPConcept);
-    map.put("60", filtEncounterType);
-    map.put("23985", regimedeTPConcept);
-    map.put("23984", threeHPPiridoxinaConcept);
-    map.put("53", masterCardEncounterType);
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6129", hivMetadata.getDataFinalizacaoProfilaxiaIsoniazidaConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
@@ -1855,14 +1739,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPD2(
-      int adultoSeguimentoEncounterType,
-      int threeHPConcept,
-      int regimedeTPConcept,
-      int dataEstadoDaProfilaxiaConcept,
-      int startDrugs,
-      int completedConcept,
-      int masterCardEncounterType) {
+  public CohortDefinition get3HPD2() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes D1");
@@ -1870,13 +1747,13 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("23954", threeHPConcept);
-    map.put("23985", regimedeTPConcept);
-    map.put("165308", dataEstadoDaProfilaxiaConcept);
-    map.put("1256", startDrugs);
-    map.put("1267", completedConcept);
-    map.put("53", masterCardEncounterType);
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
 
     String query =
         " SELECT p.patient_id FROM patient p    "
@@ -1939,32 +1816,9 @@ public class TPTCompletionCohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
-    compositionCohortDefinition.addSearch(
-        "get3HPD3A",
-        EptsReportUtils.map(
-            get3HPD3A(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
-                tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId(),
-                hivMetadata.getContinueRegimenConcept().getConceptId()),
-            mapping));
-    compositionCohortDefinition.addSearch(
-        "get3HPD3B",
-        EptsReportUtils.map(
-            get3HPD3B(
-                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                tbMetadata.get3HPConcept().getConceptId(),
-                tbMetadata.getTreatmentPrescribedConcept().getConceptId(),
-                tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId(),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.get3HPPiridoxinaConcept().getConceptId(),
-                tbMetadata.getDT3HPConcept().getConceptId()),
-            mapping));
+    compositionCohortDefinition.addSearch("get3HPD3A", EptsReportUtils.map(get3HPD3A(), mapping));
+
+    compositionCohortDefinition.addSearch("get3HPD3B", EptsReportUtils.map(get3HPD3B(), mapping));
 
     compositionCohortDefinition.setCompositionString("get3HPD3A OR get3HPD3B");
 
@@ -1986,16 +1840,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPD3A(
-      int adultoSeguimentoEncounterType,
-      int threeHPConcept,
-      int treatmentPrescribedConcept,
-      int filtEncounterType,
-      int regimedeTPConcept,
-      int threeHPPiridoxinaConcept,
-      int dataEstadoDaProfilaxiaConcept,
-      int startDrugs,
-      int continueRegimenConcept) {
+  public CohortDefinition get3HPD3A() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes D1");
@@ -2003,15 +1848,15 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("23954", threeHPConcept);
-    map.put("1719", treatmentPrescribedConcept);
-    map.put("60", filtEncounterType);
-    map.put("23985", regimedeTPConcept);
-    map.put("23984", threeHPPiridoxinaConcept);
-    map.put("165308", dataEstadoDaProfilaxiaConcept);
-    map.put("1256", startDrugs);
-    map.put("1257", continueRegimenConcept);
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id "
@@ -2119,14 +1964,7 @@ public class TPTCompletionCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition get3HPD3B(
-      int adultoSeguimentoEncounterType,
-      int threeHPConcept,
-      int treatmentPrescribedConcept,
-      int filtEncounterType,
-      int regimedeTPConcept,
-      int threeHPPiridoxinaConcept,
-      int DT3HPConcept) {
+  public CohortDefinition get3HPD3B() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" all patients with Outras prescricoes D1");
@@ -2134,13 +1972,13 @@ public class TPTCompletionCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
-    map.put("6", adultoSeguimentoEncounterType);
-    map.put("23954", threeHPConcept);
-    map.put("1719", treatmentPrescribedConcept);
-    map.put("60", filtEncounterType);
-    map.put("23985", regimedeTPConcept);
-    map.put("23984", threeHPPiridoxinaConcept);
-    map.put("165307", DT3HPConcept);
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("60", tbMetadata.getRegimeTPTEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23984", tbMetadata.get3HPPiridoxinaConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
         " SELECT p.patient_id "
