@@ -97,9 +97,28 @@ public class TPTCompletionCohortQueries {
             txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true),
             "onOrBefore=${endDate},location=${location},locations=${location}"));
 
-    compositionCohortDefinition.addSearch("A1", EptsReportUtils.map(getINHStartA1(), mapping));
+    CohortDefinition A1Inh =
+        getINHStartA2Part2(
+            Collections.singletonList(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId()),
+            tbMetadata.getRegimeTPTConcept().getConceptId(),
+            tbMetadata.getIsoniazidConcept().getConceptId(),
+            tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId());
 
-    compositionCohortDefinition.addSearch("A2", EptsReportUtils.map(getINHStartA2(), mapping));
+    compositionCohortDefinition.addSearch("A1", EptsReportUtils.map(A1Inh, mapping));
+
+    CohortDefinition A2Inh =
+        getINHStartA2Part2(
+            Arrays.asList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId()),
+            tbMetadata.getRegimeTPTConcept().getConceptId(),
+            tbMetadata.getIsoniazidConcept().getConceptId(),
+            tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
+            hivMetadata.getStartDrugs().getConceptId());
+
+    compositionCohortDefinition.addSearch("A2", EptsReportUtils.map(A2Inh, mapping));
 
     compositionCohortDefinition.addSearch("A3", EptsReportUtils.map(getINHStartA4(), mapping));
 
@@ -551,79 +570,6 @@ public class TPTCompletionCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
     return cd;
-  }
-
-  /**
-   *
-   *
-   * <h4>User_Story_ TPT: A1</h4>
-   *
-   * <ul>
-   *   <li>A1 Select all patients with Ficha Resumo (encounter type 53) with Última
-   *       profilaxia(concept id 23985) value coded INH(concept id 656) and Data Início da
-   *       Profilaxia TPT(obs datetime from concept id 165308 = Iniciar (id= 1256)) before end date.
-   *   <li>
-   * </ul>
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getINHStartA1() {
-    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-    compositionCohortDefinition.setName("TPT Completion A1");
-    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    compositionCohortDefinition.addSearch(
-        "A1",
-        EptsReportUtils.map(
-            getINHStartA2Part2(
-                Collections.singletonList(
-                    hivMetadata.getMasterCardEncounterType().getEncounterTypeId()),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId()),
-            mapping));
-
-    compositionCohortDefinition.setCompositionString("A1");
-
-    return compositionCohortDefinition;
-  }
-
-  /**
-   * <b>IMER1</b>: User_Story_ TPT <br>
-   *
-   * <ul>
-   *   <li>A2: Select all patients with Ficha clinica or Ficha de Seguimento (encounter type 6 or 9)
-   *       Profilaxia TPT (concept id 23985) value coded INH (concept id 656) and Estado da
-   *       Profilaxia (concept id 165308) value coded Início (concept id 1256) and obs datetime
-   *       before end date
-   *   <li>
-   *
-   * @return CohortDefinition
-   */
-  public CohortDefinition getINHStartA2() {
-    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-    compositionCohortDefinition.setName("TPT Completion A2");
-    compositionCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-
-    compositionCohortDefinition.addSearch(
-        "getINHStartA2",
-        EptsReportUtils.map(
-            getINHStartA2Part2(
-                Arrays.asList(
-                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId()),
-                tbMetadata.getRegimeTPTConcept().getConceptId(),
-                tbMetadata.getIsoniazidConcept().getConceptId(),
-                tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId(),
-                hivMetadata.getStartDrugs().getConceptId()),
-            mapping));
-
-    compositionCohortDefinition.setCompositionString("getINHStartA2");
-
-    return compositionCohortDefinition;
   }
 
   /**
