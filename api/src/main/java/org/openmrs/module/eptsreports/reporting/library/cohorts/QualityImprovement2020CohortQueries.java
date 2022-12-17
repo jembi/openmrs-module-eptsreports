@@ -8499,7 +8499,7 @@ public class QualityImprovement2020CohortQueries {
         "MDC",
         EptsReportUtils.map(
             alreadyMdc,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "H",
@@ -8531,7 +8531,7 @@ public class QualityImprovement2020CohortQueries {
         "FAC",
         EptsReportUtils.map(
             hadFilaAfterClinical,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("Mq15DenMds14 AND FAC");
 
