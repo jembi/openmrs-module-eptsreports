@@ -2381,7 +2381,7 @@ public class IntensiveMonitoringCohortQueries {
             + " MONTH)  "
             + " AND DATE_ADD(lastVLResult.encounter_date,INTERVAL "
             + vlMonthsUpper
-            + " MONTH)AND e.location_id=:location";
+            + " MONTH) AND e.location_id=:location";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String str = stringSubstitutor.replace(query);
@@ -2484,7 +2484,11 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch("AGE2", EptsReportUtils.map(major2, MAPPINGA));
     cd.addSearch("LMDC", EptsReportUtils.map(mdcLastClinical, MAPPINGA));
     cd.addSearch("RMDC", EptsReportUtils.map(recentMdc, MAPPINGA));
-    cd.addSearch("PICKUP", EptsReportUtils.map(pickupAfterClinical, MAPPINGA));
+    cd.addSearch(
+        "PICKUP",
+        EptsReportUtils.map(
+            pickupAfterClinical,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (isDenominator) {
 
