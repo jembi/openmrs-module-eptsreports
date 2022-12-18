@@ -1761,7 +1761,8 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "transferredIn",
         EptsReportUtils.map(
-            DsdQueries.getTranferredInPatients(), "onOrBefore=${endDate},location=${location}"));
+            DsdQueries.getTranferredInPatients(),
+            "onOrAfter=${endDate-3m},onOrBefore=${endDate},location=${location}"));
 
     cd.setCompositionString("treatmentInterruption AND filaOrDrugPickup AND NOT transferredIn");
 
