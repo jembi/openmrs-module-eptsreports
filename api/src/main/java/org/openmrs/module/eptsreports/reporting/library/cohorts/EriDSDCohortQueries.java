@@ -1582,13 +1582,6 @@ public class EriDSDCohortQueries {
     map.put("masterCard", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("hivViralLoad", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("hivViralLoadQualitative", hivMetadata.getHivViralLoadQualitative().getConceptId());
-    map.put("beyondDetectableLimit", hivMetadata.getBeyondDetectableLimitConcept().getConceptId());
-    map.put("undetectableViralLoad", hivMetadata.getUndetectableViralLoadConcept().getConceptId());
-    map.put("lessThan10Copies", hivMetadata.getLessThan10CopiesConcept().getConceptId());
-    map.put("lessThan20Copies", hivMetadata.getLessThan20CopiesConcept().getConceptId());
-    map.put("lessThan40Copies", hivMetadata.getLessThan40CopiesConcept().getConceptId());
-    map.put("lessThan400Copies", hivMetadata.getLessThan400CopiesConcept().getConceptId());
-    map.put("lessThan839Copies", hivMetadata.getLessThan839CopiesConcept().getConceptId());
 
     String query =
         " SELECT vl_max.patient_id "
@@ -1640,7 +1633,7 @@ public class EriDSDCohortQueries {
             + "        AND( "
             + "                (o.concept_id=${hivViralLoad} AND o.value_numeric < 1000) "
             + "                OR "
-            + "                (o.concept_id=${hivViralLoadQualitative} AND o.value_coded IN (${beyondDetectableLimit},${undetectableViralLoad},${lessThan10Copies},${lessThan20Copies},${lessThan40Copies},${lessThan400Copies},${lessThan839Copies})) "
+            + "                (o.concept_id=${hivViralLoadQualitative} AND o.value_coded IS NOT NULL) "
             + "            )  "
             + "        AND e.location_id= :location "
             + "AND (  "
