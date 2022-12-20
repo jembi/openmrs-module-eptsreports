@@ -285,6 +285,7 @@ public class TxPvlsCohortQueries {
     SqlCohortDefinition sql = new SqlCohortDefinition();
     sql.setName("Patients who have viral load results OR FSR coded values");
     sql.setName("Routine for all patients using FSR form");
+    sql.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sql.addParameter(new Parameter("endDate", "End Date", Date.class));
     sql.addParameter(new Parameter("location", "Location", Location.class));
 
