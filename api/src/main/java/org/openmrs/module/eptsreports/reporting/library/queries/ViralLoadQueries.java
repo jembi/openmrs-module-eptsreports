@@ -175,7 +175,7 @@ public class ViralLoadQueries {
             + " oo.voided = 0 AND "
             + " oo.concept_id = %d AND oo.value_coded IN(%d, %d) AND "
             + " ee.location_id = :location "
-            + " AND ee.encounter_datetime <= :endDate "
+            + " AND DATE(ee.encounter_datetime) <= :endDate "
             + " GROUP BY p.patient_id ) final";
 
     return String.format(
