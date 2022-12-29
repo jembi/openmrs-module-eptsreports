@@ -678,7 +678,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=childrenArt");
+        "");
     // 11.5
     dataSetDefinition.addColumn(
         "MI11NUM5",
@@ -1011,7 +1011,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=childrenArt");
+        "");
     // 11.5
     dataSetDefinition.addColumn(
         "MI11NUM5",
@@ -1236,7 +1236,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMICat13Part4(3, false),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge=MqAdults");
+        "ageByEndDateRevision=15+");
 
     // 13.12 P4 Den
     dataSetDefinition.addColumn(
@@ -1724,8 +1724,8 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI15NUM14",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15MdsNum14(),
-                "startDate=${startDate},revisionEndDate=${endDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMI15MdsNum14(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI15NUM14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1734,7 +1734,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Numerator: # de pacientes inscritos em MDS para pacientes estáveis ",
         EptsReportUtils.map(
             MI15NUM14,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEvaluationEndDate=2+");
 
     CohortIndicator MI15DEN15 =

@@ -185,55 +185,69 @@ public class TxMlDataset25 extends BaseDataSet {
     ColumnParameters twentyTo24M =
         new ColumnParameters("twentyTo24M", "20 - 24 male", "gender=M|age=20-24", "06");
     ColumnParameters twenty5To29M =
-        new ColumnParameters("twenty4To29M", "25 - 29 male", "gender=M|age=25-29", "07");
+        new ColumnParameters("twenty5To29M", "25 - 29 male", "gender=M|age=25-29", "07");
     ColumnParameters thirtyTo34M =
         new ColumnParameters("thirtyTo34M", "30 - 34 male", "gender=M|age=30-34", "08");
     ColumnParameters thirty5To39M =
         new ColumnParameters("thirty5To39M", "35 - 39 male", "gender=M|age=35-39", "09");
-    ColumnParameters foutyTo44M =
-        new ColumnParameters("foutyTo44M", "40 - 44 male", "gender=M|age=40-44", "10");
-    ColumnParameters fouty5To49M =
-        new ColumnParameters("fouty5To49M", "45 - 49 male", "gender=M|age=45-49", "11");
-    ColumnParameters above50M =
-        new ColumnParameters("above50M", "50+ male", "gender=M|age=50+", "12");
+    ColumnParameters fortyTo44M =
+        new ColumnParameters("fortyTo44M", "40 - 44 male", "gender=M|age=40-44", "10");
+    ColumnParameters forty5To49M =
+        new ColumnParameters("forty5To49M", "45 - 49 male", "gender=M|age=45-49", "11");
+    // 50-54, 55-59, 60-64, 65+ male
+    ColumnParameters fiftyTo54M =
+        new ColumnParameters("fiftyTo54M", "50 - 54 male", "gender=M|age=50-54", "12");
+    ColumnParameters fifty5To59M =
+        new ColumnParameters("fifty5To59M", "55 - 59 male", "gender=M|age=55-59", "13");
+    ColumnParameters sixtyTo64M =
+        new ColumnParameters("sixtyTo64M", "60 - 64 male", "gender=M|age=60-64", "14");
+    ColumnParameters above65M =
+        new ColumnParameters("above65M", "65+ male", "gender=M|age=65+", "15");
     ColumnParameters unknownM =
-        new ColumnParameters("unknownM", "Unknown age male", "gender=M|age=UK", "13");
-    ColumnParameters totalM = new ColumnParameters("totalM", "Total of Males", "gender=M", "28");
+        new ColumnParameters("unknownM", "Unknown age male", "gender=M|age=UK", "16");
+    ColumnParameters totalM = new ColumnParameters("totalM", "Total of Males", "gender=M", "17");
 
     ColumnParameters under1F =
-        new ColumnParameters("under1F", "under 1 year female", "gender=F|age=<1", "14");
+        new ColumnParameters("under1F", "under 1 year female", "gender=F|age=<1", "18");
     ColumnParameters oneTo4F =
-        new ColumnParameters("oneTo4F", "1 - 4 years female", "gender=F|age=1-4", "15");
+        new ColumnParameters("oneTo4F", "1 - 4 years female", "gender=F|age=1-4", "19");
     ColumnParameters fiveTo9F =
-        new ColumnParameters("fiveTo9F", "5 - 9 years female", "gender=F|age=5-9", "16");
+        new ColumnParameters("fiveTo9F", "5 - 9 years female", "gender=F|age=5-9", "20");
     ColumnParameters tenTo14F =
-        new ColumnParameters("tenTo14F", "10 - 14 female", "gender=F|age=10-14", "17");
+        new ColumnParameters("tenTo14F", "10 - 14 female", "gender=F|age=10-14", "21");
     ColumnParameters fifteenTo19F =
-        new ColumnParameters("fifteenTo19F", "15 - 19 female", "gender=F|age=15-19", "18");
+        new ColumnParameters("fifteenTo19F", "15 - 19 female", "gender=F|age=15-19", "22");
     ColumnParameters twentyTo24F =
-        new ColumnParameters("twentyTo24F", "20 - 24 female", "gender=F|age=20-24", "19");
+        new ColumnParameters("twentyTo24F", "20 - 24 female", "gender=F|age=20-24", "23");
     ColumnParameters twenty5To29F =
-        new ColumnParameters("twenty4To29F", "25 - 29 female", "gender=F|age=25-29", "20");
+        new ColumnParameters("twenty5To29F", "25 - 29 female", "gender=F|age=25-29", "24");
     ColumnParameters thirtyTo34F =
-        new ColumnParameters("thirtyTo34F", "30 - 34 female", "gender=F|age=30-34", "21");
+        new ColumnParameters("thirtyTo34F", "30 - 34 female", "gender=F|age=30-34", "25");
     ColumnParameters thirty5To39F =
-        new ColumnParameters("thirty5To39F", "35 - 39 female", "gender=F|age=35-39", "22");
-    ColumnParameters foutyTo44F =
-        new ColumnParameters("foutyTo44F", "40 - 44 female", "gender=F|age=40-44", "23");
-    ColumnParameters fouty5To49F =
-        new ColumnParameters("fouty5To49F", "45 - 49 female", "gender=F|age=45-49", "24");
-    ColumnParameters above50F =
-        new ColumnParameters("above50F", "50+ female", "gender=F|age=50+", "25");
+        new ColumnParameters("thirty5To39F", "35 - 39 female", "gender=F|age=35-39", "26");
+    ColumnParameters fortyTo44F =
+        new ColumnParameters("fortyTo44F", "40 - 44 female", "gender=F|age=40-44", "27");
+    ColumnParameters forty5To49F =
+        new ColumnParameters("forty5To49F", "45 - 49 female", "gender=F|age=45-49", "28");
+    // 50-54, 55-59, 60-64, 65+ female
+    ColumnParameters fiftyTo54F =
+        new ColumnParameters("fiftyTo54F", "50 - 54 female", "gender=F|age=50-54", "29");
+    ColumnParameters fifty5To59F =
+        new ColumnParameters("fifty5To59F", "55 - 59 female", "gender=F|age=55-59", "30");
+    ColumnParameters sixtyTo64F =
+        new ColumnParameters("sixtyTo64F", "60 - 64 female", "gender=F|age=60-64", "31");
+    ColumnParameters above65F =
+        new ColumnParameters("above65F", "65+ female", "gender=F|age=65+", "32");
     ColumnParameters unknownF =
-        new ColumnParameters("unknownF", "Unknown age female", "gender=F|age=UK", "26");
-    ColumnParameters total = new ColumnParameters("totals", "Totals", "", "27");
-    ColumnParameters totalF = new ColumnParameters("totalF", "Total of Females", "gender=F", "29");
+        new ColumnParameters("unknownF", "Unknown age female", "gender=F|age=UK", "33");
+    ColumnParameters totalF = new ColumnParameters("totalF", "Total of Females", "gender=F", "34");
+    ColumnParameters total = new ColumnParameters("totals", "Totals", "", "40");
 
     // Key population
-    ColumnParameters pid = new ColumnParameters("pid", "PID", "KP=PID", "30");
-    ColumnParameters msm = new ColumnParameters("msm", "MSM", "KP=MSM", "31");
-    ColumnParameters csw = new ColumnParameters("msm", "CSW", "KP=CSW", "32");
-    ColumnParameters pri = new ColumnParameters("pri", "PRI", "KP=PRI", "33");
+    ColumnParameters pid = new ColumnParameters("pid", "PID", "KP=PID", "35");
+    ColumnParameters msm = new ColumnParameters("msm", "MSM", "KP=MSM", "36");
+    ColumnParameters csw = new ColumnParameters("msm", "CSW", "KP=CSW", "37");
+    ColumnParameters pri = new ColumnParameters("pri", "PRI", "KP=PRI", "38");
 
     return Arrays.asList(
         under1M,
@@ -245,9 +259,12 @@ public class TxMlDataset25 extends BaseDataSet {
         twenty5To29M,
         thirtyTo34M,
         thirty5To39M,
-        foutyTo44M,
-        fouty5To49M,
-        above50M,
+        fortyTo44M,
+        forty5To49M,
+        fiftyTo54M,
+        fifty5To59M,
+        sixtyTo64M,
+        above65M,
         unknownM,
         totalM,
         under1F,
@@ -259,9 +276,12 @@ public class TxMlDataset25 extends BaseDataSet {
         twenty5To29F,
         thirtyTo34F,
         thirty5To39F,
-        foutyTo44F,
-        fouty5To49F,
-        above50F,
+        fortyTo44F,
+        forty5To49F,
+        fiftyTo54F,
+        fifty5To59F,
+        sixtyTo64F,
+        above65F,
         unknownF,
         total,
         totalF,

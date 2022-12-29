@@ -13,7 +13,10 @@ package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -84,7 +87,7 @@ public class TxPvlsCohortQueries {
         EptsReportUtils.map(
             getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "suppression",
@@ -114,7 +117,7 @@ public class TxPvlsCohortQueries {
         EptsReportUtils.map(
             getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "results",
@@ -293,20 +296,69 @@ public class TxPvlsCohortQueries {
     sql.addParameter(new Parameter("location", "Location", Location.class));
     sql.setQuery(
         ViralLoadQueries.getPatientsHavingRoutineViralLoadTestsUsingFsr(
-            hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+            hivMetadata.getFsrEncounterType().getEncounterTypeId(),
             hivMetadata.getReasonForRequestingViralLoadConcept().getConceptId(),
             hivMetadata.getRoutineForRequestingViralLoadConcept().getConceptId(),
             hivMetadata.getUnkownConcept().getConceptId()));
     cd.addSearch(
         "results",
         EptsReportUtils.map(
-            hivCohortQueries.getPatientsViralLoadWithin12Months(),
+            getPatientsViralLoadWithin12Months(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "fsr",
         EptsReportUtils.map(sql, "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.setCompositionString("results OR fsr");
     return cd;
+  }
+
+  public CohortDefinition getPatientsViralLoadWithin12Months() {
+    SqlCohortDefinition sql = new SqlCohortDefinition();
+    sql.setName("viralLoadWithin12Months");
+    sql.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    sql.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sql.addParameter(new Parameter("location", "Location", Location.class));
+    sql.setQuery(getPatientsHavingViralLoadInLast12Months());
+    return sql;
+  }
+
+  public static String getPatientsHavingViralLoadInLast12Months() {
+
+    HivMetadata hivMetadata = new HivMetadata();
+    Map<String, Integer> map = new HashMap<>();
+
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        "SELECT p.patient_id FROM  patient p "
+            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 "
+            + " AND e.voided=0 "
+            + " AND o.voided=0 "
+            + " AND e.encounter_type IN (${6}, ${9}, ${13}) "
+            + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
+            + " AND DATE(e.encounter_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate AND "
+            + " e.location_id=:location "
+            + " UNION "
+            + " SELECT p.patient_id FROM  patient p "
+            + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
+            + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
+            + " WHERE p.voided=0 "
+            + " AND e.voided=0 "
+            + " AND o.voided=0 "
+            + " AND e.encounter_type IN (${53}) "
+            + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
+            + "AND DATE(o.obs_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate "
+            + " AND e.location_id=:location ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
   }
 
   /**
@@ -399,7 +451,7 @@ public class TxPvlsCohortQueries {
         EptsReportUtils.map(
             this.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("suppression AND pregnant");
     return cd;
   }
@@ -424,7 +476,7 @@ public class TxPvlsCohortQueries {
         EptsReportUtils.map(
             this.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
                 PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
-            "onOrBefore=${endDate},location=${location}"));
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("results AND pregnant");
     return cd;
   }

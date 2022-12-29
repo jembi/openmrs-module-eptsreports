@@ -1,11 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
@@ -1024,13 +1019,9 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition restartdedExclusion =
         qualityImprovement2020CohortQueries.getPatientsWhoRestartedTarvAtLeastSixMonths();
 
-    CohortDefinition B4E =
-        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            true, false, 12);
-
     CohortDefinition B5E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            false, true, -12);
+            false, true, 12);
 
     CohortDefinition G = qualityImprovement2020CohortQueries.getMQ13G();
 
@@ -1113,10 +1104,6 @@ public class IntensiveMonitoringCohortQueries {
             B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B4E",
-        EptsReportUtils.map(B4E, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "B5E",
         EptsReportUtils.map(B5E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -1168,20 +1155,20 @@ public class IntensiveMonitoringCohortQueries {
     if (den) {
       if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND age");
       }
     } else {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString("DENOMINATOR AND G AND age");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) G AND age");
+            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) G AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND G AND age");
       }
     }
     return compositionCohortDefinition;
@@ -1356,7 +1343,7 @@ public class IntensiveMonitoringCohortQueries {
         "MI13DEN9",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMQC13P3DEN(indicator),
-            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},location=${location}"));
+            "startDate=${revisionEndDate-10m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     cd.setCompositionString("MI13DEN9");
     return cd;
   }
@@ -2378,13 +2365,15 @@ public class IntensiveMonitoringCohortQueries {
             + " MONTH)) most_recent GROUP BY most_recent.patient_id  ) as lastVLResult "
             + " ON lastVLResult.patient_id=p.patient_id "
             + " WHERE "
-            + " ( (o.concept_id=${856} AND o.value_numeric is not null) OR (o.concept_id = 1305 and o.value_coded is not null)) AND e.encounter_type=${6} AND  "
-            + " e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL "
+            + " ( (o.concept_id=${856} AND o.value_numeric is not null) OR (o.concept_id = 1305 and o.value_coded is not null)) AND e.encounter_type=${6}  "
+            + " AND e.voided = 0  "
+            + " AND o.voided = 0  "
+            + " AND e.encounter_datetime BETWEEN DATE_ADD(lastVLResult.encounter_date,INTERVAL "
             + vlMonthsLower
             + " MONTH)  "
             + " AND DATE_ADD(lastVLResult.encounter_date,INTERVAL "
             + vlMonthsUpper
-            + " MONTH)AND e.location_id=:location";
+            + " MONTH) AND e.location_id=:location";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String str = stringSubstitutor.replace(query);
@@ -2487,7 +2476,11 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch("AGE2", EptsReportUtils.map(major2, MAPPINGA));
     cd.addSearch("LMDC", EptsReportUtils.map(mdcLastClinical, MAPPINGA));
     cd.addSearch("RMDC", EptsReportUtils.map(recentMdc, MAPPINGA));
-    cd.addSearch("PICKUP", EptsReportUtils.map(pickupAfterClinical, MAPPINGA));
+    cd.addSearch(
+        "PICKUP",
+        EptsReportUtils.map(
+            pickupAfterClinical,
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (isDenominator) {
 
@@ -2708,13 +2701,9 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTherapeuticLineConcept(),
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
 
-    CohortDefinition B4E =
-        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            true, false, 12);
-
     CohortDefinition B5E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            false, true, -12);
+            false, true, 12);
 
     CohortDefinition abandonedInTheLastSixMonthsFromFirstLineDate =
         qualityImprovement2020CohortQueries
@@ -2768,10 +2757,6 @@ public class IntensiveMonitoringCohortQueries {
             B3E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B4E",
-        EptsReportUtils.map(B4E, "startDate=${startDate},endDate=${endDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "B5E",
         EptsReportUtils.map(B5E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2798,7 +2783,7 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "(B1 AND ((B2NEW AND NOT ABANDONEDTARV) OR ((RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE)) AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+        "(B1 AND ((B2NEW AND NOT ABANDONEDTARV) OR ((RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE)) AND NOT B5E) AND NOT (C OR D) AND age");
 
     return compositionCohortDefinition;
   }

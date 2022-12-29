@@ -183,17 +183,17 @@ public class TxCurrDataset extends BaseDataSet {
         new ColumnParameters("thirtyTo34M", "30 - 34 male", "gender=M|age=30-34", "M8");
     ColumnParameters thirty5To39M =
         new ColumnParameters("thirty5To39M", "35 - 39 male", "gender=M|age=35-39", "M9");
-    ColumnParameters foutyTo44M =
-        new ColumnParameters("foutyTo44M", "40 - 44 male", "gender=M|age=40-44", "M10");
-    ColumnParameters fourty5To49M =
-        new ColumnParameters("fourty5To49M", "45 - 49 male", "gender=M|age=45-49", "M11");
+    ColumnParameters fortyTo44M =
+        new ColumnParameters("fortyTo44M", "40 - 44 male", "gender=M|age=40-44", "M10");
+    ColumnParameters forty5To49M =
+        new ColumnParameters("forty5To49M", "45 - 49 male", "gender=M|age=45-49", "M11");
     // 50-54, 55-59, 60-64, 65+ male
     ColumnParameters fiftyTo54M =
         new ColumnParameters("fiftyTo54M", "50 - 54 male", "gender=M|age=50-54", "M12");
     ColumnParameters fifty5To59M =
         new ColumnParameters("fifty5To59M", "55 - 59 male", "gender=M|age=55-59", "M13");
-    ColumnParameters sixityTo64M =
-        new ColumnParameters("sixityTo64M", "60 - 64 male", "gender=M|age=60-64", "M14");
+    ColumnParameters sixtyTo64M =
+        new ColumnParameters("sixtyTo64M", "60 - 64 male", "gender=M|age=60-64", "M14");
     ColumnParameters above65M =
         new ColumnParameters("above65M", "65+ male", "gender=M|age=65+", "M15");
 
@@ -211,17 +211,17 @@ public class TxCurrDataset extends BaseDataSet {
         new ColumnParameters("thirtyTo34F", "30 - 34 female", "gender=F|age=30-34", "F8");
     ColumnParameters thirty5To39F =
         new ColumnParameters("thirty5To39F", "35 - 39 female", "gender=F|age=35-39", "F9");
-    ColumnParameters foutyTo44F =
-        new ColumnParameters("foutyTo44F", "40 - 44 female", "gender=F|age=40-44", "F10");
-    ColumnParameters fouty5To49F =
-        new ColumnParameters("fouty5To49F", "45 - 49 female", "gender=F|age=45-49", "F11");
+    ColumnParameters fortyTo44F =
+        new ColumnParameters("fortyTo44F", "40 - 44 female", "gender=F|age=40-44", "F10");
+    ColumnParameters forty5To49F =
+        new ColumnParameters("forty5To49F", "45 - 49 female", "gender=F|age=45-49", "F11");
     // 50-54, 55-59, 60-64, 65+ female
     ColumnParameters fiftyTo54F =
         new ColumnParameters("fiftyTo54F", "50 - 54 female", "gender=F|age=50-54", "F12");
     ColumnParameters fifty5To59F =
         new ColumnParameters("fifty5To59F", "55 - 59 female", "gender=F|age=55-59", "F13");
-    ColumnParameters sixityTo64F =
-        new ColumnParameters("sixityTo64F", "60 - 64 female", "gender=F|age=60-64", "F14");
+    ColumnParameters sixtyTo64F =
+        new ColumnParameters("sixtyTo64F", "60 - 64 female", "gender=F|age=60-64", "F14");
     ColumnParameters above65F =
         new ColumnParameters("above65F", "65+ female", "gender=F|age=65+", "F15");
     ColumnParameters unknown = new ColumnParameters("unknown", "Unknown age", "age=UK", "UNK");
@@ -234,11 +234,11 @@ public class TxCurrDataset extends BaseDataSet {
         twenty5To29M,
         thirtyTo34M,
         thirty5To39M,
-        foutyTo44M,
-        fourty5To49M,
+        fortyTo44M,
+        forty5To49M,
         fiftyTo54M,
         fifty5To59M,
-        sixityTo64M,
+        sixtyTo64M,
         above65M,
         unknownF,
         tenTo14F,
@@ -247,11 +247,11 @@ public class TxCurrDataset extends BaseDataSet {
         twenty5To29F,
         thirtyTo34F,
         thirty5To39F,
-        foutyTo44F,
-        fouty5To49F,
+        fortyTo44F,
+        forty5To49F,
         fiftyTo54F,
         fifty5To59F,
-        sixityTo64F,
+        sixtyTo64F,
         above65F,
         unknown);
   }

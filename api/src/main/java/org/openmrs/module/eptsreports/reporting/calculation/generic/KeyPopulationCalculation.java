@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.joda.time.LocalDate;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -182,7 +183,8 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
     if (!personAttribute.isEmpty(pId)) {
       PersonAttribute attr = personAttribute.get(pId).asType(PersonAttribute.class);
-      Date date = attr.getDateCreated();
+      Date date = new LocalDate(attr.getDateCreated()).toDate();
+
       try {
         KeyPop keypop = KeyPop.of(attr);
         keyPopByDate.putInList(date, new KeyPopAndSource(keypop, KeyPopSource.PERSON_ATTRIBUTE));
@@ -238,7 +240,42 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
     if (!keyPopByDate.isEmpty()) {
       Date maxDate = Collections.max(keyPopByDate.keySet());
       List<KeyPopAndSource> keyPops = keyPopByDate.get(maxDate);
-      assignedKeyPop = Collections.max(keyPops).getKeyPop();
+      KeyPop adulto = null;
+      KeyPop apss = null;
+      KeyPop person = null;
+      KeyPop pre = null;
+      KeyPop segm = null;
+
+      if (keyPops.size() == 1) {
+        assignedKeyPop = Collections.max(keyPops).getKeyPop();
+      } else { // we assume that we have more than one keypos in the same day for different
+        // instruments
+        for (KeyPopAndSource k : keyPops) {
+          if (k.source == KeyPopSource.ADULTO_FORM) {
+            adulto = k.getKeyPop();
+            break;
+          } else if (k.source == KeyPopSource.APSS_FORM) {
+            apss = k.getKeyPop();
+          } else if (k.source == KeyPopSource.PERSON_ATTRIBUTE) {
+            person = k.getKeyPop();
+          } else if (k.source == KeyPopSource.SEGUIMENTO_PREP_FORM) {
+            segm = k.getKeyPop();
+          } else if (k.source == KeyPopSource.REGISTO_PREP_FORM) {
+            pre = k.getKeyPop();
+          }
+        }
+        if (adulto != null) {
+          assignedKeyPop = adulto;
+        } else if (apss != null) {
+          assignedKeyPop = apss;
+        } else if (person != null) {
+          assignedKeyPop = person;
+        } else if (segm != null) {
+          assignedKeyPop = segm;
+        } else if (pre != null) {
+          assignedKeyPop = pre;
+        }
+      }
     }
 
     return assignedKeyPop;
@@ -350,9 +387,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
             && (menObs.getValueCoded().equals(hivMetadata.getHomosexualConcept())
                 || menObs.getValueCoded().equals(hivMetadata.getDrugUseConcept())
                 || menObs.getValueCoded().equals(hivMetadata.getImprisonmentConcept())
-                || menObs.getValueCoded().equals(hivMetadata.getTransGenderConcept())
-                || menObs.getValueCoded().equals(hivMetadata.getOtherOrNonCodedConcept())
-                || menObs.getValueCoded().equals(hivMetadata.getKeyPopOtherConcept()))) {
+                || menObs.getValueCoded().equals(hivMetadata.getTransGenderConcept()))) {
           keyPopForMen.add(menObs);
         }
       }
@@ -362,9 +397,7 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
             && (femaleObs.getValueCoded().equals(hivMetadata.getSexWorkerConcept())
                 || femaleObs.getValueCoded().equals(hivMetadata.getDrugUseConcept())
                 || femaleObs.getValueCoded().equals(hivMetadata.getImprisonmentConcept())
-                || femaleObs.getValueCoded().equals(hivMetadata.getTransGenderConcept())
-                || femaleObs.getValueCoded().equals(hivMetadata.getOtherOrNonCodedConcept())
-                || femaleObs.getValueCoded().equals(hivMetadata.getKeyPopOtherConcept()))) {
+                || femaleObs.getValueCoded().equals(hivMetadata.getTransGenderConcept()))) {
           keyPopForWomen.add(femaleObs);
         }
       }
@@ -399,11 +432,6 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
 
             } else if (obs.getValueCoded().equals(hivMetadata.getTransGenderConcept())) {
               requiredObs = obs;
-
-            } else if (obs.getValueCoded().equals(hivMetadata.getOtherOrNonCodedConcept())) {
-              requiredObs = obs;
-            } else if (obs.getValueCoded().equals(hivMetadata.getKeyPopOtherConcept())) {
-              requiredObs = obs;
             }
           }
         }
@@ -421,11 +449,6 @@ public class KeyPopulationCalculation extends AbstractPatientCalculation {
               requiredObs = obs;
 
             } else if (obs.getValueCoded().equals(hivMetadata.getTransGenderConcept())) {
-              requiredObs = obs;
-
-            } else if (obs.getValueCoded().equals(hivMetadata.getOtherOrNonCodedConcept())) {
-              requiredObs = obs;
-            } else if (obs.getValueCoded().equals(hivMetadata.getKeyPopOtherConcept())) {
               requiredObs = obs;
             }
           }
