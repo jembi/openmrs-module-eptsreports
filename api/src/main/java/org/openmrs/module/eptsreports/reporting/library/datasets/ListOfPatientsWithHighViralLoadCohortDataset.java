@@ -161,19 +161,33 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
-    // 11 - Pregnant/Breastfeeding: - Sheet 1: Column I
+    // 11 - Pregnant/Breastfeeding: - Sheet 1: Column K
     pdd.addColumn(
         "pregnant_breastfeeding",
         tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
         "location=${location}",
         null);
 
-    // 12 - Patients active on TB Treatment - Sheet 1: Column G
+    // 12 - Patients active on TB Treatment - Sheet 1: Column L
     pdd.addColumn(
         "ontbtreatment",
         listChildrenOnARTandFormulationsDataset.getPatientsActiveOnTB(),
         "endDate=${generationDate},location=${location}",
         new StoYesAndNtoNoConverter());
+
+        // 13 - Date of Sample collection - Sheet 1: Column M
+        pdd.addColumn(
+            "sample_collection_date",
+            listOfPatientsWithHighViralLoadCohortQueries.getVLSampleCollectionDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}",
+            null);
+
+        // 14 - Date of the VL Result reception - Sheet 1: Column N
+        pdd.addColumn(
+            "result_reception_date",
+            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}",
+            null);
 
     return pdd;
   }
