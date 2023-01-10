@@ -7478,6 +7478,72 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
+  public CohortDefinition getPatientsAlreadyEnrolledInTheMdcNum() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName(
+        "MDS para utentes estáveis que tiveram consulta no período de avaliação");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    List<Integer> mdsConcepts =
+        Arrays.asList(
+            hivMetadata.getGaac().getConceptId(),
+            hivMetadata.getQuarterlyDispensation().getConceptId(),
+            hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
+            hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
+            hivMetadata.getRapidFlow().getConceptId(),
+            hivMetadata.getSemiannualDispensation().getConceptId());
+
+    List<Integer> states =
+        Collections.singletonList(hivMetadata.getCompletedConcept().getConceptId());
+
+    CohortDefinition mdsLastClinical =
+        getPatientsWithMdcBeforeMostRecentClinicalFormWithFollowingDispensationTypesAndState(
+            mdsConcepts, states);
+
+    CohortDefinition dtBeforeClinical =
+        getPatientsWithDispensationBeforeLastConsultationDate(hivMetadata.getQuarterlyConcept());
+    CohortDefinition dsBeforeClinical =
+        getPatientsWithDispensationBeforeLastConsultationDate(
+            hivMetadata.getSemiannualDispensation());
+
+    CohortDefinition filaBC83 = getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(83, 97);
+
+    CohortDefinition filaBC173 =
+        getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(173, 187);
+
+    compositionCohortDefinition.addSearch(
+        "MDS",
+        EptsReportUtils.map(
+            mdsLastClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "DT",
+        EptsReportUtils.map(
+            dtBeforeClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "DS",
+        EptsReportUtils.map(
+            dsBeforeClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "FILA83",
+        EptsReportUtils.map(
+            filaBC83, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "FILA173",
+        EptsReportUtils.map(
+            filaBC173, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("MDS OR DS OR DT OR FILA83 OR FILA173");
+
+    return compositionCohortDefinition;
+  }
+
   /**
    * <b>MQ14Den: M&Q Report - Categoria 14 Denominador</b><br>
    * <i>A - Select all patientsTX PVLS DENOMINATOR: TX PVLS Denominator</i> <i>A1 - Filter all
@@ -8483,8 +8549,31 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
+    cd.addSearch(
+        "MQ15MdsDen14",
+        EptsReportUtils.map(
+            getMQ15MdsDen14(true),
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("MQ15MdsDen14");
+    return cd;
+  }
+
+  public CohortDefinition getMQ15MdsDen14(boolean den) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("15.14 - % de inscritos em MDS que receberam CV");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
     CohortDefinition Mq15A = intensiveMonitoringCohortQueries.getMI15A();
-    CohortDefinition alreadyMdc = getPatientsAlreadyEnrolledInTheMdc();
+    CohortDefinition alreadyMdc;
+
+    if (den) {
+      alreadyMdc = getPatientsAlreadyEnrolledInTheMdc();
+    } else {
+      alreadyMdc = getPatientsAlreadyEnrolledInTheMdcNum();
+    }
 
     CohortDefinition Mq15H = intensiveMonitoringCohortQueries.getMI15H();
 
@@ -8558,7 +8647,7 @@ public class QualityImprovement2020CohortQueries {
             hadFilaAfterClinical,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("Mq15DenMds14 AND FAC");
+    cd.setCompositionString("Mq15DenMds14 OR FAC");
 
     return cd;
   }
