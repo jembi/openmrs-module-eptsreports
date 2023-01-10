@@ -7429,9 +7429,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getSemiannualDispensation().getConceptId());
 
     List<Integer> states =
-        Arrays.asList(
-            hivMetadata.getStartDrugs().getConceptId(),
-            hivMetadata.getContinueRegimenConcept().getConceptId());
+        Collections.singletonList(hivMetadata.getCompletedConcept().getConceptId());
 
     CohortDefinition mdsLastClinical =
         getPatientsWithMdcBeforeMostRecentClinicalFormWithFollowingDispensationTypesAndState(
