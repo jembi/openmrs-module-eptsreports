@@ -114,11 +114,11 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getVLResultReceptionDate() {
+  public DataDefinition getVLResultReceptionDate(boolean resultDate) {
 
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
 
-    spdd.setName("Data de Recepção do Resultado de CV na US");
+    spdd.setName("Data de Recepção do Resultado de CV na US / Resultado da Primeira CV Alta (cp/ml)");
 
     spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
     spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
@@ -130,9 +130,13 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS result_date "
-            + "FROM   patient p "
+            " SELECT p.patient_id, ";
+    if (resultDate){
+      query  += "       Min(e.encounter_datetime) AS result_date ";
+    }else {
+      query  += "       o.value_numeric AS vl_result ";
+    }
+    query  += "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o "

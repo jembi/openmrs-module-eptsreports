@@ -185,7 +185,14 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         // 14 - Date of the VL Result reception - Sheet 1: Column N
         pdd.addColumn(
             "result_reception_date",
-            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(),
+            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}",
+            null);
+
+        // 15 - The first VL Result > 1000 - Sheet 1: Column O
+        pdd.addColumn(
+            "vl_result",
+            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(false),
             "startDate=${startDate},endDate=${endDate},location=${location}",
             null);
 
