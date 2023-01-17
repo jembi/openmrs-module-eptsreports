@@ -5194,4 +5194,19 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.dateOfNextCounselingConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 21188</b>
+   *
+   * <p><b>Name:</b>ARV REGIMEN 3rd LINE
+   *
+   * <p><b>Description:</b> Third ARV Regimen concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getRegArvThirdLine() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.regArvThirdLineUuid");
+    return getConcept(uuid);
+  }
 }

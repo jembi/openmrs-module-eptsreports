@@ -3503,6 +3503,14 @@
 			UUID for DATE OF NEXT COUNSELING Concept
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.regArvThirdLineUuid</property>
+		<defaultValue>4281f035-183f-407d-8286-92613f3039c8</defaultValue>
+		<description>
+			UUID for Third ARV Regimen Concept
+		</description>
+	</globalProperty>
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

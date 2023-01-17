@@ -175,24 +175,45 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         "endDate=${generationDate},location=${location}",
         new StoYesAndNtoNoConverter());
 
-        // 13 - Date of Sample collection - Sheet 1: Column M
-        pdd.addColumn(
-            "sample_collection_date",
-            listOfPatientsWithHighViralLoadCohortQueries.getVLSampleCollectionDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+    // 13 - Date of Sample collection - Sheet 1: Column M
+    pdd.addColumn(
+        "sample_collection_date",
+        listOfPatientsWithHighViralLoadCohortQueries.getVLSampleCollectionDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
-        // 14 - Date of the VL Result reception - Sheet 1: Column N
-        pdd.addColumn(
-            "result_reception_date",
-            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(true),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+    // 14 - Date of the VL Result reception - Sheet 1: Column N
+    pdd.addColumn(
+        "result_reception_date",
+        listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(true),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
-        // 15 - The first VL Result > 1000 - Sheet 1: Column O
-        pdd.addColumn(
-            "vl_result",
-            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(false),
+    // 15 - The first VL Result > 1000 - Sheet 1: Column O
+    pdd.addColumn(
+        "vl_result",
+        listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(false),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
+
+    // 16 - ART Line on High VL Result Date - Sheet 1: Column P
+    pdd.addColumn(
+        "art_line",
+        listOfPatientsWithHighViralLoadCohortQueries.getArtLineOnHighVLResultDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
+
+    // 17 - The first Clinical Consultation Date - Sheet 1: Column Q
+    pdd.addColumn(
+            "first_consultation",
+            listOfPatientsWithHighViralLoadCohortQueries.getFirstRegisteredClinicalConsultationAfterHighVlResultDate(),
+            "startDate=${startDate},endDate=${endDate},location=${location}",
+            new NotApplicableIfNullConverter());
+
+    // 17 - The expected Consultation date - Sheet 1: Column R
+    pdd.addColumn(
+            "expected_consultation_date",
+            listOfPatientsWithHighViralLoadCohortQueries.getExpectedConsultationDate(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
             null);
 
