@@ -205,17 +205,73 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
 
     // 17 - The first Clinical Consultation Date - Sheet 1: Column Q
     pdd.addColumn(
-            "first_consultation",
-            listOfPatientsWithHighViralLoadCohortQueries.getFirstRegisteredClinicalConsultationAfterHighVlResultDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            new NotApplicableIfNullConverter());
+        "first_consultation",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(true),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
 
-    // 17 - The expected Consultation date - Sheet 1: Column R
+    // 18 - The expected Clinical Consultation date - Sheet 1: Column R - The Expected APSS/PP
+    // Session 0 Consultation Date - Sheet 1: Column T
     pdd.addColumn(
-            "expected_consultation_date",
-            listOfPatientsWithHighViralLoadCohortQueries.getExpectedConsultationDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+        "expected_clinical_apss_consultation_date",
+        listOfPatientsWithHighViralLoadCohortQueries.getExpectedClinicalOrApssConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 19 - The date of first APSS/PP Consultation - Sheet 1: Column S
+    pdd.addColumn(
+        "first_apss_consultation",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(false),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 20 - The date of the first APSS/PP Consultation after Session Zero - Sheet 1: Column U
+    pdd.addColumn(
+        "apss_session_one",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getFirstRegisteredApssAfterApssSessionZeroConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 21 - The Expected 1st APSS/PP Consultation Date - Sheet 1: Column V
+    pdd.addColumn(
+        "apss_expected_date_session_one",
+        listOfPatientsWithHighViralLoadCohortQueries.getExpectedApssSessionOneConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 22 - The date of the first APSS/PP Consultation after Session One - Sheet 1: Column W
+    pdd.addColumn(
+        "apss_session_two",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getFirstRegisteredApssAfterApssSessionOneConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter()); // 22 - The date of the first APSS/PP Consultation
+                                             // after Session One - Sheet 1: Column W
+
+    // 23 - Expected 2nd APSS/PP Consultation Date - Sheet 1: Column X
+    pdd.addColumn(
+        "apss_expected_date_session_two",
+        listOfPatientsWithHighViralLoadCohortQueries.getExpectedApssSessionTwoConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 24 - The date of the first APSS/PP Consultation after Session Two - Sheet 1: Column Y
+    pdd.addColumn(
+        "apss_session_three",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getFirstRegisteredApssAfterApssSessionOTwoConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 25 - Expected 3rd APSS/PP Consultation Date - Sheet 1: Column Z
+    pdd.addColumn(
+        "apss_expected_date_session_three",
+        listOfPatientsWithHighViralLoadCohortQueries.getExpectedApssSessionThreeConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
 
     return pdd;
   }

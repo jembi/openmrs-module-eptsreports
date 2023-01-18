@@ -278,27 +278,30 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     return spdd;
   }
 
-
   /**
-   * <b>Data da Consulta Clínica Ocorrida/Registada no Sistema (Sheet 1: Column Q)</b>
+   * <b>Data da Consulta Clínica Ocorrida/Registada no Sistema (Sheet 1: Column Q) / Data da
+   * Consulta de APSS/PP ocorrida/registada no Sistema (Sheet 1: Column S)</b>
    *
-   * <p>The first Clinical Consultation Date registered in Ficha Clinica
-   * between the First High Viral Load Result Date (HVL_FR13) and report
-   * end date <br>
+   * <p>The first Clinical Consultation Date registered in Ficha Clinica between the First High
+   * Viral Load Result Date (HVL_FR13) and report end date <br>
    *
-   * Note: If a patient has more than one clinical consultation registered
-   * on the same date the system will show from the most recently entered
-   * consultation in the system on that specific day. For Patients who do
-   * not have any consultation registered during the period evaluated,
-   * the corresponding column will be filled with N/A.
+   * <p>The date of first APSS/PP Consultation Date registered in Ficha APSS/PP between the First
+   * High Viral Load Result Date (HVL_FR13) and report end date Note: If a patient has more than one
+   * clinical consultation registered on the same date the system will show from the most recently
+   * entered consultation in the system on that specific day. For Patients who do not have any
+   * consultation registered during the period evaluated, the corresponding column will be filled
+   * with N/A.
    *
+   * @param clinicalConsultation Type of consultation flag to change between Clinical and APSS
+   *     encounter types
    * @return {@link DataDefinition}
    */
-  public DataDefinition getFirstRegisteredClinicalConsultationAfterHighVlResultDate(){
+  public DataDefinition getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(
+      boolean clinicalConsultation) {
 
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
 
-    spdd.setName("Data da Consulta Clínica Ocorrida/Registada no Sistema");
+    spdd.setName("Data da Consulta Clínica/APSS/PP Ocorrida/Registada no Sistema");
 
     spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
     spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
@@ -309,9 +312,11 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-            " SELECT p.patient_id, MIN(e.encounter_datetime) as first_consultation "
+        " SELECT p.patient_id, MIN(e.encounter_datetime) as first_consultation "
             + "FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "               INNER JOIN ( "
             + "    SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
@@ -322,14 +327,19 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "      AND e.encounter_type IN (${13}, ${51}) "
             + "      AND o.concept_id = ${856} "
             + "      AND o.value_numeric > 1000 "
-            + "      AND e.encounter_datetime >=  >= :startDate' "
-            + "      AND e.encounter_datetime <= <= :endDate "
+            + "      AND e.encounter_datetime >= :startDate "
+            + "      AND e.encounter_datetime <= :endDate "
             + "      AND e.location_id = :location "
             + "    GROUP BY p.patient_id "
             + ") vl_result on p.patient_id = vl_result.patient_id "
-            + "WHERE p.voided = 0 AND e.voided = 0 "
-            + "  AND e.encounter_type = ${6} "
-            + "  AND e.location_id = :location "
+            + "WHERE p.voided = 0 AND e.voided = 0 ";
+    if (clinicalConsultation) {
+      query += "  AND e.encounter_type = ${6} ";
+    } else {
+      query += "  AND e.encounter_type = ${35} ";
+    }
+    query +=
+        "  AND e.location_id = :location "
             + "  AND e.encounter_datetime BETWEEN vl_result.result_date AND :endDate "
             + "GROUP BY p.patient_id";
 
@@ -340,20 +350,24 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     return spdd;
   }
 
-
   /**
-   * <b>Data da Prevista da Consulta (Sheet 1: Column R)</b>
+   * <b>Data da Prevista da Consulta (Sheet 1: Column R) / Data da Prevista da Consulta APSS/PP
+   * (Sheet 1: Column T)</b>
    *
-   * <p>The system will calculate the expected Consultation Date as follows:
-   * Expected Clinical Consultation Date = First High Viral Load Result Date (value of Column N) + 7 days
+   * <p>The system will calculate the expected Consultation Date as follows: Expected Clinical
+   * Consultation Date = First High Viral Load Result Date (value of Column N) + 7 days
+   *
+   * <p>The system will calculate the expected APSS/PP Consultation Date as follows: Expected
+   * APSS/PP Session 0 Consultation Date = First High Viral Load Result Date (value of Column N) + 7
+   * days
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getExpectedConsultationDate() {
+  public DataDefinition getExpectedClinicalOrApssConsultationDate() {
 
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
 
-    spdd.setName("Data da Prevista da Consulta");
+    spdd.setName("Data da Prevista da Consulta Clinical Consultation / APSS/PP Session 0");
 
     spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
     spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
@@ -364,22 +378,529 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
-    String query = " SELECT p.patient_id, DATE_ADD(MIN(e.encounter_datetime), interval 7 day) AS result_date "
-           + "FROM   patient p "
-                    + "       INNER JOIN encounter e "
-                    + "               ON p.patient_id = e.patient_id "
-                    + "       INNER JOIN obs o "
-                    + "               ON e.encounter_id = o.encounter_id "
-                    + "WHERE  p.voided = 0 "
-                    + "       AND e.voided = 0 "
-                    + "       AND o.voided = 0 "
-                    + "       AND e.encounter_type IN ( ${13}, ${51} ) "
-                    + "       AND o.concept_id = ${856} "
-                    + "       AND o.value_numeric > 1000 "
-                    + "       AND e.location_id = :location "
-                    + "       AND e.encounter_datetime >= :startDate "
-                    + "       AND e.encounter_datetime <= :endDate "
-                    + "GROUP  BY p.patient_id";
+    String query =
+        " SELECT p.patient_id, DATE_ADD(MIN(e.encounter_datetime), interval 7 day) AS expected_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type IN ( ${13}, ${51} ) "
+            + "       AND o.concept_id = ${856} "
+            + "       AND o.value_numeric > 1000 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Consulta de APSS/PP ocorrida/registada no Sistema (Sheet 1: Column U)</b>
+   *
+   * <p>The date of first APSS/PP Consultation registered in Ficha APSS/PP between (after) the
+   * Session 0 APSS/PP Consultation Date (value of column S) and report end date
+   *
+   * <p>Note: Note: For Patients who do not have any APSS/PP consultation registered during the
+   * period evaluated, the corresponding column will be filled with N/A.
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getFirstRegisteredApssAfterApssSessionZeroConsultationDate() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Consulta APSS/PP Ocorrida/Registada no Sistema Após a Sessão 0");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS first_session_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + "           SELECT p.patient_id, MIN(e.encounter_datetime) as session_zero_date "
+            + "                    FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                   INNER JOIN ( "
+            + "                                         SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
+            + "                                         FROM "
+            + "                                             patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                           AND e.encounter_type IN (${13}, ${51}) "
+            + "                                           AND o.concept_id = ${856} "
+            + "                                           AND o.value_numeric > 1000 "
+            + "                                           AND e.encounter_datetime >= :startDate "
+            + "                                           AND e.encounter_datetime <= :endDate "
+            + "                                           AND e.location_id = :location "
+            + "                                         GROUP BY p.patient_id "
+            + "                                 ) vl_result on p.patient_id = vl_result.patient_id "
+            + "                   WHERE p.voided = 0 AND e.voided = 0 "
+            + "                    AND e.encounter_type = ${35} "
+            + "                    AND e.location_id = :location "
+            + "                    AND e.encounter_datetime BETWEEN vl_result.result_date AND :endDate "
+            + "                   GROUP BY p.patient_id ) apss_session_zero "
+            + "       ON p.patient_id = apss_session_zero.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${35}"
+            + "       AND e.location_id = :location  "
+            + "       AND e.encounter_datetime > apss_session_zero.session_zero_date "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Prevista da Consulta APSS/PP (Sheet 1: Column V)</b>
+   *
+   * <p>The system will calculate the expected APSS/PP Consultation Date as follows: Expected 1st
+   * APSS/PP Consultation Date = APSS/PP Session 0 Consultation Date (HVL_FR15 - value of column S)
+   * + 30 days Note: Note: For Patients who do not have any APSS/PP consultation registered during
+   * the period evaluated, the corresponding column will be filled with N/A.
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getExpectedApssSessionOneConsultationDate() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Prevista da Consulta APSS/PP Sessão 0");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "   SELECT p.patient_id, DATE_ADD(MIN(e.encounter_datetime), interval 30 DAY) as expected_first_session_date "
+            + "       FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                       INNER JOIN ( "
+            + "                             SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
+            + "                             FROM "
+            + "                                 patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                           INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                             WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                               AND e.encounter_type IN (${13}, ${51}) "
+            + "                               AND o.concept_id = ${856} "
+            + "                               AND o.value_numeric > 1000 "
+            + "                               AND e.encounter_datetime >= :startDate "
+            + "                               AND e.encounter_datetime <= :endDate "
+            + "                               AND e.location_id = :location "
+            + "                             GROUP BY p.patient_id "
+            + "                     ) vl_result on p.patient_id = vl_result.patient_id "
+            + "       WHERE p.voided = 0 AND e.voided = 0 "
+            + "        AND e.encounter_type = ${35} "
+            + "        AND e.location_id = :location "
+            + "        AND e.encounter_datetime BETWEEN vl_result.result_date AND :endDate "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Consulta de APSS/PP ocorrida/registada no Sistema (Sheet 1: Column W)</b>
+   *
+   * <p>The date of first APSS/PP Consultation registered in Ficha APSS/PP between the 1st APSS/PP
+   * Consultation Date (HVL_FR16 - value of column U) and report end date
+   *
+   * <p>Note: Note: For Patients who do not have any APSS/PP consultation registered during the
+   * period evaluated, the corresponding column will be filled with N/A.
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getFirstRegisteredApssAfterApssSessionOneConsultationDate() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Consulta APSS/PP Ocorrida/Registada no Sistema Após a Sessão 1");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS second_session_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + "                       SELECT p.patient_id, "
+            + "                              Min(e.encounter_datetime) AS first_session_date "
+            + "                       FROM   patient p "
+            + "                              INNER JOIN encounter e "
+            + "                                      ON p.patient_id = e.patient_id "
+            + "                              INNER JOIN obs o "
+            + "                                      ON e.encounter_id = o.encounter_id "
+            + "                              INNER JOIN ( "
+            + "                                  SELECT p.patient_id, MIN(e.encounter_datetime) as session_zero_date "
+            + "                                           FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                          INNER JOIN ( "
+            + "                                                                SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
+            + "                                                                FROM "
+            + "                                                                    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                                              INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                                                WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                                                  AND e.encounter_type IN (${13}, ${51}) "
+            + "                                                                  AND o.concept_id = ${856} "
+            + "                                                                  AND o.value_numeric > 1000 "
+            + "                                                                  AND e.encounter_datetime >= :startDate "
+            + "                                                                  AND e.encounter_datetime <= :endDate "
+            + "                                                                  AND e.location_id = :location "
+            + "                                                                GROUP BY p.patient_id "
+            + "                                                        ) vl_result on p.patient_id = vl_result.patient_id "
+            + "                                          WHERE p.voided = 0 AND e.voided = 0 "
+            + "                                           AND e.encounter_type = ${35} "
+            + "                                           AND e.location_id = :location "
+            + "                                           AND e.encounter_datetime BETWEEN vl_result.result_date AND :endDate "
+            + "                                          GROUP BY p.patient_id ) apss_session_zero "
+            + "                              ON p.patient_id = apss_session_zero.patient_id "
+            + "                       WHERE  p.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.encounter_type = ${35}"
+            + "                              AND e.location_id = :location  "
+            + "                              AND e.encounter_datetime > apss_session_zero.session_zero_date "
+            + "                              AND e.encounter_datetime <= :endDate "
+            + "                       GROUP BY p.patient_id "
+            + "              ) apss_session_one "
+            + "       ON p.patient_id = apss_session_one.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${35} "
+            + "       AND e.location_id = :location  "
+            + "       AND e.encounter_datetime > apss_session_one.first_session_date "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Prevista da Consulta APSS/PP (Sheet 1: Column X)</b>
+   *
+   * <p>The system will calculate the expected APSS/PP Consultation Date as follows: Expected 2nd
+   * APSS/PP Consultation Date = 1st APSS/PP Consultation Date (HVL_FR16 - value of column U) + 30
+   * days
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getExpectedApssSessionTwoConsultationDate() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Prevista da Consulta APSS/PP Após a Sessão 1");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       DATE_ADD(Min(e.encounter_datetime), interval 30 DAY) AS expected_second_session_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + "           SELECT p.patient_id, MIN(e.encounter_datetime) as session_zero_date "
+            + "                    FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                   INNER JOIN ( "
+            + "                                         SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
+            + "                                         FROM "
+            + "                                             patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                           AND e.encounter_type IN (${13}, ${51}) "
+            + "                                           AND o.concept_id = ${856} "
+            + "                                           AND o.value_numeric > 1000 "
+            + "                                           AND e.encounter_datetime >= :startDate "
+            + "                                           AND e.encounter_datetime <= :endDate "
+            + "                                           AND e.location_id = :location "
+            + "                                         GROUP BY p.patient_id "
+            + "                                 ) vl_result on p.patient_id = vl_result.patient_id "
+            + "                   WHERE p.voided = 0 AND e.voided = 0 "
+            + "                    AND e.encounter_type = ${35} "
+            + "                    AND e.location_id = :location "
+            + "                    AND e.encounter_datetime BETWEEN vl_result.result_date AND :endDate "
+            + "                   GROUP BY p.patient_id ) apss_session_zero "
+            + "       ON p.patient_id = apss_session_zero.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${35}"
+            + "       AND e.location_id = :location  "
+            + "       AND e.encounter_datetime > apss_session_zero.session_zero_date "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Consulta de APSS/PP ocorrida/registada no Sistema (Sheet 1: Column Y)</b>
+   *
+   * <p>The date of first APSS/PP Consultation registered in Ficha APSS/PP between the 2nd APSS/PP
+   * Consultation Date (HVL_FR17- value of column W) and report end date
+   *
+   * <p>Note: Note: For Patients who do not have any APSS/PP consultation registered during the
+   * period evaluated, the corresponding column will be filled with N/A.
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getFirstRegisteredApssAfterApssSessionOTwoConsultationDate() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Consulta APSS/PP Ocorrida/Registada no Sistema Após a Sessão 2");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS third_session_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + "                   SELECT p.patient_id, "
+            + "                          Min(e.encounter_datetime) AS second_session_date "
+            + "                   FROM   patient p "
+            + "                          INNER JOIN encounter e "
+            + "                                  ON p.patient_id = e.patient_id "
+            + "                          INNER JOIN obs o "
+            + "                                  ON e.encounter_id = o.encounter_id "
+            + "                          INNER JOIN ( "
+            + "                                          SELECT p.patient_id, "
+            + "                                                 Min(e.encounter_datetime) AS first_session_date "
+            + "                                          FROM   patient p "
+            + "                                                 INNER JOIN encounter e "
+            + "                                                         ON p.patient_id = e.patient_id "
+            + "                                                 INNER JOIN obs o "
+            + "                                                         ON e.encounter_id = o.encounter_id "
+            + "                                                 INNER JOIN ( "
+            + "                                                     SELECT p.patient_id, MIN(e.encounter_datetime) as session_zero_date "
+            + "                                                              FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                                             INNER JOIN ( "
+            + "                                                                                   SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
+            + "                                                                                   FROM "
+            + "                                                                                       patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                                                                 INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                                                                   WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                                                                     AND e.encounter_type IN (${13}, ${51}) "
+            + "                                                                                     AND o.concept_id = ${856} "
+            + "                                                                                     AND o.value_numeric > 1000 "
+            + "                                                                                     AND e.encounter_datetime >= :startDate "
+            + "                                                                                     AND e.encounter_datetime <= :endDate "
+            + "                                                                                     AND e.location_id = :location "
+            + "                                                                                   GROUP BY p.patient_id "
+            + "                                                                           ) vl_result on p.patient_id = vl_result.patient_id "
+            + "                                                             WHERE p.voided = 0 AND e.voided = 0 "
+            + "                                                              AND e.encounter_type = ${35} "
+            + "                                                              AND e.location_id = :location "
+            + "                                                              AND e.encounter_datetime BETWEEN vl_result.result_date AND :endDate "
+            + "                                                             GROUP BY p.patient_id ) apss_session_zero "
+            + "                                                 ON p.patient_id = apss_session_zero.patient_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND o.voided = 0 "
+            + "                                                 AND e.encounter_type = ${35}"
+            + "                                                 AND e.location_id = :location  "
+            + "                                                 AND e.encounter_datetime > apss_session_zero.session_zero_date "
+            + "                                                 AND e.encounter_datetime <= :endDate "
+            + "                                          GROUP BY p.patient_id "
+            + "                                 ) apss_session_one "
+            + "                          ON p.patient_id = apss_session_one.patient_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${35} "
+            + "                          AND e.location_id = :location  "
+            + "                          AND e.encounter_datetime > apss_session_one.first_session_date "
+            + "                          AND e.encounter_datetime <= :endDate "
+            + "                   GROUP BY p.patient_id"
+            + "        ) apss_session_two "
+            + "           ON p.patient_id = apss_session_two.patient_id "
+            + " WHERE  p.voided = 0 "
+            + "        AND e.voided = 0 "
+            + "        AND o.voided = 0 "
+            + "        AND e.encounter_type = ${35} "
+            + "        AND e.location_id = :location  "
+            + "        AND e.encounter_datetime > apss_session_two.second_session_date "
+            + "        AND e.encounter_datetime <= :endDate "
+            + " GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Prevista da Consulta APSS/PP (Sheet 1: Column Z)</b>
+   *
+   * <p>The system will calculate the expected APSS/PP Consultation Date as follows: Expected 3rd
+   * APSS/PP Consultation Date = 2nd APSS/PP Consultation Date (HVL_FR17- value of column W) + 30
+   * days
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getExpectedApssSessionThreeConsultationDate() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Prevista da Consulta APSS/PP Após a Sessão 2");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       DATE_ADD(Min(e.encounter_datetime), interval 30 DAY) AS expected_third_session_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + "                       SELECT p.patient_id, "
+            + "                              Min(e.encounter_datetime) AS first_session_date "
+            + "                       FROM   patient p "
+            + "                              INNER JOIN encounter e "
+            + "                                      ON p.patient_id = e.patient_id "
+            + "                              INNER JOIN obs o "
+            + "                                      ON e.encounter_id = o.encounter_id "
+            + "                              INNER JOIN ( "
+            + "                                  SELECT p.patient_id, MIN(e.encounter_datetime) as session_zero_date "
+            + "                                           FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                          INNER JOIN ( "
+            + "                                                                SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
+            + "                                                                FROM "
+            + "                                                                    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                                              INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                                                                WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                                                  AND e.encounter_type IN (${13}, ${51}) "
+            + "                                                                  AND o.concept_id = ${856} "
+            + "                                                                  AND o.value_numeric > 1000 "
+            + "                                                                  AND e.encounter_datetime >= :startDate "
+            + "                                                                  AND e.encounter_datetime <= :endDate "
+            + "                                                                  AND e.location_id = :location "
+            + "                                                                GROUP BY p.patient_id "
+            + "                                                        ) vl_result on p.patient_id = vl_result.patient_id "
+            + "                                          WHERE p.voided = 0 AND e.voided = 0 "
+            + "                                           AND e.encounter_type = ${35} "
+            + "                                           AND e.location_id = :location "
+            + "                                           AND e.encounter_datetime BETWEEN vl_result.result_date AND :endDate "
+            + "                                          GROUP BY p.patient_id ) apss_session_zero "
+            + "                              ON p.patient_id = apss_session_zero.patient_id "
+            + "                       WHERE  p.voided = 0 "
+            + "                              AND e.voided = 0 "
+            + "                              AND o.voided = 0 "
+            + "                              AND e.encounter_type = ${35}"
+            + "                              AND e.location_id = :location  "
+            + "                              AND e.encounter_datetime > apss_session_zero.session_zero_date "
+            + "                              AND e.encounter_datetime <= :endDate "
+            + "                       GROUP BY p.patient_id "
+            + "              ) apss_session_one "
+            + "       ON p.patient_id = apss_session_one.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${35} "
+            + "       AND e.location_id = :location  "
+            + "       AND e.encounter_datetime > apss_session_one.first_session_date "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
