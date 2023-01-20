@@ -248,8 +248,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstRegisteredApssAfterApssSessionOneConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter()); // 22 - The date of the first APSS/PP Consultation
-                                             // after Session One - Sheet 1: Column W
+        new NotApplicableIfNullConverter());
 
     // 23 - Expected 2nd APSS/PP Consultation Date - Sheet 1: Column X
     pdd.addColumn(
@@ -272,6 +271,14 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries.getExpectedApssSessionThreeConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
+
+    // 26 - The Adherence Evaluation Sheet 1: Column AA
+    pdd.addColumn(
+            "adherence_evaluation",
+            listOfPatientsWithHighViralLoadCohortQueries.getAdherenceEvaluation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}",
+            null
+    ); // add converter
 
     return pdd;
   }
