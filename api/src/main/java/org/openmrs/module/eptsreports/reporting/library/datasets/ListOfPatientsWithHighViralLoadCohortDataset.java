@@ -7,6 +7,7 @@ import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.AdherenceEvaluationConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.StoYesAndNtoNoConverter;
@@ -274,11 +275,37 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
 
     // 26 - The Adherence Evaluation Sheet 1: Column AA
     pdd.addColumn(
-            "adherence_evaluation",
-            listOfPatientsWithHighViralLoadCohortQueries.getAdherenceEvaluation(),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            null
-    ); // add converter
+        "adherence_evaluation",
+        listOfPatientsWithHighViralLoadCohortQueries.getAdherenceEvaluation(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new AdherenceEvaluationConverter());
+
+    // 27 - The date of the first Clinical Consultation marked in Investigações - Pedidos
+    // Laboratoriais Sheet 1: Column AB
+    pdd.addColumn(
+        "lab_investigation_request",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getRequestForLaboratoryInvestigationsAfterApssSessionTwo(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
+
+    // 28 - The date of the first Clinical Consultation marked in Investigações - Pedidos
+    // Laboratoriais Sheet 1: Column AC
+    pdd.addColumn(
+        "clinical_expected_date",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getExpectedClinicalConsultationDateAfterApssSessionTwoConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
+
+    // 29 - The date of the first Clinical Consultation marked in Investigações - Pedidos
+    // Laboratoriais Sheet 1: Column AD
+    pdd.addColumn(
+        "sample_collection_after_session_two",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getDateOfVLSampleCollectionAfterApssSessionTwoConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
     return pdd;
   }
