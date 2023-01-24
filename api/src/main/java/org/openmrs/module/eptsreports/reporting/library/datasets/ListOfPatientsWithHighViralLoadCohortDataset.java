@@ -287,7 +287,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getRequestForLaboratoryInvestigationsAfterApssSessionTwo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new NotApplicableIfNullConverter());
 
     // 28 - The date of the first Clinical Consultation marked in Investigações - Pedidos
     // Laboratoriais Sheet 1: Column AC
@@ -296,7 +296,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedClinicalConsultationDateAfterApssSessionTwoConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new NotApplicableIfNullConverter());
 
     // 29 - The date of the first Clinical Consultation marked in Investigações - Pedidos
     // Laboratoriais Sheet 1: Column AD
@@ -305,7 +305,38 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getDateOfVLSampleCollectionAfterApssSessionTwoConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new NotApplicableIfNullConverter());
+
+    // 30 - Expected Sample Collection Date - Sheet 1: Column AE
+    pdd.addColumn(
+        "expected_date_sample_collection",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getExpectedClinicalConsultationDateAfterApssSessionTwoConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 31 - Date of the earliest Laboratory or FSR form with VL Result - Sheet 1: Column AF
+    pdd.addColumn(
+        "apss_after_session_three",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getFirstLabOrFsrAfterApssSessionThreeConsultationDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 32 - Expected second VL result  Date - Sheet 1: Column AG
+    pdd.addColumn(
+        "expected_result_date_after_session_three",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getExpectedResultDateOfFirstLabOrFsrApssSessionThree(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 33 - VL Result - Sheet 1: Column AH
+    pdd.addColumn(
+        "vl_result_after_session_three",
+        listOfPatientsWithHighViralLoadCohortQueries.getVLResultOfFirstLabOrFsrApssSessionThree(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
 
     return pdd;
   }
