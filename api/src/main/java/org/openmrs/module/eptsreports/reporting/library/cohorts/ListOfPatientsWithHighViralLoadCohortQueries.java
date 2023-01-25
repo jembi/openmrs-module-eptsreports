@@ -828,7 +828,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type = ${6} "
             + "       AND o.concept_id = ${856} "
-            + "       AND o.value_numeric > 1000 "
+            + "       AND o.value_numeric IS NOT NULL "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= session_two.second_session_date "
             + "       AND e.encounter_datetime <= :endDate "
@@ -915,28 +915,23 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT p.patient_id, "
-            + "       Min(o2.value_datetime) AS collection_date "
+            + "       Min(o.value_datetime) AS collection_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
-            + "       INNER JOIN obs o2 "
-            + "                 ON e.encounter_id = o2.encounter_id "
             + "INNER JOIN ( "
             + HighViralLoadQueries.getSessionTwoQuery()
             + "          ) session_two ON p.patient_id = session_two.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND o2.voided = 0 "
             + "       AND e.encounter_type IN ( ${13}, ${51} ) "
-            + "       AND (o.concept_id = ${856} "
-            + "       AND o.value_numeric > 1000) "
             + "       AND e.location_id = :location "
-            + "       AND (o2.concept_id = ${23821}"
-            + "       AND o2.value_datetime > session_two.second_session_date "
-            + "       AND o2.value_datetime <= :endDate) "
+            + "       AND (o.concept_id = ${23821}"
+            + "       AND o.value_datetime > session_two.second_session_date "
+            + "       AND o.value_datetime <= :endDate) "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
@@ -969,20 +964,17 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
     valuesMap.put(
         "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
         " SELECT p.patient_id, "
-            + "       Min(o2.value_datetime) AS result_date "
+            + "       Min(e.encounter_datetime) AS result_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
-            + "       INNER JOIN obs o2 "
-            + "                 ON e.encounter_id = o2.encounter_id "
             + "INNER JOIN ( "
             + HighViralLoadQueries.getSessionThreeQuery()
             + "          ) session_two ON p.patient_id = session_two.patient_id "
@@ -992,11 +984,10 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "       AND o2.voided = 0 "
             + "       AND e.encounter_type IN ( ${13}, ${51} ) "
             + "       AND (o.concept_id = ${856} "
-            + "       AND o.value_numeric > 1000) "
+            + "       AND o.value_numeric IS NOT NULL) "
             + "       AND e.location_id = :location "
-            + "       AND (o2.concept_id = ${23821}"
-            + "       AND o2.value_datetime > session_two.third_session_date "
-            + "       AND o2.value_datetime <= :endDate) "
+            + "       AND (e.encounter_datetime > session_two.third_session_date "
+            + "       AND e.encounter_datetime <= :endDate) "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
@@ -1029,7 +1020,6 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
     valuesMap.put(
         "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
@@ -1084,18 +1074,32 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "             patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                       INNER JOIN ( "
-            + "                                 SELECT session_three.patient_id, "
-            + "                                       DATE_ADD(session_three.third_session_date, INTERVAL 30 DAY) AS expected_date "
-            + "                                 FROM   ( "
-            + HighViralLoadQueries.getSessionThreeQuery()
-            + "                                  ) session_three "
-            + "                                 GROUP  BY session_three.patient_id"
-            + "                              ) expected_date on expected_date.patient_id = p.patient_id "
+            + "                                   SELECT p.patient_id, "
+            + "                                          Min(e.encounter_datetime) AS result_date "
+            + "                                   FROM   patient p "
+            + "                                          INNER JOIN encounter e "
+            + "                                                  ON p.patient_id = e.patient_id "
+            + "                                          INNER JOIN obs o "
+            + "                                                  ON e.encounter_id = o.encounter_id "
+            + "                                          INNER JOIN ( "
+            +                                                 HighViralLoadQueries.getSessionThreeQuery()
+            + "                                             ) session_two ON p.patient_id = session_two.patient_id "
+            + "                                   WHERE  p.voided = 0 "
+            + "                                          AND e.voided = 0 "
+            + "                                          AND o.voided = 0 "
+            + "                                          AND e.encounter_type IN ( ${13}, ${51} ) "
+            + "                                          AND (o.concept_id = ${856} "
+            + "                                          AND o.value_numeric IS NOT NULL) "
+            + "                                          AND e.location_id = :location "
+            + "                                          AND e.encounter_datetime > session_two.third_session_date "
+            + "                                          AND e.encounter_datetime <= :endDate) "
+            + "                                   GROUP  BY p.patient_id"
+            + "                                 ) af_date on af_date.patient_id = p.patient_id "
             + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "          AND e.encounter_type IN (${13}, ${51}) "
             + "          AND o.concept_id = ${856} "
-            + "          AND o.value_numeric > 1000 "
-            + "          AND e.encounter_datetime = expected_date.expected_date "
+            + "          AND o.value_numeric IS NOT NULL "
+            + "          AND e.encounter_datetime = af_date.result_date "
             + "          AND e.location_id = :location "
             + "        GROUP BY p.patient_id ";
 

@@ -7,10 +7,7 @@ import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.eptsreports.reporting.data.converter.AdherenceEvaluationConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.StoYesAndNtoNoConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsWithHighViralLoadCohortQueries;
@@ -337,6 +334,13 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries.getVLResultOfFirstLabOrFsrApssSessionThree(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
+
+    // 34 - The Second VL Result Classification - Sheet 1: Column AI
+    pdd.addColumn(
+        "vl_result_classification",
+        listOfPatientsWithHighViralLoadCohortQueries.getVLResultOfFirstLabOrFsrApssSessionThree(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new VlResultClassificationConverter());
 
     return pdd;
   }
