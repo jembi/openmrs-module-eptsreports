@@ -629,12 +629,16 @@ public class ResumoMensalQueries {
       int returnVisitDateForArvDrugConcept,
       int arvPharmaciaEncounterType,
       int artDatePickup,
+      int artPickupAccommodationCamp,
+      int yesConceptUuid,
       int masterCardDrugPickupEncounterType) {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("returnVisitDateForArvDrugConcept", returnVisitDateForArvDrugConcept);
     map.put("arvPharmaciaEncounterType", arvPharmaciaEncounterType);
     map.put("artDatePickup", artDatePickup);
+    map.put("artPickupAccommodationCamp", artPickupAccommodationCamp);
+    map.put("yesConceptUuid", yesConceptUuid);
     map.put("masterCardDrugPickupEncounterType", masterCardDrugPickupEncounterType);
 
     StringBuilder query = new StringBuilder();
@@ -687,11 +691,17 @@ public class ResumoMensalQueries {
     query.append("                                 ON enc.patient_id = pa.patient_id   ");
     query.append("                             inner join obs obs   ");
     query.append("                                 ON obs.encounter_id = enc.encounter_id   ");
+    query.append("                             inner join obs obs2   ");
+    query.append("                                 ON obs2.encounter_id = enc.encounter_id   ");
     query.append("                         WHERE  pa.voided = 0   ");
     query.append("                             AND enc.voided = 0   ");
     query.append("                             AND obs.voided = 0   ");
+    query.append("                             AND obs2.voided = 0   ");
     query.append("                             AND obs.concept_id = ${artDatePickup}   ");
     query.append("                             AND obs.value_datetime IS NOT NULL   ");
+    query.append(
+        "                             AND obs2.concept_id = ${artPickupAccommodationCamp}   ");
+    query.append("                             AND obs2.value_coded = ${yesConceptUuid}   ");
     query.append(
         "                             AND enc.encounter_type = ${masterCardDrugPickupEncounterType}   ");
     query.append("                             AND enc.location_id = :location   ");
