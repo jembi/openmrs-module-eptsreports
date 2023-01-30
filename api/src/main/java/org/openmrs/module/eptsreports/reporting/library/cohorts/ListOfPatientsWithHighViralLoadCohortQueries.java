@@ -967,28 +967,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put(
         "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
-    String query =
-        " SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS result_date "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON p.patient_id = e.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON e.encounter_id = o.encounter_id "
-            + "INNER JOIN ( "
-            + HighViralLoadQueries.getSessionThreeQuery()
-            + "          ) session_two ON p.patient_id = session_two.patient_id "
-            + "WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND o2.voided = 0 "
-            + "       AND e.encounter_type IN ( ${13}, ${51} ) "
-            + "       AND (o.concept_id = ${856} "
-            + "       AND o.value_numeric IS NOT NULL) "
-            + "       AND e.location_id = :location "
-            + "       AND (e.encounter_datetime > session_two.third_session_date "
-            + "       AND e.encounter_datetime <= :endDate) "
-            + "GROUP  BY p.patient_id";
+    String query = HighViralLoadQueries.getColumnFQuery(false);
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -1074,26 +1053,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "             patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                       INNER JOIN ( "
-            + "                                   SELECT p.patient_id, "
-            + "                                          Min(e.encounter_datetime) AS result_date "
-            + "                                   FROM   patient p "
-            + "                                          INNER JOIN encounter e "
-            + "                                                  ON p.patient_id = e.patient_id "
-            + "                                          INNER JOIN obs o "
-            + "                                                  ON e.encounter_id = o.encounter_id "
-            + "                                          INNER JOIN ( "
-            +                                                 HighViralLoadQueries.getSessionThreeQuery()
-            + "                                             ) session_two ON p.patient_id = session_two.patient_id "
-            + "                                   WHERE  p.voided = 0 "
-            + "                                          AND e.voided = 0 "
-            + "                                          AND o.voided = 0 "
-            + "                                          AND e.encounter_type IN ( ${13}, ${51} ) "
-            + "                                          AND (o.concept_id = ${856} "
-            + "                                          AND o.value_numeric IS NOT NULL) "
-            + "                                          AND e.location_id = :location "
-            + "                                          AND e.encounter_datetime > session_two.third_session_date "
-            + "                                          AND e.encounter_datetime <= :endDate) "
-            + "                                   GROUP  BY p.patient_id"
+            + HighViralLoadQueries.getColumnFQuery(false)
             + "                                 ) af_date on af_date.patient_id = p.patient_id "
             + "        WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "          AND e.encounter_type IN (${13}, ${51}) "
@@ -1104,6 +1064,186 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "        GROUP BY p.patient_id ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Consulta Clínica Ocorrida/Registada no Sistema (Sheet 1: Column AJ)</b>
+   *
+   * <p>The first Clinical Consultation Date registered in Ficha Clinica between the Second High
+   * Viral Load Result (>1000 copies/ml) Date (value of column AF) and report end date
+   *
+   * <p>Note: If a patient has more than one clinical consultation registered on the same date the
+   * system will show from the most recently entered consultation in the system on that specific
+   * day. For Patients who do not have any consultation registered during the period evaluated, the
+   * corresponding column will be filled with N/A.
+   *
+   * @see #getFirstLabOrFsrAfterApssSessionThreeConsultationDate
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getFirstClinicalConsultationAfterSecondHighVLResult() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName(
+        "Data da Consulta Clínica Ocorrida/Registada no Sistema Após a 2a Carga Viral alta");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT     p.patient_id, "
+            + "           Min(e.encounter_datetime) AS first_consultation "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         p.patient_id = e.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         e.encounter_id = o.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     p.patient_id, "
+            + "                                 e.encounter_datetime AS result_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e "
+            + "                      ON         p.patient_id = e.patient_id "
+            + "                      INNER JOIN obs o "
+            + "                      ON         e.encounter_id = o.encounter_id "
+            + "                      INNER JOIN "
+            + "                                 ( "
+            + HighViralLoadQueries.getColumnFQuery(false)
+            + " ) af_date "
+            + "                      ON         af_date.patient_id = p.patient_id "
+            + "                      WHERE      p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      AND        e.encounter_type IN (${13}, "
+            + "                                                      ${51}) "
+            + "                      AND        o.concept_id = ${856} "
+            + "                      AND        o.value_numeric >= 1000 "
+            + "                      AND        e.encounter_datetime = af_date.result_date "
+            + "                      AND        e.location_id = :location "
+            + "                      GROUP BY   p.patient_id ) af_date "
+            + "ON         af_date.patient_id = p.patient_id "
+            + "WHERE      p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "AND        e.encounter_type = ${6} "
+            + "AND        e.location_id = :location "
+            + "AND        e.encounter_datetime > af_date.result_date "
+            + "AND        e.encounter_datetime <= :endDate "
+            + "GROUP BY   p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Prevista da Consulta (Sheet 1: Column AK)</b>
+   *
+   * <p>The system will calculate the expected Consultation Date as follows: Expected Clinical
+   * Consultation Date = Second High Viral Load Result Date (>1000 copies/ml) (HVL_FR22 - value of
+   * column AF) + 30 days
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getExpectedClinicalConsultationDate() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Prevista da Consulta");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    String query =
+        " SELECT af_date.patient_id, "
+            + "      DATE_ADD(af_date.result_date, INTERVAL 30 DAY) AS expected_date "
+            + "FROM   ( "
+            + HighViralLoadQueries.getColumnFQuery(true)
+            + " ) af_date "
+            + "GROUP  BY af_date.patient_id";
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data de Início da Nova Linha (se aplicável) (Sheet 1: Column AL)</b>
+   *
+   * <p>The first Clinical Consultation Date registered in Ficha Clinica between the Second High
+   * Viral Load Result (>1000 copies/ml) Date (HVL_FR22 - value of column AF) and report end date
+   * with ``2a Linha`` OR ``3a Linha`` marked
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getNewLineInitiationDate() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data de Início da Nova Linha (se aplicável)");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    valuesMap.put("21188", hivMetadata.getRegArvThirdLine().getConceptId());
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    String query =
+        "SELECT p.patient_id, MIN(e.encounter_datetime) as first_consultation "
+            + "FROM patient p "
+            + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "        INNER JOIN ( "
+            + HighViralLoadQueries.getColumnFQuery(true)
+            + " ) af_date on p.patient_id = af_date.patient_id "
+            + "WHERE p.voided = 0 "
+            + "  AND e.voided = 0 "
+            + "  AND o.voided = 0 "
+            + "  AND e.encounter_type = ${6} "
+            + "  AND o.concept_id IN (${21187}, ${21188}) "
+            + "  AND o.value_coded IS NOT NULL "
+            + "  AND e.location_id = :location "
+            + "  AND e.encounter_datetime > af_date.result_date "
+            + "  AND e.encounter_datetime <= :endDate "
+            + "GROUP BY p.patient_id";
 
     spdd.setQuery(substitutor.replace(query));
 

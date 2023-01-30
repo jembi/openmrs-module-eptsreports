@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
-
 public class HighViralLoadQueries {
 
   /**
@@ -18,7 +17,7 @@ public class HighViralLoadQueries {
         + "                                         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
         + "                                           AND e.encounter_type IN (${13}, ${51}) "
         + "                                           AND o.concept_id = ${856} "
-        + "                                           AND o.value_numeric > 1000 "
+        + "                                           AND o.value_numeric >= 1000 "
         + "                                           AND e.encounter_datetime >= :startDate "
         + "                                           AND e.encounter_datetime <= :endDate "
         + "                                           AND e.location_id = :location "
@@ -107,5 +106,41 @@ public class HighViralLoadQueries {
         + "        AND e.encounter_datetime > apss_session_two.second_session_date "
         + "        AND e.encounter_datetime <= :endDate "
         + " GROUP BY p.patient_id";
+  }
+
+  /**
+   * Date of the earliest Laboratory or FSR form with VL Result registered between the 3rd APSS/PP
+   * Consultation Date (value of column Y) and report end date
+   */
+  public static String getColumnFQuery(boolean greaterThan1000) {
+    String query =
+        " SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS result_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "INNER JOIN ( "
+            + HighViralLoadQueries.getSessionThreeQuery()
+            + "          ) session_three ON p.patient_id = session_three.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "       AND e.encounter_type IN ( ${13}, ${51} ) "
+            + "       AND (o.concept_id = ${856} ";
+    if (greaterThan1000) {
+      query += "       AND o.value_numeric >= 1000) ";
+    } else {
+      query += "       AND o.value_numeric IS NOT NULL) ";
+    }
+    query +=
+        "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime > session_three.third_session_date "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id";
+
+    return query;
   }
 }
