@@ -944,7 +944,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
   /**
    * <b>Data do Resultado da 2ª CV registada no Sistema (Sheet 1: Column AF)</b>
    *
-   * <p>Date of the earliest Laboratory or FSR form with VL Result registered registered between the
+   * <p>Date of the earliest Laboratory or FSR form with VL Result registered between the
    * 3rd APSS/PP Consultation Date (value of column Y) and report end date
    *
    * @see #getFirstRegisteredApssAfterApssSessionOneConsultationDate
@@ -1260,7 +1260,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getFirstApsslConsultationAfterSecondHighVLResult() {
+  public DataDefinition getFirstApssConsultationAfterSecondHighVLResult() {
 
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
 
@@ -1279,24 +1279,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-            "SELECT p.patient_id, "
-                    + "       Min(e.encounter_datetime) AS apss_date "
-                    + "FROM   patient p "
-                    + "       INNER JOIN encounter e "
-                    + "               ON p.patient_id = e.patient_id "
-                    + "       INNER JOIN obs o "
-                    + "               ON e.encounter_id = o.encounter_id "
-                    + "        INNER JOIN ( "
-                    + HighViralLoadQueries.getColumnFQuery(true)
-                    + " ) af_date on p.patient_id = af_date.patient_id "
-                    + " WHERE  p.voided = 0 "
-                    + "        AND e.voided = 0 "
-                    + "        AND o.voided = 0 "
-                    + "        AND e.encounter_type = ${35} "
-                    + "        AND e.location_id = :location  "
-                    + "        AND e.encounter_datetime > af_date.result_date "
-                    + "        AND e.encounter_datetime <= :endDate "
-                    + " GROUP BY p.patient_id";
+            HighViralLoadQueries.getApssSessionZero();
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -1313,7 +1296,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getExpectedApsslConsultationAfterSecondHighVLResult() {
+  public DataDefinition getExpectedApssConsultationAfterSecondHighVLResult() {
 
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
 
@@ -1340,6 +1323,101 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
                     + HighViralLoadQueries.getColumnFQuery(false)
                     + " ) af_date "
                     + "GROUP  BY af_date.patient_id";
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Consulta de APSS/PP ocorrida/registada no Sistema (Sheet 1: Column AO)</b>
+   *
+   * <p>The date of first APSS/PP Consultation registered in Ficha APSS/PP between the
+   * APSS/PP Session 0 After Second High VL Consultation Date (HVL_FR27 - value of
+   * column AM) and report end date
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getFirstApssConsultationAfterFirstApssSessionZero(){
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Consulta APSS/PP Ocorrida/Registada no Sistema Após Sessao 0");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+            "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+            "SELECT p.patient_id, "
+                    + "       Min(e.encounter_datetime) AS apss_date "
+                    + "FROM   patient p "
+                    + "       INNER JOIN encounter e "
+                    + "               ON p.patient_id = e.patient_id "
+                    + "       INNER JOIN obs o "
+                    + "               ON e.encounter_id = o.encounter_id "
+                    + "        INNER JOIN ( "
+                    + HighViralLoadQueries.getApssSessionZero()
+                    + " ) session_date on p.patient_id = session_date.patient_id "
+                    + " WHERE  p.voided = 0 "
+                    + "        AND e.voided = 0 "
+                    + "        AND o.voided = 0 "
+                    + "        AND e.encounter_type = ${35} "
+                    + "        AND e.location_id = :location  "
+                    + "        AND e.encounter_datetime > session_date.apss_date "
+                    + "        AND e.encounter_datetime <= :endDate "
+                    + " GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>Data da Prevista da Consulta APSS/PP (Sheet 1: Column AP)</b>
+   *
+   * <p>Expected 1st APSS/PP Consultation Date = APSS/PP Session 0 After
+   * Second High VL Consultation Date (HVL_FR27 - value of column AM) + 30 days
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getExpectedFirstApssConsultationAfterFirstApssSessionZero() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Prevista da Consulta APSS/PP apos Sessao 0");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
+    valuesMap.put(
+            "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    String query =
+            " SELECT am_date.patient_id, "
+                    + "      DATE_ADD(am_date.apss_date, INTERVAL 30 DAY) AS expected_date "
+                    + "FROM   ( "
+                    + HighViralLoadQueries.getApssSessionZero()
+                    + " ) am_date "
+                    + "GROUP  BY am_date.patient_id";
 
     spdd.setQuery(substitutor.replace(query));
 

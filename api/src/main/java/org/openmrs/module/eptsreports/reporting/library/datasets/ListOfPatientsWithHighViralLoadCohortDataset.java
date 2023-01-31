@@ -367,16 +367,30 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     // 38 - The date of first APSS/PP Consultation Date after the Second High Viral Load Result Date  - Sheet 1: Column AM
     pdd.addColumn(
         "apss_consultation_date_after_second_high_vl",
-        listOfPatientsWithHighViralLoadCohortQueries.getFirstApsslConsultationAfterSecondHighVLResult(),
+        listOfPatientsWithHighViralLoadCohortQueries.getFirstApssConsultationAfterSecondHighVLResult(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
 
     // 39 - Expected APSS/PP Session 0 Consultation Date  - Sheet 1: Column AN
     pdd.addColumn(
         "expected_apss_consultation_date_after_second_high_vl",
-        listOfPatientsWithHighViralLoadCohortQueries.getExpectedApsslConsultationAfterSecondHighVLResult(),
+        listOfPatientsWithHighViralLoadCohortQueries.getExpectedApssConsultationAfterSecondHighVLResult(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
+
+    // 40 - The date of first APSS/PP Consultation registered in Ficha APSS/PP between the APSS/PP Session 0  - Sheet 1: Column AO
+    pdd.addColumn(
+        "first_apss_consultation_date_after_apss_session_zero",
+        listOfPatientsWithHighViralLoadCohortQueries.getFirstApssConsultationAfterFirstApssSessionZero(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 41 - Expected 1st APSS/PP Consultation Date - Sheet 1: Column AP
+    pdd.addColumn(
+            "expected_apss_consultation_date_after_apss_session_zero",
+            listOfPatientsWithHighViralLoadCohortQueries.getExpectedFirstApssConsultationAfterFirstApssSessionZero(),
+            "startDate=${startDate},endDate=${endDate},location=${location}",
+            new NotApplicableIfNullConverter());
 
     return pdd;
   }
