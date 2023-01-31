@@ -25,11 +25,8 @@ import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Concept;
 import org.openmrs.Location;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
-import org.openmrs.module.eptsreports.reporting.calculation.CodedObsOnFirstOrSecondEncounterCalculation;
-import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.EptsTransferredInCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.ResumoMensalTransferredOutCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.cohort.evaluator.ResumoMensalTransferredOutCohortDefinitionEvaluator;
@@ -2101,23 +2098,6 @@ public class ResumoMensalCohortQueries {
             hivMetadata.getARVPediatriaInitialEncounterType().getEncounterTypeId()));
 
     return sqlCohortDefinition;
-  }
-
-  /**
-   * <b>Description:<b> Number of patients that have ACTIVE TB = YES in their FIRST or SECOND S.TARV
-   * – Adulto Seguimento encounter
-   *
-   * @return {@link CohortDefinition}
-   */
-  private CohortDefinition getPatientsDiagnosedForActiveTB() {
-    CodedObsOnFirstOrSecondEncounterCalculation calculation =
-        Context.getRegisteredComponents(CodedObsOnFirstOrSecondEncounterCalculation.class).get(0);
-    CalculationCohortDefinition cd = new CalculationCohortDefinition(calculation);
-    cd.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
-    cd.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    return cd;
   }
 
   /**
