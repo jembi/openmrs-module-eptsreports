@@ -145,30 +145,78 @@ public class HighViralLoadQueries {
   }
 
   /**
-   * <p>
-   *     The date of first APSS/PP Consultation Date registered in Ficha APSS/SS between the
-   *     Second High Viral Load Result Date (HVL_FR22 - value of column AF) and report end date
-   * </p>
+   * The date of first APSS/PP Consultation Date registered in Ficha APSS/SS between the Second High
+   * Viral Load Result Date (HVL_FR22 - value of column AF) and report end date
    */
   public static String getApssSessionZero() {
 
     return "SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS apss_date "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON p.patient_id = e.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON e.encounter_id = o.encounter_id "
-            + "        INNER JOIN ( "
-            + HighViralLoadQueries.getColumnFQuery(true)
-            + " ) af_date on p.patient_id = af_date.patient_id "
-            + " WHERE  p.voided = 0 "
-            + "        AND e.voided = 0 "
-            + "        AND o.voided = 0 "
-            + "        AND e.encounter_type = ${35} "
-            + "        AND e.location_id = :location  "
-            + "        AND e.encounter_datetime > af_date.result_date "
-            + "        AND e.encounter_datetime <= :endDate "
-            + " GROUP BY p.patient_id";
+        + "       Min(e.encounter_datetime) AS apss_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "        INNER JOIN ( "
+        + HighViralLoadQueries.getColumnFQuery(true)
+        + " ) af_date on p.patient_id = af_date.patient_id "
+        + " WHERE  p.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_type = ${35} "
+        + "        AND e.location_id = :location  "
+        + "        AND e.encounter_datetime > af_date.result_date "
+        + "        AND e.encounter_datetime <= :endDate "
+        + " GROUP BY p.patient_id";
+  }
+
+  /**
+   * The date of first APSS/PP Consultation registered in Ficha APSS/PP between the APSS/PP Session
+   * 0 After Second High VL Consultation Date (HVL_FR27 - value of column AM) and report end date
+   */
+  public static String getApssSessionOne() {
+    return "SELECT p.patient_id, "
+        + "       Min(e.encounter_datetime) AS apss_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "        INNER JOIN ( "
+        + HighViralLoadQueries.getApssSessionZero()
+        + " ) session_date on p.patient_id = session_date.patient_id "
+        + " WHERE  p.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_type = ${35} "
+        + "        AND e.location_id = :location  "
+        + "        AND e.encounter_datetime > session_date.apss_date "
+        + "        AND e.encounter_datetime <= :endDate "
+        + " GROUP BY p.patient_id";
+  }
+
+  /**
+   * The date of first APSS/PP Consultation registered in Ficha APSS/PP between the 1st APSS/PP
+   * Consultation Date after second high VL (HVL_FR28 - value of column AO) and report end date
+   */
+  public static String getApssSessionTwo() {
+    return "SELECT p.patient_id, "
+        + "       Min(e.encounter_datetime) AS apss_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "        INNER JOIN ( "
+        + HighViralLoadQueries.getApssSessionOne()
+        + " ) session_date on p.patient_id = session_date.patient_id "
+        + " WHERE  p.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_type = ${35} "
+        + "        AND e.location_id = :location  "
+        + "        AND e.encounter_datetime > session_date.apss_date "
+        + "        AND e.encounter_datetime <= :endDate "
+        + " GROUP BY p.patient_id";
   }
 }
