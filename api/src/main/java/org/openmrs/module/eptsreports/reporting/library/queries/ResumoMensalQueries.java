@@ -708,50 +708,58 @@ public class ResumoMensalQueries {
     query.append("                             AND datediff(obs.value_datetime,:date) <=0");
     query.append("                        GROUP  BY pa.patient_id   ");
     query.append("                    UNION ");
-    query.append("                    SELECT     pa.patient_id, ");
-    query.append("                               obs.value_datetime AS value_datetime ");
-    query.append("                    FROM       patient pa ");
-    query.append("                    INNER JOIN encounter enc ");
-    query.append("                    ON         enc.patient_id = pa.patient_id ");
-    query.append("                    INNER JOIN obs obs ");
-    query.append("                    ON         obs.encounter_id = enc.encounter_id ");
-    query.append("                    INNER JOIN ");
-    query.append("                               ( ");
-    query.append("                                          SELECT     enc.patient_id, ");
-    query.append(
-        "                                                     max(enc.encounter_datetime) encounter_datetime ");
-    query.append("                                          FROM       patient pa ");
-    query.append("                                          INNER JOIN encounter enc ");
-    query.append(
-        "                                          ON         enc.patient_id = pa.patient_id ");
-    query.append("                                          INNER JOIN obs obs ");
-    query.append(
-        "                                          ON         obs.encounter_id = enc.encounter_id ");
-    query.append("                                          WHERE      pa.voided = 0 ");
-    query.append("                                          AND        enc.voided = 0 ");
-    query.append("                                          AND        obs.voided = 0 ");
-    query.append(
-        "                                          AND obs.concept_id =  ${returnVisitDateForArvDrugConcept}   ");
-    query.append("                                 AND obs.value_datetime IS NOT NULL   ");
-    query.append(
-        "                                          AND        enc.encounter_type = ${arvPharmaciaEncounterType} ");
-    query.append(
-        "                                          AND        enc.location_id = :location ");
-    query.append(
-        "                                          AND        datediff(enc.encounter_datetime, :date) <=0 ");
-    query.append("                                          GROUP BY   pa.patient_id ) last_fila ");
-    query.append("                    ON         last_fila.patient_id=pa.patient_id ");
-    query.append("                    WHERE      pa.voided = 0 ");
-    query.append("                    AND        obs.voided = 0 ");
-    query.append("                    AND        enc.voided = 0 ");
-    query.append(
-        "                    AND        enc.encounter_type = ${arvPharmaciaEncounterType} ");
-    query.append("                    AND        obs.value_datetime IS NULL ");
-    query.append(
-        "                    AND        enc.encounter_datetime = last_fila.encounter_datetime ");
-    query.append("                    AND        enc.location_id = :location ");
-    query.append("                    GROUP BY   pa.patient_id");
-
+    query.append("                    SELECT paa.patient_id, ");
+    query.append("                              obs.value_datetime AS value_datetime ");
+    query.append("                    FROM   patient paa ");
+    query.append("                            INNER JOIN encounter enc ");
+    query.append("                                  ON enc.patient_id = paa.patient_id ");
+    query.append("                            INNER JOIN obs obs ");
+    query.append("                                  ON obs.encounter_id = enc.encounter_id ");
+    query.append("                            INNER JOIN (SELECT pa.patient_id, ");
+    query.append("                                               obs.value_datetime AS value_datetime ");
+    query.append("                                        FROM   patient pa ");
+    query.append("                                               INNER JOIN encounter enc ");
+    query.append("                                                      ON enc.patient_id = pa.patient_id ");
+    query.append("                                               INNER JOIN obs obs ");
+    query.append("                                                      ON obs.encounter_id = enc.encounter_id ");
+    query.append("                                               INNER JOIN (SELECT enc.patient_id, ");
+    query.append("                                                                  Max(enc.encounter_datetime) ");
+    query.append("                                                                  encounter_datetime ");
+    query.append("                                                           FROM   patient pa ");
+    query.append("                                                                  INNER JOIN encounter enc ");
+    query.append("                                                                        ON enc.patient_id = ");
+    query.append("                                                                        pa.patient_id ");
+    query.append("                                                                  INNER JOIN obs obs ");
+    query.append("                                                                        ON obs.encounter_id = ");
+    query.append("                                                                        enc.encounter_id ");
+    query.append("                                                            WHERE  pa.voided = 0 ");
+    query.append("                                                            AND enc.voided = 0 ");
+    query.append("                                                            AND obs.voided = 0 ");
+    query.append("                                                            AND enc.encounter_type = ${arvPharmaciaEncounterType} ");
+    query.append("                                                            AND enc.location_id = :location ");
+    query.append("                                                            AND ");
+    query.append("                                                            Datediff(enc.encounter_datetime, :date) <= 0 ");
+    query.append("                                                            GROUP  BY pa.patient_id) last_fila ");
+    query.append("                                                              ON last_fila.patient_id = pa.patient_id ");
+    query.append("                                      WHERE  pa.voided = 0 ");
+    query.append("                                      AND obs.voided = 0 ");
+    query.append("                                      AND enc.voided = 0 ");
+    query.append("                                      AND obs.concept_id = ${returnVisitDateForArvDrugConcept} ");
+    query.append("                                      AND obs.value_datetime IS NOT NULL ");
+    query.append("                                      AND enc.encounter_type = ${arvPharmaciaEncounterType} ");
+    query.append("                                      AND enc.encounter_datetime = ");
+    query.append("                                        last_fila.encounter_datetime ");
+    query.append("                                      AND enc.location_id = :location ");
+    query.append("                                      AND pa.patient_id ");
+    query.append("                                      GROUP  BY pa.patient_id) AS ultimo_agendamento ");
+    query.append("                                      ON ultimo_agendamento.patient_id = paa.patient_id ");
+    query.append("                WHERE  paa.voided = 0 ");
+    query.append("                AND enc.voided = 0 ");
+    query.append("                AND obs.voided = 0 ");
+    query.append("                AND enc.location_id = :location ");
+    query.append("                AND enc.encounter_type = ${arvPharmaciaEncounterType} ");
+    query.append("                AND obs.value_datetime IS NULL ");
+    query.append("                GROUP  BY paa.patient_id ");
     query.append("                    ) most_recent   ");
     query.append("                GROUP BY most_recent.patient_id   ");
     query.append("                HAVING datediff(final_encounter_date,:date) < 0  ");
