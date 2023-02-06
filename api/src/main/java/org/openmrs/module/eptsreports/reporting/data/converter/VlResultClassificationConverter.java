@@ -17,9 +17,9 @@ public class VlResultClassificationConverter implements DataConverter {
 
     if (value >= 1000) {
       return "S";
-    } else {
-      return "N";
     }
+
+    return "N";
   }
 
   @Override

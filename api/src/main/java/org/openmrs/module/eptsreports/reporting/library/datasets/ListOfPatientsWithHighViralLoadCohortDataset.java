@@ -450,6 +450,66 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
 
+    // 48 - Date of Sample collection on the earliest VL result date - Sheet 1: Column AW
+    pdd.addColumn(
+        "sample_collection_date_after_apss_session_two",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getDateOfVLSampleCollectionAfterApssSessionTwo(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 49 - VL Sample Collection Date - Sheet 1: Column AX
+    pdd.addColumn(
+        "expected_collection_date_after_apss_session_two",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getExpectedFirstApssConsultationAfterFirstApssSessionTwo(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 50 - Date of the earliest Laboratory or FSR form with VL Result - Sheet 1: Column AY
+    pdd.addColumn(
+        "third_vl_result_date_after_apss_session_three",
+        listOfPatientsWithHighViralLoadCohortQueries.getThirdVLResultOrResultDate(true),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 51 - Predicted Third High VL Result Date - Sheet 1: Column AZ
+    pdd.addColumn(
+        "predicted_third_vl_result_date",
+        listOfPatientsWithHighViralLoadCohortQueries.getPredictedThirdHighVLResultDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 52 - VL Result in Laboratory or FSR on the Third Viral Load Result Date - Sheet 1: Column BA
+    pdd.addColumn(
+        "third_vl_result_after_apss_session_three",
+        listOfPatientsWithHighViralLoadCohortQueries.getThirdVLResultOrResultDate(false),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 53 - The Third VL Result Classification - Sheet 1: Column BB
+    pdd.addColumn(
+        "third_vl_result_classification",
+        listOfPatientsWithHighViralLoadCohortQueries.getThirdVLResultOrResultDate(false),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new VlResultClassificationConverter());
+
+    // 54 - The first Clinical Consultation Date registered in Ficha Clinica - Sheet 1: Column BC
+    pdd.addColumn(
+        "first_clinical_consultation_third_vl_result",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getFirstClinicalConsultationAfterThirdVLResultDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 55 - Expected Clinical Consultation Date - Sheet 1: Column BD
+    pdd.addColumn(
+        "expected_clinical_consultation_third_vl_result",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getExpectedConsultationAfterThirdHighVLResultDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
     return pdd;
   }
 
