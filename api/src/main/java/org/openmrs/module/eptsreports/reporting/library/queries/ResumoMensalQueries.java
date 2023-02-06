@@ -731,6 +731,9 @@ public class ResumoMensalQueries {
     query.append("                                          AND        enc.voided = 0 ");
     query.append("                                          AND        obs.voided = 0 ");
     query.append(
+        "                                          AND obs.concept_id =  ${returnVisitDateForArvDrugConcept}   ");
+    query.append("                                 AND obs.value_datetime IS NOT NULL   ");
+    query.append(
         "                                          AND        enc.encounter_type = ${arvPharmaciaEncounterType} ");
     query.append(
         "                                          AND        enc.location_id = :location ");
