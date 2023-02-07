@@ -708,10 +708,13 @@ public class ResumoMensalQueries {
     query.append("                             AND datediff(obs.value_datetime,:date) <=0");
     query.append("                        GROUP  BY pa.patient_id   ");
     query.append("                    UNION ");
-    query.append("                    SELECT     pa.patient_id ");
-    query.append("                    FROM       patient pa ");
+    query.append("                    SELECT     pa.patient_id, ");
+    query.append("                              obs1.value_datetime AS value_datetime ");
+    query.append("                         FROM   patient pa   ");
     query.append("                    INNER JOIN encounter enc ");
     query.append("                    ON         enc.patient_id = pa.patient_id ");
+    query.append("                    INNER JOIN obs obs1 ");
+    query.append("                    ON         enc.encounter_id = obs1.encounter_id ");
     query.append("                    INNER JOIN ");
     query.append("                               ( ");
     query.append("                                          SELECT     pa.patient_id, ");
@@ -736,8 +739,10 @@ public class ResumoMensalQueries {
     query.append(
         "                                          GROUP BY   pa.patient_id ) AS last_fila ");
     query.append("                    ON         last_fila.patient_id = pa.patient_id ");
-    query.append(
-        "                    WHERE      enc.encounter_type = ${arvPharmaciaEncounterType} ");
+    query.append("                    WHERE        pa.voided = 0 ");
+    query.append("                    AND          enc.voided = 0 ");
+    query.append("                    AND          obs1.voided = 0 ");
+    query.append("                    AND      enc.encounter_type = ${arvPharmaciaEncounterType} ");
     query.append(
         "                    AND        enc.encounter_datetime = last_fila.encounter_datetime ");
     query.append("                    AND        NOT EXISTS ");
