@@ -360,7 +360,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     // 37 - The first Clinical Consultation Date with 2nd or 3rd Line - Sheet 1: Column AL
     pdd.addColumn(
         "newline_initiation_date_after_second_high_vl",
-        listOfPatientsWithHighViralLoadCohortQueries.getNewLineInitiationDate(),
+        listOfPatientsWithHighViralLoadCohortQueries.getNewLineInitiationDate(true),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
 
@@ -507,6 +507,13 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         "expected_clinical_consultation_third_vl_result",
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedConsultationAfterThirdHighVLResultDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 56 - The first Clinical Consultation Date with 2nd or 3rd Line - Sheet 1: Column BE
+    pdd.addColumn(
+        "newline_initiation_date_after_third_high_vl",
+        listOfPatientsWithHighViralLoadCohortQueries.getNewLineInitiationDate(false),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
 

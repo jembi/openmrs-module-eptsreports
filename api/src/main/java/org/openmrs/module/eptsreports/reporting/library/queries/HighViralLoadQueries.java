@@ -277,7 +277,7 @@ public class HighViralLoadQueries {
             + "       AND e.encounter_type IN ( ${13}, ${51} ) "
             + "       AND e.location_id = :location "
             + "       AND o.concept_id = ${856} "
-            + "       AND o.value_numeric IS NOT NULL "
+            + "       AND o.value_numeric >= 1000 "
             + "       AND e.encounter_datetime > session_three.apss_date "
             + "       AND e.encounter_datetime <= :endDate "
             + "GROUP  BY p.patient_id";

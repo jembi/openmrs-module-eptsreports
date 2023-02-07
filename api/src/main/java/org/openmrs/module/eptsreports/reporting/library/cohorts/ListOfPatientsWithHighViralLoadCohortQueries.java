@@ -95,7 +95,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "       AND o2.voided = 0 "
             + "       AND e.encounter_type IN ( ${13}, ${51} ) "
             + "       AND (o.concept_id = ${856} "
-            + "       AND o.value_numeric > 1000) "
+            + "       AND o.value_numeric >= 1000) "
             + "       AND e.location_id = :location "
             + "       AND (o2.concept_id = ${23821}"
             + "       AND o2.value_datetime >= :startDate "
@@ -153,7 +153,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type IN ( ${13}, ${51} ) "
             + "       AND o.concept_id = ${856} "
-            + "       AND o.value_numeric > 1000 "
+            + "       AND o.value_numeric >= 1000 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= :startDate "
             + "       AND e.encounter_datetime <= :endDate "
@@ -235,7 +235,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "                   WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                     AND e.encounter_type IN (${13}, ${51}) "
             + "                     AND o.concept_id = ${856} "
-            + "                     AND o.value_numeric > 1000 "
+            + "                     AND o.value_numeric >= 1000 "
             + "                     AND e.encounter_datetime >= :startDate "
             + "                     AND e.encounter_datetime <= :endDate "
             + "                     AND e.location_id = :location "
@@ -328,7 +328,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "    WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "      AND e.encounter_type IN (${13}, ${51}) "
             + "      AND o.concept_id = ${856} "
-            + "      AND o.value_numeric > 1000 "
+            + "      AND o.value_numeric >= 1000 "
             + "      AND e.encounter_datetime >= :startDate "
             + "      AND e.encounter_datetime <= :endDate "
             + "      AND e.location_id = :location "
@@ -392,7 +392,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "       AND o.voided = 0 "
             + "       AND e.encounter_type IN ( ${13}, ${51} ) "
             + "       AND o.concept_id = ${856} "
-            + "       AND o.value_numeric > 1000 "
+            + "       AND o.value_numeric >= 1000 "
             + "       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= :startDate "
             + "       AND e.encounter_datetime <= :endDate "
@@ -1197,15 +1197,24 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
   }
 
   /**
-   * <b>Data de Início da Nova Linha (se aplicável) (Sheet 1: Column AL)</b>
+   * <b>Data de Início da Nova Linha (se aplicável) (Sheet 1: Column AL) / Data de Início da Nova
+   * Linha (se aplicável) (Sheet 1: Column BE)</b>
    *
    * <p>The first Clinical Consultation Date registered in Ficha Clinica between the Second High
    * Viral Load Result (>1000 copies/ml) Date (HVL_FR22 - value of column AF) and report end date
-   * with ``2a Linha`` OR ``3a Linha`` marked
+   * with ``2a Linha`` OR ``3a Linha`` marked - (Sheet 1: Column AL)
+   *
+   * <p>The first Clinical Consultation Date registered in Ficha Clinica between the third High
+   * Viral Load Result (>1000 copies/ml) Date (HVL_FR33 - value of column AY) and report end date
+   * with ``2a Linha`` marked - (Sheet 1: Column BE) or
+   *
+   * <p>The first Clinical Consultation Date registered in Ficha Clinica between the third High
+   * Viral Load Result (>1000 copies/ml) Date (HVL_FR33 - value of column AY) and report end date
+   * with ``3a Linha`` marked - (Sheet 1: Column BE)
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getNewLineInitiationDate() {
+  public DataDefinition getNewLineInitiationDate(boolean secondHighVlResult) {
 
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
 
@@ -1228,13 +1237,18 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
     String query =
-        "SELECT p.patient_id, MIN(e.encounter_datetime) as first_consultation "
+        "SELECT p.patient_id, MIN(e.encounter_datetime) as initiation_date "
             + "FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "        INNER JOIN ( "
-            + HighViralLoadQueries.getColumnFQuery(true)
-            + " ) af_date on p.patient_id = af_date.patient_id "
+            + "        INNER JOIN ( ";
+    if (secondHighVlResult) {
+      query += HighViralLoadQueries.getColumnFQuery(true);
+    } else {
+      query += HighViralLoadQueries.getThirdVLResultOrResultDateQuery(true);
+    }
+    query +=
+        " ) af_date on p.patient_id = af_date.patient_id "
             + "WHERE p.voided = 0 "
             + "  AND e.voided = 0 "
             + "  AND o.voided = 0 "

@@ -166,14 +166,14 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
-    // 11 - Pregnant/Breastfeeding: - Sheet 2: Column I
+    // 11 - Pregnant/Breastfeeding: - Sheet 2: Column K
     pdd.addColumn(
         "pregnant_breastfeeding",
         tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
         "location=${location}",
         null);
 
-    // 12 - Patients active on TB Treatment - Sheet 2: Column G
+    // 12 - Patients active on TB Treatment - Sheet 2: Column L
     pdd.addColumn(
         "ontbtreatment",
         listChildrenOnARTandFormulationsDataset.getPatientsActiveOnTB(),
