@@ -693,6 +693,49 @@ public class TXTBCohortQueries {
   }
 
   /**
+   * <b>Description:</b> Negative Investigation Research result <b>(concept_id = 6277)</b> Negativo
+   * <b>(concept_id = 1065)</b> in the follow-up (Adult and Children)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition negativeInvestigationResult() {
+    CohortDefinition cd =
+        genericCohortQueries.hasCodedObs(
+            tbMetadata.getResearchResultConcept(),
+            TimeModifier.ANY,
+            SetComparator.IN,
+            Arrays.asList(
+                hivMetadata.getAdultoSeguimentoEncounterType(),
+                hivMetadata.getPediatriaSeguimentoEncounterType()),
+            Arrays.asList(tbMetadata.getNegativeConcept()));
+    addGeneralParameters(cd);
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> At least one “NEG” selected for “Resultado da Investigação para TB de BK
+   * e/ou RX?” during the reporting period consultations;
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * response 664: "NEG" for question: 6277
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition negativeInvestigationResultComposition() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    CohortDefinition N = negativeInvestigationResult();
+    cd.addSearch("N", map(N, codedObsParameterMapping));
+    cd.setCompositionString("N");
+    addGeneralParameters(cd);
+    return cd;
+  }
+
+  /**
    * <b>Description:</b> At least one “S” or “N” selected for TB Screening (Rastreio de TB) during
    * the reporting period consultations
    *
@@ -1161,6 +1204,9 @@ public class TXTBCohortQueries {
         "tb-investigation",
         EptsReportUtils.map(positiveInvestigationResultComposition(), generalParameterMapping));
     definition.addSearch(
+        "tb-investigation-negative",
+        EptsReportUtils.map(negativeInvestigationResultComposition(), generalParameterMapping));
+    definition.addSearch(
         "started-tb-treatment",
         EptsReportUtils.map(tbTreatmentStartDateWithinReportingDate(), generalParameterMapping));
     definition.addSearch(
@@ -1244,7 +1290,7 @@ public class TXTBCohortQueries {
             "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
 
     definition.setCompositionString(
-        "(art-list AND (tb-screening OR tb-investigation OR started-tb-treatment OR in-tb-program OR pulmonary-tb OR marked-as-tb-treatment-start "
+        "(art-list AND (tb-screening OR tb-investigation OR tb-investigation-negative OR started-tb-treatment OR in-tb-program OR pulmonary-tb OR marked-as-tb-treatment-start "
             + "OR (tuberculosis-symptomys OR active-tuberculosis OR tb-observations OR application-for-laboratory-research OR tb-genexpert-test OR tb-genexpert-lab-test OR tb-xpert-mtb OR culture-test OR culture-test-lab "
             + "OR test-tb-lam OR test-tb-lam-lab OR test-bk OR x-ray-chest) OR result-for-basiloscopia)) "
             + "NOT ((transferred-out NOT (started-tb-treatment OR in-tb-program)) OR started-tb-treatment-previous-period OR in-tb-program-previous-period OR pulmonary-tb-date OR marked-as-tratamento-tb-inicio)");
