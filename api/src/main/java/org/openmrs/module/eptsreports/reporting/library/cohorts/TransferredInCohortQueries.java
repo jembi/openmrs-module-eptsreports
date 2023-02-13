@@ -29,6 +29,7 @@ public class TransferredInCohortQueries {
   private TxCurrCohortQueries txCurrCohortQueries;
   private CommonCohortQueries commonCohortQueries;
   private TxRttCohortQueries txRttCohortQueries;
+  private TXTBCohortQueries txtbCohortQueries;
 
   @Autowired
   public TransferredInCohortQueries(
@@ -71,7 +72,7 @@ public class TransferredInCohortQueries {
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true);
 
     CohortDefinition transferredOut =
-        commonCohortQueries.getMohTransferredOutPatientsByEndOfPeriod();
+            txtbCohortQueries.getPatientsTransferredOut();
 
     CohortDefinition homeVisitTrfOut =
         txCurrCohortQueries.getPatientsTransferedOutInLastHomeVisitCard();
@@ -81,7 +82,7 @@ public class TransferredInCohortQueries {
 
     String mappingsTrfIn = "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}";
     String mappingsCurr = "onOrBefore=${onOrBefore-3m},location=${location}";
-    String mappingsTrfOut = "onOrBefore=${onOrAfter-1d},location=${location}";
+    String mappingsTrfOut = "endDate=${startDate-1d},location=${location}";
     String mappingsHomeVisitTrfOut = "onOrBefore=${onOrAfter-1d},location=${location}";
     String mappingsClinicalVisit =
         "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}";
