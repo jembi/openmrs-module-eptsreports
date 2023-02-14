@@ -1657,18 +1657,32 @@ public class TXTBCohortQueries {
   /**
    * <b>Technical Specs</b>
    *
+   * <p>Patients Disaggregation – Diagnostic Test
+   *
+   * <p>TX_TB_FR13
+   *
    * <blockquote>
    *
-   * Get patients who have a GeneXpert Positivo or Negativo registered in the investigations - Ficha
-   * Clinica - Mastercard OR
+   * The system will identify patients with any diagnostic Test sent disaggregation as follows:
+   * (mWRD (with or without other testing):patients will be included who during the reporting
+   * period:
    *
-   * <p>Have a GeneXpert request registered in the investigations - Ficha Clinica - Mastercard
+   * <ul>
+   *   <li>have a ‘GeneXpert Positivo’ registered in the Investigações – resultados laboratoriais -
+   *       Ficha Clínica – Mastercard; or
+   *   <li>have a ‘GeneXpert Negativo’ registered in the Investigações – resultados laboratoriais
+   *       Ficha Clínica – Mastercard; or
+   *   <li>have a GeneXpert request registered in the Investigações – Pedidos Laboratoriais - Ficha
+   *       Clínica – Mastercard; or
+   *   <li>have a GeneXpert result ANY VALUE registered in the Laboratory Form or
+   *   <li>have a XpertMTB result ANY VALUE registered in the Laboratory Form
+   * </ul>
    *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getGenExpert() {
+  public CohortDefinition getmWRD() {
     CohortDefinition cd =
         getPatientsWhoHaveGeneXpert(
             hivMetadata.getApplicationForLaboratoryResearch(),
@@ -1701,10 +1715,31 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> Get patients who have a Additional Test AND Not GeneXpert AND Not Smear
-   * Microscopy Only
+   * <b>Technical Specs</b>
    *
-   * <p><b>Technical Specs</b>
+   * <p>Patients Disaggregation – Diagnostic Test
+   *
+   * <p>TX_TB_FR13
+   *
+   * <blockquote>
+   *
+   * <p>Additional test other than mWRD : patients will be included who during the reporting period:
+   *
+   * <ul>
+   *   <li>have Investigações - Pedidos Laboratoriais request marked for ‘TB LAM’ or ‘Cultura’ or
+   *   <li>have Investigações - Resultados Laboratoriais results (ANY RESULT) recorded for ‘TB LAM’
+   *       or ‘Cultura’ or
+   *   <li>have a Cultura result ANY VALUE registered in the Laboratory Form or
+   *   <li>have a TB LAM result ANY VALUE registered in the Laboratory Form AND
+   *   <li>do not have a GeneXpert, Xpert MTB and Baciloscopia result registered in the Laboratory
+   *       Form and
+   *   <li>do not have Investigações – Pedidos Laboratorais request marked for ‘GeneXpert’ and ‘BK’
+   *       and
+   *   <li>do not have Investigações – Resultados Laboratoriais result recorded for ‘GeneXpert’ and
+   *       ‘BK’
+   * </ul>
+   *
+   * </blockquote>
    *
    * @return {@link CohortDefinition}
    */
@@ -1776,19 +1811,18 @@ public class TXTBCohortQueries {
   }
 
   /**
-   * <b>Description:</b> BR-9 GenExpert MTB/RIF - Get patients from denominator AND
-   * positive_screened AND genexpert
+   * <b>Description:</b> BR-9 mWRD - Get patients from denominator AND positive_screened AND mWRD
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition genExpert() {
+  public CohortDefinition mWRD() {
     CompositionCohortDefinition definition = new CompositionCohortDefinition();
-    definition.setName("genExpert()");
+    definition.setName("mWRD()");
     definition.addSearch(
         "denominator", EptsReportUtils.map(getDenominator(), generalParameterMapping));
-    definition.addSearch("genExpert", EptsReportUtils.map(getGenExpert(), generalParameterMapping));
+    definition.addSearch("mWRD", EptsReportUtils.map(getmWRD(), generalParameterMapping));
     addGeneralParameters(definition);
-    definition.setCompositionString("denominator AND genExpert");
+    definition.setCompositionString("denominator AND mWRD");
     return definition;
   }
 
@@ -2068,11 +2102,10 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "applicationForLaboratoryResearchCohort",
         EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
-    definition.addSearch(
-        "genExpertCohort", EptsReportUtils.map(getGenExpert(), generalParameterMapping));
+    definition.addSearch("mWRDCohort", EptsReportUtils.map(getmWRD(), generalParameterMapping));
 
     definition.setCompositionString(
-        "(basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort) NOT genExpertCohort");
+        "(basiloscopiaCohort OR basiloscopiaLabCohort OR applicationForLaboratoryResearchCohort) NOT mWRDCohort");
     return definition;
   }
 
@@ -2151,8 +2184,7 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "applicationForLaboratoryResearchCohort",
         EptsReportUtils.map(applicationForLaboratoryResearchCohort, generalParameterMapping));
-    definition.addSearch(
-        "genExpertCohort", EptsReportUtils.map(getGenExpert(), generalParameterMapping));
+    definition.addSearch("mWRDCohort", EptsReportUtils.map(getmWRD(), generalParameterMapping));
     definition.addSearch(
         "smearMicroscopyOnlyCohort",
         EptsReportUtils.map(getSmearMicroscopyOnly(), generalParameterMapping));
@@ -2161,7 +2193,7 @@ public class TXTBCohortQueries {
         EptsReportUtils.map(basiloscopiaExamCohort, generalParameterMapping));
 
     definition.setCompositionString(
-        "(tbLamTestCohort OR tbLamLabTestCohort OR cultureTestCohort OR cultureLabTestCohort OR applicationForLaboratoryResearchCohort OR basiloscopiaExamCohort) NOT genExpertCohort NOT smearMicroscopyOnlyCohort");
+        "(tbLamTestCohort OR tbLamLabTestCohort OR cultureTestCohort OR cultureLabTestCohort OR applicationForLaboratoryResearchCohort OR basiloscopiaExamCohort) NOT mWRDCohort NOT smearMicroscopyOnlyCohort");
     return definition;
   }
 
