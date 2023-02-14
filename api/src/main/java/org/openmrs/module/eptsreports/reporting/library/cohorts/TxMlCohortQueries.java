@@ -9,8 +9,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.txml.StartedArtOnLastClinicalContactCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.library.queries.TxMlQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TXCurrQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.TxMlQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -219,8 +219,7 @@ public class TxMlCohortQueries {
    */
   public CohortDefinition getPatientsWhoMissedNextAppointmentAndTransferredOut() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName(
-        "Get patients who are transferred out, but died during reporting period");
+    cd.setName("Get patients who are transferred out, but died during reporting period");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -232,10 +231,10 @@ public class TxMlCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "patientWhoAfterMostRecentDateHaveDrugPickupOrConsultation",
-            EptsReportUtils.map(
-                    getPatientWhoAfterMostRecentDateHaveDrugPickupOrConsultation(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "patientWhoAfterMostRecentDateHaveDrugPickupOrConsultation",
+        EptsReportUtils.map(
+            getPatientWhoAfterMostRecentDateHaveDrugPickupOrConsultation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "dead",
@@ -243,7 +242,14 @@ public class TxMlCohortQueries {
             getDeadPatientsComposition(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("transferredOut AND NOT (dead OR patientWhoAfterMostRecentDateHaveDrugPickupOrConsultation)");
+    cd.addSearch(
+        "transferOutBetweenArtpickupAndRecepcaoLevantou",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
+            "onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.setCompositionString(
+        "(transferredOut AND transferOutBetweenArtpickupAndRecepcaoLevantou) AND NOT (dead OR patientWhoAfterMostRecentDateHaveDrugPickupOrConsultation)");
 
     return cd;
   }
@@ -679,7 +685,7 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "suspendedRegisteredInFichaResumoAndFichaClinicaMasterCard",
         EptsReportUtils.map(
-                getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(),
+            getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(),
             "onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
@@ -687,8 +693,8 @@ public class TxMlCohortQueries {
         EptsReportUtils.map(getExcuisionDeadPatients(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(deadByPatientProgramState OR deadOrSuspendedByPatientProgramState OR deadRegisteredInLastHomeVisitCard" +
-                " OR deadRegisteredInFichaResumoAndFichaClinicaMasterCard OR suspendedRegisteredInFichaResumoAndFichaClinicaMasterCard) AND NOT exclusion");
+        "(deadByPatientDemographics OR deadOrSuspendedByPatientProgramState OR deadRegisteredInLastHomeVisitCard"
+            + " OR deadRegisteredInFichaResumoAndFichaClinicaMasterCard OR suspendedRegisteredInFichaResumoAndFichaClinicaMasterCard) AND NOT exclusion");
 
     return cd;
   }
@@ -778,7 +784,7 @@ public class TxMlCohortQueries {
             + "        WHERE e.encounter_type = ${6}  "
             + "            AND e.encounter_datetime <= :endDate  "
             + "            AND o.concept_id = ${6273} "
-          + "            AND o.value_coded IN ( ${1366}, ${1709} )   "
+            + "            AND o.value_coded IN ( ${1366}, ${1709} )   "
             + "            AND e.location_id =  :location   "
             + "            AND p.voided=0    "
             + "            AND e.voided=0   "
@@ -1353,8 +1359,7 @@ public class TxMlCohortQueries {
         TxMlQueries.getPatientsListBasedOnProgramAndStateByReportingEndDate(
             hivMetadata.getARTProgram().getProgramId(),
             hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId(),
-                hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId()
-                ));
+            hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId()));
 
     definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
@@ -1671,7 +1676,6 @@ public class TxMlCohortQueries {
     return sqlCohortDefinition;
   }
 
-
   /**
    * <b>Technical Specs</b>
    *
@@ -1685,18 +1689,19 @@ public class TxMlCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  @DocumentedDefinition(value = "suspendedPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate")
+  @DocumentedDefinition(
+      value = "suspendedPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate")
   public CohortDefinition getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate() {
     SqlCohortDefinition definition = new SqlCohortDefinition();
     definition.setName("suspendedPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate");
 
     definition.setQuery(
-            TXCurrQueries.getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(
-                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                    hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                    hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId(),
-                    hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
-                    hivMetadata.getSuspendedTreatmentConcept().getConceptId()));
+        TXCurrQueries.getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getSuspendedTreatmentConcept().getConceptId()));
 
     definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
