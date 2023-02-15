@@ -1320,7 +1320,8 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "transferred-out-fila-arv",
         EptsReportUtils.map(
-            getPatientsTransferredOutFilaArvPickUp(), "endDate=${endDate},location=${location}"));
+            getPatientsTransferredOutFilaArvPickUp(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     definition.setCompositionString("transferred-out AND transferred-out-fila-arv");
 
     return definition;
@@ -1525,6 +1526,7 @@ public class TXTBCohortQueries {
 
     sqlCohortDefinition.setName(
         "Patient Transferred Out With most recent date between Fila AND ARV PickUp ");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -1546,7 +1548,7 @@ public class TXTBCohortQueries {
         hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
 
     String query =
-        "SELECT patient_id "
+        "SELECT final.patient_id "
             + "FROM ( "
             + "         SELECT most_recent.patient_id, "
             + "                Max(most_recent.value_datetime) AS value_datetime "
@@ -1562,7 +1564,7 @@ public class TXTBCohortQueries {
             + "                 AND o.voided = 0 "
             + "                 AND e.encounter_type = ${pharmaciaEncounterType} "
             + "                 AND o.concept_id = ${returnVisitDateForArvDrugConcept} "
-            + "                 AND e.encounter_datetime <= :endDate "
+            + "                 AND e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "                 AND e.location_id = :location "
             + "               GROUP BY p.patient_id "
             + "               UNION "
@@ -1578,12 +1580,12 @@ public class TXTBCohortQueries {
             + "                 AND o.voided = 0 "
             + "                 AND e.encounter_type = ${masterCardDrugPickupEncounterType} "
             + "                 AND o.concept_id = ${artDatePickup} "
-            + "                 AND o.value_datetime <= :endDate "
+            + "                 AND o.value_datetime BETWEEN :startDate AND :endDate "
             + "                 AND e.location_id = :location "
             + "               GROUP BY p.patient_id) AS most_recent "
             + "               GROUP BY most_recent.patient_id "
-            + "     ) recent "
-            + "GROUP BY recent.patient_id";
+            + "     ) final "
+            + " WHERE final.value_datetime <= :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String mappedQuery = stringSubstitutor.replace(query);
