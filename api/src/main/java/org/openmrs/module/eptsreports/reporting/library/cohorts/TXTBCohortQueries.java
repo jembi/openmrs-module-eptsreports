@@ -1585,7 +1585,7 @@ public class TXTBCohortQueries {
             + "               GROUP BY p.patient_id) AS most_recent "
             + "               GROUP BY most_recent.patient_id "
             + "     ) final "
-            + " WHERE final.value_datetime <= :endDate ";
+            + " WHERE final.value_datetime BETWEEN :startDate AND :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String mappedQuery = stringSubstitutor.replace(query);
