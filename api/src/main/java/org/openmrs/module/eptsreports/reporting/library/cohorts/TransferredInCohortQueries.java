@@ -73,7 +73,7 @@ public class TransferredInCohortQueries {
 
     CohortDefinition txCurr = txCurrCohortQueries.getTxCurrCompositionCohort("txCurr", true);
 
-    CohortDefinition transferredOut = txtbCohortQueries.getPatientsTransferredOut();
+    CohortDefinition transferredOut = txtbCohortQueries.getTransferredOut();
 
     CohortDefinition homeVisitTrfOut =
         txCurrCohortQueries.getPatientsTransferedOutInLastHomeVisitCard();
