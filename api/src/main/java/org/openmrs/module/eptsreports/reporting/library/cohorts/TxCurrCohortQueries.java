@@ -1642,9 +1642,9 @@ public class TxCurrCohortQueries {
             + "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
             + " )  considered_transferred "
-            + "WHERE considered_transferred.value_datetime <= :onOrBefore "
             + " GROUP BY considered_transferred.patient_id "
-            + " ) final ";
+            + " ) final " +
+                " WHERE final.max_date <= :onOrBefore  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
