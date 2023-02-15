@@ -1253,8 +1253,7 @@ public class TXTBCohortQueries {
     definition.addSearch(
         "transferred-out",
         EptsReportUtils.map(
-            getPatientsTransferredOut(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            getTransferredOut(), "startDate=${startDate},endDate=${endDate},location=${location}"));
     definition.addSearch(
         "pulmonary-tb-date",
         EptsReportUtils.map(
@@ -1280,14 +1279,78 @@ public class TXTBCohortQueries {
    *
    * <blockquote>
    *
-   * he system will identify patients who are Transferred Out as follows: Patients enrolled on ART
-   * Program (Service TARV- Tratamento) with the following last status: Transferred Out or Patients
-   * who have “Mudança no Estado de Permanência TARV” filled out in Ficha Resumo or Ficha Clinica –
-   * Master Card for the following reasons that are specified in the patient chart: patient
-   * Transferred Out or Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as
-   * “Transferido para outra US” or “Auto-transferência” marked in the last Home Visit Card by
-   * reporting end date. Use the “data da visita” when the patient reason was marked on the home
-   * visit card as the reference date.
+   * <p>The system will identify patients who are Transferred Out as follows:
+   *
+   * <ul>
+   *   <li>Patients enrolled on ART Program (Service TARV- Tratamento) with the following last
+   *       status: Transferred Out or
+   *   <li>Patients who have “Mudança no Estado de Permanência TARV” filled out in Ficha Resumo or
+   *       Ficha Clinica – Master Card for the following reasons that are specified in the patient
+   *       chart: patient Transferred Out or
+   *   <li>Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as “Transferido para
+   *       outra US” or “Auto-transferência” marked in the last Home Visit Card by reporting end
+   *       date. Use the “data da visita” when the patient reason was marked on the home visit card
+   *       as the reference date.
+   * </ul>
+   *
+   * <br>
+   *
+   * <p>The system will identify the most recent date from the different sources as the date of
+   * Transferred Out. Patients who are “marked” as transferred out who have an ARV pick-up
+   * registered in FILA or have a clinical consultation after the date the patient was “marked” as
+   * transferred out will not be considered as Transferred Out.<br>
+   *
+   * <p>The system will consider patient as transferred out as above defined only if the most recent
+   * date between (next scheduled ART pick-up on FILA + 1 day) and (the most recent ART pickup date
+   * on Ficha Recepção – Levantou ARVs + 31 days) falls during the reporting period.
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTransferredOut() {
+    CompositionCohortDefinition definition = new CompositionCohortDefinition();
+    addGeneralParameters(definition);
+    definition.setName("TxTB - Transferred Out");
+    definition.addSearch(
+        "transferred-out",
+        EptsReportUtils.map(
+            getPatientsTransferredOut(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+    definition.addSearch(
+        "transferred-out-fila-arv",
+        EptsReportUtils.map(
+            getPatientsTransferredOutFilaArvPickUp(), "endDate=${endDate},location=${location}"));
+    definition.setCompositionString("transferred-out AND transferred-out-fila-arv");
+
+    return definition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>The system will identify patients who are Transferred Out as follows:
+   *
+   * <ul>
+   *   <li>Patients enrolled on ART Program (Service TARV- Tratamento) with the following last
+   *       status: Transferred Out or
+   *   <li>Patients who have “Mudança no Estado de Permanência TARV” filled out in Ficha Resumo or
+   *       Ficha Clinica – Master Card for the following reasons that are specified in the patient
+   *       chart: patient Transferred Out or
+   *   <li>Patients who have REASON PATIENT MISSED VISIT (MOTIVOS DA FALTA) as “Transferido para
+   *       outra US” or “Auto-transferência” marked in the last Home Visit Card by reporting end
+   *       date. Use the “data da visita” when the patient reason was marked on the home visit card
+   *       as the reference date.
+   * </ul>
+   *
+   * <br>
+   *
+   * <p>The system will identify the most recent date from the different sources as the date of
+   * Transferred Out. Patients who are “marked” as transferred out who have an ARV pick-up
+   * registered in FILA or have a clinical consultation after the date the patient was “marked” as
+   * transferred out will not be considered as Transferred Out.<br>
    *
    * </blockquote>
    *
@@ -1427,6 +1490,100 @@ public class TXTBCohortQueries {
             + "                                                       GROUP BY   latest.patient_id "
             + "                                            ) transferred_out "
             + "             GROUP BY transferred_out.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    String mappedQuery = stringSubstitutor.replace(query);
+
+    sqlCohortDefinition.setQuery(mappedQuery);
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <p>The system will identify the most recent date from the different sources as the date of
+   * Transferred Out.
+   *
+   * <p>Patients who are “marked” as transferred out who have an ARV pick-up registered in FILA or
+   * have a clinical consultation after the date the patient was “marked” as transferred out will
+   * not be considered as Transferred Out.
+   *
+   * <p>The system will consider patient as transferred out as above defined only if the most recent
+   * date between (next scheduled ART pick-up on FILA + 1 day) and (the most recent ART pickup date
+   * on Ficha Recepção – Levantou ARVs + 31 days) falls during the reporting period.
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsTransferredOutFilaArvPickUp() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName(
+        "Patient Transferred Out With most recent date between Fila AND ARV PickUp ");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put(
+        "adultoSeguimentoEncounterType",
+        hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put(
+        "pediatriaSeguimentoEncounterType",
+        hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put(
+        "pharmaciaEncounterType", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("artDatePickup", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put(
+        "masterCardDrugPickupEncounterType",
+        hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put(
+        "returnVisitDateForArvDrugConcept",
+        hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+
+    String query =
+        "SELECT patient_id "
+            + "FROM ( "
+            + "         SELECT most_recent.patient_id, "
+            + "                Max(most_recent.value_datetime) AS value_datetime "
+            + "         FROM (SELECT p.patient_id, "
+            + "                      date_add(max(o.value_datetime), interval 1 day)  AS value_datetime "
+            + "               FROM patient p "
+            + "                        INNER JOIN encounter e "
+            + "                                   ON e.patient_id = p.patient_id "
+            + "                        INNER JOIN obs o "
+            + "                                   ON o.encounter_id = e.encounter_id "
+            + "               WHERE p.voided = 0 "
+            + "                 AND e.voided = 0 "
+            + "                 AND o.voided = 0 "
+            + "                 AND e.encounter_type = ${pharmaciaEncounterType} "
+            + "                 AND o.concept_id = ${returnVisitDateForArvDrugConcept} "
+            + "                 AND e.encounter_datetime <= :endDate "
+            + "                 AND e.location_id = :location "
+            + "               GROUP BY p.patient_id "
+            + "               UNION "
+            + "               SELECT p.patient_id, "
+            + "                      date_add(max(o.value_datetime), interval 31 day) AS value_datetime "
+            + "               FROM patient p "
+            + "                        INNER JOIN encounter e "
+            + "                                   ON e.patient_id = p.patient_id "
+            + "                        INNER JOIN obs o "
+            + "                                   ON o.encounter_id = e.encounter_id "
+            + "               WHERE p.voided = 0 "
+            + "                 AND e.voided = 0 "
+            + "                 AND o.voided = 0 "
+            + "                 AND e.encounter_type = ${masterCardDrugPickupEncounterType} "
+            + "                 AND o.concept_id = ${artDatePickup} "
+            + "                 AND o.value_datetime <= :endDate "
+            + "                 AND e.location_id = :location "
+            + "               GROUP BY p.patient_id) AS most_recent "
+            + "               GROUP BY most_recent.patient_id "
+            + "     ) recent "
+            + "GROUP BY recent.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String mappedQuery = stringSubstitutor.replace(query);
