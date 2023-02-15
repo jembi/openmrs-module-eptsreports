@@ -1622,7 +1622,7 @@ public class TxCurrCohortQueries {
             + "                 AND        o.voided = 0 "
             + "                 AND        e.encounter_type = ${18} "
             + "                 AND        o.concept_id = ${5096} "
-            + "                 AND        o.value_datetime <= :onOrBefore "
+            + "                 AND        e.encounter_datetime <= :onOrBefore "
             + "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
             + " UNION "
@@ -1643,7 +1643,8 @@ public class TxCurrCohortQueries {
             + "               GROUP BY   p.patient_id "
             + " )  considered_transferred "
             + " GROUP BY considered_transferred.patient_id "
-            + " ) final ";
+            + " ) final " +
+                " WHERE final.max_date <= :onOrBefore  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
