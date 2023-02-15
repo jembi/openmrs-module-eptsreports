@@ -1289,17 +1289,6 @@ public class TXTBCohortQueries {
    * reporting end date. Use the “data da visita” when the patient reason was marked on the home
    * visit card as the reference date.
    *
-   * <p>The system will identify the most recent date from the different sources as the date of
-   * Transferred Out.
-   *
-   * <p>Patients who are “marked” as transferred out who have an ARV pick-up registered in FILA or
-   * have a clinical consultation after the date the patient was “marked” as transferred out will
-   * not be considered as Transferred Out.
-   *
-   * <p>The system will consider patient as transferred out as above defined only if the most recent
-   * date between (next scheduled ART pick-up on FILA + 1 day) and (the most recent ART pickup date
-   * on Ficha Recepção – Levantou ARVs + 31 days) falls during the reporting period.
-   *
    * </blockquote>
    *
    * @return {@link CohortDefinition}
@@ -1437,44 +1426,6 @@ public class TXTBCohortQueries {
             + "                                                       GROUP BY   p.patient_id ) "
             + "                                                       GROUP BY   latest.patient_id "
             + "                                            ) transferred_out "
-            + "                                 INNER JOIN "
-            + "                                            ( "
-            + "                                                       SELECT     p.patient_id, "
-            + "                                                                  max(o.value_datetime) AS value_datetime "
-            + "                                                       FROM       patient p "
-            + "                                                       INNER JOIN encounter e "
-            + "                                                       ON         e.patient_id=p.patient_id "
-            + "                                                       INNER JOIN obs o "
-            + "                                                       ON         o.encounter_id=e.encounter_id "
-            + "                                                       WHERE      p.voided = 0 "
-            + "                                                       AND        e.voided = 0 "
-            + "                                                       AND        o.voided = 0 "
-            + "                                                       AND        e.encounter_type = ${pharmaciaEncounterType} "
-            + "                                                       AND        o.concept_id = ${returnVisitDateForArvDrugConcept} "
-            + "                                                       AND        o.value_datetime BETWEEN :startDate AND        :endDate "
-            + "                                                       AND        e.location_id = :location "
-            + "                                                       GROUP BY   p.patient_id ) AS latest_fila "
-            + "                                 ON         latest_fila.patient_id = transferred_out.patient_id "
-            + "                                 INNER JOIN "
-            + "                                            ( "
-            + "                                                       SELECT     p.patient_id, "
-            + "                                                                  max(o.value_datetime) AS value_datetime "
-            + "                                                       FROM       patient p "
-            + "                                                       INNER JOIN encounter e "
-            + "                                                       ON         e.patient_id=p.patient_id "
-            + "                                                       INNER JOIN obs o "
-            + "                                                       ON         o.encounter_id=e.encounter_id "
-            + "                                                       WHERE      p.voided = 0 "
-            + "                                                       AND        e.voided = 0 "
-            + "                                                       AND        o.voided = 0 "
-            + "                                                       AND        e.encounter_type = ${masterCardDrugPickupEncounterType} "
-            + "                                                       AND        o.concept_id = ${artDatePickup} "
-            + "                                                       AND        o.value_datetime BETWEEN :startDate AND        :endDate "
-            + "                                                       AND        e.location_id = :location "
-            + "                                                       GROUP BY   p.patient_id ) pickup_arv "
-            + "                                 ON         pickup_arv.patient_id = transferred_out.patient_id "
-            + "                                 WHERE      transferred_out.last_date > date_add(latest_fila.value_datetime, interval 1 day) "
-            + "                                 AND        transferred_out.last_date <= date_add(pickup_arv.value_datetime, interval 31 day) "
             + "             GROUP BY transferred_out.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
