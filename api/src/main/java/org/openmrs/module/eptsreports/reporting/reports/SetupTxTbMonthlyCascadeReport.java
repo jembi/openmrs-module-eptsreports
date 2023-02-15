@@ -32,12 +32,12 @@ public class SetupTxTbMonthlyCascadeReport extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "PEPFAR MER 2.6.1 Semi-Annual";
+    return "TX TB Monthly Cascade Report";
   }
 
   @Override
   public String getDescription() {
-    return "MER 2.6.1 Semi-Annual Report to PEPFAR";
+    return "TX TB Monthly Cascade Report to PEPFAR";
   }
 
   @Override
