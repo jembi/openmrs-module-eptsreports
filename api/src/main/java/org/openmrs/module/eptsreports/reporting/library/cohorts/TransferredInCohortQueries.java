@@ -55,7 +55,6 @@ public class TransferredInCohortQueries {
 
   private void addGeneralParameters(CohortDefinition cd) {
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
   }
 
@@ -97,7 +96,7 @@ public class TransferredInCohortQueries {
 
     String mappingsTrfIn = "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}";
     String mappingsCurr = "onOrBefore=${onOrBefore-3m},location=${location}";
-    String mappingsTrfOut = "startDate=${startDate},location=${location}";
+    String mappingsTrfOut = "startDate=${onOrAfter},location=${location}";
     String mappingsHomeVisitTrfOut = "onOrBefore=${onOrAfter-1d},location=${location}";
     String mappingsClinicalVisit =
         "startDate=${onOrAfter},endDate=${onOrBefore},location=${location}";
