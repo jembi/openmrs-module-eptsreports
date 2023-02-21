@@ -160,8 +160,9 @@ public class ListOfPatientsWithPositiveTbScreeningDataset extends BaseDataSet {
 
     // 8 - Date of the Last Positive TB Screening - Sheet 1: Column H
     pdd.addColumn(
-        "Earliest_positive_screening_date",
-        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries.getEarliestTbPositiveScreeningDate(),
+        "earliest_positive_screening_date",
+        listOfPatientsWithPositiveTbScreeningDataDefinitionQueries
+            .getEarliestTbPositiveScreeningDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
