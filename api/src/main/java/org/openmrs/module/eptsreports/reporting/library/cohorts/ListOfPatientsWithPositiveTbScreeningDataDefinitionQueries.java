@@ -33,26 +33,26 @@ public class ListOfPatientsWithPositiveTbScreeningDataDefinitionQueries {
   }
 
   /**
-   * <b>Date of the Last Positive TB screening (Data do Último Rastreio Positivo de TB)</b>
+   * <b>Date of the Earliest Positive TB screening (Data do Último Rastreio Positivo de TB)</b>
    *
-   * <p>The system will identify and show the most recent date, amongst all sources, when the
+   * <p>The system will identify and show the earliest date, amongst all sources, when the
    * patient had a positive screening for TB during the reporting period
    *
    * @see
-   *     ListOfPatientsWithPositiveTbScreeningCohortQueries#getPatientsWithMostRecentTbScreeningDate()
+   *     ListOfPatientsWithPositiveTbScreeningCohortQueries#getPatientsWithPositiveTbScreening()
    * @return {@link DataDefinition}
    */
-  public DataDefinition getLastTbPositiveScreeningDate() {
+  public DataDefinition getEarliestTbPositiveScreeningDate() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Date of the Last Positive TB screening");
+    sqlPatientDataDefinition.setName("Date of the Earliest Positive TB screening");
     sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     String query =
         new EptsQueriesUtil()
-            .max(
+            .min(
                 listOfPatientsWithPositiveTbScreeningQueries
                     .getTbPositiveScreeningFromSourcesQuery())
             .getQuery();
