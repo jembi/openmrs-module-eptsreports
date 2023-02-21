@@ -531,4 +531,59 @@ public class ListOfPatientsWithPositiveTbScreeningQueries {
         .union(getPatientsWithBaciloscopiaOrGenexpertOrCultureTestOrTestTbLamDate())
         .buildQuery();
   }
+
+  /**
+   * <b>Generate one union separeted query based on the given queries</b>
+   *
+   * <p>Patients who started TB Treatment in the previous 6 months
+   *
+   * @return {@link String}
+   */
+  public String getPatientsTbTratment6MonthsPriorToReportStartDate() {
+
+    return new EptsQueriesUtil()
+        .unionBuilder(getPatientMarkedAsTbTreatmentStartAndDate())
+        .union(getPatientsClinicalRecordArtWithTbTratment())
+        .union(getPatientWithPulmonaryTbdDate())
+        .union(getPatientWithTbProgramEnrollmentAndDate())
+        .buildQuery();
+  }
+
+  /**
+   * <b>Patients who started TB Treatment in the previous 6 months</b>
+   *
+   * <p>Include all patients who in “Patient Clinical Record of ART - Ficha de Seguimento (Adults
+   * and Pediatric)” have at least TB Treatment (Tratamento de TB) Start Date (Data de Início) in
+   * the 6 months prior to the report start date (>=startDate – 6 months and <startDate)
+   *
+   * <p>• Encounter Type ID's = 6 and 9 <br>
+   * • TB Drug Start Date ID = 1113 <br>
+   * • value_datetime >= startDate - 6months and <=startDate <br>
+   *
+   * @return {@link String}
+   */
+  public String getPatientsClinicalRecordArtWithTbTratment() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1113", hivMetadata.getTBDrugStartDateConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id,o.value_datetime AS recent_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type IN (${6}, ${9})  "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${1113} "
+            + "       AND o.value_datetime >= :startDate AND o.value_datetime <= :endDate ";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    return sb.replace(query);
+  }
 }
