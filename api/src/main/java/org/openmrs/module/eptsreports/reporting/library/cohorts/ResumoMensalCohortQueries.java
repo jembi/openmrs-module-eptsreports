@@ -100,6 +100,31 @@ public class ResumoMensalCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
+  public CohortDefinition getNumberOfPatientsWhoInitiatedPreTarv() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of patients who initiated Pre-TARV ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    ResumoMensalQueries rmq = new ResumoMensalQueries();
+
+    String unionQuery =
+        new EptsQueriesUtil()
+            .unionBuilder(rmq.getClinicalFileEnrollmentDate())
+            .union(rmq.getMastercardEnrollmentDate())
+            .union(rmq.getProgramEnrollmentDate())
+            .union(rmq.getMastercardArtStartDate())
+            .union(rmq.getEnrollmentOnTarvProgramDate())
+            .buildQuery();
+    String minQuery = new EptsQueriesUtil().min(unionQuery).getQuery();
+
+    cd.setQuery(new EptsQueriesUtil().patientIdQueryBuilder(minQuery).getQuery());
+
+    return cd;
+  }
+
   public CohortDefinition getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
