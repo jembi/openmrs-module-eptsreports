@@ -117,6 +117,7 @@ public class ResumoMensalCohortQueries {
             .union(rmq.getProgramEnrollmentDate())
             .union(rmq.getMastercardArtStartDate())
             .union(rmq.getEnrollmentOnTarvProgramDate())
+            .union(rmq.getEnrollmentOnMastercardWithoutPreTarvAndPickupDate())
             .buildQuery();
     String minQuery = new EptsQueriesUtil().min(unionQuery).getQuery();
 
