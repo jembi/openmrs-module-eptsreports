@@ -524,18 +524,17 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(FIVESEMEAR, "endDate=${endDate},location=${location}"),
         "");
 
-    CohortIndicator FIVEGEXPERT =
+    CohortIndicator FIVEMWRD =
         eptsGeneralIndicator.getIndicator(
-            "FIVEGEXPERT",
+            "FIVEMWRD",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.get5And6and7(
-                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
-                        .FIVE_AND_GENEXPERT),
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.FIVE_AND_MWRD),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
-        "FIVEGEXPERT",
-        "FIVEGEXPERT",
-        EptsReportUtils.map(FIVEGEXPERT, "endDate=${endDate},location=${location}"),
+        "FIVEMWRD",
+        "FIVEMWRD",
+        EptsReportUtils.map(FIVEMWRD, "endDate=${endDate},location=${location}"),
         "");
 
     CohortIndicator FIVETBLAM =
@@ -587,18 +586,17 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(SIXASEMEAR, "endDate=${endDate},location=${location}"),
         "");
 
-    CohortIndicator SIXAGEN =
+    CohortIndicator SIXAMWRD =
         eptsGeneralIndicator.getIndicator(
-            "SIXAGEN",
+            "SIXAMWRD",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.get5And6and7(
-                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
-                        .SIXA_AND_GENEXPERT),
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SIXA_AND_MWRD),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
-        "SIXAGEN",
-        "SIXAGEN",
-        EptsReportUtils.map(SIXAGEN, "endDate=${endDate},location=${location}"),
+        "SIXAMWRD",
+        "SIXAMWRD",
+        EptsReportUtils.map(SIXAMWRD, "endDate=${endDate},location=${location}"),
         "");
 
     CohortIndicator SIXATBLAM =
@@ -649,18 +647,17 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(SIXBSEMEAR, "endDate=${endDate},location=${location}"),
         "");
 
-    CohortIndicator SIXGENEXPERT =
+    CohortIndicator SIXBMWRD =
         eptsGeneralIndicator.getIndicator(
-            "SIXGENEXPERT",
+            "SIXBMWRD",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.get5And6and7(
-                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
-                        .SIXB_AND_GENEXPERT),
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SIXB_AND_MWRD),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
-        "SIXGENEXPERT",
-        "SIXGENEXPERT",
-        EptsReportUtils.map(SIXGENEXPERT, "endDate=${endDate},location=${location}"),
+        "SIXBMWRD",
+        "SIXBMWRD",
+        EptsReportUtils.map(SIXBMWRD, "endDate=${endDate},location=${location}"),
         "");
 
     CohortIndicator SIXBTBLAM =
@@ -715,18 +712,17 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(SEVENSEMEAR, "endDate=${endDate},location=${location}"),
         "");
 
-    CohortIndicator SEVENGENEXPERT =
+    CohortIndicator SEVENMWRD =
         eptsGeneralIndicator.getIndicator(
-            "SEVENGENEXPERT",
+            "SEVENMWRD",
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.get5And6and7(
-                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition
-                        .SEVEN_AND_GENEXPERT),
+                    TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.SEVEN_AND_MWRD),
                 "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
-        "SEVENGENEXPERT",
-        "SEVENGENEXPERT",
-        EptsReportUtils.map(SEVENGENEXPERT, "endDate=${endDate},location=${location}"),
+        "SEVENMWRD",
+        "SEVENMWRD",
+        EptsReportUtils.map(SEVENMWRD, "endDate=${endDate},location=${location}"),
         "");
 
     CohortIndicator SEVENTBLAM =
