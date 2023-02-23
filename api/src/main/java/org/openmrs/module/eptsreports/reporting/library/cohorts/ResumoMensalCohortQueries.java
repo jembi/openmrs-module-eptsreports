@@ -100,7 +100,7 @@ public class ResumoMensalCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getNumberOfPatientsWhoInitiatedPreTarv() {
+  public CohortDefinition getNumberOfPatientsWhoInitiatedPreTarv(boolean inRange) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of patients who initiated Pre-TARV ");
@@ -118,10 +118,25 @@ public class ResumoMensalCohortQueries {
             .union(rmq.getMastercardArtStartDate())
             .union(rmq.getEnrollmentOnTarvProgramDate())
             .union(rmq.getEnrollmentOnMastercardWithoutPreTarvAndPickupDate())
+            .union(rmq.getEnrollmentOnTarvWithoutFileAndPreTarvDate())
             .buildQuery();
-    String minQuery = new EptsQueriesUtil().min(unionQuery).getQuery();
 
-    cd.setQuery(new EptsQueriesUtil().patientIdQueryBuilder(minQuery).getQuery());
+    String sql =
+        "SELECT earliest.patient_id "
+            + "FROM ( "
+            + "      SELECT min_enrollment.patient_id, MIN(enrollment_date ) date_enrolled "
+            + "      FROM ( "
+            + unionQuery
+            + "           ) min_enrollment  "
+            + "      GROUP BY min_enrollment.patient_id "
+            + "     ) earliest "
+            + "WHERE  "
+                .concat(
+                    inRange
+                        ? "earliest.date_enrolled BETWEEN :startDate AND :endDate"
+                        : "earliest.date_enrolled <= :endDate");
+
+    cd.setQuery(sql);
 
     return cd;
   }
@@ -135,27 +150,18 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "A1I",
+        "preTarv",
         map(
-            getNumberOfPatientsInMasterCardWithArtLessThanStartDateA1(),
-            "startDate=${startDate-1d},location=${location}"));
+                getNumberOfPatientsWhoInitiatedPreTarv(false),
+            "endDate=${startDate-1d},location=${location}"));
     cd.addSearch(
-        "A1II",
+        "transferredIn",
         map(
             getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthA1(),
             "onOrAfter=${startDate-1d},location=${location}"));
-    cd.addSearch(
-        "A1III",
-        map(
-            getAllPatientsEnrolledInPreArtProgramWithDateEnrolledLessThanStartDateA1(),
-            "startDate=${startDate-1d},location=${location}"));
-    cd.addSearch(
-        "A1IV",
-        map(
-            getAllPatientsRegisteredInEncounterType5or7WithEncounterDatetimeLessThanStartDateA1(),
-            "onOrBefore=${startDate-1d},locationList=${location}"));
 
-    cd.setCompositionString("(A1I OR A1III OR A1IV) AND NOT A1II");
+
+    cd.setCompositionString("preTarv AND NOT transferredIn");
 
     return cd;
   }
@@ -229,17 +235,17 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-        "A2I",
+        "preTarv",
         map(
-            getNumberOfPatientInitiedPreArtDuringCurrentMothA2(),
+                getNumberOfPatientsWhoInitiatedPreTarv(true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "A2II",
+        "transferredIn",
         map(
             getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthA2(),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
-    cd.setCompositionString("A2I AND NOT A2II");
+    cd.setCompositionString("preTarv AND NOT transferredIn");
 
     return cd;
   }
@@ -2454,7 +2460,7 @@ public class ResumoMensalCohortQueries {
    * performed Viral Load Test (Annual Notification) B12 AND NOT (B5 OR B6 OR B7 OR B8)
    *
    * <ul>
-   *   <li>B13: {@link ResumoMensalCohortQueries#getActivePatientsInARTByEndOfCurrentMonth()}
+   *   <li>B13: {@link ResumoMensalCohortQueries# getActivePatientsInARTByEndOfCurrentMonth()}
    *       <b>AND</b>
    *   <li>Filter all patients registered in encounter “S.TARV – Adulto Seguimento” (encounter id 6)
    *       with the following information:
