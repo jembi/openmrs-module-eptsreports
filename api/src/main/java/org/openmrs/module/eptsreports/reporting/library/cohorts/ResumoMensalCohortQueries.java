@@ -1347,20 +1347,7 @@ public class ResumoMensalCohortQueries {
             + "       AND e.location_id = :locationList "
             + "       AND e.encounter_datetime > all_dead.death_date "
             + "       AND e.encounter_datetime <= :onOrBefore "
-            + "       UNION "
-            + "       SELECT p.patient_id "
-            + "       FROM   patient p "
-            + "       JOIN encounter e "
-            + "       ON p.patient_id = e.patient_id "
-            + "       JOIN obs o "
-            + "       ON e.encounter_id = o.encounter_id "
-            + "       WHERE  p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND e.encounter_type = ${arvLevantamento} "
-            + "       AND e.location_id = :locationList "
-            + "       AND o.concept_id = ${arvLevantamentoDate} "
-            + "       AND o.value_datetime > all_dead.death_date"
-            + "       AND o.value_datetime <= :onOrBefore )";
+            + "        )";
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put(
@@ -1375,9 +1362,8 @@ public class ResumoMensalCohortQueries {
         "pediatriaSeguimento",
         hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("farmacia", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    valuesMap.put(
-        "arvLevantamento", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    valuesMap.put("arvLevantamentoDate", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+
 
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     cd.setQuery(sub.replace(sql));
