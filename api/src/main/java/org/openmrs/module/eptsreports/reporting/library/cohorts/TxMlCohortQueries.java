@@ -73,6 +73,8 @@ public class TxMlCohortQueries {
     CohortDefinition transferredOut = getTransferredOutPatientsComposition();
     String mappings = "onOrBefore=${endDate},location=${location}";
     String mappings2 = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String previousPeriodMappings =
+        "startDate=${startDate-3m},endDate=${startDate-1d},location=${location}";
     CohortDefinition dead = getDeadPatientsComposition();
 
     cd.addSearch("missedAppointment", Mapped.mapStraightThrough(missedAppointment));
@@ -80,43 +82,35 @@ public class TxMlCohortQueries {
     cd.addSearch("startedArt", EptsReportUtils.map(startedArt, mappings));
     cd.addSearch(
         "transferredOutPreviousPeriod",
-        EptsReportUtils.map(
-            transferredOut,
-            "startDate=${startDate-3m},endDate=${startDate-1d},location=${location}"));
+        EptsReportUtils.map(transferredOut, previousPeriodMappings));
 
     cd.addSearch("transferredOutReportingPeriod", EptsReportUtils.map(transferredOut, mappings2));
 
-    cd.addSearch(
-        "deadPreviousPeriod",
-        EptsReportUtils.map(dead, "endDate=${startDate-1d},location=${location}"));
+    cd.addSearch("deadPreviousPeriod", EptsReportUtils.map(dead, previousPeriodMappings));
     cd.addSearch("deadReportingPeriod", EptsReportUtils.map(dead, mappings2));
 
     cd.addSearch(
-        "transferOutBetweenArtpickupAndRecepcaoLevantouReportingPeriod",
+        "transferredOutBetweenArtpickupAndRecepcaoLevantouReportingPeriod",
         EptsReportUtils.map(
             getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(), mappings2));
 
     cd.addSearch(
-        "transferOutBetweenArtpickupAndRecepcaoLevantouPreviousPeriod",
+        "transferredOutBetweenArtpickupAndRecepcaoLevantouPreviousPeriod",
         EptsReportUtils.map(
             getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
-            "startDate=${startDate-3m},endDate=${startDate-1d},location=${location}"));
+            previousPeriodMappings));
 
     cd.addSearch(
         "suspendedReportingPeriod",
         EptsReportUtils.map(getSuspendedPatientsComposition(), mappings2));
     cd.addSearch(
         "suspendedPreviousPeriod",
-        EptsReportUtils.map(
-            getSuspendedPatientsComposition(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(getSuspendedPatientsComposition(), previousPeriodMappings));
 
     cd.setCompositionString(
-        //        "dead OR (transferredOut AND transferOutBetweenArtpickupAndRecepcaoLevantou)");
-        //        "dead OR transferredOut");
         "((missedAppointment OR noScheduled OR deadReportingPeriod OR suspendedReportingPeriod OR "
-            + "(transferredOutReportingPeriod AND transferOutBetweenArtpickupAndRecepcaoLevantouReportingPeriod)) AND startedArt) "
-            + "AND NOT ((deadPreviousPeriod OR suspendedPreviousPeriod) OR (transferredOutPreviousPeriod AND transferOutBetweenArtpickupAndRecepcaoLevantouPreviousPeriod))");
+            + "(transferredOutReportingPeriod AND transferredOutBetweenArtpickupAndRecepcaoLevantouReportingPeriod)) AND startedArt) "
+            + "AND NOT ((deadPreviousPeriod OR suspendedPreviousPeriod) OR (transferredOutPreviousPeriod AND transferredOutBetweenArtpickupAndRecepcaoLevantouPreviousPeriod))");
 
     return cd;
   }
@@ -182,10 +176,10 @@ public class TxMlCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
-            "missedAppointmentLessTransfers",
-            EptsReportUtils.map(
-                    getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "missedAppointmentLessTransfers",
+        EptsReportUtils.map(
+            getPatientsWhoMissedNextAppointmentAndNoScheduledDrugPickupOrNextConsultation(),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "dead",
         EptsReportUtils.map(
@@ -603,29 +597,13 @@ public class TxMlCohortQueries {
             + "	                         ON e.patient_id=p.patient_id     "
             + "	                 WHERE  p.voided = 0     "
             + "	                     AND e.voided = 0     "
-            + "	                     AND e.encounter_type IN (${adultoSeguimentoEncounterType},"
-            + "${pediatriaSeguimentoEncounterType},"
-            + "${pharmaciaEncounterType})    "
+            + "	                     AND e.encounter_type IN (${adultoSeguimentoEncounterType}, "
+            + " ${pediatriaSeguimentoEncounterType}, "
+            + " ${pharmaciaEncounterType})    "
             + "	                     AND e.encounter_datetime > lastest.last_date "
             + " AND e.encounter_datetime <=  :endDate    "
             + "	                     AND e.location_id =  :location    "
             + "	                 GROUP BY p.patient_id "
-            + " UNION "
-            + "        			 SELECT  p.patient_id    "
-            + "	                 FROM patient p       "
-            + "	                      INNER JOIN encounter e      "
-            + "	                          ON e.patient_id=p.patient_id      "
-            + "	                      INNER JOIN obs o      "
-            + "	                          ON o.encounter_id=e.encounter_id      "
-            + "	                  WHERE  p.voided = 0      "
-            + "	                      AND e.voided = 0      "
-            + "	                      AND o.voided = 0      "
-            + "	                      AND e.encounter_type = ${masterCardDrugPickupEncounterType}     "
-            + "	                      AND o.concept_id = ${artDatePickup}     "
-            + "	                      AND o.value_datetime > lastest.last_date  "
-            + " AND o.value_datetime <= :endDate      "
-            + "	                      AND e.location_id =  :location     "
-            + "	                  GROUP BY p.patient_id   "
             + ")  "
             + " GROUP BY lastest.patient_id"
             + " )mostrecent "
@@ -1869,7 +1847,6 @@ public class TxMlCohortQueries {
             + "                 AND        o.voided = 0 "
             + "                 AND        e.encounter_type = ${18} "
             + "                 AND        o.concept_id = ${5096} "
-            + "                 AND        e.encounter_datetime >= :startDate "
             + "                 AND        e.encounter_datetime <= :endDate "
             + "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
@@ -1886,7 +1863,6 @@ public class TxMlCohortQueries {
             + "                 AND        o.voided = 0 "
             + "                 AND        e.encounter_type = ${52} "
             + "                 AND        o.concept_id = ${23866} "
-            + "                 AND        o.value_datetime >= :startDate "
             + "                 AND        o.value_datetime  <= :endDate  "
             + "                 AND        e.location_id = :location "
             + "               GROUP BY   p.patient_id "
