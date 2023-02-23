@@ -1205,22 +1205,7 @@ public class ResumoMensalCohortQueries {
     sql.append("                           AND e.location_id = :location ");
     sql.append("                           AND e.encounter_datetime > suspended_date ");
     sql.append("                           AND e.encounter_datetime <= :onOrBefore ");
-    sql.append("                         UNION ");
-    sql.append("                         SELECT p.patient_id ");
-    sql.append("                         FROM patient p ");
-    sql.append("                                  JOIN encounter e ");
-    sql.append("                                       ON p.patient_id = e.patient_id ");
-    sql.append("                                  JOIN obs o ");
-    sql.append("                                       ON e.encounter_id = o.encounter_id ");
-    sql.append("                         WHERE p.voided = 0 ");
-    sql.append("                           AND e.voided = 0 ");
-    sql.append("                           AND e.encounter_type = ${mcDrugPickup} ");
-    sql.append("                           AND e.location_id = :location ");
-    sql.append("                           AND o.concept_id = ${drugPickup} ");
-    sql.append("                           AND o.value_datetime ");
-    sql.append("                             > suspended_date");
-    sql.append("                           AND o.value_datetime");
-    sql.append("                             <= :onOrBefore);");
+    sql.append("                             );");
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("art", hivMetadata.getARTProgram().getProgramId());
@@ -1235,9 +1220,7 @@ public class ResumoMensalCohortQueries {
     valuesMap.put(
         "childSeg", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("fila", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    valuesMap.put(
-        "mcDrugPickup", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    valuesMap.put("drugPickup", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
     StringSubstitutor sub = new StringSubstitutor(valuesMap);
     cd.setQuery(sub.replace(sql));
     return cd;
