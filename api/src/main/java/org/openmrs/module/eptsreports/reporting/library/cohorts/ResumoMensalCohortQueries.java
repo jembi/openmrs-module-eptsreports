@@ -115,7 +115,7 @@ public class ResumoMensalCohortQueries {
             .unionBuilder(rmq.getClinicalFileEnrollmentDate())
             .union(rmq.getMastercardEnrollmentDate())
             .union(rmq.getProgramEnrollmentDate())
-            .union(rmq.getMastercardArtStartDate())
+            .union(rmq.getMastercardArtStartWithoutPickupDate())
             .union(rmq.getEnrollmentOnTarvProgramDate())
             .union(rmq.getEnrollmentOnMastercardWithoutPreTarvAndPickupDate())
             .union(rmq.getEnrollmentOnTarvWithoutFileAndPreTarvDate())
@@ -152,14 +152,13 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "preTarv",
         map(
-                getNumberOfPatientsWhoInitiatedPreTarv(false),
+            getNumberOfPatientsWhoInitiatedPreTarv(false),
             "endDate=${startDate-1d},location=${location}"));
     cd.addSearch(
         "transferredIn",
         map(
             getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthA1(),
             "onOrAfter=${startDate-1d},location=${location}"));
-
 
     cd.setCompositionString("preTarv AND NOT transferredIn");
 
@@ -237,7 +236,7 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "preTarv",
         map(
-                getNumberOfPatientsWhoInitiatedPreTarv(true),
+            getNumberOfPatientsWhoInitiatedPreTarv(true),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "transferredIn",

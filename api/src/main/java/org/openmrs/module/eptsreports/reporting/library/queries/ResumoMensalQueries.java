@@ -920,6 +920,12 @@ public class ResumoMensalQueries {
     return sb.replace(sql);
   }
 
+  /**
+   * registados no formulário “Ficha Resumo” Secção “Cuidados de HIV” com “Data do Início Pré-TARV”
+   * < “Data Início do Relatório”;
+   *
+   * @return String
+   */
   public String getMastercardEnrollmentDate() {
     String sql =
         "SELECT p.patient_id, o.value_datetime AS enrollment_date "
@@ -947,7 +953,7 @@ public class ResumoMensalQueries {
    *
    * @return- String
    */
-  public String getMastercardArtStartDate() {
+  public String getMastercardArtStartWithoutPickupDate() {
     String sql =
         "SELECT p.patient_id, o.value_datetime AS enrollment_date "
             + "FROM   patient p "
@@ -1037,15 +1043,13 @@ public class ResumoMensalQueries {
             + "                  FROM   encounter en "
             + "                         INNER JOIN obs o2 ON o2.encounter_id = en.encounter_id "
             + "                         INNER JOIN obs o3 ON o3.encounter_id = en.encounter_id "
-            + "                  WHERE  ( en.encounter_type IN ( ${18}, ${5}, ${7} ) "
+            + "                  WHERE  ( en.encounter_type IN ( ${5}, ${7} ) "
             + "                           AND en.encounter_datetime <= :endDate ) "
-            + "                          OR ( en.encounter_type = ${52} "
-            + "                               AND o2.concept_id = ${23866} "
+            + "                          OR ( en.encounter_type = ${53} "
+            + "                               AND o2.concept_id = ${23808} "
             + "                               AND o2.value_datetime <= :endDate "
             + "                               AND o2.voided = 0 "
-            + "                               AND o3.concept_id = ${23865} "
-            + "                               AND o3.value_coded = ${1065} "
-            + "                               AND o3.voided = 0 ) "
+            + "                                    ) "
             + "                             AND en.location_id = :location "
             + "                             AND en.voided = 0"
             + "                  GROUP BY en.patient_id "
@@ -1056,7 +1060,7 @@ public class ResumoMensalQueries {
             + "                 WHERE  p.voided = 0 "
             + "                        AND pp.voided = 0 "
             + "                        AND pp.location_id = :location "
-            + "                        AND pp.program_id = ${2} "
+            + "                        AND pp.program_id = ${1} "
             + "                        AND pp.date_enrolled <= :endDate ) no_program "
             + "              ON no_program.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
