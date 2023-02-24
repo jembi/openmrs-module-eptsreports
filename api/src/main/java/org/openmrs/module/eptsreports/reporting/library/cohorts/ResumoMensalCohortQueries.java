@@ -3247,8 +3247,8 @@ public class ResumoMensalCohortQueries {
     cd.addSearch(
         "A",
         map(
-            getNumberOfPatientsWhoAbandonedArt60DaysBeforeDate(),
-            "endDate=${endDate},location=${location}"));
+            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
+            "date=${endDate},location=${location}"));
     cd.addSearch(
         "B",
         map(
