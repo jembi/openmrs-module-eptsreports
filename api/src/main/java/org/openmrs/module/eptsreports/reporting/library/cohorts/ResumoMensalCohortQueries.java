@@ -1631,9 +1631,7 @@ public class ResumoMensalCohortQueries {
             "onOrBefore=${startDate-1d},location=${location}"));
     cd.addSearch(
         "B7A",
-        map(
-            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
-            "location=${location},date=${startDate-1d}"));
+        map(getNumberOfPatientsWhoAbandonedArt(), "location=${location},endDate=${startDate-1d}"));
     cd.addSearch(
         "B8A",
         map(getPatientsWhoDied(false), "onOrBefore=${startDate-1d},locationList=${location}"));
@@ -1666,9 +1664,7 @@ public class ResumoMensalCohortQueries {
             "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "B7A",
-        map(
-            getNumberOfPatientsWhoAbandonedArtDuringPreviousMonthForB7(),
-            "location=${location},date=${endDate}"));
+        map(getNumberOfPatientsWhoAbandonedArt(), "location=${location},endDate=${endDate}"));
     cd.addSearch(
         "B8A", map(getPatientsWhoDied(false), "onOrBefore=${endDate},locationList=${location}"));
 
