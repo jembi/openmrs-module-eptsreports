@@ -12,7 +12,9 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.CommonCohortQueries;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 
 public class QualityImprovement2020Queries {
@@ -1111,7 +1113,8 @@ public class QualityImprovement2020Queries {
       int adultoSeguimentoEncounterType,
       int hivViralLoadConcept,
       int yesConcept,
-      int pregnantConcept) {
+      int pregnantConcept,
+      boolean greaterThan50) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Cat11 B4");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1126,6 +1129,12 @@ public class QualityImprovement2020Queries {
     map.put("1065", yesConcept);
     map.put("1982", pregnantConcept);
 
+    int vlQuantity = 1000;
+
+    if (greaterThan50) {
+      vlQuantity = 50;
+    }
+
     String query =
         "SELECT p.patient_id "
             + "             FROM patient p "
@@ -1138,7 +1147,8 @@ public class QualityImprovement2020Queries {
             + "                                AND e.voided = 0   "
             + "                                AND o.voided = 0      "
             + "                                AND o.concept_id = ${856}   "
-            + "                                AND o.value_numeric >= 1000  "
+            + "                                AND o.value_numeric >= "
+            + vlQuantity
             + "                                AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
             + "                                AND e.location_id = :location   "
             + "                         GROUP  BY p.patient_id    "
@@ -1168,6 +1178,33 @@ public class QualityImprovement2020Queries {
 
     return sqlCohortDefinition;
   }
+
+  public static CohortDefinition getMQ13DenB4_P4(
+      int adultoSeguimentoEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int pregnantConcept) {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition indicator =
+        getMQ13DenB4_P4(
+            adultoSeguimentoEncounterType, hivViralLoadConcept, yesConcept, pregnantConcept, false);
+
+    compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
+
+    compositionCohortDefinition.setCompositionString("indicator");
+
+    return compositionCohortDefinition;
+  }
+
   /**
    * Revised B13 for the MQ 15 indicators
    *
@@ -1241,7 +1278,8 @@ public class QualityImprovement2020Queries {
       int adultoSeguimentoEncounterType,
       int hivViralLoadConcept,
       int yesConcept,
-      int breastfeedingConcept) {
+      int breastfeedingConcept,
+      boolean greaterThan50) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Cat11 B5");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1256,6 +1294,11 @@ public class QualityImprovement2020Queries {
     map.put("1065", yesConcept);
     map.put("6332", breastfeedingConcept);
 
+    int vlQuantity = 1000;
+
+    if (greaterThan50) {
+      vlQuantity = 50;
+    }
     String query =
         " SELECT p.patient_id "
             + "             FROM patient p "
@@ -1268,7 +1311,8 @@ public class QualityImprovement2020Queries {
             + "                                AND e.voided = 0   "
             + "                                AND o.voided = 0     "
             + "                                AND o.concept_id = ${856}   "
-            + "                                AND o.value_numeric >= 1000  "
+            + "                                AND o.value_numeric >=  "
+            + vlQuantity
             + "                                AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
             + "                                AND e.location_id = :location   "
             + "                         GROUP  BY p.patient_id    "
@@ -1296,6 +1340,36 @@ public class QualityImprovement2020Queries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  public static CohortDefinition getMQ13DenB5_P4(
+      int adultoSeguimentoEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int breastfeedingConcept) {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition indicator =
+        getMQ13DenB5_P4(
+            adultoSeguimentoEncounterType,
+            hivViralLoadConcept,
+            yesConcept,
+            breastfeedingConcept,
+            false);
+
+    compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
+
+    compositionCohortDefinition.setCompositionString("indicator");
+
+    return compositionCohortDefinition;
   }
 
   /**
