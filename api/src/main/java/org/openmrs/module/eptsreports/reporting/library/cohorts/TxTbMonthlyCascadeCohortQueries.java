@@ -213,7 +213,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             others, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        SemearTbLamGXPertComposition.GENEXPERT.getKey(),
+        SemearTbLamGXPertComposition.MWRD.getKey(),
         EptsReportUtils.map(
             genex, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
@@ -2316,10 +2316,10 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
-    GENEXPERT {
+    MWRD {
       @Override
       public String getKey() {
-        return "GENEXPERT";
+        return "MWRD";
       }
 
       @Override
@@ -2429,7 +2429,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
-    FIVE_AND_GENEXPERT {
+    FIVE_AND_MWRD {
       @Override
       public String getKey() {
         return "";
@@ -2437,7 +2437,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return GENEXPERT.getKey() + " AND " + FIVE.getKey();
+        return MWRD.getKey() + " AND " + FIVE.getKey();
       }
 
       @Override
@@ -2493,7 +2493,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
-    SIXA_AND_GENEXPERT {
+    SIXA_AND_MWRD {
       @Override
       public String getKey() {
         return "";
@@ -2501,7 +2501,7 @@ public class TxTbMonthlyCascadeCohortQueries {
 
       @Override
       public String getCompositionString() {
-        return GENEXPERT.getKey() + " AND " + SIXA.getKey();
+        return MWRD.getKey() + " AND " + SIXA.getKey();
       }
 
       @Override
@@ -2567,7 +2567,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
-    SIXB_AND_GENEXPERT {
+    SIXB_AND_MWRD {
       @Override
       public String getKey() {
         return "";
@@ -2581,7 +2581,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + " AND NOT "
             + SIXA.getKey()
             + " AND "
-            + GENEXPERT.getKey();
+            + MWRD.getKey();
       }
 
       @Override
@@ -2670,7 +2670,7 @@ public class TxTbMonthlyCascadeCohortQueries {
         return "Select all patients from TX CURR";
       }
     },
-    SEVEN_AND_GENEXPERT {
+    SEVEN_AND_MWRD {
       @Override
       public String getKey() {
         return "";
@@ -2682,7 +2682,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             + " AND NOT "
             + TxTbComposition.NUMERATOR.getKey()
             + " AND "
-            + GENEXPERT.getKey();
+            + MWRD.getKey();
       }
 
       @Override
