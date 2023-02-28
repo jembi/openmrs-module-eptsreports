@@ -104,7 +104,7 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
                 "patients with viral load",
                 EptsReportUtils.map(
                     txPvlsBySourceLabOrFsrCohortQueries
-                        .getPatientsViralLoadWithin12MonthsForLabAndFsrDenominatorAndOnArtForMoreThan3Months(),
+                        .getPatientsWithViralLoadResultsAndOnRoutineForLabAndFsrDenominator(),
                     mappings)),
             mappings),
         "");
