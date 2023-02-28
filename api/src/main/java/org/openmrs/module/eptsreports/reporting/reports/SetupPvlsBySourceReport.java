@@ -16,8 +16,9 @@ import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Deprecated
+@Component
 public class SetupPvlsBySourceReport extends EptsDataExportManager {
 
   private TxPvlsBySourceDataset txPvlsBySourceDataset;
@@ -79,7 +80,7 @@ public class SetupPvlsBySourceReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "TX_PVLS_BY_SOURCE_Template.xls",
+              "Template_TX_PVLS_by_Source_v1.1.xls",
               "TX PVLS BY SOURCE",
               getExcelDesignUuid(),
               null);
