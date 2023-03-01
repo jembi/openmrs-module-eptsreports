@@ -350,15 +350,16 @@ public class EriDSDCohortQueries {
                     ageCohortQueries.createXtoYAgeCohort("moreThanOrEqual2Years", 2, 200),
                     "effectiveDate=${endDate}"));
 
-    cd.addSearch(
-            "pregnantBreastfeedingTB",
-            EptsReportUtils.map(
-                    getPregnantAndBreastfeedingAndOnTBTreatment(),
-                    "endDate=${endDate},location=${location}"));
-
     cd.addSearch("breastfeeding",
-            EptsReportUtils.map(txNewCohortQueries.getTxNewBreastfeedingComposition(true),
-                    "onOrAfter=${endDate-11m},onOrBefore=${endDate},location=${location}"));
+            EptsReportUtils.map(
+              txNewCohortQueries.getTxNewBreastfeedingComposition(true),
+              "onOrAfter=${endDate-11m},onOrBefore=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
+            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
             "sarcomaKarposi",
@@ -380,7 +381,7 @@ public class EriDSDCohortQueries {
             EptsReportUtils.map(getPatientsWhoReturned(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-            "(B13 AND moreThan2years AND stable AND breastfeeding AND NOT (pregnantBreastfeedingTB OR sarcomaKarposi OR returned))");
+            "(B13 AND moreThan2years AND stable AND breastfeeding AND NOT (pregnant OR sarcomaKarposi OR returned))");
 
     return cd;
   }
