@@ -51,11 +51,11 @@ public class TxTbMonthlyCascadeCohortQueries {
     chd.addSearch(
         TxCurrComposition.NEWART.getKey(),
         EptsReportUtils.map(
-            newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
+            newOnArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxCurrComposition.PREVIOUSLYART.getKey(),
-        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate-6m},location=${location}"));
 
     chd.setCompositionString(indicator1and2Composition.getCompositionString());
     return chd;
@@ -132,11 +132,11 @@ public class TxTbMonthlyCascadeCohortQueries {
     chd.addSearch(
         TxTbComposition.NEWART.getKey(),
         EptsReportUtils.map(
-            newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
+            newOnArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.PREVIOUSLYART.getKey(),
-        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate-6m},location=${location}"));
 
     chd.addSearch(
         TxCurrComposition.TXCURR.getKey(),
@@ -186,7 +186,7 @@ public class TxTbMonthlyCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition sent = txtbCohortQueries.specimenSent();
-    CohortDefinition semear = getSmearMicroscopy();
+    CohortDefinition semear = txtbCohortQueries.getSmearMicroscopyOnly();
     CohortDefinition positiveResult = txtbCohortQueries.positiveResultsReturned();
     CohortDefinition tbLam = getPetientsHaveTBLAM();
     CohortDefinition others = getPatientsInOthersWithoutGenexPert();
@@ -352,7 +352,7 @@ public class TxTbMonthlyCascadeCohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "exameBaciloscopia OR haveBKTestRequest OR haveBKTestResult AND NOT (dontHaveGENEXPERTInLabForm AND dontHaveGeneXpertPositive AND dontHaveApplication4LabResearch ");
+        "(exameBaciloscopia OR haveBKTestRequest OR haveBKTestResult) AND NOT (dontHaveGENEXPERTInLabForm AND dontHaveGeneXpertPositive AND dontHaveApplication4LabResearch) ");
 
     return cd;
   }

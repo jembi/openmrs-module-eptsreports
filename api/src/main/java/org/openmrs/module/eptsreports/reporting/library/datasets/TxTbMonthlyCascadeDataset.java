@@ -125,7 +125,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 txTbMonthlyCascadeCohortQueries.getTxCurrOrTxCurrWithClinicalConsultation(
                     TxTbMonthlyCascadeCohortQueries.TxCurrComposition
                         .TXCURR_AND_CLINICAL_AND_NEWART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
         "TXCLINICALART",
@@ -149,7 +149,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 txTbMonthlyCascadeCohortQueries.getTxCurrOrTxCurrWithClinicalConsultation(
                     TxTbMonthlyCascadeCohortQueries.TxCurrComposition
                         .TXCURR_AND_CLINICAL_AND_PREVIUSLYART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
         "TXCLINICALPREV",
@@ -411,7 +411,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.NUMERATOR_AND_NEWART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "NUMERATORNEWART",
         "NUMERATORNEWART",
@@ -430,7 +430,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.NUMERATOR_AND_PREVIOUSLYART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "NUMERATORPREVIOUSLYRT",
         "NUMERATORPREVIOUSLYRT",
@@ -467,7 +467,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition
                         .NUMERATOR_AND_TXCURR_AND_NEWART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "NUMTXCURRNEWART",
         "NUMTXCURRNEWART ",
@@ -487,7 +487,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 txTbMonthlyCascadeCohortQueries.getTxTbNumeratorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition
                         .NUMERATOR_AND_TXCURR_PREVIOUSLYART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "NUMTXCURPREVART",
         "NUMTXCURPREVART",
@@ -517,7 +517,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.get5And6and7(
                     TxTbMonthlyCascadeCohortQueries.SemearTbLamGXPertComposition.FIVE_AND_SEMEAR),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "FIVESEMEAR",
         "FIVESEMEAR",
