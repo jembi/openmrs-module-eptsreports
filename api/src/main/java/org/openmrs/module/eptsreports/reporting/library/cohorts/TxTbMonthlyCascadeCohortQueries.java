@@ -97,11 +97,11 @@ public class TxTbMonthlyCascadeCohortQueries {
     chd.addSearch(
         TxTbComposition.NEWART.getKey(),
         EptsReportUtils.map(
-            newOnArt, "startDate=${endDate-6m-1d},endDate=${endDate},location=${location}"));
+            newOnArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     chd.addSearch(
         TxTbComposition.PREVIOUSLYART.getKey(),
-        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(previouslyOnArt, "endDate=${endDate-6m},location=${location}"));
 
     chd.addSearch(
         TxCurrComposition.TXCURR.getKey(),

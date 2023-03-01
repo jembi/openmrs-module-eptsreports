@@ -130,7 +130,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
     cohortIndicatorDefinition.addColumn(
         "TXCLINICALART",
         "TXCLINICALART",
-        EptsReportUtils.map(NEWART, "endDate=${endDate},location=${location}"),
+        EptsReportUtils.map(TXCLINICALART, "endDate=${endDate},location=${location}"),
         "");
 
     addRow(
@@ -187,7 +187,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_AND_NEWART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
         "TXTBDEN",
@@ -245,7 +245,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_AND_TXCURR_AND_NEWART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "TXTBTXCURRNEW",
         "TTXTBTXCURRNEW",
@@ -265,7 +265,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition
                         .TXTB_AND_TXCURR_AND_PREVIOUSLYART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "TXTBTXCURRPREV",
         "TXTBTXCURRPREV",
@@ -301,7 +301,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.POSITIVESCREENING_AND_NEWART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "POSITIVENEWART",
         "POSITIVENEWART",
@@ -321,7 +321,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition
                         .POSITIVESCREENING_AND_PREVIOUSLYRT),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "POSITIVEPREVIOUSLYRT",
         "POSITIVEPREVIOUSLYRT",
@@ -356,7 +356,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.NEGATIVESCREENING_AND_NEWART),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "NEGATIVENEWART",
         "NEGATIVENEWART",
@@ -376,7 +376,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition
                         .NEGATIVESCREENING_AND_PREVIOUSLYRT),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
     cohortIndicatorDefinition.addColumn(
         "NEGATIVEPREVIOUSLYRT",
         "NEGATIVEPREVIOUSLYRT",
