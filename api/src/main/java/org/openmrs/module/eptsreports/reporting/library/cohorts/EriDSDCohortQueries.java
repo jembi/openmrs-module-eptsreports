@@ -345,15 +345,16 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     cd.addSearch(
-            "moreThan2years",
-            EptsReportUtils.map(
-                    ageCohortQueries.createXtoYAgeCohort("moreThanOrEqual2Years", 2, 200),
-                    "effectiveDate=${endDate}"));
+        "moreThan2years",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("moreThanOrEqual2Years", 2, 200),
+            "effectiveDate=${endDate}"));
 
-    cd.addSearch("breastfeeding",
-            EptsReportUtils.map(
-              txNewCohortQueries.getTxNewBreastfeedingComposition(true),
-              "onOrAfter=${endDate-11m},onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(
+            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
+            "onOrAfter=${endDate-11m},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "pregnant",
@@ -362,26 +363,26 @@ public class EriDSDCohortQueries {
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "sarcomaKarposi",
-            EptsReportUtils.map(
-                    getAllPatientsOnSarcomaKarposi(), "endDate=${endDate},location=${location}"));
+        "sarcomaKarposi",
+        EptsReportUtils.map(
+            getAllPatientsOnSarcomaKarposi(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "B13",
-            EptsReportUtils.map(
-                    resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
-                    "endDate=${endDate},location=${location}"));
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "stable",
-            EptsReportUtils.map(getPatientsWhoAreStable(6), "endDate=${endDate},location=${location}"));
+        "stable",
+        EptsReportUtils.map(getPatientsWhoAreStable(6), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-            "returned",
-            EptsReportUtils.map(getPatientsWhoReturned(), "endDate=${endDate},location=${location}"));
+        "returned",
+        EptsReportUtils.map(getPatientsWhoReturned(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-            "(B13 AND moreThan2years AND stable AND breastfeeding AND NOT (pregnant OR sarcomaKarposi OR returned))");
+        "(B13 AND moreThan2years AND stable AND breastfeeding AND NOT (pregnant OR sarcomaKarposi OR returned))");
 
     return cd;
   }
@@ -424,10 +425,10 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     cd.addSearch(
-            "breastfeeding",
-            EptsReportUtils.map(
-                    txNewCohortQueries.getTxNewBreastfeedingComposition(true),
-                    "onOrAfter=${endDate-11m},onOrBefore=${endDate},location=${location}"));
+        "breastfeeding",
+        EptsReportUtils.map(
+            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
+            "onOrAfter=${endDate-11m},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch("onART", EptsReportUtils.map(getD4(), "endDate=${endDate},location=${location}"));
 
@@ -488,6 +489,8 @@ public class EriDSDCohortQueries {
       cd.addSearch("onART", EptsReportUtils.map(getN18(), mappings));
     } else if (indicatorFlag == 19) {
       cd.addSearch("onART", EptsReportUtils.map(getN19(), mappings));
+    } else if (indicatorFlag == 20) {
+      cd.addSearch("onART", EptsReportUtils.map(getN20(), mappings));
     }
 
     cd.addSearch(
@@ -567,9 +570,8 @@ public class EriDSDCohortQueries {
   /**
    * <b>Name: N1</b>
    *
-   * <p><b>Description:</b> Number of Non-pregnant and Non-Breastfeeding patients who are not on TB
-   * treatment and elegible for DSD who are in at least one DSD model for stable patients (GA, DT,
-   * DS, DA, FR, DCA, DD)
+   * <p><b>Description:</b> Number of active patients on ART who are included in at least one DSD
+   * model for stable patients (GA, DT, DS, DA, FR, DCA, DD)
    *
    * @return {@link CohortDefinition}
    */
@@ -1237,6 +1239,45 @@ public class EriDSDCohortQueries {
   }
 
   /**
+   * <b>Name: N20</b>
+   *
+   * <p><b>Description:</b> N20: Number of active patients on ART who are included in DSD model:
+   * Dispensa Bimestral (DB)
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getN20() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "N20: Number of active patients on ART who are included in DSD model: Dispensa Bimestral (DB)");
+
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition nextArtPickUpScheduledORdispensaBimensal =
+        DsdQueries
+            .getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaOrWithPickupOnFilaBetween(
+                53,
+                67,
+                Arrays.asList(hivMetadata.getBimonthlyDispensationConcept().getConceptId()));
+
+    cd.addSearch(
+        "nextArtPickUpScheduledORdispensaBimensal",
+        EptsReportUtils.map(
+            nextArtPickUpScheduledORdispensaBimensal, "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("B13 AND nextArtPickUpScheduledORdispensaBimensal");
+
+    return cd;
+  }
+
+  /**
    * <b>Description:</b> Patients who are registered as pregnant, as breastfeeding or who are on TB
    * treatment
    *
@@ -1315,7 +1356,8 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "A",
         EptsReportUtils.map(
-            getPatientsWhoAreStableA(atLeastXMonthsOnART), "onOrBefore=${endDate},location=${location}"));
+            getPatientsWhoAreStableA(atLeastXMonthsOnART),
+            "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "B",
         EptsReportUtils.map(
@@ -1327,10 +1369,10 @@ public class EriDSDCohortQueries {
             getCD4CountAndCD4PercentCombined(),
             "startDate=${endDate-12m},endDate=${endDate},location=${location}"));
     cd.addSearch(
-            "D",
-            EptsReportUtils.map(
-                    getPatientsWhoAreBreastfeedingD2(),
-                    "startDate=${endDate-12m},endDate=${endDate},location=${location}"));
+        "D",
+        EptsReportUtils.map(
+            getPatientsWhoAreBreastfeedingD2(),
+            "startDate=${endDate-12m},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "F",
         EptsReportUtils.map(
