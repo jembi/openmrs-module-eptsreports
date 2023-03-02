@@ -182,11 +182,11 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "activeAndUnstable",
-        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("activeAndUnstable AND NOT pregnant AND NOT breastfeeding");
+    /*    cd.addSearch(
+            "activeAndUnstable",
+            EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
+    */
+    cd.setCompositionString("pregnant AND NOT breastfeeding");
 
     return cd;
   }
@@ -208,11 +208,11 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "activeAndUnstable",
-        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("activeAndUnstable AND pregnant");
+    /*    cd.addSearch(
+            "activeAndUnstable",
+            EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
+    */
+    cd.setCompositionString("pregnant");
 
     return cd;
   }
@@ -234,12 +234,12 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             txNewCohortQueries.getTxNewBreastfeedingComposition(true),
             "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "activeAndUnstable",
-        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
-
-    cd.setCompositionString("activeAndUnstable AND breastfeeding");
+    /*
+        cd.addSearch(
+            "activeAndUnstable",
+            EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
+    */
+    cd.setCompositionString("breastfeeding");
 
     return cd;
   }
@@ -1371,8 +1371,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "D",
         EptsReportUtils.map(
-            getPatientsWhoAreBreastfeedingD2(),
-            "startDate=${endDate-12m},endDate=${endDate},location=${location}"));
+            getPatientsWhoAreBreastfeedingD2(), "endDate=${endDate},location=${location}"));
     cd.addSearch(
         "F",
         EptsReportUtils.map(
@@ -1478,14 +1477,14 @@ public class EriDSDCohortQueries {
    *       months) which contains one of the following concept:
    *       <p>
    *       <ul>
-   *         <li>CD4 Abs Result <b>(Concept id 1695 or Concept id 5497)</b> or
+   *         <li>CD4 Abs Result <b>(Concept id 1695)</b> or
    *         <li>CD4 % Result <b>(Concept id 730)</b>
    *       </ul>
    *       <div>B. The last obs.datetime of obs concept id 1695 occurred between reporting end date
    *       and (reporting end date – 12 months) recorded in Encounter of type 53.
    *   <li>Check If the most recent encounter between A and B contains:
    *       <ul>
-   *         <li>CD4 Abs Result <b>(Concept id 1695 or Concept id 5497) >750</b> or
+   *         <li>CD4 Abs Result <b>(Concept id 1695) >750</b> or
    *         <li>CD4 % Result <b>(Concept id 730) >15%</b>
    *       </ul>
    * </ol>
@@ -1506,23 +1505,6 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             genericCohortQueries.hasNumericObs(
                 hivMetadata.getCD4AbsoluteOBSConcept(),
-                BaseObsCohortDefinition.TimeModifier.LAST,
-                RangeComparator.GREATER_THAN,
-                750.0,
-                null,
-                null,
-                Arrays.asList(
-                    hivMetadata.getAdultoSeguimentoEncounterType(),
-                    hivMetadata.getPediatriaSeguimentoEncounterType(),
-                    hivMetadata.getMisauLaboratorioEncounterType(),
-                    hivMetadata.getFsrEncounterType(),
-                    hivMetadata.getMasterCardEncounterType())),
-            "onOrAfter=${endDate-12m},onOrBefore=${endDate},locationList=${location}"));
-    cd.addSearch(
-        "Cd4Lab",
-        EptsReportUtils.map(
-            genericCohortQueries.hasNumericObs(
-                hivMetadata.getCD4AbsoluteConcept(),
                 BaseObsCohortDefinition.TimeModifier.LAST,
                 RangeComparator.GREATER_THAN,
                 750.0,
@@ -1557,7 +1539,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             ageCohortQueries.createXtoYAgeCohort("2-4", 2, 4), "effectiveDate=${endDate}"));
 
-    cd.setCompositionString("(Cd4Abs OR Cd4Lab OR Cd4Percent) AND Age");
+    cd.setCompositionString("(Cd4Abs OR Cd4Percent) AND Age");
 
     return cd;
   }
@@ -1607,7 +1589,6 @@ public class EriDSDCohortQueries {
     map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
-    map.put("5497", hivMetadata.getCD4AbsoluteConcept().getConceptId());
 
     String query =
         "SELECT  cd4_max.patient_id "
@@ -1624,7 +1605,7 @@ public class EriDSDCohortQueries {
             + "                ON o.encounter_id=e.encounter_id "
             + "        WHERE  "
             + "            e.encounter_type IN (${6},${9},${13},${51})   "
-            + "            AND  o.concept_id IN (${1695},${5497})   "
+            + "            AND  o.concept_id IN (${1695})   "
             + "            AND e.encounter_datetime   "
             + "                    BETWEEN date_add(date_add( :endDate, interval -12 MONTH), interval 1 day)  "
             + "                        AND  :endDate  "
@@ -1661,7 +1642,7 @@ public class EriDSDCohortQueries {
             + "    AND o.voided=0   "
             + "    AND "
             + "    (  "
-            + "        (o.concept_id IN (${1695} ,${5497}) AND o.value_numeric > 200)  "
+            + "        (o.concept_id IN (${1695}) AND o.value_numeric > 200)  "
             + "          "
             + "    )   "
             + "    AND e.location_id=  :location   "
