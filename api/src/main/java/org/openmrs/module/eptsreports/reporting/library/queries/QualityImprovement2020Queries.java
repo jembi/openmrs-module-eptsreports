@@ -1107,6 +1107,7 @@ public class QualityImprovement2020Queries {
    * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
    * @param yesConcept The answer yes Concept Id 1065
    * @param pregnantConcept The Pregnant Concept Id 1982
+   * @param vlQuantity Quantity of viral load to evaluate
    * @return {@link CohortDefinition}
    */
   public static CohortDefinition getMQ13DenB4_P4(
@@ -1114,7 +1115,7 @@ public class QualityImprovement2020Queries {
       int hivViralLoadConcept,
       int yesConcept,
       int pregnantConcept,
-      boolean greaterThan50) {
+      int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Cat11 B4");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1128,12 +1129,6 @@ public class QualityImprovement2020Queries {
     map.put("856", hivViralLoadConcept);
     map.put("1065", yesConcept);
     map.put("1982", pregnantConcept);
-
-    int vlQuantity = 1000;
-
-    if (greaterThan50) {
-      vlQuantity = 50;
-    }
 
     String query =
         "SELECT p.patient_id "
@@ -1196,7 +1191,7 @@ public class QualityImprovement2020Queries {
 
     CohortDefinition indicator =
         getMQ13DenB4_P4(
-            adultoSeguimentoEncounterType, hivViralLoadConcept, yesConcept, pregnantConcept, false);
+            adultoSeguimentoEncounterType, hivViralLoadConcept, yesConcept, pregnantConcept, 1000);
 
     compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
 
@@ -1272,6 +1267,7 @@ public class QualityImprovement2020Queries {
    * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
    * @param yesConcept The answer yes Concept Id 1065
    * @param breastfeedingConcept The breastfeeding Concept Id 6332
+   * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
   public static CohortDefinition getMQ13DenB5_P4(
@@ -1279,7 +1275,7 @@ public class QualityImprovement2020Queries {
       int hivViralLoadConcept,
       int yesConcept,
       int breastfeedingConcept,
-      boolean greaterThan50) {
+      int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Cat11 B5");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1294,11 +1290,6 @@ public class QualityImprovement2020Queries {
     map.put("1065", yesConcept);
     map.put("6332", breastfeedingConcept);
 
-    int vlQuantity = 1000;
-
-    if (greaterThan50) {
-      vlQuantity = 50;
-    }
     String query =
         " SELECT p.patient_id "
             + "             FROM patient p "
@@ -1363,7 +1354,7 @@ public class QualityImprovement2020Queries {
             hivViralLoadConcept,
             yesConcept,
             breastfeedingConcept,
-            false);
+            1000);
 
     compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
 

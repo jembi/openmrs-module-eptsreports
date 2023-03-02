@@ -2578,7 +2578,7 @@ public class QualityImprovement2020CohortQueries {
               hivMetadata.getHivViralLoadConcept().getConceptId(),
               hivMetadata.getYesConcept().getConceptId(),
               commonMetadata.getPregnantConcept().getConceptId(),
-              true);
+              50);
 
       breastfeedingWithCargaViralHigherThan1000 =
           QualityImprovement2020Queries.getMQ13DenB5_P4(
@@ -2586,7 +2586,7 @@ public class QualityImprovement2020CohortQueries {
               hivMetadata.getHivViralLoadConcept().getConceptId(),
               hivMetadata.getYesConcept().getConceptId(),
               commonMetadata.getBreastfeeding().getConceptId(),
-              true);
+              50);
 
     } else {
       pregnantWithCargaViralHigherThan1000 =
@@ -3378,10 +3378,10 @@ public class QualityImprovement2020CohortQueries {
   /**
    * H1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date when the
    * Viral Load with >=1000 result was recorded (oldest date from B2)
-   *
+   * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
-  public CohortDefinition getMQC11NH1(boolean greaterThan50) {
+  public CohortDefinition getMQC11NH1(int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
@@ -3393,12 +3393,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-
-    int vlQuantity = 1000;
-
-    if (greaterThan50) {
-      vlQuantity = 50;
-    }
 
     String query =
         " SELECT p.patient_id "
@@ -3438,10 +3432,10 @@ public class QualityImprovement2020CohortQueries {
   /**
    * H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st consultation”
    * (oldest date from H1)+20 days and <=“1st consultation” (oldest date from H1)+33days
-   *
+   * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
-  public CohortDefinition getMQC11NH2(boolean greaterThan50) {
+  public CohortDefinition getMQC11NH2(int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
@@ -3453,12 +3447,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-
-    int vlQuantity = 1000;
-
-    if (greaterThan50) {
-      vlQuantity = 50;
-    }
 
     String query =
         " SELECT p.patient_id "
@@ -3510,10 +3498,10 @@ public class QualityImprovement2020CohortQueries {
   /**
    * H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd consultation”
    * (oldest date from H2)+20 days and <=“2nd consultation” (oldest date from H2)+33days
-   *
+   * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
-  public CohortDefinition getMQC11NH3(boolean greaterThan50) {
+  public CohortDefinition getMQC11NH3(int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
@@ -3525,12 +3513,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-
-    int vlQuantity = 1000;
-
-    if (greaterThan50) {
-      vlQuantity = 50;
-    }
 
     String query =
         "SELECT p.patient_id "
@@ -3624,13 +3606,13 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition h3;
 
     if (numerator4) {
-      h1 = getMQC11NH1(true);
-      h2 = getMQC11NH2(true);
-      h3 = getMQC11NH3(true);
+      h1 = getMQC11NH1(50);
+      h2 = getMQC11NH2(50);
+      h3 = getMQC11NH3(50);
     } else {
-      h1 = getMQC11NH1(false);
-      h2 = getMQC11NH2(false);
-      h3 = getMQC11NH3(false);
+      h1 = getMQC11NH1(1000);
+      h2 = getMQC11NH2(1000);
+      h3 = getMQC11NH3(1000);
     }
 
     String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
@@ -3917,7 +3899,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
-            true);
+            50);
 
     CohortDefinition b5 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
@@ -3925,7 +3907,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId(),
-            true);
+            50);
 
     CohortDefinition c =
         commonCohortQueries.getMOHPregnantORBreastfeeding(
