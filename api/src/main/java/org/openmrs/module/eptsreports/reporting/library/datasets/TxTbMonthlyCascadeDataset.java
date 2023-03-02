@@ -231,7 +231,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.TXTB_AND_TXCURR),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
         "TXTBTXCURR",
@@ -342,7 +342,7 @@ public class TxTbMonthlyCascadeDataset extends BaseDataSet {
             EptsReportUtils.map(
                 txTbMonthlyCascadeCohortQueries.getTxTbDenominatorCohort(
                     TxTbMonthlyCascadeCohortQueries.TxTbComposition.NEGATIVESCREENING),
-                "startDate=${endDate-6m},endDate=${endDate},location=${location}"));
+                "startDate=${endDate-6m+1d},endDate=${endDate},location=${location}"));
 
     cohortIndicatorDefinition.addColumn(
         "NEGATIVESCREENING",
