@@ -450,7 +450,9 @@ public class EriDSDCohortQueries {
 
     String mappings = "endDate=${endDate},location=${location}";
 
-    if (indicatorFlag == 2) {
+    if (indicatorFlag == 1) {
+      cd.addSearch("onART", EptsReportUtils.map(getN1(), mappings));
+    } else if (indicatorFlag == 2) {
       cd.addSearch("onART", EptsReportUtils.map(getN2(), mappings));
     } else if (indicatorFlag == 3) {
       cd.addSearch("onART", EptsReportUtils.map(getN3(), mappings));

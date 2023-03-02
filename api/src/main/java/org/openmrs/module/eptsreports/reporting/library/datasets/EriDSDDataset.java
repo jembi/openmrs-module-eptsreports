@@ -232,6 +232,53 @@ public class EriDSDDataset extends BaseDataSet {
             mappings),
         "");
     dsd.addColumn(
+            "D4T",
+            "DSD D4 Total",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "DSD D4 Total", EptsReportUtils.map(eriDSDCohortQueries.getD4(), mappings)),
+                mappings),
+            "");
+    dsd.addColumn(
+            "D4BWA",
+            "D4 Breastfeeding Woman Adults (>=15)",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "D4BWA",
+                    EptsReportUtils.map(
+                        eriDSDCohortQueries.getPatientsWhoAreBreastfeedingD4(), mappings)),
+                mappings),
+            "age=15+");
+    dsd.addColumn(
+            "D4BWC",
+            "D4 Breastfeeding Woman Children (<15)",
+            EptsReportUtils.map(
+                eptsGeneralIndicator.getIndicator(
+                    "D4BWC",
+                    EptsReportUtils.map(
+                        eriDSDCohortQueries.getPatientsWhoAreBreastfeedingD4(), mappings)),
+                mappings),
+            "age=<15");
+    dsd.addColumn(
+                "N1PW",
+                "N1 Pregnant Women",
+                EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                        "N1PW",
+                        EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(1), mappings)),
+                    mappings),
+                "");
+    dsd.addColumn(
+                "N1BW",
+                "N1 Breastfeeding Women",
+                EptsReportUtils.map(
+                    eptsGeneralIndicator.getIndicator(
+                        "N1BW",
+                        EptsReportUtils.map(
+                            eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(1), mappings)),
+                    mappings),
+                "");
+    dsd.addColumn(
         "N2PW",
         "N2 Pregnant Women",
         EptsReportUtils.map(
