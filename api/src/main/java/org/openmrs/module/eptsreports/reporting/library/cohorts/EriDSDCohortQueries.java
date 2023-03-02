@@ -644,7 +644,7 @@ public class EriDSDCohortQueries {
     CohortDefinition nextArtPickUpScheduledORdispensaSemestral =
         DsdQueries
             .getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaOrWithPickupOnFilaBetween(
-                175, 190, Arrays.asList(hivMetadata.getSemiannualDispensation().getConceptId()));
+                173, 187, Arrays.asList(hivMetadata.getSemiannualDispensation().getConceptId()));
 
     cd.addSearch(
         "nextArtPickUpScheduledORdispensaSemestral",
