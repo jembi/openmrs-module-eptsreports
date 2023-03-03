@@ -158,7 +158,7 @@ public class TransferredInCohortQueries {
         "transferred-out-fila-arv",
         EptsReportUtils.map(
             getTrfOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
-            "startDate=${startDate},location=${location}"));
+            "startDate=${startDate-3m},endDate=${startDate-1d},location=${location}"));
     definition.setCompositionString("transferred-out AND transferred-out-fila-arv");
 
     return definition;
@@ -352,6 +352,7 @@ public class TransferredInCohortQueries {
             + "and (the most recent ART pickup date on Ficha Recepção – Levantou ARVs + 31 days");
 
     definition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -398,7 +399,7 @@ public class TransferredInCohortQueries {
             + " )  considered_transferred "
             + " GROUP BY considered_transferred.patient_id "
             + " ) final "
-            + " WHERE final.max_date < :startDate  ";
+            + " WHERE final.max_date BETWEEN :startDate AND :endDate  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
