@@ -2733,9 +2733,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    // MQ indicators category 18
-
-    // Category 18 Denominator
 
     // MQ indicators category 18
 
@@ -2771,7 +2768,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 qualityImprovement2020CohortQueries.getPatientsOnMQCat18Numerator(),
                 "endDate=${revisionEndDate},location=${location}"));
 
-    MQ18DEN.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    MQ18NUM.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
         "MQ18NUM89",
