@@ -87,7 +87,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(getPatientsWhoReturned(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(D3 AND moreThan2years AND stable AND NOT (pregnantBreastfeedingTB OR sarcomaKarposi OR returned))");
+        "(D3 AND moreThan2years AND NOT (pregnantBreastfeedingTB OR sarcomaKarposi OR returned))");
 
     return cd;
   }
@@ -382,8 +382,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(getPatientsWhoReturned(), "endDate=${endDate},location=${location}"));
 
     cd.setCompositionString(
-        "(B13 AND moreThan2years AND stable AND breastfeeding AND NOT (pregnant OR sarcomaKarposi OR returned))");
-
+        "(B13 AND moreThan2years AND breastfeeding AND NOT (pregnant OR sarcomaKarposi OR returned))");
     return cd;
   }
 
@@ -1371,7 +1370,8 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "D",
         EptsReportUtils.map(
-            getPatientsWhoAreBreastfeedingD2(), "endDate=${endDate},location=${location}"));
+            txNewCohortQueries.getTxNewBreastfeedingComposition(false),
+            "onOrAfter=${endDate-12m},onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
         "F",
         EptsReportUtils.map(
@@ -1397,7 +1397,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsViralLoadWithin12Months(),
             "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("A AND (B OR (C AND NOT patientsWithViralLoad)) AND NOT F");
+    cd.setCompositionString("A AND D AND (B OR (C AND NOT patientsWithViralLoad)) AND NOT F");
 
     return cd;
   }
