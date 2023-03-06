@@ -2739,22 +2739,24 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     CohortIndicator MQ18DEN =
         eptsGeneralIndicator.getIndicator(
-            "MQ18DEN89",
+            "MQ18DEN",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getPatientsOnMQCat18Denominator(),
-                "endDate=${endDate},location=${location}"));
+                "endDate=${revisionEndDate},location=${location}"));
 
     dataSetDefinition.addColumn(
         "MQ18DEN89",
         "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T)",
-        EptsReportUtils.map(MQ18DEN, "endDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MQ18DEN, "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageBasedOnArt=8-9");
 
     dataSetDefinition.addColumn(
         "MQ18DEN1014",
         "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)",
-        EptsReportUtils.map(MQ18DEN, "endDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MQ18DEN, "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageBasedOnArt=10-14");
+
+
 
     return dataSetDefinition;
   }
