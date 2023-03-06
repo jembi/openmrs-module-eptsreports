@@ -7671,7 +7671,7 @@ public class QualityImprovement2020CohortQueries {
         break;
       case 2:
         cd.setName(
-            "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição");
+            "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
         break;
     }
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -7750,7 +7750,7 @@ public class QualityImprovement2020CohortQueries {
           "A AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND ADULT");
     } else if (flag == 2) {
       cd.setCompositionString(
-          "A AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND CHILDREN");
+          "A AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND ADULT");
     }
 
     return cd;
