@@ -3378,6 +3378,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * H1 - One Consultation (Encounter_datetime (from encounter type 35)) on the same date when the
    * Viral Load with >=1000 result was recorded (oldest date from B2)
+   *
    * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
@@ -3432,6 +3433,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * H2- Another consultation (Encounter_datetime (from encounter type 35)) > “1st consultation”
    * (oldest date from H1)+20 days and <=“1st consultation” (oldest date from H1)+33days
+   *
    * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
@@ -3498,6 +3500,7 @@ public class QualityImprovement2020CohortQueries {
   /**
    * H3- Another consultation (Encounter_datetime (from encounter type 35)) > “2nd consultation”
    * (oldest date from H2)+20 days and <=“2nd consultation” (oldest date from H2)+33days
+   *
    * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
@@ -11030,6 +11033,38 @@ public class QualityImprovement2020CohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
 
     cd.setQuery(sb.replace(query));
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsOnMQCat18Denominator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Cat 18 Denominator");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition startedArt = getMOHArtStartDate();
+    CohortDefinition inTarv = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    cd.addSearch(
+        "startedArt",
+        EptsReportUtils.map(
+            startedArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "inTarv", EptsReportUtils.map(startedArt, "endDate=${endDate},location=${location}"));
+    cd.addSearch("transferredIn", EptsReportUtils.map(transferredIn, "location=${location}"));
+
+    cd.setCompositionString("(startedArt AND inTarv) AND NOT transferredIn");
 
     return cd;
   }
