@@ -2330,22 +2330,26 @@ public class QualityImprovement2020Queries {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
-            "utentes com registo de revelação total do diagnóstico no primeiro ano de TARV");
+        "utentes com registo de revelação total do diagnóstico no primeiro ano de TARV");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
     HivMetadata hivMetadata = new HivMetadata();
 
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId() );
-    map.put("6340", hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId() );
-    map.put("6337", hivMetadata.getRevealdConcept().getConceptId() );
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put(
+        "6340",
+        hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
+    map.put("6337", hivMetadata.getRevealdConcept().getConceptId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
-
-    String query = ""
+    String query =
+        ""
             + "SELECT     art.patient_id, art.art_date "
             + "FROM       (        SELECT     p.patient_id, Min(value_datetime) art_date "
             + "                      FROM       patient p "
@@ -2371,12 +2375,11 @@ public class QualityImprovement2020Queries {
             + "                      AND        o.value_coded = ${6337} "
             + "                      AND        e.encounter_type = ${35} "
             + "                      AND        e.location_id = :location "
-            + "                      AND        e.encounter_datetime <= :endDate "
+            + "                      AND        e.encounter_datetime <= :revisionEndDate "
             + "                      GROUP BY   p.patient_id ) revelacao "
             + "WHERE      art.art_date BETWEEN :startDate AND :endDate "
             + "AND        revelacao.diagnostic_date BETWEEN art.art_date AND date_add(art.art_date, INTERVAL 12 month) "
             + "GROUP BY   art.patient_id";
-
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

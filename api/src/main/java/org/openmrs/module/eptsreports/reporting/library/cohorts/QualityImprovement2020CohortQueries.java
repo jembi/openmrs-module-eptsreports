@@ -11069,4 +11069,30 @@ public class QualityImprovement2020CohortQueries {
 
     return cd;
   }
+
+  public CohortDefinition getPatientsOnMQCat18Numerator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Cat 18 Numerator");
+    cd.addParameter(new Parameter("revisionEndDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition denominator = getPatientsOnMQCat18Denominator();
+    CohortDefinition diagnose =
+        QualityImprovement2020Queries.getDisclosureOfHIVDiagnosisToChildrenAdolescents();
+
+    cd.addSearch(
+        "denominator",
+        EptsReportUtils.map(denominator, "endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "diagnose",
+        EptsReportUtils.map(
+            diagnose,
+            "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("denominator AND diagnose");
+
+    return cd;
+  }
 }
