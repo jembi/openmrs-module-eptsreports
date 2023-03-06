@@ -60,6 +60,12 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     dataSetDefinition.addDimension(
+            "ageBasedOnArtCat18",
+            EptsReportUtils.map(
+                    eptsCommonDimension.ageBasedOnArtStartDateMOH(),
+                    "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
+
+    dataSetDefinition.addDimension(
         "mqAge",
         EptsReportUtils.map(
             eptsCommonDimension.getPatientAgeBasedOnFirstViralLoadDate(),
@@ -2732,7 +2738,6 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
                 "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
-
 
     // MQ indicators category 18
 

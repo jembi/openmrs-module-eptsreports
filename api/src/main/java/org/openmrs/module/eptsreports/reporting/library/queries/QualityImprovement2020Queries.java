@@ -2349,9 +2349,8 @@ public class QualityImprovement2020Queries {
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-        ""
-            + "SELECT     art.patient_id, art.art_date "
-            + "FROM       (        SELECT     p.patient_id, Min(value_datetime) art_date "
+        "SELECT     art.patient_id "
+            + "FROM       (        SELECT     p.patient_id, Min(o.value_datetime) art_date "
             + "                      FROM       patient p "
             + "                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "                      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
