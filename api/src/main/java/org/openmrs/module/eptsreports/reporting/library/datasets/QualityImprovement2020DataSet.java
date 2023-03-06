@@ -2766,7 +2766,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ18NUM",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getPatientsOnMQCat18Numerator(),
-                "endDate=${revisionEndDate},location=${location}"));
+                "revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ18NUM.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
