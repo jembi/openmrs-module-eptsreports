@@ -2737,24 +2737,30 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     // Category 18 Denominator
 
+    // MQ indicators category 18
+
+    // Category 18 Denominator
+
     CohortIndicator MQ18DEN =
-        eptsGeneralIndicator.getIndicator(
-            "MQ18DEN",
-            EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getPatientsOnMQCat18Denominator(),
-                "endDate=${revisionEndDate},location=${location}"));
+            eptsGeneralIndicator.getIndicator(
+                    "MQ18DEN",
+                    EptsReportUtils.map(
+                            qualityImprovement2020CohortQueries.getPatientsOnMQCat18Denominator(),
+                            "endDate=${revisionEndDate},location=${location}"));
+
+    MQ18DEN.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     dataSetDefinition.addColumn(
-        "MQ18DEN89",
-        "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T)",
-        EptsReportUtils.map(MQ18DEN, "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=8-9");
+            "MQ18DEN89",
+            "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T)",
+            EptsReportUtils.map(MQ18DEN, "revisionEndDate=${revisionEndDate},location=${location}"),
+            "ageBasedOnArtCat18=8-9");
 
     dataSetDefinition.addColumn(
-        "MQ18DEN1014",
-        "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)",
-        EptsReportUtils.map(MQ18DEN, "startDate=${revisionEndDate-14m},endDate=${revisionEndDate-11m},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt=10-14");
+            "MQ18DEN1014",
+            "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)",
+            EptsReportUtils.map(MQ18DEN, "revisionEndDate=${revisionEndDate},location=${location}"),
+            "ageBasedOnArtCat18=10-14");
 
 
 

@@ -11041,7 +11041,6 @@ public class QualityImprovement2020CohortQueries {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Cat 18 Denominator");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
@@ -11058,11 +11057,13 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "startedArt",
         EptsReportUtils.map(
-            startedArt, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            startedArt, "startDate=${endDate-14m},endDate=${endDate-11m},location=${location}"));
 
+    cd.addSearch("inTarv", EptsReportUtils.map(inTarv, "endDate=${endDate},location=${location}"));
     cd.addSearch(
-        "inTarv", EptsReportUtils.map(startedArt, "endDate=${endDate},location=${location}"));
-    cd.addSearch("transferredIn", EptsReportUtils.map(transferredIn, "location=${location}"));
+        "transferredIn",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${endDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(startedArt AND inTarv) AND NOT transferredIn");
 
