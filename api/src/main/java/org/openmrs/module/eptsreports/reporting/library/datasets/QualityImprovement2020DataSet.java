@@ -60,10 +60,10 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     dataSetDefinition.addDimension(
-            "ageBasedOnArtCat18",
-            EptsReportUtils.map(
-                    eptsCommonDimension.ageBasedOnArtStartDateMOH(),
-                    "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
+        "ageBasedOnArtCat18",
+        EptsReportUtils.map(
+            eptsCommonDimension.ageBasedOnArtStartDateMOH(),
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
 
     dataSetDefinition.addDimension(
         "mqAge",
