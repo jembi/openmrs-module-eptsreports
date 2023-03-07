@@ -61,7 +61,8 @@ public class TxPvlsBySourceDataset extends BaseDataSet {
     dsd.addDimension(
         "rt",
         EptsReportUtils.map(
-            eptsCommonDimension.getViralLoadRoutineTargetReasonsDimension(), mappings));
+            eptsCommonDimension.getViralLoadRoutineTargetReasonsDimensionForPvlsBySource(),
+            mappings));
     dsd.addDimension(
         "KP", EptsReportUtils.map(eptsCommonDimension.getKeyPopsDimension(), mappingsKp));
 

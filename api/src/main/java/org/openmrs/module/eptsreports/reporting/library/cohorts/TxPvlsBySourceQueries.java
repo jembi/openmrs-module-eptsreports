@@ -106,7 +106,8 @@ public class TxPvlsBySourceQueries {
             + " SELECT p.patient_id FROM  patient p INNER JOIN encounter e ON p.patient_id=e.patient_id INNER JOIN "
             + " obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND "
-            + " e.encounter_type IN (${53}) AND o.concept_id=${856} AND o.value_numeric IS NOT NULL AND "
+            + " o.concept_id IN(${856}, ${1305}) "
+            + " AND (o.value_numeric IS NOT NULL OR o.value_coded IS NOT NULL) AND "
             + " o.obs_datetime BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate AND "
             + " e.location_id=:location ";
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -157,10 +158,10 @@ public class TxPvlsBySourceQueries {
             + " (SELECT p.patient_id, MAX(o.obs_datetime) AS data_carga FROM  patient p INNER JOIN encounter e ON p.patient_id=e.patient_id INNER JOIN "
             + " obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 AND e.voided=0 AND o.voided=0 AND "
-            + " e.encounter_type IN (${53}) AND o.concept_id=${856} AND o.value_numeric IS NOT NULL AND "
+            + " e.encounter_type IN (${53}) AND o.concept_id IN (${856} , ${1305}) AND (o.value_numeric IS NOT NULL OR o.value_coded IS NOT NULL) AND "
             + " o.obs_datetime BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate "
             + " AND e.location_id=:location GROUP BY p.patient_id) comb INNER JOIN obs ON obs.person_id=comb.patient_id AND obs.obs_datetime= "
-            + " comb.data_carga  WHERE obs.voided=0 AND obs.concept_id IN (${856}) "
+            + " comb.data_carga  WHERE obs.voided=0 AND obs.concept_id IN (${856} , ${1305}) "
             + " AND obs.location_id=:location AND "
             + " (obs.value_numeric IS NOT NULL OR obs.value_coded IS NOT NULL) GROUP BY patient_id)fn GROUP BY patient_id)fn1 "
             + " INNER JOIN obs os ON os.person_id=fn1.patient_id WHERE fn1.data_carga=os.obs_datetime AND os.concept_id IN(${856}, ${1305}) "

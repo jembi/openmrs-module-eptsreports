@@ -336,7 +336,7 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getPatientsOnTargetByFsr() {
+  public CohortDefinition getPatientsOnTargetByFsr() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Get patients on target using FSR encounter type");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -436,6 +436,22 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
         EptsReportUtils.map(txPvlsCohortQueries.getPatientsWhoAreOnRoutine(), mappings));
     cd.addSearch("RoutineByFsr", EptsReportUtils.map(getRoutineByFsr(), mappings));
     cd.setCompositionString("supp AND NOT (RoutineByLab OR RoutineByFsr)");
+    return cd;
+  }
+
+  public CohortDefinition getRoutineDisaggregationForPvlsBySource() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+
+    cd.addSearch("RoutineByLab", EptsReportUtils.map(getRoutineByLab(), mappings));
+
+    cd.addSearch("RoutineByFsr", EptsReportUtils.map(getRoutineByFsr(), mappings));
+
+    cd.setCompositionString("RoutineByLab OR RoutineByFsr");
     return cd;
   }
 }
