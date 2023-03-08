@@ -3164,6 +3164,76 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>RF50</b>: Categoria 13 MG Indicador 13.18 Denominador – Pedido de CV <br>
+   *
+   * <ul>
+   *   <li>incluindo todos os utentes com registo de uma Carga Viral na Ficha Clínica ou Ficha
+   *       Resumo com resultado > 50 cópias durante o período de inclusão (“Data da CV >50” >= “Data
+   *       Início Inclusão” e <= “Data Fim Inclusão”.
+   *   <li>Nota: em caso de existência de mais de um registo de Carga Viral com resultado > =10050
+   *       cópias, deve ser considerado o primeiro registo ocorrido durante o período de inclusão
+   * </ul>
+   *
+   * @return CohortDefinition <strong>Should</strong> <strong>Should</strong> Returns empty if there
+   *     is no patient who meets the conditions <strong>Should</strong> fetch all patients with B2
+   *     criteria
+   */
+  public CohortDefinition getB3_13(boolean e53) {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "All patients from Ficha Clinica with “Carga Viral” registered with numeric value > 1000 during the Inclusion period");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        " SELECT"
+            + "             p.patient_id"
+            + "             FROM"
+            + "             patient p"
+            + "                INNER JOIN"
+            + "             (SELECT"
+            + "                p.patient_id, MIN(e.encounter_datetime) AS first_encounter"
+            + "             FROM"
+            + "                patient p"
+            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id"
+            + "             JOIN obs o ON o.encounter_id = e.encounter_id"
+            + "             WHERE p.voided = 0"
+            + "                    AND e.voided = 0"
+            + "                    AND o.voided = 0"
+            + "                    AND e.location_id = :location"
+            + "                    AND o.location_id = :location"
+            + "                    AND o.concept_id = ${856}"
+            + "                    AND o.value_numeric > 50"
+            + "                    AND ("
+            + "                         ( e.encounter_type = ${6} "
+            + "                         AND e.encounter_datetime BETWEEN :startDate AND :endDate) ";
+
+    if (e53) {
+      query +=
+          "                         OR (e.encounter_type = ${53} "
+              + "                         AND o.obs_datetime BETWEEN :startDate AND :endDate)";
+    }
+    query +=
+        "                   ) "
+            + "               GROUP BY p.patient_id) filtered ON p.patient_id = filtered.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
    * <b>MQC11B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 <br>
    * <i> A and not B</i> <br>
    *
@@ -5637,22 +5707,24 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 3) {
         compositionCohortDefinition.setName(
-            "(B1 and B2)  and NOT (B4 or B5 or E or F) and Age > 14**");
+            "# de Adultos (15/+anos) na 1ª linha de TARV com registo resultado de CV acima de 1000");
       } else if (line == 12) {
         compositionCohortDefinition.setName(
-            "(B1 and B2)  and NOT (B4 or B5 or E or F) and Age >= 2 and Age <= 15*");
+            "# de crianças (>2 anos de idade) na 1ª linha de TARV com registo de resultado de CV ≥1000");
       } else if (line == 18) {
-        compositionCohortDefinition.setName("(B1 and B4)  and NOT (B5 or E or F)");
+        compositionCohortDefinition.setName(
+            "# de MG na 1ª linha de TARV com registo de resultado de CV >50");
       }
     } else {
       if (line == 3) {
         compositionCohortDefinition.setName(
-            "(B1 AND B2 AND H)  AND NOT (B4 or B5 or E or F) and Age >= 15*");
+            "# de Adultos (15/+anos) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV ≥1000 cps/ml");
       } else if (line == 12) {
         compositionCohortDefinition.setName(
-            "(B1 AND B2 AND H)  and NOT (B4 or B5 or E or F) and Age > 2 and Age < 14*");
+            "# de crianças (>2 anos de idade) na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV ≥1000");
       } else if (line == 18) {
-        compositionCohortDefinition.setName("(B1 AND B4 AND H)  and NOT (B5 or E or F)");
+        compositionCohortDefinition.setName(
+            "# de MG na 1ª linha de TARV com registo de pedido de CV entre o 3º e o 4º mês após terem recebido o último resultado de CV >50");
       }
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -5661,7 +5733,7 @@ public class QualityImprovement2020CohortQueries {
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition adults = this.ageCohortQueries.createXtoYAgeCohort("adullts", 2, 14);
+    CohortDefinition children = this.ageCohortQueries.createXtoYAgeCohort("children", 2, 14);
 
     CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
         getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
@@ -5692,14 +5764,19 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
 
+    CohortDefinition pregnantFromFichaClinicaCargaViral50 = getB3_13(useE53);
+
     CohortDefinition H = getMQ13P4H();
     compositionCohortDefinition.addSearch(
-        "adults", EptsReportUtils.map(adults, "effectiveDate=${revisionEndDate}"));
+        "children", EptsReportUtils.map(children, "effectiveDate=${revisionEndDate}"));
     compositionCohortDefinition.addSearch(
         "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "B22", EptsReportUtils.map(pregnantFromFichaClinicaCargaViral50, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "B4", EptsReportUtils.map(pregnantWithCargaViralHigherThan1000, MAPPING1));
@@ -5719,9 +5796,10 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND B2) AND NOT (B4 or B5 or E or F)");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND B2) AND NOT (B4 or B5 or E or F)) AND adults");
+            "((B1 AND B2) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
-        compositionCohortDefinition.setCompositionString("(B1 AND B4) AND NOT (B5 or E or F)");
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND B22 AND B4) AND NOT (B5 or E or F)");
       }
     } else {
       if (line == 3) {
@@ -5732,7 +5810,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND B2 AND H) AND NOT (B4 or B5 or E or F)");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B4 AND H) AND NOT (B5 or E or F)");
+            "(B1 AND B22 AND B4 AND H) AND NOT (B5 or E or F)");
       }
     }
     return compositionCohortDefinition;
