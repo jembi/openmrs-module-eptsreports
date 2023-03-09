@@ -5831,6 +5831,8 @@ public class QualityImprovement2020CohortQueries {
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     String query =
         "       SELECT patient_id "
@@ -5840,12 +5842,16 @@ public class QualityImprovement2020CohortQueries {
             + "               INNER JOIN person per on p.patient_id=per.person_id "
             + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "               INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "               INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "         WHERE p.voided = 0 "
             + "           AND per.voided=0 AND per.gender = 'F' "
             + "           AND e.voided = 0 AND o.voided  = 0 "
+            + "           AND o2.voided  = 0 "
             + "           AND e.encounter_type = ${6} "
             + "           AND o.concept_id = ${1982} "
             + "           AND o.value_coded = ${1065} "
+            + "           AND o2.concept_id = ${23722} "
+            + "           AND o2.value_coded = ${856} "
             + "           AND e.location_id = :location "
             + "         GROUP BY p.patient_id) gest  "
             + " WHERE gest.first_gestante >= :startDate "
@@ -6059,7 +6065,6 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
     cd.addSearch(
         "E",
         EptsReportUtils.map(
@@ -6069,7 +6074,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
 
-    cd.setCompositionString("((A AND NOT ABANDONED) AND C) AND NOT (D OR E OR F)");
+    cd.setCompositionString("((A AND NOT ABANDONED) AND C) AND NOT (E OR F)");
 
     return cd;
   }
@@ -6706,7 +6711,6 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
     cd.addSearch(
         "E",
         EptsReportUtils.map(
@@ -6717,7 +6721,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
 
-    cd.setCompositionString("((A AND NOT ABANDONED)AND C AND H) AND NOT (D OR E OR F)");
+    cd.setCompositionString("((A AND NOT ABANDONED)AND C AND H) AND NOT (E OR F)");
     return cd;
   }
 
