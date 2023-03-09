@@ -1426,7 +1426,8 @@ public class QualityImprovement2020Queries {
             + "                                       AND o.value_coded = ${1707} "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= end_period.first_pickup "
-            + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 6 MONTH) "
+            + "                                       AND e.encounter_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
+            + "                                       AND e.encounter_datetime <= end_period.first_pickup "
             + "                                     GROUP BY p.patient_id "
             + "UNION "
             + "     SELECT p.patient_id, max(o.obs_datetime) as last_encounter FROM patient p "
@@ -1441,7 +1442,8 @@ public class QualityImprovement2020Queries {
             + "                                       AND o.value_coded = ${1707} "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= end_period.first_pickup "
-            + "                                       AND o.obs_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 6 MONTH)"
+            + "                                       AND o.obs_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
+            + "                                       AND o.obs_datetime <= end_period.first_pickup "
             + "                                     GROUP BY p.patient_id "
             + "                                 ) abandoned GROUP BY abandoned.patient_id";
 
