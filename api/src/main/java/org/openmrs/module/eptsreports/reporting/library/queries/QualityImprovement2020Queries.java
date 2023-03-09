@@ -12,7 +12,9 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.CommonCohortQueries;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 
 public class QualityImprovement2020Queries {
@@ -1105,13 +1107,15 @@ public class QualityImprovement2020Queries {
    * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
    * @param yesConcept The answer yes Concept Id 1065
    * @param pregnantConcept The Pregnant Concept Id 1982
+   * @param vlQuantity Quantity of viral load to evaluate
    * @return {@link CohortDefinition}
    */
   public static CohortDefinition getMQ13DenB4_P4(
       int adultoSeguimentoEncounterType,
       int hivViralLoadConcept,
       int yesConcept,
-      int pregnantConcept) {
+      int pregnantConcept,
+      int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Cat11 B4");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1138,7 +1142,8 @@ public class QualityImprovement2020Queries {
             + "                                AND e.voided = 0   "
             + "                                AND o.voided = 0      "
             + "                                AND o.concept_id = ${856}   "
-            + "                                AND o.value_numeric >= 1000  "
+            + "                                AND o.value_numeric >= "
+            + vlQuantity
             + "                                AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
             + "                                AND e.location_id = :location   "
             + "                         GROUP  BY p.patient_id    "
@@ -1168,6 +1173,33 @@ public class QualityImprovement2020Queries {
 
     return sqlCohortDefinition;
   }
+
+  public static CohortDefinition getMQ13DenB4_P4(
+      int adultoSeguimentoEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int pregnantConcept) {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition indicator =
+        getMQ13DenB4_P4(
+            adultoSeguimentoEncounterType, hivViralLoadConcept, yesConcept, pregnantConcept, 1000);
+
+    compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
+
+    compositionCohortDefinition.setCompositionString("indicator");
+
+    return compositionCohortDefinition;
+  }
+
   /**
    * Revised B13 for the MQ 15 indicators
    *
@@ -1235,13 +1267,15 @@ public class QualityImprovement2020Queries {
    * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
    * @param yesConcept The answer yes Concept Id 1065
    * @param breastfeedingConcept The breastfeeding Concept Id 6332
+   * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
   public static CohortDefinition getMQ13DenB5_P4(
       int adultoSeguimentoEncounterType,
       int hivViralLoadConcept,
       int yesConcept,
-      int breastfeedingConcept) {
+      int breastfeedingConcept,
+      int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Cat11 B5");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -1268,7 +1302,8 @@ public class QualityImprovement2020Queries {
             + "                                AND e.voided = 0   "
             + "                                AND o.voided = 0     "
             + "                                AND o.concept_id = ${856}   "
-            + "                                AND o.value_numeric >= 1000  "
+            + "                                AND o.value_numeric >=  "
+            + vlQuantity
             + "                                AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
             + "                                AND e.location_id = :location   "
             + "                         GROUP  BY p.patient_id    "
@@ -1296,6 +1331,36 @@ public class QualityImprovement2020Queries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  public static CohortDefinition getMQ13DenB5_P4(
+      int adultoSeguimentoEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int breastfeedingConcept) {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition indicator =
+        getMQ13DenB5_P4(
+            adultoSeguimentoEncounterType,
+            hivViralLoadConcept,
+            yesConcept,
+            breastfeedingConcept,
+            1000);
+
+    compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
+
+    compositionCohortDefinition.setCompositionString("indicator");
+
+    return compositionCohortDefinition;
   }
 
   /**
@@ -2259,5 +2324,66 @@ public class QualityImprovement2020Queries {
         + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
         + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
         + " GROUP BY pa.patient_id ";
+  }
+
+  public static SqlCohortDefinition getDisclosureOfHIVDiagnosisToChildrenAdolescents() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "utentes com registo de revelação total do diagnóstico no primeiro ano de TARV");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    HivMetadata hivMetadata = new HivMetadata();
+
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put(
+        "6340",
+        hivMetadata.getDisclosureOfHIVDiagnosisToChildrenAdolescentsConcept().getConceptId());
+    map.put("6337", hivMetadata.getRevealdConcept().getConceptId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        "SELECT     art.patient_id "
+            + "FROM       (        SELECT     p.patient_id, Min(o.value_datetime) art_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                      INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                      WHERE      p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      AND        e.encounter_type = ${53} "
+            + "                      AND        o.concept_id = ${1190} "
+            + "                      AND        o.value_datetime IS NOT NULL "
+            + "                      AND        o.value_datetime <= :endDate "
+            + "                      AND        e.location_id = :location "
+            + "                      GROUP BY   p.patient_id ) art "
+            + "INNER JOIN (          SELECT     p.patient_id, Min(e.encounter_datetime) diagnostic_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e  ON e.patient_id = p.patient_id "
+            + "                      INNER JOIN obs o  ON o.encounter_id = e.encounter_id "
+            + "                      WHERE      p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      AND        o.concept_id = ${6340} "
+            + "                      AND        o.value_coded = ${6337} "
+            + "                      AND        e.encounter_type = ${35} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        e.encounter_datetime <= :revisionEndDate "
+            + "                      GROUP BY   p.patient_id ) revelacao ON revelacao.patient_id = art.patient_id "
+            + "WHERE      art.art_date BETWEEN :startDate AND :endDate "
+            + "AND        revelacao.diagnostic_date BETWEEN art.art_date AND date_add(art.art_date, INTERVAL 12 month) "
+            + "GROUP BY   art.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
