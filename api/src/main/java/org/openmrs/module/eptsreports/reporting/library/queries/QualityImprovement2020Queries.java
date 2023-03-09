@@ -2375,7 +2375,7 @@ public class QualityImprovement2020Queries {
             + "                      AND        e.encounter_type = ${35} "
             + "                      AND        e.location_id = :location "
             + "                      AND        e.encounter_datetime <= :revisionEndDate "
-            + "                      GROUP BY   p.patient_id ) revelacao "
+            + "                      GROUP BY   p.patient_id ) revelacao ON revelacao.patient_id = art.patient_id "
             + "WHERE      art.art_date BETWEEN :startDate AND :endDate "
             + "AND        revelacao.diagnostic_date BETWEEN art.art_date AND date_add(art.art_date, INTERVAL 12 month) "
             + "GROUP BY   art.patient_id";
