@@ -5033,13 +5033,9 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition restartdedExclusion = getPatientsWhoRestartedTarvAtLeastSixMonths();
 
-    CohortDefinition B4E =
-        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            true, false, 12);
-
     CohortDefinition B5E =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
-            false, true, 6);
+            false, true, 12);
 
     CohortDefinition G = getMQ13G();
 
@@ -5122,11 +5118,6 @@ public class QualityImprovement2020CohortQueries {
             B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B4E",
-        EptsReportUtils.map(
-            B4E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
         "B5E",
         EptsReportUtils.map(
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
@@ -5161,7 +5152,7 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
+            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ))  AND NOT B4E AND NOT B5E) AND NOT (C OR D) AND age");
