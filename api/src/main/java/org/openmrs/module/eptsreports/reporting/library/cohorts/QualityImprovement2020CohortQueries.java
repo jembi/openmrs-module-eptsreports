@@ -7673,7 +7673,30 @@ public class QualityImprovement2020CohortQueries {
         cd.setName(
             "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
         break;
+      case 3:
+        cd.setName(
+            "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
+        break;
+      case 4:
+        cd.setName(
+            "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+        break;
     }
+
+    if (flag == 1 || flag == 2) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    } else if (flag == 3 || flag == 4) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    }
+
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -7717,17 +7740,6 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             commonCohortQueries.getTranferredOutPatients(),
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "CHILDREN",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
-        "ADULT",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "pregnantOnPeriod",
@@ -7745,12 +7757,123 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionPeriodMappings));
 
-    if (flag == 1) {
-      cd.setCompositionString(
-          "A AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND ADULT");
-    } else if (flag == 2) {
-      cd.setCompositionString(
-          "A AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND ADULT");
+    cd.setCompositionString(
+        "A AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+
+    return cd;
+  }
+
+  public CohortDefinition getCd4RequestAndResultForPregnantsCat9Den(int flag) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    switch (flag) {
+      case 5:
+        cd.setName(
+            "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+        break;
+      case 6:
+        cd.setName(
+            "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
+        break;
+    }
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String inclusionPeriodMappings =
+        "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}";
+
+    cd.addSearch(
+        "pregnantOnPeriod",
+        EptsReportUtils.map(
+            getFirstPregnancyORBreastfeedingOnClinicalConsultation(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            inclusionPeriodMappings));
+
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            QualityImprovement2020Queries.getTransferredInPatients(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+                hivMetadata.getPatientFoundYesConcept().getConceptId(),
+                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+                hivMetadata.getArtStatus().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("pregnantOnPeriod AND NOT transferredIn");
+
+    return cd;
+  }
+
+  public CohortDefinition getCd4RequestAndResultForPregnantsCat9Num(int flag) {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    switch (flag) {
+      case 5:
+        cd.setName(
+            "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+        break;
+      case 6:
+        cd.setName(
+            "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”");
+        break;
+    }
+
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    String inclusionPeriodMappings =
+        "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}";
+
+    cd.addSearch(
+        "pregnantOnPeriod",
+        EptsReportUtils.map(
+            getFirstPregnancyORBreastfeedingOnClinicalConsultation(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            inclusionPeriodMappings));
+
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            QualityImprovement2020Queries.getTransferredInPatients(
+                hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+                commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+                hivMetadata.getPatientFoundYesConcept().getConceptId(),
+                hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+                hivMetadata.getArtStatus().getConceptId()),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "requestCd4ForPregnant",
+        EptsReportUtils.map(
+            getRequestForCd4OnFirstClinicalConsultationOfPregnancy(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId(),
+                hivMetadata.getApplicationForLaboratoryResearch().getConceptId(),
+                hivMetadata.getCD4AbsoluteOBSConcept().getConceptId()),
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "resultCd4ForPregnant",
+        EptsReportUtils.map(
+            getCd4ResultAfterFirstConsultationOfPregnancy(
+                commonMetadata.getPregnantConcept().getConceptId(),
+                hivMetadata.getYesConcept().getConceptId()),
+            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    if (flag == 5) {
+      cd.setCompositionString("(pregnantOnPeriod AND requestCd4ForPregnant) AND NOT transferredIn");
+    } else if (flag == 6) {
+      cd.setCompositionString("(pregnantOnPeriod AND resultCd4ForPregnant) AND NOT transferredIn");
     }
 
     return cd;
@@ -7868,6 +7991,8 @@ public class QualityImprovement2020CohortQueries {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(
         "B: Filter all patients with CD4 within 33 days from the first clinical consultation");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(
         new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -7951,13 +8076,36 @@ public class QualityImprovement2020CohortQueries {
     switch (flag) {
       case 1:
         cd.setName(
-            "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra”");
+            "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
         break;
       case 2:
         cd.setName(
-            "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição");
+            "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
+        break;
+      case 3:
+        cd.setName(
+            "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra");
+        break;
+      case 4:
+        cd.setName(
+            "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra");
         break;
     }
+
+    if (flag == 1 || flag == 2) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    } else if (flag == 3 || flag == 4) {
+      cd.addSearch(
+          "AGE",
+          EptsReportUtils.map(
+              genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
+              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+    }
+
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
@@ -8002,12 +8150,6 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-        "ADULT",
-        EptsReportUtils.map(
-            genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
-            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
-
-    cd.addSearch(
         "requestCd4",
         EptsReportUtils.map(
             getRequestForCd4OnFirstClinicalConsultationDuringInclusionPeriod(),
@@ -8034,12 +8176,12 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getYesConcept().getConceptId()),
             inclusionPeriodMappings));
 
-    if (flag == 1) {
+    if (flag == 1 || flag == 3) {
       cd.setCompositionString(
-          "A AND requestCd4 AND NOT (C OR D OR E OR FOR pregnantOnPeriod OR breastfeedingOnPeriod) AND ADULT");
-    } else if (flag == 2) {
+          "A AND requestCd4 AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+    } else if (flag == 2 || flag == 4) {
       cd.setCompositionString(
-          "A AND resultCd4 AND NOT (C OR D OR E OR FOR pregnantOnPeriod OR breastfeedingOnPeriod) AND ADULT");
+          "A AND resultCd4 AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
     }
 
     return cd;
@@ -11186,6 +11328,283 @@ public class QualityImprovement2020CohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>Description:</b> MQ-MOH Query For pregnant or Breastfeeding patients
+   *
+   * <p><b>Technical Specs</b>
+   * <li>O sistema irá identificar mulheres que tiveram primeiro registo de gravidez durante o
+   *     período de inclusão, ou seja, as que iniciaram a gravidez durante o período de inclusão,
+   *     seleccionado:
+   * <li>todos os utentes do sexo feminino, independentemente da idade, e registados como
+   *     “Grávida=Sim” numa consulta clínica decorrida durante o período de inclusão (“Data Consulta
+   *     Clínica Gravida” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim
+   *     Revisão” menos (-) 9 meses.
+   * <li>excluindo todos os utentes registados como “Grávida=Sim” numa consulta clínica decorrida
+   *     nos últimos 9 meses antes do período de inclusão (“Data Consulta Clínica Gravida” < “Data
+   *     Fim Revisão” menos (-) 12 meses mais (+) 1 dia e >= “Data Fim Revisão” menos (-) 12 meses
+   *     mais (+) 1 dia menos (-) 9 meses).
+   *
+   * @param question The question Concept Id
+   * @param answer The value coded Concept Id
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getFirstPregnancyORBreastfeedingOnClinicalConsultation(
+      int question, int answer) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Mulheres com registo de primeira gravidez no período de inclusão");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("question", question);
+    map.put("answer", answer);
+
+    String query =
+        "SELECT   pregnant.person_id "
+            + "FROM     ( "
+            + "                  SELECT   p.person_id, "
+            + "                           Min(e.encounter_datetime) AS first_pregnancy "
+            + "                  FROM     person p "
+            + "                  JOIN     encounter e "
+            + "                  ON       e.patient_id = p.person_id "
+            + "                  JOIN     obs o "
+            + "                  ON       o.encounter_id = e.encounter_id "
+            + "                  AND      encounter_type = ${6} "
+            + "                  AND      o.concept_id = ${question} "
+            + "                  AND      o.value_coded = ${answer} "
+            + "                  AND      e.location_id = :location "
+            + "                  AND      e.encounter_datetime <= :revisionEndDate "
+            + "                  AND      p.gender = 'F' "
+            + "                  AND      e.voided = 0 "
+            + "                  AND      o.voided = 0 "
+            + "                  AND      p.voided = 0 "
+            + "                  GROUP BY p.person_id) pregnant "
+            + "WHERE    pregnant.first_pregnancy >= :startDate "
+            + "AND      pregnant.first_pregnancy <= :endDate "
+            + "AND      NOT EXISTS "
+            + "         ( "
+            + "                SELECT p.person_id "
+            + "                FROM   person p "
+            + "                JOIN   encounter e "
+            + "                ON     e.patient_id = p.person_id "
+            + "                JOIN   obs o "
+            + "                ON     o.encounter_id = e.encounter_id "
+            + "                AND    encounter_type = ${6} "
+            + "                AND    o.concept_id = ${question} "
+            + "                AND    o.value_coded = ${answer} "
+            + "                AND    e.location_id = :location "
+            + "                AND    e.encounter_datetime >= date_add(:startDate, interval -9 month ) "
+            + "                AND    e.encounter_datetime <= :startDate "
+            + "                AND    p.gender = 'F' "
+            + "                AND    e.voided = 0 "
+            + "                AND    o.voided = 0 "
+            + "                AND    p.voided = 0 ) "
+            + "GROUP BY pregnant.person_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * Filtrando as que tiveram registo do “Pedido de CD4” na mesma consulta clínica na qual tiveram o
+   * primeiro registo de Gravidez durante o período de inclusão (>= “Data Fim de Revisão” menos (-)
+   * 12 meses mais (+) 1 dia e “Data fim de Revisão” menos (-) 9 meses).
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getRequestForCd4OnFirstClinicalConsultationOfPregnancy(
+      int pregnantConcept, int yesConcept, int labResearchConcept, int cd4) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        " “Pedido de CD4” na mesma consulta clínica na qual tiveram o primeiro registo de Gravidez");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("pregnantConcept", pregnantConcept);
+    map.put("yesConcept", yesConcept);
+    map.put("labResearchConcept", labResearchConcept);
+    map.put("cd4", cd4);
+
+    String query =
+        "SELECT pa.patient_id "
+            + "             FROM "
+            + "                 patient pa "
+            + "                     INNER JOIN encounter enc "
+            + "                                ON enc.patient_id =  pa.patient_id "
+            + "                     INNER JOIN obs o2 "
+            + "                                ON o2.encounter_id = enc.encounter_id "
+            + "                     INNER JOIN "
+            + "                 ( "
+            + "                     SELECT pregnant.person_id, pregnant.first_pregnancy as first_consultation FROM ( "
+            + "                                                                                                        SELECT p.person_id, MIN(e.encounter_datetime) as first_pregnancy "
+            + "                                                                                                        FROM   person p "
+            + "                                                                                                                   JOIN encounter e "
+            + "                                                                                                                        ON e.patient_id = p.person_id "
+            + "                                                                                                                   JOIN obs o "
+            + "                                                                                                                        ON o.encounter_id = e.encounter_id "
+            + "                                                                                                                            AND encounter_type = ${6} "
+            + "                                                                                                                            AND o.concept_id = ${pregnantConcept} "
+            + "                                                                                                                            AND o.value_coded = ${yesConcept} "
+            + "                                                                                                                            AND e.location_id = :location "
+            + "                                                                                                                            AND e.encounter_datetime <= :revisionEndDate "
+            + "                                                                                                                            AND p.gender = 'F' "
+            + "                                                                                                                            AND e.voided = 0 "
+            + "                                                                                                                            AND o.voided = 0 "
+            + "                                                                                                                            AND p.voided = 0 "
+            + "                                                                                                        GROUP BY p.person_id) pregnant "
+            + "                     WHERE "
+            + "                             pregnant.first_pregnancy >=  :startDate "
+            + "                       AND pregnant.first_pregnancy <= :endDate "
+            + "                       AND NOT EXISTS( "
+            + "                             SELECT p.person_id "
+            + "                             FROM   person p "
+            + "                                        JOIN encounter e "
+            + "                                             ON e.patient_id = p.person_id "
+            + "                                        JOIN obs o "
+            + "                                             ON o.encounter_id = e.encounter_id "
+            + "                                                 AND encounter_type = ${6} "
+            + "                                                 AND o.concept_id = ${pregnantConcept} "
+            + "                                                 AND o.value_coded = ${yesConcept} "
+            + "                                                 AND e.location_id = :location "
+            + "                                                 AND e.encounter_datetime >= Date_add(:startDate, INTERVAL -9 MONTH ) "
+            + "                                                 AND e.encounter_datetime <= :startDate "
+            + "                                                 AND p.gender = 'F' "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND o.voided = 0 "
+            + "                                                 AND p.voided = 0 "
+            + "                         ) "
+            + "                     GROUP BY pregnant.person_id "
+            + "                 ) final ON final.person_id = pa.patient_id "
+            + "             WHERE pa.voided = 0 "
+            + "               AND enc.voided = 0 "
+            + "               AND o2.voided = 0 "
+            + "               AND enc.encounter_type = ${6} "
+            + "               AND enc.encounter_datetime = final.first_consultation "
+            + "               AND o2.concept_id = ${labResearchConcept} "
+            + "               AND o2.value_coded = ${cd4} "
+            + "               AND enc.location_id = :location "
+            + "             GROUP BY pa.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   *
+   * <li>Filtrando os que tiveram registo do “Resultado de CD4” na consulta clínica decorrida em 33
+   *     dias após a consulta clínica com o primeiro registo de Gravidez no período de inclusão
+   *     (“Data Consulta Grávida” >= “Data Fim de Revisão” menos (-) 12 meses mais (+) 1 dia e “Data
+   *     fim de Revisão” menos (-) 9 meses), ou seja, “Data Resultado de CD4” menos a “Data Primeira
+   *     Gravidez” <=33 dias.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getCd4ResultAfterFirstConsultationOfPregnancy(
+      int pregnantConcept, int yesConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Filter all patients with CD4 within 33 days from the first pregnancy consultation");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("730", hivMetadata.getCD4PercentConcept().getConceptId());
+    map.put("pregnantConcept", pregnantConcept);
+    map.put("yesConcept", yesConcept);
+
+    String query =
+        "SELECT pa.patient_id "
+            + "FROM "
+            + "    patient pa "
+            + "        INNER JOIN encounter enc "
+            + "                   ON enc.patient_id =  pa.patient_id "
+            + "        INNER JOIN obs "
+            + "                   ON obs.encounter_id = enc.encounter_id "
+            + "        INNER JOIN obs o2 "
+            + "                   ON o2.encounter_id = enc.encounter_id "
+            + "        INNER JOIN "
+            + "    ( "
+            + "                     SELECT pregnant.person_id, pregnant.first_pregnancy as first_consultation FROM ( "
+            + "                                                                                                        SELECT p.person_id, MIN(e.encounter_datetime) as first_pregnancy "
+            + "                                                                                                        FROM   person p "
+            + "                                                                                                                   JOIN encounter e "
+            + "                                                                                                                        ON e.patient_id = p.person_id "
+            + "                                                                                                                   JOIN obs o "
+            + "                                                                                                                        ON o.encounter_id = e.encounter_id "
+            + "                                                                                                                            AND encounter_type = ${6} "
+            + "                                                                                                                            AND o.concept_id = ${pregnantConcept} "
+            + "                                                                                                                            AND o.value_coded = ${yesConcept} "
+            + "                                                                                                                            AND e.location_id = :location "
+            + "                                                                                                                            AND e.encounter_datetime <= :revisionEndDate "
+            + "                                                                                                                            AND p.gender = 'F' "
+            + "                                                                                                                            AND e.voided = 0 "
+            + "                                                                                                                            AND o.voided = 0 "
+            + "                                                                                                                            AND p.voided = 0 "
+            + "                                                                                                        GROUP BY p.person_id) pregnant "
+            + "                     WHERE "
+            + "                             pregnant.first_pregnancy >=  :startDate "
+            + "                       AND pregnant.first_pregnancy <= :endDate "
+            + "                       AND NOT EXISTS( "
+            + "                             SELECT p.person_id "
+            + "                             FROM   person p "
+            + "                                        JOIN encounter e "
+            + "                                             ON e.patient_id = p.person_id "
+            + "                                        JOIN obs o "
+            + "                                             ON o.encounter_id = e.encounter_id "
+            + "                                                 AND encounter_type = ${6} "
+            + "                                                 AND o.concept_id = ${pregnantConcept} "
+            + "                                                 AND o.value_coded = ${yesConcept} "
+            + "                                                 AND e.location_id = :location "
+            + "                                                 AND e.encounter_datetime >= Date_add(:startDate, INTERVAL -9 MONTH ) "
+            + "                                                 AND e.encounter_datetime <= :startDate "
+            + "                                                 AND p.gender = 'F' "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND o.voided = 0 "
+            + "                                                 AND p.voided = 0 "
+            + "                         ) "
+            + "                     GROUP BY pregnant.person_id "
+            + "    ) consultation_date ON consultation_date.person_id = pa.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "  AND enc.voided = 0 "
+            + "  AND obs.voided = 0 "
+            + "  AND o2.voided = 0 "
+            + "  AND enc.encounter_type = ${6} "
+            + "  AND ( "
+            + "        (obs.concept_id = ${1695} AND obs.value_numeric IS NOT NULL) "
+            + "        OR "
+            + "        (o2.concept_id = ${730} AND o2.value_numeric IS NOT NULL) "
+            + "      ) "
+            + "  AND enc.encounter_datetime > consultation_date.first_consultation "
+            + "  AND enc.encounter_datetime <= DATE_ADD(consultation_date.first_consultation, INTERVAL 33 DAY) "
+            + "  AND enc.location_id = :location "
+            + "GROUP BY pa.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(sb.replace(query));
 
     return sqlCohortDefinition;
   }
