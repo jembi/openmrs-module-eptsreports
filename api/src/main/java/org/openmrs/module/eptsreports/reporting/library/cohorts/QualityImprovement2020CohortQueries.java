@@ -6096,7 +6096,11 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
 
-    cd.setCompositionString("B2");
+    CohortDefinition pregnantAbandonedDuringPeriod =
+        getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate();
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
+
+    cd.setCompositionString("B2 AND NOT ABANDONED");
 
     return cd;
   }
@@ -9982,6 +9986,83 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
             hivMetadata.getAbandonedConcept().getConceptId(),
             hivMetadata.getStateOfStayOfPreArtPatient().getConceptId()));
+
+    return cd;
+  }
+
+  /**
+   * <b> RF7.2 EXCLUSION FOR PREGNANT PATIENTS WHO ABANDONED DURING ART START DATE PERIOD</b>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
+   * seguinte forma:
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
+   * Consulta”<=”Data Fim Período”
+   *
+   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
+   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
+   * Período” e “Data Consulta”<=”Data Fim Período”
+   * <li>5. para exclusão nas mulheres grávidas que iniciaram TARV a “Data Início Período” será
+   *     igual a “Data Início TARV” e “Data Fim do Período” será igual a “Data Início TARV”+3meses.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients who abandoned TARV on Art Start Date For Pregnants");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String a =
+        "SELECT abandoned.patient_id from (  "
+            + "                                                               SELECT p.patient_id, max(e.encounter_datetime) as last_encounter FROM patient p  "
+            + "                                                                                                                                         INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "                                                                                                                                         INNER JOIN obs o on e.encounter_id = o.encounter_id  "
+            + "                                                                                                                                         INNER JOIN (  "
+            + QualityImprovement2020Queries.getPregnancyDuringPeriod()
+            + "                                                               ) end_period ON end_period.patient_id = p.patient_id  "
+            + "                                                               WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
+            + "                                                                 AND e.encounter_type = ${6}  "
+            + "                                                                 AND o.concept_id = ${6273}  "
+            + "                                                                 AND o.value_coded = ${1707}  "
+            + "                                                                 AND e.location_id = :location  "
+            + "                                                                 AND e.encounter_datetime > DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
+            + "                                                                 AND e.encounter_datetime <= end_period.first_gestante  "
+            + "                                                               GROUP BY p.patient_id  "
+            + "                                                               UNION  "
+            + "                                                               SELECT p.patient_id, max(o.obs_datetime) as last_encounter FROM patient p  "
+            + "                                                                                                                                   INNER JOIN encounter e ON e.patient_id = p.patient_id  "
+            + "                                                                                                                                   INNER JOIN obs o on e.encounter_id = o.encounter_id  "
+            + "                                                                                                                                   INNER JOIN (  "
+            + QualityImprovement2020Queries.getPregnancyDuringPeriod()
+            + "                                                               ) end_period ON end_period.patient_id = p.patient_id  "
+            + "                                                               WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
+            + "                                                                 AND e.encounter_type = ${53}  "
+            + "                                                                 AND o.concept_id = ${6272}  "
+            + "                                                                 AND o.value_coded = ${1707}  "
+            + "                                                                 AND e.location_id = :location  "
+            + "                                                                 AND e.encounter_datetime > DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
+            + "                                                                 AND e.encounter_datetime <= end_period.first_gestante  "
+            + "                                                               GROUP BY p.patient_id  "
+            + "                                                           ) abandoned GROUP BY abandoned.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    cd.setQuery(sb.replace(a));
 
     return cd;
   }

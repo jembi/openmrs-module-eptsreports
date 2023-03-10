@@ -2327,4 +2327,36 @@ public class QualityImprovement2020Queries {
         + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
         + " GROUP BY pa.patient_id ";
   }
+
+  public static String getPregnancyDuringPeriod() {
+    return "       SELECT patient_id, first_gestante "
+        + " FROM ("
+        + "         SELECT p.patient_id, MIN(e.encounter_datetime) AS first_gestante "
+        + "         FROM  patient p "
+        + "               INNER JOIN person per on p.patient_id=per.person_id "
+        + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "               INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+        + "               INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
+        + "         WHERE p.voided = 0 "
+        + "           AND per.voided=0 AND per.gender = 'F' "
+        + "           AND e.voided = 0 AND o.voided  = 0 "
+        + "           AND o2.voided  = 0 "
+        + "           AND e.encounter_type = ${6} "
+        + "           AND o.concept_id = ${1982} "
+        + "           AND o.value_coded = ${1065} "
+        + "           AND o2.concept_id = ${23722} "
+        + "           AND o2.value_coded = ${856} "
+        + "           AND e.location_id = :location "
+        + "         GROUP BY p.patient_id) gest  "
+        + " WHERE gest.first_gestante >= :startDate "
+        + "   AND gest.first_gestante <= :endDate "
+        + "   AND gest.first_gestante > DATE_ADD((SELECT MIN(o.value_datetime) as art_date "
+        + "                                       FROM encounter e "
+        + "                                           INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+        + "                                       WHERE gest.patient_id = e.patient_id "
+        + "                                         AND e.voided = 0 AND o.voided = 0 "
+        + "                                         AND e.encounter_type = ${53} AND o.concept_id = ${1190} "
+        + "                                         AND o.value_datetime IS NOT NULL AND o.value_datetime <= :endDate AND e.location_id = :location "
+        + "                                       LIMIT 1), interval 3 MONTH) ";
+  }
 }
