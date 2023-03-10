@@ -72,7 +72,8 @@ public class TxMlCohortQueries {
     CohortDefinition startedArt = genericCohortQueries.getStartedArtBeforeDate(false);
     CohortDefinition transferredOut = getTransferredOutPatientsComposition();
     String mappings = "onOrBefore=${endDate},location=${location}";
-    String mappings2 = "startDate=${startDate},endDate=${endDate},reportEndDate=${endDate}location=${location}";
+    String mappings2 =
+        "startDate=${startDate},endDate=${endDate},reportEndDate=${endDate},location=${location}";
     String previousPeriodMappings =
         "startDate=${startDate-3m},endDate=${startDate-1d},reportEndDate=${endDate},location=${location}";
     CohortDefinition dead = getDeadPatientsComposition();
@@ -92,13 +93,14 @@ public class TxMlCohortQueries {
     cd.addSearch(
         "transferredOutBetweenArtpickupAndRecepcaoLevantouReportingPeriod",
         EptsReportUtils.map(
-            getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(true), mappings2));
+            getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "transferredOutBeforeArtpickupAndRecepcaoLevantouPreviousPeriod",
         EptsReportUtils.map(
             getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(false),
-            previousPeriodMappings));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "suspendedReportingPeriod",
@@ -671,6 +673,7 @@ public class TxMlCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Get patients who are dead according to criteria a,b,c,d and e");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("reportEndDate", "Report End Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -735,6 +738,7 @@ public class TxMlCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Get patients who are dead according to criteria a,b,c,d and e");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("reportEndDate", "Report End Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
