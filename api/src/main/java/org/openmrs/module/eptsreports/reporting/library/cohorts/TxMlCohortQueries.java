@@ -100,7 +100,7 @@ public class TxMlCohortQueries {
         "transferredOutBeforeArtpickupAndRecepcaoLevantouPreviousPeriod",
         EptsReportUtils.map(
             getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(false),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${startDate-3m},endDate=${startdDate-1d},location=${location}"));
 
     cd.addSearch(
         "suspendedReportingPeriod",
