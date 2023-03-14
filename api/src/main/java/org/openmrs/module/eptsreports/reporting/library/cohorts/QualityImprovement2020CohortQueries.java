@@ -3170,7 +3170,7 @@ public class QualityImprovement2020CohortQueries {
    *   <li>incluindo todos os utentes com registo de uma Carga Viral na Ficha Clínica ou Ficha
    *       Resumo com resultado > 50 cópias durante o período de inclusão (“Data da CV >50” >= “Data
    *       Início Inclusão” e <= “Data Fim Inclusão”.
-   *   <li>Nota: em caso de existência de mais de um registo de Carga Viral com resultado > =10050
+   *   <li>Nota: em caso de existência de mais de um registo de Carga Viral com resultado > 50
    *       cópias, deve ser considerado o primeiro registo ocorrido durante o período de inclusão
    * </ul>
    *
@@ -9993,18 +9993,13 @@ public class QualityImprovement2020CohortQueries {
   /**
    * <b> RF7.2 EXCLUSION FOR PREGNANT PATIENTS WHO ABANDONED DURING ART START DATE PERIOD</b>
    *
-   * <p>O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
-   * seguinte forma:
+   * <p>Excepto as utentes abandono em TARV durante o período (seguindo os critérios
+   * definidosBetween 1st clina no RF7.2) nos últimos 3 meses (entre “Data 1ª Consulta Grávida” – 3
+   * meses e “Data 1ª Consulta Grávida”).<br>
+   * <br>
    *
-   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
-   * Consulta”<=”Data Fim Período”
-   *
-   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
-   * Período” e “Data Consulta”<=”Data Fim Período”
-   * <li>5. para exclusão nas mulheres grávidas que iniciaram TARV a “Data Início Período” será
-   *     igual a “Data Início TARV” e “Data Fim do Período” será igual a “Data Início TARV”+3meses.
+   * <p>Nota 1: “Data 1ª Consulta Grávida” deve ser a primeira consulta de sempre com registo de
+   * grávida e essa consulta deve ter ocorrido no período de inclusão. <br>
    *
    * @return CohortDefinition
    */
