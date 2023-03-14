@@ -1364,29 +1364,27 @@ public class QualityImprovement2020Queries {
   }
 
   /**
-   * <b> O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
-   * seguinte forma: </b>
+   * <b> O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período de
+   * revisão seguinte forma: </b>
    *
    * <blockquote>
    *
-   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
-   * Consulta”<=”Data Fim Período”
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” na Ficha
+   * Clínica nos 6 meses anteriores a data a última consulta. (“Data Consulta Abandono” >= “Data
+   * Última Consulta” menos 6 meses e <= “Data última Consulta”).
    *
    * <blockquote>
    *
-   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
-   * Período” e “Data Consulta”<=”Data Fim Período”
+   * <p>Nota MISAU: Data da última consulta recuar 6 meses [data última consulta menos (-) 6 meses]
    *
-   * <p>Nota: O período é definido conforme o requisito onde os utentes abandonos em TARV no fim do
-   * período serão excluídos:
-   * <li>1. para exclusão nos utentes que iniciaram a 1ª linha de TARV, a “Data Início Período” será
-   *     igual a “Data Início TARV” e “Data Fim do Período” será igual a “Data Início TARV”+6meses.
+   * <blockquote>
    *
-   *     <p>Patient ART Start Date is the oldest date from the set of criterias defined in the
-   *     common query: 1/1 Patients who initiated ART and ART Start Date as earliest from the
-   *     following criterias is by End of the period (reporting endDate)
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” na Ficha
+   * Resumo durante o período (“Data de Mudança de Estado Permanência Abandono” (“Data Consulta
+   * Abandono” >= “Data Última Consulta” menos 6 meses e <= “Data última Consulta”)
+   *
+   * <p>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o período
+   * de revisão.
    *
    * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
    * @param masterCardEncounterType The Ficha Resumo Encounter Type 53
