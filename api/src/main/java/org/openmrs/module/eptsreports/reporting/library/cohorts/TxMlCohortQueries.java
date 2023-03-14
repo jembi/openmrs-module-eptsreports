@@ -100,7 +100,7 @@ public class TxMlCohortQueries {
         "transferredOutBeforeArtpickupAndRecepcaoLevantouPreviousPeriod",
         EptsReportUtils.map(
             getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(false),
-            "startDate=${startDate-3m},endDate=${startdDate-1d},location=${location}"));
+            "startDate=${startDate-3m},endDate=${startDate-1d},location=${location}"));
 
     cd.addSearch(
         "suspendedReportingPeriod",
@@ -1882,7 +1882,6 @@ public class TxMlCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     definition.setQuery(stringSubstitutor.replace(query));
-    System.out.println(definition.getQuery());
 
     return definition;
   }
