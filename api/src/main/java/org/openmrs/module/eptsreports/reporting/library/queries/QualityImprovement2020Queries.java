@@ -11,6 +11,7 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.CommonCohortQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -1174,6 +1175,157 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
+
+
+  /**
+   * incluindo todos os utentes com registo de uma Carga Viral na Ficha Clínica com resultado > 50
+   * cópias durante o período de inclusão (“Data da CV >50” >= “Data Início Inclusão” e <= “Data Fim
+   * Inclusão”), filtrando os utentes do sexo feminino, com registo de “Grávida” na mesma consulta
+   * (“Data da Consulta CV>50”)
+   *
+   * </blockquote>
+   *
+   * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
+   * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
+   * @param yesConcept The answer yes Concept Id 1065
+   * @param pregnantConcept The Pregnant Concept Id 1982
+   * @return {@link CohortDefinition}
+   */
+  public static CohortDefinition getMQ13DenB4_Clinica_CV_50(
+      int adultoSeguimentoEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int pregnantConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Cat11 B4");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+            new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("856", hivViralLoadConcept);
+    map.put("1065", yesConcept);
+    map.put("1982", pregnantConcept);
+
+    String query =
+        "SELECT p.patient_id "
+            + "             FROM patient p "
+            + "             INNER JOIN ( "
+            + "                         SELECT p.patient_id, MIN(e.encounter_datetime) as first_carga_viral  "
+            + "                         FROM patient p  "
+            + "                         INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                         INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "                         WHERE  p.voided = 0   "
+            + "                                AND e.voided = 0   "
+            + "                                AND o.voided = 0      "
+            + "                                AND o.concept_id = ${856}   "
+            + "                                AND o.value_numeric >= 50 "
+            + "                                AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
+            + "                                AND e.location_id = :location   "
+            + "                         GROUP  BY p.patient_id    "
+            + "                       ) AS lab ON lab.patient_id = p.patient_id  "
+            + "             INNER JOIN (  "
+            + "                         SELECT p.patient_id, e.encounter_datetime AS gestante  "
+            + "                         FROM patient p   "
+            + "                         INNER JOIN encounter e ON e.patient_id = p.patient_id   "
+            + "                         INNER JOIN obs o ON e.encounter_id = o.encounter_id   "
+            + "                         INNER JOIN person pe ON p.patient_id = pe.person_id "
+            + "                         WHERE   p.voided = 0   "
+            + "                                 AND e.voided = 0   "
+            + "                                 AND o.voided = 0       "
+            + "                                 AND o.concept_id = ${1982}    "
+            + "                                 AND o.value_coded = ${1065}    "
+            + "                                 AND pe.gender = 'F' "
+            + "                                 AND ( e.encounter_type = ${6} "
+            + "                                 AND e.encounter_datetime BETWEEN :startDate AND :endDate) "
+            + "                                 AND e.location_id = :location    "
+            + "                       ) AS mulher ON mulher.patient_id = p.patient_id  "
+            + "             WHERE p.voided = 0  "
+            + "                   AND lab.first_carga_viral = mulher.gestante";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * incluindo todos os utentes com registo de uma Carga Viral na Ficha Resumo com resultado > 50
+   * cópias durante o período de inclusão (“Data da CV > 50” >= “Data Início Inclusão” e <= “Data
+   * Fim Inclusão”), filtrando os utentes do sexo feminino, com registo de “Grávida” na mesma
+   * consulta (“Data da Consulta CV > 50”)
+   *
+   * </blockquote>
+   *
+   * @param masterCardEncounterType The Adulto Seguimento Encounter Type 53
+   * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
+   * @param yesConcept The answer yes Concept Id 1065
+   * @param pregnantConcept The Pregnant Concept Id 1982
+   * @return {@link CohortDefinition}
+   */
+  public static CohortDefinition getMQ13DenB4_Resumo_CV_50(
+      int masterCardEncounterType, int hivViralLoadConcept, int yesConcept, int pregnantConcept) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Cat11 B4");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", masterCardEncounterType);
+    map.put("856", hivViralLoadConcept);
+    map.put("1065", yesConcept);
+    map.put("1982", pregnantConcept);
+
+    String query =
+        "SELECT p.patient_id "
+            + "     FROM patient p "
+            + "              INNER JOIN ( "
+            + "         SELECT p.patient_id, MIN(o.obs_datetime) as first_carga_viral "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "         WHERE  p.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND o.voided = 0 "
+            + "           AND o.concept_id = ${856} "
+            + "           AND o.value_numeric >= 50 "
+            + "           AND ( e.encounter_type = ${53} AND o.obs_datetime BETWEEN :startDate AND :endDate) "
+            + "           AND e.location_id = :location "
+            + "         GROUP  BY p.patient_id "
+            + "     ) AS lab ON lab.patient_id = p.patient_id "
+            + "              INNER JOIN ( "
+            + "         SELECT p.patient_id, e.encounter_datetime AS gestante "
+            + "         FROM patient p "
+            + "                  INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                  INNER JOIN person pe ON p.patient_id = pe.person_id "
+            + "         WHERE   p.voided = 0 "
+            + "           AND e.voided = 0 "
+            + "           AND o.voided = 0 "
+            + "           AND o.concept_id = ${1982} "
+            + "           AND o.value_coded = ${1065} "
+            + "           AND pe.gender = 'F' "
+            + "           AND ( e.encounter_type = ${53} "
+            + "             AND o.obs_datetime BETWEEN :startDate AND :endDate) "
+            + "           AND e.location_id = :location "
+            + "     ) AS mulher ON mulher.patient_id = p.patient_id "
+            + "     WHERE p.voided = 0 "
+            + "       AND lab.first_carga_viral = mulher.gestante;";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   public static CohortDefinition getMQ13DenB4_P4(
       int adultoSeguimentoEncounterType,
       int hivViralLoadConcept,
@@ -1355,6 +1507,36 @@ public class QualityImprovement2020Queries {
             yesConcept,
             breastfeedingConcept,
             1000);
+
+    compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
+
+    compositionCohortDefinition.setCompositionString("indicator");
+
+    return compositionCohortDefinition;
+  }
+
+  public static CohortDefinition getMQ13DenB5_PregnantCV50(
+          int adultoSeguimentoEncounterType,
+          int hivViralLoadConcept,
+          int yesConcept,
+          int breastfeedingConcept) {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName("");
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+            new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition indicator =
+            getMQ13DenB5_P4(
+                    adultoSeguimentoEncounterType,
+                    hivViralLoadConcept,
+                    yesConcept,
+                    breastfeedingConcept,
+                    50);
 
     compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
 
