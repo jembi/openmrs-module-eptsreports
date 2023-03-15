@@ -7745,14 +7745,14 @@ public class QualityImprovement2020CohortQueries {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
-              genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
-              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
+              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (flag == 3 || flag == 4) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
-              genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
-              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+              genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
+              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -7793,11 +7793,6 @@ public class QualityImprovement2020CohortQueries {
                 hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
                 hivMetadata.getArtStatus().getConceptId()),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
-    cd.addSearch(
-        "F",
-        EptsReportUtils.map(
-            commonCohortQueries.getTranferredOutPatients(),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "pregnantOnPeriod",
@@ -7816,8 +7811,7 @@ public class QualityImprovement2020CohortQueries {
             inclusionPeriodMappings));
 
     cd.setCompositionString(
-        "A AND NOT (C OR D OR E OR F OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
-
+        "A AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
     return cd;
   }
 
@@ -7868,6 +7862,15 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * O sistema irá produzir o Numerador para o indicador do pedido de CD4 para MG:
+   * “# de MG HIV+ em TARV com registo de pedido de CD4 na primeira CPN (Primeira consulta com registo Gravidez)”
+   *
+   *
+   *
+   * @param flag parameter to receive the indicator number
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getCd4RequestAndResultForPregnantsCat9Num(int flag) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -11506,7 +11509,7 @@ public class QualityImprovement2020CohortQueries {
             + "                  GROUP BY p.person_id) pregnant "
             + "WHERE    pregnant.first_pregnancy >= :startDate "
             + "AND      pregnant.first_pregnancy <= :endDate "
-            + "AND      NOT EXISTS "
+            + "AND      pregnant.person_id NOT IN "
             + "         ( "
             + "                SELECT p.person_id "
             + "                FROM   person p "
@@ -11518,8 +11521,8 @@ public class QualityImprovement2020CohortQueries {
             + "                AND    o.concept_id = ${question} "
             + "                AND    o.value_coded = ${answer} "
             + "                AND    e.location_id = :location "
-            + "                AND    e.encounter_datetime >= date_add(:startDate, interval -9 month ) "
-            + "                AND    e.encounter_datetime <= :startDate "
+            + "                AND    e.encounter_datetime >= date_sub(:startDate, interval 9 month ) "
+            + "                AND    e.encounter_datetime < :startDate "
             + "                AND    p.gender = 'F' "
             + "                AND    e.voided = 0 "
             + "                AND    o.voided = 0 "
@@ -11588,7 +11591,7 @@ public class QualityImprovement2020CohortQueries {
             + "                     WHERE "
             + "                             pregnant.first_pregnancy >=  :startDate "
             + "                       AND pregnant.first_pregnancy <= :endDate "
-            + "                       AND NOT EXISTS( "
+            + "                       AND   pregnant.person_id NOT IN ( "
             + "                             SELECT p.person_id "
             + "                             FROM   person p "
             + "                                        JOIN encounter e "
@@ -11599,8 +11602,8 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 AND o.concept_id = ${pregnantConcept} "
             + "                                                 AND o.value_coded = ${yesConcept} "
             + "                                                 AND e.location_id = :location "
-            + "                                                 AND e.encounter_datetime >= Date_add(:startDate, INTERVAL -9 MONTH ) "
-            + "                                                 AND e.encounter_datetime <= :startDate "
+            + "                                                 AND e.encounter_datetime >= date_sub(:startDate, interval 9 month )  "
+            + "                                                 AND e.encounter_datetime < :startDate "
             + "                                                 AND p.gender = 'F' "
             + "                                                 AND e.voided = 0 "
             + "                                                 AND o.voided = 0 "
@@ -11685,7 +11688,7 @@ public class QualityImprovement2020CohortQueries {
             + "                     WHERE "
             + "                             pregnant.first_pregnancy >=  :startDate "
             + "                       AND pregnant.first_pregnancy <= :endDate "
-            + "                       AND NOT EXISTS( "
+            + "                       AND   pregnant.person_id NOT IN ( "
             + "                             SELECT p.person_id "
             + "                             FROM   person p "
             + "                                        JOIN encounter e "
@@ -11696,8 +11699,8 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 AND o.concept_id = ${pregnantConcept} "
             + "                                                 AND o.value_coded = ${yesConcept} "
             + "                                                 AND e.location_id = :location "
-            + "                                                 AND e.encounter_datetime >= Date_add(:startDate, INTERVAL -9 MONTH ) "
-            + "                                                 AND e.encounter_datetime <= :startDate "
+            + "                                                 AND e.encounter_datetime >= date_sub(:startDate, interval 9 month )  "
+            + "                                                 AND e.encounter_datetime < :startDate "
             + "                                                 AND p.gender = 'F' "
             + "                                                 AND e.voided = 0 "
             + "                                                 AND o.voided = 0 "
