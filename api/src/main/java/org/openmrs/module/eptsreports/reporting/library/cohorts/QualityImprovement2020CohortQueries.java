@@ -5746,11 +5746,11 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId());
 
     CohortDefinition breastfeedingWithCargaViralHigherThan50 =
-            QualityImprovement2020Queries.getMQ13DenB5_PregnantCV50(
-                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                    hivMetadata.getHivViralLoadConcept().getConceptId(),
-                    hivMetadata.getYesConcept().getConceptId(),
-                    commonMetadata.getBreastfeeding().getConceptId());
+        QualityImprovement2020Queries.getMQ13DenB5_PregnantCV50(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getBreastfeeding().getConceptId());
 
     CohortDefinition transferredIn =
         QualityImprovement2020Queries.getTransferredInPatients(
@@ -5794,8 +5794,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("B4CV50", EptsReportUtils.map(B4CV50, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-            "B5CV50", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan50, MAPPING1));
-
+        "B5CV50", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan50, MAPPING1));
 
     if (den) {
       if (line == 3) {
@@ -5805,7 +5804,8 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND B2) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
-        compositionCohortDefinition.setCompositionString("(B1 AND B4CV50) AND NOT (B5CV50 or E or F)");
+        compositionCohortDefinition.setCompositionString(
+            "(B1 AND B4CV50) AND NOT (B5CV50 or E or F)");
       }
     } else {
       if (line == 3) {
@@ -11266,37 +11266,37 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(
-            new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    compositionCohortDefinition.setName("Cat 13 - DEN 18: # de MG na 1ª linha de TARV com registo de resultado de CV");
-
+    compositionCohortDefinition.setName(
+        "Cat 13 - DEN 18: # de MG na 1ª linha de TARV com registo de resultado de CV");
 
     CohortDefinition pregnantClinicalWithCargaViralHigherThan50 =
-            QualityImprovement2020Queries.getMQ13DenB4_Clinica_CV_50(
-                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                    hivMetadata.getHivViralLoadConcept().getConceptId(),
-                    hivMetadata.getYesConcept().getConceptId(),
-                    commonMetadata.getPregnantConcept().getConceptId());
+        QualityImprovement2020Queries.getMQ13DenB4_Clinica_CV_50(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId());
 
     CohortDefinition pregnantMasterCardWithCargaViralHigherThan50 =
-            QualityImprovement2020Queries.getMQ13DenB4_Resumo_CV_50(
-                    hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                    hivMetadata.getHivViralLoadConcept().getConceptId(),
-                    hivMetadata.getYesConcept().getConceptId(),
-                    commonMetadata.getPregnantConcept().getConceptId());
+        QualityImprovement2020Queries.getMQ13DenB4_Resumo_CV_50(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId());
 
     compositionCohortDefinition.addSearch(
-            "CV50Clinical",
-            EptsReportUtils.map(
-                    pregnantClinicalWithCargaViralHigherThan50,
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+        "CV50Clinical",
+        EptsReportUtils.map(
+            pregnantClinicalWithCargaViralHigherThan50,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-            "CV50MasterCard",
-            EptsReportUtils.map(
-                    pregnantMasterCardWithCargaViralHigherThan50,
-                    "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+        "CV50MasterCard",
+        EptsReportUtils.map(
+            pregnantMasterCardWithCargaViralHigherThan50,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString("CV50Clinical AND CV50MasterCard");
 

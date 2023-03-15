@@ -11,7 +11,6 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.CommonCohortQueries;
-import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -1175,8 +1174,6 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
-
-
   /**
    * incluindo todos os utentes com registo de uma Carga Viral na Ficha Clínica com resultado > 50
    * cópias durante o período de inclusão (“Data da CV >50” >= “Data Início Inclusão” e <= “Data Fim
@@ -1201,7 +1198,7 @@ public class QualityImprovement2020Queries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(
-            new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1516,10 +1513,10 @@ public class QualityImprovement2020Queries {
   }
 
   public static CohortDefinition getMQ13DenB5_PregnantCV50(
-          int adultoSeguimentoEncounterType,
-          int hivViralLoadConcept,
-          int yesConcept,
-          int breastfeedingConcept) {
+      int adultoSeguimentoEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int breastfeedingConcept) {
 
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
@@ -1527,16 +1524,16 @@ public class QualityImprovement2020Queries {
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(
-            new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition indicator =
-            getMQ13DenB5_P4(
-                    adultoSeguimentoEncounterType,
-                    hivViralLoadConcept,
-                    yesConcept,
-                    breastfeedingConcept,
-                    50);
+        getMQ13DenB5_P4(
+            adultoSeguimentoEncounterType,
+            hivViralLoadConcept,
+            yesConcept,
+            breastfeedingConcept,
+            50);
 
     compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
 
