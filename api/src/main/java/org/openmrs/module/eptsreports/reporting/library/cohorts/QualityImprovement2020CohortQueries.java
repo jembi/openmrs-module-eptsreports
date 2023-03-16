@@ -3164,76 +3164,6 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b>RF50</b>: Categoria 13 MG Indicador 13.18 Denominador – Pedido de CV <br>
-   *
-   * <ul>
-   *   <li>incluindo todos os utentes com registo de uma Carga Viral na Ficha Clínica ou Ficha
-   *       Resumo com resultado > 50 cópias durante o período de inclusão (“Data da CV >50” >= “Data
-   *       Início Inclusão” e <= “Data Fim Inclusão”.
-   *   <li>Nota: em caso de existência de mais de um registo de Carga Viral com resultado > 50
-   *       cópias, deve ser considerado o primeiro registo ocorrido durante o período de inclusão
-   * </ul>
-   *
-   * @return CohortDefinition <strong>Should</strong> <strong>Should</strong> Returns empty if there
-   *     is no patient who meets the conditions <strong>Should</strong> fetch all patients with B2
-   *     criteria
-   */
-  public CohortDefinition getB3_13(boolean e53) {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(
-        "All patients from Ficha Clinica with “Carga Viral” registered with numeric value > 1000 during the Inclusion period");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-
-    String query =
-        " SELECT"
-            + "             p.patient_id"
-            + "             FROM"
-            + "             patient p"
-            + "                INNER JOIN"
-            + "             (SELECT"
-            + "                p.patient_id, MIN(e.encounter_datetime) AS first_encounter"
-            + "             FROM"
-            + "                patient p"
-            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id"
-            + "             JOIN obs o ON o.encounter_id = e.encounter_id"
-            + "             WHERE p.voided = 0"
-            + "                    AND e.voided = 0"
-            + "                    AND o.voided = 0"
-            + "                    AND e.location_id = :location"
-            + "                    AND o.location_id = :location"
-            + "                    AND o.concept_id = ${856}"
-            + "                    AND o.value_numeric > 50"
-            + "                    AND ("
-            + "                         ( e.encounter_type = ${6} "
-            + "                         AND e.encounter_datetime BETWEEN :startDate AND :endDate) ";
-
-    if (e53) {
-      query +=
-          "                         OR (e.encounter_type = ${53} "
-              + "                         AND o.obs_datetime BETWEEN :startDate AND :endDate)";
-    }
-    query +=
-        "                   ) "
-            + "               GROUP BY p.patient_id) filtered ON p.patient_id = filtered.patient_id ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
    * <b>MQC11B2</b>: Melhoria de Qualidade Category 11 Deniminator B1 <br>
    * <i> A and not B</i> <br>
    *
@@ -5762,8 +5692,6 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transferOut = getTranferredOutPatients();
 
-    CohortDefinition pregnantFromFichaClinicaCargaViral50 = getB3_13(useE53);
-
     CohortDefinition H = getMQ13P4H();
 
     CohortDefinition B4CV50 = getpregnantWithCargaViralHigherThan50();
@@ -5775,9 +5703,6 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch(
         "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING1));
-
-    compositionCohortDefinition.addSearch(
-        "B22", EptsReportUtils.map(pregnantFromFichaClinicaCargaViral50, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "B4", EptsReportUtils.map(pregnantWithCargaViralHigherThan1000, MAPPING1));
@@ -5846,8 +5771,6 @@ public class QualityImprovement2020CohortQueries {
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
-    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
-    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     String query =
         "       SELECT patient_id "
@@ -5857,16 +5780,12 @@ public class QualityImprovement2020CohortQueries {
             + "               INNER JOIN person per on p.patient_id=per.person_id "
             + "               INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "               INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "               INNER JOIN obs o2 ON e.encounter_id = o2.encounter_id "
             + "         WHERE p.voided = 0 "
             + "           AND per.voided=0 AND per.gender = 'F' "
             + "           AND e.voided = 0 AND o.voided  = 0 "
-            + "           AND o2.voided  = 0 "
             + "           AND e.encounter_type = ${6} "
             + "           AND o.concept_id = ${1982} "
             + "           AND o.value_coded = ${1065} "
-            + "           AND o2.concept_id = ${23722} "
-            + "           AND o2.value_coded = ${856} "
             + "           AND e.location_id = :location "
             + "         GROUP BY p.patient_id) gest  "
             + " WHERE gest.first_gestante >= :startDate "
@@ -5966,11 +5885,9 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * (B4=J from Numerator) - Select all patients with clinical consultation (encounter type 6) with
-   * concept “PEDIDO DE INVESTIGACOES LABORATORIAIS” (Concept Id 23722) and value coded “HIV CARGA
-   * VIRAL” (Concept Id 856) on the first occurrence of concept “GESTANTE” (Concept Id 1982) and
-   * value coded “SIM” ( Concept Id 1065) encounter_datetime during the inclusion period
-   * (encounter_datetime from B2)
+   * filtrando os utentes que têm o registo de “Pedido de Investigações Laboratoriais” igual a
+   * “Carga Viral” na primeira consulta clínica com registo de grávida durante o período de inclusão
+   * (“Data 1ª Consulta Grávida”).
    *
    * @return CohortDefinition
    */
@@ -5992,40 +5909,44 @@ public class QualityImprovement2020CohortQueries {
     StringSubstitutor sb = new StringSubstitutor(map);
 
     String query =
-        " SELECT p.patient_id "
-            + " FROM patient p "
-            + " INNER JOIN ( "
-            + "             SELECT p.patient_id, MIN(e.encounter_datetime) AS first_gestante "
-            + "             FROM patient p  "
-            + "             INNER JOIN encounter e ON e.patient_id = p.patient_id  "
-            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
-            + "             WHERE   p.voided = 0  "
-            + "                     AND e.voided = 0  "
-            + "                     AND o.voided = 0  "
-            + "                     AND e.encounter_type = ${6}   "
-            + "                     AND o.concept_id = ${1982}   "
-            + "                     AND o.value_coded = ${1065}   "
-            + "                     AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
-            + "                     AND e.location_id = :location   "
-            + "             GROUP BY p.patient_id "
-            + "           ) AS gestante ON gestante.patient_id = p.patient_id "
-            + " INNER JOIN ( "
-            + "             SELECT p.patient_id, e.encounter_datetime as carga_viral "
-            + "             FROM patient p "
-            + "             INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "             INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "             WHERE  p.voided = 0  "
-            + "                    AND e.voided = 0  "
-            + "                    AND o.voided = 0 "
-            + "                    AND e.encounter_type = ${6}   "
-            + "                    AND o.concept_id = ${23722}  "
-            + "                    AND o.value_coded = ${856} "
-            + "                    AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
-            + "                    AND e.location_id = :location  "
-            + "             GROUP  BY p.patient_id   "
-            + "           ) AS lab ON lab.patient_id = p.patient_id "
-            + " WHERE p.voided = 0 "
-            + "       AND gestante.first_gestante = lab.carga_viral";
+        "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         p.patient_id = e.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         e.encounter_id = o.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                  SELECT pregnant.patient_id, "
+            + "                         pregnant.first_gestante "
+            + "                  FROM   ( "
+            + "                                    SELECT     p.patient_id, "
+            + "                                               Min(e.encounter_datetime) AS first_gestante "
+            + "                                    FROM       patient p "
+            + "                                    INNER JOIN encounter e "
+            + "                                    ON         e.patient_id = p.patient_id "
+            + "                                    INNER JOIN obs o "
+            + "                                    ON         e.encounter_id = o.encounter_id "
+            + "                                    WHERE      p.voided = 0 "
+            + "                                    AND        e.voided = 0 "
+            + "                                    AND        o.voided = 0 "
+            + "                                    AND        e.encounter_type = ${6} "
+            + "                                    AND        o.concept_id = ${1982} "
+            + "                                    AND        o.value_coded = ${1065} "
+            + "                                    AND        e.encounter_datetime <= :endDate "
+            + "                                    AND        e.location_id = :location "
+            + "                                    GROUP BY   p.patient_id ) pregnant "
+            + "                  WHERE  pregnant.first_gestante BETWEEN :startDate AND    :endDate ) pregnancy "
+            + "ON         pregnancy.patient_id = p.patient_id "
+            + "WHERE      p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "AND        e.encounter_type = ${6} "
+            + "AND        o.concept_id = ${23722} "
+            + "AND        o.value_coded = ${856} "
+            + "AND        e.encounter_datetime = pregnancy.first_gestante "
+            + "AND        e.location_id = :location "
+            + "GROUP BY   p.patient_id";
 
     cd.setQuery(sb.replace(query));
     return cd;
