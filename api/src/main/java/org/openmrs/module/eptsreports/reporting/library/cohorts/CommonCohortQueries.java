@@ -400,12 +400,30 @@ public class CommonCohortQueries {
             + "                                                      e.patient_id "
             + "                                          WHERE  p.voided = 0 "
             + "                                                 AND e.voided = 0 "
-            + "                                                 AND e.encounter_type IN (${6}, ${18}) "
+            + "                                                 AND e.encounter_type = ${6} "
             + "                                                 AND e.location_id = :location "
             + "                                                 AND "
             + "              e.encounter_datetime > transferout_date "
             + "                                                 AND "
-            + "              e.encounter_datetime <= :revisionEndDate) ";
+            + "              e.encounter_datetime <= :revisionEndDate "
+            + "                                          UNION "
+            + "                                          SELECT p.patient_id "
+            + "                                          FROM   patient p "
+            + "                                                 JOIN encounter e "
+            + "                                                   ON p.patient_id = "
+            + "                                                      e.patient_id "
+            + "                                                 JOIN obs o "
+            + "                                                   ON e.encounter_id = "
+            + "                                                      o.encounter_id "
+            + "                                          WHERE  p.voided = 0 "
+            + "                                                 AND e.voided = 0 "
+            + "                                                 AND e.encounter_type = ${52} "
+            + "                                                 AND e.location_id = :location "
+            + "                                                 AND o.concept_id = ${23866} "
+            + "                                                 AND o.value_datetime > "
+            + "                                                     transferout_date "
+            + "                                                 AND o.value_datetime <= "
+            + "                                                     :revisionEndDate)  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
