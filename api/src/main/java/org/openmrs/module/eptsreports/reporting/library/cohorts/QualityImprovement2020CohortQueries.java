@@ -7863,10 +7863,8 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * O sistema irá produzir o Numerador para o indicador do pedido de CD4 para MG:
-   * “# de MG HIV+ em TARV com registo de pedido de CD4 na primeira CPN (Primeira consulta com registo Gravidez)”
-   *
-   *
+   * O sistema irá produzir o Numerador para o indicador do pedido de CD4 para MG: “# de MG HIV+ em
+   * TARV com registo de pedido de CD4 na primeira CPN (Primeira consulta com registo Gravidez)”
    *
    * @param flag parameter to receive the indicator number
    * @return {@link CohortDefinition}
@@ -8157,14 +8155,14 @@ public class QualityImprovement2020CohortQueries {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
-              genericCohortQueries.getAgeOnMOHArtStartDate(15, null, false),
-              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+              genericCohortQueries.getAgeOnFirstClinicalConsultation(15, null),
+              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     } else if (flag == 3 || flag == 4) {
       cd.addSearch(
           "AGE",
           EptsReportUtils.map(
-              genericCohortQueries.getAgeOnMOHArtStartDate(0, 14, true),
-              "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+              genericCohortQueries.getAgeOnFirstClinicalConsultation(0, 14),
+              "onOrAfter=${revisionEndDate-12m+1d},onOrBefore=${revisionEndDate-9m},revisionEndDate=${revisionEndDate},location=${location}"));
     }
 
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));

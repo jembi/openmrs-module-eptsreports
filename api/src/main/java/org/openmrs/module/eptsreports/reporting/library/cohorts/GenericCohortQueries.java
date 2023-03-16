@@ -909,7 +909,7 @@ public class GenericCohortQueries {
   }
 
   /**
-   * <b>dade do Utente na Primeira Consulta</b>
+   * <b>Idade do Utente na Primeira Consulta</b>
    *
    * <p>
    * <li>Idade = “Data Primeira Consulta” - Data de Nascimento
