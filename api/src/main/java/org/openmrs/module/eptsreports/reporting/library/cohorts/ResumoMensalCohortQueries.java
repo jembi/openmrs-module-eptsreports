@@ -2019,7 +2019,8 @@ public class ResumoMensalCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition transferred =  getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthA2();
+    CohortDefinition transferred =
+        getNumberOfPatientsTransferredInFromOtherHealthFacilitiesDuringCurrentMonthA2();
     CohortDefinition tpi = getPatientsWhoHadTPTonFirstOrSecondEncounterAfterPreTarv();
     CohortDefinition ex = getPatientsWhoStartedTptAfterPreArt();
 
@@ -2029,7 +2030,9 @@ public class ResumoMensalCohortQueries {
         "onOrAfter=${onOrAfter-1m},onOrBefore=${onOrBefore},locationList=${locationList}";
     String inProgramStatesMappings =
         "startDate=${onOrAfter-1m},endDate=${onOrBefore},location=${locationList}";
-    cd.addSearch("transferred", map(transferred, mappings1));
+    cd.addSearch(
+        "transferred",
+        map(transferred, "onOrAfter=${startDate-1m},onOrBefore=${endDate},location=${location}"));
     cd.addSearch("TPI", map(tpi, mappings));
     cd.addSearch("extpt", map(ex, mappings1));
     cd.addSearch(
