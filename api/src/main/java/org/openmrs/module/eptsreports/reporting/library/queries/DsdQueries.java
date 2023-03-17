@@ -382,7 +382,8 @@ public class DsdQueries {
           List<Integer> dispensationTypesFila, List<Integer> dispensationTypesFichaClinica) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("TO DO");
+    cd.setName(
+        "Patients With Type Of Dispensation On Mdc In The Most Recent Ficha Clinica And Fila");
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
@@ -438,7 +439,7 @@ public class DsdQueries {
             + " "
             + "             UNION "
             + " "
-            + "             SELECT p.patient_id, oo.value_datetime as last_encounter_datetime "
+            + "             SELECT p.patient_id, MAX(oo.value_datetime) as last_encounter_datetime "
             + "             FROM   patient p "
             + "                        INNER JOIN encounter e "
             + "                                   ON e.patient_id = p.patient_id "
@@ -465,7 +466,7 @@ public class DsdQueries {
             + "               AND oo.voided = 0 "
             + "               AND oo.concept_id = ${5096} "
             + "               AND oo.value_datetime IS NOT NULL "
-            + "               AND e.encounter_datetime = last_fila.last_encounter "
+            + "               AND e.encounter_datetime = last_fila.last_encounter GROUP BY p.patient_id"
             + "         ) last_encounter "
             + "               GROUP BY last_encounter.patient_id "
             + ") last_mdc ON last_mdc.patient_id = p.patient_id "
@@ -511,7 +512,8 @@ public class DsdQueries {
           int lowerBounded, int upperBounded, List<Integer> dispensationTypesFichaClinica) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("TO DO");
+    cd.setName(
+        "Patients With Type Of Dispensation On Mdc In The Most Recent Ficha Clinica Or With Pickup On Fila Between dates");
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
@@ -529,6 +531,7 @@ public class DsdQueries {
     map.put("dispensationTypesFichaClinica", StringUtils.join(dispensationTypesFichaClinica, ","));
     map.put("lower", String.valueOf(lowerBounded));
     map.put("upper", String.valueOf(upperBounded));
+    map.put("23888", hivMetadata.getSemiannualDispensation().getConceptId().toString());
 
     String query =
         ""
@@ -537,8 +540,6 @@ public class DsdQueries {
             + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "         INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
             + "         INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
-            + "         INNER JOIN obs o1 ON o1.encounter_id = e.encounter_id "
-            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + "         INNER JOIN ( SELECT last_encounter.patient_id, "
             + "                             Max(last_encounter.last_encounter_datetime) AS last_encounter "
             + "                      FROM ( SELECT p.patient_id, "
@@ -571,7 +572,7 @@ public class DsdQueries {
             + "                               AND e.location_id = :location "
             + "                             UNION "
             + "                             SELECT p.patient_id, "
-            + "                                    o.value_datetime AS last_encounter_datetime "
+            + "                                    MAX(o.value_datetime) AS last_encounter_datetime "
             + "                             FROM patient p "
             + "                                   INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                                   INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -623,47 +624,89 @@ public class DsdQueries {
             + "  AND p.voided = 0 "
             + "  AND otype.voided = 0 "
             + "  AND ostate.voided = 0 "
-            + "  AND o.voided = 0 "
             + "  AND e.location_id = :location "
             + "  AND (( e.encounter_type = ${18} "
-            + "    AND o.concept_id = ${5096} "
-            + "    AND o.value_datetime = last_mdc.last_encounter "
-            + "    AND Datediff(o.value_datetime, e.encounter_datetime) >= ${lower} "
-            + "    AND Datediff(o.value_datetime, e.encounter_datetime) <= ${upper} ) "
+            + "    AND otype.concept_id = ${5096} "
+            + "    AND otype.value_datetime = last_mdc.last_encounter "
+            + "    AND Datediff(otype.value_datetime, (SELECT max(e.encounter_datetime)"
+            + "                                        FROM  encounter e"
+            + "                                        INNER JOIN obs o ON e.encounter_id=o.encounter_id"
+            + "                                        WHERE e.voided = 0 "
+            + "                                        AND e.encounter_type = 18 "
+            + "                                        AND o.value_datetime =last_mdc.last_encounter"
+            + "                                        AND o.concept_id = 5096"
+            + "                                        AND e.encounter_datetime <= '2022-09-20' "
+            + "                                        AND e.patient_id = p.patient_id "
+            + "                                        AND e.location_id = 399"
+            + "                                        GROUP BY e.patient_id limit 1)) >= ${lower} "
+            + "    AND Datediff(otype.value_datetime, (SELECT max(e.encounter_datetime)"
+            + "                                        FROM  encounter e"
+            + "                                        INNER JOIN obs o ON e.encounter_id=o.encounter_id"
+            + "                                        WHERE e.voided = 0 "
+            + "                                        AND e.encounter_type = 18 "
+            + "                                        AND o.value_datetime =last_mdc.last_encounter"
+            + "                                        AND o.concept_id = 5096"
+            + "                                        AND e.encounter_datetime <= '2022-09-20' "
+            + "                                        AND e.patient_id = p.patient_id "
+            + "                                        AND e.location_id = 399"
+            + "                                        GROUP BY e.patient_id limit 1)) <= ${upper} ) "
             + "    OR ( e.encounter_type = ${6} "
             + "        AND e.encounter_datetime = last_mdc.last_encounter "
             + "        AND otype.concept_id = ${165174} "
+            + "        AND e.encounter_datetime <= :endDate"
             + "        AND otype.value_coded IN (${dispensationTypesFichaClinica}) "
             + "        AND ostate.concept_id = ${165322} "
             + "        AND otype.obs_group_id = ostate.obs_group_id "
             + "        AND ostate.value_coded IN (${1256}, ${1257}) "
-            + "        AND p.patient_id NOT IN ( SELECT e.patient_id "
+            + "        AND NOT EXISTS ( SELECT e.patient_id "
             + "                                  FROM encounter e "
-            + "                                           INNER JOIN obs o "
+            + "                                           INNER JOIN obs o ON e.encounter_id=o.encounter_id "
             + "                                  where e.voided = 0 "
             + "                                    AND o.voided = 0 "
             + "                                    AND e.encounter_type = ${18} "
-            + "                                    AND e.encounter_datetime = last_mdc.last_encounter "
+            + "                                    AND o.value_datetime =last_mdc.last_encounter "
             + "                                    AND e.patient_id = p.patient_id "
             + "                                    AND e.location_id = :location "
-            + "                                    AND o.concept_id = ${5096}) ) "
-            + "    OR ( e.encounter_type = 6 "
-            + "        AND e.encounter_datetime = last_mdc.last_encounter "
-            + "        AND o1.concept_id = ${23739} "
-            + "        AND o1.value_coded   IN (${23720}) "
-            + "        AND p.patient_id NOT IN ( SELECT e.patient_id "
-            + "                                  FROM encounter e "
-            + "                                           INNER JOIN obs o "
-            + "                                  WHERE e.voided = 0 "
-            + "                                    AND o.voided = 0 "
-            + "                                    AND e.encounter_type = ${18} "
-            + "                                    AND e.encounter_datetime = last_mdc.last_encounter "
-            + "                                    AND e.patient_id = p.patient_id "
-            + "                                    AND e.location_id = :location "
-            + "                                    AND o.concept_id = ${5096} ) ) );";
+            + "                                    AND o.concept_id = ${5096}) ) ";
+    String sql = ");";
+    // In case Dispensa Trimestral
+    if (lowerBounded == 83 && upperBounded == 97)
+      sql =
+          "    OR ( e.encounter_type = 6 "
+              + "        AND e.encounter_datetime = last_mdc.last_encounter "
+              + "        AND otype.concept_id = ${23739} "
+              + "        AND e.encounter_datetime <= :endDate"
+              + "        AND otype.value_coded   IN (${23720}) "
+              + "        AND NOT EXISTS ( SELECT e.patient_id "
+              + "                                  FROM encounter e "
+              + "                                           INNER JOIN obs o ON e.encounter_id=o.encounter_id"
+              + "                                  WHERE e.voided = 0 "
+              + "                                    AND o.voided = 0 "
+              + "                                    AND e.encounter_type = ${18} "
+              + "                                    AND o.value_datetime =last_mdc.last_encounter "
+              + "                                    AND e.patient_id = p.patient_id "
+              + "                                    AND e.location_id = :location "
+              + "                                    AND o.concept_id = ${5096} ) ) );";
+    else if (lowerBounded == 173 && upperBounded == 187) // Incase dispensa semestral
+    sql =
+          "    OR ( e.encounter_type = 6 "
+              + "        AND e.encounter_datetime = last_mdc.last_encounter "
+              + "        AND otype.concept_id = ${23739} "
+              + "        AND e.encounter_datetime <= :endDate"
+              + "        AND otype.value_coded   IN (${23888}) "
+              + "        AND NOT EXISTS ( SELECT e.patient_id "
+              + "                                  FROM encounter e "
+              + "                                           INNER JOIN obs o ON e.encounter_id=o.encounter_id"
+              + "                                  WHERE e.voided = 0 "
+              + "                                    AND o.voided = 0 "
+              + "                                    AND e.encounter_type = ${18} "
+              + "                                    AND o.value_datetime =last_mdc.last_encounter "
+              + "                                    AND e.patient_id = p.patient_id "
+              + "                                    AND e.location_id = :location "
+              + "                                    AND o.concept_id = ${5096} ) ) );";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
+    query = query + sql;
     cd.setQuery(stringSubstitutor.replace(query));
 
     return cd;
@@ -674,7 +717,7 @@ public class DsdQueries {
           List<Integer> dispensationTypesFichaClinica) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("TO DO");
+    cd.setName("Patients With Type Of Dispensation On Mdc In The Most Recent Ficha Clinica");
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 

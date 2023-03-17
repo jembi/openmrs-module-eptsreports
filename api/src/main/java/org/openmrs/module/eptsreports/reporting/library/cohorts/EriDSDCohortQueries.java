@@ -352,9 +352,7 @@ public class EriDSDCohortQueries {
 
     cd.addSearch(
         "breastfeeding",
-        EptsReportUtils.map(
-            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
-            "onOrAfter=${endDate-11m},onOrBefore=${endDate},location=${location}"));
+        EptsReportUtils.map(getBreastfeeding(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
         "pregnant",
@@ -389,6 +387,100 @@ public class EriDSDCohortQueries {
 
     cd.setCompositionString(
         "(B13 AND moreThan2years AND breastfeeding AND stable AND NOT (pregnant OR sarcomaKarposi OR returned OR tb))");
+    return cd;
+  }
+
+  private CohortDefinition getBreastfeeding() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Women who are Breastfeeding at least 11 months");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "    FROM patient p "
+            + "        INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "        INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + "        INNER JOIN (SELECT p.patient_id,MIN(e.encounter_datetime) min_breast "
+            + "                    FROM patient p "
+            + "                      INNER JOIN person pe ON pe.person_id=p.patient_id "
+            + "                      INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "                      INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + "                    WHERE p.voided=0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND pe.voided = 0 "
+            + "                          AND e.encounter_type = ${6} "
+            + "                          AND o.concept_id =  ${6332} "
+            + "                          AND o.value_coded = ${1065} "
+            + "                          AND e.location_id = :location "
+            + "                          AND pe.gender='F' "
+            + "                          AND e.encounter_datetime BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate "
+            + "                      GROUP BY p.patient_id) AS breastfeeding ON breastfeeding.patient_id = p.patient_id "
+            + "        INNER JOIN (SELECT p.patient_id,MAX(e.encounter_datetime) AS last_clinic_date "
+            + "                    FROM patient p "
+            + "                      INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "                      INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + "                    WHERE p.voided=0 "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type =${6}"
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime <= :endDate "
+            + "                    GROUP BY p.patient_id) AS last_clinic ON last_clinic.patient_id=p.patient_id "
+            + "    WHERE "
+            + "        p.voided = 0 AND e.voided = 0  AND o.voided = 0 "
+            + "        AND TIMESTAMPDIFF(MONTH, breastfeeding.min_breast, last_clinic.last_clinic_date) >= 11 "
+            + "        AND e.location_id = :location AND e.encounter_type=6 "
+            + "        AND NOT EXISTS( "
+            + "                              SELECT p.patient_id "
+            + "                              FROM patient p "
+            + "                                INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "                                INNER JOIN( "
+            + "                                      SELECT p.patient_id,MAX(e.encounter_datetime) AS pregnant_date "
+            + "                                      FROM patient p "
+            + "                                        INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "                                        INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + "                                      WHERE p.voided=0 "
+            + "                                            AND e.voided = 0 "
+            + "                                            AND o.voided = 0 "
+            + "                                            AND e.encounter_type =${6}"
+            + "                                            AND o.concept_id = ${1982} "
+            + "                                            AND o.value_coded = ${1065} "
+            + "                                            AND e.location_id = :location "
+            + "                                            BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate "
+            + "                                      GROUP BY p.patient_id) AS last_pregnant ON last_pregnant.patient_id=p.patient_id "
+            + "                                INNER JOIN( "
+            + "                                  SELECT p.patient_id,MAX(e.encounter_datetime) AS breastfeeding_date "
+            + "                                      FROM patient p "
+            + "                                        INNER JOIN encounter e ON e.patient_id=p.patient_id "
+            + "                                        INNER JOIN obs o ON o.encounter_id=e.encounter_id "
+            + "                                      WHERE p.voided=0 "
+            + "                                            AND e.voided = 0 "
+            + "                                            AND o.voided = 0 "
+            + "                                            AND e.encounter_type =${6}"
+            + "                                            AND o.concept_id =  ${6332} "
+            + "                                            AND o.value_coded = ${1065} "
+            + "                                            AND e.location_id = :location "
+            + "                                            BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate "
+            + "                                      GROUP BY p.patient_id "
+            + "                                ) AS last_breast ON last_breast.patient_id=p.patient_id "
+            + "                                      WHERE p.voided=0 AND e.voided=0 AND e.encounter_type=${6} AND e.location_id= :location"
+            + "                                            AND Date(last_pregnant.pregnant_date)>=Date(last_breast.breastfeeding_date) "
+            + "        ) "
+            + "    GROUP BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(map);
+    String replaceQuery = sb.replace(query);
+
+    cd.setQuery(replaceQuery);
+
     return cd;
   }
 
@@ -431,13 +523,11 @@ public class EriDSDCohortQueries {
 
     cd.addSearch(
         "breastfeeding",
-        EptsReportUtils.map(
-            txNewCohortQueries.getTxNewBreastfeedingComposition(true),
-            "onOrAfter=${endDate-11m},onOrBefore=${endDate},location=${location}"));
+        EptsReportUtils.map(getBreastfeeding(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch("onART", EptsReportUtils.map(getD4(), "endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("onART AND breastfeeding");
+    cd.setCompositionString("onART");
 
     return cd;
   }
@@ -595,7 +685,8 @@ public class EriDSDCohortQueries {
     cd.addSearch("N6", mapStraightThrough(getN6()));
     cd.addSearch("N7", mapStraightThrough(getN7()));
     cd.addSearch("N8", mapStraightThrough(getN8()));
-    cd.setCompositionString("(N2 OR N3 OR N5 OR N6 OR N7 OR N8)");
+    cd.addSearch("N4", mapStraightThrough(getN4()));
+    cd.setCompositionString("(N2 OR N3 OR N4 OR N5 OR N6 OR N7 OR N8)");
     return cd;
   }
 
