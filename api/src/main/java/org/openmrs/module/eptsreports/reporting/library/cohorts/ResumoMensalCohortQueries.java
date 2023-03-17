@@ -394,7 +394,7 @@ public class ResumoMensalCohortQueries {
             + "            ) ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
-    System.out.println(sb.replace(sql));
+
     cd.setQuery(sb.replace(sql));
 
     return cd;
