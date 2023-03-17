@@ -2926,7 +2926,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transfOut = getTranferredOutPatients();
 
     CohortDefinition abandonedTarv = getPatientsWhoAbandonedTarvOnArtStartDate();
     CohortDefinition abandonedFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
@@ -5656,6 +5656,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition children = this.ageCohortQueries.createXtoYAgeCohort("children", 2, 14);
 
+    CohortDefinition adult = this.ageCohortQueries.createXtoYAgeCohort("adult", 15, 200);
+
     CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
         getPatientsFromFichaClinicaWithLastTherapeuticLineSetAsFirstLine_B1();
 
@@ -5699,6 +5701,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "children", EptsReportUtils.map(children, "effectiveDate=${revisionEndDate}"));
     compositionCohortDefinition.addSearch(
+        "adult", EptsReportUtils.map(adult, "effectiveDate=${revisionEndDate}"));
+    compositionCohortDefinition.addSearch(
         "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING1));
 
     compositionCohortDefinition.addSearch(
@@ -5724,7 +5728,7 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B2) AND NOT (B4 or B5 or E or F)");
+            "((B1 AND B2) AND NOT (B4 or B5 or E or F)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND B2) AND NOT (B4 or B5 or E or F)) AND children");
@@ -5735,10 +5739,10 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B2 AND H) AND NOT (B4 or B5 or E or F)");
+            "((B1 AND B2 AND H) AND NOT (B4 or B5 or E or F)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B2 AND H) AND NOT (B4 or B5 or E or F)");
+            "((B1 AND B2 AND H) AND NOT (B4 or B5 or E or F)) AND children ");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
             "(B1 AND B4CV50 AND H) AND NOT (B5CV50 or E or F)");
