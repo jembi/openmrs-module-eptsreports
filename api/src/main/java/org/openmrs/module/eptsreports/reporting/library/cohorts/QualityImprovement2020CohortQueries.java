@@ -17,6 +17,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.En
 import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.SecondFollowingEncounterAfterOldestARTStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.ThirdFollowingEncounterAfterOldestARTStartDateCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
 import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
@@ -56,6 +57,8 @@ public class QualityImprovement2020CohortQueries {
   private TxMlCohortQueries txMlCohortQueries;
 
   private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
+
+  @Autowired private EptsCommonDimension eptsCommonDimension;
 
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
   private final String MAPPING1 =
@@ -2571,6 +2574,10 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition pregnantWithCargaViralHigherThan1000;
     CohortDefinition breastfeedingWithCargaViralHigherThan1000;
 
+    CohortDefinition less2years = genericCohortQueries.getAgeInMonths(0, 9);
+
+    CohortDefinition between2And14 = genericCohortQueries.getAgeOnMOHArtStartDate(2, 14, false);
+
     if (indicatorFlag == 4) {
       pregnantWithCargaViralHigherThan1000 =
           QualityImprovement2020Queries.getMQ13DenB4_P4(
@@ -2642,6 +2649,15 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
+
+      compositionCohortDefinition.addSearch(
+          "less2years", EptsReportUtils.map(less2years, "effectiveDate=${endDate}"));
+
+      compositionCohortDefinition.addSearch(
+          "between2And14",
+          EptsReportUtils.map(
+              between2And14, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
     } else if (reportSource.equals(MIMQ.MI)) {
 
       if (indicatorFlag == 1) {
@@ -2678,8 +2694,16 @@ public class QualityImprovement2020CohortQueries {
       }
     }
 
-    if (indicatorFlag == 1 || indicatorFlag == 5 || indicatorFlag == 6) {
+    if (indicatorFlag == 1) {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
+    }
+    if (indicatorFlag == 5) {
+      compositionCohortDefinition.setCompositionString(
+          "(A AND NOT (C OR D OR E OR F)) AND between2And14");
+    }
+    if (indicatorFlag == 6) {
+      compositionCohortDefinition.setCompositionString(
+          "(A AND NOT (C OR D OR E OR F)) AND less2years");
     }
     if (indicatorFlag == 2 || indicatorFlag == 7) {
       compositionCohortDefinition.setCompositionString("(B1 AND B2) AND NOT (B5 OR F OR B4)");
