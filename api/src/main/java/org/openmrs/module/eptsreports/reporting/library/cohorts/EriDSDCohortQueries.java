@@ -143,12 +143,6 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(getD1(), "endDate=${endDate},location=${location}"));
 
     cd.addSearch(
-        "pregnantOrBreastfeedingOrTBTreatment",
-        EptsReportUtils.map(
-            getPregnantAndBreastfeedingAndOnTBTreatment(),
-            "endDate=${endDate},location=${location}"));
-
-    cd.addSearch(
         "B13",
         EptsReportUtils.map(
             resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
@@ -182,11 +176,11 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    /*    cd.addSearch(
-            "activeAndUnstable",
-            EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
-    */
-    cd.setCompositionString("pregnant AND NOT breastfeeding");
+    cd.addSearch(
+        "activeAndUnstable",
+        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("activeAndUnstable AND NOT (pregnant OR breastfeeding)");
 
     return cd;
   }
@@ -208,11 +202,11 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
             "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
-    /*    cd.addSearch(
-            "activeAndUnstable",
-            EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
-    */
-    cd.setCompositionString("pregnant");
+    cd.addSearch(
+        "activeAndUnstable",
+        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("activeAndUnstable AND pregnant");
 
     return cd;
   }
@@ -234,12 +228,12 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             txNewCohortQueries.getTxNewBreastfeedingComposition(true),
             "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}"));
-    /*
-        cd.addSearch(
-            "activeAndUnstable",
-            EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
-    */
-    cd.setCompositionString("breastfeeding");
+
+    cd.addSearch(
+        "activeAndUnstable",
+        EptsReportUtils.map(getD2(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("activeAndUnstable AND breastfeeding");
 
     return cd;
   }
