@@ -405,17 +405,10 @@ public class TxPvlsBySourceLabOrFsrCohortQueries {
         EptsReportUtils.map(
             getPatientsWithViralLoadSuppressionForLabAndFsrNumeratorWhoAreOnArtMoreThan3Months(),
             mappings));
-    cd.addSearch(
-        "onArtLongEnough",
-        EptsReportUtils.map(
-            txPvlsCohortQueries.getPatientsWhoAreMoreThan3MonthsOnArt(
-                Arrays.asList(
-                    hivMetadata.getMisauLaboratorioEncounterType(),
-                    hivMetadata.getFsrEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+
     cd.addSearch("RoutineByLab", EptsReportUtils.map(getRoutineByLab(), mappings));
     cd.addSearch("RoutineByFsr", EptsReportUtils.map(getRoutineByFsr(), mappings));
-    cd.setCompositionString("(supp AND onArtLongEnough) AND (RoutineByLab OR RoutineByFsr)");
+    cd.setCompositionString("supp AND (RoutineByLab OR RoutineByFsr)");
     return cd;
   }
 
