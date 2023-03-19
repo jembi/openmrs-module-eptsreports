@@ -289,25 +289,6 @@ public class EriDSDDataset extends BaseDataSet {
             mappings),
         "");
     dsd.addColumn(
-        "N2PW",
-        "N2 Pregnant Women",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "N2PW",
-                EptsReportUtils.map(eriDSDCohortQueries.getPatientsWhoArePregnant(2), mappings)),
-            mappings),
-        "");
-    dsd.addColumn(
-        "N2BW",
-        "N2 Breastfeeding Women",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "N2BW",
-                EptsReportUtils.map(
-                    eriDSDCohortQueries.getPatientsWhoAreBreastfeeding(2), mappings)),
-            mappings),
-        "");
-    dsd.addColumn(
         "N3PW",
         "N3 Pregnant Women",
         EptsReportUtils.map(
@@ -831,6 +812,17 @@ public class EriDSDDataset extends BaseDataSet {
             "Not Eligible 10-14",
             "eligible=NE|pregnantBreastfeedingTb=NPNBNTB|age=10-14",
             "12"),
+        new ColumnParameters(
+            "Not Eligible Pregnant Women",
+            "Not Eligible Pregnant Women",
+            "eligible=NE|pregnantBreastfeedingTb=P",
+            "15"),
+        new ColumnParameters(
+            "Not Eligible Breastfeeding Women",
+            "Not Eligible Breastfeeding Women",
+            "eligible=NE|pregnantBreastfeedingTb=B",
+            "16"),
+        // TODO N20 disag (lactante do N20 =  e elig do N20 = D4)
         new ColumnParameters(
             "Eligible Adults Breastfeeding",
             "Eligible Adults Breastfeeding",
