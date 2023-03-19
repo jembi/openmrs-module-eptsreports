@@ -792,4 +792,66 @@ public class DsdQueries {
 
     return cd;
   }
+
+  public static SqlCohortDefinition
+      getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinica(
+          List<Integer> dispensationTypesFichaClinica, int lowerBounded, int upperBounded) {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients With Type Of Dispensation On Mdc In The Most Recent Ficha Clinica lowerBound and UpperBound");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> map = new HashMap<>();
+    HivMetadata hivMetadata = new HivMetadata();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId().toString());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId().toString());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId().toString());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId().toString());
+    map.put("165322", hivMetadata.getMdcState().getConceptId().toString());
+    map.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId().toString());
+    map.put("dispensationTypesFichaClinica", StringUtils.join(dispensationTypesFichaClinica, ","));
+    map.put("lowerBounded", String.valueOf(lowerBounded));
+    map.put("upperBounded", String.valueOf(upperBounded));
+
+    String query =
+        " SELECT p.patient_id "
+            + " FROM   patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN obs otype ON otype.encounter_id = e.encounter_id "
+            + " INNER JOIN obs ostate ON ostate.encounter_id = e.encounter_id "
+            + " INNER JOIN ( "
+            + " SELECT p.patient_id, MAX(e.encounter_datetime) AS last_encounter "
+            + " FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " WHERE p.voided = 0 "
+            + " AND e.voided = 0 "
+            + " AND e.location_id = :location "
+            + " AND e.encounter_type = ${6} "
+            + " AND e.encounter_datetime <= :endDate "
+            + " GROUP BY p.patient_id "
+            + " ) last_mdc ON last_mdc.patient_id = p.patient_id "
+            + " WHERE e.voided = 0 "
+            + " AND p.voided = 0 "
+            + " AND otype.voided = 0 "
+            + " AND ostate.voided = 0 "
+            + " AND e.location_id = :location "
+            + " AND e.encounter_type = ${6} "
+            + " AND e.encounter_datetime = last_mdc.last_encounter "
+            + " AND (( otype.concept_id = ${165174} "
+            + " AND otype.value_coded IN (${dispensationTypesFichaClinica}) "
+            + " AND ostate.concept_id = ${165322} "
+            + " AND otype.obs_group_id = ostate.obs_group_id "
+            + " AND ostate.value_coded IN (${1256}, ${1257}) ) OR (  "
+            + " otype.concept_id = ${1410}"
+            + " AND Datediff(otype.value_datetime, last_mdc.last_encounter) >= ${lowerBounded}"
+            + " AND Datediff(otype.value_datetime, last_mdc.last_encounter) <= ${upperBounded}))"
+            + " GROUP BY p.patient_id;";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
 }

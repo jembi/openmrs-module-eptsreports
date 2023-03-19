@@ -886,9 +886,8 @@ public class EriDSDCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     CohortDefinition nextArtPickUpScheduledORfluxoRapido =
-        DsdQueries
-            .getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaOrWithPickupOnFilaBetween(
-                175, 190, Arrays.asList(hivMetadata.getRapidFlow().getConceptId()));
+        DsdQueries.getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinica(
+            Arrays.asList(hivMetadata.getRapidFlow().getConceptId()), 175, 190);
 
     cd.addSearch(
         "nextArtPickUpScheduledORfluxoRapido",
