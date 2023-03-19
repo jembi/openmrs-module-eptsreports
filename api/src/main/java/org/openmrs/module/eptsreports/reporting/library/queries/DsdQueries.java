@@ -798,7 +798,8 @@ public class DsdQueries {
           List<Integer> dispensationTypesFichaClinica, int lowerBounded, int upperBounded) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Patients With Type Of Dispensation On Mdc In The Most Recent Ficha Clinica lowerBound and UpperBound");
+    cd.setName(
+        "Patients With Type Of Dispensation On Mdc In The Most Recent Ficha Clinica lowerBound and UpperBound");
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
