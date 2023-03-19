@@ -1401,6 +1401,45 @@ public class EriDSDCohortQueries {
   }
 
   /**
+   * <b>Description:</b> Patients who are registered as pregnant
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getDSDPregnant() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("endDate", "After Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setName("Pregnant");
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(true);
+
+    String pregnantMappings = "startDate=${endDate-9m},endDate=${endDate},location=${location}";
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnantMappings));
+    cd.setCompositionString("pregnant");
+
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> Patients who are registered as breastfeeding
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getDSDBreastfeeding() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("endDate", "After Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setName("Breastfeeding");
+    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition(true);
+
+    String breastfeedingMappings =
+        "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}";
+    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, breastfeedingMappings));
+    cd.setCompositionString("breastfeeding");
+
+    return cd;
+  }
+
+  /**
    * <b>Description:</b> Number of patients who are on Sarcoma Karposi
    *
    * <p><b>Techinal Specs</b>

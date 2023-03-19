@@ -463,8 +463,12 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("location", "Location", Location.class));
     CohortDefinition pregnantBreastfeedingTb =
         eriDSDCohortQueries.getPregnantAndBreastfeedingAndOnTBTreatment();
+    CohortDefinition pregnant = eriDSDCohortQueries.getDSDPregnant();
+    CohortDefinition breastfeeding = eriDSDCohortQueries.getDSDBreastfeeding();
     CohortDefinition inverse = new InverseCohortDefinition(pregnantBreastfeedingTb);
     dim.addCohortDefinition("NPNBNTB", mapStraightThrough(inverse));
+    dim.addCohortDefinition("P", mapStraightThrough(pregnant));
+    dim.addCohortDefinition("B", mapStraightThrough(breastfeeding));
     return dim;
   }
 
