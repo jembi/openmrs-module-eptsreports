@@ -1030,8 +1030,8 @@ public class EriDSDCohortQueries {
     CohortDefinition clinicaMovel =
         DsdQueries.getPatientsWithTypeOfDispensationOnMdcInTheMostRecentFichaClinicaAndFila(
             Arrays.asList(
-                hivMetadata.getBrigadasMoveisDiurnasConcept().getConceptId(),
-                hivMetadata.getBrigadasMoveisNocturnasConcept().getConceptId()),
+                hivMetadata.getClinicasMoveisDiurnasConcept().getConceptId(),
+                hivMetadata.getClinicasMoveisNocturnasConcept().getConceptId()),
             Arrays.asList(hivMetadata.getClinicasMoveisConcept().getConceptId()));
 
     cd.addSearch(
