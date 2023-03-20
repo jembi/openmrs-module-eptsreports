@@ -384,6 +384,64 @@ public class EriDSDCohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Name: D3 NOT D4</b>
+   *
+   * <p><b>Description:</b> Number of active patients on ART not eligible for Dispensa Bimestral”
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getD3NotD4() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("D3 Not D4 - Number of active patients on ART not eligible for Dispensa Bimestral");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.addSearch(
+        "moreThan2years",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("moreThanOrEqual2Years", 2, 200),
+            "effectiveDate=${endDate}"));
+
+    cd.addSearch(
+        "breastfeeding",
+        EptsReportUtils.map(getBreastfeeding(), "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "pregnant",
+        EptsReportUtils.map(
+            txNewCohortQueries.getPatientsPregnantEnrolledOnART(true),
+            "startDate=${endDate-9m},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "tb",
+        EptsReportUtils.map(
+            commonCohortQueries.getPatientsOnTbTreatment(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "sarcomaKarposi",
+        EptsReportUtils.map(
+            getAllPatientsOnSarcomaKarposi(), "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "stable",
+        EptsReportUtils.map(getPatientsWhoAreStable(6), "endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "returned",
+        EptsReportUtils.map(getPatientsWhoReturned(), "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(B13 AND NOT (moreThan2years AND breastfeeding AND stable AND NOT (pregnant OR sarcomaKarposi OR returned OR tb)))");
+    return cd;
+  }
+
   private CohortDefinition getBreastfeeding() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Women who are Breastfeeding at least 11 months");
@@ -1396,6 +1454,31 @@ public class EriDSDCohortQueries {
     cd.addSearch("tb", EptsReportUtils.map(tb, tbMappings));
 
     cd.setCompositionString("pregnant OR breastfeeding OR tb");
+
+    return cd;
+  }
+
+  /**
+   * <b>Description:</b> Patients who are registered as pregnant, as breastfeeding
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPregnantAndBreastfeeding() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("endDate", "After Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+    cd.setName("Pregnant, Breastfeeding or on TB Treatment");
+    CohortDefinition breastfeeding = txNewCohortQueries.getTxNewBreastfeedingComposition(true);
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(true);
+
+    String pregnantMappings = "startDate=${endDate-9m},endDate=${endDate},location=${location}";
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, pregnantMappings));
+
+    String breastfeedingMappings =
+        "onOrAfter=${endDate-18m},onOrBefore=${endDate},location=${location}";
+    cd.addSearch("breastfeeding", EptsReportUtils.map(breastfeeding, breastfeedingMappings));
+
+    cd.setCompositionString("pregnant OR breastfeeding");
 
     return cd;
   }
