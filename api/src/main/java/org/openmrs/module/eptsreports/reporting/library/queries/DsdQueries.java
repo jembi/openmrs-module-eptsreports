@@ -478,12 +478,13 @@ public class DsdQueries {
             + "                 AND ostate.value_coded IN (${1256}, ${1257}) "
             + "                 AND NOT EXISTS (SELECT e.patient_id "
             + "                                          FROM encounter e "
-            + "                                                   INNER JOIN obs o "
+            + "                                                   INNER JOIN obs o ON e.encounter_id=o.encounter_id"
             + "                                          WHERE e.voided = 0 "
             + "                                            AND o.voided = 0 "
             + "                                            AND e.encounter_type = ${18} "
             + "                                            AND o.value_datetime = last_mdc.last_encounter "
-            + "                                            AND e.patient_id = p.patient_id                                                    "
+            + "                                            AND e.encounter_dateTime <= :endDate "
+            + "                                            AND e.patient_id = p.patient_id "
             + "                                            AND e.location_id = :location "
             + "                                            AND o.concept_id = ${5096}) ))";
 
