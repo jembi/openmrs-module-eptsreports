@@ -460,16 +460,19 @@ public class GenericCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
-  }  /**
-   * Age should be calculated In Months on Patient ART Start Date (Check Section A for the algorithm to define
-   * this date).
+  }
+  /**
+   * Age should be calculated In Months on Patient ART Start Date (Check Section A for the algorithm
+   * to define this date).
    *
    * @param minAge Minimum age of a patient based on ART Start Date
    * @param maxAge Maximum age of a patient based on ART Start Date
    * @return CohortDefinition
    */
-  public CohortDefinition getAgeInMonthsBasedOnArtStartDateIgualGreaterThanLoweBoundAndLessThanUpperBound(
-      Integer minAge, Integer maxAge) {
+
+  public CohortDefinition
+      getAgeInMonthsBasedOnArtStartDateIgualGreaterThanLoweBoundAndLessThanUpperBound(
+          Integer minAge, Integer maxAge) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Age In Months on MOH ART start date");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -496,9 +499,7 @@ public class GenericCohortQueries {
             + "WHERE A1.first_start_drugs >= :startDate "
             + "  AND A1.first_start_drugs <= :endDate "
             + "  AND TIMESTAMPDIFF(MONTH, p.birthdate, A1.first_start_drugs) >= ${minAge}  "
-              + " AND TIMESTAMPDIFF(MONTH, p.birthdate, A1.first_start_drugs) < ${maxAge}; ";
-
-
+            + " AND TIMESTAMPDIFF(MONTH, p.birthdate, A1.first_start_drugs) < ${maxAge}; ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
