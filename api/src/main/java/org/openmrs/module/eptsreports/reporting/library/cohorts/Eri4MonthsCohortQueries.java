@@ -363,7 +363,10 @@ public class Eri4MonthsCohortQueries {
             hivCohortQueries.getPatientsTransferredOut(),
             "onOrBefore=${reportingEndDate},location=${location}"));
     cd.addSearch(
-        "stoppedTreatment", mapStraightThrough(hivCohortQueries.getPatientsWhoStoppedTreatment()));
+        "stoppedTreatment",
+        EptsReportUtils.map(
+            hivCohortQueries.getPatientsWhoStoppedTreatment(),
+            "onOrBefore=${reportingEndDate},location=${location}"));
     cd.setCompositionString(
         "initiatedArt AND NOT (consultation OR dead OR transfersOut OR stoppedTreatment)");
     return cd;
