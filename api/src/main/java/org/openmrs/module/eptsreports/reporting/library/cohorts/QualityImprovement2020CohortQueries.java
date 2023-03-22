@@ -5677,6 +5677,14 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
 
+    CohortDefinition pregnantWithCargaViralHigherThan50 =
+        QualityImprovement2020Queries.getMQ13DenB4_P4(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getHivViralLoadConcept().getConceptId(),
+            hivMetadata.getYesConcept().getConceptId(),
+            commonMetadata.getPregnantConcept().getConceptId(),
+            50);
+
     CohortDefinition breastfeedingWithCargaViralHigherThan50 =
         QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
@@ -5696,8 +5704,6 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition transferOut = getTranferredOutPatients();
 
     CohortDefinition H = getMQ13P4H();
-
-    CohortDefinition B4CV50 = getpregnantWithCargaViralHigherThan50();
 
     compositionCohortDefinition.addSearch(
         "children", EptsReportUtils.map(children, "effectiveDate=${revisionEndDate}"));
@@ -5721,7 +5727,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(H, MAPPING));
 
-    compositionCohortDefinition.addSearch("B4CV50", EptsReportUtils.map(B4CV50, MAPPING1));
+    compositionCohortDefinition.addSearch(
+        "B4CV50", EptsReportUtils.map(pregnantWithCargaViralHigherThan50, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "B5CV50", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan50, MAPPING1));
@@ -11184,49 +11191,6 @@ public class QualityImprovement2020CohortQueries {
     cd.setCompositionString("denominator AND diagnose");
 
     return cd;
-  }
-
-  public CohortDefinition getpregnantWithCargaViralHigherThan50() {
-    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    compositionCohortDefinition.setName(
-        "Cat 13 - DEN 18: # de MG na 1ª linha de TARV com registo de resultado de CV");
-
-    CohortDefinition pregnantClinicalWithCargaViralHigherThan50 =
-        QualityImprovement2020Queries.getMQ13DenB4_Clinica_CV_50(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getHivViralLoadConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId());
-
-    CohortDefinition pregnantMasterCardWithCargaViralHigherThan50 =
-        QualityImprovement2020Queries.getMQ13DenB4_Resumo_CV_50(
-            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-            hivMetadata.getHivViralLoadConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getPregnantConcept().getConceptId());
-
-    compositionCohortDefinition.addSearch(
-        "CV50Clinical",
-        EptsReportUtils.map(
-            pregnantClinicalWithCargaViralHigherThan50,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.addSearch(
-        "CV50MasterCard",
-        EptsReportUtils.map(
-            pregnantMasterCardWithCargaViralHigherThan50,
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    compositionCohortDefinition.setCompositionString("CV50Clinical AND CV50MasterCard");
-
-    return compositionCohortDefinition;
   }
 
   /**
