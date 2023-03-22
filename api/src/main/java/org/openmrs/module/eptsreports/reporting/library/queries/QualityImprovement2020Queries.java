@@ -1512,36 +1512,6 @@ public class QualityImprovement2020Queries {
     return compositionCohortDefinition;
   }
 
-  public static CohortDefinition getMQ13DenB5_PregnantCV50(
-      int adultoSeguimentoEncounterType,
-      int hivViralLoadConcept,
-      int yesConcept,
-      int breastfeedingConcept) {
-
-    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
-
-    compositionCohortDefinition.setName("");
-    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
-    compositionCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    CohortDefinition indicator =
-        getMQ13DenB5_P4(
-            adultoSeguimentoEncounterType,
-            hivViralLoadConcept,
-            yesConcept,
-            breastfeedingConcept,
-            50);
-
-    compositionCohortDefinition.addSearch("indicator", Mapped.mapStraightThrough(indicator));
-
-    compositionCohortDefinition.setCompositionString("indicator");
-
-    return compositionCohortDefinition;
-  }
-
   /**
    * <b> O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período de
    * revisão seguinte forma: </b>

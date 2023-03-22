@@ -5678,11 +5678,12 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId());
 
     CohortDefinition breastfeedingWithCargaViralHigherThan50 =
-        QualityImprovement2020Queries.getMQ13DenB5_PregnantCV50(
+        QualityImprovement2020Queries.getMQ13DenB5_P4(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
-            commonMetadata.getBreastfeeding().getConceptId());
+            commonMetadata.getBreastfeeding().getConceptId(),
+            50);
 
     CohortDefinition transferredIn =
         QualityImprovement2020Queries.getTransferredInPatients(
