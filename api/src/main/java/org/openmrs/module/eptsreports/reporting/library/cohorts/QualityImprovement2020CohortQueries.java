@@ -3917,7 +3917,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatients();
     CohortDefinition h = getMQC11NH(true);
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
