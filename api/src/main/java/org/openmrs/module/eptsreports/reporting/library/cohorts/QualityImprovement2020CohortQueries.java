@@ -3849,7 +3849,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatients();
 
     CohortDefinition g = getMQC11NG();
 
@@ -3977,7 +3977,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatients();
     CohortDefinition g = getMQC11NG();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4038,7 +4038,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
-    CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatients();
     CohortDefinition i = getMQC11NI();
     CohortDefinition babies = genericCohortQueries.getAgeInMonths(0, 9);
 
@@ -4114,7 +4114,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId());
 
-    CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatients();
     CohortDefinition h = getMQC11NH();
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
