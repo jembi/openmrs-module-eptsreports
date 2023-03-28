@@ -425,10 +425,8 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("6272", hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
         "SELECT patient_id "
@@ -524,23 +522,7 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                                            AND "
             + "                                                  e.encounter_datetime > transferout_date "
             + "                                            AND "
-            + "                                                  e.encounter_datetime <= curdate() "
-            + "                                          UNION "
-            + "                                          SELECT p.patient_id "
-            + "                                          FROM   patient p "
-            + "                                                     JOIN encounter e "
-            + "                                                          ON p.patient_id = "
-            + "                                                             e.patient_id "
-            + "                                                     JOIN obs o "
-            + "                                                          ON e.encounter_id = "
-            + "                                                             o.encounter_id "
-            + "                                          WHERE  p.voided = 0 "
-            + "                                            AND e.voided = 0 "
-            + "                                            AND e.encounter_type =  ${52} "
-            + "                                            AND e.location_id = :location "
-            + "                                            AND o.concept_id =  ${23866} "
-            + "                                            AND o.value_datetime > transferout_date "
-            + "                                            AND o.value_datetime <= curdate()); ";
+            + "                                                  e.encounter_datetime <= curdate())";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -579,15 +561,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             .getProgramWorkflowStateId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put("21", hivMetadata.getBuscaActivaEncounterType().getEncounterTypeId());
     map.put("23863", hivMetadata.getAutoTransferConcept().getConceptId());
     map.put("2016", hivMetadata.getDefaultingMotiveConcept().getConceptId());
+    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
 
     String query =
         "  SELECT patient_id  "
@@ -679,41 +660,25 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                                                                 e.patient_id  "
             + "                                                     WHERE  p.voided = 0  "
             + "                                                            AND e.voided = 0  "
-            + "                                                            AND e.encounter_type =  ${6}   "
+            + "                                                            AND e.encounter_type IN (${6}, ${9})   "
             + "                                                            AND e.location_id = :location  "
             + "                                                            AND  "
             + "                         e.encounter_datetime > transferout_date  "
             + "                                                            AND  "
             + "                         e.encounter_datetime <= CURRENT_DATE()  "
-            + "                                                     UNION  "
-            + "                                                     SELECT p.patient_id  "
-            + "                                                     FROM   patient p  "
-            + "                                                            JOIN encounter e  "
-            + "                                                              ON p.patient_id =  "
-            + "                                                                 e.patient_id  "
-            + "                                                            JOIN obs o  "
-            + "                                                              ON e.encounter_id =  "
-            + "                                                                 o.encounter_id  "
-            + "                                                     WHERE  p.voided = 0  "
-            + "                                                            AND e.voided = 0  "
-            + "                                                            AND e.encounter_type =  ${52}   "
-            + "                                                            AND e.location_id = :location  "
-            + "                                                            AND o.concept_id =  ${23866}   "
-            + "                                                            AND o.value_datetime >  "
-            + "                                                                transferout_date  "
-            + "                                                            AND o.value_datetime <= CURRENT_DATE()"
-            + "                                                                "
             + "                                                                UNION"
-            + "                                                                "
             + "                                                          SELECT p.patient_id"
             + "                                                            FROM   patient p"
-            + "                                                                    JOIN encounter e ON p.patient_id = e.patient_id"
+            + "                                                                    JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                                                    JOIN obs o ON e.encounter_id = o.encounter_id "
             + "                                                            WHERE  p.voided = 0"
-            + "                                                                    AND e.voided = 0"
-            + "                                                                    AND e.encounter_type IN (${9},${18})"
-            + "                                                                    AND e.location_id = :location"
-            + "                                                                    AND e.encounter_datetime > transferout_date"
-            + "                                                                    AND e.encounter_datetime <= CURRENT_DATE()) ";
+            + "                                                                    AND e.voided = 0 "
+            + "                                                                    AND o.voided = 0 "
+            + "                                                                    AND e.encounter_type = ${18} "
+            + "                                                                    AND o.concept_id = ${5096} "
+            + "                                                                    AND e.location_id = :location "
+            + "                                                                    AND o.value_datetime > DATE_SUB(transferout_date, INTERVAL 1 DAY) "
+            + "                                                                    AND o.value_datetime <= CURRENT_DATE()) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
@@ -749,12 +714,10 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
     map.put("8", hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId());
     map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1709", hivMetadata.getSuspendedTreatmentConcept().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
 
     String query =
         "  SELECT patient_id  "
@@ -823,47 +786,14 @@ public class ListOfPatientsDefaultersOrIITCohortQueries {
             + "                            GROUP BY p.patient_id"
             + "                           ) transferout  "
             + "                   GROUP  BY transferout.patient_id) max_transferout  "
-            + "           WHERE  max_transferout.patient_id NOT IN (SELECT p.patient_id  "
-            + "                                                     FROM   patient p  "
-            + "                                                            JOIN encounter e  "
-            + "                                                              ON p.patient_id =  "
-            + "                                                                 e.patient_id  "
-            + "                                                     WHERE  p.voided = 0  "
-            + "                                                            AND e.voided = 0  "
-            + "                                                            AND e.encounter_type =  ${6}   "
-            + "                                                            AND e.location_id = :location  "
-            + "                                                            AND  "
-            + "                         e.encounter_datetime > transferout_date  "
-            + "                                                            AND  "
-            + "                         e.encounter_datetime <= CURRENT_DATE()  "
-            + "                                                     UNION  "
-            + "                                                     SELECT p.patient_id  "
-            + "                                                     FROM   patient p  "
-            + "                                                            JOIN encounter e  "
-            + "                                                              ON p.patient_id =  "
-            + "                                                                 e.patient_id  "
-            + "                                                            JOIN obs o  "
-            + "                                                              ON e.encounter_id =  "
-            + "                                                                 o.encounter_id  "
-            + "                                                     WHERE  p.voided = 0  "
-            + "                                                            AND e.voided = 0  "
-            + "                                                            AND e.encounter_type =  ${52}   "
-            + "                                                            AND e.location_id = :location  "
-            + "                                                            AND o.concept_id =  ${23866}   "
-            + "                                                            AND o.value_datetime >  "
-            + "                                                                transferout_date  "
-            + "                                                            AND o.value_datetime <= CURRENT_DATE()"
-            + "                                                                "
-            + "                                                                UNION"
-            + "                                                                "
-            + "                                                          SELECT p.patient_id"
+            + "           WHERE  max_transferout.patient_id NOT IN ( SELECT p.patient_id "
             + "                                                            FROM   patient p"
             + "                                                                    JOIN encounter e ON p.patient_id = e.patient_id"
             + "                                                            WHERE  p.voided = 0"
             + "                                                                    AND e.voided = 0"
-            + "                                                                    AND e.encounter_type IN (${9},${18})"
-            + "                                                                    AND e.location_id = :location"
-            + "                                                                    AND e.encounter_datetime > transferout_date"
+            + "                                                                    AND e.encounter_type = ${18} "
+            + "                                                                    AND e.location_id = :location "
+            + "                                                                    AND e.encounter_datetime > transferout_date "
             + "                                                                    AND e.encounter_datetime <= CURRENT_DATE()) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
