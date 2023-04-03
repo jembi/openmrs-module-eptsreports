@@ -2928,7 +2928,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transfOut = getTranferredOutPatients();
 
-    CohortDefinition abandonedTarv = getPatientsWhoAbandonedTarvOnArtStartDate();
+    CohortDefinition abandonedTarv = getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
     CohortDefinition abandonedFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
     CohortDefinition abandonedSecondLine = getPatientsWhoAbandonedTarvOnOnSecondLineDate();
 
@@ -3005,7 +3005,7 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "ABANDONEDTARV", EptsReportUtils.map(abandonedTarv, MAPPING));
+        "ABANDONEDTARV", EptsReportUtils.map(abandonedTarv, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedFirstLine, MAPPING1));
@@ -5238,7 +5238,9 @@ public class QualityImprovement2020CohortQueries {
             MAPPING));
 
     cd.addSearch(
-        "ABANDONEDTARV", EptsReportUtils.map(getPatientsWhoAbandonedTarvOnArtStartDate(), MAPPING));
+        "ABANDONEDTARV",
+        EptsReportUtils.map(
+            getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate(), MAPPING1));
 
     cd.addSearch(
         "ABANDONED1LINE",
