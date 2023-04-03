@@ -9989,7 +9989,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                                 AND o.concept_id = ${6273}  "
             + "                                                                 AND o.value_coded = ${1707}  "
             + "                                                                 AND e.location_id = :location  "
-            + "                                                                 AND e.encounter_datetime > DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
+            + "                                                                 AND e.encounter_datetime >= DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
             + "                                                                 AND e.encounter_datetime <= end_period.first_gestante  "
             + "                                                               GROUP BY p.patient_id  "
             + "                                                               UNION  "
@@ -10004,8 +10004,8 @@ public class QualityImprovement2020CohortQueries {
             + "                                                                 AND o.concept_id = ${6272}  "
             + "                                                                 AND o.value_coded = ${1707}  "
             + "                                                                 AND e.location_id = :location  "
-            + "                                                                 AND e.encounter_datetime > DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
-            + "                                                                 AND e.encounter_datetime <= end_period.first_gestante  "
+            + "                                                                 AND o.obs_datetime >= DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
+            + "                                                                 AND o.obs_datetime <= end_period.first_gestante  "
             + "                                                               GROUP BY p.patient_id  "
             + "                                                           ) abandoned GROUP BY abandoned.patient_id";
 
