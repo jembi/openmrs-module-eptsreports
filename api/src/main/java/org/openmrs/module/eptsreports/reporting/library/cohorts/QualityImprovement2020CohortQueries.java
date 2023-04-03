@@ -5537,7 +5537,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ13P4H() {
+  public CohortDefinition getMQ13P4H(int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
@@ -5573,7 +5573,8 @@ public class QualityImprovement2020CohortQueries {
             + "                AND e.encounter_type = ${6}  "
             + "                AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "                AND o.concept_id = ${856}  "
-            + "                AND o.value_numeric >= 1000  "
+            + "                AND o.value_numeric >=  "
+            + vlQuantity
             + "        GROUP BY p.patient_id) vl ON vl.patient_id = p.patient_id  "
             + "    WHERE  "
             + "        p.voided = 0 AND e.voided = 0  "
@@ -5708,7 +5709,9 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transferOut = getTranferredOutPatients();
 
-    CohortDefinition H = getMQ13P4H();
+    CohortDefinition H = getMQ13P4H(1000);
+
+    CohortDefinition H50 = getMQ13P4H(50);
 
     compositionCohortDefinition.addSearch(
         "children", EptsReportUtils.map(children, "effectiveDate=${revisionEndDate}"));
@@ -5731,6 +5734,8 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(H, MAPPING));
+
+    compositionCohortDefinition.addSearch("H50", EptsReportUtils.map(H50, MAPPING));
 
     compositionCohortDefinition.addSearch(
         "B4CV50", EptsReportUtils.map(pregnantWithCargaViralHigherThan50, MAPPING1));
@@ -5758,7 +5763,7 @@ public class QualityImprovement2020CohortQueries {
             "((B1 AND B2 AND H) AND NOT (B4 or B5 or E or F)) AND children ");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND B4CV50 AND H) AND NOT (B5CV50 or E or F)");
+            "(B1 AND B4CV50 AND H50) AND NOT (B5CV50 or E or F)");
       }
     }
     return compositionCohortDefinition;
