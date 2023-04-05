@@ -123,7 +123,7 @@ public class ViralLoadQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        "SELECT p.patient_id FROM  patient p "
+        "SELECT p.patient_id, DATE(e.encounter_datetime) vl_date FROM  patient p"
             + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 "
@@ -134,7 +134,7 @@ public class ViralLoadQueries {
             + " AND DATE(e.encounter_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate AND "
             + " e.location_id=:location "
             + " UNION "
-            + " SELECT p.patient_id FROM  patient p "
+            + " SELECT p.patient_id, DATE(o.obs_datetime) vl_date FROM  patient p "
             + " INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + " INNER JOIN obs o ON e.encounter_id=o.encounter_id "
             + " WHERE p.voided=0 "

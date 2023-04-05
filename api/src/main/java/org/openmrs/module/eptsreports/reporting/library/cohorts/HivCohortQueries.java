@@ -43,6 +43,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupC
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.ResumoMensalQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -93,7 +94,11 @@ public class HivCohortQueries {
     sql.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sql.addParameter(new Parameter("endDate", "End Date", Date.class));
     sql.addParameter(new Parameter("location", "Location", Location.class));
-    sql.setQuery(ViralLoadQueries.getPatientsHavingViralLoadInLast12Months());
+    String vlQuery =
+        new EptsQueriesUtil()
+            .patientIdQueryBuilder(ViralLoadQueries.getPatientsHavingViralLoadInLast12Months())
+            .toString();
+    sql.setQuery(vlQuery);
     return sql;
   }
 

@@ -23,7 +23,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.mq.BreastfeedingPregnantCalculation4MQ;
 import org.openmrs.module.eptsreports.reporting.calculation.pvls.BreastfeedingPregnantCalculation;
-import org.openmrs.module.eptsreports.reporting.calculation.pvls.OnArtForMoreThanXmonthsCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
@@ -48,7 +47,8 @@ public class TxPvlsCohortQueries {
   private CommonQueries commonQueries;
 
   @Autowired
-  public TxPvlsCohortQueries(HivCohortQueries hivCohortQueries, HivMetadata hivMetadata, CommonQueries commonQueries) {
+  public TxPvlsCohortQueries(
+      HivCohortQueries hivCohortQueries, HivMetadata hivMetadata, CommonQueries commonQueries) {
     this.hivCohortQueries = hivCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonQueries = commonQueries;
@@ -63,16 +63,27 @@ public class TxPvlsCohortQueries {
   public CohortDefinition getPatientsWhoAreMoreThan3MonthsOnArt(
       List<EncounterType> encounterTypeList) {
 
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("ART for less than 3 months");
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String artStart = commonQueries.getARTStartDate(true);
     String viralLoad = ViralLoadQueries.getPatientsHavingViralLoadInLast12Months();
-    CalculationCohortDefinition cd =
-        new CalculationCohortDefinition(
-            "On ART for at least 3 months for pvls",
-            Context.getRegisteredComponents(OnArtForMoreThanXmonthsCalculation.class).get(0));
-    cd.addParameter(new Parameter("onOrBefore", "On or before Date", Date.class));
-    cd.addParameter(new Parameter("location", "Location", Location.class));
-    cd.addCalculationParameter("listOfEncounters", encounterTypeList);
+
+    String query =
+        "SELECT vl.patient_id FROM ( "
+            + "                                   SELECT patient_id, MAX(vl_date) vl_date"
+            + "                                   FROM ( "
+            + viralLoad
+            + "                                        ) viral GROUP BY viral.patient_id"
+            + "                                  ) vl "
+            + "     INNER JOIN ("
+            + artStart
+            + ") art ON art.patient_id = vl.patient_id "
+            + "WHERE TIMESTAMPDIFF(DAY, art.first_pickup, vl.vl_date) > 90";
+
+    cd.setQuery(query);
     return cd;
   }
 
@@ -192,9 +203,9 @@ public class TxPvlsCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
     String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
-   // cd.addSearch(
-     //   "results",
-       // EptsReportUtils.map(hivCohortQueries.getPatientsViralLoadWithin12Months(), mappings));
+    cd.addSearch(
+        "results",
+        EptsReportUtils.map(hivCohortQueries.getPatientsViralLoadWithin12Months(), mappings));
     cd.addSearch(
         "onArtLongEnough",
         EptsReportUtils.map(
