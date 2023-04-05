@@ -180,7 +180,7 @@ public class TxPvlsCohortQueries {
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMasterCardEncounterType(),
                     hivMetadata.getFsrEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("supp AND onArtLongEnough");
     return cd;
   }
@@ -252,7 +252,7 @@ public class TxPvlsCohortQueries {
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMasterCardEncounterType(),
                     hivMetadata.getFsrEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.addSearch("Routine", EptsReportUtils.map(getPatientsWhoAreOnRoutine(), mappings));
     cd.setCompositionString("(results AND onArtLongEnough) AND Routine");
     return cd;
@@ -289,7 +289,7 @@ public class TxPvlsCohortQueries {
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMasterCardEncounterType(),
                     hivMetadata.getFsrEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.addSearch("Target", EptsReportUtils.map(getPatientsWhoAreOnTarget(), mappings));
     cd.setCompositionString("(results AND onArtLongEnough) AND Target");
     return cd;
