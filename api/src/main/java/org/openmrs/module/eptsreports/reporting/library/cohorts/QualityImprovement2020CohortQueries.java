@@ -4926,16 +4926,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition secondLine6Months = getPatientsOnRegimeArvSecondLineB2NEWP1_2();
 
-    CohortDefinition changeRegimen6Months =
-        commonCohortQueries.getMOHPatientsOnTreatmentFor6Months(
-            true,
-            hivMetadata.getAdultoSeguimentoEncounterType(),
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
-            Arrays.asList(
-                commonMetadata.getAlternativeFirstLineConcept(),
-                commonMetadata.getRegimeChangeConcept(),
-                hivMetadata.getNoConcept()));
+    CohortDefinition changeRegimen6Months = getMOHPatientsOnTreatmentFor6Months();
 
     CohortDefinition B3E =
         commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
@@ -5040,7 +5031,7 @@ public class QualityImprovement2020CohortQueries {
         "B3",
         EptsReportUtils.map(
             changeRegimen6Months,
-            "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B3E",
@@ -5662,7 +5653,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition adult = this.ageCohortQueries.createXtoYAgeCohort("adult", 15, 200);
 
     CohortDefinition patientsFromFichaClinicaLinhaTerapeutica =
-            getPatientsOnArtFirstLineForMoreThanSixMonthsFromArtStartDate();
+        getPatientsOnArtFirstLineForMoreThanSixMonthsFromArtStartDate();
 
     CohortDefinition patientsFromFichaClinicaCargaViral = getB2_13(useE53);
 
@@ -11959,11 +11950,11 @@ public class QualityImprovement2020CohortQueries {
    * <b>MQC11B2</b>: Utentes em 1ª Linha elegíveis ao pedido de CV <br>
    *
    * <ul>
-   *   <li>incluindo os utentes há pelo menos 6 meses na 1ª Linha de TARV, ou seja, incluindo
-   *   todos os utentes que têm o último registo da “Linha Terapêutica” na Ficha Clínica durante
-   *   o período de revisão igual a “1ª Linha” (última consulta, “Data 1ª Linha”>= “Data Início Revisão”
-   *   e <= “Data Fim Revisão”), sendo a “Data 1ª Linha” menos (-) “Data do Início TARV” registada na Ficha Resumo
-   *   maior ou igual (>=) a 6 meses
+   *   <li>incluindo os utentes há pelo menos 6 meses na 1ª Linha de TARV, ou seja, incluindo todos
+   *       os utentes que têm o último registo da “Linha Terapêutica” na Ficha Clínica durante o
+   *       período de revisão igual a “1ª Linha” (última consulta, “Data 1ª Linha”>= “Data Início
+   *       Revisão” e <= “Data Fim Revisão”), sendo a “Data 1ª Linha” menos (-) “Data do Início
+   *       TARV” registada na Ficha Resumo maior ou igual (>=) a 6 meses
    * </ul>
    *
    * @return CohortDefinition
@@ -12004,11 +11995,10 @@ public class QualityImprovement2020CohortQueries {
             + "                         AND e.voided = 0  "
             + "                         AND e.location_id = :location  "
             + "                         AND o.voided = 0  "
-            + "                         AND o.concept_id = ${21151}  "
             + "                         AND e.encounter_datetime BETWEEN  "
             + "                           :startDate AND :revisionEndDate  "
-            + "                       GROUP  BY p.patient_id) filtered  "
-            + "                      ON p.patient_id = filtered.patient_id  "
+            + "                       GROUP  BY p.patient_id) first_consultation  "
+            + "                      ON p.patient_id = first_consultation.patient_id  "
             + "           INNER JOIN (  "
             + "    SELECT p.patient_id, Min(o.value_datetime) art_date  "
             + "            FROM patient p  "
@@ -12031,13 +12021,95 @@ public class QualityImprovement2020CohortQueries {
             + "  AND e.location_id = :location  "
             + "  AND e.voided = 0  "
             + "  AND o.voided = 0  "
-            + "  AND e.encounter_datetime = filtered.encounter_datetime  "
+            + "  AND e.encounter_datetime = first_consultation.encounter_datetime  "
             + "  AND TIMESTAMPDIFF(MONTH, art_start.art_date, e.encounter_datetime) >= 6 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
-    System.out.println(sqlCohortDefinition.getQuery());
+
+    return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>MQC11B2</b>: Utentes em 1ª Linha elegíveis ao pedido de CV <br>
+   *
+   * <ul>
+   *   Todos utentes que Mudaram de Regime na 1ª Linha de TARV há pelo menos 6 meses, ou seja,
+   *   incluindo todos os utentes que têm o último registo da “Alternativa a Linha – 1ª Linha” na
+   *   Ficha Resumo, sendo a “Data Última Alternativa 1ª Linha” menos (-) “Data Última Consulta”
+   *   maior ou igual (>=) a 6 meses
+   * </ul>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getMOHPatientsOnTreatmentFor6Months() {
+
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "utentes que Mudaram de Regime na 1ª Linha de TARV há pelo menos 6 meses");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("21190", commonMetadata.getRegimenAlternativeToFirstLineConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id  "
+            + "FROM   patient p  "
+            + "           INNER JOIN encounter e  "
+            + "                      ON e.patient_id = p.patient_id  "
+            + "           INNER JOIN obs o  "
+            + "                      ON o.encounter_id = e.encounter_id  "
+            + "           INNER JOIN (SELECT p.patient_id,  "
+            + "                              Max(e.encounter_datetime) AS encounter_datetime  "
+            + "                       FROM   patient p  "
+            + "                                  INNER JOIN encounter e  "
+            + "                                             ON e.patient_id = p.patient_id  "
+            + "                                  JOIN obs o  "
+            + "                                       ON o.encounter_id = e.encounter_id  "
+            + "                       WHERE  e.encounter_type = ${6}  "
+            + "                         AND p.voided = 0  "
+            + "                         AND e.voided = 0  "
+            + "                         AND e.location_id = :location  "
+            + "                         AND o.voided = 0  "
+            + "                         AND e.encounter_datetime BETWEEN  "
+            + "                           :startDate AND :revisionEndDate  "
+            + "                       GROUP  BY p.patient_id) first_consultation  "
+            + "                      ON p.patient_id = first_consultation.patient_id  "
+            + "           INNER JOIN (  "
+            + "    SELECT p.patient_id, MAX(o.obs_datetime) first_line_date  "
+            + "    FROM patient p  "
+            + "             INNER JOIN encounter e  "
+            + "                        ON p.patient_id = e.patient_id  "
+            + "             INNER JOIN obs o  "
+            + "                        ON e.encounter_id = o.encounter_id  "
+            + "    WHERE  p.voided = 0  "
+            + "      AND e.voided = 0  "
+            + "      AND o.voided = 0  "
+            + "      AND e.encounter_type = ${53}  "
+            + "      AND o.concept_id = ${21190}  "
+            + "      AND o.value_coded IS NOT NULL  "
+            + "      AND o.obs_datetime BETWEEN  :startDate AND :revisionEndDate  "
+            + "      AND e.location_id = :location  "
+            + "    GROUP  BY p.patient_id  "
+            + ") regimen_change on regimen_change.patient_id = p.patient_id  "
+            + "WHERE e.encounter_type = ${53} "
+            + "  AND o.concept_id = ${21190}  "
+            + "  AND o.value_coded IS NOT NULL  "
+            + "  AND o.obs_datetime = regimen_change.first_line_date  "
+            + "  AND e.location_id = :location  "
+            + "  AND e.voided = 0  "
+            + "  AND o.voided = 0  "
+            + "  AND TIMESTAMPDIFF(MONTH, o.obs_datetime, first_consultation.encounter_datetime) >= 6";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
   }
