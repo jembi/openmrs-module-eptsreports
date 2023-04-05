@@ -69,7 +69,7 @@ public class TxPvlsCohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String artStart = commonQueries.getARTStartDate(true);
-    String viralLoad = ViralLoadQueries.getPatientsHavingViralLoadInLast12Months();
+    String viralLoad = ViralLoadQueries.getPatientsHavingViralLoadInLast12Months(encounterTypeList);
 
     String query =
         "SELECT vl.patient_id FROM ( "

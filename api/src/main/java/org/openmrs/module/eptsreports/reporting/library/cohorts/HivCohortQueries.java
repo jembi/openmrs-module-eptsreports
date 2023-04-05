@@ -28,11 +28,10 @@ import static org.openmrs.module.eptsreports.reporting.calculation.generic.Targe
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.SERODISCORDANT;
 import static org.openmrs.module.eptsreports.reporting.calculation.generic.TargetGroupCalculation.TargetGroup.TRUCK_DRIVER;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.ProgramWorkflowState;
@@ -94,9 +93,16 @@ public class HivCohortQueries {
     sql.addParameter(new Parameter("startDate", "Start Date", Date.class));
     sql.addParameter(new Parameter("endDate", "End Date", Date.class));
     sql.addParameter(new Parameter("location", "Location", Location.class));
+
+    List<EncounterType> encounters = Arrays.asList(
+            hivMetadata.getMisauLaboratorioEncounterType(),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getPediatriaSeguimentoEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            hivMetadata.getFsrEncounterType());
     String vlQuery =
         new EptsQueriesUtil()
-            .patientIdQueryBuilder(ViralLoadQueries.getPatientsHavingViralLoadInLast12Months())
+            .patientIdQueryBuilder(ViralLoadQueries.getPatientsHavingViralLoadInLast12Months(encounters))
             .toString();
     sql.setQuery(vlQuery);
     return sql;
