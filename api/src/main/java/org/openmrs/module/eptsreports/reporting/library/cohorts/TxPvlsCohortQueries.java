@@ -216,7 +216,7 @@ public class TxPvlsCohortQueries {
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMasterCardEncounterType(),
                     hivMetadata.getFsrEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("onArtLongEnough");
     return cd;
   }
