@@ -81,7 +81,7 @@ public class TxPvlsCohortQueries {
             + "     INNER JOIN ("
             + artStart
             + ") art ON art.patient_id = vl.patient_id "
-            + "WHERE TIMESTAMPDIFF(DAY, art.first_pickup, vl.vl_date) > 90";
+            + "WHERE TIMESTAMPDIFF(DAY, art.first_pickup, vl.vl_date) >= 90";
 
     cd.setQuery(query);
     return cd;

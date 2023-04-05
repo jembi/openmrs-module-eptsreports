@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
@@ -114,14 +113,24 @@ public class ViralLoadQueries {
    * @param vlQualitativeConceptQuestion
    * @return {@link String}
    */
-  public static String getPatientsHavingViralLoadInLast12Months(List<EncounterType> encounterTypeList) {
+  public static String getPatientsHavingViralLoadInLast12Months(
+      List<EncounterType> encounterTypeList) {
 
     HivMetadata hivMetadata = new HivMetadata();
     Map<String, Integer> map = new HashMap<>();
 
-    List<Integer> encountersId = encounterTypeList.stream().map(encounterType -> encounterType.getEncounterTypeId()).collect(Collectors.toList());
-    List<Integer> notEncounter53 = encountersId.stream().filter(e -> e != 53).collect(Collectors.toList());
-    List<Integer> encounter53 = encountersId.stream().filter(e -> e == 53).collect(Collectors.toList());
+    List<Integer> encountersId =
+        encounterTypeList.stream()
+            .map(encounterType -> encounterType.getEncounterTypeId())
+            .collect(Collectors.toList());
+    List<Integer> notEncounter53 =
+        encountersId.stream()
+            .filter(e -> e != hivMetadata.getMasterCardEncounterType().getEncounterTypeId())
+            .collect(Collectors.toList());
+    List<Integer> encounter53 =
+        encountersId.stream()
+            .filter(e -> e == hivMetadata.getMasterCardEncounterType().getEncounterTypeId())
+            .collect(Collectors.toList());
 
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
@@ -133,7 +142,9 @@ public class ViralLoadQueries {
             + " WHERE p.voided=0 "
             + " AND e.voided=0 "
             + " AND o.voided=0 "
-            + " AND e.encounter_type IN ("+ StringUtils.join(notEncounter53, ",") +") "
+            + " AND e.encounter_type IN ("
+            + StringUtils.join(notEncounter53, ",")
+            + ") "
             + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
             + " AND DATE(e.encounter_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate AND "
             + " e.location_id=:location "
@@ -144,7 +155,9 @@ public class ViralLoadQueries {
             + " WHERE p.voided=0 "
             + " AND e.voided=0 "
             + " AND o.voided=0 "
-            + " AND e.encounter_type IN ("+ StringUtils.join(encounter53, ",") +") "
+            + " AND e.encounter_type IN ("
+            + StringUtils.join(encounter53, ",")
+            + ") "
             + " AND ((o.concept_id=${856} AND o.value_numeric IS NOT NULL) OR (o.concept_id=${1305} AND o.value_coded IS NOT NULL)) "
             + "AND DATE(o.obs_datetime) BETWEEN date_add(date_add(:endDate, interval -12 MONTH), interval 1 day) AND :endDate "
             + " AND e.location_id=:location ";
