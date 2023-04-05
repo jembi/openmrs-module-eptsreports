@@ -38,9 +38,6 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static org.openmrs.module.eptsreports.reporting.library.queries.TxPvlsQueries.getPatientsMarkedAsPregnentInInitialConsultation;
-import static org.openmrs.module.eptsreports.reporting.library.queries.TxPvlsQueries.getPatientsThatHaveNumberOfWeeksPregnantRegisteredInIinitialOrFollow;
-
 /** Defines all of the TxPvls Cohort Definition instances we want to expose for EPTS */
 @Component
 public class TxPvlsCohortQueries {
@@ -100,9 +97,6 @@ public class TxPvlsCohortQueries {
 
     return cd;
   }
-
-
-
 
   /**
    * <b>Description</b> Breast feeding women with viral load suppression
@@ -539,7 +533,6 @@ public class TxPvlsCohortQueries {
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("results AND pregnant");
     return cd;
-
   }
 
   /**
@@ -560,7 +553,6 @@ public class TxPvlsCohortQueries {
     cd.addCalculationParameter("state", state);
     cd.addCalculationParameter("encounterTypeList", encounterTypeList);
     return cd;
-
   }
   /**
    * <b>Description</b>Get patients who are breastfeeding or pregnant controlled by parameter This
@@ -625,6 +617,11 @@ public class TxPvlsCohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("6331", hivMetadata.getBpostiveConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
@@ -642,29 +639,41 @@ public class TxPvlsCohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        "SELECT last_vl.patient_id  "
-            + "FROM  (SELECT ultima.patient_id,  "
-            + "              Max(ultima.last_date) AS last_date  "
-            + "       FROM  ( "
+        "SELECT last_vl.patient_id "
+            + " FROM  (SELECT ultima.patient_id, "
+            + " Max(ultima.last_date) AS last_date "
+            + " FROM  ( "
             + getLastVlResult()
             + " )ultima "
-            + "GROUP  BY ultima.patient_id)last_vl "
-            + "INNER JOIN ("
-            + "SELECT lactantes.patient_id,  "
-            + "                         Max(lactantes.last_date) AS breastfeeding_date  "
-            + "                  FROM ( "
+            + " GROUP  BY ultima.patient_id)last_vl "
+            + " INNER JOIN ("
+            + " SELECT lactantes.patient_id, "
+            + " Max(lactantes.last_date) AS breastfeeding_date "
+            + " FROM ( "
             + getMaxBreastfeeding()
-            + ")lactantes  "
-            + "                  GROUP  BY lactantes.patient_id "
-            + ")AS breastfeeding  "
-            + "              ON last_vl.patient_id = breastfeeding.patient_id"
+            + " )lactantes "
+            + " GROUP  BY lactantes.patient_id "
+            + " )AS breastfeeding  "
+            + "  ON last_vl.patient_id = breastfeeding.patient_id "
             + " LEFT JOIN ( "
-            + "_____________________________"
+            + "select pregnant.patient_id, pregnant.pregnancy_date AS pregnancy_date "
+            + " FROM  ( "
+            + " SELECT ultima.patient_id, MAX(ultima.last_Date) as ultima "
+            + " FROM ("
+            + getLastVlResult()
+            + " ) AS ultima "
+            + " GROUP  BY ultima.patient_id) AS last_vl "
+            + " INNER JOIN ("
+            + "SELECT gravidas.patient_id, MAX(gravidas.last_Date) as pregnancy_date from ("
+            + getMaxPregnant()
+            + " ) gravidas "
+            + " group by gravidas.patient_id)as pregnant on last_vl.patient_id = pregnant.patient_id "
+            + " WHERE pregnant.pregnancy_date between date_sub(last_vl.ultima, interval 9 month) and last_vl.ultima"
             + " ) AS max_pregnant On max_pregnant.patient_id= breastfeeding.patient_id "
-            + "WHERE breastfeeding.breastfeeding_date BETWEEN Date_sub(last_vl.last_date, interval 18 month) AND last_vl.last_date  "
-            + "AND (breastfeeding.breastfeeding_date is not NULL  "
-            + "AND breastfeeding.breastfeeding_date > max_pregnant.pregnancy_date)  "
-            + "OR max_pregnant.pregnancy_date is null ";
+            + " WHERE breastfeeding.breastfeeding_date BETWEEN Date_sub(last_vl.last_date, interval 18 month) AND last_vl.last_date "
+            + " AND (breastfeeding.breastfeeding_date is not NULL "
+            + " AND breastfeeding.breastfeeding_date > max_pregnant.pregnancy_date) "
+            + " OR max_pregnant.pregnancy_date is null ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String mappedQuery = stringSubstitutor.replace(query);
@@ -693,84 +702,86 @@ public class TxPvlsCohortQueries {
         .union(TxPvlsQueries.getBreastfeedingOnFichaResumo())
         .union(TxPvlsQueries.getBreastfeedingOnFSR())
         .buildQuery();
-
-
   }
-
 
   public CohortDefinition getPregnantWoman() {
-      SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-      sqlCohortDefinition.setName(" Patients disaggregation - Pregnant");
-      sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-      sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-      Map<String, Integer> map = new HashMap<>();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(" Patients disaggregation - Pregnant");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
 
-
-
-      map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-      map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
-      map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-      map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-      map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
-      map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
-      map.put("1065", hivMetadata.getYesConcept().getConceptId());
-      map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
-      map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
-      map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
-      map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-      map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
-      map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-      map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("6331", hivMetadata.getBpostiveConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-            "SELECT last_vl.patient_id  "
-                    + "FROM  (SELECT ultima.patient_id,  "
-                    + "              Max(ultima.last_date) AS last_date  "
-                    + "       FROM  ( "
-                    + getLastVlResult()
-                    + " )ultima   GROUP BY ultima.patient_id ) as last_vl  "
-                    + "INNER JOIN(  " +
-                    " SELECT gravidas.patient_id, MAX(gravidas.last_Date) as pregnancy_date from ( " +getMaxPregnant()+ " ) gravidas " +
-                    " group by gravidas.patient_id ) as pregnant on last_vl.patient_id = pregnant.patient_id "
-                    +" left join ( " +
+        "SELECT last_vl.patient_id  "
+            + "FROM  (SELECT ultima.patient_id,  "
+            + "              Max(ultima.last_date) AS last_date  "
+            + "       FROM  ( "
+            + getLastVlResult()
+            + " )ultima   GROUP BY ultima.patient_id ) as last_vl  "
+            + "INNER JOIN(  "
+            + " SELECT gravidas.patient_id, MAX(gravidas.last_Date) as pregnancy_date from ( "
+            + getMaxPregnant()
+            + " ) gravidas "
+            + " group by gravidas.patient_id ) as pregnant on last_vl.patient_id = pregnant.patient_id "
+            + " left join ( "
+            + " SELECT last_vl.patient_id, breastfeeding.breastfeeding_date "
+            + " FROM(  SELECT ultima.patient_id, MAX(ultima.last_date) AS last_date "
+            + " FROM ("
+            + getLastVlResult()
+            + " ) as ultima   GROUP BY ultima.patient_id ) as last_vl  "
+            + "  inner join (  "
+            + "        SELECT lactantes.patient_id, MAX(lactantes.last_date) AS breastfeeding_date"
+            + "        FROM ( "
+            + getMaxBreastfeeding()
+            + ") AS lactantes "
+            + "        GROUP BY lactantes.patient_id "
+            + " ) AS breastfeeding On last_vl.patient_id = breastfeeding.patient_id "
+            + "  WHERE breastfeeding.breastfeeding_date BETWEEN DATE_SUB( last_vl.last_date, interval 18 MONTH ) AND last_vl.last_date "
+            + " ) as brestfeading on brestfeading.patient_id = pregnant.patient_id "
+            + " WHERE pregnant.pregnancy_date between date_sub(last_vl.last_date, interval 9 month) AND last_vl.last_date "
+            + "    and (pregnant.pregnancy_date is not null and pregnant.pregnancy_date >= brestfeading.breastfeeding_date) "
+            + "   or brestfeading.breastfeeding_date is null"
+            + " group by pregnant.patient_id ";
+    ;
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    String mappedQuery = stringSubstitutor.replace(query);
+    sqlCohortDefinition.setQuery(mappedQuery);
+    return sqlCohortDefinition;
+  }
 
-                    "    SELECT last_vl.patient_id, breastfeeding.breastfeeding_date " +
-                    "    FROM(  SELECT ultima.patient_id, MAX(ultima.last_date) AS last_date " +
-                    " FROM ("+
-                     getLastVlResult() + " )ultima   GROUP BY ultima.patient_id ) as last_vl  "
-                    +"  inner join (  " +
-                    "        SELECT lactantes.patient_id, MAX(lactantes.last_date) AS breastfeeding_date" +
-                    "        FROM ( "+
-                    getMaxBreastfeeding()+
-
-                    " lactantes" +
-                    "        GROUP BY lactantes.patient_id " +
-                    " ) AS breastfeeding On last_vl.patient_id = breastfeeding.patient_id " +
-                    "  WHERE breastfeeding.breastfeeding_date BETWEEN DATE_SUB( last_vl.last_date, interval 18 MONTH ) AND last_vl.last_date " +
-                    " ) as brestfeading on brestfeading.patient_id = pregnant.patient_id " +
-                    " WHERE pregnant.pregnancy_date between date_sub(last_vl.ultima, interval 9 month) " +
-                    "    and (pregnant.pregnancy_date is not null and pregnant.pregnancy_date >= brestfeading.breastfeeding_date) " +
-                    "   or brestfeading.breastfeeding_date is null" +
-                    " group by pregnant.patient_id "
-
-                    ;
-;
-      StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-      String mappedQuery = stringSubstitutor.replace(query);
-      sqlCohortDefinition.setQuery(mappedQuery);
-      return sqlCohortDefinition;
-    }
-  public static String getMaxPregnant(){
+  public static String getMaxPregnant() {
     return new EptsQueriesUtil()
-            .unionBuilder(TxPvlsQueries.getPatientsMarkedAsPregnentInInitialConsultation())
-            .union(TxPvlsQueries.getPatientsThatHaveNumberOfWeeksPregnantRegisteredInIinitialOrFollow ())
-            .union(TxPvlsQueries.getPatientsWithDeliverDueDateInInitialFlowUp())
-            .union(TxPvlsQueries.getPatientsThatStartedARTForBeingInCriterioParaInicioTarv())
-            .union(TxPvlsQueries.getPatientsEnrolledonPreventionoftheVerticalTransmission())
-            .union(TxPvlsQueries.getPatientsRegisteredAsPregnantFichaResumoBetweenStartAndEndDate())
-            .union(TxPvlsQueries.getPatientsthatFemaleAndHaveRegisteredAsPregnantFichaClinicaMasterCardBetweenStartandDate())
-            .union(TxPvlsQueries.getPatientWhoActualmenteEncontraGravidaMarkedSim())
-            .buildQuery();
+        .unionBuilder(TxPvlsQueries.getPatientsMarkedAsPregnentInInitialConsultation())
+        .union(TxPvlsQueries.getPatientsThatHaveNumberOfWeeksPregnantRegisteredInIinitialOrFollow())
+        .union(TxPvlsQueries.getPatientsWithDeliverDueDateInInitialFlowUp())
+        .union(TxPvlsQueries.getPatientsThatStartedARTForBeingInCriterioParaInicioTarv())
+        .union(TxPvlsQueries.getPatientsEnrolledonPreventionoftheVerticalTransmission())
+        .union(TxPvlsQueries.getPatientsRegisteredAsPregnantFichaResumoBetweenStartAndEndDate())
+        .union(
+            TxPvlsQueries
+                .getPatientsthatFemaleAndHaveRegisteredAsPregnantFichaClinicaMasterCardBetweenStartandDate())
+        .union(TxPvlsQueries.getPatientWhoActualmenteEncontraGravidaMarkedSim())
+        .buildQuery();
   }
-  }
-
+}
