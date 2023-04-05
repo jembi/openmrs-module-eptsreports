@@ -33,7 +33,7 @@ public class TxPvlsQueries {
         + "                  AND        p.voided =0 "
         + "                  AND        o.voided =0 "
         + "                  AND        o2.voided =0 "
-        + "                  AND        e.encounter_datetime BETWEEN date_sub(:endDate, interval 12 month) AND        :endDate "
+        + "                  AND        e.encounter_datetime BETWEEN date_sub(:endDate, interval 12 month) AND :endDate "
         + "                  GROUP BY   p.patient_id";
   }
 
@@ -47,17 +47,17 @@ public class TxPvlsQueries {
    *     </blockquote>
    */
   public static String getVlResultOnFichaResumo() {
-    return "SELECT     p.patient_id, "
+    return " SELECT     p.patient_id, "
         + "           Max(o.obs_datetime)AS last_date "
-        + "FROM       patient p "
-        + "INNER JOIN encounter e "
-        + "ON         e.patient_id =p.patient_id "
-        + "INNER JOIN obs o "
-        + "ON         o.encounter_id =e.encounter_id "
-        + "INNER JOIN obs o2 "
-        + "ON         o2.encounter_id = e.encounter_id "
-        + "WHERE      e.encounter_type =${53} "
-        + "AND        (( "
+        + " FROM       patient p "
+        + " INNER JOIN encounter e "
+        + " ON         e.patient_id =p.patient_id "
+        + " INNER JOIN obs o "
+        + " ON         o.encounter_id =e.encounter_id "
+        + " INNER JOIN obs o2 "
+        + " ON         o2.encounter_id = e.encounter_id "
+        + " WHERE      e.encounter_type =${53} "
+        + " AND        (( "
         + "                                 o.concept_id = ${856} "
         + "                      AND        o.value_numeric IS NOT NULL) "
         + "           OR         ( "
@@ -67,7 +67,7 @@ public class TxPvlsQueries {
         + "AND        p.voided =0 "
         + "AND        o.voided =0 "
         + "AND        o2.voided =0 "
-        + "AND        o.obs_datetime BETWEEN date_sub(:endDate, interval 12 month) AND        :endDate "
+        + "AND        o.obs_datetime BETWEEN date_sub(:endDate, interval 12 month) AND :endDate "
         + "GROUP BY   p.patient_id";
   }
 
@@ -100,7 +100,7 @@ public class TxPvlsQueries {
         + "                                 AND p.voided = 0 "
         + "                                 AND e.voided = 0 "
         + "                                 AND p2.voided = 0 "
-        + "                          GROUP  BY p.patient_id";
+        + "                          GROUP  BY p.patient_id ";
   }
 
   /**
@@ -109,7 +109,7 @@ public class TxPvlsQueries {
    * <blockquote>
    *
    * <li>Patients that are female and have registered as breastfeeding in follow up consultation
-   *     within the period range
+   *      (Ficha de Seguimento Adulto) within the period range
    *
    *     </blockquote>
    */
@@ -133,7 +133,7 @@ public class TxPvlsQueries {
         + "                                 AND e.voided = 0 "
         + "                                 AND p.voided = 0 "
         + "                                 AND p2.voided = 0 "
-        + "                          GROUP  BY p.patient_id";
+        + "                          GROUP  BY p.patient_id ";
   }
 
   /**
@@ -168,7 +168,7 @@ public class TxPvlsQueries {
         + "                                 AND p2.voided = 0 "
         + "                                 AND e.location_id = :location "
         + "                                 AND e.encounter_datetime <= :endDate "
-        + "                          GROUP  BY p.patient_id";
+        + "                          GROUP  BY p.patient_id ";
   }
 
   /**
@@ -176,7 +176,7 @@ public class TxPvlsQueries {
    *
    * <blockquote>
    *
-   * <li>Patients enrolled in PTV(ETV) Program
+   * <li>Patients enrolled on Prevention of the Vertical Transmission/Elimination of the Vertical Transmission (PTV/ETV) program with state 27 (gave birth) within the period range.
    *
    *     </blockquote>
    */
@@ -196,7 +196,7 @@ public class TxPvlsQueries {
         + "                                 AND ps.voided = 0 "
         + "                                 AND p.voided = 0 "
         + "                                 AND ps.start_date <= :endDate "
-        + "                          GROUP  BY pp.patient_id";
+        + "                          GROUP  BY pp.patient_id ";
   }
 
   /**
@@ -229,7 +229,7 @@ public class TxPvlsQueries {
         + "                                 AND e.voided = 0 "
         + "                                 AND o.voided = 0 "
         + "                                 AND p2.voided = 0 "
-        + "                          GROUP  BY p.patient_id";
+        + "                          GROUP  BY p.patient_id ";
   }
 
   /**
@@ -237,8 +237,7 @@ public class TxPvlsQueries {
    *
    * <blockquote>
    *
-   * <li>Patient who have “Actualmente está a amamentar?” marked as “Sim” and Data de Colheita is
-   *     during the period range
+   * <li>Patient who have “Actualmente está a amamentar” marked as “Sim” on FSR Form and Data de Colheita is during the period range.
    *
    *     </blockquote>
    */
@@ -262,6 +261,10 @@ public class TxPvlsQueries {
         + "                                 AND o.voided = 0 "
         + "                                 AND o2.voided = 0 "
         + "                                 AND e.location_id = :location "
-        + "                          GROUP  BY p.patient_id";
+        + "                          GROUP  BY p.patient_id ";
   }
+
+
+
+
 }
