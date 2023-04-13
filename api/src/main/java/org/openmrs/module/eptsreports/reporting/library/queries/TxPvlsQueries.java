@@ -397,6 +397,7 @@ return""
             + "               and o.value_coded = ${1065} ) "
             + "               and (   o2.concept_id= ${23821} and o2.value_datetime <= :endDate ) "
             + "             group by p.patient_id";
+
   }
 
 }
