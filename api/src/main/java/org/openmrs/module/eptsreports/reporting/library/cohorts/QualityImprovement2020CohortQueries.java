@@ -3732,7 +3732,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("E", EptsReportUtils.map(e, MAPPING));
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING1));
-    } else if (reportResource.equals(EptsReportConstants.MIMQ.MI)) {
+    } else if (reportResource.equals(EptsReportConstants.MIMQ.MQ)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
       compositionCohortDefinition.addSearch("C", EptsReportUtils.map(c, MAPPING6));
       compositionCohortDefinition.addSearch("D", EptsReportUtils.map(d, MAPPING6));
@@ -12094,7 +12094,7 @@ public class QualityImprovement2020CohortQueries {
             + "      AND e.encounter_type = ${53}  "
             + "      AND o.concept_id = ${21190}  "
             + "      AND o.value_coded IS NOT NULL  "
-            + "      AND o.obs_datetime BETWEEN  :startDate AND :revisionEndDate  "
+            + "      AND o.obs_datetime <= :revisionEndDate  "
             + "      AND e.location_id = :location  "
             + "    GROUP  BY p.patient_id  "
             + ") regimen_change on regimen_change.patient_id = p.patient_id  "
