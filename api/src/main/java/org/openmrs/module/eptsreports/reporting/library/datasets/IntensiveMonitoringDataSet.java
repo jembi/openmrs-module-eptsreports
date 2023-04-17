@@ -1865,7 +1865,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    // MQ indicators category 9 numerator
+    // MI indicators category 9 numerator
     dataSetDefinition.addColumn(
         "MI9NUM1",
         "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
