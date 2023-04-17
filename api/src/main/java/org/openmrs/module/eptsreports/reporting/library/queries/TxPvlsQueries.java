@@ -264,10 +264,9 @@ public class TxPvlsQueries {
         + "                                 AND e.location_id = :location "
         + "                          GROUP  BY p.patient_id";
   }
-//pregnent
-  public static String getPatientsMarkedAsPregnentInInitialConsultation(){
-return
-        "SELECT gravidas.patient_id, MAX(gravidas.last_Date) as pregnancy_date from ( "
+  // pregnent
+  public static String getPatientsMarkedAsPregnentInInitialConsultation() {
+    return "SELECT gravidas.patient_id, MAX(gravidas.last_Date) as pregnancy_date from ( "
         + " "
         + "                       select p.patient_id, MAX(o.obs_datetime)as last_date "
         + "             from patient p "
@@ -283,121 +282,118 @@ return
         + "               and  o.value_coded=${1065} "
         + "               and e.location_id = :location  "
         + "               AND o.obs_datetime <= :endDate "
-        + "             group by p.patient_id"; }
-
-  public static String getPatientsThatHaveNumberOfWeeksPregnantRegisteredInIinitialOrFollow (){
-    return
-            "select p.patient_id, "
-                    + "MAX(o.obs_datetime)as last_date "
-                    + "             from patient p "
-                    + "                      inner join encounter e on p.patient_id = e.patient_id "
-                    + "                      inner join obs o on e.encounter_id = o.encounter_id "
-                    + " "
-                    + "             where p.voided=0 "
-                    + "               and e.voided=0 "
-                    + "               and o.voided=0 "
-                    + "               and e.encounter_type in (${5},${6}) "
-                    + "               and o.concept_id =${1279} "
-                    + "               and e.location_id =:location  "
-                    + "               AND o.obs_datetime <=:endDate "
-                    + "             group by p.patient_id";
+        + "             group by p.patient_id";
   }
 
-  public static String getPatientsWithDeliverDueDateInInitialFlowUp(){
-    return
-            "select p.patient_id, MAx(e.encounter_datetime)as last_date "
-                    + "             from patient p "
-                    + "                      inner join encounter e on p.patient_id = e.patient_id "
-                    + "                      inner join obs o on e.encounter_id = o.encounter_id "
-                    + "                      inner join person p2 on o.person_id = p2.person_id "
-                    + "             where p.voided=0 "
-                    + "               and e.voided=0 "
-                    + "               and o.voided=0 "
-                    + "               and p2.gender='F' "
-                    + "               and e.encounter_type in (${5},${6}) "
-                    + "               and o.concept_id =${1600} "
-                    + "               and e.location_id =:location  "
-                    + "               AND e.encounter_datetime <=:endDate "
-                    + "             group by p.patient_id";
-  }
-  public static String getPatientsThatStartedARTForBeingInCriterioParaInicioTarv(){
-    return
-            "select p.patient_id , MAX(e.encounter_datetime) as last_date "
-                    + "             from patient p "
-                    + "                      inner join encounter e on p.patient_id = e.patient_id "
-                    + "                      inner join obs o on e.encounter_id = o.encounter_id "
-                    + "                      inner join person p2 on p.patient_id = p2.person_id "
-                    + " "
-                    + "             where p.voided=0 "
-                    + "               and e.voided=0 "
-                    + "               and o.voided=0 "
-                    + "               and p2.gender='F' "
-                    + "               and e.encounter_type in (${5},{6}) "
-                    + "               and o.concept_id =${6334} "
-                    + "               and o.value_coded =${6331} "
-                    + "               and e.location_id = :location  "
-                    + "               AND e.encounter_datetime <= :endDate "
-                    + "             group by p.patient_id";
-  }
-  public static String getPatientsEnrolledonPreventionoftheVerticalTransmission(){
-    return
-
-            "select pp.patient_id, MAX(pp.date_enrolled) as last_date "
-            + "             from  patient_program pp "
-            + "                       inner join person p on pp.patient_id = p.person_id "
-
-            + "             where "
-            + "                     p.gender = 'F' "
-            + "               and  pp.program_id=${8} "
-            + "               and pp.voided=0 "
-            + "               and p.voided = 0 "
-            + "               and pp.location_id = :location  "
-            + "               AND pp.date_enrolled<=:endDate "
-            + "             group by pp.patient_id";}
-public  static String getPatientsRegisteredAsPregnantFichaResumoBetweenStartAndEndDate(){
-return           "select p.patient_id ,  MAX(value_datetime) as last_date"
-          + "from patient p "
-          + "         inner join encounter e on p.patient_id = e.patient_id "
-          + "         inner join obs o on e.encounter_id = o.encounter_id "
-          + "         inner join obs o2 on e.encounter_type = o2.encounter_id "
-          + " "
-          + "where "
-          + "        e.encounter_type = ${53} "
-          + "  and (o.concept_id = ${1982} "
-          + "    and o.value_coded = ${1065}) " +
-                 "and e.location_id = :location "
-
-          + "  and (o2.concept_id =${1190} and o2.value_datetime >= :endDate) "
-          + "group by p.patient_id";}
-
-         public static String getPatientsthatFemaleAndHaveRegisteredAsPregnantFichaClinicaMasterCardBetweenStartandDate(){
-          return
-           "select p.patient_id, MAX(e.encounter_datetime) as last_date "
-          + "from patient p "
-          + "         inner join patient_program pp on p.patient_id = pp.patient_id "
-          + "         inner  join encounter e on p.patient_id = e.patient_id "
-          + "         inner join obs o on e.encounter_id = o.encounter_id "
-          + " "
-          + "where e.encounter_type = ${6} "
-          + "  and (o.concept_id = ${1982} "
-          + "  and o.value_coded = ${1065}) " +
-                   "and e.encounter_datetime = :endDate "+
-                   "e.location_id= :location "
-          + "group by p.patient_id";}
-
-  public static String  getPatientWhoActualmenteEncontraGravidaMarkedSim(){
-return""
-            + "select p.patient_id, MAX(o2.value_datetime) as last_date from patient p "
-            + "     inner join encounter e on p.patient_id = e.patient_id "
-            + "     inner join obs o on e.encounter_id = o.encounter_id "
-            + "     inner join obs o2 on e.encounter_id = o2.encounter_id "
-
-            + "             where e.encounter_type = ${51} "
-            + "               and ( o.concept_id = ${1982} "
-            + "               and o.value_coded = ${1065} ) "
-            + "               and (   o2.concept_id= ${23821} and o2.value_datetime <= :endDate ) "
-            + "             group by p.patient_id";
-
+  public static String getPatientsThatHaveNumberOfWeeksPregnantRegisteredInIinitialOrFollow() {
+    return "select p.patient_id, "
+        + "MAX(o.obs_datetime)as last_date "
+        + "             from patient p "
+        + "                      inner join encounter e on p.patient_id = e.patient_id "
+        + "                      inner join obs o on e.encounter_id = o.encounter_id "
+        + " "
+        + "             where p.voided=0 "
+        + "               and e.voided=0 "
+        + "               and o.voided=0 "
+        + "               and e.encounter_type in (${5},${6}) "
+        + "               and o.concept_id =${1279} "
+        + "               and e.location_id =:location  "
+        + "               AND o.obs_datetime <=:endDate "
+        + "             group by p.patient_id";
   }
 
+  public static String getPatientsWithDeliverDueDateInInitialFlowUp() {
+    return "select p.patient_id, MAx(e.encounter_datetime)as last_date "
+        + "             from patient p "
+        + "                      inner join encounter e on p.patient_id = e.patient_id "
+        + "                      inner join obs o on e.encounter_id = o.encounter_id "
+        + "                      inner join person p2 on o.person_id = p2.person_id "
+        + "             where p.voided=0 "
+        + "               and e.voided=0 "
+        + "               and o.voided=0 "
+        + "               and p2.gender='F' "
+        + "               and e.encounter_type in (${5},${6}) "
+        + "               and o.concept_id =${1600} "
+        + "               and e.location_id =:location  "
+        + "               AND e.encounter_datetime <=:endDate "
+        + "             group by p.patient_id";
+  }
+
+  public static String getPatientsThatStartedARTForBeingInCriterioParaInicioTarv() {
+    return "select p.patient_id , MAX(e.encounter_datetime) as last_date "
+        + "             from patient p "
+        + "                      inner join encounter e on p.patient_id = e.patient_id "
+        + "                      inner join obs o on e.encounter_id = o.encounter_id "
+        + "                      inner join person p2 on p.patient_id = p2.person_id "
+        + " "
+        + "             where p.voided=0 "
+        + "               and e.voided=0 "
+        + "               and o.voided=0 "
+        + "               and p2.gender='F' "
+        + "               and e.encounter_type in (${5},{6}) "
+        + "               and o.concept_id =${6334} "
+        + "               and o.value_coded =${6331} "
+        + "               and e.location_id = :location  "
+        + "               AND e.encounter_datetime <= :endDate "
+        + "             group by p.patient_id";
+  }
+
+  public static String getPatientsEnrolledonPreventionoftheVerticalTransmission() {
+    return "select pp.patient_id, MAX(pp.date_enrolled) as last_date "
+        + "             from  patient_program pp "
+        + "                       inner join person p on pp.patient_id = p.person_id "
+        + "             where "
+        + "                     p.gender = 'F' "
+        + "               and  pp.program_id=${8} "
+        + "               and pp.voided=0 "
+        + "               and p.voided = 0 "
+        + "               and pp.location_id = :location  "
+        + "               AND pp.date_enrolled<=:endDate "
+        + "             group by pp.patient_id";
+  }
+
+  public static String getPatientsRegisteredAsPregnantFichaResumoBetweenStartAndEndDate() {
+    return "select p.patient_id ,  MAX(value_datetime) as last_date"
+        + "from patient p "
+        + "         inner join encounter e on p.patient_id = e.patient_id "
+        + "         inner join obs o on e.encounter_id = o.encounter_id "
+        + "         inner join obs o2 on e.encounter_type = o2.encounter_id "
+        + " "
+        + "where "
+        + "        e.encounter_type = ${53} "
+        + "  and (o.concept_id = ${1982} "
+        + "    and o.value_coded = ${1065}) "
+        + "and e.location_id = :location "
+        + "  and (o2.concept_id =${1190} and o2.value_datetime >= :endDate) "
+        + "group by p.patient_id";
+  }
+
+  public static String
+      getPatientsthatFemaleAndHaveRegisteredAsPregnantFichaClinicaMasterCardBetweenStartandDate() {
+    return "select p.patient_id, MAX(e.encounter_datetime) as last_date "
+        + "from patient p "
+        + "         inner join patient_program pp on p.patient_id = pp.patient_id "
+        + "         inner  join encounter e on p.patient_id = e.patient_id "
+        + "         inner join obs o on e.encounter_id = o.encounter_id "
+        + " "
+        + "where e.encounter_type = ${6} "
+        + "  and (o.concept_id = ${1982} "
+        + "  and o.value_coded = ${1065}) "
+        + "and e.encounter_datetime = :endDate "
+        + "e.location_id= :location "
+        + "group by p.patient_id";
+  }
+
+  public static String getPatientWhoActualmenteEncontraGravidaMarkedSim() {
+    return ""
+        + "select p.patient_id, MAX(o2.value_datetime) as last_date from patient p "
+        + "     inner join encounter e on p.patient_id = e.patient_id "
+        + "     inner join obs o on e.encounter_id = o.encounter_id "
+        + "     inner join obs o2 on e.encounter_id = o2.encounter_id "
+        + "             where e.encounter_type = ${51} "
+        + "               and ( o.concept_id = ${1982} "
+        + "               and o.value_coded = ${1065} ) "
+        + "               and (   o2.concept_id= ${23821} and o2.value_datetime <= :endDate ) "
+        + "             group by p.patient_id";
+  }
 }

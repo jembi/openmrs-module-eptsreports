@@ -20,6 +20,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.mq.BreastfeedingPregnantCalculation4MQ;
 import org.openmrs.module.eptsreports.reporting.calculation.pvls.BreastfeedingPregnantCalculation;
@@ -38,9 +39,6 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static org.openmrs.module.eptsreports.reporting.library.queries.TxPvlsQueries.getPatientsMarkedAsPregnentInInitialConsultation;
-import static org.openmrs.module.eptsreports.reporting.library.queries.TxPvlsQueries.getPatientsThatHaveNumberOfWeeksPregnantRegisteredInIinitialOrFollow;
-
 /** Defines all of the TxPvls Cohort Definition instances we want to expose for EPTS */
 @Component
 public class TxPvlsCohortQueries {
@@ -49,10 +47,13 @@ public class TxPvlsCohortQueries {
 
   private HivMetadata hivMetadata;
 
+  private CommonMetadata commonMetadata;
+
   @Autowired
   public TxPvlsCohortQueries(HivCohortQueries hivCohortQueries, HivMetadata hivMetadata) {
     this.hivCohortQueries = hivCohortQueries;
     this.hivMetadata = hivMetadata;
+    this.commonMetadata = commonMetadata;
   }
 
   /**
@@ -100,9 +101,6 @@ public class TxPvlsCohortQueries {
 
     return cd;
   }
-
-
-
 
   /**
    * <b>Description</b> Breast feeding women with viral load suppression
@@ -509,9 +507,7 @@ public class TxPvlsCohortQueries {
             getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(), mappings));
     cd.addSearch(
         "pregnant",
-        EptsReportUtils.map(
-            this.getPregnantWoman(),
-            "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(this.getPregnantWoman(), "endDate=${endDate},location=${location}"));
     cd.setCompositionString("suppression AND pregnant");
     return cd;
   }
@@ -533,12 +529,9 @@ public class TxPvlsCohortQueries {
         EptsReportUtils.map(getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings));
     cd.addSearch(
         "pregnant",
-        EptsReportUtils.map(
-                this.getPregnantWoman(),
-            "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(this.getPregnantWoman(), "endDate=${endDate},location=${location}"));
     cd.setCompositionString("results AND pregnant");
     return cd;
-
   }
 
   /**
@@ -559,7 +552,6 @@ public class TxPvlsCohortQueries {
     cd.addCalculationParameter("state", state);
     cd.addCalculationParameter("encounterTypeList", encounterTypeList);
     return cd;
-
   }
   /**
    * <b>Description</b>Get patients who are breastfeeding or pregnant controlled by parameter This
@@ -692,36 +684,38 @@ public class TxPvlsCohortQueries {
         .union(TxPvlsQueries.getBreastfeedingOnFichaResumo())
         .union(TxPvlsQueries.getBreastfeedingOnFSR())
         .buildQuery();
-
-
   }
 
-
   public CohortDefinition getPregnantWoman() {
-      SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-      sqlCohortDefinition.setName(" Patients disaggregation - Pregnant");
-      sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-      sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-      Map<String, Integer> map = new HashMap<>();
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(" Patients disaggregation - Pregnant");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
 
-
-      map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-      map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
-      map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-      map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-      map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
-      map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
-      map.put("1065", hivMetadata.getYesConcept().getConceptId());
-      map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
-      map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
-      map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
-      map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-      map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
-      map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-      map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
+    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
+    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
+    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    map.put("6331", hivMetadata.getBPlusConcept().getConceptId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
+    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
+    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
 
     String query =
-             "SELECT pregnant.patient_id, pregnant.last_vl, pregnant.pg_date  FROM( "
+        "SELECT pregnant.patient_id FROM( "
             + "                                                                        SELECT vl.patient_id, "
             + "                                                                               vl.last_date AS last_vl, MAX(pg.pregnancy_date) as pg_date "
             + "                                                                        FROM "
@@ -890,7 +884,7 @@ public class TxPvlsCohortQueries {
             + "                                                                               AND o.voided = 0 "
             + "                                                                               AND e.encounter_datetime <= :endDate "
             + "                                                                             UNION "
-            + "                                                                             SELEC399T p.patient_id, "
+            + "                                                                             SELECT p.patient_id, "
             + "                                                                                    DATE(o2.value_datetime) AS pregnancy_date "
             + "                                                                             FROM   patient p "
             + "                                                                                        inner join person p2 "
@@ -971,20 +965,23 @@ public class TxPvlsCohortQueries {
             + "                  AND pregnant.patient_id= pp.patient_id "
             + "                  AND ps.start_date > pregnant.pg_date "
             + "                  AND ps.start_date BETWEEN DATE_SUB(pregnant.last_vl, INTERVAL 18 MONTH) AND pregnant.last_vl "
-            + "                UNION "
-            + "                SELECT e.patient_id "
-            + "                FROM   encounter e "
-            + "                           inner join obs o "
-            + "                                      ON o.encounter_id = e.encounter_id "
-            + "                WHERE e.encounter_type = ${53} "
-            + "                  AND o.concept_id = ${6332} "
-            + "                  AND o.value_coded = ${1065} "
-            + "                  AND e.location_id = :location "
-            + "                  AND pregnant.patient_id= e.patient_id "
-            + "                  AND o.obs_datetime > pregnant.pg_date "
-            + "                  AND o.obs_datetime BETWEEN DATE_SUB(pregnant.last_vl, INTERVAL 18 MONTH) AND pregnant.last_vl "
-            + "                  AND e.voided = 0 "
-            + "                  AND o.voided = 0 "
+            + "                UNION        "
+            + "SELECT e.patient_id"
+            + "                                    FROM encounter e "
+            + "                                    INNER JOIN obs o "
+            + "                                        ON e.encounter_id=o.encounter_id "
+            + "                                    INNER JOIN obs hist "
+            + "                                        ON e.encounter_id=hist.encounter_id "
+            + "                                    WHERE  e.voided = 0 "
+            + "                                    AND o.voided = 0 "
+            + "                                    AND hist.voided=0 "
+            + "                                    AND o.concept_id = ${6332} "
+            + "                                    AND o.value_coded = ${1065} "
+            + "                                    AND e.encounter_type = ${53} "
+            + "                                    AND hist.concept_id = ${1190} "
+            + "                  AND hist.value_datetime BETWEEN DATE_SUB(pregnant.last_vl, INTERVAL 18 MONTH) AND pregnant.last_vl "
+            + "AND hist.value_datetime > pregnant.pg_date "
+            + "AND e.patient_id = pregnant.patient_id "
             + "                UNION "
             + "                SELECT e.patient_id "
             + "                FROM   encounter e "
@@ -1006,24 +1003,9 @@ public class TxPvlsCohortQueries {
             + " "
             + "    )";
 
-                    ;
-;
-      StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-      String mappedQuery = stringSubstitutor.replace(query);
-      sqlCohortDefinition.setQuery(mappedQuery);
-      return sqlCohortDefinition;
-    }
-  public static String getMaxPregnant(){
-    return new EptsQueriesUtil()
-            .unionBuilder(TxPvlsQueries.getPatientsMarkedAsPregnentInInitialConsultation())
-            .union(TxPvlsQueries.getPatientsThatHaveNumberOfWeeksPregnantRegisteredInIinitialOrFollow ())
-            .union(TxPvlsQueries.getPatientsWithDeliverDueDateInInitialFlowUp())
-            .union(TxPvlsQueries.getPatientsThatStartedARTForBeingInCriterioParaInicioTarv())
-            .union(TxPvlsQueries.getPatientsEnrolledonPreventionoftheVerticalTransmission())
-            .union(TxPvlsQueries.getPatientsRegisteredAsPregnantFichaResumoBetweenStartAndEndDate())
-            .union(TxPvlsQueries.getPatientsthatFemaleAndHaveRegisteredAsPregnantFichaClinicaMasterCardBetweenStartandDate())
-            .union(TxPvlsQueries.getPatientWhoActualmenteEncontraGravidaMarkedSim())
-            .buildQuery();
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    String mappedQuery = stringSubstitutor.replace(query);
+    sqlCohortDefinition.setQuery(mappedQuery);
+    return sqlCohortDefinition;
   }
-  }
-
+}
