@@ -25,8 +25,8 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.mq.BreastfeedingPregnantCalculation4MQ;
 import org.openmrs.module.eptsreports.reporting.calculation.pvls.BreastfeedingPregnantCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
-import org.openmrs.module.eptsreports.reporting.library.queries.TxPvlsQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
+import org.openmrs.module.eptsreports.reporting.library.queries.TxPvlsQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants.PregnantOrBreastfeedingWomen;
@@ -52,10 +52,14 @@ public class TxPvlsCohortQueries {
 
   @Autowired
   public TxPvlsCohortQueries(
-      HivCohortQueries hivCohortQueries, HivMetadata hivMetadata, CommonQueries commonQueries) {
+      HivCohortQueries hivCohortQueries,
+      HivMetadata hivMetadata,
+      CommonQueries commonQueries,
+      CommonMetadata commonMetadata) {
     this.hivCohortQueries = hivCohortQueries;
     this.hivMetadata = hivMetadata;
-
+    this.commonQueries = commonQueries;
+    this.commonMetadata = commonMetadata;
   }
 
   /**
