@@ -461,6 +461,49 @@ public class GenericCohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
     return sqlCohortDefinition;
   }
+  /**
+   * Age should be calculated In Months on Patient ART Start Date (Check Section A for the algorithm
+   * to define this date).
+   *
+   * @param minAge Minimum age of a patient based on ART Start Date
+   * @param maxAge Maximum age of a patient based on ART Start Date
+   * @return CohortDefinition
+   */
+  public CohortDefinition
+      getAgeInMonthsBasedOnArtStartDateIgualGreaterThanLoweBoundAndLessThanUpperBound(
+          Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Age In Months on MOH ART start date");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+    String query =
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + "           SELECT pp.patient_id, MIN(o.value_datetime) as first_start_drugs "
+            + "           FROM patient pp "
+            + "                INNER JOIN encounter e ON e.patient_id = pp.patient_id "
+            + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "           WHERE pp.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "             AND e.encounter_type = ${53} and o.concept_id = ${1190} "
+            + "             AND e.location_id = :location "
+            + "             AND o.value_datetime <= :endDate "
+            + "           GROUP BY pp.patient_id ) AS A1 ON p.person_id = A1.patient_id "
+            + "WHERE A1.first_start_drugs >= :startDate "
+            + "  AND A1.first_start_drugs <= :endDate "
+            + "  AND TIMESTAMPDIFF(MONTH, p.birthdate, A1.first_start_drugs) >= ${minAge}  "
+            + " AND TIMESTAMPDIFF(MONTH, p.birthdate, A1.first_start_drugs) < ${maxAge}; ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+    return sqlCohortDefinition;
+  }
 
   /**
    * @param considerTransferredIn
@@ -906,5 +949,76 @@ public class GenericCohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getPatientFoundYesConcept().getConceptId(),
             commonMetadata.getBreastfeeding().getConceptId()));
+  }
+
+  /**
+   * <b>Idade do Utente na Primeira Consulta</b>
+   *
+   * <p>
+   * <li>Idade = “Data Primeira Consulta” - Data de Nascimento
+   * <li>Nota1: A idade será calculada em anos.
+   * <li>Nota2: “Data Primeira Consulta” é a data da primeira consulta clínica do utente, ou seja, o
+   *     primeiro registo, de sempre, de consulta clínica (Ficha Clínica) decorrido no período de
+   *     inclusão (>= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim Revisão”
+   *     menos (-) 9 meses.)
+   *
+   * @param minAge Minimum age of a patient based on First Clinical consultation
+   * @param maxAge Maximum age of a patient based on First Clinical consultation
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getAgeOnFirstClinicalConsultation(Integer minAge, Integer maxAge) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Age on First Clinical Consultation");
+    sqlCohortDefinition.addParameter(new Parameter("onOrAfter", "onOrAfter", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("minAge", minAge);
+    map.put("maxAge", maxAge);
+
+    String query =
+        "SELECT p.person_id "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + "           SELECT pa.patient_id,  "
+            + "                  MIN(enc.encounter_datetime) AS first_consultation  "
+            + "           FROM   patient pa  "
+            + "                      INNER JOIN encounter enc  "
+            + "                                 ON enc.patient_id =  pa.patient_id  "
+            + "                      INNER JOIN obs  "
+            + "                                 ON obs.encounter_id = enc.encounter_id  "
+            + "           WHERE pa.voided = 0  "
+            + "             AND enc.voided = 0  "
+            + "             AND obs.voided = 0  "
+            + "             AND enc.encounter_type = ${6}  "
+            + "             AND enc.encounter_datetime <= :revisionEndDate "
+            + "             AND enc.location_id = :location  "
+            + "           GROUP  BY pa.patient_id  "
+            + "     ) AS final ON p.person_id = final.patient_id "
+            + "WHERE  final.first_consultation >= :onOrAfter  "
+            + "  AND final.first_consultation <= :onOrBefore"
+            + " AND ";
+
+    if (minAge != null && maxAge != null) {
+      query +=
+          "     TIMESTAMPDIFF(YEAR, p.birthdate, final.first_consultation) >= ${minAge}  "
+              + "         AND   "
+              + "   TIMESTAMPDIFF(YEAR, p.birthdate, final.first_consultation) <= ${maxAge} ";
+
+    } else if (minAge == null && maxAge != null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, final.first_consultation) <= ${maxAge} ";
+    } else if (minAge != null && maxAge == null) {
+      query += "   TIMESTAMPDIFF(YEAR, p.birthdate, final.first_consultation) >= ${minAge}  ";
+    }
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
