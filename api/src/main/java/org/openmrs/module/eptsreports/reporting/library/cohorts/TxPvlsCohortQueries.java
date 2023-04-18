@@ -26,9 +26,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.mq.BreastfeedingPreg
 import org.openmrs.module.eptsreports.reporting.calculation.pvls.BreastfeedingPregnantCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
-import org.openmrs.module.eptsreports.reporting.library.queries.TxPvlsQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
-import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants.PregnantOrBreastfeedingWomen;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -111,7 +109,10 @@ public class TxPvlsCohortQueries {
 
     cd.addSearch(
         "breastfeeding",
-        EptsReportUtils.map(getBreastfeedingPatients(), "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+                PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "suppression",
@@ -138,7 +139,10 @@ public class TxPvlsCohortQueries {
 
     cd.addSearch(
         "breastfeeding",
-        EptsReportUtils.map(getBreastfeedingPatients(), "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+                PregnantOrBreastfeedingWomen.BREASTFEEDINGWOMEN, null),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
 
     cd.addSearch(
         "results",
@@ -630,7 +634,6 @@ public class TxPvlsCohortQueries {
    *
    * @return {@link CohortDefinition}
    */
-
   public CohortDefinition getPregnantWoman() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" Patients disaggregation - Pregnant");
