@@ -520,7 +520,10 @@ public class TxPvlsCohortQueries {
             getPatientsWithViralLoadSuppressionWhoAreOnArtMoreThan3Months(), mappings));
     cd.addSearch(
         "pregnant",
-        EptsReportUtils.map(this.getPregnantWoman(), "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            this.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+                PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("suppression AND pregnant");
     return cd;
   }
@@ -542,7 +545,10 @@ public class TxPvlsCohortQueries {
         EptsReportUtils.map(getPatientsWithViralLoadResultsAndOnArtForMoreThan3Months(), mappings));
     cd.addSearch(
         "pregnant",
-        EptsReportUtils.map(this.getPregnantWoman(), "endDate=${endDate},location=${location}"));
+        EptsReportUtils.map(
+            this.getPatientsWhoArePregnantOrBreastfeedingBasedOnParameter(
+                PregnantOrBreastfeedingWomen.PREGNANTWOMEN, null),
+            "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.setCompositionString("results AND pregnant");
     return cd;
   }
@@ -928,60 +934,6 @@ public class TxPvlsCohortQueries {
 
     sqlCohortDefinition.setQuery(mappedQuery);
 
-    return sqlCohortDefinition;
-  }
-
-  public CohortDefinition getPregnantWoman() {
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" Patients disaggregation - Pregnant");
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
-    Map<String, Integer> map = new HashMap<>();
-
-    map.put("1600", hivMetadata.getPregnancyDueDate().getConceptId());
-    map.put("1279", hivMetadata.getNumberOfWeeksPregnant().getConceptId());
-    map.put("1982", hivMetadata.getPregnantConcept().getConceptId());
-    map.put("6331", hivMetadata.getBpostiveConcept().getConceptId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("5", hivMetadata.getARVAdultInitialEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    map.put("5599", hivMetadata.getPriorDeliveryDateConcept().getConceptId());
-    map.put("23821", hivMetadata.getSampleCollectionDateAndTime().getConceptId());
-    map.put("6332", hivMetadata.getBreastfeeding().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6334", hivMetadata.getCriteriaForArtStart().getConceptId());
-    map.put("8", hivMetadata.getPtvEtvProgram().getProgramId());
-    map.put("27", hivMetadata.getPatientGaveBirthWorkflowState().getProgramWorkflowStateId());
-    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
-
-    String query =
-        " SELECT p.patient_id     "
-            + "                                             FROM   patient p     "
-            + "                                                    inner join person p2     "
-            + "                                                            ON p2.person_id = p.patient_id     "
-            + "                                                    inner join encounter e     "
-            + "                                                            ON e.patient_id = p.patient_id     "
-            + "                                                    inner join obs o     "
-            + "                                                            ON o.encounter_id = e.encounter_id     "
-            + "                                             WHERE  e.encounter_type IN ( ${5}, ${6} )     "
-            + "                                                    AND p2.gender = 'F'     "
-            + "                                                    AND ( o.concept_id = ${1982}     "
-            + "                                                          AND o.value_coded = ${1065} )     "
-            + "                                                    AND e.location_id = :location     "
-            + "                                                    AND p.voided = 0     "
-            + "                                                    AND e.encounter_datetime >= :endDate     "
-            + "                                                    AND p2.voided = 0     "
-            + "                                                    AND e.voided = 0     "
-            + "                                                    AND o.voided = 0";
-    ;
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-    String mappedQuery = stringSubstitutor.replace(query);
-    sqlCohortDefinition.setQuery(mappedQuery);
     return sqlCohortDefinition;
   }
 }
