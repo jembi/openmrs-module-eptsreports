@@ -313,12 +313,12 @@ public class TXCXCADataset extends BaseDataSet {
         new ColumnParameters("thirty5To39", "35 - 39", "age=35-39", "05");
     ColumnParameters foutyTo44 = new ColumnParameters("foutyTo44", "40 - 44", "age=40-44", "06");
     ColumnParameters fouty5To49 = new ColumnParameters("fouty5To49", "45 - 49", "age=45-49", "07");
-    ColumnParameters fiftyTo54 = new ColumnParameters("fiftyTo54M", "50 - 54", "age=50-54", "08");
-    ColumnParameters fifty5To59 = new ColumnParameters("fifty5To59M", "55 - 59", "age=55-59", "09");
-    ColumnParameters sixtyTo64 = new ColumnParameters("sixtyTo64M", "60 - 64", "age=60-64", "10");
-    ColumnParameters above65 = new ColumnParameters("above65M", "65+", "age=65+", "11");
-    ColumnParameters unknown = new ColumnParameters("unknown", "Unknown age", "age=UK", "09");
-    ColumnParameters total = new ColumnParameters("totals", "Totals", "", "10");
+    ColumnParameters fiftyTo54 = new ColumnParameters("fiftyTo54", "50 - 54", "age=50-54", "08");
+    ColumnParameters fifty5To59 = new ColumnParameters("fifty5To59", "55 - 59", "age=55-59", "09");
+    ColumnParameters sixtyTo64 = new ColumnParameters("sixtyTo64", "60 - 64", "age=60-64", "10");
+    ColumnParameters above65 = new ColumnParameters("above65", "65+", "age=65+", "11");
+    ColumnParameters unknown = new ColumnParameters("unknown", "Unknown age", "age=UK", "12");
+    ColumnParameters total = new ColumnParameters("totals", "Totals", "", "13");
 
     return Arrays.asList(
         fifteenTo19,
