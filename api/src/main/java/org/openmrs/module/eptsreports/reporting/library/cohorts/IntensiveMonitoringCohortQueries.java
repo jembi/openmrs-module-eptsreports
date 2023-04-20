@@ -3494,23 +3494,23 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition startedArt = qualityImprovement2020CohortQueries.getMOHArtStartDate();
     CohortDefinition inTarv = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
     CohortDefinition transferredIn =
-            QualityImprovement2020Queries.getTransferredInPatients(
-                    hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-                    commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-                    hivMetadata.getPatientFoundYesConcept().getConceptId(),
-                    hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-                    hivMetadata.getArtStatus().getConceptId());
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
 
     cd.addSearch(
-            "startedArt",
-            EptsReportUtils.map(
-                    startedArt, "startDate=${endDate-13m+1d},endDate=${endDate-12m},location=${location}"));
+        "startedArt",
+        EptsReportUtils.map(
+            startedArt, "startDate=${endDate-13m+1d},endDate=${endDate-12m},location=${location}"));
 
     cd.addSearch("inTarv", EptsReportUtils.map(inTarv, "endDate=${endDate},location=${location}"));
     cd.addSearch(
-            "transferredIn",
-            EptsReportUtils.map(
-                    transferredIn, "startDate=${endDate},endDate=${endDate},location=${location}"));
+        "transferredIn",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${endDate},endDate=${endDate},location=${location}"));
 
     cd.setCompositionString("(startedArt AND inTarv) AND NOT transferredIn");
 
@@ -3526,17 +3526,17 @@ public class IntensiveMonitoringCohortQueries {
 
     CohortDefinition denominator = getPatientsOnMICat18Denominator();
     CohortDefinition diagnose =
-            QualityImprovement2020Queries.getDisclosureOfHIVDiagnosisToChildrenAdolescents();
+        QualityImprovement2020Queries.getDisclosureOfHIVDiagnosisToChildrenAdolescents();
 
     cd.addSearch(
-            "denominator",
-            EptsReportUtils.map(denominator, "endDate=${revisionEndDate},location=${location}"));
+        "denominator",
+        EptsReportUtils.map(denominator, "endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "diagnose",
-            EptsReportUtils.map(
-                    diagnose,
-                    "startDate=${revisionEndDate-13m+1d},endDate=${revisionEndDate-12m},revisionEndDate=${revisionEndDate},location=${location}"));
+        "diagnose",
+        EptsReportUtils.map(
+            diagnose,
+            "startDate=${revisionEndDate-13m+1d},endDate=${revisionEndDate-12m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("denominator AND diagnose");
 
