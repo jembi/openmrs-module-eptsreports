@@ -54,10 +54,22 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(eptsCommonDimension.ageInMonths(), "effectiveDate=${endDate}"));
 
     dataSetDefinition.addDimension(
+        "ageArtMonths",
+        EptsReportUtils.map(
+            eptsCommonDimension.ageInMonthsBasedOnArt(),
+            "startDate=${startDate},endDate={endDate},location=${location}"));
+
+    dataSetDefinition.addDimension(
         "ageBasedOnArt",
         EptsReportUtils.map(
             eptsCommonDimension.ageBasedOnArtStartDateMOH(),
             "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    dataSetDefinition.addDimension(
+        "ageBasedOnArtCat18",
+        EptsReportUtils.map(
+            eptsCommonDimension.ageBasedOnArtStartDateMOH(),
+            "onOrAfter=${revisionEndDate-14m},onOrBefore=${revisionEndDate-11m},location=${location}"));
 
     dataSetDefinition.addDimension(
         "mqAge",
@@ -110,7 +122,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
 
     dataSetDefinition.addColumn(
         "MCC4D1",
-        "Crianças em TARV com estado (grau) da avaliação nutricional registado na última  consulta clínica",
+        "Crianças em TARV com estado (grau) da avaliação nutricional registado na última consulta clínica",
         EptsReportUtils.map(
             MCC4D1,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
@@ -667,7 +679,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ11DEN6,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageInMonths=9m-");
+        "ageArtMonths=10m-");
 
     CohortIndicator MQ11DEN7 =
         eptsGeneralIndicator.getIndicator(
@@ -793,7 +805,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ11NUM6,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "ageArtMonths=10m-");
 
     CohortIndicator MQ11NUM7 =
         eptsGeneralIndicator.getIndicator(
@@ -1512,7 +1524,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ13DEN3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "");
 
     CohortIndicator MQ13DEN12 =
         eptsGeneralIndicator.getIndicator(
@@ -1667,7 +1679,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ13NUM3,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=15+");
+        "");
 
     CohortIndicator MQ13NUM12 =
         eptsGeneralIndicator.getIndicator(
@@ -1684,7 +1696,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         EptsReportUtils.map(
             MQ13NUM12,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2-14");
+        "");
 
     CohortIndicator MQ13NUM18 =
         eptsGeneralIndicator.getIndicator(
@@ -2660,6 +2672,106 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
+    dataSetDefinition.addColumn(
+        "MQ9DEN3",
+        "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getMQ9Den(3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+    dataSetDefinition.addColumn(
+        "MQ9DEN4",
+        "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getMQ9Den(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ9DEN5",
+        "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Den(5),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ9DEN6",
+        "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Den(6),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MQ indicators category 9 numerator
+    dataSetDefinition.addColumn(
+        "MQ9NUM1",
+        "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getMQ9Num(1),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ9NUM2",
+        "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getMQ9Num(2),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ9NUM3",
+        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getMQ9Num(3),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ9NUM4",
+        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getMQ9Num(4),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ9NUM5",
+        "% de MG HIV+ em TARV com registo de pedido de CD4 na primeira CPN (Primeira consulta com registo Gravidez)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Num(5),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MQ9NUM6",
+        "% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                qualityImprovement2020CohortQueries.getCd4RequestAndResultForPregnantsCat9Num(6),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
     // MQ indicators category 10 denominator
 
     CohortIndicator MQ10DEN1A =
@@ -2713,25 +2825,53 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"),
         "");
 
-    // MQ indicators category 9 numerator
+    // MQ indicators category 18
+
+    // Category 18 Denominator
+
+    CohortIndicator MQ18DEN =
+        eptsGeneralIndicator.getIndicator(
+            "MQ18DEN",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getPatientsOnMQCat18Denominator(),
+                "endDate=${revisionEndDate},location=${location}"));
+
+    MQ18DEN.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
-        "MQ9NUM1",
-        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getMQ9Num(1),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "MQ18DEN89",
+        "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T)",
+        EptsReportUtils.map(MQ18DEN, "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageBasedOnArtCat18=8-9");
+
     dataSetDefinition.addColumn(
-        "MQ9NUM2",
-        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                qualityImprovement2020CohortQueries.getMQ9Num(2),
-                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+        "MQ18DEN1014",
+        "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)",
+        EptsReportUtils.map(MQ18DEN, "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageBasedOnArtCat18=10-14");
+
+    // Cat 18 Numerator
+
+    CohortIndicator MQ18NUM =
+        eptsGeneralIndicator.getIndicator(
+            "MQ18NUM",
+            EptsReportUtils.map(
+                qualityImprovement2020CohortQueries.getPatientsOnMQCat18Numerator(),
+                "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ18NUM.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+        "MQ18NUM89",
+        "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T) NUM",
+        EptsReportUtils.map(MQ18NUM, "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageBasedOnArtCat18=8-9");
+
+    dataSetDefinition.addColumn(
+        "MQ18NUM1014",
+        "Adolescentes de 10 - 14 anos activos em TARV com RD Total  (T) NUM",
+        EptsReportUtils.map(MQ18NUM, "revisionEndDate=${revisionEndDate},location=${location}"),
+        "ageBasedOnArtCat18=10-14");
 
     return dataSetDefinition;
   }

@@ -9,6 +9,7 @@ import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
@@ -50,7 +51,7 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "Monitoria Intensiva de HIV - 2022";
+    return "Monitoria Intensiva de HIV - 2023";
   }
 
   @Override
@@ -75,23 +76,16 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
         Mapped.mapStraightThrough(
             intensiveMonitoringDataSet.constructIntensiveMonitoringDataSet()));
 
-    /* reportDefinition.addDataSetDefinition(
-        "TOTAL",
-        EptsReportUtils.map(
-            this.viralLoadIntensiveMonitoringDataSet.constructViralLoadIntensiveMonitoringDataSet(),
-            "endDate=${revisionEndDate},location=${location}"));
+    reportDefinition.addDataSetDefinition(
+        "DATIM", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
+    reportDefinition.addDataSetDefinition(
+        "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(),
             "endDate=${revisionEndDate},location=${location}"));
-    reportDefinition.addDataSetDefinition(
-        "DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));*/
-
-    reportDefinition.addDataSetDefinition(
-        "DATIM", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
-    reportDefinition.addDataSetDefinition(
-        "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
 
     return reportDefinition;
   }

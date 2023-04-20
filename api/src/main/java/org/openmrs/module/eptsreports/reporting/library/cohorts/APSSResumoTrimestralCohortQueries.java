@@ -220,10 +220,10 @@ public class APSSResumoTrimestralCohortQueries {
 
     cd.setName("C1");
 
-    String mapping = "startDate=${startDate},endDate=${endDate},location=${location}";
+    String mapping = "endDate=${endDate},location=${location}";
 
     CohortDefinition activeInART =
-        this.resumoMensalCohortQueries.getActivePatientsInARTByEndOfCurrentMonth(false);
+        this.resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
 
     cd.addSearch("activeInART", EptsReportUtils.map(activeInART, mapping));
 
@@ -288,7 +288,9 @@ public class APSSResumoTrimestralCohortQueries {
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
-    CohortDefinition startedART = this.getPatientsWhoStartedArtByEndOfPreviousMonthB10();
+    CohortDefinition startedART =
+        this.resumoMensalCohortQueries
+            .getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
     CohortDefinition patientAtAge15OrOlder = genericCohortQueries.getAgeOnReportEndDate(15, null);
     CohortDefinition registeredInFichaAPSSPP = this.getPatientsRegisteredInFichaAPSSPP();
 
@@ -596,6 +598,7 @@ public class APSSResumoTrimestralCohortQueries {
     map.put("24011", hivMetadata.getPatientReturnedAfterVisitConcept().getConceptId());
     map.put("24012", hivMetadata.getDatePatientReturnedAfterVisitConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
         "SELECT "
@@ -1095,7 +1098,6 @@ public class APSSResumoTrimestralCohortQueries {
         "prevencaoPositivaSeguimentoEncounterType",
         hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put("yesConcept", hivMetadata.getPatientFoundYesConcept().getConceptId());
-    map.put("noConcept", hivMetadata.getNoConcept().getConceptId());
     map.put("memberShipPlanConcept", hivMetadata.getMemberShipPlanConcept().getConceptId());
     map.put(
         "counseledOnSideEffectsOfArtConcept",
@@ -1143,11 +1145,11 @@ public class APSSResumoTrimestralCohortQueries {
             + "    AND e.voided = 0 "
             + "    AND o.voided = 0 "
             + "    AND e.encounter_type = ${prevencaoPositivaSeguimentoEncounterType} "
-            + "    AND (o.concept_id = ${memberShipPlanConcept} AND o.value_coded IN (${yesConcept},${noConcept}) "
+            + "    AND ((o.concept_id = ${memberShipPlanConcept} AND o.value_coded = ${yesConcept}) "
             + "        OR "
-            + "        o.concept_id = ${counseledOnSideEffectsOfArtConcept} AND o.value_coded IN (${yesConcept},${noConcept}) "
+            + "        (o.concept_id = ${counseledOnSideEffectsOfArtConcept} AND o.value_coded = ${yesConcept}) "
             + "        OR "
-            + "        o.concept_id = ${adherenceEvaluationConcept} AND o.value_coded IN (${goodConcept}, ${arvAdherenceRiskConcept}, ${badConcept}) "
+            + "        (o.concept_id = ${adherenceEvaluationConcept} AND o.value_coded IN (${goodConcept}, ${arvAdherenceRiskConcept}, ${badConcept}) )"
             + "        ) "
             + "    AND encounter_datetime "
             + "        > (SELECT DATE_ADD(min(art_startdate.min_date), INTERVAL 30 DAY) as min_min_date  "

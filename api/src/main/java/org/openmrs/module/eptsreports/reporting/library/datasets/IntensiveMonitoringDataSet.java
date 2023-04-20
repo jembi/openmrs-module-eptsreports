@@ -159,7 +159,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7DenMI2021Part246Definition(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=childrenArt");
+        "ageBasedOnArt246=1-14");
     // 7.5
     dataSetDefinition.addColumn(
         "MI7DEN5",
@@ -222,7 +222,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getCat7NumMI2021Part246Definition(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=childrenArt");
+        "ageBasedOnArt246=1-14");
     // 7.5
     dataSetDefinition.addColumn(
         "MI7NUM5",
@@ -678,7 +678,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMIC11NUM(4),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=childrenArt");
+        "");
     // 11.5
     dataSetDefinition.addColumn(
         "MI11NUM5",
@@ -896,152 +896,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    /**
-     * *********************************** CATEGORY 11 ********************* //*********************
-     * Denominator **************
-     */
-    // 11.1
-    dataSetDefinition.addColumn(
-        "MI11DEN1",
-        "MI DEN 11.1",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11DEN(1),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt54=adultsArt");
-    // 11.2
-    dataSetDefinition.addColumn(
-        "MI11DEN2",
-        "MI DEN 11.2",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11DEN(2),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge11=MqAdults");
-    // 11.3
-    dataSetDefinition.addColumn(
-        "MI11DEN3",
-        "MI DEN 11.3",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11DEN(3),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
-    // 11.4
-    dataSetDefinition.addColumn(
-        "MI11DEN4",
-        "MI DEN 11.4",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11DEN(4),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
-    // 11.5
-    dataSetDefinition.addColumn(
-        "MI11DEN5",
-        "MI DEN 11.5",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11DEN(5),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt54=2-14"); // porque isto inclui intervalos
-    // 11.6
-    dataSetDefinition.addColumn(
-        "MI11DEN6",
-        "MI DEN 11.6",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11DEN(6),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageInMonths54=9m-");
-    // 11.7
-    dataSetDefinition.addColumn(
-        "MI11DEN7",
-        "MI DEN 11.7",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11DEN(7),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge11=MqChildren");
 
-    // ********************* Numerator **************
-    // 11.1
-    dataSetDefinition.addColumn(
-        "MI11NUM1",
-        "MI NUM 11.1",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11NUM(1),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt54=adultsArt");
-    // 11.2
-    dataSetDefinition.addColumn(
-        "MI11NUM2",
-        "MI NUM 11.2",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11NUM(2),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge11=MqAdults");
-    // 11.3
-    dataSetDefinition.addColumn(
-        "MI11NUM3",
-        "MI NUM 11.3",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11NUM(3),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
-    // 11.4
-    dataSetDefinition.addColumn(
-        "MI11NUM4",
-        "MI NUM 11.4",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11NUM(4),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt246=childrenArt");
-    // 11.5
-    dataSetDefinition.addColumn(
-        "MI11NUM5",
-        "MI NUM 11.5",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11NUM(5),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageBasedOnArt54=2-14");
-    // 11.6
-    dataSetDefinition.addColumn(
-        "MI11NUM6",
-        "MI NUM 11.6",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11NUM(6),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "ageInMonths54=9m-");
-    // 11.7
-    dataSetDefinition.addColumn(
-        "MI11NUM7",
-        "MI NUM 11.7",
-        EptsReportUtils.map(
-            customCohortIndicator(
-                intensiveMonitoringCohortQueries.getMIC11NUM(7),
-                "revisionEndDate=${revisionEndDate},location=${location}"),
-            "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge11=MqChildren");
 
     /**
      * *********************************** CATEGORY 12 *******************************************
@@ -1236,7 +1091,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
                 intensiveMonitoringCohortQueries.getMICat13Part4(3, false),
                 "revisionEndDate=${revisionEndDate},location=${location}"),
             "revisionEndDate=${revisionEndDate},location=${location}"),
-        "miAge=MqAdults");
+        "ageByEndDateRevision=15+");
 
     // 13.12 P4 Den
     dataSetDefinition.addColumn(
@@ -1724,8 +1579,8 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "MI15NUM14",
             EptsReportUtils.map(
-                qualityImprovement2020CohortQueries.getMQ15MdsNum14(),
-                "startDate=${startDate},revisionEndDate=${endDate},location=${location}"));
+                qualityImprovement2020CohortQueries.getMI15MdsNum14(),
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MI15NUM14.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -1734,7 +1589,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "Numerator: # de pacientes inscritos em MDS para pacientes estáveis ",
         EptsReportUtils.map(
             MI15NUM14,
-            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"),
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"),
         "ageByEvaluationEndDate=2+");
 
     CohortIndicator MI15DEN15 =
@@ -1801,6 +1656,129 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         EptsReportUtils.map(
             MI15NUM16,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI indicators category 9 denominators
+
+    dataSetDefinition.addColumn(
+        "MI9DEN1",
+        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMQ9Den(1),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN2",
+        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMQ9Den(2),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN3",
+        "% de crianças HIV+ ≤ 14 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMQ9Den(3),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN4",
+        "% de crianças HIV+ ≤ 14 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMQ9Den(4),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN5",
+        "Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Den(5),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9DEN6",
+        "Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Den(6),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    // MI indicators category 9 numerator
+    dataSetDefinition.addColumn(
+        "MI9NUM1",
+        "% de adultos HIV+ ≥ 15 anos que teve registo de pedido do primeiro CD4 na data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMQ9Num(1),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM2",
+        "% de adultos HIV+ ≥ 15 anos que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira consulta clínica/abertura da Ficha Mestra",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMQ9Num(2),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM3",
+        "% de adultos  HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMQ9Num(3),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM4",
+        "% de crianças HIV+ em TARV que tiveram conhecimento do resultado do primeiro CD4 dentro de 33 dias após a inscrição",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getMQ9Num(4),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM5",
+        "% de MG HIV+ em TARV com registo de pedido de CD4 na primeira CPN (Primeira consulta com registo Gravidez)",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Num(5),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
+
+    dataSetDefinition.addColumn(
+        "MI9NUM6",
+        "% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez",
+        EptsReportUtils.map(
+            customCohortIndicator(
+                intensiveMonitoringCohortQueries.getCd4RequestAndResultForPregnantsCat9Num(6),
+                "revisionEndDate=${revisionEndDate},location=${location}"),
+            "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     return dataSetDefinition;

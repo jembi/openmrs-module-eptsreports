@@ -107,7 +107,7 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMasterCardEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("supp AND onArtLongEnough");
     return cd;
   }
@@ -143,7 +143,7 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMasterCardEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.setCompositionString("results AND onArtLongEnough");
     return cd;
   }
@@ -309,13 +309,13 @@ public class TxPvlsBySourceClinicalOrFichaResumoCohortQueries {
                     hivMetadata.getAdultoSeguimentoEncounterType(),
                     hivMetadata.getPediatriaSeguimentoEncounterType(),
                     hivMetadata.getMasterCardEncounterType())),
-            "onOrBefore=${endDate},location=${location}"));
+            "endDate=${endDate},location=${location}"));
     cd.addSearch("RoutineByClinical", EptsReportUtils.map(getRoutineByClinicalForms(), mappings));
     cd.setCompositionString("(results AND onArtLongEnough) AND RoutineByClinical");
     return cd;
   }
 
-  private CohortDefinition getRoutineByClinicalForms() {
+  public CohortDefinition getRoutineByClinicalForms() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));

@@ -18,19 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.CXCASCRNDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.CXCASCRNPositiveDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.PrepCtDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.PrepNewDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TXCXCADataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TransferredInDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxCurrDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxMlDataset25;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxNewDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxPvlsDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxRTTPLHIVDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxRttDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.ReportingException;
@@ -106,12 +94,12 @@ public class SetupMERQuarterly26 extends EptsDataExportManager {
 
   @Override
   public String getName() {
-    return "PEPFAR MER 2.6 Quarterly";
+    return "PEPFAR MER 2.6.1 Quarterly";
   }
 
   @Override
   public String getDescription() {
-    return "MER 2.6 Quarterly Report";
+    return "MER 2.6.1 Quarterly Report";
   }
 
   @Override

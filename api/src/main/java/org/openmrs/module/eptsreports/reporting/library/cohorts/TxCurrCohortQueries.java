@@ -136,7 +136,7 @@ public class TxCurrCohortQueries {
         .put(
             "6",
             EptsReportUtils.map(
-                getPatientsDeadTransferredOutSuspensionsInProgramStateByReportingEndDate(),
+                getPatientsSuspendedOrDeadOnProgramEnrollment(),
                 "onOrBefore=${onOrBefore},location=${location}"));
     txCurrComposition
         .getSearches()
@@ -221,10 +221,26 @@ public class TxCurrCohortQueries {
                 getPatientsTransferedOutInLastHomeVisitCard(),
                 "onOrBefore=${onOrBefore},location=${location}"));
 
+    txCurrComposition
+        .getSearches()
+        .put(
+            "mostRecentSchedule",
+            EptsReportUtils.map(
+                getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou(),
+                "onOrBefore=${onOrBefore},location=${location}"));
+
+    txCurrComposition
+        .getSearches()
+        .put(
+            "transferredOutProgram",
+            EptsReportUtils.map(
+                getTransferredOutOnProgramEnrollment(),
+                "onOrBefore=${onOrBefore},location=${location}"));
+
     String compositionString;
     if (currentSpec) {
       compositionString =
-          "(1 OR 2 OR 3 OR 4 OR 5) AND NOT ((6 OR 7 OR 8 OR 9 OR 10 OR 11 OR 15) AND NOT 12) AND NOT (13 OR 14)";
+          "(1 OR 2 OR 3 OR 4 OR 5) AND NOT ((6 OR 7 OR 8 OR 9 OR 11 OR ((10 OR 15 OR transferredOutProgram) AND mostRecentSchedule)) AND NOT 12) AND NOT (13 OR 14)";
     } else {
       compositionString = "(111 OR 2 OR 3 OR 4) AND (NOT (555 OR (666 AND (NOT (777 OR 888)))))";
     }
@@ -890,8 +906,6 @@ public class TxCurrCohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId(),
-            hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId(),
-            hivMetadata.getArtDatePickupMasterCard().getConceptId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata
                 .getTransferredOutToAnotherHealthFacilityWorkflowState()
@@ -1574,6 +1588,149 @@ public class TxCurrCohortQueries {
             hivMetadata.getDefaultingMotiveConcept().getConceptId(),
             hivMetadata.getTransferredOutConcept().getConceptId(),
             hivMetadata.getAutoTransferConcept().getConceptId()));
+
+    definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * The system will consider patient as transferred out as above defined only if the most recent
+   * date between (next scheduled ART pick-up on FILA + 1 day) and (the most recent ART pickup date
+   * on Ficha Recepção – Levantou ARVs + 31 days) falls during the reporting period.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou() {
+
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName(
+        "Patients Transfered Out between (next scheduled ART pick-up on FILA + 1 day) "
+            + "and (the most recent ART pickup date on Ficha Recepção – Levantou ARVs + 31 days");
+
+    definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        "SELECT final.patient_id FROM  ( "
+            + "SELECT considered_transferred.patient_id, max(considered_transferred.value_datetime) as max_date "
+            + "FROM ( "
+            + "               SELECT     p.patient_id, "
+            + "                          date_add(max(o.value_datetime), interval 1 day) AS value_datetime "
+            + "               FROM       patient p "
+            + "                              INNER JOIN encounter e "
+            + "                                         ON         e.patient_id=p.patient_id "
+            + "                              INNER JOIN obs o "
+            + "                                         ON         o.encounter_id=e.encounter_id "
+            + "               WHERE      p.voided = 0 "
+            + "                 AND        e.voided = 0 "
+            + "                 AND        o.voided = 0 "
+            + "                 AND        e.encounter_type = ${18} "
+            + "                 AND        o.concept_id = ${5096} "
+            + "                 AND        e.encounter_datetime <= :onOrBefore "
+            + "                 AND        e.location_id = :location "
+            + "               GROUP BY   p.patient_id "
+            + " UNION "
+            + "               SELECT     p.patient_id, "
+            + "                          date_add(max(o.value_datetime), interval 31 day)  AS value_datetime "
+            + "               FROM       patient p "
+            + "                              INNER JOIN encounter e "
+            + "                                         ON         e.patient_id=p.patient_id "
+            + "                              INNER JOIN obs o "
+            + "                                         ON         o.encounter_id=e.encounter_id "
+            + "               WHERE      p.voided = 0 "
+            + "                 AND        e.voided = 0 "
+            + "                 AND        o.voided = 0 "
+            + "                 AND        e.encounter_type = ${52} "
+            + "                 AND        o.concept_id = ${23866} "
+            + "                 AND        o.value_datetime <= :onOrBefore "
+            + "                 AND        e.location_id = :location "
+            + "               GROUP BY   p.patient_id "
+            + " )  considered_transferred "
+            + " GROUP BY considered_transferred.patient_id "
+            + " ) final "
+            + " WHERE final.max_date <= :onOrBefore  ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    definition.setQuery(stringSubstitutor.replace(query));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b>
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>6 –</b> All deaths <b>(Patient_State.state = 10)</b>, Transferred-out
+   * <b>(Patient_State.state = 7)</b> and Suspensions <b>(Patient_State.state = 8)</b>
+   *
+   * <p>Registered in Patient Program State by reporting end date <b>Patient_State.start_date <=
+   * endDate Patient_state.end_date</b> is null
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  @DocumentedDefinition(
+      value = "patientsDeadTransferredOutSuspensionsInProgramStateByReportingEndDate")
+  public CohortDefinition getTransferredOutOnProgramEnrollment() {
+
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("patientsDeadTransferredOutSuspensionsInProgramStateByReportingEndDate");
+
+    definition.setQuery(
+        TXCurrQueries.getPatientsTransferredOutOnProgramEnrollment(
+            hivMetadata.getARTProgram().getProgramId(),
+            Arrays.asList(
+                hivMetadata
+                    .getTransferredOutToAnotherHealthFacilityWorkflowState()
+                    .getProgramWorkflowStateId())));
+
+    definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    return definition;
+  }
+
+  /**
+   * <b>Description:</b>
+   *
+   * <p><b>Technical Specs</b>
+   *
+   * <blockquote>
+   *
+   * <b>6 –</b> All deaths <b>(Patient_State.state = 10)</b>, Transferred-out
+   * <b>(Patient_State.state = 7)</b> and Suspensions <b>(Patient_State.state = 8)</b>
+   *
+   * <p>Registered in Patient Program State by reporting end date <b>Patient_State.start_date <=
+   * endDate Patient_state.end_date</b> is null
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsSuspendedOrDeadOnProgramEnrollment() {
+
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName("patientsDeadSuspensionsInProgramStateByReportingEndDate");
+
+    definition.setQuery(
+        TXCurrQueries.getPatientsTransferredOutOnProgramEnrollment(
+            hivMetadata.getARTProgram().getProgramId(),
+            Arrays.asList(
+                hivMetadata.getSuspendedTreatmentWorkflowState().getProgramWorkflowStateId(),
+                hivMetadata.getArtDeadWorkflowState().getProgramWorkflowStateId())));
 
     definition.addParameter(new Parameter("onOrBefore", "onOrBefore", Date.class));
     definition.addParameter(new Parameter("location", "location", Location.class));

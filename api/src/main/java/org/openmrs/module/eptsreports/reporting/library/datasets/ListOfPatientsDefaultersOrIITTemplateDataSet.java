@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Collections;
+import java.util.Date;
 import org.openmrs.Location;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
@@ -17,9 +19,6 @@ import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.Date;
 
 @Component
 public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
@@ -82,10 +81,10 @@ public class ListOfPatientsDefaultersOrIITTemplateDataSet extends BaseDataSet {
         "onOrBefore=${endDate},location=${location}",
         new CalculationResultConverter());
 
-    // 4 - Sex - Sheet 1: Column D */
+    // 5 - Sex - Sheet 1: Column E */
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
-    // 5 - Age - Sheet 1: Column E */
+    // 4 - Age - Sheet 1: Column D */
     pdd.addColumn(
         "age", listChildrenOnARTandFormulationsDataset.getAge(), "endDate=${endDate}", null);
 

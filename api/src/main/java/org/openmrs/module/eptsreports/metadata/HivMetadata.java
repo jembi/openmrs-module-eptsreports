@@ -1012,21 +1012,6 @@ public class HivMetadata extends ProgramsMetadata {
   }
 
   /**
-   * <b>concept_id = 5497</b>
-   *
-   * <p><b>Name:</b> CD4 COUNT
-   *
-   * <p><b>Description:</b>
-   *
-   * @return {@link Concept}
-   */
-  public Concept getCD4AbsoluteConcept() {
-    String uuid =
-        Context.getAdministrationService().getGlobalProperty("eptsreports.cd4AbsolutoUuid");
-    return getConcept(uuid);
-  }
-
-  /**
    * <b>concept_id = 730</b>
    *
    * <p><b>Name:</b> CD4 %
@@ -5101,6 +5086,23 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.doencaAvancadaPorHIVConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165340</b>
+   *
+   * <p><b>Name:</b> Dispensa Bimensal
+   *
+   * <p><b>Description:</b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getBimonthlyDispensationConcept() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.bimonthlyDispensationUuid");
+    return getConcept(uuid);
+  }
+
   /**
    * <b>concept_id = 23885</b>
    *
@@ -5207,6 +5209,22 @@ public class HivMetadata extends ProgramsMetadata {
   public Concept getRegArvThirdLine() {
     String uuid =
         Context.getAdministrationService().getGlobalProperty("eptsreports.regArvThirdLineUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23856</b>
+   *
+   * <p><b>Name:</b> ART PICK UP AT AN ACCOMMODATION CAMP
+   *
+   * <p><b>Description:</b> ART PICK UP CONCEPT
+   *
+   * @return {@link Concept}
+   */
+  public Concept getArtPickupAccommodationCamp() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.artPickupAccommodationCamp");
     return getConcept(uuid);
   }
 }

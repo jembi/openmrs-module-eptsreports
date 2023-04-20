@@ -1,7 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.library.queries;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 public class TXCurrQueries {
@@ -102,6 +104,22 @@ public class TXCurrQueries {
         transferredOutToAnotherHealthFacilityWorkflowState,
         suspendedTreatmentWorkflowState,
         artDeadWorkflowState);
+  }
+
+  public static String getPatientsTransferredOutOnProgramEnrollment(
+      int artProgram, List<Integer> states) {
+
+    String concepts = StringUtils.join(states, ",");
+
+    String query =
+        " select p.patient_id from patient p "
+            + " inner join patient_program pg on p.patient_id=pg.patient_id "
+            + " inner join patient_state ps on pg.patient_program_id=ps.patient_program_id "
+            + " where pg.voided=0 and ps.voided=0 and p.voided=0 and pg.program_id=%d "
+            + " and ps.state IN (%s) and ps.start_date<=:onOrBefore "
+            + "and pg.location_id=:location group by p.patient_id ";
+
+    return String.format(query, artProgram, concepts);
   }
 
   /**
@@ -474,10 +492,11 @@ public class TXCurrQueries {
     map.put("6", adultoSeguimentoEncounterType);
     map.put("9", ARVPediatriaSeguimentoEncounterType);
     map.put("18", aRVPharmaciaEncounterType);
-    map.put("52", masterCardDrugPickupEncounterType);
     map.put("1410", returnVisitDateConcept);
     map.put("5096", returnVisitDateForArvDrugConcept);
+    map.put("52", masterCardDrugPickupEncounterType);
     map.put("23866", artDatePickup);
+
     String query =
         "SELECT pat.patient_id "
             + "FROM   patient pat "
@@ -532,7 +551,6 @@ public class TXCurrQueries {
             + "                AND        o1.voided = 0 "
             + "                AND        o1.concept_id IN(${5096}) "
             + "                AND        o1.location_id = :location "
-            + " "
             + "            UNION "
             + "            SELECT     pa.patient_id FROM       patient pa "
             + "                INNER JOIN encounter en ON         pa.patient_id = en.patient_id "
@@ -541,11 +559,11 @@ public class TXCurrQueries {
             + "                AND        en.voided = 0 "
             + "                AND        ob.voided = 0 "
             + "                AND        en.location_id = :location "
-            + "                AND        ob.location_id = :location "
-            + "                AND        en.encounter_type IN(${52}) "
-            + "                AND        ob.concept_id     IN(${23866}) "
+            + "                AND        en.encounter_type = ${52} "
+            + "                AND        ob.concept_id     = ${23866} "
             + "                AND        ob.value_datetime IS NOT NULL "
-            + "            AND        ob.value_datetime <= :onOrBefore ) fn  )  ; ";
+            + "            AND        ob.value_datetime <= :onOrBefore "
+            + " ) fn  )  ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     return stringSubstitutor.replace(query);
@@ -604,8 +622,6 @@ public class TXCurrQueries {
       int adultoSeguimento,
       int aRVPediatriaSeguimento,
       int aRVPharmacia,
-      int masterCardDrugPickup,
-      int artDatePickup,
       int masterCardEncounterType,
       int transferredOutToAnotherHealthFacilityWorkflowState,
       int getSuspendedTreatmentWorkflowState,
@@ -629,8 +645,6 @@ public class TXCurrQueries {
     map.put("6", adultoSeguimento);
     map.put("9", aRVPediatriaSeguimento);
     map.put("18", aRVPharmacia);
-    map.put("52", masterCardDrugPickup);
-    map.put("23866", artDatePickup);
     map.put("53", masterCardEncounterType);
     map.put("7", transferredOutToAnotherHealthFacilityWorkflowState);
     map.put("8", getSuspendedTreatmentWorkflowState);
@@ -841,9 +855,7 @@ public class TXCurrQueries {
             + "        INNER JOIN obs obss ON obss.encounter_id=e.encounter_id "
             + "        WHERE e.voided=0 "
             + "            AND obss.voided=0 "
-            + "            AND ((e.encounter_type IN (${6},${18}) AND  e.encounter_datetime >  most_recent2.common_date  AND e.encounter_datetime <= :onOrBefore ) OR "
-            + "            ( e.encounter_type = ${52} "
-            + "                AND obss.concept_id= ${23866} AND  obss.value_datetime > most_recent2.common_date AND obss.value_datetime <= :onOrBefore ))   "
+            + "            AND (e.encounter_type IN (${6},${18}) AND  e.encounter_datetime >  most_recent2.common_date  AND e.encounter_datetime <= :onOrBefore )  "
             + "            and e.location_id =  :location "
             + "    GROUP BY most_recent2.patient_id;";
 

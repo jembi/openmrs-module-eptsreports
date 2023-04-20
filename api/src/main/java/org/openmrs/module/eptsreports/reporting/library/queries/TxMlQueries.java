@@ -956,14 +956,14 @@ public class TxMlQueries {
    * reporting end date <b>ps.start_date <=: onOrBefore</b>
    *
    * @param program - program id
-   * @param stateOfProgram - state
+   * @param deadState - Dead state
    * @return String
    */
   public static String getPatientsListBasedOnProgramAndStateByReportingEndDate(
-      int program, int stateOfProgram) {
+      int program, int deadState) {
     Map<String, Integer> map = new HashMap<>();
     map.put("program", program);
-    map.put("stateOfProgram", stateOfProgram);
+    map.put("deadState", deadState);
     String query =
         "select patient_id "
             + "from ("
@@ -975,7 +975,7 @@ public class TxMlQueries {
             + " and ps.voided=0 "
             + " and p.voided=0 "
             + " and pg.program_id=${program} "
-            + " and ps.state =${stateOfProgram} "
+            + " and ps.state = ${deadState} "
             + " and ps.start_date<=:onOrBefore "
             + " and pg.location_id=:location "
             + " group by p.patient_id  "

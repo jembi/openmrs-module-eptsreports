@@ -1163,15 +1163,6 @@
 		</description>
 	</globalProperty>
 
-	<!-- CD4 ABSOLUTO  -->
-	<globalProperty>
-		<property>eptsreports.cd4AbsolutoUuid</property>
-		<defaultValue>e1e68f26-1d5f-11e0-b929-000c29ad1d07</defaultValue>
-		<description>
-			UUID for the  CD4 ABSOLUTO   concept
-		</description>
-	</globalProperty>
-
 	<!-- TUBERCULOSIS DRUG TREATMENT END DATE -->
 	<globalProperty>
 		<property>eptsreports.tbDgrusTreatmentEndDateUuid</property>
@@ -3447,6 +3438,14 @@
 			UUID for Doença Avançada Por HIV concept
 		</description>
 	</globalProperty>
+	<!-- 165340 -->
+	<globalProperty>
+		<property>eptsreports.bimonthlyDispensationUuid</property>
+		<defaultValue>687d72a2-c123-42b1-8083-968c4588b243</defaultValue>
+		<description>
+			UUID for Dispensa Bimensal
+		</description>
+	</globalProperty>
 
 	<globalProperty>
 		<property>@MODULE_ID@.negativeDiagnosisConceptUuid</property>
@@ -3511,6 +3510,15 @@
 			UUID for Third ARV Regimen Concept
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.artPickupAccommodationCamp</property>
+		<defaultValue>1f872b4f-68ed-450b-babf-ac568d455cd0</defaultValue>
+		<description>
+			UUID for ART PICKUP AT AN ACCOMMODATION CAMP Concept
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

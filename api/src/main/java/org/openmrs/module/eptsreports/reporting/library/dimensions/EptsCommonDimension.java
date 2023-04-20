@@ -15,19 +15,7 @@ import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraig
 
 import java.util.Date;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.Eri2MonthsCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.Eri4MonthsCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.EriCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.EriDSDCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenderCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.HivCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.MISAUKeyPopsCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.PrepCtCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TbPrevCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TxCurrCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TxNewCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TxPvlsCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.library.queries.TbPrevQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -68,6 +56,7 @@ public class EptsCommonDimension {
   private PrepCtCohortQueries prepCtCohortQueries;
 
   private TbPrevQueries tbPrevQueries;
+  @Autowired private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
 
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
@@ -160,7 +149,7 @@ public class EptsCommonDimension {
         ageDimensionCohort.createXtoYAgeCohort("patients with age between 5 and 9", 5, 9));
     dim.addCohortDefinition(
         DimensionKeyForAge.bellow10Years.getKey(),
-        ageDimensionCohort.createXtoYAgeCohort("patients with age below 15", null, 9));
+        ageDimensionCohort.createXtoYAgeCohort("patients with age below 10", null, 9));
     dim.addCohortDefinition(
         DimensionKeyForAge.bellow15Years.getKey(),
         ageDimensionCohort.createXtoYAgeCohort("patients with age below 15", null, 14));
@@ -432,6 +421,19 @@ public class EptsCommonDimension {
     return dim;
   }
 
+  public CohortDefinitionDimension getViralLoadRoutineTargetReasonsBySourceDimension() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.addParameter(new Parameter("startDate", "onOrAfter", Date.class));
+    dim.addParameter(new Parameter("endDate", "onOrBefore", Date.class));
+    dim.addParameter(new Parameter("location", "Location", Location.class));
+    CohortDefinition routineViralLoadCohort =
+        txPvlsQueries.getPatientsWhoAreOnRoutineOnMasterCardAndClinicalEncounter();
+    CohortDefinition targetedViralLoadCohort = txPvlsQueries.getPatientsWhoAreOnTargetBySource();
+    dim.addCohortDefinition("VLR", mapStraightThrough(routineViralLoadCohort));
+    dim.addCohortDefinition("VLT", mapStraightThrough(targetedViralLoadCohort));
+    return dim;
+  }
+
   public CohortDefinitionDimension getDispensingQuantityDimension() {
     CohortDefinitionDimension dim = new CohortDefinitionDimension();
     dim.setName("ARV Dispensing quantity dimension");
@@ -459,10 +461,14 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("endDate", "End Date", Date.class));
     dim.addParameter(new Parameter("location", "Location", Location.class));
     CohortDefinition eligible = eriDSDCohortQueries.getD1();
+    CohortDefinition eligibleD4 = eriDSDCohortQueries.getD4();
     CohortDefinition notEligible = eriDSDCohortQueries.getD2();
+    CohortDefinition notEligibleD4 = eriDSDCohortQueries.getD3NotD4();
 
     dim.addCohortDefinition("E", mapStraightThrough(eligible));
+    dim.addCohortDefinition("ED4", mapStraightThrough(eligibleD4));
     dim.addCohortDefinition("NE", mapStraightThrough(notEligible));
+    dim.addCohortDefinition("NED4", mapStraightThrough(notEligibleD4));
     return dim;
   }
 
@@ -474,8 +480,15 @@ public class EptsCommonDimension {
     dim.addParameter(new Parameter("location", "Location", Location.class));
     CohortDefinition pregnantBreastfeedingTb =
         eriDSDCohortQueries.getPregnantAndBreastfeedingAndOnTBTreatment();
+    CohortDefinition pregnantBreastfeeding = eriDSDCohortQueries.getPregnantAndBreastfeeding();
+    CohortDefinition pregnant = eriDSDCohortQueries.getDSDPregnant();
+    CohortDefinition breastfeeding = eriDSDCohortQueries.getDSDBreastfeeding();
     CohortDefinition inverse = new InverseCohortDefinition(pregnantBreastfeedingTb);
+    CohortDefinition inversePB = new InverseCohortDefinition(pregnantBreastfeeding);
     dim.addCohortDefinition("NPNBNTB", mapStraightThrough(inverse));
+    dim.addCohortDefinition("NPNB", mapStraightThrough(inversePB));
+    dim.addCohortDefinition("P", mapStraightThrough(pregnant));
+    dim.addCohortDefinition("B", mapStraightThrough(breastfeeding));
     return dim;
   }
 
@@ -488,6 +501,23 @@ public class EptsCommonDimension {
         "9m-",
         EptsReportUtils.map(
             genericCohortQueries.getAgeInMonths(0, 9), "effectiveDate=${effectiveDate}"));
+    return dim;
+  }
+
+  /** Dimension for Age in months */
+  public CohortDefinitionDimension ageInMonthsBasedOnArt() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Patients having age in months");
+    dim.addParameter(new Parameter("startDate", "Start  Date", Date.class));
+    dim.addParameter(new Parameter("endDate", "End  Date", Date.class));
+    dim.addParameter(new Parameter("location", "Location", Location.class));
+    dim.addCohortDefinition(
+        "10m-",
+        EptsReportUtils.map(
+            genericCohortQueries
+                .getAgeInMonthsBasedOnArtStartDateIgualGreaterThanLoweBoundAndLessThanUpperBound(
+                    0, 10),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     return dim;
   }
   /**
@@ -525,6 +555,18 @@ public class EptsCommonDimension {
         "1-14",
         EptsReportUtils.map(
             genericCohortQueries.getAgeOnMOHArtStartDate(1, 14, false),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        "8-9",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(8, 9, false),
+            "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
+
+    dim.addCohortDefinition(
+        "10-14",
+        EptsReportUtils.map(
+            genericCohortQueries.getAgeOnMOHArtStartDate(10, 14, false),
             "onOrAfter=${onOrAfter},onOrBefore=${onOrBefore},location=${location}"));
 
     return dim;
@@ -853,6 +895,34 @@ public class EptsCommonDimension {
     dim.addCohortDefinition("TD", mapStraightThrough(truckDriverTargetGroupCohort));
     dim.addCohortDefinition("CS", mapStraightThrough(serodiscordantCouplesTargetGroupCohort));
 
+    return dim;
+  }
+
+  /**
+   * <b>Patients disaggregation – routine</b>
+   *
+   * <p>The system will identify patients with routine type of VL test as following:
+   *
+   * <ul>
+   *   <li>all patients who have the most recent VL test result registered on Laboratory or FSR
+   *       (with the Reason for requesting viral load as routine viral load or UNKNOWN) Forms within
+   *       past 12 months.
+   * </ul>
+   *
+   * @return {@link CohortDefinitionDimension}
+   */
+  public CohortDefinitionDimension getViralLoadRoutineTargetReasonsDimensionForPvlsBySource() {
+    CohortDefinitionDimension dim = new CohortDefinitionDimension();
+    dim.setName("Patients disaggregation – routine");
+    dim.addParameter(new Parameter("startDate", "onOrAfter", Date.class));
+    dim.addParameter(new Parameter("endDate", "onOrBefore", Date.class));
+    dim.addParameter(new Parameter("location", "Location", Location.class));
+    CohortDefinition routineViralLoadCohort =
+        txPvlsBySourceLabOrFsrCohortQueries.getRoutineDisaggregationForPvlsBySource();
+    CohortDefinition targetedViralLoadCohort =
+        txPvlsBySourceLabOrFsrCohortQueries.getPatientsOnTargetByFsr();
+    dim.addCohortDefinition("VLR", mapStraightThrough(routineViralLoadCohort));
+    dim.addCohortDefinition("VLT", mapStraightThrough(targetedViralLoadCohort));
     return dim;
   }
 }
