@@ -1781,6 +1781,50 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
             "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
+    // Category 18 Denominator
+
+    CohortIndicator MQ18DEN =
+            eptsGeneralIndicator.getIndicator(
+                    "MQ18DEN",
+                    EptsReportUtils.map(
+                            qualityImprovement2020CohortQueries.getPatientsOnMQCat18Denominator(),
+                            "endDate=${revisionEndDate},location=${location}"));
+
+    MQ18DEN.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+            "MQ18DEN89",
+            "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T)",
+            EptsReportUtils.map(MQ18DEN, "revisionEndDate=${revisionEndDate},location=${location}"),
+            "ageBasedOnArtCat18=8-9");
+
+    dataSetDefinition.addColumn(
+            "MQ18DEN1014",
+            "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)",
+            EptsReportUtils.map(MQ18DEN, "revisionEndDate=${revisionEndDate},location=${location}"),
+            "ageBasedOnArtCat18=10-14");
+  // MI Cat 18 Numerator
+    CohortIndicator MQ18NUM =
+            eptsGeneralIndicator.getIndicator(
+                    "MQ18NUM",
+                    EptsReportUtils.map(
+                            qualityImprovement2020CohortQueries.getPatientsOnMQCat18Numerator(),
+                            "revisionEndDate=${revisionEndDate},location=${location}"));
+
+    MQ18NUM.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
+    dataSetDefinition.addColumn(
+            "MQ18NUM89",
+            "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T) NUM",
+            EptsReportUtils.map(MQ18NUM, "revisionEndDate=${revisionEndDate},location=${location}"),
+            "ageBasedOnArtCat18=8-9");
+
+    dataSetDefinition.addColumn(
+            "MQ18NUM1014",
+            "Adolescentes de 10 - 14 anos activos em TARV com RD Total  (T) NUM",
+            EptsReportUtils.map(MQ18NUM, "revisionEndDate=${revisionEndDate},location=${location}"),
+            "ageBasedOnArtCat18=10-14");
+
     return dataSetDefinition;
   }
 
