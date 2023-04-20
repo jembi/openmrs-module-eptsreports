@@ -8,10 +8,9 @@ public class TPTCompletionQueries {
    *
    * <blockquote>
    *
-   * <p>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida + Piridoxina”)
-   * and “Seguimento de Tratamento TPT” with values “Continua” or no value marked on the first pick-
-   * up on Ficha de Levantamento de TPT (FILT) during the reporting period as FILT INH Start Date
-   * and:
+   * <p>Patients who have Regime de TPT with the values (“Isoniazida” or “Isoniazida+Piridoxina”)
+   * and “Seguimento de Tratamento TPT” with values “Continua” or no value marked on a drug pick-up
+   * on Ficha de Levantamento de TPT (FILT) as “FILT Start Date” and:
    *
    * <ul>
    *   <li>No other INH values [Regime de TPT” (concept id 23985) value coded ‘Isoniazid’ or
@@ -55,14 +54,9 @@ public class TPTCompletionQueries {
         + "                      AND        o.voided = 0 "
         + "                      AND        e.location_id = :location "
         + "                      AND        e.encounter_type = ${60} "
-        + "                      AND ( "
-        + "                                    (o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982})) "
-        + "                                    AND ( "
-        + "                                            (o2.concept_id = ${23987} AND o2.value_coded = ${1257}) "
-        + "                                            OR NOT (o2.concept_id = ${23987} AND o2.value_coded IS NOT NULL) "
-        + "                                        ) "
-        + "                                    AND o2.obs_datetime <= :endDate "
-        + "                                )"
+        + "                      AND (o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982})) "
+        + "                      AND (o2.concept_id = ${23987} AND ( o2.value_coded = ${1257} OR o2.value_coded IS NULL )  "
+        + "                        AND o2.obs_datetime <= :endDate )"
         + "                      GROUP BY   p.patient_id ) AS filt "
         + "ON         filt.patient_id = p.patient_id "
         + "WHERE      p.patient_id NOT IN "
