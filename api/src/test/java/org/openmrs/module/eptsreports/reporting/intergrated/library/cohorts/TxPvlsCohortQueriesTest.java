@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.metadata.CommonMetadata;
@@ -50,7 +52,7 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     context.addParameterValue("endDate", endDate);
     context.addParameterValue("location", location);
   }
-
+  @Test
   public void getPregnantWoman() throws EvaluationException {
 
     CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
