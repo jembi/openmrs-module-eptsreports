@@ -9,6 +9,8 @@ import org.openmrs.module.eptsreports.metadata.CommonMetadata;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.HighViralLoadQueries;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -1218,7 +1220,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
 
-    spdd.setName("Data de Início da Nova Linha (se aplicável)");
+    spdd.setName("Mudança de Linha A - Data de Início da Nova Linha (se aplicável)");
 
     spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
     spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
@@ -1236,29 +1238,116 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
+    String arvStart = commonQueries.getARTStartDate(true);
+
+    String viralLoadResultQuery =
+        secondHighVlResult
+            ? HighViralLoadQueries.getColumnFQuery(true)
+            : HighViralLoadQueries.getThirdVLResultOrResultDateQuery(true);
+
     String query =
-        "SELECT p.patient_id, MIN(e.encounter_datetime) as initiation_date "
-            + "FROM patient p "
-            + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
-            + "         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "        INNER JOIN ( ";
-    if (secondHighVlResult) {
-      query += HighViralLoadQueries.getColumnFQuery(true);
-    } else {
-      query += HighViralLoadQueries.getThirdVLResultOrResultDateQuery(true);
-    }
-    query +=
-        " ) af_date on p.patient_id = af_date.patient_id "
-            + "WHERE p.voided = 0 "
-            + "  AND e.voided = 0 "
-            + "  AND o.voided = 0 "
-            + "  AND e.encounter_type = ${6} "
-            + "  AND o.concept_id IN (${21187}, ${21188}) "
-            + "  AND o.value_coded IS NOT NULL "
-            + "  AND e.location_id = :location "
-            + "  AND e.encounter_datetime > af_date.result_date "
-            + "  AND e.encounter_datetime <= :endDate "
-            + "GROUP BY p.patient_id";
+        "SELECT     p.patient_id, "
+            + "           Min(e.encounter_datetime) AS initiation_date "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         p.patient_id = e.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         e.encounter_id = o.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                  SELECT patient_id "
+            + "                  FROM   ( "
+            + arvStart
+            + " ) initiated_art "
+            + "                  WHERE  initiated_art.first_pickup BETWEEN :startDate AND    :endDate "
+            + "                  AND    initiated_art.patient_id NOT IN "
+            + "                         ( "
+            + "                                SELECT regimen_lines.patient_id "
+            + "                                FROM   ( "
+            + "                                                  SELECT     p.patient_id, "
+            + "                                                             max(o.obs_datetime) AS recent_date "
+            + "                                                  FROM       patient p "
+            + "                                                  INNER JOIN encounter e "
+            + "                                                  ON         e.patient_id = p.patient_id "
+            + "                                                  INNER JOIN obs o "
+            + "                                                  ON         o.encounter_id = e.encounter_id "
+            + "                                                  WHERE      e.voided = 0 "
+            + "                                                  AND        p.voided = 0 "
+            + "                                                  AND        o.voided = 0 "
+            + "                                                  AND        e.encounter_type = ${53} "
+            + "                                                  AND        e.location_id = :location "
+            + "                                                  AND        o.concept_id IN ( ${21187}, "
+            + "                                                                              ${21188} ) "
+            + "                                                  AND        o.value_coded IS NOT NULL "
+            + "                                                  AND        o.obs_datetime <= :endDate "
+            + "                                                  GROUP BY   p.patient_id) regimen_lines "
+            + "                                WHERE  regimen_lines.patient_id = initiated_art.patient_id ) ) first_line "
+            + "ON         first_line.patient_id = p.patient_id "
+            + "INNER JOIN ( "
+            + viralLoadResultQuery
+            + " ) af_date "
+            + "ON         p.patient_id = af_date.patient_id "
+            + "WHERE      p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "AND        e.encounter_type = ${6} "
+            + "AND        o.concept_id = ${21187} "
+            + "AND        o.value_coded IS NOT NULL "
+            + "AND        e.location_id = :location "
+            + "AND        e.encounter_datetime > af_date.result_date "
+            + "AND        e.encounter_datetime <= :endDate "
+            + "GROUP BY   p.patient_id"
+            + "UNION "
+            + "SELECT     p.patient_id, "
+            + "           min(e.encounter_datetime) AS initiation_date "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         p.patient_id = e.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         e.encounter_id = o.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                  SELECT initiated_art.patient_id "
+            + "                  FROM   ( "
+            + arvStart
+            + " ) initiated_art "
+            + "                  WHERE  initiated_art.first_pickup BETWEEN :startDate AND    :endDate "
+            + "                  AND    initiated_art.patient_id IN "
+            + "                         ( "
+            + "                                SELECT regimen_lines.patient_id "
+            + "                                FROM   ( "
+            + "                                                  SELECT     p.patient_id, "
+            + "                                                             max(o.obs_datetime) AS recent_date "
+            + "                                                  FROM       patient p "
+            + "                                                  INNER JOIN encounter e "
+            + "                                                  ON         e.patient_id = p.patient_id "
+            + "                                                  INNER JOIN obs o "
+            + "                                                  ON         o.encounter_id = e.encounter_id "
+            + "                                                  WHERE      e.voided = 0 "
+            + "                                                  AND        p.voided = 0 "
+            + "                                                  AND        o.voided = 0 "
+            + "                                                  AND        e.encounter_type = ${53} "
+            + "                                                  AND        e.location_id = :location "
+            + "                                                  AND        o.concept_id = ${21187} "
+            + "                                                  AND        o.value_coded IS NOT NULL "
+            + "                                                  AND        o.obs_datetime <= :endDate "
+            + "                                                  GROUP BY   p.patient_id) regimen_lines "
+            + "                                WHERE  regimen_lines.patient_id = initiated_art.patient_id ) ) second_line "
+            + "ON         second_line.patient_id = p.patient_id "
+            + "INNER JOIN ( "
+            + viralLoadResultQuery
+            + " ) af_date "
+            + "ON         p.patient_id = af_date.patient_id "
+            + "WHERE      p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "AND        e.encounter_type = ${6} "
+            + "AND        o.concept_id = ${21188} "
+            + "AND        o.value_coded IS NOT NULL "
+            + "AND        e.location_id = :location "
+            + "AND        e.encounter_datetime > af_date.result_date "
+            + "AND        e.encounter_datetime <= :endDate "
+            + "GROUP BY   p.patient_id";
 
     spdd.setQuery(substitutor.replace(query));
 
@@ -1845,6 +1934,98 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + HighViralLoadQueries.getThirdVLResultOrResultDateQuery(true)
             + " ) session_date "
             + "GROUP  BY session_date.patient_id";
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b></b>
+   * <li>All patients on 1st Line of ART Regimen by reporting end date (HVL_FR4) and with a VL
+   *     Result > 1000 copies/ml registered in Ficha de Laboratório Geral or FSR with the VL Result
+   *     Date during the reporting period OR
+   * <li>All patients on 2nd Line of ART Regimen by reporting end date (HVL_FR5) and with a VL
+   *     Result > 1000 copies/ml registered in Ficha de Laboratório Geral or FSR with VL Result Date
+   *     greater than the most recent Date of the 2nd Line of ART Regimen registered in Ficha
+   *     Resumo.
+   *
+   * @return {@link DataDefinition}
+   */
+  public CohortDefinition getPatientsWithUnsuppressedVlesult() {
+
+    SqlCohortDefinition spdd = new SqlCohortDefinition();
+
+    spdd.setName("Patients with unsuppressed VL Result");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
+    valuesMap.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    valuesMap.put("21188", hivMetadata.getRegArvThirdLine().getConceptId());
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    String arvStart = commonQueries.getARTStartDate(true);
+
+    String query =
+        "SELECT     p.patient_id "
+            + "FROM       patient p "
+            + "INNER JOIN "
+            + "           ( "
+            + "                  SELECT initiated_art.patient_id "
+            + "                  FROM   ( "
+            + arvStart
+            + " ) initiated_art "
+            + "                  WHERE  initiated_art.first_pickup BETWEEN :startDate AND    :endDate ) art_start "
+            + "ON         art_start.patient_id = p.patient_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     p.patient_id, "
+            + "                                 max(o.obs_datetime) AS recent_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e "
+            + "                      ON         e.patient_id = p.patient_id "
+            + "                      INNER JOIN obs o "
+            + "                      ON         o.encounter_id = e.encounter_id "
+            + "                      WHERE      e.voided = 0 "
+            + "                      AND        p.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      AND        e.encounter_type = ${53} "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        o.concept_id = ${21187} "
+            + "                      AND        o.value_coded IS NOT NULL "
+            + "                      AND        o.obs_datetime <= :endDate "
+            + "                      GROUP BY   p.patient_id ) second_line "
+            + "ON         second_line.patient_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     p.patient_id, "
+            + "                                 min(e.encounter_datetime) AS result_date "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e "
+            + "                      ON         p.patient_id = e.patient_id "
+            + "                      INNER JOIN obs o "
+            + "                      ON         e.encounter_id = o.encounter_id "
+            + "                      WHERE      p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      AND        e.encounter_type IN (${13}, "
+            + "                                                      ${51}) "
+            + "                      AND        o.concept_id = ${856} "
+            + "                      AND        o.value_numeric >= 1000 "
+            + "                      AND        e.encounter_datetime >= second_line.recent_date "
+            + "                      AND        e.encounter_datetime <= :endDate "
+            + "                      AND        e.location_id = :location "
+            + "                      GROUP BY   p.patient_id ) vlresult "
+            + "ON         vlresult.patient_id = p.patient_id "
+            + "GROUP BY   second_line.patient_id";
 
     spdd.setQuery(substitutor.replace(query));
 
