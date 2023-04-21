@@ -329,7 +329,7 @@ public class PregnantQueries {
             + ") AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore AND e.location_id=:location AND pe.gender='F' "
             + " GROUP BY p.patient_id "
             + " UNION "
-            + "     SELECT p.patient_id,  MAX(o.value_datetime) AS last_date  FROM patient p "
+            + "     SELECT p.patient_id,  MAX(DATE(o.value_datetime)) AS last_date  FROM patient p "
             + "     INNER JOIN person pe ON p.patient_id=pe.person_id "
             + "     INNER JOIN encounter e ON p.patient_id=e.patient_id "
             + "     INNER JOIN obs o ON e.encounter_id=o.encounter_id "
@@ -342,7 +342,7 @@ public class PregnantQueries {
             + yesConcept
             + " AND e.encounter_type = "
             + fsr
-            + " AND pe.gender='F' AND o.value_datetime BETWEEN :onOrAfter AND :onOrBefore GROUP BY p.patient_id "
+            + " AND pe.gender='F' AND DATE(o.value_datetime) BETWEEN :onOrAfter AND :onOrBefore GROUP BY p.patient_id "
             + " UNION "
             + " SELECT pp.patient_id, MAX(ps.start_date) AS last_date "
             + " FROM patient_program pp"
