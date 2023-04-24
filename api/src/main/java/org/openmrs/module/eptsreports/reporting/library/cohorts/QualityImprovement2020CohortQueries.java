@@ -12079,8 +12079,8 @@ public class QualityImprovement2020CohortQueries {
             + "                         AND o.voided = 0  "
             + "                         AND e.encounter_datetime BETWEEN  "
             + "                           :startDate AND :revisionEndDate  "
-            + "                       GROUP  BY p.patient_id) first_consultation  "
-            + "                      ON p.patient_id = first_consultation.patient_id  "
+            + "                       GROUP  BY p.patient_id) last_consultation  "
+            + "                      ON p.patient_id = last_consultation.patient_id  "
             + "           INNER JOIN (  "
             + "    SELECT p.patient_id, Min(o.value_datetime) art_date  "
             + "            FROM patient p  "
@@ -12103,7 +12103,7 @@ public class QualityImprovement2020CohortQueries {
             + "  AND e.location_id = :location  "
             + "  AND e.voided = 0  "
             + "  AND o.voided = 0  "
-            + "  AND e.encounter_datetime = first_consultation.encounter_datetime  "
+            + "  AND e.encounter_datetime = last_consultation.encounter_datetime  "
             + "  AND TIMESTAMPDIFF(MONTH, art_start.art_date, e.encounter_datetime) >= 6 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
@@ -12161,8 +12161,8 @@ public class QualityImprovement2020CohortQueries {
             + "                         AND o.voided = 0  "
             + "                         AND e.encounter_datetime BETWEEN  "
             + "                           :startDate AND :revisionEndDate  "
-            + "                       GROUP  BY p.patient_id) first_consultation  "
-            + "                      ON p.patient_id = first_consultation.patient_id  "
+            + "                       GROUP  BY p.patient_id) last_consultation  "
+            + "                      ON p.patient_id = last_consultation.patient_id  "
             + "           INNER JOIN (  "
             + "    SELECT p.patient_id, MAX(o.obs_datetime) first_line_date  "
             + "    FROM patient p  "
@@ -12187,7 +12187,7 @@ public class QualityImprovement2020CohortQueries {
             + "  AND e.location_id = :location  "
             + "  AND e.voided = 0  "
             + "  AND o.voided = 0  "
-            + "  AND TIMESTAMPDIFF(MONTH, o.obs_datetime, first_consultation.encounter_datetime) >= 6";
+            + "  AND TIMESTAMPDIFF(MONTH, o.obs_datetime, last_consultation.encounter_datetime) >= 6";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
