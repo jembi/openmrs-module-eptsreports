@@ -2928,7 +2928,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transfOut = getTranferredOutPatients();
 
-    CohortDefinition abandonedTarv = getPatientsWhoAbandonedTarvOnArtStartDate();
+    CohortDefinition abandonedTarv = getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
     CohortDefinition abandonedFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
     CohortDefinition abandonedSecondLine = getPatientsWhoAbandonedTarvOnOnSecondLineDate();
 
@@ -3005,7 +3005,7 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "ABANDONEDTARV", EptsReportUtils.map(abandonedTarv, MAPPING));
+        "ABANDONEDTARV", EptsReportUtils.map(abandonedTarv, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedFirstLine, MAPPING1));
@@ -5229,7 +5229,9 @@ public class QualityImprovement2020CohortQueries {
             MAPPING));
 
     cd.addSearch(
-        "ABANDONEDTARV", EptsReportUtils.map(getPatientsWhoAbandonedTarvOnArtStartDate(), MAPPING));
+        "ABANDONEDTARV",
+        EptsReportUtils.map(
+            getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate(), MAPPING1));
 
     cd.addSearch(
         "ABANDONED1LINE",
@@ -5526,7 +5528,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getMQ13P4H() {
+  public CohortDefinition getMQ13P4H(int vlQuantity) {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.addParameter(new Parameter("startDate", "Start date", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "End date", Date.class));
@@ -5562,7 +5564,8 @@ public class QualityImprovement2020CohortQueries {
             + "                AND e.encounter_type = ${6}  "
             + "                AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "                AND o.concept_id = ${856}  "
-            + "                AND o.value_numeric >= 1000  "
+            + "                AND o.value_numeric >=  "
+            + vlQuantity
             + "        GROUP BY p.patient_id) vl ON vl.patient_id = p.patient_id  "
             + "    WHERE  "
             + "        p.voided = 0 AND e.voided = 0  "
@@ -5697,7 +5700,9 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transferOut = getTranferredOutPatients();
 
-    CohortDefinition H = getMQ13P4H();
+    CohortDefinition H = getMQ13P4H(1000);
+
+    CohortDefinition H50 = getMQ13P4H(50);
 
     CohortDefinition patientsWithCargaViralonFichaClinicaAndFichaResumo =
         getPatientsWithCargaViralonFichaClinicaAndFichaResumo(1000);
@@ -5768,6 +5773,8 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(H, MAPPING));
 
+    compositionCohortDefinition.addSearch("H50", EptsReportUtils.map(H50, MAPPING));
+
     compositionCohortDefinition.addSearch(
         "B2NEW",
         EptsReportUtils.map(
@@ -5829,7 +5836,7 @@ public class QualityImprovement2020CohortQueries {
             "(((B1 AND H) AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1Den18 AND B4CV50 AND H) AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) ) AND NOT (B5CV50 or E or F)");
+            "(((B1Den18 AND B4CV50 AND H50) AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) ) AND NOT (B5CV50 or E or F)");
       }
     }
     return compositionCohortDefinition;
@@ -7917,6 +7924,16 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * <b>Categoria 9 Denominador - Pedido e Resultado de CD4 - MG</b>
+   * <li>Pedido de CD4 = “% de MG HIV+ que teve registo de pedido do primeiro CD4 na data da
+   *     primeira consulta clínica/abertura da Ficha Mestra”
+   * <li>Resultado de CD4 = “% de MG HIV+ que teve conhecimento do resultado do primeiro CD4 dentro
+   *     de 33 dias após a data da primeira CPN (primeira consulta com registo de Gravidez”
+   *
+   * @param flag parameter to receive the indicator numbe
+   * @return {@link CohortDefinition}
+   */
   public CohortDefinition getCd4RequestAndResultForPregnantsCat9Den(int flag) {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
@@ -10242,7 +10259,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                                 AND o.concept_id = ${6273}  "
             + "                                                                 AND o.value_coded = ${1707}  "
             + "                                                                 AND e.location_id = :location  "
-            + "                                                                 AND e.encounter_datetime > DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
+            + "                                                                 AND e.encounter_datetime >= DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
             + "                                                                 AND e.encounter_datetime <= end_period.first_gestante  "
             + "                                                               GROUP BY p.patient_id  "
             + "                                                               UNION  "
@@ -10257,8 +10274,8 @@ public class QualityImprovement2020CohortQueries {
             + "                                                                 AND o.concept_id = ${6272}  "
             + "                                                                 AND o.value_coded = ${1707}  "
             + "                                                                 AND e.location_id = :location  "
-            + "                                                                 AND e.encounter_datetime > DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
-            + "                                                                 AND e.encounter_datetime <= end_period.first_gestante  "
+            + "                                                                 AND o.obs_datetime >= DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
+            + "                                                                 AND o.obs_datetime <= end_period.first_gestante  "
             + "                                                               GROUP BY p.patient_id  "
             + "                                                           ) abandoned GROUP BY abandoned.patient_id";
 
