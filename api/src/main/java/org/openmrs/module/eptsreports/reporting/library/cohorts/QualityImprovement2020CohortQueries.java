@@ -12206,6 +12206,7 @@ public class QualityImprovement2020CohortQueries {
    *       “Data Fim Inclusão”)
    * </ul>
    *
+   * @param vlQuantity Quantity of viral load to evaluate
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithCargaViralonFichaClinicaAndFichaResumo(int vlQuantity) {
@@ -12221,46 +12222,36 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        "  SELECT p.patient_id "
-            + "FROM   (SELECT p.patient_id, "
-            + "               Min(e.encounter_datetime) AS first_encounter "
+        "  SELECT vl.patient_id "
+            + " FROM   (SELECT p.patient_id, "
+            + "         CASE "
+            + "           WHEN e.encounter_type = ${6} THEN MIN(e.encounter_datetime) "
+            + "           WHEN e.encounter_type = ${53} THEN MIN(o.obs_datetime) "
+            + "         END AS first_encounter "
             + "        FROM   patient p "
             + "               INNER JOIN encounter e "
             + "                       ON e.patient_id = p.patient_id "
             + "               INNER JOIN obs o "
             + "                       ON o.encounter_id = e.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.location_id = :location "
-            + "               AND o.concept_id = ${856} "
-            + "               AND o.value_numeric >= "
+            + "         WHERE "
+            + "             ( "
+            + "               (  (e.encounter_type = ${6} "
+            + "                     AND e.encounter_datetime BETWEEN :startDate AND :endDate)"
+            + "               OR (e.encounter_type = ${53} "
+            + "                     AND o.obs_datetime BETWEEN :startDate AND :endDate) ) "
+            + "             ) "
+            + "         AND e.location_id = :location "
+            + "         AND o.concept_id = ${856} "
+            + "         AND o.value_numeric >= "
             + vlQuantity
-            + "               AND e.encounter_type = ${6} "
-            + "               AND e.encounter_datetime BETWEEN :startDate AND "
-            + "                                                :endDate "
-            + "        GROUP  BY p.patient_id "
-            + "        UNION "
-            + "        SELECT p.patient_id, "
-            + "               Min(o.obs_datetime) AS first_encounter "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON e.patient_id = p.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON o.encounter_id = e.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.location_id = :location "
-            + "               AND o.concept_id = ${856} "
-            + "               AND o.value_numeric >= "
-            + vlQuantity
-            + "               AND e.encounter_type = ${53} "
-            + "               AND o.obs_datetime BETWEEN :startDate AND :endDate "
-            + "        GROUP  BY p.patient_id) p";
+            + "        AND p.voided = 0 "
+            + "        AND e.voided = 0 "
+            + "        AND o.voided = 0 "
+            + " GROUP BY p.patient_id "
+            + "        ) vl "
+            + " GROUP BY vl.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
