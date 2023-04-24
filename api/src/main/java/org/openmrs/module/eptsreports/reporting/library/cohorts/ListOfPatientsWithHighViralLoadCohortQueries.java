@@ -10,9 +10,11 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.HighViralLoadQueries;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.SqlPatientDataDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -1941,10 +1943,91 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
   }
 
   /**
-   * <b></b>
-   * <li>All patients on 1st Line of ART Regimen by reporting end date (HVL_FR4) and with a VL
-   *     Result > 1000 copies/ml registered in Ficha de Laboratório Geral or FSR with the VL Result
-   *     Date during the reporting period OR
+   * <b>List of Patients with unsuppressed VL Result Part1</b>
+   *
+   * <ul>
+   *   <li>All patients on 1st Line of ART Regimen by reporting end date (HVL_FR4) and with a VL
+   *       Result > 1000 copies/ml registered in Ficha de Laboratório Geral or FSR with the VL
+   *       Result Date during the reporting period
+   * </ul>
+   *
+   * @return {@link DataDefinition}
+   */
+  public CohortDefinition getPatientsInFirstArtLineAndHighVLResult() {
+
+    SqlCohortDefinition spdd = new SqlCohortDefinition();
+
+    spdd.setName(
+        "All patients on 1st Line of ART Regimen by reporting end date with a VL Result > 1000 copies/ml");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
+    valuesMap.put("21188", hivMetadata.getRegArvThirdLine().getConceptId());
+
+    String arvStart = commonQueries.getARTStartDate(true);
+
+    String query =
+        " SELECT first_line.patient_id FROM ( "
+            + "                SELECT patient_id FROM ( "
+            + arvStart
+            + "                 ) initiated_art"
+            + "                    WHERE initiated_art.first_pickup BETWEEN :startDate AND :endDate "
+            + "               AND initiated_art.patient_id NOT IN ( "
+            + "                             SELECT regimen_lines.patient_id "
+            + "                             FROM   (SELECT p.patient_id, "
+            + "                                            Max(o.obs_datetime) AS recent_date "
+            + "                                     FROM   patient p "
+            + "                                            INNER JOIN encounter e "
+            + "                                                    ON e.patient_id = p.patient_id "
+            + "                                            INNER JOIN obs o "
+            + "                                                    ON o.encounter_id = e.encounter_id "
+            + "                                     WHERE  e.voided = 0 "
+            + "                                            AND p.voided = 0 "
+            + "                                            AND o.voided = 0 "
+            + "                                            AND e.encounter_type = ${53} "
+            + "                                            AND e.location_id = :location "
+            + "                                            AND o.concept_id IN ( ${21187}, ${21188} ) "
+            + "                                            AND o.value_coded IS NOT NULL "
+            + "                                            AND o.obs_datetime <= :endDate "
+            + "                                     GROUP  BY p.patient_id) regimen_lines "
+            + "                             WHERE  regimen_lines.patient_id = initiated_art.patient_id"
+            + "                )) first_line "
+            + "INNER JOIN ( "
+            + "         SELECT first_vl.patient_id FROM ( "
+            + "                   SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
+            + "                   FROM "
+            + "                       patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "                                 INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                   WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                     AND e.encounter_type IN (${13}, ${51}) "
+            + "                     AND o.concept_id = ${856} "
+            + "                     AND o.value_numeric > 1000 "
+            + "                     AND e.encounter_datetime >= :startDate "
+            + "                     AND e.encounter_datetime <= :endDate "
+            + "                     AND e.location_id = :location "
+            + "                   GROUP BY p.patient_id "
+            + "                  ) first_vl "
+            + "          )vl "
+            + "     ON vl.patient_id = first_line.patient_id "
+            + "GROUP BY first_line.patient_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
+   * <b>List of Patients with unsuppressed VL Result Part2</b>
    * <li>All patients on 2nd Line of ART Regimen by reporting end date (HVL_FR5) and with a VL
    *     Result > 1000 copies/ml registered in Ficha de Laboratório Geral or FSR with VL Result Date
    *     greater than the most recent Date of the 2nd Line of ART Regimen registered in Ficha
@@ -1952,7 +2035,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public CohortDefinition getPatientsWithUnsuppressedVlesult() {
+  public CohortDefinition getPatientsWithHighVLResultAfterSecondVlResultDate() {
 
     SqlCohortDefinition spdd = new SqlCohortDefinition();
 
@@ -1965,6 +2048,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
     valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
     valuesMap.put("21187", hivMetadata.getRegArvSecondLine().getConceptId());
@@ -2003,11 +2087,10 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "                      AND        o.value_coded IS NOT NULL "
             + "                      AND        o.obs_datetime <= :endDate "
             + "                      GROUP BY   p.patient_id ) second_line "
-            + "ON         second_line.patient_id "
-            + "INNER JOIN "
+            + "ON         second_line.patient_id = p.patient_id "
+            + "WHERE p.patient_id IN "
             + "           ( "
-            + "                      SELECT     p.patient_id, "
-            + "                                 min(e.encounter_datetime) AS result_date "
+            + "                      SELECT     p.patient_id "
             + "                      FROM       patient p "
             + "                      INNER JOIN encounter e "
             + "                      ON         p.patient_id = e.patient_id "
@@ -2023,12 +2106,48 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "                      AND        e.encounter_datetime >= second_line.recent_date "
             + "                      AND        e.encounter_datetime <= :endDate "
             + "                      AND        e.location_id = :location "
-            + "                      GROUP BY   p.patient_id ) vlresult "
-            + "ON         vlresult.patient_id = p.patient_id "
-            + "GROUP BY   second_line.patient_id";
+            + "                      GROUP BY   p.patient_id )  "
+            + "GROUP BY   p.patient_id";
 
     spdd.setQuery(substitutor.replace(query));
 
     return spdd;
+  }
+
+  /**
+   * <b>Patients with unsuppressed VL Result</b>
+   *
+   * <ul>
+   *   <li>All patients on 1st Line of ART Regimen by reporting end date (HVL_FR4) and with a VL
+   *       Result > 1000 copies/ml registered in Ficha de Laboratório Geral or FSR with the VL
+   *       Result Date during the reporting period OR
+   *   <li>All patients on 2nd Line of ART Regimen by reporting end date (HVL_FR5) and with a VL
+   *       Result > 1000 copies/ml registered in Ficha de Laboratório Geral or FSR with VL Result
+   *       Date greater than the most recent Date of the 2nd Line of ART Regimen registered in Ficha
+   *       Resumo.
+   * </ul>
+   *
+   * @return {@link DataDefinition}
+   */
+  public CohortDefinition getPatientsWithUnsuppressedVlResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Patients with unsuppressed VL Result");
+
+    cd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.addSearch(
+        "firstLine", Mapped.mapStraightThrough(getPatientsInFirstArtLineAndHighVLResult()));
+
+    cd.addSearch(
+        "secondLine",
+        Mapped.mapStraightThrough(getPatientsWithHighVLResultAfterSecondVlResultDate()));
+
+    cd.setCompositionString("firstLine OR secondLine");
+
+    return cd;
   }
 }
