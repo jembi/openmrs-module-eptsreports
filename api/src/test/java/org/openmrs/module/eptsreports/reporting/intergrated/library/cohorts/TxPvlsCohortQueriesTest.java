@@ -9,8 +9,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.eptsreports.metadata.CommonMetadata;
-import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.reporting.intergrated.utils.DefinitionsTest;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TxPvlsCohortQueries;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
@@ -32,8 +30,8 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
   private EvaluationContext context;
 
   public void setup() throws Exception {
-    new TxPvlsCohortQueries(new HivMetadata(), new CommonMetadata());
     executeDataSet("TxPvlsCohortQueriesTest.xml");
+    executeDataSet("metadata.xml");
   }
 
   @Override
@@ -53,7 +51,7 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     context.addParameterValue("location", location);
   }
   @Test
-  public void getPregnantWoman() throws EvaluationException {
+  public void getPregnantWomanShouldPass() throws EvaluationException {
 
     CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
 

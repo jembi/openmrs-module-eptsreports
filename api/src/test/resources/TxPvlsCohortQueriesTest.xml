@@ -8,7 +8,7 @@
 <dataset>
         <!-- location -->
 
-        <location location_id="398" name="Clínica_A" description="NA"
+        <location location_id="400" name="Clínica_A" description="NA"
           address2="NA" state_province="NA" country="MA"
           date_created="2008-10-13 11:32:52" county_district="NA" address6="NA"
           retired="0" uuid="97186cee-e23d-11ec-8e84-6728408eef40" />
@@ -45,63 +45,58 @@
 
         <encounter_type encounter_type_id="6" name="S.TARV: ADULTO SEGUIMENTO" description="seguimento visita do paciente adulto" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e278f956-1d5f-11e0-b929-000c29ad1d07" />
 
-        <encounter_type encounter_type_id="5" name="Tratamento Profilático da Tuberculose (TPT)" description="Seguimento visita do paciente tratamento profilático da tuberculose" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="24bd60e2-a1c9-4159-a24f-12af15b77510" />
-
         <encounter_type encounter_type_id="53"  name="Master Card - Ficha Resumo" description="Seguimento visita do paciente ficha resumo" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e422ecf9-75dd-4367-b21e-54bccabc4763" />
 
-        <encounter_type encounter_type_id="51" name="Carga Viral" description="Carga Viral do paciente" creator="1" date_created="2005-10-13 04:32:34" retired="0" uuid="e278f956-1d5f-11e0-b929-000c29ad1d07" />
+        <encounter_type encounter_type_id="51" name="Carga Viral" description="Carga Viral do paciente" creator="1" date_created="2005-10-13 04:32:34" retired="0" uuid="b5b7d21f-efd1-407e-81ce-ba9d93c524f8" />
 
         <encounter_type encounter_type_id="9" name="S.TARV: PEDIATRIA SEGUIMENTO" description="Seguimento visita do paciente pediatria" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e278fce4-1d5f-11e0-b929-000c29ad1d07" />
 
         <encounter_type encounter_type_id="5" name="S.TARV: ADULTO INICIAL A" description="Primeira visita do paciente adulto" creator="1" date_created="2008-10-13 04:31:00" retired="0" uuid="e278f820-1d5f-11e0-b929-000c29ad1d07" />
 
-        <encounter_type encounter_type_id="13" name="Laboratorio" description="Laboratorio" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e278fce4-1d5f-11e0-b929-000c29ad1d07" />
-
-
-
+        <encounter_type encounter_type_id="13" name="Laboratorio" description="Laboratorio" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e2790f68-1d5f-11e0-b929-000c29ad1d07" />
 
 
         <!-- concept -->
 
-        <concept concept_id="1600" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="9db4ce3b-4c1c-45dd-905f-c984a052f26e" />
-        <concept concept_id="23821" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="b6c4d473-2af5-4c4d-a9bb-ad3779fa5579" />
-        <concept concept_id="1065" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1d43e52-1d5f-11e0-b929-000c29ad1d07" />
-        <concept concept_id="6334" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="bce7d965-3396-4667-8294-aa5260c26334" />
+        <concept concept_id="1600" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1dca8ee-1d5f-11e0-b929-000c29ad1d07" />
+        <concept concept_id="23821" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="f85e3f84-a255-412a-aa43-40174f69c305" />
+        <concept concept_id="1065" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
+        <concept concept_id="6334" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="607315ab-2f52-4d9f-b28a-6383b9a5f9c4" />
 
-        <concept concept_id="1279" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="bb57a096-e022-11ed-a1eb-4b06fda5a353" />
-        <concept concept_id="1982" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="f2abbf04-e023-11ed-8427-c3bfaee121b2" />
-        <concept concept_id="856" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e0e3c5e6-e023-11ed-b344-037804ef8b82" />
-        <concept concept_id="1305" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="310cadd0-e024-11ed-8ec8-df6248cd74aa" />
-
-
-        <concept concept_id="6331" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="805769c4-e025-11ed-aad4-a31d87bf72f9" />
-        <concept concept_id="1190" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1dadb40-1d5f-11e0-b929-000c29ad1d07" />
-        <concept concept_id="5599" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="d246130c-e025-11ed-8b08-3b4dc3852932" />
-        <concept concept_id="6332" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1c99902-e025-11ed-a06f-fbbfbb078ca0" />
+        <concept concept_id="1279" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1da0788-1d5f-11e0-b929-000c29ad1d07" />
+        <concept concept_id="1982" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1e056a6-1d5f-11e0-b929-000c29ad1d07" />
+        <concept concept_id="856" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1d6247e-1d5f-11e0-b929-000c29ad1d07" />
+        <concept concept_id="1305" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1da2704-1d5f-11e0-b929-000c29ad1d07" />
 
 
-        <program program_id="8" concept_id="1781" creator="1" date_created="2012-02-29 09:42:25" retired="0" name="PTV/ETC" description="PTV/ETC" uuid="7b2e4a0a-d4eb-4df7-be30-78ca4b28ca99" />
+        <concept concept_id="6331" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="8ace1eb2-656b-46e0-933b-670fc975ea19" />
+        <concept concept_id="1190" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1d8f690-1d5f-11e0-b929-000c29ad1d07" />
+        <concept concept_id="5599" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="e1e765c2-1d5f-11e0-b929-000c29ad1d07" />
+        <concept concept_id="6332" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="bc4fe755-fc8f-49b8-9956-baf2477e8313" />
 
 
-<encounter encounter_id="9002" encounter_type="5"
-           patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
-           date_created="2018-06-20 12:55:48" voided="0"
-           uuid="f34fb18a-f3bc-11ec-83e7-0f5560f1285d" location_id="400" />
+        <program program_id="8" concept_id="1781" creator="1" date_created="2012-02-29 09:42:25" retired="0" name="PTV/ETC" description="UUID for the PTV program" uuid="06057245-ca21-43ab-a02f-e861d7e54593" />
 
-<encounter encounter_id="9003" encounter_type="6"
-           patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
-           date_created="2018-06-20 12:55:48" voided="0"
-           uuid="5015031a-f55d-11ec-9669-7fa34f85acd6" location_id="400" />
 
-<encounter encounter_id="9004" encounter_type="53"
-           patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
-           date_created="2018-06-20 12:55:48" voided="0"
-           uuid="3ff86408-f55e-11ec-9402-9b445716e988" location_id="400" />
+        <encounter encounter_id="9002" encounter_type="5"
+                   patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
+                   date_created="2018-06-20 12:55:48" voided="0"
+                   uuid="f34fb18a-f3bc-11ec-83e7-0f5560f1285d" location_id="400" />
 
-<encounter encounter_id="9005" encounter_type="51"
-           patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
-           date_created="2018-06-20 12:55:48" voided="0"
-           uuid="094d5de2-f562-11ec-9b3b-c3f656026041" location_id="400" />
+        <encounter encounter_id="9003" encounter_type="6"
+                   patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
+                   date_created="2018-06-20 12:55:48" voided="0"
+                   uuid="5015031a-f55d-11ec-9669-7fa34f85acd6" location_id="400" />
+
+        <encounter encounter_id="9004" encounter_type="53"
+                   patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
+                   date_created="2018-06-20 12:55:48" voided="0"
+                   uuid="3ff86408-f55e-11ec-9402-9b445716e988" location_id="400" />
+
+        <encounter encounter_id="9005" encounter_type="51"
+                   patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
+                   date_created="2018-06-20 12:55:48" voided="0"
+                   uuid="094d5de2-f562-11ec-9b3b-c3f656026041" location_id="400" />
 
 
         <obs obs_id="116" person_id="9999" concept_id="1982"
@@ -135,17 +130,24 @@
              voided="0" uuid="73cbe900-f56b-11ec-b60b-bb55d88846b1" location_id="400" />
 
         <!--Global Proprety-->
-        <global_property property="eptsreports.reasonPatientNotFoundByActivist2ndVisitConceptUuid" property_value="9db4ce3b-4c1c-45dd-905f-c984a052f26e" description=" UUID for  PREGNANCY DUE DATE " uuid="668ea3dc-472a-11ea-94ad-87ec1077a1b9" />
-        <global_property property="eptsreports.reasonPatientNotFoundByActivist3rdVisitConceptUuid" property_value="b6c4d473-2af5-4c4d-a9bb-ad3779fa5579" description=" UUID for Sample collection date and time" uuid="9a628470-472b-11ea-8826-7ff98c298bc7" />
-        <global_property property="eptsreports.stateOfStayPriorArtPatientConceptUuid" property_value="e1d43e52-1d5f-11e0-b929-000c29ad1d07" description=" UUID for  " uuid="3f8e2435-281e-45d6-b9c8-5e28dbebb495" />
-        <global_property property="eptsreports.defaultingMotive" property_value="bce7d965-3396-4667-8294-aa5260c26334" description=" UUID for " uuid="8de95500-0fa5-4f54-9e11-4474a75ca285" />
-        <global_property property="eptsreports.autoTransferConceptUuid" property_value="bb57a096-e022-11ed-a1eb-4b06fda5a353" description="UUID for " uuid="58eed846-7495-446c-8dfc-33658e16dadd" />
-        <global_property property="eptsreports.urogenitalExamFindingsConcept" property_value="f2abbf04-e023-11ed-8427-c3bfaee121b2" description="UUID for PREGANT patirnts" uuid="aac7ae05-91e6-41ce-b2d8-4d49566b9d75" />
-        <global_property property="eptsreports.normalConcept" property_value="e0e3c5e6-e023-11ed-b344-037804ef8b82" description="UUID for a measure of the number of copies/ml of DNA/RNA in patients with HIV." uuid="0929a332-dc5e-4699-9c55-008bd051e863" />
-        <global_property property="eptsreports.abnormalConcept" property_value="310cadd0-e024-11ed-8ec8-df6248cd74aa" description="UUID for HIV VIRAL LOAD, QUALITATIVE" uuid="aaff0f5c-6dc8-4e0f-aab2-60d630270664" />
-        <global_property property="eptsreports.secretionsConcept" property_value="e1dadb40-1d5f-11e0-b929-000c29ad1d07" description="UUID for  HISTORICAL DRUG START DATE" uuid="7195e80a-59cc-4dee-aee2-d2012e46d472" />
-        <global_property property="eptsreports.condylomasConcept" property_value="d246130c-e025-11ed-8b08-3b4dc3852932" description="UUID for  PRIOR DELIVERY DATE" uuid="4f324bba-6f97-41cc-8853-ac56cded84db" />
-        <global_property property="eptsreports.ulcersConcept" property_value="e1c99902-e025-11ed-a06f-fbbfbb078ca0" description="UUID for BREASTFEEDING" uuid="7d031e96-2309-444f-90c0-b7d6599dff13" />
-
-
-</dataset>
+        <global_property property="@MODULE_ID@.sTarvAdultoSeguimentoEncounterTypeUuid" property_value="e278f956-1d5f-11e0-b929-000c29ad1d07" description=" Seguimento visita do paciente adulto " uuid="ff66a588-e28a-11ed-80bd-c3f922d09fd3" />
+        <global_property property="@MODULE_ID@.masterCardEncounterType" property_value="e422ecf9-75dd-4367-b21e-54bccabc4763" description="UUID for the Master Card - Ficha Resumo encounter type" uuid="4a12b030-e296-11ed-9833-1bc63e6f018c" />
+        <global_property property="@MODULE_ID@.sTarvAdultoInitialAEncounterTypeUuid" property_value="e278f820-1d5f-11e0-b929-000c29ad1d07" description="UUID for the S.TARV: ADULTO INICIAL A encounter type " uuid="249f94a8-e2aa-11ed-b07d-d7c03f0e97e7" />
+        <global_property property="eptsreports.fsrEncounterType" property_value="b5b7d21f-efd1-407e-81ce-ba9d93c524f8" description="UUID for FSR - Carga Viral encounter type" uuid="894ff596-e2aa-11ed-8f59-7306be2a2fef" />
+        <global_property property="@MODULE_ID@.sTarvPediatriaSeguimentoEncounterTypeUuid" property_value="e278fce4-1d5f-11e0-b929-000c29ad1d07" description=" UUID for the S.TARV: PEDIATRIA SEGUIMENTO encounter type" uuid="7a1a2b68-e2ab-11ed-8d0c-dfe95a968204" />
+        <global_property property="@MODULE_ID@.misauLaboratorioEncounterTypeUuid" property_value="e2790f68-1d5f-11e0-b929-000c29ad1d07" description="	UUID for the MISAU: LABORATORIO program " uuid="36a1e042-e2ab-11ed-a28f-0baac6455629" />
+        <global_property property="@MODULE_ID@.pregnancyDueDateConceptUuid" property_value="e1dca8ee-1d5f-11e0-b929-000c29ad1d07" description=" UUID for the DATA GRAVIDEZ concept" uuid="54bc0e4e-e2ac-11ed-9437-4f0a15ea74ef" />
+        <global_property property="eptsreports.sampleCollectionDateAndTimeUuid" property_value="f85e3f84-a255-412a-aa43-40174f69c305" description=" Sample collection date and time concept" uuid="9f474794-e2ac-11ed-b78f-fb628fea94e5"/>
+        <global_property property="@MODULE_ID@.yesConceptUuid" property_value="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" description="UUID for the SIM concept" uuid="68c7ed44-e2ad-11ed-b29f-475729e38cb8" />
+        <global_property property="@MODULE_ID@.criteriaForArtStartUuid" property_value="607315ab-2f52-4d9f-b28a-6383b9a5f9c4" description="UUID for the CRITÉRIO PARA INICIO DE TRATAMENTO ARV" uuid="9ed7a960-e2ad-11ed-88b2-3f178169a6b2" />
+        <global_property property="@MODULE_ID@.ptvEtvProgramUuid" property_value="06057245-ca21-43ab-a02f-e861d7e54593" description="UUID for the PTV program" uuid="f910e29c-e2b3-11ed-b425-e3834869c4e4" />
+        <global_property property="@MODULE_ID@.numberOfWeeksPregnantConceptUuid" property_value="e1da0788-1d5f-11e0-b929-000c29ad1d07" description=" UUID for the SEMANAS DE GESTAÇÃO concept" uuid="40b07aae-e2b4-11ed-8e84-ef187e14920a" />
+        <global_property property="@MODULE_ID@.pregnantConceptUuid" property_value="e1e056a6-1d5f-11e0-b929-000c29ad1d07" description=" UUID for the GESTANTE concept" uuid="843f7d1a-e2b4-11ed-8314-bb7ed9d05a5d" />
+        <global_property property="@MODULE_ID@.hivViralLoadConceptUuid" property_value="e1d6247e-1d5f-11e0-b929-000c29ad1d07" description=" UUID for the HIV CARGA VIRAL concept" uuid="d09d06c8-e2b4-11ed-946b-6fbbf0c704c3" />
+        <global_property property="eptsreports.viralLoadQualitativeConceptUuid" property_value="e1da2704-1d5f-11e0-b929-000c29ad1d07" description=" UUID for the Viral load qualitative  concept" uuid="23131f46-e2b5-11ed-a27b-a3d86790dc0e" />
+        <global_property property="eptsreports.bPlusConceptUuid" property_value="8ace1eb2-656b-46e0-933b-670fc975ea19" description="UUID for the B plus concept" uuid="6f4b48ac-e2b5-11ed-93b2-d70346aaaeb3" />
+        <global_property property="@MODULE_ID@.historicalStartDateConceptUuid" property_value="e1d8f690-1d5f-11e0-b929-000c29ad1d07" description="UUID for the DATA DE INICIO DO TARV concept" uuid="db0e70fa-e2b5-11ed-ae76-ab488d34a878" />
+        <global_property property="@MODULE_ID@.priorDeliveryDateConceptUuid" property_value="e1e765c2-1d5f-11e0-b929-000c29ad1d07" description="UUID for the Prior Delivery Date concept" uuid="1aa317c4-e2b7-11ed-972c-ffe8573791a6" />
+        <global_property property="@MODULE_ID@.breastfeedingConceptUuid" property_value="bc4fe755-fc8f-49b8-9956-baf2477e8313" description="UUID for the BREASTFEEDING concept" uuid="8bb0c51e-e2b8-11ed-bfbc-c7ecf32d7a8f" />
+        <global_property property="" property_value="" description=" " uuid="" />
+        </dataset>
