@@ -704,7 +704,7 @@ public class TxPvlsCohortQueries {
             + "                                        WHERE  p2.gender = 'F' "
             + "                                               AND e.encounter_type IN ( ${5}, ${6} ) "
             + "                                               AND e.location_id = :location "
-            + "                                               AND o.concept_id = 5599 "
+            + "                                               AND o.concept_id = ${5599} "
             + "                                               AND o.value_datetime <= :endDate "
             + "                                               AND o.voided = 0 "
             + "                                               AND p.voided = 0 "
