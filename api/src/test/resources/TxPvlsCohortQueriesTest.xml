@@ -11,34 +11,24 @@
         <location location_id="400" name="Clínica_A" description="NA"
           address2="NA" state_province="NA" country="MA"
           date_created="2008-10-13 11:32:52" county_district="NA" address6="NA"
-          retired="0" uuid="97186cee-e23d-11ec-8e84-6728408eef40" />
+          retired="0" uuid="606c50c0-e36d-11ed-afc4-abe8fd12acd3" />
 
 
         <!-- person -->
 
-        <person person_id="9999" gender="F"  creator="1"
-                birthdate="1948-01-01 00:00:00.0" birthdate_estimated="0"
-                date_created="2005-01-01 00:00:00.0" voided="false"
-                uuid="421875e2-6f22-1000-9281-8f1ee524029e" />
+        <person person_id="9999" gender="F"  creator="1" birthdate="1948-01-01 00:00:00.0" birthdate_estimated="0" dead="false"  date_created="2005-01-01 00:00:00.0" voided="false" uuid="421875e2-6f22-1000-9281-8f1ee524029e" />
 
 
-        <person person_id="1020" gender="F" birthdate="1948-01-01 00:00:00.0" birthdate_estimated="0" dead="false"
-                creator="1" date_created="2005-01-01 00:00:00.0" voided="false"
-                uuid="8b6657b8-57dc-11ea-8247-a0a4c5d1c75c"/>
+        <person person_id="1020" gender="F" birthdate="1948-01-01 00:00:00.0" birthdate_estimated="0" dead="false" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="8b6657b8-57dc-11ea-8247-a0a4c5d1c75c"/>
 
-        <person person_id="1022" gender="F" birthdate="1948-01-01 00:00:00.0" birthdate_estimated="0" dead="false"
-                creator="1" date_created="2005-01-01 00:00:00.0" voided="false"
-                uuid="c64cc15b-57dc-11ea-8247-a0a4c5d1c75c"/>
+        <person person_id="1022" gender="F" birthdate="1948-01-01 00:00:00.0" birthdate_estimated="0" dead="false" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="c64cc15b-57dc-11ea-8247-a0a4c5d1c75c"/>
 
         <!-- patient -->
-        <patient patient_id="9999"  creator="1"
-                 date_created="2005-09-22 00:00:00.0"
-                 date_changed="2008-08-18 12:29:59.0"
-                 voided="false" void_reason="" />
+        <patient patient_id="9999"  creator="1" date_created="2005-09-22 00:00:00.0" date_changed="2019-08-18 12:29:59.0"  voided="false" void_reason="" />
 
         <patient patient_id="1020" creator="1" date_created="2019-09-22 00:00:00.0" changed_by="1" date_changed="2019-10-20 12:29:59.0" voided="false" void_reason="" />
 
-        <patient patient_id="1022" creator="1" date_created="2005-09-22 00:00:00.0" changed_by="1" date_changed="2008-08-18 12:29:59.0" voided="false" void_reason="" />
+        <patient patient_id="1022" creator="1" date_created="2005-09-22 00:00:00.0" changed_by="1" date_changed="2019-08-18 12:29:59.0" voided="false" void_reason="" />
 
 
         <!-- enconters -->
@@ -75,8 +65,8 @@
         <concept concept_id="6332" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1" date_created="2005-02-22 20:07:06" changed_by="1" date_changed="2016-10-31 17:09:42" uuid="bc4fe755-fc8f-49b8-9956-baf2477e8313" />
 
 
-        <program program_id="8" concept_id="1781" creator="1" date_created="2012-02-29 09:42:25" retired="0" name="PTV/ETC" description="UUID for the PTV program" uuid="06057245-ca21-43ab-a02f-e861d7e54593" />
-
+        <concept concept_id="1598" retired="0"  class_id="5" datatype_id="4" is_set="0" date_created="2012-02-27 11:30:21"  creator="1" uuid="e1dca6e6-1d5f-11e0-b929-000c29ad1d07" />
+        <program program_id="8" concept_id="1598" creator="1" date_created="2012-02-29 09:42:25" retired="0" name="PTV" description="Programa de representa o estado de gravidez de uma mulher" uuid="06057245-ca21-43ab-a02f-e861d7e54593" />
 
         <encounter encounter_id="9002" encounter_type="5"
                    patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
@@ -93,7 +83,18 @@
                    date_created="2018-06-20 12:55:48" voided="0"
                    uuid="3ff86408-f55e-11ec-9402-9b445716e988" location_id="400" />
 
-        <encounter encounter_id="9005" encounter_type="51"
+        <encounter encounter_id="9001" encounter_type="51"
+                   patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
+                   date_created="2018-06-20 12:55:48" voided="0"
+                   uuid="094d5de2-f562-11ec-9b3b-c3f656026041" location_id="400" />
+
+
+        <encounter encounter_id="9007" encounter_type="51"
+                   patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
+                   date_created="2018-06-20 12:55:48" voided="0"
+                   uuid="094d5de2-f562-11ec-9b3b-c3f656026041" location_id="400" />
+
+        <encounter encounter_id="9008" encounter_type="51"
                    patient_id="9999" encounter_datetime="2018-07-08 00:00:00" creator="1"
                    date_created="2018-06-20 12:55:48" voided="0"
                    uuid="094d5de2-f562-11ec-9b3b-c3f656026041" location_id="400" />
@@ -105,7 +106,7 @@
              voided="0" uuid="f5273630-f570-11ec-b133-6f4a16b209db" location_id="400" />
 
         <obs obs_id="109" person_id="9999" concept_id="1279"
-             encounter_id="9006" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
+             encounter_id="9003" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
              value_coded="656" creator="1" date_created="2018-07-08 12:55:48"
              voided="0" uuid="eaca6aba-f569-11ec-a3a3-434d99430936" location_id="400" />
 
@@ -115,7 +116,7 @@
              voided="0" uuid="84f8b23a-f56b-11ec-aacc-2f74571d3b8b" location_id="400" />
 
         <obs obs_id="111" person_id="1022" concept_id="6334"
-             encounter_id="9007" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
+             encounter_id="9004" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
              value_coded="656" creator="1" date_created="2018-07-08 12:55:48"
              voided="0" uuid="7c6dcbfa-f56b-11ec-b352-63e6d14b7581" location_id="400" />
 
@@ -125,8 +126,8 @@
              voided="0" uuid="73cbe900-f56b-11ec-b60b-bb55d88846b1" location_id="400" />
 
         <obs obs_id="112" person_id="1007" concept_id="1982"
-             encounter_id="9007" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-             value_coded="1256" creator="1" value_id="1065" date_created="2018-07-08 12:55:48"
+             encounter_id="9008" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
+             value_coded="1256" creator="1" date_created="2018-07-08 12:55:48"
              voided="0" uuid="73cbe900-f56b-11ec-b60b-bb55d88846b1" location_id="400" />
 
         <!--Global Proprety-->

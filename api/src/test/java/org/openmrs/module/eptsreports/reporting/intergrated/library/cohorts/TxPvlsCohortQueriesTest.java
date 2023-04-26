@@ -1,11 +1,9 @@
 package org.openmrs.module.eptsreports.reporting.intergrated.library.cohorts;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.*;
+import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -19,19 +17,15 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
-
-
-
-
 public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
   @Autowired private TxPvlsCohortQueries txPvlsCohortQueries;
   private EvaluationContext context;
 
+  @Before
   public void setup() throws Exception {
+    //  executeDataSet("metadata.xml");
     executeDataSet("TxPvlsCohortQueriesTest.xml");
-    executeDataSet("metadata.xml");
   }
 
   @Override
@@ -47,9 +41,11 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
   @Override
   protected void setParameters(
       Date startDate, Date endDate, Location location, EvaluationContext context) {
+    context.addParameterValue("startDate", startDate);
     context.addParameterValue("endDate", endDate);
     context.addParameterValue("location", location);
   }
+
   @Test
   public void getPregnantWomanShouldPass() throws EvaluationException {
 
