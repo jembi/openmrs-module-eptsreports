@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -49,7 +48,7 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  //@Ignore("DATE_SUB and DATE Funtions are not supported by H2")
+  // @Ignore("DATE_SUB and DATE Funtions are not supported by H2")
   public void getBreastfeedingPatientsShouldPass() throws EvaluationException {
     CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
 

@@ -117,6 +117,20 @@
             description="UUID for the PTV program"
             uuid="13c07500-e36b-11ed-922f-a721f4a03a3a" />
 
+    <global_property
+            property=""
+            property_value="98979f92-b5bf-4716-b5de-679c88dd755a"
+            description="UUID for 6248 concept"
+            uuid="a56b8b04-e41d-11ed-b1f0-13b198a0bef4" />
+
+
+
+    <global_property
+            property=""
+            property_value="e1e482ee-1d5f-11e0-b929-000c29ad1d07"
+            description="UUID for 5272 concept"
+            uuid="d82ccf58-e41d-11ed-b97f-bff44140add6" />
+
 
 
 
@@ -312,6 +326,35 @@
              is_set="0"   date_created="2012-02-27 11:30:21"  creator="1"
              uuid="e1dca6e6-1d5f-11e0-b929-000c29ad1d07" />
 
+    <!--5272 -->
+    <concept concept_id="5272" retired="0" class_id="7" datatype_id="2"
+             is_set="0"   date_created="2012-02-27 11:30:21"
+             creator="1"     uuid="e1e482ee-1d5f-11e0-b929-000c29ad1d07" />
+
+    <!--6248 -->
+    <concept concept_id="6248" retired="0"  creator="1"
+             is_set="0"  class_id="11" datatype_id="4"
+             date_created="2012-02-27 11:30:21"
+             uuid="98979f92-b5bf-4716-b5de-679c88dd755a" />
+
+    <concept_name concept_id="5272"
+                  name="gravidez" locale="en"
+                  date_created="2012-02-29 09:50:50" concept_name_id="1" voided="0"
+                  uuid="2dffc540-e42b-11ed-93cd-6f177e024542" creator="1"
+                  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
+    <concept_name concept_id="6248"
+                  name="GAVE BIRTH" locale="en"
+                  date_created="2012-02-29 09:50:50" concept_name_id="2" voided="0"
+                  uuid="39a8d47c-e42b-11ed-afb6-eff97a1feefa" creator="1"
+                  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
+    <concept_name concept_id="1598"
+                  name="nao sabemos" locale="en"
+                  date_created="2012-02-29 09:50:50" concept_name_id="3" voided="0"
+                  uuid="3ff2218a-e42b-11ed-a134-c7a22d6df075" creator="1"
+                  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+
 
 
     <!-- OBS-->
@@ -367,14 +410,15 @@
 
 <!-- Program workflow -->
     <program_workflow program_workflow_id="5"
-                      program_id="8" concept_id="6332" creator="1"
-                      date_created="2012-02-29 10:17:25" retired="0"
+                      program_id="8" concept_id="5272" creator="1"
+                      date_created="2012-02-29 10:17:25" retired="0" changed_by = "1"
                       uuid="38b2c29f-496c-4b3d-b792-e2f7cdc7c8b7" />
 
 
     <!-- Program workflow_state -->
+
     <program_workflow_state program_workflow_state_id="27" program_workflow_id="5"
-                            concept_id="6332" initial="1" terminal="0" creator="1"
+                            concept_id="6248" initial="0" terminal="1" creator="1"
                             date_created="2012-07-24 11:45:26" retired="0"
                             uuid="1fa545c3-ba8b-4979-b6eb-62a96ad844af" />
 
