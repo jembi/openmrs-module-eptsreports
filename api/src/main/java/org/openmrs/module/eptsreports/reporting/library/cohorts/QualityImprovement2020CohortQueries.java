@@ -7920,7 +7920,7 @@ public class QualityImprovement2020CohortQueries {
             inclusionPeriodMappings));
 
     cd.setCompositionString(
-        "A AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+        "A AND breastfeedingOnPeriod AND D AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     return cd;
   }
 
@@ -8351,10 +8351,10 @@ public class QualityImprovement2020CohortQueries {
 
     if (flag == 1 || flag == 3) {
       cd.setCompositionString(
-          "A AND D AND breastfeedingOnPeriod AND requestCd4 AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
+              "A AND requestCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
     } else if (flag == 2 || flag == 4) {
       cd.setCompositionString(
-          "A AND breastfeedingOnPeriod AND D AND resultCd4 AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
+              "A AND resultCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
     }
 
     return cd;
@@ -11508,32 +11508,32 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
             "SELECT primeira.patient_id "
-                    + " FROM  (SELECT p.patient_id, "
-                    + "              Min(e.encounter_datetime) AS first_consultation "
-                    + "       FROM   patient p "
-                    + "              inner join encounter e "
-                    + "                      ON e.patient_id = p.patient_id "
-                    + "       WHERE  e.encounter_type = ${6} "
-                    + "              AND e.encounter_datetime <= :revisionEndDate "
-                    + "              AND e.voided = 0 "
-                    + "              AND p.voided = 0 "
-                    + "              AND e.location_id = :location "
-                    + "       GROUP  BY p.patient_id) AS primeira "
-                    + "      inner join encounter enc "
-                    + "              ON enc.patient_id = primeira.patient_id "
-                    + "      inner join obs o "
-                    + "              ON o.encounter_id = enc.encounter_id "
-                    + "      inner join person pe "
-                    + "              ON pe.person_id = primeira.patient_id "
-                    + " WHERE  primeira.first_consultation >= :startDate "
-                    + "       AND primeira.first_consultation <= :endDate "
-                    + "       AND o.concept_id = ${question} "
-                    + "       AND o.value_coded = ${answer} "
-                    + "       AND enc.encounter_type = ${6} "
-                    + "       AND enc.encounter_datetime = primeira.first_consultation "
-                    + "       AND pe.gender = 'F' "
-                    + "       AND enc.location_id = :location "
-                    + "       GROUP BY primeira.patient_id     ";
+                    + "                      FROM  (SELECT p.patient_id, "
+                    + "                                   Min(e.encounter_datetime) AS first_consultation "
+                    + "                            FROM   patient p "
+                    + "                                   inner join encounter e "
+                    + "                                           ON e.patient_id = p.patient_id "
+                    + "                            WHERE  e.encounter_type = ${6} "
+                    + "                                   AND e.encounter_datetime <= :revisionEndDate "
+                    + "                                   AND e.voided = 0 "
+                    + "                                   AND p.voided = 0 "
+                    + "                                   AND e.location_id = :location "
+                    + "                            GROUP  BY p.patient_id) AS primeira "
+                    + "                           inner join encounter enc "
+                    + "                                   ON enc.patient_id = primeira.patient_id "
+                    + "                           inner join obs o "
+                    + "                                   ON o.encounter_id = enc.encounter_id "
+                    + "                           inner join person pe "
+                    + "                                   ON pe.person_id = primeira.patient_id "
+                    + "                        WHERE enc.encounter_datetime = primeira.first_consultation "
+                    + "                        AND enc.encounter_datetime >= :startDate "
+                    + "                        AND enc.encounter_datetime <= :endDate "
+                    + "                        AND enc.encounter_type = ${6} "
+                    + "                        AND o.concept_id = ${question} "
+                    + "                        AND o.value_coded = ${answer} "
+                    + "                        AND pe.gender = 'F' "
+                    + "                        AND enc.location_id = :location "
+                    + "                        GROUP BY primeira.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
