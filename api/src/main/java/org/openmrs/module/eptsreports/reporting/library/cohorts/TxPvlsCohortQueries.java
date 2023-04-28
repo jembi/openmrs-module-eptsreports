@@ -52,8 +52,8 @@ public class TxPvlsCohortQueries {
   public TxPvlsCohortQueries(
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
-      CommonQueries commonQueries,
-      HivCohortQueries hivCohortQueries) {
+      HivCohortQueries hivCohortQueries,
+      CommonQueries commonQueries) {
     this.hivCohortQueries = hivCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonQueries = commonQueries;
