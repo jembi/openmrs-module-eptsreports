@@ -8351,10 +8351,10 @@ public class QualityImprovement2020CohortQueries {
 
     if (flag == 1 || flag == 3) {
       cd.setCompositionString(
-          "A AND requestCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+          "A AND C AND breastfeedingOnPeriod AND requestCd4 AND NOT (D OR E OR pregnantOnPeriod) AND AGE");
     } else if (flag == 2 || flag == 4) {
       cd.setCompositionString(
-          "A AND resultCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+          "A AND breastfeedingOnPeriod AND C AND resultCd4 AND NOT (D OR E OR pregnantOnPeriod) AND AGE");
     }
 
     return cd;
@@ -11490,6 +11490,7 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+    sqlCohortDefinition.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -11497,22 +11498,32 @@ public class QualityImprovement2020CohortQueries {
     map.put("answer", answer);
 
     String query =
-        "SELECT p.person_id  "
-            + "FROM   person p  "
-            + "       JOIN encounter e  "
-            + "         ON e.patient_id = p.person_id  "
-            + "       JOIN obs o  "
-            + "         ON o.encounter_id = e.encounter_id  "
-            + "            AND encounter_type = ${6}  "
-            + "            AND o.concept_id = ${question}  "
-            + "            AND o.value_coded = ${answer}  "
-            + "            AND e.location_id = :location  "
-            + "            AND e.encounter_datetime >= :startDate  "
-            + "            AND e.encounter_datetime <= :endDate  "
-            + "            AND p.gender = 'F'  "
-            + "            AND e.voided = 0  "
-            + "            AND o.voided = 0  "
-            + "            AND p.voided = 0 ";
+            "SELECT primeira.patient_id "
+                    + " FROM  (SELECT p.patient_id, "
+                    + "              Min(e.encounter_datetime) AS first_consultation "
+                    + "       FROM   patient p "
+                    + "              inner join encounter e "
+                    + "                      ON e.patient_id = p.patient_id "
+                    + "       WHERE  e.encounter_type = ${6} "
+                    + "              AND e.encounter_datetime <= :revisionEndDate "
+                    + "              AND e.voided = 0 "
+                    + "              AND p.voided = 0 "
+                    + "              AND e.location_id = :location "
+                    + "       GROUP  BY p.patient_id) AS primeira "
+                    + "      inner join encounter enc "
+                    + "              ON enc.patient_id = primeira.patient_id "
+                    + "      inner join obs o "
+                    + "              ON o.encounter_id = enc.encounter_id "
+                    + "      inner join person pe "
+                    + "              ON pe.person_id = primeira.patient_id "
+                    + " WHERE  primeira.first_consultation >= :startDate "
+                    + "       AND primeira.first_consultation <= :endDate "
+                    + "       AND o.concept_id = ${question} "
+                    + "       AND o.value_coded = ${answer} "
+                    + "       AND enc.encounter_type = ${6} "
+                    + "       AND pe.gender = 'F' "
+                    + "       AND enc.location_id = :location "
+                    + "       GROUP BY primeira.patient_id     ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
