@@ -8351,10 +8351,10 @@ public class QualityImprovement2020CohortQueries {
 
     if (flag == 1 || flag == 3) {
       cd.setCompositionString(
-          "A AND C AND breastfeedingOnPeriod AND requestCd4 AND NOT (D OR E OR pregnantOnPeriod) AND AGE");
+          "A AND D AND breastfeedingOnPeriod AND requestCd4 AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     } else if (flag == 2 || flag == 4) {
       cd.setCompositionString(
-          "A AND breastfeedingOnPeriod AND C AND resultCd4 AND NOT (D OR E OR pregnantOnPeriod) AND AGE");
+          "A AND breastfeedingOnPeriod AND D AND resultCd4 AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     }
 
     return cd;
@@ -11472,12 +11472,21 @@ public class QualityImprovement2020CohortQueries {
    * <b>Description:</b> MQ-MOH Query For pregnant or Breastfeeding patients
    *
    * <p><b>Technical Specs</b>
-   * <li>A - Select all female patients who are pregnant as following: all patients registered in
-   *     Ficha Clinica (encounter type=6) with “Gestante”(concept_id 1982) value coded equal to
-   *     “Yes” (concept_id 1065) and sex=Female
-   * <li>B - Select all female patients who are breastfeeding as following: all patients registered
-   *     in Ficha Clinica (encounter type=6) with “Lactante”(concept_id 6332) value coded equal to
-   *     “Yes” (concept_id 1065) and sex=Female
+   * <li>A - O sistema irá identificar mulheres grávidas registadas na consulta inicial
+   * selecionando todos os utentes do sexo feminino, independentemente da idade,
+   * e registados como “Grávida=Sim” na primeira consulta clínica decorrida durante o período de inclusão
+   * (“Data Consulta Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim Revisão” menos (-) 9 meses.
+   * Nota 1: é a primeira consulta clínica de sempre do utente que decorreu no período de inclusão.
+   *
+   *
+   * <li>B - O sistema irá identificar mulheres lactantes registadas na consulta inicial
+   * selecionando todos os utentes do sexo feminino, independentemente da idade,
+   * e registados como “Lactante=Sim” na primeira consulta clínica decorrida durante o período de inclusão
+   * (“Data Consulta  Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim Revisão” menos 9 (-) meses.
+   * Nota 1: é a primeira consulta clínica de sempre do utente que decorreu no período de inclusão.
+   *
+   *
+   * <li>Nota 2: A mulher grávida e lactante ao mesmo tempo, ou seja com registo de “Grávida=Sim” e “Lactante=Sim” na mesma consulta inicial, será considerada como grávida.
    *
    * @param question The question Concept Id
    * @param answer The value coded Concept Id
@@ -11521,6 +11530,7 @@ public class QualityImprovement2020CohortQueries {
                     + "       AND o.concept_id = ${question} "
                     + "       AND o.value_coded = ${answer} "
                     + "       AND enc.encounter_type = ${6} "
+                    + "       AND enc.encounter_datetime = primeira.first_consultation "
                     + "       AND pe.gender = 'F' "
                     + "       AND enc.location_id = :location "
                     + "       GROUP BY primeira.patient_id     ";
