@@ -55,6 +55,8 @@ public class QualityImprovement2020CohortQueries {
 
   private TxMlCohortQueries txMlCohortQueries;
 
+  private TxCurrCohortQueries txCurrCohortQueries;
+
   private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
@@ -2994,7 +2996,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
 
     compositionCohortDefinition.addSearch(
-        "DD", EptsReportUtils.map(txMlCohortQueries.getDeadPatientsComposition(), MAPPING3));
+        "DD", EptsReportUtils.map(getDeadPatientsCompositionMQ13(), MAPPING3));
 
     compositionCohortDefinition.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
 
@@ -5253,8 +5255,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("J", EptsReportUtils.map(getMQC13P3NUM_J(), MAPPING));
     cd.addSearch("K", EptsReportUtils.map(getMQC13P3NUM_K(), MAPPING1));
     cd.addSearch("L", EptsReportUtils.map(getMQC13P3NUM_L(), MAPPING));
-    cd.addSearch(
-        "DD", EptsReportUtils.map(txMlCohortQueries.getDeadPatientsComposition(), MAPPING3));
+    cd.addSearch("DD", EptsReportUtils.map(getDeadPatientsCompositionMQ13(), MAPPING3));
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
@@ -5769,7 +5770,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-        "DD", EptsReportUtils.map(txMlCohortQueries.getDeadPatientsComposition(), MAPPING3));
+        "DD", EptsReportUtils.map(getDeadPatientsCompositionMQ13(), MAPPING3));
 
     compositionCohortDefinition.addSearch("H", EptsReportUtils.map(H, MAPPING));
 
@@ -12275,5 +12276,69 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  /**
+   * <b>RF 7.1 Utentes com Registo de Óbito (para exclusão)</b>
+   *
+   * <blockquote>
+   *
+   * <p>O sistema irá identificar utentes com registo de “Óbito” durante o período de revisão
+   * seleccionando os utentes registados:
+   *
+   * <p><b>a.</b> com o último estado [“Mudança Estado Permanência TARV” (Coluna 21) = “O” (Óbito)
+   * na Ficha Clínica com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo da
+   * mudança do estado de permanência TARV) <= “Data Fim de Revisão”; ou
+   *
+   * <p><b>b.</b> com último estado “Mudança Estado Permanência TARV” = “Óbito” na Ficha Resumo
+   * antes do fim do período de revisão (“Data de Óbito” <= “Data Fim de Revisão”); ou
+   *
+   * <p><b>c.</b> como “‘Óbito” nos “Dados Demográficos do Paciente” ou
+   *
+   * <p><b>d.</b> como ‘Óbito’ (último estado de inscrição) no programa SERVIÇO TARV TRATAMENTO
+   * antes do fim do período de revisão (“Data de Óbito” <= Data Fim de revisão” ;
+   *
+   * <p><b>Nota:.</b> Excluindo os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou
+   * levantamento de ARV (FILA) após a “Data de Óbito” (a data mais recente entre os critérios acima
+   * identificados) e até “Data Fim Revisão”.
+   *
+   * </blockquote>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getDeadPatientsCompositionMQ13() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Get patients who are dead according to criteria a,b,c,d and e");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("reportEndDate", "Report End Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    cd.addSearch(
+        "deadByPatientProgramState",
+        EptsReportUtils.map(
+            txMlCohortQueries.getPatientsDeadInProgramStateByReportingEndDate(),
+            "onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "deadByPatientDemographics",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getDeadPatientsInDemographiscByReportingEndDate(),
+            "onOrBefore=${endDate}"));
+    cd.addSearch(
+        "deadRegisteredInFichaResumoAndFichaClinicaMasterCard",
+        EptsReportUtils.map(
+            txCurrCohortQueries.getDeadPatientsInFichaResumeAndClinicaOfMasterCardByReportEndDate(),
+            "onOrBefore=${endDate},location=${location}"));
+    cd.addSearch(
+        "exclusion",
+        EptsReportUtils.map(
+            txMlCohortQueries.getExclusionForDeadOrSuspendedPatients(true),
+            "endDate=${endDate},reportEndDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(deadByPatientDemographics OR deadByPatientProgramState"
+            + " OR deadRegisteredInFichaResumoAndFichaClinicaMasterCard) AND NOT exclusion");
+
+    return cd;
   }
 }
