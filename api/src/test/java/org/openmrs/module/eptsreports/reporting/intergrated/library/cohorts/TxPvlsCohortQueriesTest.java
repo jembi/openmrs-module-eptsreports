@@ -64,33 +64,24 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
 
   @Test
-  public void getPatientsWhoAreBreastfeedingShoudPass() throws EvaluationException {
+  public void getWomanWhoAreBreastfeedingShouldpass()
+          throws EvaluationException {
+    CohortDefinition cd =
+            txPvlsCohortQueries.getBreastfeedingPatients();
 
-    CohortDefinition cohort = txPvlsCohortQueries.getBreastfeedingPatients();
+    HashMap<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
 
-    Map<Parameter, Object> parameters = new HashMap<>();
-
-    parameters.put(new Parameter("onOrAfter", "onOrAfter", Date.class), this.getStartDate());
-    parameters.put(new Parameter("onOrBefore", "onOrBefore", Date.class), this.getEndDate());
-    parameters.put(new Parameter("locationList", "Location", Location.class), this.getLocation());
-
-    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort, parameters);
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
     assertEquals(2, evaluatedCohort.getMemberIds().size());
-
-
-    assertTrue(evaluatedCohort.getMemberIds().contains(1000));
-
-
     assertFalse(evaluatedCohort.getMemberIds().contains(1002));
-
-
-    assertTrue(evaluatedCohort.getMemberIds().contains(1001));
-
   }
 
   @Test
-  @Ignore("Test not supported by H2")
+  @Ignore("query not supported by H2")
   public void getBreastfeedingShoudPass() throws EvaluationException {
 
     CohortDefinition cohort = txPvlsCohortQueries.getBreastfeedingPatients();
@@ -103,13 +94,14 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort, parameters);
 
+    assertEquals(2, evaluatedCohort.getMemberIds().size());
     assertFalse(evaluatedCohort.getMemberIds().contains(1002));
 
   }
 
 
   @Test
-  @Ignore("Test not supported by H2")
+  @Ignore("query not supported by H2")
   public void getSpecificBreastfeedingPatientShoudPass() throws EvaluationException {
 
     CohortDefinition cohort = txPvlsCohortQueries.getBreastfeedingPatients();
@@ -122,7 +114,7 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort, parameters);
 
-    assertTrue(evaluatedCohort.getMemberIds().contains(1000));
+    assertTrue(evaluatedCohort.getMemberIds().contains(1001));
 
   }
 
@@ -139,8 +131,10 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertEquals(2, evaluatedCohort.getMemberIds().size());
     assertTrue(evaluatedCohort.getMemberIds().contains(1000));
+    assertTrue(evaluatedCohort.getMemberIds().contains(1001));
+    assertFalse(evaluatedCohort.getMemberIds().contains(1002));
   }
 
 

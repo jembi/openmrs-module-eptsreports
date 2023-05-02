@@ -180,7 +180,6 @@
     <!--Encounters-->
     <encounter encounter_id="9001" encounter_type="5" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="3d0840f6-df5f-11ed-8e3c-9754497b55fb" location_id="399" />
 
-
     <encounter encounter_id="9002" encounter_type="6" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="4927fa98-df5f-11ed-ba26-c3df3f049a09" location_id="399" />
 
     <encounter encounter_id="9003" encounter_type="9" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="b6679ab0-df77-11ed-91b0-fb77a18eb098" location_id="399" />
@@ -189,8 +188,35 @@
 
     <encounter encounter_id="9005" encounter_type="51" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="8da22748-e29d-11ed-8c31-ab7076db1ae7" location_id="399" />
 
-
     <encounter encounter_id="9006" encounter_type="53" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="bb7f4a52-df5e-11ed-9e14-db423fbcae98" location_id="399" />
+
+
+    <encounter encounter_id="9007" encounter_type="5" patient_id="1001" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="9c549e66-e90e-11ed-84bf-9b9257683845" location_id="399" />
+
+    <encounter encounter_id="9008" encounter_type="6" patient_id="1001" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="a2c726ec-e90e-11ed-8303-b7307ab88621" location_id="399" />
+
+    <encounter encounter_id="9009" encounter_type="9" patient_id="1001" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="a92ce260-e90e-11ed-bbd1-97324c6ec87e" location_id="399" />
+
+    <encounter encounter_id="9010" encounter_type="13" patient_id="1001" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="afcf69bc-e90e-11ed-ad28-bb3254435858" location_id="399" />
+
+    <encounter encounter_id="9011" encounter_type="51" patient_id="1001" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="b5f6d096-e90e-11ed-a433-c7477f38c837" location_id="399" />
+
+    <encounter encounter_id="9012" encounter_type="53" patient_id="1001" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="bd0a966a-e90e-11ed-8239-6f913b9a9e65" location_id="399" />
+
+
+
+    <encounter encounter_id="9013" encounter_type="5" patient_id="1002" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2015-05-08 00:00:00" voided="0" uuid="3e0908bc-e911-11ed-b6d1-6ffd8ed60e15" location_id="399" />
+
+    <encounter encounter_id="9014" encounter_type="6" patient_id="1002" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2015-05-08 00:00:00" voided="0" uuid="468a8434-e911-11ed-b60c-1f82c8767d68" location_id="399" />
+
+    <encounter encounter_id="9015" encounter_type="9" patient_id="1002" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2015-05-08 00:00:00" voided="0" uuid="4f0689fa-e911-11ed-b71d-bffbd5a72074" location_id="399" />
+
+    <encounter encounter_id="9016" encounter_type="13" patient_id="1002" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2015-05-08 00:00:00" voided="0" uuid="56bc51ac-e911-11ed-af35-27b5d2fb0db0" location_id="399" />
+
+    <encounter encounter_id="9017" encounter_type="51" patient_id="1002" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2015-05-08 00:00:00" voided="0" uuid="5debf180-e911-11ed-8fd4-774c46f39247" location_id="399" />
+
+    <encounter encounter_id="9018" encounter_type="53" patient_id="1002" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2015-05-08 00:00:00" voided="0" uuid="65c30560-e911-11ed-a36e-27a0bd790b54" location_id="399" />
+
 
 
 
@@ -250,6 +276,40 @@
 
     <obs obs_id="111" person_id="1000" concept_id="5599" encounter_id="9002" obs_datetime="2022-05-08 00:00:00" comments="Marte" creator="1" value_datetime="2022-05-08 00:00:00" status = "FINAL" date_created="2019-12-18 14:50:26" voided="0" uuid="cc001cda-e8eb-11ed-b7ba-d78f2828bbf5" location_id="399" />
     <obs obs_id="112" person_id="1000" concept_id="6334" encounter_id="9002" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="6332" creator="1" value_datetime="2022-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="c0f0388a-e8ef-11ed-badf-bf20b03739f5" location_id="399" />
+
+
+
+
+    <obs obs_id="113" person_id="1001" concept_id="856" encounter_id="9008" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_numeric="2000" creator="1" date_created="2018-07-08 12:55:48" voided="0" uuid="cc5205d6-e90e-11ed-acb3-87ec241e9210" location_id="399" />
+
+    <obs obs_id="114" person_id="1001" concept_id="1305" encounter_id="9012" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" date_created="2018-07-08 12:55:48" voided="0" uuid="d2eb98d0-e90e-11ed-9fe4-972274c0a2d3" location_id="399" />
+
+    <obs obs_id="115" person_id="1001" concept_id="6332" encounter_id="9007" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" value_datetime="2022-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="d8fff73e-e90e-11ed-8df1-630f17817e3b" location_id="399" />
+
+    <obs obs_id="116" person_id="1001" concept_id="6332" encounter_id="9008" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" value_datetime="2022-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="defab516-e90e-11ed-bc64-4b84e8734af6" location_id="399" />
+
+    <obs obs_id="117" person_id="1001" concept_id="5599" encounter_id="9007" obs_datetime="2022-05-08 00:00:00" comments="Marte" creator="1" value_datetime="2022-05-08 00:00:00" status = "FINAL" date_created="2019-12-18 14:50:26" voided="0"  uuid="e540b542-e90e-11ed-bd20-9fa04d807fc3" location_id="399" />
+
+    <obs obs_id="118" person_id="1001" concept_id="5599" encounter_id="9008" obs_datetime="2022-05-08 00:00:00" comments="Marte" creator="1" value_datetime="2022-05-08 00:00:00" status = "FINAL" date_created="2019-12-18 14:50:26" voided="0" uuid="eb8e7286-e90e-11ed-9add-b36eb874d41c" location_id="399" />
+    <obs obs_id="119" person_id="1001" concept_id="6334" encounter_id="9008" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="6332" creator="1" value_datetime="2022-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="f1ee5218-e90e-11ed-a4f1-f78d267645a4" location_id="399" />
+
+
+
+
+    <obs obs_id="113" person_id="1002" concept_id="856" encounter_id="9008" obs_datetime="2015-05-08 00:00:00" status = "FINAL" value_numeric="2000" creator="1" date_created="2015-07-08 12:55:48" voided="0" uuid="cc5205d6-e90e-11ed-acb3-87ec241e9210" location_id="399" />
+
+    <obs obs_id="114" person_id="1002" concept_id="1305" encounter_id="9012" obs_datetime="2015-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" date_created="2015-07-08 12:55:48" voided="0" uuid="d2eb98d0-e90e-11ed-9fe4-972274c0a2d3" location_id="399" />
+
+    <obs obs_id="115" person_id="1002" concept_id="6332" encounter_id="9007" obs_datetime="2015-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" value_datetime="2015-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="d8fff73e-e90e-11ed-8df1-630f17817e3b" location_id="399" />
+
+    <obs obs_id="116" person_id="1002" concept_id="6332" encounter_id="9008" obs_datetime="2015-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" value_datetime="2015-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="defab516-e90e-11ed-bc64-4b84e8734af6" location_id="399" />
+
+    <obs obs_id="117" person_id="1002" concept_id="5599" encounter_id="9007" obs_datetime="2015-05-08 00:00:00" comments="Marte" creator="1" value_datetime="2015-05-08 00:00:00" status = "FINAL" date_created="2019-12-18 14:50:26" voided="0"  uuid="e540b542-e90e-11ed-bd20-9fa04d807fc3" location_id="399" />
+
+    <obs obs_id="118" person_id="1002" concept_id="5599" encounter_id="9008" obs_datetime="2015-05-08 00:00:00" comments="Marte" creator="1" value_datetime="2015-05-08 00:00:00" status = "FINAL" date_created="2019-12-18 14:50:26" voided="0" uuid="eb8e7286-e90e-11ed-9add-b36eb874d41c" location_id="399" />
+    <obs obs_id="119" person_id="1002" concept_id="6334" encounter_id="9008" obs_datetime="2015-05-08 00:00:00" status = "FINAL" value_coded="6332" creator="1" value_datetime="2022-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="f1ee5218-e90e-11ed-a4f1-f78d267645a4" location_id="399" />
+
+
 
     <!-- Program -->
     <program program_id="8" concept_id="1598" creator="1"
