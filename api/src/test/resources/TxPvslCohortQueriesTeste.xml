@@ -133,272 +133,123 @@
 
 
 
-
-
-
-
-
     <!-- BreastfeedingPatients -->
 
 
 
     <!--Location -->
-    <location location_id="399" name="Marte" description="NA"
-              address2="NA" state_province="NA" country="MZ"
-              date_created="2008-10-13 11:32:52" county_district="NA" address6="NA"
-              retired="0" uuid="97186cee-e23d-11ec-8e84-6728408eef40" />
+    <location location_id="399" name="Marte" description="NA" address2="NA" state_province="NA" country="MZ" date_created="2008-10-13 11:32:52" county_district="NA" address6="NA" retired="0" uuid="97186cee-e23d-11ec-8e84-6728408eef40" />
 
 
 
     <!-- Person-->
-    <person person_id="1000" gender="F" dead="false"
-            creator="1" birthdate_estimated="0" date_created="2019-01-01 15:46:47.0"
-            voided="false" uuid="7dadab04-df4c-11ed-9abc-b75861911050"/>
+    <person person_id="1000" gender="F" dead="false" creator="1" birthdate_estimated="0" date_created="2019-01-01 15:46:47.0" voided="false" uuid="7dadab04-df4c-11ed-9abc-b75861911050"/>
 
-    <person person_id="1001" gender="F" dead="false"
-            creator="1" birthdate_estimated="0" date_created="2019-01-01 15:46:47.0"
-            voided="false" uuid="7f82f012-e29c-11ed-910d-7b3c86a263c5"/>
+    <person person_id="1001" gender="F" dead="false" creator="1" birthdate_estimated="0" date_created="2019-01-01 15:46:47.0" voided="false" uuid="7f82f012-e29c-11ed-910d-7b3c86a263c5"/>
 
-    <person person_id="1002" gender="F" dead="false"
-            creator="1" birthdate_estimated="0" date_created="2019-01-01 15:46:47.0"
-            voided="false" uuid="86c6701a-e29c-11ed-96cd-d7314a0ccfd1"/>
+    <person person_id="1002" gender="F" dead="false" creator="1" birthdate_estimated="0" date_created="2019-01-01 15:46:47.0" voided="false" uuid="86c6701a-e29c-11ed-96cd-d7314a0ccfd1"/>
 
 
     <!-- Patient-->
-    <patient patient_id="1000"   creator="1"
-             date_created="2005-09-22 00:00:00.0"
-             date_changed="2008-08-18 12:29:59.0" voided="false" void_reason="" />
+    <patient patient_id="1000"   creator="1" date_created="2005-09-22 00:00:00.0" date_changed="2008-08-18 12:29:59.0" voided="false" void_reason="" />
 
-    <patient patient_id="1001"   creator="1"
-             date_created="2006-09-22 00:00:00.0"
-             date_changed="2009-08-18 12:29:59.0" voided="false" void_reason="" />
+    <patient patient_id="1001"   creator="1" date_created="2006-09-22 00:00:00.0" date_changed="2009-08-18 12:29:59.0" voided="false" void_reason="" />
 
-    <patient patient_id="1002"   creator="1"
-             date_created="2007-09-22 00:00:00.0"
-             date_changed="2010-08-18 12:29:59.0" voided="false" void_reason="" />
+    <patient patient_id="1002"   creator="1" date_created="2007-09-22 00:00:00.0" date_changed="2010-08-18 12:29:59.0" voided="false" void_reason="" />
 
 
     <!-- Encounter_types-->
 
-    <encounter_type encounter_type_id="5"
-                    name="S.TARV: ADULTO INICIAL A"
-                    description="Primeira visita do paciente adulto" creator="1"
-                    date_created="2008-10-13 11:35:34" retired="0"
-                    uuid="e278f820-1d5f-11e0-b929-000c29ad1d07" />
+    <encounter_type encounter_type_id="5" name="S.TARV: ADULTO INICIAL A" description="Primeira visita do paciente adulto" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e278f820-1d5f-11e0-b929-000c29ad1d07" />
 
 
-    <encounter_type encounter_type_id="6"
-                    name="S.TARV: ADULTO SEGUIMENTO"
-                    description="Seguimento visita do paciente adulto" creator="1"
-                    date_created="2008-10-13 11:35:34" retired="0"
-                    uuid="e278f956-1d5f-11e0-b929-000c29ad1d07" />
+    <encounter_type encounter_type_id="6" name="S.TARV: ADULTO SEGUIMENTO" description="Seguimento visita do paciente adulto" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e278f956-1d5f-11e0-b929-000c29ad1d07" />
 
-    <encounter_type encounter_type_id="9"
-                    name="S.TARV: PEDIATRIA SEGUIMENTO"
-                    description="Seguimento visita do paciente pediatria" creator="1"
-                    date_created="2008-10-13 11:35:34" retired="0"
-                    uuid="e278fce4-1d5f-11e0-b929-000c29ad1d07" />
+    <encounter_type encounter_type_id="9" name="S.TARV: PEDIATRIA SEGUIMENTO" description="Seguimento visita do paciente pediatria" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e278fce4-1d5f-11e0-b929-000c29ad1d07" />
 
-    <encounter_type encounter_type_id="13"
-                    name="MISAU: LABORATORIO"
-                    description="Laboratorio" creator="1"
-                    date_created="2008-10-13 11:35:34" retired="0"
-                    uuid="e2790f68-1d5f-11e0-b929-000c29ad1d07" />
+    <encounter_type encounter_type_id="13" name="MISAU: LABORATORIO" description="Laboratorio" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e2790f68-1d5f-11e0-b929-000c29ad1d07" />
 
-    <encounter_type encounter_type_id="51"
-                    name="FSR"
-                    description="Carga Viral" creator="1"
-                    date_created="2008-10-13 11:35:34" retired="0"
-                    uuid="b5b7d21f-efd1-407e-81ce-ba9d93c524f8" />
+    <encounter_type encounter_type_id="51" name="FSR" description="Carga Viral" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="b5b7d21f-efd1-407e-81ce-ba9d93c524f8" />
 
 
-    <encounter_type encounter_type_id="53"
-                    name="Master Card - Ficha Resumo"
-                    description="Ficha resumo no master card" creator="1"
-                    date_created="2008-10-13 11:35:34" retired="0"
-                    uuid="e422ecf9-75dd-4367-b21e-54bccabc4763" />
+    <encounter_type encounter_type_id="53" name="Master Card - Ficha Resumo" description="Ficha resumo no master card" creator="1" date_created="2008-10-13 11:35:34" retired="0" uuid="e422ecf9-75dd-4367-b21e-54bccabc4763" />
 
 
 
 
     <!--Encounters-->
-    <encounter encounter_id="9001" encounter_type="5"
-               patient_id="1000" encounter_datetime="2018-07-08 00:00:00" creator="1"
-               date_created="2018-06-20 12:55:48" voided="0"
-               uuid="3d0840f6-df5f-11ed-8e3c-9754497b55fb" location_id="399" />
+    <encounter encounter_id="9001" encounter_type="5" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="3d0840f6-df5f-11ed-8e3c-9754497b55fb" location_id="399" />
 
 
-    <encounter encounter_id="9002" encounter_type="6"
-               patient_id="1000" encounter_datetime="2018-07-08 00:00:00" creator="1"
-               date_created="2018-06-20 12:55:48" voided="0"
-               uuid="4927fa98-df5f-11ed-ba26-c3df3f049a09" location_id="399" />
+    <encounter encounter_id="9002" encounter_type="6" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="4927fa98-df5f-11ed-ba26-c3df3f049a09" location_id="399" />
 
-    <encounter encounter_id="9003" encounter_type="9"
-               patient_id="1000" encounter_datetime="2019-07-08 00:00:00" creator="1"
-               date_created="2018-06-20 12:55:48" voided="0"
-               uuid="b6679ab0-df77-11ed-91b0-fb77a18eb098" location_id="399" />
+    <encounter encounter_id="9003" encounter_type="9" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="b6679ab0-df77-11ed-91b0-fb77a18eb098" location_id="399" />
 
-    <encounter encounter_id="9004" encounter_type="13"
-               patient_id="1000" encounter_datetime="2018-07-08 00:00:00" creator="1"
-               date_created="2018-06-20 12:55:48" voided="0"
-               uuid="be840368-e29d-11ed-9019-976b18246831" location_id="399" />
+    <encounter encounter_id="9004" encounter_type="13" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="be840368-e29d-11ed-9019-976b18246831" location_id="399" />
 
-    <encounter encounter_id="9005" encounter_type="51"
-               patient_id="1000" encounter_datetime="2016-07-08 00:00:00" creator="1"
-               date_created="2018-06-20 12:55:48" voided="0"
-               uuid="8da22748-e29d-11ed-8c31-ab7076db1ae7" location_id="399" />
+    <encounter encounter_id="9005" encounter_type="51" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="8da22748-e29d-11ed-8c31-ab7076db1ae7" location_id="399" />
 
 
-    <encounter encounter_id="9006" encounter_type="53"
-               patient_id="1000" encounter_datetime="2017-07-08 00:00:00" creator="1"
-               date_created="2018-06-20 12:55:48" voided="0"
-               uuid="bb7f4a52-df5e-11ed-9e14-db423fbcae98" location_id="399" />
-
-
-
-
+    <encounter encounter_id="9006" encounter_type="53" patient_id="1000" encounter_datetime="2022-05-08 00:00:00" creator="1" date_created="2022-05-08 00:00:00" voided="0" uuid="bb7f4a52-df5e-11ed-9e14-db423fbcae98" location_id="399" />
 
 
 
 
     <!-- Concept-->
-    <concept concept_id="1600" retired="0" datatype_id="4"
-             class_id="11" is_set="0" creator="1"
-             date_created="2005-01-06 00:00:00"
-             uuid="e1dca8ee-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="1600" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1" date_created="2005-01-06 00:00:00" uuid="e1dca8ee-1d5f-11e0-b929-000c29ad1d07" />
 
-    <concept concept_id="1279" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="e1da0788-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="1279" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="e1da0788-1d5f-11e0-b929-000c29ad1d07" />
 
-    <concept concept_id="1982" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="e1e056a6-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="1982" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="e1e056a6-1d5f-11e0-b929-000c29ad1d07" />
 
-    <concept concept_id="6331" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="8ace1eb2-656b-46e0-933b-670fc975ea19" />
+    <concept concept_id="6331" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="8ace1eb2-656b-46e0-933b-670fc975ea19" />
 
-    <concept concept_id="1190" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="e1d8f690-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="1190" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="e1d8f690-1d5f-11e0-b929-000c29ad1d07" />
 
-    <concept concept_id="5599" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="e1e765c2-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="5599" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="e1e765c2-1d5f-11e0-b929-000c29ad1d07" />
 
-    <concept concept_id="23821" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="f85e3f84-a255-412a-aa43-40174f69c305" />
+    <concept concept_id="23821" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="f85e3f84-a255-412a-aa43-40174f69c305" />
 
-    <concept concept_id="6332" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="bc4fe755-fc8f-49b8-9956-baf2477e8313" />
+    <concept concept_id="6332" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="bc4fe755-fc8f-49b8-9956-baf2477e8313" />
 
-    <concept concept_id="1065" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
+    <concept concept_id="1065" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" />
 
-    <concept concept_id="6334" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="607315ab-2f52-4d9f-b28a-6383b9a5f9c4" />
+    <concept concept_id="6334" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="607315ab-2f52-4d9f-b28a-6383b9a5f9c4" />
 
-    <concept concept_id="856" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="e1d6247e-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="856" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="e1d6247e-1d5f-11e0-b929-000c29ad1d07" />
 
-    <concept concept_id="1305" retired="0" datatype_id="6"
-             class_id="7" is_set="0" creator="1"
-             date_created="2005-02-09 00:00:00"
-             uuid="e1da2704-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="1305" retired="0" datatype_id="6" class_id="7" is_set="0" creator="1" date_created="2005-02-09 00:00:00" uuid="e1da2704-1d5f-11e0-b929-000c29ad1d07" />
 
-    <concept concept_id="1598" retired="0"  class_id="5" datatype_id="4"
-             is_set="0"   date_created="2012-02-27 11:30:21"  creator="1"
-             uuid="e1dca6e6-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="1598" retired="0"  class_id="5" datatype_id="4" is_set="0"   date_created="2012-02-27 11:30:21"  creator="1" uuid="e1dca6e6-1d5f-11e0-b929-000c29ad1d07" />
 
     <!--5272 -->
-    <concept concept_id="5272" retired="0" class_id="7" datatype_id="2"
-             is_set="0"   date_created="2012-02-27 11:30:21"
-             creator="1"     uuid="e1e482ee-1d5f-11e0-b929-000c29ad1d07" />
+    <concept concept_id="5272" retired="0" class_id="7" datatype_id="2" is_set="0"   date_created="2012-02-27 11:30:21" creator="1" uuid="e1e482ee-1d5f-11e0-b929-000c29ad1d07" />
 
     <!--6248 -->
-    <concept concept_id="6248" retired="0"  creator="1"
-             is_set="0"  class_id="11" datatype_id="4"
-             date_created="2012-02-27 11:30:21"
-             uuid="98979f92-b5bf-4716-b5de-679c88dd755a" />
+    <concept concept_id="6248" retired="0"  creator="1" is_set="0"  class_id="11" datatype_id="4" date_created="2012-02-27 11:30:21" uuid="98979f92-b5bf-4716-b5de-679c88dd755a" />
 
-    <concept_name concept_id="5272"
-                  name="gravidez" locale="en"
-                  date_created="2012-02-29 09:50:50" concept_name_id="1" voided="0"
-                  uuid="2dffc540-e42b-11ed-93cd-6f177e024542" creator="1"
-                  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+    <concept_name concept_id="5272" name="gravidez" locale="en" date_created="2012-02-29 09:50:50" concept_name_id="1" voided="0" uuid="2dffc540-e42b-11ed-93cd-6f177e024542" creator="1" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
-    <concept_name concept_id="6248"
-                  name="GAVE BIRTH" locale="en"
-                  date_created="2012-02-29 09:50:50" concept_name_id="2" voided="0"
-                  uuid="39a8d47c-e42b-11ed-afb6-eff97a1feefa" creator="1"
-                  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+    <concept_name concept_id="6248" name="GAVE BIRTH" locale="en" date_created="2012-02-29 09:50:50" concept_name_id="2" voided="0" uuid="39a8d47c-e42b-11ed-afb6-eff97a1feefa" creator="1" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
-    <concept_name concept_id="1598"
-                  name="nao sabemos" locale="en"
-                  date_created="2012-02-29 09:50:50" concept_name_id="3" voided="0"
-                  uuid="3ff2218a-e42b-11ed-a134-c7a22d6df075" creator="1"
-                  concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
+    <concept_name concept_id="1598" name="nao sabemos" locale="en" date_created="2012-02-29 09:50:50" concept_name_id="3" voided="0" uuid="3ff2218a-e42b-11ed-a134-c7a22d6df075" creator="1" concept_name_type="FULLY_SPECIFIED" locale_preferred="0" />
 
 
 
     <!-- OBS-->
 
-    <obs obs_id="102" person_id="1000" concept_id="1982"
-         encounter_id="9001" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-         value_coded="1065" creator="1" date_created="2018-07-08 12:55:48"
-         voided="0" uuid="1ff4cba6-df4b-11ed-a469-33035f05fd69" location_id="399" />
+    <obs obs_id="102" person_id="1000" concept_id="856" encounter_id="9002" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_numeric="2000" creator="1" date_created="2018-07-08 12:55:48" voided="0" uuid="1ff4cba6-df4b-11ed-a469-33035f05fd69" location_id="399" />
 
-    <obs obs_id="104" person_id="1000" concept_id="1190"
-         encounter_id="9001" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-         creator="1" date_created="2018-07-08 12:55:48"
-         voided="0" uuid="3b746b20-df4b-11ed-b67b-97daf318a22c" location_id="399" />
+    <obs obs_id="102" person_id="1000" concept_id="1305" encounter_id="9006" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" date_created="2018-07-08 12:55:48" voided="0" uuid="9ad20f2e-e8eb-11ed-a18a-d7a050c2b594" location_id="399" />
 
-    <obs obs_id="105" person_id="1000" concept_id="5599"
-         encounter_id="9001" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-         creator="1" date_created="2018-07-08 12:55:48"
-         voided="0" uuid="461867fc-df4b-11ed-a892-b7e0972f1d87" location_id="399" />
+    <obs obs_id="107" person_id="1000" concept_id="6332" encounter_id="9001" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" value_datetime="2022-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="b809fb9c-e8eb-11ed-8b97-1f6f716cd7b8" location_id="399" />
 
-    <obs obs_id="106" person_id="1000" concept_id="23821"
-         encounter_id="9001" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-         creator="1" date_created="2018-07-08 12:55:48"
-         voided="0" uuid="4e686e66-df4b-11ed-8dee-af3d4f67a47f" location_id="399" />
+    <obs obs_id="109" person_id="1000" concept_id="6332" encounter_id="9002" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="1065" creator="1" value_datetime="2022-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="be800e80-e8eb-11ed-8cb8-63aea93bc50b" location_id="399" />
 
-    <obs obs_id="107" person_id="1000" concept_id="6332"
-         encounter_id="9001" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-         value_coded="1065" creator="1" date_created="2018-07-08 12:55:48"
-         voided="0" uuid="8bf39b52-df4b-11ed-a615-e7261733b87b" location_id="399" />
+    <obs obs_id="110" person_id="1000" concept_id="5599" encounter_id="9001" obs_datetime="2022-05-08 00:00:00" comments="Marte" creator="1" value_datetime="2022-05-08 00:00:00" status = "FINAL" date_created="2019-12-18 14:50:26" voided="0"  uuid="c58a751c-e8eb-11ed-ad8e-972de26685ff" location_id="399" />
 
-    <obs obs_id="109" person_id="1000" concept_id="6334"
-         encounter_id="9001" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-         value_coded="6332" creator="1" date_created="2018-07-08 12:55:48"
-         voided="0" uuid="9f496f92-df4b-11ed-b6e7-c7932f324500" location_id="399" />
-
-    <obs obs_id="110" person_id="1000" concept_id="856"
-         encounter_id="9001" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-         creator="1" date_created="2018-07-08 12:55:48"
-         voided="0" uuid="6d68ba36-df4c-11ed-a1c3-43c6040832e6" location_id="399" />
-
-    <obs obs_id="111" person_id="1000" concept_id="1305"
-         encounter_id="9001" obs_datetime="2018-07-08 00:00:00" status = "FINAL"
-         creator="1" date_created="2018-07-08 12:55:48"
-         voided="0" uuid="75aa4ec6-df4c-11ed-a82f-ffbd325c79ec" location_id="399" />
-
+    <obs obs_id="111" person_id="1000" concept_id="5599" encounter_id="9002" obs_datetime="2022-05-08 00:00:00" comments="Marte" creator="1" value_datetime="2022-05-08 00:00:00" status = "FINAL" date_created="2019-12-18 14:50:26" voided="0" uuid="cc001cda-e8eb-11ed-b7ba-d78f2828bbf5" location_id="399" />
+    <obs obs_id="112" person_id="1000" concept_id="6334" encounter_id="9002" obs_datetime="2022-05-08 00:00:00" status = "FINAL" value_coded="6332" creator="1" value_datetime="2022-05-08 00:00:00" date_created="2018-07-08 12:55:48" voided="0" uuid="c0f0388a-e8ef-11ed-badf-bf20b03739f5" location_id="399" />
 
     <!-- Program -->
     <program program_id="8" concept_id="1598" creator="1"

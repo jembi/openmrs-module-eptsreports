@@ -1,11 +1,10 @@
 package org.openmrs.module.eptsreports.reporting.intergrated.library.cohorts;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.api.context.Context;
@@ -18,6 +17,9 @@ import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
@@ -48,7 +50,6 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  // @Ignore("DATE_SUB and DATE Funtions are not supported by H2")
   public void getBreastfeedingPatientsShouldPass() throws EvaluationException {
     CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
 
@@ -60,4 +61,89 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
     assertNotNull(evaluatedCohort.getMemberIds());
   }
+
+
+  @Test
+  public void getPatientsWhoAreBreastfeedingShoudPass() throws EvaluationException {
+
+    CohortDefinition cohort = txPvlsCohortQueries.getBreastfeedingPatients();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+
+    parameters.put(new Parameter("onOrAfter", "onOrAfter", Date.class), this.getStartDate());
+    parameters.put(new Parameter("onOrBefore", "onOrBefore", Date.class), this.getEndDate());
+    parameters.put(new Parameter("locationList", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort, parameters);
+
+    assertEquals(2, evaluatedCohort.getMemberIds().size());
+
+
+    assertTrue(evaluatedCohort.getMemberIds().contains(1000));
+
+
+    assertFalse(evaluatedCohort.getMemberIds().contains(1002));
+
+
+    assertTrue(evaluatedCohort.getMemberIds().contains(1001));
+
+  }
+
+  @Test
+  @Ignore("Test not supported by H2")
+  public void getBreastfeedingShoudPass() throws EvaluationException {
+
+    CohortDefinition cohort = txPvlsCohortQueries.getBreastfeedingPatients();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+
+    parameters.put(new Parameter("onOrAfter", "onOrAfter", Date.class), this.getStartDate());
+    parameters.put(new Parameter("onOrBefore", "onOrBefore", Date.class), this.getEndDate());
+    parameters.put(new Parameter("locationList", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort, parameters);
+
+    assertFalse(evaluatedCohort.getMemberIds().contains(1002));
+
+  }
+
+
+  @Test
+  @Ignore("Test not supported by H2")
+  public void getSpecificBreastfeedingPatientShoudPass() throws EvaluationException {
+
+    CohortDefinition cohort = txPvlsCohortQueries.getBreastfeedingPatients();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+
+    parameters.put(new Parameter("onOrAfter", "onOrAfter", Date.class), this.getStartDate());
+    parameters.put(new Parameter("onOrBefore", "onOrBefore", Date.class), this.getEndDate());
+    parameters.put(new Parameter("locationList", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort, parameters);
+
+    assertTrue(evaluatedCohort.getMemberIds().contains(1000));
+
+  }
+
+  @Test
+  public void getNumberOfPatientsWhoInitiatedPreTarvByEndOfPreviousMonthA1ShouldPass()
+          throws EvaluationException {
+    CohortDefinition cd =
+            txPvlsCohortQueries.getBreastfeedingPatients();
+
+    HashMap<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1000));
+  }
+
+
+
+
 }
