@@ -7870,7 +7870,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
+        "revisionEndDate=${revisionEndDate},startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
 
     cd.addSearch(
         "A",
@@ -8290,7 +8290,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
     String inclusionPeriodMappings =
-        "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
+        "revisionEndDate=${revisionEndDate},startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate-9m},location=${location}";
 
     cd.addSearch(
         "A",
@@ -8351,10 +8351,10 @@ public class QualityImprovement2020CohortQueries {
 
     if (flag == 1 || flag == 3) {
       cd.setCompositionString(
-              "A AND requestCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+          "A AND requestCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
     } else if (flag == 2 || flag == 4) {
       cd.setCompositionString(
-              "A AND resultCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+          "A AND resultCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
     }
 
     return cd;
@@ -11472,21 +11472,20 @@ public class QualityImprovement2020CohortQueries {
    * <b>Description:</b> MQ-MOH Query For pregnant or Breastfeeding patients
    *
    * <p><b>Technical Specs</b>
-   * <li>A - O sistema irá identificar mulheres grávidas registadas na consulta inicial
-   * selecionando todos os utentes do sexo feminino, independentemente da idade,
-   * e registados como “Grávida=Sim” na primeira consulta clínica decorrida durante o período de inclusão
-   * (“Data Consulta Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim Revisão” menos (-) 9 meses.
-   * Nota 1: é a primeira consulta clínica de sempre do utente que decorreu no período de inclusão.
-   *
-   *
+   * <li>A - O sistema irá identificar mulheres grávidas registadas na consulta inicial selecionando
+   *     todos os utentes do sexo feminino, independentemente da idade, e registados como
+   *     “Grávida=Sim” na primeira consulta clínica decorrida durante o período de inclusão (“Data
+   *     Consulta Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim
+   *     Revisão” menos (-) 9 meses. Nota 1: é a primeira consulta clínica de sempre do utente que
+   *     decorreu no período de inclusão.
    * <li>B - O sistema irá identificar mulheres lactantes registadas na consulta inicial
-   * selecionando todos os utentes do sexo feminino, independentemente da idade,
-   * e registados como “Lactante=Sim” na primeira consulta clínica decorrida durante o período de inclusão
-   * (“Data Consulta  Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim Revisão” menos 9 (-) meses.
-   * Nota 1: é a primeira consulta clínica de sempre do utente que decorreu no período de inclusão.
-   *
-   *
-   * <li>Nota 2: A mulher grávida e lactante ao mesmo tempo, ou seja com registo de “Grávida=Sim” e “Lactante=Sim” na mesma consulta inicial, será considerada como grávida.
+   *     selecionando todos os utentes do sexo feminino, independentemente da idade, e registados
+   *     como “Lactante=Sim” na primeira consulta clínica decorrida durante o período de inclusão
+   *     (“Data Consulta Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data
+   *     Fim Revisão” menos 9 (-) meses. Nota 1: é a primeira consulta clínica de sempre do utente
+   *     que decorreu no período de inclusão.
+   * <li>Nota 2: A mulher grávida e lactante ao mesmo tempo, ou seja com registo de “Grávida=Sim” e
+   *     “Lactante=Sim” na mesma consulta inicial, será considerada como grávida.
    *
    * @param question The question Concept Id
    * @param answer The value coded Concept Id
@@ -11499,7 +11498,8 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -11507,33 +11507,33 @@ public class QualityImprovement2020CohortQueries {
     map.put("answer", answer);
 
     String query =
-            "SELECT primeira.patient_id "
-                    + "                      FROM  (SELECT p.patient_id, "
-                    + "                                   Min(e.encounter_datetime) AS first_consultation "
-                    + "                            FROM   patient p "
-                    + "                                   inner join encounter e "
-                    + "                                           ON e.patient_id = p.patient_id "
-                    + "                            WHERE  e.encounter_type = ${6} "
-                    + "                                   AND e.encounter_datetime <= :revisionEndDate "
-                    + "                                   AND e.voided = 0 "
-                    + "                                   AND p.voided = 0 "
-                    + "                                   AND e.location_id = :location "
-                    + "                            GROUP  BY p.patient_id) AS primeira "
-                    + "                           inner join encounter enc "
-                    + "                                   ON enc.patient_id = primeira.patient_id "
-                    + "                           inner join obs o "
-                    + "                                   ON o.encounter_id = enc.encounter_id "
-                    + "                           inner join person pe "
-                    + "                                   ON pe.person_id = primeira.patient_id "
-                    + "                        WHERE enc.encounter_datetime = primeira.first_consultation "
-                    + "                        AND enc.encounter_datetime >= :startDate "
-                    + "                        AND enc.encounter_datetime <= :endDate "
-                    + "                        AND enc.encounter_type = ${6} "
-                    + "                        AND o.concept_id = ${question} "
-                    + "                        AND o.value_coded = ${answer} "
-                    + "                        AND pe.gender = 'F' "
-                    + "                        AND enc.location_id = :location "
-                    + "                        GROUP BY primeira.patient_id ";
+        "SELECT primeira.patient_id "
+            + "                      FROM  (SELECT p.patient_id, "
+            + "                                   Min(e.encounter_datetime) AS first_consultation "
+            + "                            FROM   patient p "
+            + "                                   inner join encounter e "
+            + "                                           ON e.patient_id = p.patient_id "
+            + "                            WHERE  e.encounter_type = ${6} "
+            + "                                   AND e.encounter_datetime <= :revisionEndDate "
+            + "                                   AND e.voided = 0 "
+            + "                                   AND p.voided = 0 "
+            + "                                   AND e.location_id = :location "
+            + "                            GROUP  BY p.patient_id) AS primeira "
+            + "                           inner join encounter enc "
+            + "                                   ON enc.patient_id = primeira.patient_id "
+            + "                           inner join obs o "
+            + "                                   ON o.encounter_id = enc.encounter_id "
+            + "                           inner join person pe "
+            + "                                   ON pe.person_id = primeira.patient_id "
+            + "                        WHERE enc.encounter_datetime = primeira.first_consultation "
+            + "                        AND enc.encounter_datetime >= :startDate "
+            + "                        AND enc.encounter_datetime <= :endDate "
+            + "                        AND enc.encounter_type = ${6} "
+            + "                        AND o.concept_id = ${question} "
+            + "                        AND o.value_coded = ${answer} "
+            + "                        AND pe.gender = 'F' "
+            + "                        AND enc.location_id = :location "
+            + "                        GROUP BY primeira.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
