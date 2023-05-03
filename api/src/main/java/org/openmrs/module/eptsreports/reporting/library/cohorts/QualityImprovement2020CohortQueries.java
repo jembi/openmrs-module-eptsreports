@@ -10141,20 +10141,26 @@ public class QualityImprovement2020CohortQueries {
   // ************** ABANDONED ART SECTION *************
 
   /**
-   * <b> RF7.2 EXCLUSION PATIENTS WHO ABANDONED DURING ART START DATE PERIOD</b>
+   * <b> RF7.2 Utentes Abandono ou reinício TARV durante os últimos 6 meses anteriores a última
+   * consulta (para exclusão)</b><br>
+   * <br>
    *
    * <p>O sistema irá identificar utentes que abandonaram o tratamento TARV durante o período da
    * seguinte forma:
    *
-   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
-   * Consulta”<=”Data Fim Período”
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reinicio” na Ficha Clínica nos 6 meses anteriores a data da última consulta (“Data Consulta
+   * Abandono/Reinicio” >= “Data Última Consulta” menos 6 meses e <= “Data última Consulta”).<br>
+   * <br>
    *
-   * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
-   * Período” e “Data Consulta”<=”Data Fim Período”
-   * <li>1. para exclusão nos utentes que iniciaram a 1ª linha de TARV, a “Data Início Período” será
-   *     igual a “Data Início TARV” e “Data Fim do Período” será igual a “Data Início TARV”+6meses.
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reinicio” na Ficha Resumo nos 6 meses anteriores a data da última consulta (“Data de Mudança
+   * de Estado Permanência Abandono/Reinicio” >= “Data Última Consulta” menos 6 meses e <= “Data
+   * última Consulta”).<br>
+   * <br>
+   *
+   * <p><b>Nota:</b> “Data Última Consulta” é a data da última consulta clínica ocorrida durante o
+   * período de revisão.
    *
    * @return CohortDefinition
    */
@@ -10172,6 +10178,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
             hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getRestartConcept().getConceptId(),
             hivMetadata.getStateOfStayOfPreArtPatient().getConceptId()));
 
     return cd;

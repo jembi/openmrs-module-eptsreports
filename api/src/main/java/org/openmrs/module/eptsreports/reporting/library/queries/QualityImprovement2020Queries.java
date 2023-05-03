@@ -1390,6 +1390,7 @@ public class QualityImprovement2020Queries {
    * @param masterCardEncounterType The Ficha Resumo Encounter Type 53
    * @param stateOfStayOfArtPatient The State of Stay in ART Concept 6273
    * @param abandonedConcept The Abandoned Concept 1707
+   * @param restartConcept The Abandoned Concept 1705
    * @param stateOfStayOfPreArtPatient The State of Stay in Pre Art Concept 6272
    * @return {@link String}
    */
@@ -1398,6 +1399,7 @@ public class QualityImprovement2020Queries {
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
       int abandonedConcept,
+      int restartConcept,
       int stateOfStayOfPreArtPatient) {
 
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
@@ -1408,6 +1410,7 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
     map.put("6272", stateOfStayOfPreArtPatient);
 
     String query =
@@ -1421,7 +1424,7 @@ public class QualityImprovement2020Queries {
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= end_period.first_pickup "
             + "                                       AND e.encounter_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
@@ -1437,7 +1440,7 @@ public class QualityImprovement2020Queries {
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= end_period.first_pickup "
             + "                                       AND o.obs_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
