@@ -1305,7 +1305,6 @@ public class TxPvlsCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     String mappedQuery = stringSubstitutor.replace(query);
     sqlCohortDefinition.setQuery(mappedQuery);
-    System.out.println(sqlCohortDefinition.getQuery());
     return sqlCohortDefinition;
   }
 }
