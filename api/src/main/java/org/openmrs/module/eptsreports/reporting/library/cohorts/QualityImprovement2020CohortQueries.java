@@ -87,22 +87,24 @@ public class QualityImprovement2020CohortQueries {
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
       GenderCohortQueries genderCohortQueries,
+      AgeCohortQueries ageCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
       CommonCohortQueries commonCohortQueries,
       TbMetadata tbMetadata,
       TxPvlsCohortQueries txPvls,
-      AgeCohortQueries ageCohortQueries,
-      TxMlCohortQueries txMlCohortQueries) {
+      TxMlCohortQueries txMlCohortQueries,
+      TxCurrCohortQueries txCurrCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
-    this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
+    this.hivMetadata = hivMetadata;
     this.genderCohortQueries = genderCohortQueries;
+    this.ageCohortQueries = ageCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.commonCohortQueries = commonCohortQueries;
     this.tbMetadata = tbMetadata;
     this.txPvls = txPvls;
-    this.ageCohortQueries = ageCohortQueries;
     this.txMlCohortQueries = txMlCohortQueries;
+    this.txCurrCohortQueries = txCurrCohortQueries;
   }
 
   public void setIntensiveMonitoringCohortQueries(

@@ -1471,8 +1471,7 @@ public class QualityImprovement2020Queries {
    * <br>
    *
    * <p><b>Nota:</b> Data Início Período” e “Data Fim Período” estão definidas no respectivo
-   * indicador/RF.</p><br>
-   *
+   * indicador/RF.<br>
    *
    * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
    * @param masterCardEncounterType The Ficha Resumo Encounter Type 53
