@@ -24,7 +24,6 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
   @Before
   public void setup() throws Exception {
-    //  executeDataSet("metadata.xml");
     executeDataSet("TxPvlsCohortQueriesTest.xml");
   }
 
@@ -52,9 +51,8 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
 
     Map<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
-    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
-
+    parameters.put(new Parameter("endDate", "End Date", Date.class),getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class),getLocation());
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
     assertNotNull(evaluatedCohort.getMemberIds());
@@ -66,7 +64,7 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
 
     Map<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class),getEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
@@ -81,7 +79,7 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
 
     Map<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class),getEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);

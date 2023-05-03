@@ -26,7 +26,6 @@ public class ResumoMensalCohortQueriesTest extends DefinitionsTest {
 
   @Before
   public void setup() throws Exception {
-    // executeDataSet("metadata.xml");
     executeDataSet("ResumoMensalTest.xml");
   }
 
