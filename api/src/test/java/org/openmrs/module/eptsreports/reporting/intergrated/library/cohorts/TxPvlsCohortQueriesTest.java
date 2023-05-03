@@ -30,12 +30,12 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
   @Override
   protected Date getEndDate() {
-    return DateUtil.getDateTime(2020, 6, 27);
+    return DateUtil.getDateTime(2022, 6, 27);
   }
 
   @Override
   protected Location getLocation() {
-    return Context.getLocationService().getLocation(400);
+    return Context.getLocationService().getLocation(399);
   }
 
   @Override
@@ -44,6 +44,35 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     context.addParameterValue("startDate", startDate);
     context.addParameterValue("endDate", endDate);
     context.addParameterValue("location", location);
+  }
+
+  @Test
+  public void getPregnantWomanShouldPassAny() throws EvaluationException {
+
+    CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+
+    assertNotNull(evaluatedCohort.getMemberIds());
+  }
+
+  @Test
+  public void getPregnantWomanShouldFail() throws EvaluationException {
+
+    CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().contains(1022));
   }
 
   @Test
@@ -57,6 +86,7 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertNotNull(evaluatedCohort.getMemberIds());
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1020));
   }
 }
