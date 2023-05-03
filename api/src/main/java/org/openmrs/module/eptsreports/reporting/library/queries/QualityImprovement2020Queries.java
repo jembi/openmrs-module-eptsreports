@@ -1394,7 +1394,7 @@ public class QualityImprovement2020Queries {
    * @param stateOfStayOfPreArtPatient The State of Stay in Pre Art Concept 6272
    * @return {@link String}
    */
-  public static String getMQ13AbandonedTarvOnArtStartDate(
+  public static String getMQ13AbandonedOrRestartedTarvOnLast6MonthsArt(
       int adultoSeguimentoEncounterType,
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
@@ -1445,6 +1445,94 @@ public class QualityImprovement2020Queries {
             + "       AND o.obs_datetime >= end_period.first_pickup "
             + "                                       AND o.obs_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
             + "                                       AND o.obs_datetime <= end_period.first_pickup "
+            + "                                     GROUP BY p.patient_id "
+            + "                                 ) abandoned GROUP BY abandoned.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * <b> RF7.3 Utentes Abandono ou Reinício TARV durante o período (para exclusão)</b><br>
+   * <br>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram ou reiniciaram o tratamento TARV durante
+   * um determinado período ( entre “Data Início Periodo” e “Data Fim Período” da seguinte forma:
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reincio” na Ficha Clínica durante o período (“Data Consulta Abandono/Reinicio” >= “Data Início
+   * Período e <= “Data Fim Período.<br>
+   * <br>
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reinicio” na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência
+   * Abandono/Reinicio” >= “Data Início Período” e <= “Data Fim Período”). .<br>
+   * <br>
+   *
+   * <p><b>Nota:</b> Data Início Período” e “Data Fim Período” estão definidas no respectivo
+   * indicador/RF.</p><br>
+   *
+   *
+   * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
+   * @param masterCardEncounterType The Ficha Resumo Encounter Type 53
+   * @param stateOfStayOfArtPatient The State of Stay in ART Concept 6273
+   * @param abandonedConcept The Abandoned Concept 1707
+   * @param restartConcept The Abandoned Concept 1705
+   * @param stateOfStayOfPreArtPatient The State of Stay in Pre Art Concept 6272
+   * @return {@link String}
+   */
+  public static String getMQ13AbandonedOrRestartedTarvOnArtStartDate(
+      int adultoSeguimentoEncounterType,
+      int masterCardEncounterType,
+      int stateOfStayOfArtPatient,
+      int abandonedConcept,
+      int restartConcept,
+      int stateOfStayOfPreArtPatient) {
+
+    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
+    String artStart = commonQueries.getARTStartDate(true);
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("53", masterCardEncounterType);
+    map.put("6273", stateOfStayOfArtPatient);
+    map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
+    map.put("6272", stateOfStayOfPreArtPatient);
+
+    String query =
+        " SELECT abandoned.patient_id from ( "
+            + "                                     SELECT p.patient_id, max(e.encounter_datetime) as last_encounter FROM patient p "
+            + "                                                                                                               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                                                                                               INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                                                                                                               INNER JOIN ( "
+            + artStart
+            + " ) end_period ON end_period.patient_id = p.patient_id "
+            + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                       AND e.encounter_type = ${6} "
+            + "                                       AND o.concept_id = ${6273} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
+            + "                                       AND e.location_id = :location "
+            + "       AND e.encounter_datetime >= end_period.first_pickup "
+            + "                                       AND e.encounter_datetime >= :startDate "
+            + "                                       AND e.encounter_datetime <= :endDate "
+            + "                                     GROUP BY p.patient_id "
+            + "UNION "
+            + "     SELECT p.patient_id, max(o.obs_datetime) as last_encounter FROM patient p "
+            + "                                                                                                               INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                                                                                               INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                                                                                                               INNER JOIN ( "
+            + artStart
+            + " ) end_period ON end_period.patient_id = p.patient_id "
+            + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                                       AND e.encounter_type = ${53} "
+            + "                                       AND o.concept_id = ${6272} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
+            + "                                       AND e.location_id = :location "
+            + "       AND o.obs_datetime >= end_period.first_pickup "
+            + "                                       AND o.obs_datetime >= :startDate "
+            + "                                       AND o.obs_datetime <= :endDate "
             + "                                     GROUP BY p.patient_id "
             + "                                 ) abandoned GROUP BY abandoned.patient_id";
 

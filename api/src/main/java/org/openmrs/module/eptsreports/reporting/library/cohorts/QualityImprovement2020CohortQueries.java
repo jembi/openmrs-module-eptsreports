@@ -10164,7 +10164,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWhoAbandonedTarvOnArtStartDate() {
+  public CohortDefinition getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients who abandoned TARV On Art Start Date");
@@ -10173,7 +10173,49 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.setQuery(
-        QualityImprovement2020Queries.getMQ13AbandonedTarvOnArtStartDate(
+        QualityImprovement2020Queries.getMQ13AbandonedOrRestartedTarvOnLast6MonthsArt(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getRestartConcept().getConceptId(),
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId()));
+
+    return cd;
+  }
+
+  /**
+   * <b> RF7.3 Utentes Abandono ou Reinício TARV durante o período (para exclusão)</b><br>
+   * <br>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram ou reiniciaram o tratamento TARV durante
+   * um determinado período ( entre “Data Início Periodo” e “Data Fim Período” da seguinte forma:
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reincio” na Ficha Clínica durante o período (“Data Consulta Abandono/Reinicio” >= “Data Início
+   * Período e <= “Data Fim Período.<br>
+   * <br>
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reinicio” na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência
+   * Abandono/Reinicio” >= “Data Início Período” e <= “Data Fim Período”). .<br>
+   * <br>
+   *
+   * <p><b>Nota:</b> Data Início Período” e “Data Fim Período” estão definidas no respectivo
+   * indicador/RF.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoAbandonedOrRestartedTarvOnArtStartDate() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients who abandoned TARV On Art Start Date");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setQuery(
+        QualityImprovement2020Queries.getMQ13AbandonedOrRestartedTarvOnArtStartDate(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
