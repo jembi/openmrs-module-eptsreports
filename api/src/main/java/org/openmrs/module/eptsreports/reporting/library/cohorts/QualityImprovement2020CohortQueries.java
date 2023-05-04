@@ -7920,7 +7920,7 @@ public class QualityImprovement2020CohortQueries {
             inclusionPeriodMappings));
 
     cd.setCompositionString(
-        "A AND breastfeedingOnPeriod AND D AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
+        "A OR (D AND breastfeedingOnPeriod) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     return cd;
   }
 
@@ -11486,6 +11486,8 @@ public class QualityImprovement2020CohortQueries {
    *     que decorreu no período de inclusão.
    * <li>Nota 2: A mulher grávida e lactante ao mesmo tempo, ou seja com registo de “Grávida=Sim” e
    *     “Lactante=Sim” na mesma consulta inicial, será considerada como grávida.
+   * <li>Nota: Para o registo de mulheres grávidas deve se considerar a consulta inicial e não
+   *     qualquer consulta durante o periodo de inclusão
    *
    * @param question The question Concept Id
    * @param answer The value coded Concept Id
