@@ -1426,7 +1426,6 @@ public class QualityImprovement2020Queries {
             + "                                       AND o.concept_id = ${6273} "
             + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
-            + "       AND e.encounter_datetime >= end_period.first_pickup "
             + "                                       AND e.encounter_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
             + "                                       AND e.encounter_datetime <= end_period.first_pickup "
             + "                                     GROUP BY p.patient_id "
@@ -1442,7 +1441,6 @@ public class QualityImprovement2020Queries {
             + "                                       AND o.concept_id = ${6272} "
             + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
-            + "       AND o.obs_datetime >= end_period.first_pickup "
             + "                                       AND o.obs_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
             + "                                       AND o.obs_datetime <= end_period.first_pickup "
             + "                                     GROUP BY p.patient_id "
@@ -1877,6 +1875,7 @@ public class QualityImprovement2020Queries {
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
       int abandonedConcept,
+      int restartConcept,
       int stateOfStayOfPreArtPatient,
       int therapeuticLineConcept,
       int firstLineConcept,
@@ -1892,6 +1891,7 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
     map.put("6272", stateOfStayOfPreArtPatient);
     map.put("21151", therapeuticLineConcept);
     map.put("21150", firstLineConcept);
@@ -1911,7 +1911,7 @@ public class QualityImprovement2020Queries {
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= DATE_SUB(end_period.last_encounter, INTERVAL 6 MONTH)  "
             + "                                       AND e.encounter_datetime <= end_period.last_encounter "
@@ -1926,7 +1926,7 @@ public class QualityImprovement2020Queries {
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= DATE_SUB(end_period.last_encounter, INTERVAL 6 MONTH)  "
             + "                                       AND o.obs_datetime <= end_period.last_encounter "
