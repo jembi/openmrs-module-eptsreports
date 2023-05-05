@@ -6953,7 +6953,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
             hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getAnnualArvDispensationConcept().getConceptId());
 
     List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
 
