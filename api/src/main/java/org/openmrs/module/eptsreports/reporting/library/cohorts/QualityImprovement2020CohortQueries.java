@@ -5083,7 +5083,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ) AND NOT ABANDONEDTARV OR B5E) AND NOT (C OR D) AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND age");
+            "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT (ABANDONED2LINE OR B5E)) AND NOT (C OR D) AND age");
       }
     } else {
       if (line == 1) {
@@ -5094,7 +5094,7 @@ public class QualityImprovement2020CohortQueries {
             "(B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) ) AND NOT ABANDONEDTARV OR B5E) AND NOT (C OR D) AND G AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND G AND age");
+            "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT (ABANDONED2LINE OR B5E)) AND NOT (C OR D) AND G AND age");
       }
     }
 
@@ -10411,6 +10411,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
             hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getRestartConcept().getConceptId(),
             hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
             hivMetadata.getTherapeuticLineConcept().getConceptId(),
             hivMetadata.getFirstLineConcept().getConceptId(),
@@ -10500,6 +10501,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
             hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getRestartConcept().getConceptId(),
             hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
             hivMetadata.getRegArvSecondLine().getConceptId()));
 
