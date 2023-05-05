@@ -273,7 +273,7 @@ public class QualityImprovement2020Queries {
 
   /**
    * <b>MQ15DEN RF5 </b> - O sistema irá identificar utentes adultos inscritos no MDS
-   * (GAAC/DT/APE/DD/DS/FR) há 24 meses selecionando:</b><br>
+   * (GAAC/DT/APE/DD/FR/DS/DA) há 24 meses selecionando:</b><br>
    *
    * <ul>
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “GA” e
@@ -299,6 +299,10 @@ public class QualityImprovement2020Queries {
    *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “FR” e
    *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
    *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DA” e 
+   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
+   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta 
    *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    * </ul>
    *
