@@ -3211,7 +3211,7 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getMOHPregnantORBreastfeedingOnClinicalConsultation(
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
+                "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     cd.addSearch(
         "breastfeedingOnPeriod",
@@ -3219,10 +3219,10 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getMOHPregnantORBreastfeedingOnClinicalConsultation(
                 commonMetadata.getBreastfeeding().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
+                "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     cd.setCompositionString(
-        "A AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+        "A OR (breastfeedingOnPeriod AND D) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     return cd;
   }
 
