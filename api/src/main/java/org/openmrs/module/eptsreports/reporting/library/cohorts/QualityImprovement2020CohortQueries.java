@@ -10298,6 +10298,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
+    map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
@@ -10316,7 +10317,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                               WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "                                                                 AND e.encounter_type = ${6}  "
             + "                                                                 AND o.concept_id = ${6273}  "
-            + "                                                                 AND o.value_coded = ${1707}  "
+            + "                                                                 AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                                                 AND e.location_id = :location  "
             + "                                                                 AND e.encounter_datetime >= DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
             + "                                                                 AND e.encounter_datetime <= end_period.first_gestante  "
@@ -10331,7 +10332,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                               WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "                                                                 AND e.encounter_type = ${53}  "
             + "                                                                 AND o.concept_id = ${6272}  "
-            + "                                                                 AND o.value_coded = ${1707}  "
+            + "                                                                 AND o.value_coded IN ( ${1707}, ${1705} )  "
             + "                                                                 AND e.location_id = :location  "
             + "                                                                 AND o.obs_datetime >= DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
             + "                                                                 AND o.obs_datetime <= end_period.first_gestante  "
