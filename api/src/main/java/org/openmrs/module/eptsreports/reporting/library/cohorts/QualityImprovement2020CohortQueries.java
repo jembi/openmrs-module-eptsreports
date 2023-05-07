@@ -5823,24 +5823,24 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) AND NOT (B4 or B5 or E or F or DD)) AND adult");
+            "((B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) AND NOT (B4 or B5 or E or F or DD)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) AND NOT (B4 or B5 or E or F)) AND children");
+            "((B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1Den18 AND B4CV50) AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) ) AND NOT (B5CV50 or E or F)");
+            "((B1Den18 AND B4CV50) AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) ) AND NOT (E or F)");
       }
     } else {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND H) AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) AND NOT (B4 or B5 or E or F or DD)) AND adult");
+            "(((B1 AND H) AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) AND NOT (B4 or B5 or E or F or DD)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND H) AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) AND NOT (B4 or B5 or E or F)) AND children");
+            "(((B1 AND H) AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1Den18 AND B4CV50 AND H50) AND ( (B2NEW AND NOT ABANDONEDTARV) OR (RESTARTED AND NOT (RESTARTEDTARV OR ABANDONEDTARV)) OR (B3 AND NOT B3E AND NOT (ABANDONED1LINE OR ABANDONEDTARV)) ) AND NOT B5E ) ) AND NOT (B5CV50 or E or F)");
+            "((B1Den18 AND B4CV50 AND H50) AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) ) AND NOT (E or F)");
       }
     }
     return compositionCohortDefinition;
