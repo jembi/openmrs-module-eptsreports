@@ -6115,7 +6115,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
 
-    cd.setCompositionString("((A AND NOT ABANDONED) AND C) AND NOT (E OR F)");
+    cd.setCompositionString("((A AND C) AND NOT (ABANDONED OR E OR F))");
 
     return cd;
   }
@@ -10266,6 +10266,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
             hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getRestartConcept().getConceptId(),
             hivMetadata.getStateOfStayOfPreArtPatient().getConceptId()));
 
     return cd;

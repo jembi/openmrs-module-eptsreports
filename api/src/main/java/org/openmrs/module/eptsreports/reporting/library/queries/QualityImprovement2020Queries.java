@@ -1575,6 +1575,7 @@ public class QualityImprovement2020Queries {
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
       int abandonedConcept,
+      int restartConcept,
       int stateOfStayOfPreArtPatient) {
 
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
@@ -1585,6 +1586,7 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
     map.put("6272", stateOfStayOfPreArtPatient);
 
     String query =
@@ -1598,7 +1600,7 @@ public class QualityImprovement2020Queries {
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= end_period.first_pickup "
             + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 3 MONTH) "
@@ -1613,7 +1615,7 @@ public class QualityImprovement2020Queries {
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= end_period.first_pickup "
             + "                                       AND o.obs_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 3 MONTH)"
