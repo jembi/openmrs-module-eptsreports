@@ -6766,7 +6766,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
 
-    cd.setCompositionString("((A AND NOT ABANDONED)AND C AND H) AND NOT (E OR F)");
+    cd.setCompositionString("((A AND C AND H) AND NOT (ABANDONED OR E OR F))");
     return cd;
   }
 
