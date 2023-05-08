@@ -1166,7 +1166,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND o2.concept_id = ${artDatePickupMasterCard} AND o2.value_datetime <= :endDate  "
             + "        GROUP BY p.patient_id  "
             + ") art_startdate   "
-            + "    WHERE art_startdate.patient_id=external.patient_id ) AND encounter_datetime <=:endDate "
+            + "    WHERE art_startdate.patient_id=external.patient_id ) AND encounter_datetime BETWEEN :startDate AND :endDate "
             + "    AND e.location_id = :location";
 
     StringSubstitutor sb = new StringSubstitutor(map);
