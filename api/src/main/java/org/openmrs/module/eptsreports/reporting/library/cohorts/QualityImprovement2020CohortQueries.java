@@ -5003,6 +5003,84 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>RF15</b>: Utentes em 2ª Linha elegíveis ao pedido de CV <br>
+   * <i></i><br>
+   * <i> <b>O sistema irá identificar os utentes em 2ª Linha de TARV elegíveis ao pedido de Carga
+   * Viral:</i> <br>
+   * <i></i><br>
+   * <i> <b>incluindo os utentes há pelo menos 6 meses na 2ª Linha de TARV, ou seja, incluindo todos
+   * os utentes que têm o último registo de “Regime ARV Segunda Linha” na Ficha Resumo durante o
+   * período de revisão (“Data Última 2ª Linha” >= “Data Início Revisão” e <= “Data Fim Revisão”),
+   * sendo a “Data Última 2ª Linha” menos (-) “Data Última Consulta” maior ou igual (>=) a 6 meses.
+   * Excepto os utentes que, entretanto, mudaram de linha, ou seja, excepto os utentes que têm um
+   * registo de “Linha Terapêutica” diferente de “2ª Linha”, na Ficha Clínica durante o período
+   * compreendido entre “Data Última 2ª Linha” e “Data Última Consulta”. </i> <br>
+   * <i> <b>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o
+   * período de revisão..</i> <br>
+   * <br>
+   * <i> <b>excluindo os utentes abandono ou reinício TARV nos últimos 6 meses anteriores a última
+   * consulta do período de revisão (seguindo os critérios definidos no RF7.2);</i> <br>
+   * <br>
+   * <i> <b>excluindo os utentes que têm o registo do “Pedido de Investigações Laboratoriais” igual
+   * a “Carga Viral”, na Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido
+   * CV”>= “Data Última Consulta” menos (-) 12meses e < “Data Última Consulta”). Nota: “Data Última
+   * Consulta” é a data da última consulta clínica ocorrida durante o período de revisão.</i> <br>
+   * <br>
+   */
+  public CohortDefinition getUtentesSegundaLinha() {
+
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition secondLine6Months = getPatientsOnRegimeArvSecondLineB2NEWP1_2();
+
+    CohortDefinition b2e = getMQC13DEN_B2E();
+
+    CohortDefinition abandonedExclusionInTheLastSixMonthsFromFirstLineDate =
+        getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
+
+    CohortDefinition abandonedExclusionSecondLine = getPatientsWhoAbandonedTarvOnOnSecondLineDate();
+
+    CohortDefinition B5E =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            false, true, 12);
+
+    compositionCohortDefinition.addSearch(
+        "secondLineB2",
+        EptsReportUtils.map(
+            secondLine6Months,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B2E",
+        EptsReportUtils.map(
+            b2e,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONEDTARV",
+        EptsReportUtils.map(abandonedExclusionInTheLastSixMonthsFromFirstLineDate, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONED2LINE", EptsReportUtils.map(abandonedExclusionSecondLine, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "B5E",
+        EptsReportUtils.map(
+            B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "(secondLineB2 AND NOT B2E) AND NOT (ABANDONED2LINE OR B5E)");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
    * <b>MQ13</b>: Melhoria de Qualidade Category 13 <br>
    * <i></i><br>
    * <i> <b>DENOMINATOR (1,6,7,8):</b> B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR
@@ -5085,6 +5163,8 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition G = getMQ13G();
 
     CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha();
+
+    CohortDefinition SegundaLinha = getUtentesSegundaLinha();
 
     if (line == 1) {
       compositionCohortDefinition.addSearch(
@@ -5199,6 +5279,9 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "PrimeiraLinha", EptsReportUtils.map(PrimeiraLinha, MAPPING1));
 
+    compositionCohortDefinition.addSearch(
+        "SegundaLinha", EptsReportUtils.map(SegundaLinha, MAPPING1));
+
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
@@ -5208,10 +5291,10 @@ public class QualityImprovement2020CohortQueries {
             "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND age");
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT (ABANDONED2LINE OR B5E)) AND NOT C AND (D AND age)");
+            "((B1 AND SegundaLinha) AND NOT C AND (D AND age)");
       } else if (line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT (ABANDONED2LINE OR B5E)) AND NOT (C OR D) AND age");
+            "((B1 AND SegundaLinha) AND NOT (C OR D) AND age");
       }
     } else {
       if (line == 1) {
@@ -5222,10 +5305,10 @@ public class QualityImprovement2020CohortQueries {
             "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND G AND age");
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT (ABANDONED2LINE OR B5E)) AND NOT C AND (D AND G AND age)");
+            "((B1 AND SegundaLinha) AND NOT C AND (D AND G AND age)");
       } else if (line == 13) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT (ABANDONED2LINE OR B5E)) AND NOT (C OR D) AND G AND age");
+            "((B1 AND SegundaLinha) AND NOT (C OR D) AND (G AND age)");
       }
     }
 
