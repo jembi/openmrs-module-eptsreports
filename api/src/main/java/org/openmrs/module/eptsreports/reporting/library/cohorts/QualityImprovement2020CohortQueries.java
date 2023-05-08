@@ -4883,6 +4883,126 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
+   * <b>RF14</b>: Utentes em 1ª Linha elegíveis ao pedido de CV <br>
+   * <i></i><br>
+   * <i> <b>O sistema irá identificar os utentes em 1ª Linha de TARV elegíveis ao pedido de Carga
+   * Viral:</i> <br>
+   * <i></i><br>
+   * <i> <b>incluindo os utentes há pelo menos 6 meses na 1ª Linha de TARV, ou seja, incluindo todos
+   * os utentes que têm o último registo da “Linha Terapêutica” na Ficha Clínica durante o período
+   * de revisão igual a “1ª Linha” (última consulta, “Data 1ª Linha”>= “Data Início Revisão” e <=
+   * “Data Fim Revisão”), sendo a “Data 1ª Linha” menos (-) “Data do Início TARV” registada na Ficha
+   * Resumo maior ou igual (>=) a 6 meses.</i> <br>
+   * <i> <b>Nota: “Data do Início TARV” é a data início TARV registada na “Ficha Resumo”,
+   * independentemente do período. Caso exista o registo de mais que uma “Ficha Resumo” deve-se
+   * considerar a data de início TARV mais antiga.</i> <br>
+   * <br>
+   * <i> <b>incluindo os utentes que reiniciaram TARV há pelo menos 6 meses, ou seja, incluindo
+   * todos os utentes que têm o registo de “Mudança de Estado de Permanência TARV” = “Reinício” na
+   * Ficha Clínica durante o período de inclusão (“Data Consulta Reinício TARV” >= “Data Início
+   * Inclusão” e <= “Data Fim Inclusão”), sendo a “Data Última Consulta” durante o período de
+   * revisão, menos (-) “Data Consulta Reinício TARV” maior ou igual (>=) a 6 meses.</i> <br>
+   * <br>
+   * <i> <b>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o
+   * período de revisão.</i> <br>
+   * <i> <b>incluindo os utentes que Mudaram de Regime na 1ª Linha de TARV há pelo menos 6 meses, ou
+   * seja, incluindo todos os utentes que têm o último registo da “Alternativa a Linha – 1ª Linha”
+   * na Ficha Resumo, sendo a “Data Última Alternativa 1ª Linha” menos (-) “Data Última Consulta”
+   * maior ou igual (>=) a 6 meses. Excepto (excluindo) os utentes que, entretanto, mudaram de
+   * linha, ou seja, excepto os utentes que têm um registo de “Linha Terapêutica”, na Ficha Clínica,
+   * diferente de “1ª Linha”, durante o período compreendido entre “Data Última Alternativa 1ª
+   * Linha” e “Data Última Consulta.</i> <br>
+   * <br>
+   * <i> <b>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o
+   * período de revisão.</i> <br>
+   * <i> <b>excluindo os utentes abandono ou reinício TARV nos últimos 6 meses anteriores a última
+   * consulta do período de revisão (seguindo os critérios definidos no RF7.2);</i> <br>
+   * <br>
+   * <i> <b>excluindo os utentes que têm o registo do “Pedido de Investigações Laboratoriais” igual
+   * a “Carga Viral”, na Ficha Clínica nos últimos 12 meses da última consulta clínica (“Data Pedido
+   * CV” >= “Data Última Consulta” menos (-) 12meses e < “Data Última Consulta”).</i> <br>
+   * <br>
+   * <i> <b>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o
+   * período de revisão.</i> <br>
+   * <br>
+   */
+  public CohortDefinition getUtentesPrimeiraLinha() {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition b2New =
+        commonCohortQueries.getPatientsWithFirstTherapeuticLineOnLastClinicalEncounterB2NEW();
+
+    CohortDefinition restartded = getPatientsWhoRestartedTarvAtLeastSixMonths();
+
+    CohortDefinition changeRegimen6Months = getMOHPatientsOnTreatmentFor6Months();
+
+    CohortDefinition B3E =
+        commonCohortQueries.getMOHPatientsToExcludeFromTreatmentIn6Months(
+            true,
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getMasterCardEncounterType(),
+            commonMetadata.getRegimenAlternativeToFirstLineConcept(),
+            Arrays.asList(
+                commonMetadata.getAlternativeFirstLineConcept(),
+                commonMetadata.getRegimeChangeConcept(),
+                hivMetadata.getNoConcept()),
+            hivMetadata.getAdultoSeguimentoEncounterType(),
+            hivMetadata.getTherapeuticLineConcept(),
+            Collections.singletonList(hivMetadata.getFirstLineConcept()));
+
+    CohortDefinition abandonedExclusionInTheLastSixMonthsFromFirstLineDate =
+        getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
+
+    CohortDefinition abandonedExclusionFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
+
+    CohortDefinition B5E =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            false, true, 12);
+
+    compositionCohortDefinition.addSearch(
+        "B2NEW",
+        EptsReportUtils.map(
+            b2New,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch("RESTARTED", EptsReportUtils.map(restartded, MAPPING));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONEDTARV",
+        EptsReportUtils.map(abandonedExclusionInTheLastSixMonthsFromFirstLineDate, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "B3",
+        EptsReportUtils.map(
+            changeRegimen6Months,
+            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B3E",
+        EptsReportUtils.map(
+            B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));
+
+    compositionCohortDefinition.addSearch(
+        "B5E",
+        EptsReportUtils.map(
+            B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(
+        "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E)");
+
+    return compositionCohortDefinition;
+  }
+
+  /**
    * <b>MQ13</b>: Melhoria de Qualidade Category 13 <br>
    * <i></i><br>
    * <i> <b>DENOMINATOR (1,6,7,8):</b> B1 AND ((B2 AND NOT B2E) OR (B3 AND NOT B3E)) AND NOT (B4E OR
@@ -4901,9 +5021,9 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     if (den) {
-      compositionCohortDefinition.setName("B AND NOT C AND NOT D");
+      compositionCohortDefinition.setName("DENOMINADOR");
     } else {
-      compositionCohortDefinition.setName("(B AND G) AND NOT (C OR D)");
+      compositionCohortDefinition.setName("NUMERADOR");
     }
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -4963,6 +5083,8 @@ public class QualityImprovement2020CohortQueries {
             false, true, 12);
 
     CohortDefinition G = getMQ13G();
+
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha();
 
     if (line == 1) {
       compositionCohortDefinition.addSearch(
@@ -5074,13 +5196,16 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "ABANDONED2LINE", EptsReportUtils.map(abandonedExclusionSecondLine, MAPPING1));
 
+    compositionCohortDefinition.addSearch(
+        "PrimeiraLinha", EptsReportUtils.map(PrimeiraLinha, MAPPING1));
+
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E)) AND NOT C AND (D AND age)");
+            "((B1 AND PrimeiraLinha) AND NOT C AND (D AND age)");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E)) AND NOT (C OR D) AND age");
+            "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND age");
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT (ABANDONED2LINE OR B5E)) AND NOT C AND (D AND age)");
@@ -5091,10 +5216,10 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E)) AND NOT C AND (D AND G AND age)");
+            "((B1 AND PrimeiraLinha) AND NOT C AND (D AND G AND age)");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E)) AND NOT (C OR D) AND G AND age");
+            "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND G AND age");
       } else if (line == 4) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND (secondLineB2 AND NOT B2E)) AND NOT (ABANDONED2LINE OR B5E)) AND NOT C AND (D AND G AND age)");
@@ -5747,6 +5872,8 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
 
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha();
+
     compositionCohortDefinition.addSearch(
         "children", EptsReportUtils.map(children, "effectiveDate=${revisionEndDate}"));
     compositionCohortDefinition.addSearch(
@@ -5820,27 +5947,30 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "B5CV50", EptsReportUtils.map(breastfeedingWithCargaViralHigherThan50, MAPPING1));
 
+    compositionCohortDefinition.addSearch(
+        "PrimeiraLinha", EptsReportUtils.map(PrimeiraLinha, MAPPING1));
+
     if (den) {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) AND NOT (B4 or B5 or E or F or DD)) AND adult");
+            "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F or DD)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) AND NOT (B4 or B5 or E or F)) AND children");
+            "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "((B1Den18 AND B4CV50) AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) ) AND NOT (E or F)");
+            "((B1Den18 AND B4CV50 AND PrimeiraLinha) AND NOT (E or F))");
       }
     } else {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND H) AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) AND NOT (B4 or B5 or E or F or DD)) AND adult");
+            "(((B1 AND PrimeiraLinha AND H) AND NOT (B4 or B5 or E or F or DD)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND H) AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) AND NOT (B4 or B5 or E or F)) AND children");
+            "(((B1 AND PrimeiraLinha AND H) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "((B1Den18 AND B4CV50 AND H50) AND ( B2NEW OR (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E ) ) AND NOT (E or F)");
+            "((B1Den18 AND B4CV50 AND PrimeiraLinha AND H50) AND NOT (E or F)");
       }
     }
     return compositionCohortDefinition;
@@ -10387,12 +10517,12 @@ public class QualityImprovement2020CohortQueries {
    * seguinte forma:
    *
    * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
+   * ou “Reincio” na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
    * Consulta”<=”Data Fim Período”
    *
    * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
-   * Período” e “Data Consulta”<=”Data Fim Período”
+   * ou “Reincio” na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data
+   * Início Período” e “Data Consulta”<=”Data Fim Período”
    * <li>3. para exclusão nos utentes que iniciaram novo regime de 1ª Linha, a “Data Início Período”
    *     será igual a “Data última Alternativa 1ª Linha” e a “Data Fim do Período” será “Data última
    *     Alternativa 1ª Linha” + 6meses.
@@ -10433,12 +10563,12 @@ public class QualityImprovement2020CohortQueries {
    * seguinte forma:
    *
    * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e “Data
-   * Consulta”<=”Data Fim Período”
+   * ou “Reinicio” na Ficha Clínica durante o período (“Data Consulta”>=”Data Início Período” e
+   * “Data Consulta”<=”Data Fim Período”
    *
    * <p>incluindo os utentes com Último registo de “Mudança de Estado de Permanência” = “Abandono”
-   * na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data Início
-   * Período” e “Data Consulta”<=”Data Fim Período”
+   * ou “Reinicio” na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência”>=”Data
+   * Início Período” e “Data Consulta”<=”Data Fim Período”
    * <li>6. para exclusão nos utentes que estão na 1ª linha de TARV, a “Data Início Período” será
    *     igual a “Data 1a Linha” – 6 meses e “Data Fim do Período” será igual a “Data 1a Linha”.
    *
