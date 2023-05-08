@@ -7545,27 +7545,33 @@ public class QualityImprovement2020CohortQueries {
    * <p>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DT” e o respectivo
    * “Estado” = “Início” ou “Continua”, ou
    *
-   * <p>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DS” e o respectivo
-   * “Estado” = “Início” ou “Continua”, ou
-   *
    * <p>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “APE” e o respectivo
-   * “Estado” = “Início” ou “Continua”, ou
-   *
-   * <p>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “FR” e o respectivo
    * “Estado” = “Início” ou “Continua”, ou
    *
    * <p>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DD” e o respectivo
    * “Estado” = “Início” ou “Continua”
    *
-   * <p>Nota1: A “Data Última Consulta” é a última “Data de Consulta” do utente ocorrida no período
-   * compreendido entre: “Data Início Avaliação” = “Data Fim de Revisão” menos 12 meses + 1 dia
-   * “Data Fim Avaliação” = “Data Fim de Revisão”
+   * <p>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “DS” e o respectivo
+   * “Estado” = “Início” ou “Continua”, ou 
+   * 
+   * <p>Último registo de MDC (MDC1 ou MDC2 ou MDC3 ou MDC4 ou MDC5) como “FR” e o respectivo
+   * “Estado” = “Início” ou “Continua”, ou
    *
+   * <p>utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DA” e o 
+   * respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24 meses 
+   * (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta Clínica” <= 
+   * “Data Fim Revisão” – 24 meses) ou
+   * 
    * <p>Filtrando os utentes que têm o último registo de “Tipo de Dispensa” = “DT” antes da última
    * consulta do período de revisão ( “Data Última Consulta”)
    *
    * <p>Filtrando os utentes que têm o último registo de “Tipo de Dispensa” = “DS” antes da última
    * consulta do período de revisão ( “Data Última Consulta”)
+   *  
+   * <p>Nota1: A “Data Última Consulta” é a última “Data de Consulta” do utente ocorrida no período
+   * compreendido entre: “Data Início Avaliação” = “Data Fim de Revisão” menos 12 meses + 1 dia
+   * “Data Fim Avaliação” = “Data Fim de Revisão”
+   *
    *
    * <p>Filtrando os utentes com registo de último levantamento na farmácia (FILA) antes da última
    * consulta do período de revisão (“Data última Consulta) com próximo levantamento agendado para
@@ -7596,7 +7602,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
             hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getAnnualArvDispensationConcept().getConceptId());
 
     List<Integer> states =
         Arrays.asList(
@@ -8685,7 +8692,7 @@ public class QualityImprovement2020CohortQueries {
         "MDS",
         EptsReportUtils.map(
             alreadyMds,
-            "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     cd.setCompositionString("A AND B1 AND (E1 AND E2 AND E3) AND NOT (C OR D OR F OR G OR MDS)");
 
