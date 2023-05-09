@@ -7920,7 +7920,7 @@ public class QualityImprovement2020CohortQueries {
             inclusionPeriodMappings));
 
     cd.setCompositionString(
-        "A OR (D AND breastfeedingOnPeriod) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
+        "((A OR D OR breastfeedingOnPeriod) AND NOT (C OR E OR pregnantOnPeriod)) AND AGE");
     return cd;
   }
 
