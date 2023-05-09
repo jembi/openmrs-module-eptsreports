@@ -6979,7 +6979,7 @@ public class QualityImprovement2020CohortQueries {
             SetComparator.IN,
             Arrays.asList(hivMetadata.getAdultoSeguimentoEncounterType()),
             Arrays.asList(
-                hivMetadata.getQuarterlyConcept(), 
+                hivMetadata.getQuarterlyConcept(),
                 hivMetadata.getSemiannualDispensation(),
                 hivMetadata.getAnnualArvDispensationConcept()));
 
@@ -6991,6 +6991,8 @@ public class QualityImprovement2020CohortQueries {
         QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(83, 97);
     CohortDefinition nextPickupBetween173And187 =
         QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(173, 187);
+    CohortDefinition nextPickupBetween335And395 =
+        QualityImprovement2020Queries.getPatientsWithPickupOnFilaBetween(335, 395);
 
     CohortDefinition viralLoad = QualityImprovement2020Queries.getPatientsWithVlGreaterThen1000();
     // Pacientes com pedidos de investigações depois de DT
@@ -7022,15 +7024,21 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
-        "NPF83",
+        "proxLevtoFILA83a97Dias",
         EptsReportUtils.map(
             nextPickupBetween83And97,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
-        "NPF173",
+        "proxLevtoFILA173a187Dias",
         EptsReportUtils.map(
             nextPickupBetween173And187,
+            "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
+
+    comp.addSearch(
+        "proxLevtoFILA335a395Dias",
+        EptsReportUtils.map(
+            nextPickupBetween335And395,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
@@ -7087,25 +7095,29 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (den == 1) {
-      comp.setCompositionString("(MDSHa24Meses OR tipoDispensa OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
+      comp.setCompositionString(
+          "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND NOT (CD OR F OR dead)");
     } else if (den == 2) {
-      comp.setCompositionString("((MDSHa24Meses OR tipoDispensa OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2");
+      comp.setCompositionString(
+          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND NOT (CD OR F OR VL)) AND G2");
     } else if (den == 3) {
       comp.setCompositionString(
-          "(MDSHa24Meses OR tipoDispensa OR NPF83 OR NPF173) AND G2 AND IAMDS AND NOT (CD OR F OR VL)");
+          "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND G2 AND IAMDS AND NOT (CD OR F OR VL)");
     } else if (den == 4) {
       comp.setCompositionString(
-          "((MDSHa24Meses OR tipoDispensa OR NPF83 OR NPF173) AND G2 AND IAMDS AND VLFL AND NOT (CD OR F OR VL)) ");
+          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND G2 AND IAMDS AND VLFL AND NOT (CD OR F OR VL)) ");
     } else if (den == 5 || den == 6) {
-      comp.setCompositionString("(DT OR tipoDispensa OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
+      comp.setCompositionString(
+          "(DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 8) {
-      comp.setCompositionString("((DT OR tipoDispensa OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 ");
+      comp.setCompositionString(
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND  NOT (CD OR F OR VL)) AND G2 ");
     } else if (den == 11 || den == 12) {
       comp.setCompositionString(
-          "((DT OR tipoDispensa OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
     } else if (den == 9 || den == 10) {
       comp.setCompositionString(
-          "((DT OR tipoDispensa OR NPF83 OR NPF173) AND  NOT (CD OR F OR VL)) AND G2 IADT");
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND  NOT (CD OR F OR VL)) AND G2 IADT");
     }
     return comp;
   }
@@ -12291,11 +12303,14 @@ public class QualityImprovement2020CohortQueries {
    *
    * <blockquote>
    *
-   * <b>a.</b> com o último estado [“Mudança Estado Permanência TARV” (Coluna 21) = “O” (Óbito) na Ficha Clínica com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo da mudança do estado de permanência TARV) <= “Data Fim de Revisão”; ou 
+   * <b>a.</b> com o último estado [“Mudança Estado Permanência TARV” (Coluna 21) = “O” (Óbito) na
+   * Ficha Clínica com “Data da Consulta Actual” (Coluna 1, durante a qual se fez o registo da
+   * mudança do estado de permanência TARV) <= “Data Fim de Revisão”; ou
    *
    * <p><b>
    *
-   * <p>b.</b> com último estado “Mudança Estado Permanência TARV” = “Óbito” na Ficha Resumo antes do fim do período de revisão (“Data de Óbito” <= “Data Fim de Revisão”); ou
+   * <p>b.</b> com último estado “Mudança Estado Permanência TARV” = “Óbito” na Ficha Resumo antes
+   * do fim do período de revisão (“Data de Óbito” <= “Data Fim de Revisão”); ou
    *
    * <p><b>
    *
@@ -12303,7 +12318,8 @@ public class QualityImprovement2020CohortQueries {
    *
    * <p><b>
    *
-   * <p>d.</b> como ‘Óbito’ (último estado de inscrição) no programa SERVIÇO TARV TRATAMENTO antes do fim do período de revisão (“Data de Óbito” <= Data Fim de revisão”;
+   * <p>d.</b> como ‘Óbito’ (último estado de inscrição) no programa SERVIÇO TARV TRATAMENTO antes
+   * do fim do período de revisão (“Data de Óbito” <= Data Fim de revisão”;
    *
    * </blockquote>
    *
