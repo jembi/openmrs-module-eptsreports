@@ -7924,7 +7924,8 @@ public class QualityImprovement2020CohortQueries {
             inclusionPeriodMappings));
 
     cd.setCompositionString(
-        "A AND breastfeedingOnPeriod AND D AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
+        "((A OR D OR breastfeedingOnPeriod) AND NOT (C OR E OR pregnantOnPeriod)) AND AGE");
+
     return cd;
   }
 
@@ -11482,14 +11483,19 @@ public class QualityImprovement2020CohortQueries {
    *     Consulta Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim
    *     Revisão” menos (-) 9 meses. Nota 1: é a primeira consulta clínica de sempre do utente que
    *     decorreu no período de inclusão.
+   *
    * <li>B - O sistema irá identificar mulheres lactantes registadas na consulta inicial
    *     selecionando todos os utentes do sexo feminino, independentemente da idade, e registados
    *     como “Lactante=Sim” na primeira consulta clínica decorrida durante o período de inclusão
    *     (“Data Consulta Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data
    *     Fim Revisão” menos 9 (-) meses. Nota 1: é a primeira consulta clínica de sempre do utente
    *     que decorreu no período de inclusão.
+   *
    * <li>Nota 2: A mulher grávida e lactante ao mesmo tempo, ou seja com registo de “Grávida=Sim” e
    *     “Lactante=Sim” na mesma consulta inicial, será considerada como grávida.
+   *
+   * <li>Nota: Para o registo de mulheres grávidas deve se considerar a consulta inicial e não
+   *     qualquer consulta durante o periodo de inclusão.
    *
    * @param question The question Concept Id
    * @param answer The value coded Concept Id

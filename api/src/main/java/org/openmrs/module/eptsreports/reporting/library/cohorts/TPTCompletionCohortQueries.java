@@ -2465,6 +2465,8 @@ public class TPTCompletionCohortQueries {
   }
 
   /**
+   *
+   *
    * <ul>
    *   <li>Patient has at least one Última profilaxia TPT with value “Isoniazida (INH)” and Estado
    *       da Profilaxia with the value “Fim (F)” and Data de Fim da Profilaxia TPT registered by

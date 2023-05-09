@@ -1106,8 +1106,8 @@ public class APSSResumoTrimestralCohortQueries {
     map.put("arvAdherenceRiskConcept", hivMetadata.getArvAdherenceRiskConcept().getConceptId());
     map.put("badConcept", hivMetadata.getBadConcept().getConceptId());
     map.put(
-                  "prevencaoPositivaSeguimentoEncounterType",
-                    hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+        "prevencaoPositivaSeguimentoEncounterType",
+        hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
     map.put(
         "arvPharmaciaEncounterType",
         hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
