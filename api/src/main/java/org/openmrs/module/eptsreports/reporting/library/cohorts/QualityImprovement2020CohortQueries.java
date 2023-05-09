@@ -6957,11 +6957,12 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
             hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getAnnualArvDispensationConcept().getConceptId());
 
     List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
 
-    CohortDefinition queryA1 =
+    CohortDefinition inscritosNoMDSHa24Meses =
         QualityImprovement2020Queries.getPatientsWithFollowingMdcDispensationsWithStates(
             dispensationTypes, states);
 
@@ -7013,9 +7014,9 @@ public class QualityImprovement2020CohortQueries {
         getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(mdsConcepts);
 
     comp.addSearch(
-        "A1",
+        "MDSHa24Meses",
         EptsReportUtils.map(
-            queryA1,
+            inscritosNoMDSHa24Meses,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},location=${location}"));
 
     comp.addSearch(
@@ -7084,15 +7085,15 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     if (den == 1) {
-      comp.setCompositionString("(A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
+      comp.setCompositionString("(MDSHa24Meses OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR dead)");
     } else if (den == 2) {
-      comp.setCompositionString("((A1 OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2");
+      comp.setCompositionString("((MDSHa24Meses OR A3 OR NPF83 OR NPF173) AND NOT (CD OR F OR VL)) AND G2");
     } else if (den == 3) {
       comp.setCompositionString(
-          "(A1 OR A3 OR NPF83 OR NPF173) AND G2 AND IAMDS AND NOT (CD OR F OR VL)");
+          "(MDSHa24Meses OR A3 OR NPF83 OR NPF173) AND G2 AND IAMDS AND NOT (CD OR F OR VL)");
     } else if (den == 4) {
       comp.setCompositionString(
-          "((A1 OR A3 OR NPF83 OR NPF173) AND G2 AND IAMDS AND VLFL AND NOT (CD OR F OR VL)) ");
+          "((MDSHa24Meses OR A3 OR NPF83 OR NPF173) AND G2 AND IAMDS AND VLFL AND NOT (CD OR F OR VL)) ");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString("(DT OR A3 OR NPF83 OR NPF173) AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 8) {
