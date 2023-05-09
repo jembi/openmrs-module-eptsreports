@@ -7008,8 +7008,9 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
             hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
-    CohortDefinition IAMDS =
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getAnnualArvDispensationConcept().getConceptId());
+    CohortDefinition VL2Pedidos =
         getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(mdsConcepts);
 
     // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
@@ -7083,9 +7084,9 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "IAMDS",
+        "VL2Pedidos",
         EptsReportUtils.map(
-            IAMDS,
+            VL2Pedidos,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
@@ -7096,28 +7097,36 @@ public class QualityImprovement2020CohortQueries {
 
     if (den == 1) {
       comp.setCompositionString(
-          "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND NOT (CD OR F OR dead)");
+          "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
+          + " AND NOT (CD OR F OR dead)");
     } else if (den == 2) {
       comp.setCompositionString(
-          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND NOT (CD OR F OR VL)) AND G2");
+          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
+          + " AND NOT (CD OR F OR VL)) AND G2");
     } else if (den == 3) {
       comp.setCompositionString(
-          "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND G2 AND IAMDS AND NOT (CD OR F OR VL)");
+          "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
+          + " AND G2 AND VL2Pedidos AND NOT (CD OR F OR VL)");
     } else if (den == 4) {
       comp.setCompositionString(
-          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND G2 AND IAMDS AND VLFL AND NOT (CD OR F OR VL)) ");
+          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
+          + " AND G2 AND VL2Pedidos AND VLFL AND NOT (CD OR F OR VL)) ");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString(
-          "(DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND  NOT (CD OR F OR dead)");
+          "(DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
+          + " AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 8) {
       comp.setCompositionString(
-          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND  NOT (CD OR F OR VL)) AND G2 ");
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
+          + " AND  NOT (CD OR F OR VL)) AND G2 ");
     } else if (den == 11 || den == 12) {
       comp.setCompositionString(
-          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
+          + " AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
     } else if (den == 9 || den == 10) {
       comp.setCompositionString(
-          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) AND  NOT (CD OR F OR VL)) AND G2 IADT");
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
+          + " AND  NOT (CD OR F OR VL)) AND G2 IADT");
     }
     return comp;
   }
@@ -7305,8 +7314,9 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
             hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
-    CohortDefinition IAMDS =
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getAnnualArvDispensationConcept().getConceptId());
+    CohortDefinition VL2Pedidos =
         getPatientsWithVLResultLessThan1000Between2VlRequestAfterTheseMDS(concepts);
 
     // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
@@ -7419,9 +7429,9 @@ public class QualityImprovement2020CohortQueries {
             "revisionEndDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
-        "IAMDS",
+        "VL2Pedidos",
         EptsReportUtils.map(
-            IAMDS,
+            VL2Pedidos,
             "startDate=${revisionEndDate-26m+1d},endDate=${revisionEndDate-24m},revisionEndDate=${revisionEndDate},location=${location}"));
     comp.addSearch(
         "VLFL",
@@ -7444,7 +7454,7 @@ public class QualityImprovement2020CohortQueries {
     if (num == 1) {
       comp.setCompositionString("Den1 AND G2");
     } else if (num == 2) {
-      comp.setCompositionString("Den2 AND IAMDS");
+      comp.setCompositionString("Den2 AND VL2Pedidos");
     } else if (num == 3) {
       comp.setCompositionString("Den3  AND VLFL");
     } else if (num == 4) {
