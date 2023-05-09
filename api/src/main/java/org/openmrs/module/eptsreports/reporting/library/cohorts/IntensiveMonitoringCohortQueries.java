@@ -3222,7 +3222,7 @@ public class IntensiveMonitoringCohortQueries {
             "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     cd.setCompositionString(
-        "A OR (breastfeedingOnPeriod AND D) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
+        "((A OR breastfeedingOnPeriod OR D) AND NOT (C OR E OR pregnantOnPeriod)) AND AGE");
     return cd;
   }
 
