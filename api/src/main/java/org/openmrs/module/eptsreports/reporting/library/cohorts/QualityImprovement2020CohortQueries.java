@@ -10714,12 +10714,11 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * Utentes com marcação de levantamento a seguir a última consulta clínica no período de
-   * avaliação/revisão, na qual foi registado o resultado de CV >= 1000, sendo esta marcação de
-   * levantamento entre 23 a 37 dias do levantamento, ou seja, “Data Próximo Levantamento” (marcado
-   * no FILA com “Data Levantamento” >= “Data última Consulta” e <= “Data Fim Revisão”) >= “Data
-   * Levantamento”+23 dias e <= “Data Levantamento + 37 dias)
-   *
+   * Utentes com marcação de próxima consulta a seguir a última consulta clínica no período de
+   * avaliação/revisão, na qual foi registado o resultado de CV >= 1000, sendo esta marcação de 
+   * consulta entre 23 a 37 dias da consultao, ou seja, “Próxima Consulta” (marcada na Ficha 
+   * Clínica com “Próxima Consulta” >= “Data última Consulta” e <= “Data Fim Revisão”) >= data última
+   * consulta + 23 dias e <= data última consulta + 37 dias)
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsWhoHadPickupOnFilaAfterMostRecentVlOnFichaClinica() {
@@ -10736,7 +10735,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
-    map.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    map.put("1410", hivMetadata.getReturnVisitDateConcept().getConceptId());
 
     String query =
         "SELECT     p.patient_id "
@@ -10759,7 +10758,7 @@ public class QualityImprovement2020CohortQueries {
             + "                      GROUP BY   p.patient_id ) vl ON vl.patient_id = p.patient_id "
             + "WHERE      e.encounter_type = ${18} "
             + "AND        e.location_id = :location "
-            + "AND        o.concept_id = ${5096} "
+            + "AND        o.concept_id = ${1410} "
             + "AND        e.encounter_datetime BETWEEN vl.vl_date AND :revisionEndDate "
             + "AND        o.value_datetime BETWEEN DATE_ADD(e.encounter_datetime, INTERVAL 23 DAY) AND  DATE_ADD(e.encounter_datetime, INTERVAL 37 DAY) "
             + "AND        e.voided = 0 "
