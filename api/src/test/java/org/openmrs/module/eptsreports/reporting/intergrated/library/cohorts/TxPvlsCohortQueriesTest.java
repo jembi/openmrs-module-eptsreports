@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Location;
@@ -48,26 +47,13 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  public void getBreastfeedingPatientsShouldPass() throws EvaluationException {
-    CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
-
-    Map<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
-    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
-
-    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
-
-    assertNotNull(evaluatedCohort.getMemberIds());
-  }
-
-  @Test
   public void getWomanWhoAreBreastfeedingShouldNOTpass() throws EvaluationException {
     CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
 
     HashMap<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
-    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
-    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
@@ -76,45 +62,13 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
   }
 
   @Test
-  public void getBreastfeedingShoudNOTPass() throws EvaluationException {
-
-    CohortDefinition cohort = txPvlsCohortQueries.getBreastfeedingPatients();
-
-    Map<Parameter, Object> parameters = new HashMap<>();
-
-    parameters.put(new Parameter("startDate", "start Date", Date.class), this.getStartDate());
-    parameters.put(new Parameter("endDate", "end Date", Date.class), this.getEndDate());
-    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
-
-    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort, parameters);
-
-    assertFalse(evaluatedCohort.getMemberIds().contains(1002));
-  }
-
-  @Test
-  public void getSpecificBreastfeedingPatientShoudPass() throws EvaluationException {
-
-    CohortDefinition cohort = txPvlsCohortQueries.getBreastfeedingPatients();
-
-    Map<Parameter, Object> parameters = new HashMap<>();
-
-    parameters.put(new Parameter("startDate", "start Date", Date.class), this.getStartDate());
-    parameters.put(new Parameter("endDate", "end Date", Date.class), this.getEndDate());
-    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
-
-    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cohort, parameters);
-
-    assertTrue(evaluatedCohort.getMemberIds().contains(1001));
-  }
-
-  @Test
   public void getNumberOfPatientshouldPass() throws EvaluationException {
     CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
 
     HashMap<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("startDate", "Start Date", Date.class), this.getStartDate());
-    parameters.put(new Parameter("endDate", "End Date", Date.class), this.getEndDate());
-    parameters.put(new Parameter("location", "Location", Location.class), this.getLocation());
+    parameters.put(new Parameter("startDate", "Start Date", Date.class), getStartDate());
+    parameters.put(new Parameter("endDate", "End Date", Date.class), getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
