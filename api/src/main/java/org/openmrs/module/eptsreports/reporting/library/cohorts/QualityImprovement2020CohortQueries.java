@@ -7594,6 +7594,10 @@ public class QualityImprovement2020CohortQueries {
    *
    * <p>Filtrando os utentes que têm o último registo de “Tipo de Dispensa” = “DS” antes da última
    * consulta do período de revisão ( “Data Última Consulta”)
+   * 
+   * Filtrando os utentes com registo de “Tipo de Dispensa” = “DA” na última consulta (“Ficha Clínica”)
+   * decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 12 meses+1dia 
+   * e <= “Data Fim Revisão”) ou
    *
    * <p>Filtrando os utentes com registo de último levantamento na farmácia (FILA) antes da última
    * consulta do período de revisão (“Data última Consulta) com próximo levantamento agendado para
@@ -7624,7 +7628,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
             hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getAnnualArvDispensationConcept().getConceptId());
 
     List<Integer> states =
         Arrays.asList(
@@ -7641,10 +7646,12 @@ public class QualityImprovement2020CohortQueries {
         getPatientsWithDispensationBeforeLastConsultationDate(
             hivMetadata.getSemiannualDispensation());
 
-    CohortDefinition filaBC83 = getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(83, 97);
+    CohortDefinition proxLevtoFILA83a97Dias = getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(83, 97);
 
-    CohortDefinition filaBC173 =
+    CohortDefinition proxLevtoFILA173a187Dias =
         getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(173, 187);
+
+    CohortDefinition proxLevtoFILA335a395Dias = getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(335, 395);
 
     compositionCohortDefinition.addSearch(
         "MDS",
@@ -7662,16 +7669,22 @@ public class QualityImprovement2020CohortQueries {
             dsBeforeClinical, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "FILA83",
+        "proxLevtoFILA83a97Dias",
         EptsReportUtils.map(
-            filaBC83, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            proxLevtoFILA83a97Dias, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "FILA173",
+        "proxLevtoFILA173a187Dias",
         EptsReportUtils.map(
-            filaBC173, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            proxLevtoFILA173a187Dias, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("MDS OR DS OR DT OR FILA83 OR FILA173");
+    compositionCohortDefinition.addSearch(
+        "proxLevtoFILA335a395Dias",
+        EptsReportUtils.map(
+            proxLevtoFILA335a395Dias, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString("MDS OR DS OR DT OR "
+        + " proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias");
 
     return compositionCohortDefinition;
   }
@@ -8787,7 +8800,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getDispensaComunitariaViaApeConcept().getConceptId(),
             hivMetadata.getDescentralizedArvDispensationConcept().getConceptId(),
             hivMetadata.getRapidFlow().getConceptId(),
-            hivMetadata.getSemiannualDispensation().getConceptId());
+            hivMetadata.getSemiannualDispensation().getConceptId(),
+            hivMetadata.getAnnualArvDispensationConcept().getConceptId());
 
     List<Integer> states = Arrays.asList(hivMetadata.getStartDrugs().getConceptId());
 
