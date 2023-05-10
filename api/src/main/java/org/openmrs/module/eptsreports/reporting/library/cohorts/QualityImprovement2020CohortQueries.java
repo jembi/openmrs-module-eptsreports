@@ -8716,8 +8716,28 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             onTB,
             "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "adverseReaction",
+        EptsReportUtils.map(
+            genericCohortQueries.hasCodedObs(
+                hivMetadata.getAdverseReaction(),
+                BaseObsCohortDefinition.TimeModifier.ANY,
+                SetComparator.IN,
+                Arrays.asList(
+                    hivMetadata.getAdultoSeguimentoEncounterType(),
+                    hivMetadata.getPediatriaSeguimentoEncounterType()),
+                Arrays.asList(
+                    hivMetadata.getCytopeniaConcept(),
+                    hivMetadata.getPancreatitis(),
+                    hivMetadata.getNephrotoxicityConcept(),
+                    hivMetadata.getHepatitisConcept(),
+                    hivMetadata.getStevensJonhsonSyndromeConcept(),
+                    hivMetadata.getHypersensitivityToAbcOrRailConcept(),
+                    hivMetadata.getLacticAcidosis(),
+                    hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
+            "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
 
-    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS onTB)");
+    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction)");
 
     return cd;
   }
