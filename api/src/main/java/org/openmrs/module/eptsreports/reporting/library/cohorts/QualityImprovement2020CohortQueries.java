@@ -6310,7 +6310,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtStatus().getConceptId());
 
     CohortDefinition pregnantAbandonedDuringPeriod =
-        getPatientsWhoAbandonedTarvOnArtStartDateForPregnants();
+        getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate();
 
     cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
@@ -6961,7 +6961,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtStatus().getConceptId());
 
     CohortDefinition pregnantAbandonedDuringPeriod =
-        getPatientsWhoAbandonedTarvOnArtStartDateForPregnants();
+        getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate();
 
     cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
@@ -6996,7 +6996,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
     cd.addSearch("J", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
     CohortDefinition pregnantAbandonedDuringPeriod =
-        getPatientsWhoAbandonedTarvOnArtStartDateForPregnants();
+        getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate();
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
 
     cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
@@ -10484,11 +10484,12 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * <b> RF7.2 EXCLUSION FOR PREGNANT PATIENTS WHO ABANDONED DURING ART START DATE PERIOD</b>
+   * <b> RF7.3 EXCLUSION FOR PREGNANT PATIENTS WHO ABANDONED DURING ART START DATE PERIOD</b>
    *
-   * <p>Excepto as utentes abandono em TARV durante o período (seguindo os critérios
-   * definidosBetween 1st clina no RF7.2) nos últimos 3 meses (entre “Data 1ª Consulta Grávida” – 3
-   * meses e “Data 1ª Consulta Grávida”).<br>
+   * <p>excluindo os utentes abandono ou reinício TARV durante o período (seguindo os critérios
+   * definidos no RF7.3) nos últimos 3 meses anteriores a última consulta do período de revisão
+   * (entre “Data última Consulta menos 3 meses” [=Data Início Periodo] e “Data última Consulta”
+   * [=Data Fim Período])..<br>
    * <br>
    *
    * <p>Nota 1: “Data 1ª Consulta Grávida” deve ser a primeira consulta de sempre com registo de
@@ -10522,31 +10523,51 @@ public class QualityImprovement2020CohortQueries {
             + "                                                               SELECT p.patient_id, max(e.encounter_datetime) as last_encounter FROM patient p  "
             + "                                                                                                                                         INNER JOIN encounter e ON e.patient_id = p.patient_id  "
             + "                                                                                                                                         INNER JOIN obs o on e.encounter_id = o.encounter_id  "
-            + "                                                                                                                                         INNER JOIN (  "
-            + QualityImprovement2020Queries.getPregnancyDuringPeriod()
-            + "                                                               ) end_period ON end_period.patient_id = p.patient_id  "
+            + "                                            INNER JOIN ( "
+            + "                                                   SELECT p.patient_id, MAX(e.encounter_datetime) as last_consultation "
+            + "                                                   FROM   patient p  "
+            + "                                                           INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                                                           INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "                                                   WHERE  p.voided = 0  "
+            + "                                                    AND e.voided = 0  "
+            + "                                                    AND o.voided = 0  "
+            + "                                                    AND e.location_id = :location "
+            + "                                                    AND e.encounter_type = ${6} "
+            + "                                                    AND e.encounter_datetime <= :endDate "
+            + "                                                  GROUP BY p.patient_id "
+            + "                                          ) most_recent  ON p.patient_id = most_recent.patient_id   "
             + "                                                               WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "                                                                 AND e.encounter_type = ${6}  "
             + "                                                                 AND o.concept_id = ${6273}  "
             + "                                                                 AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                                                 AND e.location_id = :location  "
-            + "                                                                 AND e.encounter_datetime >= DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
-            + "                                                                 AND e.encounter_datetime <= end_period.first_gestante  "
+            + "                                                                 AND e.encounter_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL 3 MONTH)  "
+            + "                                                                 AND e.encounter_datetime <= most_recent.last_consultation  "
             + "                                                               GROUP BY p.patient_id  "
             + "                                                               UNION  "
             + "                                                               SELECT p.patient_id, max(o.obs_datetime) as last_encounter FROM patient p  "
             + "                                                                                                                                   INNER JOIN encounter e ON e.patient_id = p.patient_id  "
             + "                                                                                                                                   INNER JOIN obs o on e.encounter_id = o.encounter_id  "
-            + "                                                                                                                                   INNER JOIN (  "
-            + QualityImprovement2020Queries.getPregnancyDuringPeriod()
-            + "                                                               ) end_period ON end_period.patient_id = p.patient_id  "
+            + "                                            INNER JOIN ( "
+            + "                                                   SELECT p.patient_id, MAX(e.encounter_datetime) as last_consultation "
+            + "                                                   FROM   patient p  "
+            + "                                                           INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                                                           INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "                                                   WHERE  p.voided = 0  "
+            + "                                                    AND e.voided = 0  "
+            + "                                                    AND o.voided = 0  "
+            + "                                                    AND e.location_id = :location "
+            + "                                                    AND e.encounter_type = ${6} "
+            + "                                                    AND e.encounter_datetime <= :endDate "
+            + "                                                  GROUP BY p.patient_id "
+            + "                                          ) most_recent  ON p.patient_id = most_recent.patient_id   "
             + "                                                               WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0  "
             + "                                                                 AND e.encounter_type = ${53}  "
             + "                                                                 AND o.concept_id = ${6272}  "
             + "                                                                 AND o.value_coded IN ( ${1707}, ${1705} )  "
             + "                                                                 AND e.location_id = :location  "
-            + "                                                                 AND o.obs_datetime >= DATE_SUB(end_period.first_gestante, INTERVAL 3 MONTH)  "
-            + "                                                                 AND o.obs_datetime <= end_period.first_gestante  "
+            + "                                                                 AND o.obs_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL 3 MONTH)  "
+            + "                                                                 AND o.obs_datetime <= most_recent.last_consultation  "
             + "                                                               GROUP BY p.patient_id  "
             + "                                                           ) abandoned GROUP BY abandoned.patient_id";
 
@@ -11752,17 +11773,14 @@ public class QualityImprovement2020CohortQueries {
    *     Consulta Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data Fim
    *     Revisão” menos (-) 9 meses. Nota 1: é a primeira consulta clínica de sempre do utente que
    *     decorreu no período de inclusão.
-   *
    * <li>B - O sistema irá identificar mulheres lactantes registadas na consulta inicial
    *     selecionando todos os utentes do sexo feminino, independentemente da idade, e registados
    *     como “Lactante=Sim” na primeira consulta clínica decorrida durante o período de inclusão
    *     (“Data Consulta Inicial” >= “Data Fim Revisão” menos (-) 12 meses mais (+) 1 dia e <= “Data
    *     Fim Revisão” menos 9 (-) meses. Nota 1: é a primeira consulta clínica de sempre do utente
    *     que decorreu no período de inclusão.
-   *
    * <li>Nota 2: A mulher grávida e lactante ao mesmo tempo, ou seja com registo de “Grávida=Sim” e
    *     “Lactante=Sim” na mesma consulta inicial, será considerada como grávida.
-   *
    * <li>Nota: Para o registo de mulheres grávidas deve se considerar a consulta inicial e não
    *     qualquer consulta durante o periodo de inclusão.
    *

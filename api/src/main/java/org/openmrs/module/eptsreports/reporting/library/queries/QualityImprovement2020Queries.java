@@ -1402,9 +1402,6 @@ public class QualityImprovement2020Queries {
       int restartConcept,
       int stateOfStayOfPreArtPatient) {
 
-    CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
-    String artStart = commonQueries.getARTStartDate(true);
-
     Map<String, Integer> map = new HashMap<>();
     map.put("6", adultoSeguimentoEncounterType);
     map.put("53", masterCardEncounterType);
@@ -1415,34 +1412,54 @@ public class QualityImprovement2020Queries {
 
     String query =
         " SELECT abandoned.patient_id from ( "
-            + "                                     SELECT p.patient_id, max(e.encounter_datetime) as last_encounter FROM patient p "
-            + "                                                                                                               INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                                                                                                               INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "                                                                                                               INNER JOIN ( "
-            + artStart
-            + " ) end_period ON end_period.patient_id = p.patient_id "
+            + "                                     SELECT p.patient_id, e.encounter_datetime as last_encounter FROM patient p "
+            + "                                            INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "                                            INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                                            INNER JOIN ( "
+            + "                                                   SELECT p.patient_id, MAX(e.encounter_datetime) as last_consultation "
+            + "                                                   FROM   patient p  "
+            + "                                                           INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                                                           INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "                                                   WHERE  p.voided = 0  "
+            + "                                                    AND e.voided = 0  "
+            + "                                                    AND o.voided = 0  "
+            + "                                                    AND e.location_id = :location "
+            + "                                                    AND e.encounter_type = ${6} "
+            + "                                                    AND e.encounter_datetime <= :endDate "
+            + "                                                  GROUP BY p.patient_id "
+            + "                                          ) most_recent  ON p.patient_id = most_recent.patient_id   "
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
             + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
-            + "                                       AND e.encounter_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
-            + "                                       AND e.encounter_datetime <= end_period.first_pickup "
+            + "                                       AND e.encounter_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL 6 MONTH) "
+            + "                                       AND e.encounter_datetime <= most_recent.last_consultation "
             + "                                     GROUP BY p.patient_id "
             + "UNION "
             + "     SELECT p.patient_id, max(o.obs_datetime) as last_encounter FROM patient p "
             + "                                                                                                               INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                                                                                                               INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "                                                                                                               INNER JOIN ( "
-            + artStart
-            + " ) end_period ON end_period.patient_id = p.patient_id "
+            + "                                            INNER JOIN ( "
+            + "                                                   SELECT p.patient_id, MAX(e.encounter_datetime) as last_consultation "
+            + "                                                   FROM   patient p  "
+            + "                                                           INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                                                           INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "                                                   WHERE  p.voided = 0  "
+            + "                                                    AND e.voided = 0  "
+            + "                                                    AND o.voided = 0  "
+            + "                                                    AND e.location_id = :location "
+            + "                                                    AND e.encounter_type = ${53} "
+            + "                                                    AND e.encounter_datetime <= :endDate "
+            + "                                                  GROUP BY p.patient_id "
+            + "                                          ) most_recent  ON p.patient_id = most_recent.patient_id   "
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
             + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
-            + "                                       AND o.obs_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
-            + "                                       AND o.obs_datetime <= end_period.first_pickup "
+            + "                                       AND o.obs_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL 6 MONTH) "
+            + "                                       AND o.obs_datetime <= most_recent.last_consultation "
             + "                                     GROUP BY p.patient_id "
             + "                                 ) abandoned GROUP BY abandoned.patient_id";
 
