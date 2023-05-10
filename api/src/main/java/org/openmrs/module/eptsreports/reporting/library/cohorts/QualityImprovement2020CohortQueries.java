@@ -8680,6 +8680,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
     CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
+    CohortDefinition onTB  = commonCohortQueries.getPatientsOnTbTreatment();
 
     cd.addSearch(
         "A",
@@ -8710,8 +8711,13 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             alreadyMds,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "onTB",
+        EptsReportUtils.map(
+            onTB,
+            "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS)");
+    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS onTB)");
 
     return cd;
   }
