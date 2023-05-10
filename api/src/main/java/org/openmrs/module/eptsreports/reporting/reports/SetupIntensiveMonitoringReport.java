@@ -57,7 +57,7 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
 
   @Override
   public String getDescription() {
-    return "Relatórios com os Indicadores Monitoria de Intensiva";
+    return "Este relatório apresenta os indicadores de monitoria intensiva da Unidade Sanitária para o Programa do HIV/SIDA.";
   }
 
   @Override
