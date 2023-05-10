@@ -2932,7 +2932,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition transfOut = getTranferredOutPatients();
 
-    CohortDefinition abandonedTarv = getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
+    CohortDefinition abandonedTarv = getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
     CohortDefinition abandonedFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
     CohortDefinition abandonedSecondLine = getPatientsWhoAbandonedTarvOnOnSecondLineDate();
 
@@ -3019,10 +3019,10 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       compositionCohortDefinition.setCompositionString(
-          "((A AND NOT C) OR B1) AND NOT (F OR E OR DD OR ABANDONED1LINE) AND age");
+          "((A AND NOT C) OR B1) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
     if (indicator == 5 || indicator == 14)
       compositionCohortDefinition.setCompositionString(
-          "B2New AND NOT (F OR E OR DD OR ABANDONED2LINE) AND age");
+          "B2New AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
     return compositionCohortDefinition;
   }
 
@@ -4956,8 +4956,8 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTherapeuticLineConcept(),
             Collections.singletonList(hivMetadata.getFirstLineConcept()));
 
-    CohortDefinition abandonedExclusionInTheLastSixMonthsFromFirstLineDate =
-        getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
+    CohortDefinition abandonedExclusionInTheLastSixMonths =
+        getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
 
     CohortDefinition abandonedExclusionFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
 
@@ -4974,8 +4974,7 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch("RESTARTED", EptsReportUtils.map(restartded, MAPPING));
 
     compositionCohortDefinition.addSearch(
-        "ABANDONEDTARV",
-        EptsReportUtils.map(abandonedExclusionInTheLastSixMonthsFromFirstLineDate, MAPPING1));
+        "ABANDONEDTARV", EptsReportUtils.map(abandonedExclusionInTheLastSixMonths, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "B3",
@@ -4997,7 +4996,7 @@ public class QualityImprovement2020CohortQueries {
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONED1LINE OR B5E)");
+        "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5E)");
 
     return compositionCohortDefinition;
   }
@@ -5041,8 +5040,8 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition b2e = getMQC13DEN_B2E();
 
-    CohortDefinition abandonedExclusionInTheLastSixMonthsFromFirstLineDate =
-        getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
+    CohortDefinition abandonedExclusionInTheLastSixMonths =
+        getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt();
 
     CohortDefinition abandonedExclusionSecondLine = getPatientsWhoAbandonedTarvOnOnSecondLineDate();
 
@@ -5063,8 +5062,7 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "ABANDONEDTARV",
-        EptsReportUtils.map(abandonedExclusionInTheLastSixMonthsFromFirstLineDate, MAPPING1));
+        "ABANDONEDTARV", EptsReportUtils.map(abandonedExclusionInTheLastSixMonths, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED2LINE", EptsReportUtils.map(abandonedExclusionSecondLine, MAPPING1));
@@ -5075,7 +5073,7 @@ public class QualityImprovement2020CohortQueries {
             B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "(secondLineB2 AND NOT B2E) AND NOT (ABANDONED2LINE OR B5E)");
+        "(secondLineB2 AND NOT B2E) AND NOT (ABANDONEDTARV OR B5E)");
 
     return compositionCohortDefinition;
   }
@@ -5448,8 +5446,7 @@ public class QualityImprovement2020CohortQueries {
 
     cd.addSearch(
         "ABANDONEDTARV",
-        EptsReportUtils.map(
-            getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate(), MAPPING1));
+        EptsReportUtils.map(getPatientsWhoAbandonedOrRestartedTarvOnLast6MonthsArt(), MAPPING1));
 
     cd.addSearch(
         "ABANDONED1LINE",
@@ -5475,10 +5472,10 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
-          "((A AND NOT C AND (G OR J)) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONED1LINE) AND age");
+          "((A AND NOT C AND (G OR J)) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
     if (indicator == 5 || indicator == 14)
       cd.setCompositionString(
-          "(B2New AND (I OR L)) AND NOT (F OR E OR DD OR ABANDONED2LINE) AND age");
+          "(B2New AND (I OR L)) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
 
     return cd;
   }
@@ -10386,6 +10383,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("All patients who abandoned TARV On Art Start Date");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.setQuery(
