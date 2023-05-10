@@ -8681,6 +8681,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
     CohortDefinition onTB  = commonCohortQueries.getPatientsOnTbTreatment();
+    CohortDefinition onSK  = getPatientsWithSarcomaKarposi();
 
     cd.addSearch(
         "A",
@@ -8717,6 +8718,11 @@ public class QualityImprovement2020CohortQueries {
             onTB,
             "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
+        "onSK",
+        EptsReportUtils.map(
+            onSK,
+            "endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
         "adverseReaction",
         EptsReportUtils.map(
             genericCohortQueries.hasCodedObs(
@@ -8737,7 +8743,7 @@ public class QualityImprovement2020CohortQueries {
                     hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
             "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
 
-    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction)");
+    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK)");
 
     return cd;
   }
@@ -12385,5 +12391,40 @@ public class QualityImprovement2020CohortQueries {
             + " OR deadRegisteredInFichaResumoAndFichaClinicaMasterCard) AND NOT exclusion");
 
     return cd;
+  }
+
+  public SqlCohortDefinition getPatientsWithSarcomaKarposi() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with Sarcoma Karposi");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("507", hivMetadata.getKaposiSarcomaConcept().getConceptId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+
+    String query =
+        " SELECT p.patient_id "
+            + "        FROM patient p "
+            + "             INNER JOIN encounter e "
+            + "                ON p.patient_id = e.patient_id "
+            + "             INNER JOIN obs o "
+            + "                ON e.encounter_id = o.encounter_id "
+            + "        WHERE p.voided = 0 "
+            + "             AND e.voided = 0 "
+            + "             AND o.voided = 0 "
+            + "             AND e.encounter_type IN (${6},${9}) "
+            + "             AND o.concept_id = ${1406} "
+            + "             AND o.value_coded = ${507} "
+            + "             AND e.location_id = :location "
+            + "             AND e.encounter_datetime <= :endDate ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
