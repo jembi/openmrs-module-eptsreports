@@ -41,7 +41,6 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
   @Override
   protected void setParameters(
       Date startDate, Date endDate, Location location, EvaluationContext context) {
-    context.addParameterValue("startDate", startDate);
     context.addParameterValue("endDate", endDate);
     context.addParameterValue("location", location);
   }
@@ -51,7 +50,6 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
 
     HashMap<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("startDate", "Start Date", Date.class), getStartDate());
     parameters.put(new Parameter("endDate", "End Date", Date.class), getEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
@@ -66,7 +64,6 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
 
     HashMap<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("startDate", "Start Date", Date.class), getStartDate());
     parameters.put(new Parameter("endDate", "End Date", Date.class), getEndDate());
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
