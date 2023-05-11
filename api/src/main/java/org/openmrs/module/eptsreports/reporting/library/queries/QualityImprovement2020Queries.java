@@ -1174,6 +1174,115 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * incluindo todos os utentes com registo de uma Carga Viral na Ficha Clínica ou Ficha Resumo com
+   * resultado > 50 cópias durante o período de inclusão (“Data da CV >50” >= “Data Início Inclusão”
+   * e <= “Data Fim Inclusão”), filtrando os utentes do sexo feminino, com registo de “Grávida” na
+   * mesma consulta (“Data da Consulta CV>50”)
+   *
+   * </blockquote>
+   *
+   * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
+   * @param masterCardEncounterType The Adulto Seguimento Encounter Type 53
+   * @param pregnantConcept The Pregnant Concept Id 1982
+   * @param yesConcept The answer yes Concept Id 1065
+   * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
+   * @param vlQuantity Quantity of viral load to evaluate
+   * @return {@link CohortDefinition}
+   */
+  public static CohortDefinition getCV50ForPregnant(
+      int adultoSeguimentoEncounterType,
+      int masterCardEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int pregnantConcept,
+      int vlQuantity) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Pedido de CV após CV > 50 Paciente com Registro de Grávida na mesma consulta");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("53", masterCardEncounterType);
+    map.put("856", hivViralLoadConcept);
+    map.put("1982", pregnantConcept);
+    map.put("1065", yesConcept);
+
+    String query =
+        "SELECT p.patient_id "
+            + "       FROM patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "       INNER JOIN ( "
+            + "                   SELECT p.patient_id, MIN(e.encounter_datetime) as first_carga_viral "
+            + "                   FROM patient p "
+            + "						INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "						INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                        AND e.voided = 0 "
+            + "                        AND o.voided = 0 "
+            + "                        AND o.concept_id = ${856} "
+            + "                        AND o.value_numeric >= "
+            + vlQuantity
+            + "                        AND ( e.encounter_type = ${6} AND e.encounter_datetime BETWEEN :startDate AND :endDate ) "
+            + "                        AND e.location_id = :location "
+            + "                   GROUP  BY p.patient_id "
+            + "                   UNION "
+            + "                   SELECT p.patient_id, MIN(o.obs_datetime) as first_carga_viral "
+            + "                   FROM patient p "
+            + "						INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "						INNER JOIN obs o ON e.encounter_id = o.encounter_id "
+            + "                   WHERE  p.voided = 0 "
+            + "                   AND e.voided = 0 "
+            + "                   AND o.voided = 0 "
+            + "                   AND o.concept_id = ${856} "
+            + "                   AND o.value_numeric >= "
+            + vlQuantity
+            + "                   AND ( e.encounter_type = ${53} AND e.encounter_datetime BETWEEN :startDate AND :endDate ) "
+            + "                   AND e.location_id = :location "
+            + "                   GROUP  BY p.patient_id "
+            + "                  ) AS lab ON lab.patient_id = p.patient_id "
+            + "	   INNER JOIN ( "
+            + "                   SELECT primeira.patient_id, "
+            + "                          enc.encounter_datetime AS first_consultation "
+            + "                   FROM  (SELECT p.patient_id, "
+            + "								 Min(e.encounter_datetime) AS first_consultation "
+            + "                          FROM   patient p "
+            + "								INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "						  WHERE  e.encounter_type = 6 "
+            + "                          AND e.encounter_datetime <= :revisionEndDate "
+            + "                          AND e.voided = 0 "
+            + "                          AND p.voided = 0 "
+            + "                          AND e.location_id = :location "
+            + "                          GROUP  BY p.patient_id) AS primeira "
+            + "                         INNER JOIN encounter enc ON enc.patient_id = primeira.patient_id "
+            + "                         INNER JOIN obs o ON o.encounter_id = enc.encounter_id "
+            + "                         INNER JOIN person pe ON pe.person_id = primeira.patient_id "
+            + "				   WHERE enc.encounter_datetime = primeira.first_consultation "
+            + "                   AND enc.encounter_datetime >= :startDate "
+            + "                   AND enc.encounter_datetime <= :endDate "
+            + "                   AND enc.encounter_type = ${6} "
+            + "                   AND o.concept_id = ${1982} "
+            + "                   AND o.value_coded = ${1065} "
+            + "                   AND pe.gender = 'F' "
+            + "                   AND enc.location_id = :location "
+            + "                   GROUP BY primeira.patient_id "
+            + "                  ) AS mulher ON mulher.patient_id = p.patient_id "
+            + "       WHERE p.voided = 0 "
+            + "       AND lab.first_carga_viral = mulher.first_consultation";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   public static CohortDefinition getMQ13DenB4_P4(
       int adultoSeguimentoEncounterType,
       int hivViralLoadConcept,

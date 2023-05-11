@@ -5888,8 +5888,9 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getBreastfeeding().getConceptId());
 
     CohortDefinition pregnantWithCargaViralHigherThan50 =
-        QualityImprovement2020Queries.getMQ13DenB4_P4(
+        QualityImprovement2020Queries.getCV50ForPregnant(
             hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
             hivMetadata.getHivViralLoadConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId(),
             commonMetadata.getPregnantConcept().getConceptId(),
@@ -6043,7 +6044,7 @@ public class QualityImprovement2020CohortQueries {
             "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "((B1Den18 AND B4CV50 AND PrimeiraLinha) AND NOT (E or F))");
+            "((B4CV50 AND PrimeiraLinha) AND NOT (E or F))");
       }
     } else {
       if (line == 3) {
@@ -6054,7 +6055,7 @@ public class QualityImprovement2020CohortQueries {
             "(((B1 AND PrimeiraLinha AND H) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "((B1Den18 AND B4CV50 AND PrimeiraLinha AND H50) AND NOT (E or F)");
+            "((B4CV50 AND PrimeiraLinha AND H50) AND NOT (E or F)");
       }
     }
     return compositionCohortDefinition;
