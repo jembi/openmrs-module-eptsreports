@@ -1501,6 +1501,7 @@ public class QualityImprovement2020Queries {
    * @param abandonedConcept The Abandoned Concept 1707
    * @param restartConcept The Abandoned Concept 1705
    * @param stateOfStayOfPreArtPatient The State of Stay in Pre Art Concept 6272
+   * @param numberOfMonths Number of months before last consultation
    * @return {@link String}
    */
   public static String getMQ13AbandonedOrRestartedTarvOnLast6MonthsArt(
@@ -1509,7 +1510,8 @@ public class QualityImprovement2020Queries {
       int stateOfStayOfArtPatient,
       int abandonedConcept,
       int restartConcept,
-      int stateOfStayOfPreArtPatient) {
+      int stateOfStayOfPreArtPatient,
+      int numberOfMonths) {
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", adultoSeguimentoEncounterType);
@@ -1542,7 +1544,9 @@ public class QualityImprovement2020Queries {
             + "                                       AND o.concept_id = ${6273} "
             + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
-            + "                                       AND e.encounter_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL 6 MONTH) "
+            + "                                       AND e.encounter_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL "
+            + numberOfMonths
+            + " MONTH) "
             + "                                       AND e.encounter_datetime <= most_recent.last_consultation "
             + "                                     GROUP BY p.patient_id "
             + "UNION "

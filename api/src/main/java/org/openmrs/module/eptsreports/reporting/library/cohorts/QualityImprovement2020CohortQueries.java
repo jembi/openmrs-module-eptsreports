@@ -6311,7 +6311,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtStatus().getConceptId());
 
     CohortDefinition pregnantAbandonedDuringPeriod =
-        getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate();
+        getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
 
     cd.addSearch("A", EptsReportUtils.map(startedART, MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
@@ -6348,7 +6348,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
 
     CohortDefinition pregnantAbandonedDuringPeriod =
-        getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate();
+        getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
 
     cd.setCompositionString("B2 AND NOT ABANDONED");
@@ -6962,7 +6962,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getArtStatus().getConceptId());
 
     CohortDefinition pregnantAbandonedDuringPeriod =
-        getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate();
+        getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
 
     cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
     cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
@@ -6997,7 +6997,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
     cd.addSearch("J", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
     CohortDefinition pregnantAbandonedDuringPeriod =
-        getPatientsWhoAbandonedTarvBetween3MonthsBeforePregnancyDate();
+        getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
 
     cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
@@ -10399,7 +10399,52 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
             hivMetadata.getAbandonedConcept().getConceptId(),
             hivMetadata.getRestartConcept().getConceptId(),
-            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId()));
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
+            6));
+
+    return cd;
+  }
+
+  /**
+   * <b> RF7.3 Utentes Abandono ou Reinício TARV durante o período (para exclusão)</b><br>
+   * <br>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram ou reiniciaram o tratamento TARV durante
+   * um determinado período (entre “Data Início Periodo” e “Data Fim Período” da seguinte forma:
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reincio” na Ficha Clínica durante o período (“Data Consulta Abandono/Reinicio” >= “Data Início
+   * Período” e <= “Data Fim Período”).<br>
+   * <br>
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reinicio” na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência
+   * Abandono/Reinicio” >= “Data Início Período” e <= “Data Fim Período”). <br>
+   * <br>
+   *
+   * <p><b>Nota:</b> “Data Início Período” e “Data Fim Período” estão definidas no respectivo
+   * indicador/RF.
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt() {
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("All patients who abandoned TARV On Art Start Date");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.setQuery(
+        QualityImprovement2020Queries.getMQ13AbandonedOrRestartedTarvOnLast6MonthsArt(
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            hivMetadata.getStateOfStayOfArtPatient().getConceptId(),
+            hivMetadata.getAbandonedConcept().getConceptId(),
+            hivMetadata.getRestartConcept().getConceptId(),
+            hivMetadata.getStateOfStayOfPreArtPatient().getConceptId(),
+            3));
 
     return cd;
   }
