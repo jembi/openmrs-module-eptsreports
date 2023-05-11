@@ -57,6 +57,8 @@ public class QualityImprovement2020CohortQueries {
 
   private TxCurrCohortQueries txCurrCohortQueries;
 
+  private EriDSDCohortQueries eriDSDCohortQueries;
+
   private IntensiveMonitoringCohortQueries intensiveMonitoringCohortQueries;
 
   private final String MAPPING = "startDate=${startDate},endDate=${endDate},location=${location}";
@@ -92,7 +94,9 @@ public class QualityImprovement2020CohortQueries {
       TbMetadata tbMetadata,
       TxPvlsCohortQueries txPvls,
       AgeCohortQueries ageCohortQueries,
-      TxMlCohortQueries txMlCohortQueries) {
+      TxMlCohortQueries txMlCohortQueries,
+      TxCurrCohortQueries txCurrCohortQueries,
+      EriDSDCohortQueries eriDSDCohortQueries) {
     this.genericCohortQueries = genericCohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
@@ -103,6 +107,8 @@ public class QualityImprovement2020CohortQueries {
     this.txPvls = txPvls;
     this.ageCohortQueries = ageCohortQueries;
     this.txMlCohortQueries = txMlCohortQueries;
+    this.txCurrCohortQueries = txCurrCohortQueries;
+    this.eriDSDCohortQueries = eriDSDCohortQueries;
   }
 
   public void setIntensiveMonitoringCohortQueries(
@@ -7068,8 +7074,7 @@ public class QualityImprovement2020CohortQueries {
     comp.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
     comp.addSearch(
-        "dead",
-        EptsReportUtils.map(dead, "onOrBefore=${revisionEndDate},locationList=${location}"));
+        "dead", EptsReportUtils.map(dead, "endDate=${revisionEndDate},location=${location}"));
 
     comp.addSearch(
         "VL",
@@ -7097,36 +7102,36 @@ public class QualityImprovement2020CohortQueries {
 
     if (den == 1) {
       comp.setCompositionString(
-          "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
-          + " AND NOT (CD OR F OR dead)");
+          "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
+              + " AND NOT (CD OR F OR dead)");
     } else if (den == 2) {
       comp.setCompositionString(
-          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
-          + " AND NOT (CD OR F OR VL)) AND G2");
+          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
+              + " AND NOT (CD OR F OR VL)) AND G2");
     } else if (den == 3) {
       comp.setCompositionString(
           "(MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
-          + " AND G2 AND VL2Pedidos AND NOT (CD OR F OR VL)");
+              + " AND G2 AND VL2Pedidos AND NOT (CD OR F OR VL)");
     } else if (den == 4) {
       comp.setCompositionString(
-          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
-          + " AND G2 AND VL2Pedidos AND VLFL AND NOT (CD OR F OR VL)) ");
+          "((MDSHa24Meses OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
+              + " AND G2 AND VL2Pedidos AND VLFL AND NOT (CD OR F OR VL)) ");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString(
-          "(DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
-          + " AND  NOT (CD OR F OR dead)");
+          "(DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
+              + " AND  NOT (CD OR F OR dead)");
     } else if (den == 7 || den == 8) {
       comp.setCompositionString(
-          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) " 
-          + " AND  NOT (CD OR F OR VL)) AND G2 ");
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
+              + " AND  NOT (CD OR F OR VL)) AND G2 ");
     } else if (den == 11 || den == 12) {
       comp.setCompositionString(
           "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
-          + " AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
+              + " AND  NOT (CD OR F OR VL)) AND G2 AND IADT AND VLFL");
     } else if (den == 9 || den == 10) {
       comp.setCompositionString(
           "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
-          + " AND  NOT (CD OR F OR VL)) AND G2 IADT");
+              + " AND  NOT (CD OR F OR VL)) AND G2 IADT");
     }
     return comp;
   }
@@ -7594,10 +7599,10 @@ public class QualityImprovement2020CohortQueries {
    *
    * <p>Filtrando os utentes que têm o último registo de “Tipo de Dispensa” = “DS” antes da última
    * consulta do período de revisão ( “Data Última Consulta”)
-   * 
-   * Filtrando os utentes com registo de “Tipo de Dispensa” = “DA” na última consulta (“Ficha Clínica”)
-   * decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 12 meses+1dia 
-   * e <= “Data Fim Revisão”) ou
+   *
+   * <p>Filtrando os utentes com registo de “Tipo de Dispensa” = “DA” na última consulta (“Ficha
+   * Clínica”) decorrida há 12 meses (última “Data Consulta Clínica” >= “Data Fim Revisão” – 12
+   * meses+1dia e <= “Data Fim Revisão”) ou
    *
    * <p>Filtrando os utentes com registo de último levantamento na farmácia (FILA) antes da última
    * consulta do período de revisão (“Data última Consulta) com próximo levantamento agendado para
@@ -7646,12 +7651,14 @@ public class QualityImprovement2020CohortQueries {
         getPatientsWithDispensationBeforeLastConsultationDate(
             hivMetadata.getSemiannualDispensation());
 
-    CohortDefinition proxLevtoFILA83a97Dias = getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(83, 97);
+    CohortDefinition proxLevtoFILA83a97Dias =
+        getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(83, 97);
 
     CohortDefinition proxLevtoFILA173a187Dias =
         getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(173, 187);
 
-    CohortDefinition proxLevtoFILA335a395Dias = getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(335, 395);
+    CohortDefinition proxLevtoFILA335a395Dias =
+        getPatientsWhoHadFilaBeforeLastClinicalConsutationBetween(335, 395);
 
     compositionCohortDefinition.addSearch(
         "MDS",
@@ -7671,20 +7678,24 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "proxLevtoFILA83a97Dias",
         EptsReportUtils.map(
-            proxLevtoFILA83a97Dias, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            proxLevtoFILA83a97Dias,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "proxLevtoFILA173a187Dias",
         EptsReportUtils.map(
-            proxLevtoFILA173a187Dias, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            proxLevtoFILA173a187Dias,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "proxLevtoFILA335a395Dias",
         EptsReportUtils.map(
-            proxLevtoFILA335a395Dias, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            proxLevtoFILA335a395Dias,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString("MDS OR DS OR DT OR "
-        + " proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias");
+    compositionCohortDefinition.setCompositionString(
+        "MDS OR DS OR DT OR "
+            + " proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias");
 
     return compositionCohortDefinition;
   }
@@ -8680,8 +8691,9 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
     CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
-    CohortDefinition onTB  = commonCohortQueries.getPatientsOnTbTreatment();
-    CohortDefinition onSK  = getPatientsWithSarcomaKarposi();
+    CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
+    CohortDefinition onSK = getPatientsWithSarcomaKarposi();
+    CohortDefinition returned = eriDSDCohortQueries.getPatientsWhoReturned();
 
     cd.addSearch(
         "A",
@@ -8715,13 +8727,12 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch(
         "onTB",
         EptsReportUtils.map(
-            onTB,
-            "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
+            onTB, "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-        "onSK",
-        EptsReportUtils.map(
-            onSK,
-            "endDate=${revisionEndDate},location=${location}"));
+        "onSK", EptsReportUtils.map(onSK, "endDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "returned",
+        EptsReportUtils.map(returned, "endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "adverseReaction",
         EptsReportUtils.map(
@@ -8743,7 +8754,8 @@ public class QualityImprovement2020CohortQueries {
                     hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
             "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
 
-    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK)");
+    cd.setCompositionString(
+        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned)");
 
     return cd;
   }
@@ -10741,10 +10753,11 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    * Utentes com marcação de próxima consulta a seguir a última consulta clínica no período de
-   * avaliação/revisão, na qual foi registado o resultado de CV >= 1000, sendo esta marcação de 
-   * consulta entre 23 a 37 dias da consultao, ou seja, “Próxima Consulta” (marcada na Ficha 
-   * Clínica com “Próxima Consulta” >= “Data última Consulta” e <= “Data Fim Revisão”) >= data última
+   * avaliação/revisão, na qual foi registado o resultado de CV >= 1000, sendo esta marcação de
+   * consulta entre 23 a 37 dias da consultao, ou seja, “Próxima Consulta” (marcada na Ficha Clínica
+   * com “Próxima Consulta” >= “Data última Consulta” e <= “Data Fim Revisão”) >= data última
    * consulta + 23 dias e <= data última consulta + 37 dias)
+   *
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsWhoHadPickupOnFilaAfterMostRecentVlOnFichaClinica() {
@@ -12359,9 +12372,7 @@ public class QualityImprovement2020CohortQueries {
    */
   public CohortDefinition getDeadPatientsComposition() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Get patients who are dead according to criteria a,b,c,d and e");
-    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-    cd.addParameter(new Parameter("reportEndDate", "Report End Date", Date.class));
+    cd.setName("Get patients who are dead");
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -12393,6 +12404,17 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
+  /**
+   * O sistema irá identificar todos os utentes com Sarcoma de Karposi os que têm o registo de:
+   *
+   * <p>Outros diagnósticos – Sarcoma de Kaposi na “Ficha de Seguimento” registada até o fim do
+   * período de revisão ou
+   *
+   * <p>Infecções oportunistas incluindo Sarcoma de Kaposi e outras doenças – Sarcoma de Kaposi
+   * registado na “Ficha Clinica – Master Card” até o fim do período de revisão.
+   *
+   * @return {@link CohortDefinition}
+   */
   public SqlCohortDefinition getPatientsWithSarcomaKarposi() {
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients with Sarcoma Karposi");
