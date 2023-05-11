@@ -875,6 +875,7 @@ public class TxPvlsCohortQueries {
             + "                                                                 WHERE pp.program_id = ${8} "
             + "                                                                 AND pp.voided = 0 "
             + "                                                                 AND breastfeeding.patient_id = pp.patient_id "
+            + "                                                                 AND pp.location_id = :location "
             + "                                                                 AND pp.date_enrolled >= breastfeeding.bf_date "
             + "                                                                 AND pp.date_enrolled BETWEEN DATE_SUB(breastfeeding.last_vl, INTERVAL 9 MONTH) AND breastfeeding.last_vl "
             + "                                                          UNION "
