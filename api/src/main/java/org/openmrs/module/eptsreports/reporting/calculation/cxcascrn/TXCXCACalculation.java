@@ -49,7 +49,7 @@ public class TXCXCACalculation extends AbstractPatientCalculation {
     Concept yesConcept = hivMetadata.getPatientFoundYesConcept();
     Concept cryotherapyDateConcept = hivMetadata.getCryotherapyDateConcept();
     Concept viaResultOnTheReferenceConcept = hivMetadata.getViaResultOnTheReferenceConcept();
-    Concept pediatricNursingConcept = hivMetadata.getPediatricNursingConcept();
+    Concept cryotherapyConcept = hivMetadata.getCryotherapyConcept();
     Concept thermocoagulationConcept = hivMetadata.getThermocoagulationConcept();
     Concept leepConcept = hivMetadata.getLeepConcept();
     Concept conizationConcept = hivMetadata.getconizationConcept();
@@ -97,11 +97,11 @@ public class TXCXCACalculation extends AbstractPatientCalculation {
             cohort,
             location,
             Arrays.asList(
-                pediatricNursingConcept, thermocoagulationConcept, leepConcept, conizationConcept),
+                cryotherapyConcept, thermocoagulationConcept, leepConcept, conizationConcept),
             TimeQualifier.ANY,
             null,
             endDate,
-            EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
+            EPTSMetadataDatetimeQualifier.OBS_DATETIME,
             context);
 
     for (Integer pId : cohort) {
@@ -143,11 +143,9 @@ public class TXCXCACalculation extends AbstractPatientCalculation {
 
         for (Obs viaResultRefence : viaResultRefences) {
 
-          if (viaResultRefence
-                      .getValueDatetime()
-                      .compareTo(obs.getEncounter().getEncounterDatetime())
+          if (viaResultRefence.getObsDatetime().compareTo(obs.getEncounter().getEncounterDatetime())
                   >= 0
-              && viaResultRefence.getValueDatetime().compareTo(endDate) <= 0) {
+              && viaResultRefence.getObsDatetime().compareTo(endDate) <= 0) {
             map.put(pId, new SimpleResult(viaResultRefence, this));
             break;
           }

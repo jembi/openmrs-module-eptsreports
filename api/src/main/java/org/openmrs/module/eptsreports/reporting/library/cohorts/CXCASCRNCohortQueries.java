@@ -115,7 +115,7 @@ public class CXCASCRNCohortQueries {
    *       </ul>
    * </ul>
    */
-  private CohortDefinition getAA(CXCASCRNResult result) {
+  public CohortDefinition getAA(CXCASCRNResult result) {
     CXCASCRNAACalculation cxcascrnCalculation =
         Context.getRegisteredComponents(CXCASCRNAACalculation.class).get(0);
 
@@ -371,6 +371,8 @@ public class CXCASCRNCohortQueries {
     }
 
     cd.setQuery(CXCASCRNQueries.getAA3OrAA4Query(cxcascrnResult, hivMetadata, false));
+
+    System.out.println(cd.getQuery());
 
     return cd;
   }
