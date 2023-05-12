@@ -1251,7 +1251,10 @@ public class QualityImprovement2020Queries {
             + "                   GROUP  BY p.patient_id "
             + "                  ) AS lab ON lab.patient_id = p.patient_id "
             + "                  ) AS first_lab ON first_lab.patient_id = p.patient_id "
-            + "	   INNER JOIN ( "
+            + "	   INNER JOIN ( SELECT p.patient_id, "
+            + "                        MIN(mulher.first_consultation) AS first_pregnant_consultation "
+            + "                    FROM patient p "
+            + "                    INNER JOIN ( "
             + "                   SELECT primeira.patient_id, "
             + "                          enc.encounter_datetime AS first_consultation "
             + "                   FROM  (SELECT p.patient_id, "
@@ -1302,8 +1305,9 @@ public class QualityImprovement2020Queries {
             + "                   AND enc.location_id = :location "
             + "                   GROUP BY primeira.patient_id "
             + "                  ) AS mulher ON mulher.patient_id = p.patient_id "
+            + "                  ) AS first_pregnant ON first_pregnant.patient_id = p.patient_id "
             + "       WHERE p.voided = 0 "
-            + "       AND first_lab.first_carga_viral = mulher.first_consultation";
+            + "       AND first_lab.first_carga_viral = first_pregnant.first_pregnant_consultation";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
