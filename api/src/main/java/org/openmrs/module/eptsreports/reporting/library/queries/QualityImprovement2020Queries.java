@@ -1218,7 +1218,10 @@ public class QualityImprovement2020Queries {
             + "       FROM patient p "
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON e.encounter_id = o.encounter_id "
-            + "       INNER JOIN ( "
+            + "       INNER JOIN ( SELECT p.patient_id, "
+            + "                           MIN(first_carga_viral) AS first_carga_viral "
+            + "                    FROM patient p "
+            + "                    INNER JOIN ( "
             + "                   SELECT p.patient_id, MIN(e.encounter_datetime) as first_carga_viral "
             + "                   FROM patient p "
             + "						INNER JOIN encounter e ON p.patient_id = e.patient_id "
@@ -1243,10 +1246,11 @@ public class QualityImprovement2020Queries {
             + "                   AND o.concept_id = ${856} "
             + "                   AND o.value_numeric >= "
             + vlQuantity
-            + "                   AND ( e.encounter_type = ${53} AND e.encounter_datetime BETWEEN :startDate AND :endDate ) "
+            + "                   AND ( e.encounter_type = ${53} AND o.obs_datetime BETWEEN :startDate AND :endDate ) "
             + "                   AND e.location_id = :location "
             + "                   GROUP  BY p.patient_id "
             + "                  ) AS lab ON lab.patient_id = p.patient_id "
+            + "                  ) AS first_lab ON first_lab.patient_id = p.patient_id "
             + "	   INNER JOIN ( "
             + "                   SELECT primeira.patient_id, "
             + "                          enc.encounter_datetime AS first_consultation "
@@ -1274,7 +1278,7 @@ public class QualityImprovement2020Queries {
             + "                   GROUP BY primeira.patient_id "
             + "                  ) AS mulher ON mulher.patient_id = p.patient_id "
             + "       WHERE p.voided = 0 "
-            + "       AND lab.first_carga_viral = mulher.first_consultation";
+            + "       AND first_lab.first_carga_viral = mulher.first_consultation";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
