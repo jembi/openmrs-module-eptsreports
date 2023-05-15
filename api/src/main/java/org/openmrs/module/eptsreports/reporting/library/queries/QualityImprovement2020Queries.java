@@ -1174,6 +1174,113 @@ public class QualityImprovement2020Queries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * incluindo todos os utentes com registo de uma Carga Viral na Ficha Clínica ou Ficha Resumo com
+   * resultado > 50 cópias durante o período de inclusão (“Data da CV >50” >= “Data Início Inclusão”
+   * e <= “Data Fim Inclusão”), filtrando os utentes do sexo feminino, com registo de “Grávida” na
+   * mesma consulta (“Data da Consulta CV>50”)
+   *
+   * </blockquote>
+   *
+   * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
+   * @param masterCardEncounterType The Adulto Seguimento Encounter Type 53
+   * @param pregnantConcept The Pregnant Concept Id 1982
+   * @param yesConcept The answer yes Concept Id 1065
+   * @param hivViralLoadConcept The HIV ViralLoad Concept Id 856
+   * @param vlQuantity Quantity of viral load to evaluate
+   * @return {@link CohortDefinition}
+   */
+  public static CohortDefinition getCV50ForPregnant(
+      int adultoSeguimentoEncounterType,
+      int masterCardEncounterType,
+      int hivViralLoadConcept,
+      int yesConcept,
+      int pregnantConcept,
+      int vlQuantity) {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName(
+        "Pedido de CV após CV > 50 Paciente com Registro de Grávida na mesma consulta");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("53", masterCardEncounterType);
+    map.put("856", hivViralLoadConcept);
+    map.put("1982", pregnantConcept);
+    map.put("1065", yesConcept);
+
+    String query =
+        "SELECT     p.person_id "
+            + "FROM       person p "
+            + "INNER JOIN encounter e "
+            + "ON         e.patient_id = p.person_id "
+            + "INNER JOIN obs o "
+            + "ON         o.encounter_id = e.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                    SELECT   viral_load.patient_id , "
+            + "                             Min(viral_load.first_encounter) AS first_of_all "
+            + "                    FROM     ( "
+            + "                                        SELECT     p.patient_id, "
+            + "                                                   Min(e.encounter_datetime) AS first_encounter "
+            + "                                        FROM       patient p "
+            + "                                        INNER JOIN encounter e "
+            + "                                        ON         e.patient_id = p.patient_id "
+            + "                                        INNER JOIN obs o "
+            + "                                        ON         o.encounter_id = e.encounter_id "
+            + "                                        WHERE      p.voided = 0 "
+            + "                                        AND        e.voided = 0 "
+            + "                                        AND        o.voided = 0 "
+            + "                                        AND        e.encounter_type = ${6} "
+            + "                                        AND        e.location_id = :location "
+            + "                                        AND        o.concept_id = ${856} "
+            + "                                        AND        o.value_numeric > "
+            + vlQuantity
+            + "                                        AND        e.encounter_datetime >= :startDate "
+            + "                                        AND        e.encounter_datetime <= :endDate "
+            + "                                        GROUP BY   p.patient_id "
+            + "                                        UNION "
+            + "                                        SELECT     p.patient_id, "
+            + "                                                   min(o.obs_datetime) AS first_encounter "
+            + "                                        FROM       patient p "
+            + "                                        INNER JOIN encounter e "
+            + "                                        ON         e.patient_id = p.patient_id "
+            + "                                        INNER JOIN obs o "
+            + "                                        ON         o.encounter_id = e.encounter_id "
+            + "                                        WHERE      p.voided = 0 "
+            + "                                        AND        e.voided = 0 "
+            + "                                        AND        o.voided = 0 "
+            + "                                        AND        e.encounter_type = ${53} "
+            + "                                        AND        e.location_id = :location "
+            + "                                        AND        o.concept_id = ${856} "
+            + "                                        AND        o.value_numeric > "
+            + vlQuantity
+            + "                                        AND        e.encounter_datetime >= :startDate "
+            + "                                        AND        e.encounter_datetime <= :endDate "
+            + "                                        GROUP BY   p.patient_id ) viral_load "
+            + "                    GROUP BY viral_load.patient_id ) vl "
+            + "ON         vl.patient_id = p.person_id "
+            + "WHERE      p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "AND        vl.first_of_all = e.encounter_datetime "
+            + "AND        encounter_type = ${6} "
+            + "AND        o.concept_id = ${1982} "
+            + "AND        o.value_coded = ${1065} "
+            + "AND        e.location_id = :location "
+            + "AND        p.gender = 'F' ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
+  }
+
   public static CohortDefinition getMQ13DenB4_P4(
       int adultoSeguimentoEncounterType,
       int hivViralLoadConcept,
@@ -1390,14 +1497,125 @@ public class QualityImprovement2020Queries {
    * @param masterCardEncounterType The Ficha Resumo Encounter Type 53
    * @param stateOfStayOfArtPatient The State of Stay in ART Concept 6273
    * @param abandonedConcept The Abandoned Concept 1707
+   * @param restartConcept The Abandoned Concept 1705
    * @param stateOfStayOfPreArtPatient The State of Stay in Pre Art Concept 6272
+   * @param numberOfMonths Number of months before last consultation
    * @return {@link String}
    */
-  public static String getMQ13AbandonedTarvOnArtStartDate(
+  public static String getMQ13AbandonedOrRestartedTarvOnLast6MonthsArt(
       int adultoSeguimentoEncounterType,
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
       int abandonedConcept,
+      int restartConcept,
+      int stateOfStayOfPreArtPatient,
+      int numberOfMonths) {
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", adultoSeguimentoEncounterType);
+    map.put("53", masterCardEncounterType);
+    map.put("6273", stateOfStayOfArtPatient);
+    map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
+    map.put("6272", stateOfStayOfPreArtPatient);
+
+    String query =
+        " SELECT abandoned.patient_id from ( "
+            + "        SELECT p.patient_id, e.encounter_datetime as last_encounter "
+            + "        FROM patient p "
+            + "           INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "           INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "           INNER JOIN ( "
+            + "               SELECT p.patient_id, MAX(e.encounter_datetime) as last_consultation "
+            + "               FROM   patient p  "
+            + "                   INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                   INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "               WHERE  p.voided = 0  "
+            + "               AND e.voided = 0  "
+            + "               AND o.voided = 0  "
+            + "               AND e.location_id = :location "
+            + "               AND e.encounter_type = ${6} "
+            + "               AND e.encounter_datetime <= :endDate "
+            + "               GROUP BY p.patient_id "
+            + "         ) most_recent  ON p.patient_id = most_recent.patient_id   "
+            + "      WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "      AND e.encounter_type = ${6} "
+            + "      AND o.concept_id = ${6273} "
+            + "      AND o.value_coded IN (${1707}, ${1705}) "
+            + "      AND e.location_id = :location "
+            + "      AND e.encounter_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL "
+            + numberOfMonths
+            + "      MONTH) "
+            + "      AND e.encounter_datetime <= most_recent.last_consultation "
+            + "      GROUP BY p.patient_id "
+            + "       UNION "
+            + "     SELECT p.patient_id, max(o.obs_datetime) as last_encounter FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "         INNER JOIN ( "
+            + "                       SELECT p.patient_id, MAX(e.encounter_datetime) as last_consultation "
+            + "                       FROM   patient p  "
+            + "                              INNER JOIN encounter e ON p.patient_id = e.patient_id  "
+            + "                              INNER JOIN obs o ON e.encounter_id = o.encounter_id  "
+            + "                       WHERE  p.voided = 0  "
+            + "                       AND e.voided = 0  "
+            + "                       AND o.voided = 0  "
+            + "                       AND e.location_id = :location "
+            + "                       AND e.encounter_type = ${6} "
+            + "                       AND e.encounter_datetime <= :endDate "
+            + "                       GROUP BY p.patient_id "
+            + "           ) most_recent  ON p.patient_id = most_recent.patient_id   "
+            + "         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "         AND e.encounter_type = ${53} "
+            + "         AND o.concept_id = ${6272} "
+            + "         AND o.value_coded IN (${1707}, ${1705}) "
+            + "         AND e.location_id = :location "
+            + "         AND o.obs_datetime >= DATE_SUB(most_recent.last_consultation, INTERVAL "
+            + numberOfMonths
+            + "         MONTH) "
+            + "         AND o.obs_datetime <= most_recent.last_consultation "
+            + "         GROUP BY p.patient_id "
+            + ") abandoned GROUP BY abandoned.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    return stringSubstitutor.replace(query);
+  }
+
+  /**
+   * <b> RF7.3 Utentes Abandono ou Reinício TARV durante o período (para exclusão)</b><br>
+   * <br>
+   *
+   * <p>O sistema irá identificar utentes que abandonaram ou reiniciaram o tratamento TARV durante
+   * um determinado período ( entre “Data Início Periodo” e “Data Fim Período” da seguinte forma:
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reincio” na Ficha Clínica durante o período (“Data Consulta Abandono/Reinicio” >= “Data Início
+   * Período e <= “Data Fim Período.<br>
+   * <br>
+   *
+   * <p>incluindo os utentes com registo de “Mudança de Estado de Permanência” = “Abandono” ou
+   * “Reinicio” na Ficha Resumo durante o período (“Data de Mudança de Estado Permanência
+   * Abandono/Reinicio” >= “Data Início Período” e <= “Data Fim Período”). .<br>
+   * <br>
+   *
+   * <p><b>Nota:</b> Data Início Período” e “Data Fim Período” estão definidas no respectivo
+   * indicador/RF.<br>
+   *
+   * @param adultoSeguimentoEncounterType The Adulto Seguimento Encounter Type 6
+   * @param masterCardEncounterType The Ficha Resumo Encounter Type 53
+   * @param stateOfStayOfArtPatient The State of Stay in ART Concept 6273
+   * @param abandonedConcept The Abandoned Concept 1707
+   * @param restartConcept The Abandoned Concept 1705
+   * @param stateOfStayOfPreArtPatient The State of Stay in Pre Art Concept 6272
+   * @return {@link String}
+   */
+  public static String getMQ13AbandonedOrRestartedTarvOnArtStartDate(
+      int adultoSeguimentoEncounterType,
+      int masterCardEncounterType,
+      int stateOfStayOfArtPatient,
+      int abandonedConcept,
+      int restartConcept,
       int stateOfStayOfPreArtPatient) {
 
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
@@ -1408,6 +1626,7 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
     map.put("6272", stateOfStayOfPreArtPatient);
 
     String query =
@@ -1421,11 +1640,11 @@ public class QualityImprovement2020Queries {
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= end_period.first_pickup "
-            + "                                       AND e.encounter_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
-            + "                                       AND e.encounter_datetime <= end_period.first_pickup "
+            + "                                       AND e.encounter_datetime >= :startDate "
+            + "                                       AND e.encounter_datetime <= :endDate "
             + "                                     GROUP BY p.patient_id "
             + "UNION "
             + "     SELECT p.patient_id, max(o.obs_datetime) as last_encounter FROM patient p "
@@ -1437,11 +1656,11 @@ public class QualityImprovement2020Queries {
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= end_period.first_pickup "
-            + "                                       AND o.obs_datetime >= DATE_SUB(end_period.first_pickup, INTERVAL 6 MONTH) "
-            + "                                       AND o.obs_datetime <= end_period.first_pickup "
+            + "                                       AND o.obs_datetime >= :startDate "
+            + "                                       AND o.obs_datetime <= :endDate "
             + "                                     GROUP BY p.patient_id "
             + "                                 ) abandoned GROUP BY abandoned.patient_id";
 
@@ -1487,6 +1706,7 @@ public class QualityImprovement2020Queries {
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
       int abandonedConcept,
+      int restartConcept,
       int stateOfStayOfPreArtPatient) {
 
     CommonQueries commonQueries = new CommonQueries(new CommonMetadata(), new HivMetadata());
@@ -1497,6 +1717,7 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
     map.put("6272", stateOfStayOfPreArtPatient);
 
     String query =
@@ -1510,7 +1731,7 @@ public class QualityImprovement2020Queries {
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= end_period.first_pickup "
             + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 3 MONTH) "
@@ -1525,7 +1746,7 @@ public class QualityImprovement2020Queries {
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= end_period.first_pickup "
             + "                                       AND o.obs_datetime <= DATE_ADD(end_period.first_pickup, INTERVAL 3 MONTH)"
@@ -1679,6 +1900,7 @@ public class QualityImprovement2020Queries {
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
       int abandonedConcept,
+      int restartConcept,
       int stateOfStayOfPreArtPatient,
       int therapeuticLineConcept,
       int firstLineConcept,
@@ -1692,6 +1914,7 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
     map.put("6272", stateOfStayOfPreArtPatient);
     map.put("21151", therapeuticLineConcept);
     map.put("21150", firstLineConcept);
@@ -1711,7 +1934,7 @@ public class QualityImprovement2020Queries {
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= end_period.last_encounter "
             + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.last_encounter, INTERVAL 6 MONTH) "
@@ -1726,7 +1949,7 @@ public class QualityImprovement2020Queries {
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= end_period.last_encounter "
             + "                                       AND o.obs_datetime <= DATE_ADD(end_period.last_encounter, INTERVAL 6 MONTH)"
@@ -1787,6 +2010,7 @@ public class QualityImprovement2020Queries {
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
       int abandonedConcept,
+      int restartConcept,
       int stateOfStayOfPreArtPatient,
       int therapeuticLineConcept,
       int firstLineConcept,
@@ -1802,6 +2026,7 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
     map.put("6272", stateOfStayOfPreArtPatient);
     map.put("21151", therapeuticLineConcept);
     map.put("21150", firstLineConcept);
@@ -1821,7 +2046,7 @@ public class QualityImprovement2020Queries {
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= DATE_SUB(end_period.last_encounter, INTERVAL 6 MONTH)  "
             + "                                       AND e.encounter_datetime <= end_period.last_encounter "
@@ -1836,7 +2061,7 @@ public class QualityImprovement2020Queries {
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN (${1707}, ${1705}) "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= DATE_SUB(end_period.last_encounter, INTERVAL 6 MONTH)  "
             + "                                       AND o.obs_datetime <= end_period.last_encounter "
@@ -1887,6 +2112,7 @@ public class QualityImprovement2020Queries {
       int masterCardEncounterType,
       int stateOfStayOfArtPatient,
       int abandonedConcept,
+      int restartConcept,
       int stateOfStayOfPreArtPatient,
       int regArvSecondLineConcept) {
 
@@ -1895,6 +2121,7 @@ public class QualityImprovement2020Queries {
     map.put("53", masterCardEncounterType);
     map.put("6273", stateOfStayOfArtPatient);
     map.put("1707", abandonedConcept);
+    map.put("1705", restartConcept);
     map.put("6272", stateOfStayOfPreArtPatient);
     map.put("21187", regArvSecondLineConcept);
 
@@ -1909,7 +2136,7 @@ public class QualityImprovement2020Queries {
             + "                                     WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${6} "
             + "                                       AND o.concept_id = ${6273} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                       AND e.location_id = :location "
             + "       AND e.encounter_datetime >= end_period.last_encounter "
             + "                                       AND e.encounter_datetime <= DATE_ADD(end_period.last_encounter, INTERVAL 6 MONTH) "
@@ -1924,7 +2151,7 @@ public class QualityImprovement2020Queries {
             + " WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "                                       AND e.encounter_type = ${53} "
             + "                                       AND o.concept_id = ${6272} "
-            + "                                       AND o.value_coded = ${1707} "
+            + "                                       AND o.value_coded IN ( ${1707}, ${1705} ) "
             + "                                       AND e.location_id = :location "
             + "       AND o.obs_datetime >= end_period.last_encounter "
             + "                                       AND o.obs_datetime <= DATE_ADD(end_period.last_encounter, INTERVAL 6 MONTH)"
