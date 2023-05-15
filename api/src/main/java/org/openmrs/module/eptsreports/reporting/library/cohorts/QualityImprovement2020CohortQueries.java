@@ -2689,7 +2689,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
     }
     if (indicatorFlag == 2) {
-      compositionCohortDefinition.setCompositionString("((B1 AND B2 AND B5) AND NOT (B4 OR F))");
+      compositionCohortDefinition.setCompositionString("((B2 AND (B1 OR B5)) AND NOT (B4 OR F))");
     }
     if (indicatorFlag == 7) {
       compositionCohortDefinition.setCompositionString("((B1 AND B2) AND NOT (B4 OR B5 OR F))");
@@ -3815,7 +3815,7 @@ public class QualityImprovement2020CohortQueries {
     }
 
     compositionCohortDefinition.setCompositionString(
-        "((B1 AND B2 AND B5 AND H) AND NOT (B4 OR F))");
+        "((B2 AND H AND (B1 OR B5)) AND NOT (B4 OR F))");
 
     return compositionCohortDefinition;
   }
