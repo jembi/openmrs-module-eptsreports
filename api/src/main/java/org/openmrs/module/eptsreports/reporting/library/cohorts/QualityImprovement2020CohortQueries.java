@@ -12468,7 +12468,8 @@ public class QualityImprovement2020CohortQueries {
             + "             AND o.concept_id = ${1406} "
             + "             AND o.value_coded = ${507} "
             + "             AND e.location_id = :location "
-            + "             AND e.encounter_datetime <= :endDate ";
+            + "             AND e.encounter_datetime <= :endDate "
+            + "        GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
