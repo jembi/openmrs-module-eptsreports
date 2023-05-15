@@ -50,21 +50,23 @@ public class CommonQueries {
       int startDrugsConceptId,
       int continueRegimenConceptId,
       int masterCardEncounterType,
-      int pulmonaryTBConceptId) {
+      int pulmonaryTBConceptId,
+      int otherDiagnosisId) {
     Map<String, Integer> map = new HashMap<>();
+    map.put("5", tbProgramId);
     map.put("6", adultoSeguimentoEncounterTypeId);
     map.put("9", arvPediatriaSeguimentoEncounterTypeId);
-    map.put("1113", tbStartDateConceptId);
-    map.put("6120", tbEndDateConceptId);
-    map.put("5", tbProgramId);
     map.put("16", patientStateId);
-    map.put("23761", activeTBConceptId);
+    map.put("42", pulmonaryTBConceptId);
+    map.put("53", masterCardEncounterType);
     map.put("1065", yesConceptId);
-    map.put("1268", tbTreatmentPlanConceptId);
+    map.put("1113", tbStartDateConceptId);
     map.put("1256", startDrugsConceptId);
     map.put("1257", continueRegimenConceptId);
-    map.put("53", masterCardEncounterType);
-    map.put("42", pulmonaryTBConceptId);
+    map.put("1268", tbTreatmentPlanConceptId);
+    map.put("1406", otherDiagnosisId);
+    map.put("6120", tbEndDateConceptId);
+    map.put("23761", activeTBConceptId);
 
     String query =
         "SELECT p.patient_id "
@@ -169,14 +171,14 @@ public class CommonQueries {
             + "             ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o "
             + "             ON e.encounter_id = o.encounter_id "
-            + " WHERE o.concept_id = ${42} "
-            + "       AND e.location_id =   :location  "
+            + " WHERE e.location_id =   :location  "
             + "       AND e.encounter_type = ${53} "
+            + "       AND o.concept_id = ${1406} "
+            + "       AND o.value_coded = ${42}"
             + "       AND o.obs_datetime BETWEEN date_sub(:endDate, INTERVAL 7 MONTH) AND :endDate "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + "       AND o.value_coded = ${1065}";
+            + "       AND o.voided = 0 ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     String replaced = sb.replace(query);
