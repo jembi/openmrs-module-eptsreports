@@ -550,7 +550,7 @@ public class TPTEligiblePatientsQueries {
         + "AND        o2.value_coded IN ( ${1256}, "
         + "                              ${1705} ) "
         + "AND        ee.location_id = :location "
-        + "AND        o2.obs_datetime <= :endDate";
+        + "AND        o2.obs_datetime < :endDate";
   }
 
   /**

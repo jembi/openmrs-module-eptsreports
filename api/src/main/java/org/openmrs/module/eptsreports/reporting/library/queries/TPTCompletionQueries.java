@@ -32,14 +32,8 @@ public class TPTCompletionQueries {
    * @return {@link String}
    */
   public static String getInhStartOnFilt() {
-    return " SELECT     p.patient_id, filt.start_date AS start_date "
-        + "FROM       patient p "
-        + "INNER JOIN encounter e "
-        + "ON         e.patient_id = p.patient_id "
-        + "INNER JOIN obs o "
-        + "ON         o.encounter_id = e.encounter_id "
-        + "INNER JOIN "
-        + "           ( "
+    return " SELECT     filt.patient_id, filt.start_date AS start_date "
+        + " FROM    ( "
         + "                      SELECT     p.patient_id, "
         + "                                 o2.obs_datetime start_date "
         + "                      FROM       patient p "
@@ -57,9 +51,8 @@ public class TPTCompletionQueries {
         + "                      AND (o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982})) "
         + "                      AND (o2.concept_id = ${23987} AND ( o2.value_coded = ${1257} OR o2.value_coded IS NULL )  "
         + "                        AND o2.obs_datetime <= :endDate )"
-        + "                       ) AS filt "
-        + "ON         filt.patient_id = p.patient_id "
-        + "WHERE      p.patient_id NOT IN "
+        + "                       ) filt "
+        + "WHERE      filt.patient_id NOT IN "
         + "           ( "
         + "                      SELECT     pp.patient_id "
         + "                      FROM       patient pp "
@@ -67,7 +60,7 @@ public class TPTCompletionQueries {
         + "                      ON         ee.patient_id = pp.patient_id "
         + "                      INNER JOIN obs oo "
         + "                      ON         oo.encounter_id = ee.encounter_id "
-        + "                      WHERE      p.patient_id = pp.patient_id "
+        + "                      WHERE      filt.patient_id = pp.patient_id "
         + "                      AND        pp.voided = 0 "
         + "                      AND        ee.voided = 0 "
         + "                      AND        oo.voided = 0 "
@@ -78,7 +71,6 @@ public class TPTCompletionQueries {
         + "                                                    ${23982} ) "
         + "                      AND        ee.encounter_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
         + "                      AND        ee.encounter_datetime < filt.start_date "
-        + "                      GROUP BY   p.patient_id "
         + "                      UNION "
         + "                      SELECT p.patient_id "
         + "                      FROM   patient p "
@@ -89,6 +81,7 @@ public class TPTCompletionQueries {
         + "                      JOIN   obs o2 "
         + "                      ON     o2.encounter_id = e.encounter_id "
         + "                      WHERE  o.voided = 0 "
+        + "                      AND filt.patient_id = p.patient_id "
         + "                      AND    e.voided = 0 "
         + "                      AND    p.voided = 0 "
         + "                      AND    e.location_id = :location "
@@ -102,7 +95,6 @@ public class TPTCompletionQueries {
         + "                                           o2.concept_id = ${165308} "
         + "                                    AND    o2.value_coded = ${1256} "
         + "                                    AND    o2.obs_datetime >= date_sub(filt.start_date, INTERVAL 7 month) "
-        + "                                    AND    o2.obs_datetime < filt.start_date ) ) ) "
-        + "GROUP BY   p.patient_id";
+        + "                                    AND    o2.obs_datetime < filt.start_date ) ) ) ";
   }
 }
