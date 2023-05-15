@@ -1238,7 +1238,7 @@ public class QualityImprovement2020Queries {
             + "                                        AND        e.encounter_type = ${6} "
             + "                                        AND        e.location_id = :location "
             + "                                        AND        o.concept_id = ${856} "
-            + "                                        AND        o.value_numeric >= "
+            + "                                        AND        o.value_numeric > "
             + vlQuantity
             + "                                        AND        e.encounter_datetime >= :startDate "
             + "                                        AND        e.encounter_datetime <= :endDate "
@@ -1257,7 +1257,7 @@ public class QualityImprovement2020Queries {
             + "                                        AND        e.encounter_type = ${53} "
             + "                                        AND        e.location_id = :location "
             + "                                        AND        o.concept_id = ${856} "
-            + "                                        AND        o.value_numeric >= "
+            + "                                        AND        o.value_numeric > "
             + vlQuantity
             + "                                        AND        e.encounter_datetime >= :startDate "
             + "                                        AND        e.encounter_datetime <= :endDate "
