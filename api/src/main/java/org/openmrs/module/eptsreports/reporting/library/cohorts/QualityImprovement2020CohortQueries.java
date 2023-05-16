@@ -2683,13 +2683,13 @@ public class QualityImprovement2020CohortQueries {
     }
 
     if (indicatorFlag == 1) {
-      compositionCohortDefinition.setCompositionString("((A AND D) AND NOT (C OR E OR F))");
+      compositionCohortDefinition.setCompositionString("((A OR D) AND NOT (C OR E OR F))");
     }
     if (indicatorFlag == 5 || indicatorFlag == 6) {
       compositionCohortDefinition.setCompositionString("A AND NOT (C OR D OR E OR F)");
     }
     if (indicatorFlag == 2) {
-      compositionCohortDefinition.setCompositionString("((B1 AND B2 AND B5) AND NOT (B4 OR F))");
+      compositionCohortDefinition.setCompositionString("((B2 AND (B1 OR B5)) AND NOT (B4 OR F))");
     }
     if (indicatorFlag == 7) {
       compositionCohortDefinition.setCompositionString("((B1 AND B2) AND NOT (B4 OR B5 OR F))");
@@ -3732,7 +3732,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    CohortDefinition f = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition f = getTranferredOutPatients();
     CohortDefinition g = getMQC11NG();
 
     if (reportResource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -3751,7 +3751,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("G", EptsReportUtils.map(g, MAPPING10));
     }
 
-    compositionCohortDefinition.setCompositionString("((A AND D AND G) AND NOT (C OR E OR F))");
+    compositionCohortDefinition.setCompositionString("(((A OR D) AND G) AND NOT (C OR E OR F))");
 
     return compositionCohortDefinition;
   }
@@ -3815,7 +3815,7 @@ public class QualityImprovement2020CohortQueries {
     }
 
     compositionCohortDefinition.setCompositionString(
-        "((B1 AND B2 AND B5 AND H) AND NOT (B4 OR F))");
+        "((B2 AND H AND (B1 OR B5)) AND NOT (B4 OR F))");
 
     return compositionCohortDefinition;
   }
