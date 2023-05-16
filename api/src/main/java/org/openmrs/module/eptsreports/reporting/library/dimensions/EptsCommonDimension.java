@@ -57,7 +57,6 @@ public class EptsCommonDimension {
 
   private TbPrevQueries tbPrevQueries;
 
-  private TxMlCohortQueries txMlCohortQueries;
   @Autowired private TxPvlsBySourceLabOrFsrCohortQueries txPvlsBySourceLabOrFsrCohortQueries;
 
   @Autowired
@@ -95,7 +94,6 @@ public class EptsCommonDimension {
     this.misauKeyPopsCohortQueries = misauKeyPopsCohortQueries;
     this.prepCtCohortQueries = prepCtCohortQueries;
     this.tbPrevQueries = tbPrevQueries;
-    this.txMlCohortQueries = txMlCohortQueries;
   }
 
   /**
