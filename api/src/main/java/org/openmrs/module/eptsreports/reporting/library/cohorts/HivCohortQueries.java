@@ -618,10 +618,6 @@ public class HivCohortQueries {
     map.put(
         "pharmaciaEncounterType", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
     map.put(
-        "masterCardDrugPickupEncounterType",
-        hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("artDatePickup", hivMetadata.getArtDatePickupMasterCard().getConceptId());
-    map.put(
         "masterCardEncounterType", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put(
         "stateOfStayOfPreArtPatient", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
@@ -704,24 +700,6 @@ public class HivCohortQueries {
             + "                      AND DATEDIFF (e.encounter_datetime, :onOrBefore )<=0    "
             + "	                     AND e.location_id =  :location    "
             + "	                 GROUP BY p.patient_id "
-            + "  "
-            + " UNION "
-            + "  "
-            + "        			 SELECT  p.patient_id    "
-            + "	                 FROM patient p       "
-            + "	                      INNER JOIN encounter e      "
-            + "	                          ON e.patient_id=p.patient_id      "
-            + "	                      INNER JOIN obs o      "
-            + "	                          ON o.encounter_id=e.encounter_id      "
-            + "	                  WHERE  p.voided = 0      "
-            + "	                      AND e.voided = 0      "
-            + "	                      AND o.voided = 0      "
-            + "	                      AND e.encounter_type = ${masterCardDrugPickupEncounterType}     "
-            + "	                      AND o.concept_id = ${artDatePickup}     "
-            + "	                      AND DATEDIFF (o.value_datetime, lastest.last_date)>0  "
-            + "                       AND DATEDIFF (o.value_datetime, :onOrBefore )<=0      "
-            + "	                      AND e.location_id =  :location     "
-            + "	                  GROUP BY p.patient_id   "
             + ")  "
             + " GROUP BY lastest.patient_id"
             + " )mostrecent "
