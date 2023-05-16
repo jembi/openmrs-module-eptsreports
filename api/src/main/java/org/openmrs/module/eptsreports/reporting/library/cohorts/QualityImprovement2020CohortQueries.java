@@ -89,7 +89,6 @@ public class QualityImprovement2020CohortQueries {
       HivMetadata hivMetadata,
       CommonMetadata commonMetadata,
       GenderCohortQueries genderCohortQueries,
-      AgeCohortQueries ageCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
       CommonCohortQueries commonCohortQueries,
       TbMetadata tbMetadata,
