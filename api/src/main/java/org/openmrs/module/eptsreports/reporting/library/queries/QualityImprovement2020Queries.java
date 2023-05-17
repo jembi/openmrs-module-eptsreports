@@ -300,6 +300,10 @@ public class QualityImprovement2020Queries {
    *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
    *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
    *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
+   *   <li>os utentes com registo de um MDC (MDC 1 ou MDC 2 ou MDC 3 ou MDC 4 ou MDC 5) como “DA” e
+   *       o respectivo “Estado” = “Início” numa consulta clínica (“Ficha Clínica”) decorrida há 24
+   *       meses (“Data Consulta Clínica” >= “Data Fim Revisão” – 26 meses+1dia e “Data Consulta
+   *       Clínica” <= “Data Fim Revisão” – 24 meses) ou<br>
    * </ul>
    *
    * @return SqlCohortDefinition
