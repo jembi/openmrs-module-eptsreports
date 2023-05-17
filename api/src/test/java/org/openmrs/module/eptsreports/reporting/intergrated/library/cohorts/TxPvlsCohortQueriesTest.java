@@ -1,7 +1,6 @@
 package org.openmrs.module.eptsreports.reporting.intergrated.library.cohorts;
 
 import static org.junit.Assert.*;
-
 import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,15 +36,18 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     return Context.getLocationService().getLocation(399);
   }
 
+
   @Override
   protected void setParameters(
       Date startDate, Date endDate, Location location, EvaluationContext context) {
     context.addParameterValue("startDate", startDate);
+
     context.addParameterValue("endDate", endDate);
     context.addParameterValue("location", location);
   }
 
   @Test
+
   public void getPregnantWomanShouldPassAny() throws EvaluationException {
 
     CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
@@ -65,6 +67,7 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
     Map<Parameter, Object> parameters = new HashMap<>();
     parameters.put(new Parameter("endDate", "End Date", Date.class),getEndDate());
+
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
@@ -86,5 +89,6 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
     assertEquals(1, evaluatedCohort.getMemberIds().size());
     assertTrue(evaluatedCohort.getMemberIds().contains(1020));
+
   }
 }
