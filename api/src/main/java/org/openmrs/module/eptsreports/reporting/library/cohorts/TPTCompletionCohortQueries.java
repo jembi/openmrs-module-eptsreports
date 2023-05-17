@@ -264,6 +264,9 @@ public class TPTCompletionCohortQueries {
 
     compositionCohortDefinition.setCompositionString(
         "txcurr AND (((A1 OR A2 OR A3 OR A4) AND (B1B OR B2 OR (B5Part1 OR B5Part2 OR B5Part3) OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5) AND (D1 OR D2 OR D3 OR D4)))");
+    //        "txcurr AND (((A1 OR A2 OR A3 OR A4) AND (B1B OR B2 OR (B5Part1 OR B5Part2 OR B5Part3)
+    // OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5) AND (D1 OR D2 OR D3 OR
+    // D4)))");
 
     return compositionCohortDefinition;
   }
