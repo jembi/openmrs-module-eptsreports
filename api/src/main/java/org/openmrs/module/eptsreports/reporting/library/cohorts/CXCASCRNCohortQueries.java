@@ -115,7 +115,7 @@ public class CXCASCRNCohortQueries {
    *       </ul>
    * </ul>
    */
-  public CohortDefinition getAA(CXCASCRNResult result) {
+  private CohortDefinition getAA(CXCASCRNResult result) {
     CXCASCRNAACalculation cxcascrnCalculation =
         Context.getRegisteredComponents(CXCASCRNAACalculation.class).get(0);
 
@@ -180,7 +180,6 @@ public class CXCASCRNCohortQueries {
     CohortDefinition a = getA();
     CohortDefinition aa = getAA(cxcascrnResult);
     CohortDefinition aa1 = getAA1OrAA2(CXCASCRNResult.ANY, true, false);
-    CohortDefinition aa2 = getAA1OrAA2(CXCASCRNResult.ANY, false, false);
 
     cd.addSearch(
         "A",
@@ -190,9 +189,8 @@ public class CXCASCRNCohortQueries {
         EptsReportUtils.map(
             aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch("AA1", EptsReportUtils.map(aa1, "onOrAfter=${startDate},location=${location}"));
-    cd.addSearch("AA2", EptsReportUtils.map(aa2, "onOrAfter=${startDate},location=${location}"));
 
-    cd.setCompositionString("A AND AA AND NOT AA1 ");
+    cd.setCompositionString("(A AND AA) AND NOT AA1");
     return cd;
   }
 
@@ -371,8 +369,6 @@ public class CXCASCRNCohortQueries {
     }
 
     cd.setQuery(CXCASCRNQueries.getAA3OrAA4Query(cxcascrnResult, hivMetadata, false));
-
-    System.out.println(cd.getQuery());
 
     return cd;
   }

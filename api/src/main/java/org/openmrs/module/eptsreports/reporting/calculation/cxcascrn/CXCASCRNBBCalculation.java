@@ -57,11 +57,14 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
     Concept leepConcept = hivMetadata.getLeepConcept();
     Concept conizationConcept = hivMetadata.getconizationConcept();
 
+    Map<String, Object> stringObjectMap = new HashMap<>();
+    stringObjectMap.put("result", CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
+
     CalculationResultMap aaResultMap =
         calculate(
             Context.getRegisteredComponents(CXCASCRNAACalculation.class).get(0),
             cohort,
-            parameterValues,
+            stringObjectMap,
             context);
 
     CalculationResultMap aa4ResultMap = getAA4Map(hivMetadata, cohort, context);
