@@ -6044,8 +6044,8 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.setCompositionString(
             "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F or DD)) AND adult");
       } else if (line == 12) {
-        compositionCohortDefinition.setCompositionString(
-            "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F)) AND children");
+        compositionCohortDefinition.setCompositionString("PrimeiraLinha");
+        //            "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
             "((B4CV50 AND PrimeiraLinha) AND NOT (E or F))");
@@ -6288,7 +6288,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition startedART = getMOHArtStartDate();
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatients();
 
     CohortDefinition breastfeeding =
         commonCohortQueries.getMohMQPatientsOnCondition(
@@ -6944,7 +6944,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transfOut = getTranferredOutPatients();
 
     CohortDefinition breastfeeding =
         commonCohortQueries.getMohMQPatientsOnCondition(
