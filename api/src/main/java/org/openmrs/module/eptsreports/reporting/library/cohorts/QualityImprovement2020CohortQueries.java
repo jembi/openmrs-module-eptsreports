@@ -8485,7 +8485,7 @@ public class QualityImprovement2020CohortQueries {
             + "        OR "
             + "        (o2.concept_id = ${730} AND o2.value_numeric IS NOT NULL) "
             + "      ) "
-            + "  AND enc.encounter_datetime > consultation_date.first_consultation "
+            + "  AND enc.encounter_datetime >= consultation_date.first_consultation "
             + "  AND enc.encounter_datetime <= DATE_ADD(consultation_date.first_consultation, INTERVAL 33 DAY) "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
