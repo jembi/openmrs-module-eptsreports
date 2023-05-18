@@ -264,9 +264,6 @@ public class TPTCompletionCohortQueries {
 
     compositionCohortDefinition.setCompositionString(
         "txcurr AND (((A1 OR A2 OR A3 OR A4) AND (B1B OR B2 OR (B5Part1 OR B5Part2 OR B5Part3) OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5) AND (D1 OR D2 OR D3 OR D4)))");
-    //        "txcurr AND (((A1 OR A2 OR A3 OR A4) AND (B1B OR B2 OR (B5Part1 OR B5Part2 OR B5Part3)
-    // OR (B6Part1 OR B6Part2 OR B6Part3))) OR ((C1 OR C2 OR C3 OR C4 OR C5) AND (D1 OR D2 OR D3 OR
-    // D4)))");
 
     return compositionCohortDefinition;
   }
@@ -2447,11 +2444,13 @@ public class TPTCompletionCohortQueries {
             + "                      AND ( EXISTS(SELECT oo.obs_id    "
             + "                                   FROM   obs oo   "
             + "                                   WHERE  oo.encounter_id = ee.encounter_id    "
+            + "                                          AND oo.voided = 0 "
             + "                                          AND oo.concept_id = ${23985}    "
             + "                                          AND oo.value_coded IN ( ${656}, ${23982} ))    "
             + "                            AND EXISTS(SELECT oo.obs_id    "
             + "                                       FROM   obs oo   "
             + "                                       WHERE  oo.encounter_id = ee.encounter_id    "
+            + "                                              AND oo.voided = 0 "
             + "                                              AND oo.concept_id = ${23986}    "
             + "                                              AND oo.value_coded IN ( ${23720} )) )   "
             + "                      AND ee.encounter_datetime BETWEEN    "
