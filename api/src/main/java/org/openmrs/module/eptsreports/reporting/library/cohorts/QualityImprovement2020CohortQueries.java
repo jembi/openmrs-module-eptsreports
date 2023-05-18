@@ -6044,8 +6044,8 @@ public class QualityImprovement2020CohortQueries {
         compositionCohortDefinition.setCompositionString(
             "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F or DD)) AND adult");
       } else if (line == 12) {
-        compositionCohortDefinition.setCompositionString("PrimeiraLinha");
-        //            "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F)) AND children");
+        compositionCohortDefinition.setCompositionString(
+            "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
             "((B4CV50 AND PrimeiraLinha) AND NOT (E or F))");
