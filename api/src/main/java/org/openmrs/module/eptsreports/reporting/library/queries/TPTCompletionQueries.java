@@ -49,7 +49,7 @@ public class TPTCompletionQueries {
         + "                      AND        e.location_id = :location "
         + "                      AND        e.encounter_type = ${60} "
         + "                      AND (o.concept_id = ${23985} AND o.value_coded IN (${656}, ${23982})) "
-        + "                      AND (o2.concept_id = ${23987} AND  o2.value_coded = ${1257} OR NOT (o2.concept_id = ${23987} AND o2.value_coded IS NOT NULL )   "
+        + "                      AND (o2.concept_id = ${23987} AND  o2.value_coded = ${1257} OR NOT (o2.concept_id = ${23987} AND o2.value_coded !=(1257) )   "
         + "                        AND o2.obs_datetime <= :endDate )"
         + "                       ) filt "
         + "WHERE      filt.patient_id NOT IN "
