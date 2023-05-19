@@ -1086,7 +1086,7 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getFichaAPSSAndMinArtStartDate() {
+  private CohortDefinition getFichaAPSSAndMinArtStartDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1105,12 +1105,17 @@ public class APSSResumoTrimestralCohortQueries {
     map.put("goodConcept", hivMetadata.getPatientIsDead().getConceptId());
     map.put("arvAdherenceRiskConcept", hivMetadata.getArvAdherenceRiskConcept().getConceptId());
     map.put("badConcept", hivMetadata.getBadConcept().getConceptId());
+<<<<<<< HEAD
     map.put(
         "prevencaoPositivaSeguimentoEncounterType",
         hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+=======
+
+>>>>>>> parent of dbf6c47c (Add mappings)
     map.put(
         "arvPharmaciaEncounterType",
         hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+
     map.put(
         "masterCardDrugPickupEncounterType",
         hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
