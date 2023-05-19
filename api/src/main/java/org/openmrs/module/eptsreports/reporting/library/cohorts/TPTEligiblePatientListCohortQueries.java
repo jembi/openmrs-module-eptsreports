@@ -1221,14 +1221,14 @@ public class TPTEligiblePatientListCohortQueries {
             + "                        AND ( oo.concept_id = ${23985} "
             + "                                AND oo.value_coded = ${656} ) "
             + "                        AND ( o2.concept_id = ${165308} "
-            + "                                AND o2.value_coded IN ( ${1256}, ${1257} ) "
-            + "                                ) "
-            + "                                GROUP BY ee.patient_id, ee.encounter_id "
+            + "                                AND o2.value_coded IN ( ${1256}, ${1257} ) )"
+            + "                        AND o2.obs_datetime <= :endDate "
+            + "                        GROUP BY ee.patient_id, ee.encounter_id "
             + "                                )consultations "
             + "                                WHERE consultations.patient_id= p.patient_id "
             + "                                AND consultations.obs_datetime > tabela.start_date "
             + "                                AND consultations.obs_datetime <= Date_add(tabela.start_date, interval 7 month) "
-            + "                                AND consultations.obs_datetime <= :endDate)>= 5 "
+            + "                                )>= 5 "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
