@@ -3029,7 +3029,7 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       compositionCohortDefinition.setCompositionString(
-          "((A AND NOT C) OR B1) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
+          "((A AND NOT C) AND B1) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
     if (indicator == 5 || indicator == 14)
       compositionCohortDefinition.setCompositionString(
           "B2New AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
@@ -5480,7 +5480,7 @@ public class QualityImprovement2020CohortQueries {
 
     if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
-          "((A AND NOT C AND (G OR J)) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
+          "((A AND NOT C AND (G OR J)) AND (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
     if (indicator == 5 || indicator == 14)
       cd.setCompositionString(
           "(B2New AND (I OR L)) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
@@ -6288,7 +6288,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition startedART = getMOHArtStartDate();
 
-    CohortDefinition transferOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transferOut = getTranferredOutPatients();
 
     CohortDefinition breastfeeding =
         commonCohortQueries.getMohMQPatientsOnCondition(
@@ -6327,7 +6327,7 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch("F", EptsReportUtils.map(transferOut, MAPPING1));
 
-    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
     cd.setCompositionString("((A AND C) AND NOT (ABANDONED OR E OR F))");
 
@@ -6353,7 +6353,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition pregnantAbandonedDuringPeriod =
         getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
-    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
     cd.setCompositionString("B2 AND NOT ABANDONED");
 
@@ -6944,7 +6944,7 @@ public class QualityImprovement2020CohortQueries {
             commonMetadata.getPregnantConcept().getConceptId(),
             hivMetadata.getYesConcept().getConceptId());
 
-    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition transfOut = getTranferredOutPatients();
 
     CohortDefinition breastfeeding =
         commonCohortQueries.getMohMQPatientsOnCondition(
@@ -6978,7 +6978,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch("H", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
 
-    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
     cd.setCompositionString("((A AND C AND H) AND NOT (ABANDONED OR E OR F))");
     return cd;
@@ -7002,7 +7002,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("J", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
     CohortDefinition pregnantAbandonedDuringPeriod =
         getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
-    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING));
+    cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
     cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
 
