@@ -11,6 +11,7 @@ import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.calculation.tpt.CompletedIsoniazidTPTCalculation;
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
+import org.openmrs.module.eptsreports.reporting.library.queries.TPTCompletionQueries;
 import org.openmrs.module.eptsreports.reporting.library.queries.TPTEligiblePatientsQueries;
 import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -32,6 +33,8 @@ public class TPTEligiblePatientListCohortQueries {
   private TxCurrCohortQueries txCurrCohortQueries;
 
   private CommonMetadata commonMetadata;
+
+  private TPTCompletionCohortQueries tptCompletionCohortQueries;
 
   private final TPTInitiationCohortQueries tptInitiationCohortQueries;
 
@@ -1201,26 +1204,32 @@ public class TPTEligiblePatientListCohortQueries {
             + "            INNER JOIN(   "
             + unionQuery
             + " ) AS tabela  ON tabela.patient_id = p.patient_id    "
-            + "                    WHERE e.location_id= :location AND e.encounter_type IN  (${6}, ${9}, ${53})  "
-            + "                    AND "
-            + "                    (SELECT Count(ee.patient_id)  "
-            + "                     FROM   encounter ee   "
-            + "                            INNER JOIN obs oo  ON oo.encounter_id = ee.encounter_id   "
-            + "                            INNER JOIN obs o2  ON o2.encounter_id = ee.encounter_id   "
-            + "                     WHERE  ee.voided = 0  "
-            + "                            AND p.patient_id = ee.patient_id  "
-            + "                            AND oo.voided = 0  "
-            + "                            AND ee.location_id = :location   "
-            + "                            AND ee.encounter_type IN (${6},${9}) "
-            + "              AND (oo.concept_id = ${23985} and oo.value_coded = ${656}) "
-            + "              AND "
-            + "                (o2.concept_id = ${165308} and o2.value_coded in (${1256},${1257}) "
-            + "                               AND o2.obs_datetime >  tabela.start_date "
-            + "                               AND o2.obs_datetime <=  Date_add(tabela.start_date, INTERVAL 7 MONTH) "
-            + "                               AND o2.obs_datetime <= :endDate "
-            + "                  )"
-            + "                           ) >= 5  "
-            + "      GROUP  BY p.patient_id ";
+            + "                    WHERE e.location_id= :location "
+            + "AND e.encounter_type IN ( ${6}, ${9}, ${53} ) "
+            + "       AND( SELECT count(patient_id) "
+            + "            FROM "
+            + "            (SELECT ee.patient_id, o2.obs_datetime "
+            + "                    FROM   encounter ee "
+            + "                        inner join obs oo "
+            + "                                ON oo.encounter_id = ee.encounter_id "
+            + "                        inner join obs o2 "
+            + "                                ON o2.encounter_id = ee.encounter_id "
+            + "                    WHERE  ee.voided = 0 "
+            + "                        AND oo.voided = 0 "
+            + "                        AND ee.location_id = :location "
+            + "                        AND ee.encounter_type IN ( ${6}, ${9} ) "
+            + "                        AND ( oo.concept_id = ${23985} "
+            + "                                AND oo.value_coded = ${656} ) "
+            + "                        AND ( o2.concept_id = ${165308} "
+            + "                                AND o2.value_coded IN ( ${1256}, ${1257} ) )"
+            + "                        AND o2.obs_datetime <= :endDate "
+            + "                        GROUP BY ee.patient_id, ee.encounter_id "
+            + "                                )consultations "
+            + "                                WHERE consultations.patient_id= p.patient_id "
+            + "                                AND consultations.obs_datetime > tabela.start_date "
+            + "                                AND consultations.obs_datetime <= Date_add(tabela.start_date, interval 7 month) "
+            + "                                )>= 5 "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -1293,7 +1302,7 @@ public class TPTEligiblePatientListCohortQueries {
             + "  ) AS tabela "
             + "                           ON tabela.patient_id = p.patient_id "
             + "                           WHERE e.location_id= :location AND e.encounter_type IN (${6}, ${9}, ${53}) AND e.voided=0 AND o.voided=0    "
-            + "                           GROUP BY p.patient_id) result   "
+            + "                           ) result   "
             + "               WHERE   ( (SELECT Count(*)  "
             + "                          FROM   patient pp    "
             + "                                 JOIN encounter ee "
@@ -1547,11 +1556,13 @@ public class TPTEligiblePatientListCohortQueries {
             + "                      AND ( EXISTS(SELECT oo.obs_id"
             + "                                   FROM   obs oo"
             + "                                   WHERE  oo.encounter_id = ee.encounter_id"
+            + "                                          AND oo.voided = 0 "
             + "                                          AND oo.concept_id = ${23985}"
             + "                                          AND oo.value_coded IN ( ${656}, ${23982} ))"
             + "                            AND EXISTS(SELECT oo.obs_id"
             + "                                       FROM   obs oo"
             + "                                       WHERE  oo.encounter_id = ee.encounter_id"
+            + "                                              AND oo.voided = 0 "
             + "                                              AND oo.concept_id = ${23986}"
             + "                                              AND oo.value_coded IN ( ${1098} )) )"
             + "                      AND ee.encounter_datetime BETWEEN"
@@ -1721,9 +1732,8 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getY4QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
-            .union(TPTEligiblePatientsQueries.getY6QueryWithPatientIdForB5())
+            .unionBuilder(TPTEligiblePatientsQueries.getY5QueryWithPatientIdForB5())
+            .union(TPTCompletionQueries.getInhStartOnFilt())
             .buildQuery();
 
     String query =
@@ -1753,11 +1763,13 @@ public class TPTEligiblePatientListCohortQueries {
             + "                       AND ( EXISTS(SELECT oo.obs_id"
             + "                                    FROM   obs oo"
             + "                                    WHERE  oo.encounter_id = ee.encounter_id"
+            + "                                           AND oo.voided = 0 "
             + "                                           AND oo.concept_id = ${23985}"
             + "                                           AND oo.value_coded IN ( ${656}, ${23982} ))"
             + "                             AND EXISTS(SELECT oo.obs_id"
             + "                                        FROM   obs oo"
-            + "                                        WHERE  oo.encounter_id = ee.encounter_id"
+            + "                                        WHERE  oo.encounter_id = ee.encounter_id "
+            + "                                               AND oo.voided = 0 "
             + "                                               AND oo.concept_id = ${23986}"
             + "                                               AND oo.value_coded IN ( ${1098} )) )"
             + "                       AND ee.encounter_datetime BETWEEN"
@@ -1774,14 +1786,16 @@ public class TPTEligiblePatientListCohortQueries {
             + "                           AND ee.location_id = :location"
             + "                           AND ( EXISTS(SELECT oo.obs_id"
             + "                                        FROM   obs oo"
-            + "                                        WHERE  oo.encounter_id = ee.encounter_id"
+            + "                                        WHERE  oo.encounter_id = ee.encounter_id "
+            + "                                               AND oo.voided = 0 "
             + "                                               AND oo.concept_id = ${23985}"
             + "                                               AND oo.value_coded IN ( ${656},"
             + "                                                   ${23982} ))"
             + "                                 AND EXISTS(SELECT oo.obs_id"
             + "                                            FROM   obs oo"
-            + "                                            WHERE  oo.encounter_id ="
-            + "                                                   ee.encounter_id"
+            + "                                            WHERE  oo.encounter_id = "
+            + "                                                   ee.encounter_id "
+            + "                                                   AND oo.voided = 0 "
             + "                                                   AND oo.concept_id = ${23986}"
             + "                                                   AND oo.value_coded IN ( ${23720}"
             + "                                                       )) )"
