@@ -56,7 +56,6 @@ public class TXCXCACohortQueries {
             bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch("B1", EptsReportUtils.map(b1, "onOrAfter=${startDate},location=${location}"));
 
-    //    cd.setCompositionString("B AND BB");
     cd.setCompositionString("B AND BB AND NOT B1");
     return cd;
   }

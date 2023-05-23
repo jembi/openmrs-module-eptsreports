@@ -13,7 +13,6 @@ import org.openmrs.module.reporting.evaluation.parameter.ParameterizableUtil;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Deprecated
 public class SetupMERSemiAnnualReport extends EptsDataExportManager {
@@ -89,8 +88,8 @@ public class SetupMERSemiAnnualReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_PEPFAR_MER_2.6.1_Semiannual_Report_v1.5.1.xls",
-              "PEPFAR MER 2.6 Semi-Annual Report",
+              "Template_PEPFAR_MER_2.6.1_Semiannual_Report_v1.5.2.xls",
+              "PEPFAR MER 2.6.1 Semi-Annual Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
