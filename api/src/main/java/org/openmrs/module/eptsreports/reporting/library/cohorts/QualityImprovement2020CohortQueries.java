@@ -4082,7 +4082,7 @@ public class QualityImprovement2020CohortQueries {
         "BABIES", EptsReportUtils.map(babies, "effectiveDate=${effectiveDate}"));
 
     compositionCohortDefinition.setCompositionString(
-        "A and NOT C and NOT D and NOT E and NOT F AND I");
+        "A and NOT C and NOT D and NOT E and NOT F AND I AND BABIES");
 
     return compositionCohortDefinition;
   }
@@ -12697,6 +12697,66 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
+  }
+
+  public CohortDefinition getPatientWhoHadThreeApssAfterArtStart(){
+
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Three APss consultation");
+
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
+    map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+
+    String query =
+             "SELECT patient_id "
+            + " FROM ( "
+            + " select apss.patient_id, count(apss.encounter_id) consultations "
+            + " FROM ( "
+            + " SELECT p.patient_id ,e.encounter_datetime, e.encounter_id, art_date "
+            + " FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + " INNER JOIN( "
+            + "			 SELECT patient_id, art_date "
+            + "			 FROM   (SELECT p.patient_id, Min(value_datetime) art_date "
+            + "						 FROM patient p "
+            + "				   INNER JOIN encounter e "
+            + "					   ON p.patient_id = e.patient_id "
+            + "				   INNER JOIN obs o "
+            + "					   ON e.encounter_id = o.encounter_id "
+            + "			   WHERE  p.voided = 0 "
+            + "				   AND e.voided = 0 "
+            + "				   AND o.voided = 0 "
+            + "				   AND e.encounter_type = ${53} "
+            + "				   AND o.concept_id = ${1190} "
+            + "				   AND o.value_datetime IS NOT NULL "
+            + "				   AND o.value_datetime <= :endDate "
+            + "				   AND e.location_id = :location "
+            + "			   GROUP  BY p.patient_id  ) "
+            + "					union_tbl "
+            + "			 WHERE  union_tbl.art_date BETWEEN :startDate AND :endDate "
+            + " )art ON art.patient_id = p.patient_id "
+            + " WHERE e.encounter_type = ${35} "
+            + " AND e.location_id = :location "
+            + " AND e.voided = 0 "
+            + " ) apss "
+            + " WHERE apss.encounter_datetime > apss.art_date AND apss.encounter_datetime <= DATE_ADD(art_date, INTERVAL 99 DAY) "
+            + " GROUP BY apss.patient_id "
+            + " HAVING consultations >= 3 "
+            + " ) three_consultations";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+
   }
 
   /**
