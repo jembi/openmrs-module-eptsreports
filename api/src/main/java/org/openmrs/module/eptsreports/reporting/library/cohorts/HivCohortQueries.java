@@ -378,12 +378,31 @@ public class HivCohortQueries {
   }
 
   public CohortDefinition getPatientsTransferredOut() {
-    Integer transferOut = hivMetadata.getTransferredOutConcept().getConceptId();
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Get patients who are transferred out - disaggretation");
+    cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    Integer transferredOut = hivMetadata.getTransferredOutConcept().getConceptId();
     Integer transferOutState =
         hivMetadata
             .getTransferredOutToAnotherHealthFacilityWorkflowState()
             .getProgramWorkflowStateId();
-    return getPatientsTransferredOut(transferOut, transferOutState);
+
+    CohortDefinition transferred = getPatientsTransferredOut(transferredOut, transferOutState);
+
+    CohortDefinition artPickup = getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou();
+
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(transferred, "onOrBefore=${onOrBefore},location=${location}"));
+
+    cd.addSearch(
+        "arvPickup", EptsReportUtils.map(artPickup, "endDate=${onOrBefore},location=${location}"));
+    cd.setCompositionString("transferredOut AND NOT arvPickup");
+
+    return cd;
   }
 
   public CohortDefinition getPatientsWhoStoppedTreatment() {
@@ -462,10 +481,7 @@ public class HivCohortQueries {
         hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put(
         "pharmaciaEncounterType", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put(
-        "masterCardDrugPickupEncounterType",
-        hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("artDatePickup", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
     map.put(
         "masterCardEncounterType", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put(
@@ -571,24 +587,6 @@ public class HivCohortQueries {
             + "                      AND DATEDIFF (e.encounter_datetime, :onOrBefore )<=0    "
             + "	                     AND e.location_id =  :location    "
             + "	                 GROUP BY p.patient_id "
-            + "  "
-            + " UNION "
-            + "  "
-            + "        			 SELECT  p.patient_id    "
-            + "	                 FROM patient p       "
-            + "	                      INNER JOIN encounter e      "
-            + "	                          ON e.patient_id=p.patient_id      "
-            + "	                      INNER JOIN obs o      "
-            + "	                          ON o.encounter_id=e.encounter_id      "
-            + "	                  WHERE  p.voided = 0      "
-            + "	                      AND e.voided = 0      "
-            + "	                      AND o.voided = 0      "
-            + "	                      AND e.encounter_type = ${masterCardDrugPickupEncounterType}     "
-            + "	                      AND o.concept_id = ${artDatePickup}     "
-            + "	                      AND DATEDIFF (o.value_datetime, lastest.last_date)>0  "
-            + "                       AND DATEDIFF (o.value_datetime, :onOrBefore )<=0      "
-            + "	                      AND e.location_id =  :location     "
-            + "	                  GROUP BY p.patient_id   "
             + ")  "
             + " GROUP BY lastest.patient_id"
             + " )mostrecent "
@@ -619,10 +617,6 @@ public class HivCohortQueries {
         hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
     map.put(
         "pharmaciaEncounterType", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
-    map.put(
-        "masterCardDrugPickupEncounterType",
-        hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
-    map.put("artDatePickup", hivMetadata.getArtDatePickupMasterCard().getConceptId());
     map.put(
         "masterCardEncounterType", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put(
@@ -706,24 +700,6 @@ public class HivCohortQueries {
             + "                      AND DATEDIFF (e.encounter_datetime, :onOrBefore )<=0    "
             + "	                     AND e.location_id =  :location    "
             + "	                 GROUP BY p.patient_id "
-            + "  "
-            + " UNION "
-            + "  "
-            + "        			 SELECT  p.patient_id    "
-            + "	                 FROM patient p       "
-            + "	                      INNER JOIN encounter e      "
-            + "	                          ON e.patient_id=p.patient_id      "
-            + "	                      INNER JOIN obs o      "
-            + "	                          ON o.encounter_id=e.encounter_id      "
-            + "	                  WHERE  p.voided = 0      "
-            + "	                      AND e.voided = 0      "
-            + "	                      AND o.voided = 0      "
-            + "	                      AND e.encounter_type = ${masterCardDrugPickupEncounterType}     "
-            + "	                      AND o.concept_id = ${artDatePickup}     "
-            + "	                      AND DATEDIFF (o.value_datetime, lastest.last_date)>0  "
-            + "                       AND DATEDIFF (o.value_datetime, :onOrBefore )<=0      "
-            + "	                      AND e.location_id =  :location     "
-            + "	                  GROUP BY p.patient_id   "
             + ")  "
             + " GROUP BY lastest.patient_id"
             + " )mostrecent "
@@ -857,5 +833,74 @@ public class HivCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
     cd.addCalculationParameter(TIPO, SERODISCORDANT);
     return cd;
+  }
+
+  /**
+   * The system will consider patient as transferred out as above defined only if the most recent
+   * date between (next scheduled ART pick-up on FILA + 1 day) and (the most recent ART pickup date
+   * on Ficha Recepção – Levantou ARVs + 31 days) falls by end of the reporting period.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTransferredOutBetweenNextPickupDateFilaAndRecepcaoLevantou() {
+
+    SqlCohortDefinition definition = new SqlCohortDefinition();
+    definition.setName(
+        "Patients Transfered Out between (next scheduled ART pick-up on FILA + 1 day) "
+            + "and (the most recent ART pickup date on Ficha Recepção – Levantou ARVs + 31 days");
+    definition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    definition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    valuesMap.put("5096", hivMetadata.getReturnVisitDateForArvDrugConcept().getConceptId());
+    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+        "SELECT final.patient_id FROM  ( "
+            + "SELECT considered_transferred.patient_id, max(considered_transferred.value_datetime) as max_date "
+            + "FROM ( "
+            + "               SELECT     p.patient_id, "
+            + "                          date_add(max(o.value_datetime), interval 1 day) AS value_datetime "
+            + "               FROM       patient p "
+            + "                              INNER JOIN encounter e "
+            + "                                         ON         e.patient_id=p.patient_id "
+            + "                              INNER JOIN obs o "
+            + "                                         ON         o.encounter_id=e.encounter_id "
+            + "               WHERE      p.voided = 0 "
+            + "                 AND        e.voided = 0 "
+            + "                 AND        o.voided = 0 "
+            + "                 AND        e.encounter_type = ${18} "
+            + "                 AND        o.concept_id = ${5096} "
+            + "                 AND        e.encounter_datetime <= :endDate "
+            + "                 AND        e.location_id = :location "
+            + "               GROUP BY   p.patient_id "
+            + " UNION "
+            + "               SELECT     p.patient_id, "
+            + "                          date_add(max(o.value_datetime), interval 31 day)  AS value_datetime "
+            + "               FROM       patient p "
+            + "                              INNER JOIN encounter e "
+            + "                                         ON         e.patient_id=p.patient_id "
+            + "                              INNER JOIN obs o "
+            + "                                         ON         o.encounter_id=e.encounter_id "
+            + "               WHERE      p.voided = 0 "
+            + "                 AND        e.voided = 0 "
+            + "                 AND        o.voided = 0 "
+            + "                 AND        e.encounter_type = ${52} "
+            + "                 AND        o.concept_id = ${23866} "
+            + "                 AND        o.value_datetime  <= :endDate  "
+            + "                 AND        e.location_id = :location "
+            + "               GROUP BY   p.patient_id "
+            + " )  considered_transferred "
+            + " GROUP BY considered_transferred.patient_id "
+            + " ) final "
+            + " WHERE  final.max_date  <= :endDate  ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    definition.setQuery(stringSubstitutor.replace(query));
+
+    return definition;
   }
 }
