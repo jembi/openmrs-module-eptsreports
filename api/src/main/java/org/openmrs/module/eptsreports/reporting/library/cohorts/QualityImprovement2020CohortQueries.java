@@ -12715,7 +12715,7 @@ public class QualityImprovement2020CohortQueries {
     String query =
         "SELECT patient_id "
             + " FROM ( "
-            + " select apss.patient_id, count(apss.encounter_id) consultations "
+            + " SELECT apss.patient_id, count(apss.encounter_id) consultations "
             + " FROM ( "
             + " SELECT p.patient_id ,e.encounter_datetime, e.encounter_id, art_date "
             + " FROM patient p "
@@ -12742,6 +12742,7 @@ public class QualityImprovement2020CohortQueries {
             + " )art ON art.patient_id = p.patient_id "
             + " WHERE e.encounter_type = ${35} "
             + " AND e.location_id = :location "
+            + " AND e.encounter_datetime >= :startDate "
             + " AND e.voided = 0 "
             + " ) apss "
             + " WHERE apss.encounter_datetime > apss.art_date AND apss.encounter_datetime <= DATE_ADD(art_date, INTERVAL 99 DAY) "
