@@ -1147,7 +1147,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        (o.concept_id = ${adherenceEvaluationConcept} AND o.value_coded IN (${goodConcept}, ${arvAdherenceRiskConcept}, ${badConcept}) )"
             + "        ) "
             + "    AND encounter_datetime "
-            + "        > (SELECT DATE_ADD(min(art_startdate.min_date), INTERVAL 30 DAY) as min_min_date  "
+            + "        >= (SELECT DATE_ADD(min(art_startdate.min_date), INTERVAL 30 DAY) as min_min_date  "
             + "FROM  "
             + "(  "
             + "    SELECT  p.patient_id as patient_id, min(pp.date_enrolled) AS min_date  "
