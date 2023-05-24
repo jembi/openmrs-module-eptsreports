@@ -1,10 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.intergrated.library.cohorts;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Location;
@@ -22,10 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TxPvlsCohortQueriesTest extends DefinitionsTest {
 
   @Autowired private TxPvlsCohortQueries txPvlsCohortQueries;
+  private EvaluationContext context;
+
+  @Before
+  public void setup() throws Exception {
+    executeDataSet("TxPvlsCohortQueriesTest.xml");
+  }
 
   @Override
   protected Date getEndDate() {
-    return DateUtil.getDateTime(2022, 9, 20);
+    return DateUtil.getDateTime(2022, 6, 27);
   }
 
   @Override
@@ -33,45 +36,59 @@ public class TxPvlsCohortQueriesTest extends DefinitionsTest {
     return Context.getLocationService().getLocation(399);
   }
 
-  @Before
-  public void setup() throws Exception {
-    executeDataSet("TxPvslCohortQueriesTeste.xml");
-  }
 
   @Override
   protected void setParameters(
       Date startDate, Date endDate, Location location, EvaluationContext context) {
+    context.addParameterValue("startDate", startDate);
+
     context.addParameterValue("endDate", endDate);
     context.addParameterValue("location", location);
   }
 
   @Test
-  public void getWomanWhoAreBreastfeedingShouldNOTpass() throws EvaluationException {
-    CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
 
-    HashMap<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("endDate", "End Date", Date.class), getEndDate());
-    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+  public void getPregnantWomanShouldPassAny() throws EvaluationException {
 
+    CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("endDate", "End Date", Date.class),getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class),getLocation());
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(2, evaluatedCohort.getMemberIds().size());
-    assertFalse(evaluatedCohort.getMemberIds().contains(1002));
+    assertNotNull(evaluatedCohort.getMemberIds());
   }
 
   @Test
-  public void getNumberOfPatientshouldPass() throws EvaluationException {
-    CohortDefinition cd = txPvlsCohortQueries.getBreastfeedingPatients();
+  public void getPregnantWomanShouldFail() throws EvaluationException {
 
-    HashMap<Parameter, Object> parameters = new HashMap<>();
-    parameters.put(new Parameter("endDate", "End Date", Date.class), getEndDate());
+    CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("endDate", "End Date", Date.class),getEndDate());
+
     parameters.put(new Parameter("location", "Location", Location.class), getLocation());
 
     EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
 
-    assertEquals(2, evaluatedCohort.getMemberIds().size());
-    assertTrue(evaluatedCohort.getMemberIds().contains(1000));
-    assertTrue(evaluatedCohort.getMemberIds().contains(1001));
-    assertFalse(evaluatedCohort.getMemberIds().contains(1002));
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertFalse(evaluatedCohort.getMemberIds().contains(1022));
+  }
+
+  @Test
+  public void getPregnantWomanShouldPass() throws EvaluationException {
+
+    CohortDefinition cd = txPvlsCohortQueries.getPregnantWoman();
+
+    Map<Parameter, Object> parameters = new HashMap<>();
+    parameters.put(new Parameter("endDate", "End Date", Date.class),getEndDate());
+    parameters.put(new Parameter("location", "Location", Location.class), getLocation());
+
+    EvaluatedCohort evaluatedCohort = evaluateCohortDefinition(cd, parameters);
+
+    assertEquals(1, evaluatedCohort.getMemberIds().size());
+    assertTrue(evaluatedCohort.getMemberIds().contains(1020));
+
   }
 }
