@@ -4051,7 +4051,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
     CohortDefinition f = getTranferredOutPatients();
-    CohortDefinition i = getMQC11NI();
+    CohortDefinition i = getPatientWhoHadThreeApssAfterArtStart();
     CohortDefinition babies = genericCohortQueries.getAgeInMonths(0, 9);
 
     if (reportSource.equals(EptsReportConstants.MIMQ.MQ)) {
@@ -4062,8 +4062,7 @@ public class QualityImprovement2020CohortQueries {
       compositionCohortDefinition.addSearch("F", EptsReportUtils.map(f, MAPPING1));
       compositionCohortDefinition.addSearch(
           "I",
-          EptsReportUtils.map(
-              i, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+          EptsReportUtils.map(i, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     } else if (reportSource.equals(EptsReportConstants.MIMQ.MI)) {
       compositionCohortDefinition.addSearch("A", EptsReportUtils.map(a, MAPPING4));
@@ -4082,7 +4081,7 @@ public class QualityImprovement2020CohortQueries {
         "BABIES", EptsReportUtils.map(babies, "effectiveDate=${effectiveDate}"));
 
     compositionCohortDefinition.setCompositionString(
-        "A and NOT C and NOT D and NOT E and NOT F AND I AND BABIES");
+        "A and NOT C and NOT D and NOT E and NOT F AND I");
 
     return compositionCohortDefinition;
   }
@@ -12699,7 +12698,7 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
-  public CohortDefinition getPatientWhoHadThreeApssAfterArtStart(){
+  public CohortDefinition getPatientWhoHadThreeApssAfterArtStart() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Three APss consultation");
@@ -12713,9 +12712,8 @@ public class QualityImprovement2020CohortQueries {
     map.put("1190", hivMetadata.getHistoricalDrugStartDateConcept().getConceptId());
     map.put("35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
-
     String query =
-             "SELECT patient_id "
+        "SELECT patient_id "
             + " FROM ( "
             + " select apss.patient_id, count(apss.encounter_id) consultations "
             + " FROM ( "
@@ -12756,7 +12754,6 @@ public class QualityImprovement2020CohortQueries {
     cd.setQuery(stringSubstitutor.replace(query));
 
     return cd;
-
   }
 
   /**
