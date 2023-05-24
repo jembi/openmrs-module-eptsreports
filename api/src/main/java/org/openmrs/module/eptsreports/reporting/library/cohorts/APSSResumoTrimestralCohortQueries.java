@@ -1086,7 +1086,7 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getFichaAPSSAndMinArtStartDate() {
+  public CohortDefinition getFichaAPSSAndMinArtStartDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1168,7 +1168,6 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND ps.voided = 0  "
             + "        AND pp.voided = 0  "
             + "        AND pgr.program_id = ${artProgram}   "
-            + "        AND ps.state = ${transferredFromOtherHealthFacilityWorkflowState}   "
             + "    GROUP BY p.patient_id  "
             + "    UNION  "
             + "    SELECT p.patient_id as patient_id, min(o.value_datetime)  AS min_date  "
