@@ -3542,4 +3542,143 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
+
+
+  public CohortDefinition getPatientsOnTBTreatment(){
+    SqlCohortDefinition sql = new SqlCohortDefinition();
+    sql.setName("Patients Who are Active on a TB Treatment ");
+    sql.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sql.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1113", hivMetadata.getTBDrugStartDateConcept().getConceptId());
+    map.put("5", hivMetadata.getTBProgram().getProgramId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("42", hivMetadata);
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+
+
+    String query =
+            "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "       inner join encounter e "
+                    + "               ON e.patient_id = p.patient_id "
+                    + "       inner join obs o "
+                    + "               ON o.encounter_id = e.encounter_id "
+                    + "WHERE  e.encounter_type IN ( ${6}, ${9} ) "
+                    + "       AND o.concept_id = ${1113} "
+                    + "       AND p.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND o.voided = 0 "
+                    + "       AND e.location_id = :location "
+                    + "       AND o.value_datetime BETWEEN Date_sub(:endDate, interval 7 month) AND :endDate "
+                    + "UNION "
+                    + "SELECT pp.patient_id "
+                    + "FROM   patient_program pp "
+                    + "       inner join encounter e on e.patient_id=pp.patient_id "
+                    + "WHERE  pp.program_id = ${5} "
+                    + "       AND pp.voided = 0 "
+                    + "       AND e.voided=0 "
+                    + "       AND e.location_id = :location "
+                    + "       AND pp.date_enrolled BETWEEN Date_sub(:endDate, interval 7 month) AND :endDate "
+                    + "UNION "
+                    + "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "       inner join encounter e "
+                    + "               ON e.patient_id = p.patient_id "
+                    + "       inner join obs o "
+                    + "               ON o.encounter_id = e.encounter_id "
+                    + "WHERE  e.encounter_type = ${53} "
+                    + "       AND o.concept_id = ${1406} "
+                    + "       AND o.value_coded = ${42} "
+                    + "       AND p.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND o.voided = 0 "
+                    + "       AND e.location_id = :location "
+                    + "       AND o.obs_datetime BETWEEN Date_sub(:endDate, interval 7 month) AND :endDate "
+                    + "UNION "
+                    + "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "       inner join encounter e "
+                    + "               ON e.patient_id = p.patient_id "
+                    + "       inner join obs o "
+                    + "               ON e.encounter_id = o.encounter_id "
+                    + "WHERE  e.encounter_type = ${6} "
+                    + "       AND o.concept_id = ${1268} "
+                    + "       AND o.value_coded = ${1256} "
+                    + "       AND p.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND o.voided = 0 "
+                    + "       AND e.location_id = :location "
+                    + "       AND o.obs_datetime BETWEEN Date_sub(:endDate, interval 7 month) AND :endDate "
+                    + "UNION "
+                    + "SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "       inner join encounter e "
+                    + "               ON e.patient_id = p.patient_id "
+                    + "       inner join obs o "
+                    + "               ON o.encounter_id = e.encounter_id "
+                    + "WHERE  e.encounter_type = ${6} "
+                    + "       AND o.concept_id = ${23761} "
+                    + "       AND o.value_coded = ${1065} "
+                    + "       AND p.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND o.voided = 0 "
+                    + "       AND e.location_id = :location "
+                    + "       AND e.encounter_datetime BETWEEN Date_sub(:endDate, interval 7 month) AND :endDate "
+                    + "GROUP  BY patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sql.setQuery(stringSubstitutor.replace(query));
+
+
+    return sql;
+  }
+
+  public CohortDefinition getPatientsWhoReactedToTheMedication(){
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients Who Had any Reaction To The Medication ");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+
+
+    String query =
+            " SELECT p.patient_id "
+                    + "FROM   patient p "
+                    + "       inner join encounter e "
+                    + "               ON e.patient_id = p.patient_id "
+                    + "       inner join obs o "
+                    + "               ON o.encounter_id = e.encounter_id "
+                    + "WHERE  e.encounter_type = ${6} "
+                    + "       AND ( o.concept_id = 2015 "
+                    + "             AND o.value_coded IN ( 23748, 6293, 23749, 29, "
+                    + "                                    23750, 23751, 6299 ) ) "
+                    + "       AND p.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND o.voided = 0 "
+                    + "       AND e.encounter_datetime BETWEEN Date_sub(:endDate, interval 6 month) AND :endDate "
+                    + " GROUP  BY patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+
+
 }
