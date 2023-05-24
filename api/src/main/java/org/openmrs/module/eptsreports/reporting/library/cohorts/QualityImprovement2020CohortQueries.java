@@ -4082,7 +4082,7 @@ public class QualityImprovement2020CohortQueries {
         "BABIES", EptsReportUtils.map(babies, "effectiveDate=${effectiveDate}"));
 
     compositionCohortDefinition.setCompositionString(
-        "A and NOT C and NOT D and NOT E and NOT F AND I AND BABIES");
+        "A and NOT C and NOT D and NOT E and NOT F AND I");
 
     return compositionCohortDefinition;
   }
