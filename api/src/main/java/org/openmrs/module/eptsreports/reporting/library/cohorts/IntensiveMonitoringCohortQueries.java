@@ -3557,7 +3557,7 @@ public class IntensiveMonitoringCohortQueries {
     map.put("5", hivMetadata.getTBProgram().getProgramId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-    map.put("42", hivMetadata);
+    //map.put("42", hivMetadata);
     map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
     map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
@@ -3649,11 +3649,15 @@ public class IntensiveMonitoringCohortQueries {
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
+    map.put("23748", hivMetadata.getCytopeniaConcept().getConceptId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-
+    map.put("6293", hivMetadata.getPancreatitis().getConceptId());
+    map.put("23749", hivMetadata.getNephrotoxicityConcept().getConceptId());
+    map.put("29", hivMetadata.getHepatitisConcept().getConceptId());
+    map.put("23750", hivMetadata.getStevensJonhsonSyndromeConcept().getConceptId());
+    map.put("23751", hivMetadata.getHypersensitivityToAbcOrRailConcept().getConceptId());
+    map.put("6299", hivMetadata.getLacticAcidosis().getConceptId());
+    map.put("2015", hivMetadata.getAdverseReaction().getConceptId());
 
     String query =
             " SELECT p.patient_id "
@@ -3663,14 +3667,46 @@ public class IntensiveMonitoringCohortQueries {
                     + "       inner join obs o "
                     + "               ON o.encounter_id = e.encounter_id "
                     + "WHERE  e.encounter_type = ${6} "
-                    + "       AND ( o.concept_id = 2015 "
-                    + "             AND o.value_coded IN ( 23748, 6293, 23749, 29, "
-                    + "                                    23750, 23751, 6299 ) ) "
+                    + "       AND ( o.concept_id = ${2015} "
+                    + "             AND o.value_coded IN ( ${23748}, ${6293}, ${23749}, ${29}, "
+                    + "                                    ${23750}, ${23751}, ${6299} ) ) "
                     + "       AND p.voided = 0 "
                     + "       AND e.voided = 0 "
                     + "       AND o.voided = 0 "
                     + "       AND e.encounter_datetime BETWEEN Date_sub(:endDate, interval 6 month) AND :endDate "
                     + " GROUP  BY patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    cd.setQuery(stringSubstitutor.replace(query));
+
+    return cd;
+  }
+
+
+  public CohortDefinition getPatientsWhoHadSarcomaDeKarposi() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Patients Who Have Sarcoma De Karposi  ");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("507", hivMetadata.getKaposiSarcomaConcept().getConceptId());
+
+    String query =
+            "SELECT p.patient_id "
+                    + "from patient p "
+                    + "inner join encounter e on e.patient_id=p.patient_id "
+                    + "inner join obs o on o.encounter_id=e.encounter_id "
+                    + "where encounter_type=${6} "
+                    + "and o.concept_id=${1406} "
+                    + "and o.value_coded=${507} "
+                    + "and o.voided=0 "
+                    + "and e.voided=0 "
+                    + "and p.voided=0 "
+                    + "and e.encounter_datetime <= :endDate ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
