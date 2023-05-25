@@ -8990,6 +8990,9 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
     CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
+    CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
+    CohortDefinition onSK = getPatientsWithSarcomaKarposi();
+    CohortDefinition returned = eriDSDCohortQueries.getPatientsWhoReturned();
 
     cd.addSearch(
         "A",
@@ -8999,19 +9002,6 @@ public class QualityImprovement2020CohortQueries {
         "B1",
         EptsReportUtils.map(
             Mq15B1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
-        "E1",
-        EptsReportUtils.map(
-            E1, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "E2",
-        EptsReportUtils.map(
-            E2, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "E3",
-        EptsReportUtils.map(
-            E3, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
         "C",
@@ -9029,12 +9019,46 @@ public class QualityImprovement2020CohortQueries {
             Mq15F, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "G", EptsReportUtils.map(Mq15G, "endDate=${revisionEndDate},location=${location}"));
+
     cd.addSearch(
         "MDS",
         EptsReportUtils.map(
             alreadyMds, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("A AND B1 AND (E1 AND E2 AND E3)  AND NOT (C OR D OR F OR G OR MDS)");
+    cd.addSearch(
+            "onTB",
+            EptsReportUtils.map(
+                    onTB, "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+            "onSK", EptsReportUtils.map(onSK, "endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+            "returned",
+            EptsReportUtils.map(returned, "endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+            "adverseReaction",
+            EptsReportUtils.map(
+                    genericCohortQueries.hasCodedObs(
+                            hivMetadata.getAdverseReaction(),
+                            BaseObsCohortDefinition.TimeModifier.ANY,
+                            SetComparator.IN,
+                            Arrays.asList(
+                                    hivMetadata.getAdultoSeguimentoEncounterType(),
+                                    hivMetadata.getPediatriaSeguimentoEncounterType()),
+                            Arrays.asList(
+                                    hivMetadata.getCytopeniaConcept(),
+                                    hivMetadata.getPancreatitis(),
+                                    hivMetadata.getNephrotoxicityConcept(),
+                                    hivMetadata.getHepatitisConcept(),
+                                    hivMetadata.getStevensJonhsonSyndromeConcept(),
+                                    hivMetadata.getHypersensitivityToAbcOrRailConcept(),
+                                    hivMetadata.getLacticAcidosis(),
+                                    hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
+                    "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
+
+    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned)");
 
     return cd;
   }
@@ -9276,7 +9300,7 @@ public class QualityImprovement2020CohortQueries {
 
   public CohortDefinition getMI15Den15() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("15.15 % de pacientes inscritos em MDS em TARV há mais de 21 meses MQ ");
+    cd.setName("15.15 % de pacientes inscritos em MDS em TARV há mais de 21 meses MI ");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
@@ -9295,7 +9319,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15P, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("A NOT IR");
+    cd.setCompositionString("A");
     return cd;
   }
 
