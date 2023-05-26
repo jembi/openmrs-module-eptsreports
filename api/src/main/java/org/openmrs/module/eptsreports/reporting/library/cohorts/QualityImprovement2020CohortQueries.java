@@ -5931,6 +5931,8 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition b2New =
         commonCohortQueries.getPatientsWithFirstTherapeuticLineOnLastClinicalEncounterB2NEW();
 
+    CohortDefinition PatPrimeraLinha = getPatientsFirstLine();
+
     CohortDefinition abandonedExclusionInTheLastSixMonthsFromFirstLineDate =
         getPatientsWhoAbandonedInTheLastSixMonthsFromFirstLineDate();
 
@@ -6039,27 +6041,30 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "PrimeiraLinha", EptsReportUtils.map(PrimeiraLinha, MAPPING1));
 
+    compositionCohortDefinition.addSearch(
+        "PatPrimeraLinha", EptsReportUtils.map(PatPrimeraLinha, MAPPING));
+
     if (den) {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F or DD)) AND adult");
+            "(((B1 AND PatPrimeraLinha) AND NOT (B4 or B5 or E or F or DD)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND PrimeiraLinha) AND NOT (B4 or B5 or E or F)) AND children");
+            "(((B1 AND PatPrimeraLinha) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "((B4CV50 AND PrimeiraLinha) AND NOT (E or F))");
+            "((B4CV50 AND PatPrimeraLinha) AND NOT (E or F))");
       }
     } else {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND PrimeiraLinha AND H) AND NOT (B4 or B5 or E or F or DD)) AND adult");
+            "(((B1 AND PatPrimeraLinha AND H) AND NOT (B4 or B5 or E or F or DD)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND PrimeiraLinha AND H) AND NOT (B4 or B5 or E or F)) AND children");
+            "(((B1 AND PatPrimeraLinha AND H) AND NOT (B4 or B5 or E or F)) AND children");
       } else if (line == 18) {
         compositionCohortDefinition.setCompositionString(
-            "((B4CV50 AND PrimeiraLinha AND H50) AND NOT (E or F)");
+            "((B4CV50 AND PatPrimeraLinha AND H50) AND NOT (E or F)");
       }
     }
     return compositionCohortDefinition;
@@ -12869,5 +12874,58 @@ public class QualityImprovement2020CohortQueries {
             + " OR deadRegisteredInFichaResumoAndFichaClinicaMasterCard) AND NOT exclusion");
 
     return cd;
+  }
+
+  /**
+   * filtrando os utentes que estão na 1ª Linha de TARV no período de inclusão , ou seja, os utentes
+   * com registo da última linha terapêutica, na Ficha Clínica durante o período de avaliação
+   *
+   * <p>Infecções oportunistas incluindo Sarcoma de Kaposi e outras doenças – Sarcoma de Kaposi
+   * registado na “Ficha Clinica – Master Card” até o fim do período de revisão.
+   *
+   * @return {@link CohortDefinition}
+   */
+  public SqlCohortDefinition getPatientsFirstLine() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+    sqlCohortDefinition.setName("Patients with LINHA TERAPEUTICA equal to PRIMEIRA LINHA");
+    sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("21151", hivMetadata.getTherapeuticLineConcept().getConceptId());
+    map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id "
+            + "		FROM patient p "
+            + "         INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN (SELECT p.patient_id, "
+            + "				    	    MAX(e.encounter_datetime) AS last_clinical "
+            + "						FROM patient p "
+            + "				    	    INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "						WHERE e.encounter_type = ${6} "
+            + "                     AND p.voided = 0 "
+            + "						AND e.voided = 0 "
+            + "                     AND e.location_id = :location "
+            + "						AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "						GROUP BY p.patient_id) filtered ON filtered.patient_id = p.patient_id "
+            + "     WHERE e.encounter_datetime = filtered.last_clinical "
+            + "     AND p.voided = 0 "
+            + "     AND e.voided = 0 "
+            + "     AND o.voided = 0 "
+            + "     AND o.concept_id = ${21151} "
+            + "     AND o.value_coded = ${21150} "
+            + "     AND e.encounter_type = ${6} "
+            + "     AND e.location_id = :location "
+            + "     GROUP BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlCohortDefinition;
   }
 }
