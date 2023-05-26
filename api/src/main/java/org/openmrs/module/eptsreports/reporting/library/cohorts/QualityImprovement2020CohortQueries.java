@@ -12698,6 +12698,13 @@ public class QualityImprovement2020CohortQueries {
     return sqlCohortDefinition;
   }
 
+  /**
+   * Filtrando os utentes com o registo de pelo menos 3 consultas de APSS/PP em 99 dias após a “Data
+   * Início TARV”, isto é, as 3 consultas de APSS/PP devem ocorrer no período compreendido entre a
+   * “Data Início TARV” + 1dia e “Data Início TARV” + 99 dias
+   *
+   * @return CohortDefinition
+   */
   public CohortDefinition getPatientWhoHadThreeApssAfterArtStart() {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
