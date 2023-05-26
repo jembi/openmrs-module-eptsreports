@@ -58,7 +58,7 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
     Concept conizationConcept = hivMetadata.getconizationConcept();
 
     Map<String, Object> stringObjectMap = new HashMap<>();
-    stringObjectMap.put("result", CXCASCRNCohortQueries.CXCASCRNResult.POSITIVE);
+    stringObjectMap.put("result", CXCASCRNCohortQueries.CXCASCRNResult.ALL);
 
     CalculationResultMap aaResultMap =
         calculate(
