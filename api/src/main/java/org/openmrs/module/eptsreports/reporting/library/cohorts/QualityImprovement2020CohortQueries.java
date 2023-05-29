@@ -12916,7 +12916,6 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        o.voided = 0 "
             + "                      AND        e.location_id = :location "
             + "                      AND        o.concept_id = ${21151} "
-            + "                      AND        o.value_coded = ${21150} "
             + "                      AND        e.encounter_datetime BETWEEN :startDate AND  :endDate "
             + "                      GROUP BY   p.patient_id) filtered "
             + "ON         filtered.patient_id = p.patient_id "
