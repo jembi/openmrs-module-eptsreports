@@ -52,16 +52,19 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
     Concept yesConcept = hivMetadata.getPatientFoundYesConcept();
     Concept cryotherapyDateConcept = hivMetadata.getCryotherapyDateConcept();
     Concept viaResultOnTheReferenceConcept = hivMetadata.getViaResultOnTheReferenceConcept();
-    Concept pediatricNursingConcept = hivMetadata.getPediatricNursingConcept();
+    Concept cryotherapyConcept = hivMetadata.getCryotherapyConcept();
     Concept thermocoagulationConcept = hivMetadata.getThermocoagulationConcept();
     Concept leepConcept = hivMetadata.getLeepConcept();
     Concept conizationConcept = hivMetadata.getconizationConcept();
+
+    Map<String, Object> stringObjectMap = new HashMap<>();
+    stringObjectMap.put("result", CXCASCRNCohortQueries.CXCASCRNResult.ALL);
 
     CalculationResultMap aaResultMap =
         calculate(
             Context.getRegisteredComponents(CXCASCRNAACalculation.class).get(0),
             cohort,
-            parameterValues,
+            stringObjectMap,
             context);
 
     CalculationResultMap aa4ResultMap = getAA4Map(hivMetadata, cohort, context);
@@ -89,7 +92,7 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
             TimeQualifier.ANY,
             null,
             endDate,
-            EPTSMetadataDatetimeQualifier.OBS_DATETIME,
+            EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
             context);
 
     CalculationResultMap viaResultRefenceResulMap =
@@ -99,7 +102,7 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
             cohort,
             location,
             Arrays.asList(
-                pediatricNursingConcept, thermocoagulationConcept, leepConcept, conizationConcept),
+                cryotherapyConcept, thermocoagulationConcept, leepConcept, conizationConcept),
             TimeQualifier.ANY,
             null,
             endDate,
@@ -134,9 +137,9 @@ public class CXCASCRNBBCalculation extends AbstractPatientCalculation {
         }
 
         for (Obs criotherapyDate : criotherapyDates) {
-          if (criotherapyDate.getObsDatetime().compareTo(aa4LastDate) >= 0
+          if (criotherapyDate.getValueDatetime().compareTo(aa4LastDate) >= 0
               && criotherapyDate
-                      .getObsDatetime()
+                      .getValueDatetime()
                       .compareTo(obs.getEncounter().getEncounterDatetime())
                   <= 0) {
             map.put(pId, new SimpleResult(criotherapyDate, this));

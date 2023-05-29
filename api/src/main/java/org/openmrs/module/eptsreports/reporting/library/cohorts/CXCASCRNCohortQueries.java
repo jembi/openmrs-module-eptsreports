@@ -180,7 +180,6 @@ public class CXCASCRNCohortQueries {
     CohortDefinition a = getA();
     CohortDefinition aa = getAA(cxcascrnResult);
     CohortDefinition aa1 = getAA1OrAA2(CXCASCRNResult.ANY, true, false);
-    CohortDefinition aa2 = getAA1OrAA2(CXCASCRNResult.ANY, false, false);
 
     cd.addSearch(
         "A",
@@ -190,9 +189,8 @@ public class CXCASCRNCohortQueries {
         EptsReportUtils.map(
             aa, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch("AA1", EptsReportUtils.map(aa1, "onOrAfter=${startDate},location=${location}"));
-    cd.addSearch("AA2", EptsReportUtils.map(aa2, "onOrAfter=${startDate},location=${location}"));
 
-    cd.setCompositionString("A AND AA AND NOT AA1 ");
+    cd.setCompositionString("(A AND AA) AND NOT AA1");
     return cd;
   }
 

@@ -5212,4 +5212,19 @@ public class HivMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.artPickupAccommodationCamp");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 23974</b>
+   *
+   * <p><b>Name:</b> Cryotherapy
+   *
+   * <p><b>Description:</b> Cryotherapy Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCryotherapyConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cryotherapyConceptUuid");
+    return getConcept(uuid);
+  }
 }
