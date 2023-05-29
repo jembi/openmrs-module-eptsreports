@@ -12895,7 +12895,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("21150", hivMetadata.getFirstLineConcept().getConceptId());
 
     String query =
-            "SELECT     p.patient_id "
+        "SELECT     p.patient_id "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         e.patient_id = p.patient_id "
@@ -12915,8 +12915,6 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        e.voided = 0 "
             + "                      AND        o.voided = 0 "
             + "                      AND        e.location_id = :location "
-            + "                     AND        p.voided = 0 "
-            + "AND        e.voided = 0 "
             + "                      AND        o.concept_id = ${21151} "
             + "                      AND        o.value_coded = ${21150} "
             + "                      AND        e.encounter_datetime BETWEEN :startDate AND  :endDate "
@@ -12928,7 +12926,6 @@ public class QualityImprovement2020CohortQueries {
             + "AND        e.encounter_type = ${6} "
             + "AND        e.location_id = :location "
             + "GROUP BY   p.patient_id";
-
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
