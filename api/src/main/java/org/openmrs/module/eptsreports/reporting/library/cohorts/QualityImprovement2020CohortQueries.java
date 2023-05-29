@@ -9026,39 +9026,40 @@ public class QualityImprovement2020CohortQueries {
             alreadyMds, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "onTB",
-            EptsReportUtils.map(
-                    onTB, "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
+        "onTB",
+        EptsReportUtils.map(
+            onTB, "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "onSK", EptsReportUtils.map(onSK, "endDate=${revisionEndDate},location=${location}"));
+        "onSK", EptsReportUtils.map(onSK, "endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "returned",
-            EptsReportUtils.map(returned, "endDate=${revisionEndDate},location=${location}"));
+        "returned",
+        EptsReportUtils.map(returned, "endDate=${revisionEndDate},location=${location}"));
 
     cd.addSearch(
-            "adverseReaction",
-            EptsReportUtils.map(
-                    genericCohortQueries.hasCodedObs(
-                            hivMetadata.getAdverseReaction(),
-                            BaseObsCohortDefinition.TimeModifier.ANY,
-                            SetComparator.IN,
-                            Arrays.asList(
-                                    hivMetadata.getAdultoSeguimentoEncounterType(),
-                                    hivMetadata.getPediatriaSeguimentoEncounterType()),
-                            Arrays.asList(
-                                    hivMetadata.getCytopeniaConcept(),
-                                    hivMetadata.getPancreatitis(),
-                                    hivMetadata.getNephrotoxicityConcept(),
-                                    hivMetadata.getHepatitisConcept(),
-                                    hivMetadata.getStevensJonhsonSyndromeConcept(),
-                                    hivMetadata.getHypersensitivityToAbcOrRailConcept(),
-                                    hivMetadata.getLacticAcidosis(),
-                                    hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
-                    "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
+        "adverseReaction",
+        EptsReportUtils.map(
+            genericCohortQueries.hasCodedObs(
+                hivMetadata.getAdverseReaction(),
+                BaseObsCohortDefinition.TimeModifier.ANY,
+                SetComparator.IN,
+                Arrays.asList(
+                    hivMetadata.getAdultoSeguimentoEncounterType(),
+                    hivMetadata.getPediatriaSeguimentoEncounterType()),
+                Arrays.asList(
+                    hivMetadata.getCytopeniaConcept(),
+                    hivMetadata.getPancreatitis(),
+                    hivMetadata.getNephrotoxicityConcept(),
+                    hivMetadata.getHepatitisConcept(),
+                    hivMetadata.getStevensJonhsonSyndromeConcept(),
+                    hivMetadata.getHypersensitivityToAbcOrRailConcept(),
+                    hivMetadata.getLacticAcidosis(),
+                    hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
+            "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
 
-    cd.setCompositionString("A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned)");
+    cd.setCompositionString(
+        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned)");
 
     return cd;
   }
@@ -9314,10 +9315,7 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15withoutExclusions,
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "IR",
-        EptsReportUtils.map(
-            Mq15P, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
 
     cd.setCompositionString("A");
     return cd;

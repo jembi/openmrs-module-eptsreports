@@ -3542,9 +3542,4 @@ public class IntensiveMonitoringCohortQueries {
 
     return cd;
   }
-
-
-
-
-
 }
