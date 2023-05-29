@@ -12880,9 +12880,6 @@ public class QualityImprovement2020CohortQueries {
    * filtrando os utentes que estão na 1ª Linha de TARV no período de inclusão , ou seja, os utentes
    * com registo da última linha terapêutica, na Ficha Clínica durante o período de avaliação
    *
-   * <p>Infecções oportunistas incluindo Sarcoma de Kaposi e outras doenças – Sarcoma de Kaposi
-   * registado na “Ficha Clinica – Master Card” até o fim do período de revisão.
-   *
    * @return {@link CohortDefinition}
    */
   public SqlCohortDefinition getPatientsFirstLine() {
