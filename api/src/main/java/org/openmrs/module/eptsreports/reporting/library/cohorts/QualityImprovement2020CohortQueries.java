@@ -6366,10 +6366,15 @@ public class QualityImprovement2020CohortQueries {
   }
 
   /**
-   * 13.17. % de MG que receberam o resultado da Carga Viral dentro de 33 dias após pedido
-   * Denominator: # de MG com registo de pedido de CV no período de revisão (Line 92,Column F in the
-   * Template) as following: <code>
-   * ((A and B1 and B3) or (B2 and B4)) and NOT (D or E or F) and Age >= 15*</code>
+   * O sistema irá produzir o seguinte denominador do Indicador 13.17 da Categoria 13 MG de
+   * Resultado de CV:
+   *
+   * <ul>
+   *   <li>incluindo todos os utentes selecionados no Indicador 13.15 Numerador definido no RF29
+   *       (Categoria 13 MG Indicador 13.15 – Numerador Pedido CV) e
+   *   <li>incluindo todos os utentes selecionados no Indicador 13.16 Numerador definido no RF31
+   *       (Categoria 13 MG Indicador 13.16 – Numerador Pedido CV)
+   * </ul>
    *
    * @return CohortDefinition
    */
@@ -6380,44 +6385,15 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition num13a15 = getMQC13P2Num1();
 
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            true,
-            false,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getBreastfeeding(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
+    CohortDefinition num13a16 = getMQC13P2Num2();
 
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
+    cd.addSearch("num13a15", EptsReportUtils.map(num13a15, MAPPING1));
 
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
+    cd.addSearch("num13a16", EptsReportUtils.map(num13a16, MAPPING1));
 
-    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
-
-    cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
-    cd.addSearch("B3", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
-    cd.addSearch("B4", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
-
-    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
-
-    cd.setCompositionString("((A AND C AND B3) AND NOT (D OR E OR F)) OR (B2 AND B4)");
+    cd.setCompositionString("num13a15 OR num13a16");
 
     return cd;
   }
@@ -9320,7 +9296,6 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15withoutExclusions,
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
 
     cd.setCompositionString("A");
     return cd;
