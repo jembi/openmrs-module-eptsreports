@@ -8192,7 +8192,6 @@ public class QualityImprovement2020CohortQueries {
 
     cd.setCompositionString(
         "((A OR D OR breastfeedingOnPeriod) AND NOT (C OR E OR pregnantOnPeriod)) AND AGE");
-
     return cd;
   }
 
@@ -9320,7 +9319,6 @@ public class QualityImprovement2020CohortQueries {
         EptsReportUtils.map(
             Mq15withoutExclusions,
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
 
     cd.setCompositionString("A");
     return cd;
@@ -11956,6 +11954,8 @@ public class QualityImprovement2020CohortQueries {
             + "                        WHERE enc.encounter_datetime = primeira.first_consultation "
             + "                        AND enc.encounter_datetime >= :startDate "
             + "                        AND enc.encounter_datetime <= :endDate "
+            + "                        AND enc.voided = 0 "
+            + "                        AND o.voided = 0 "
             + "                        AND enc.encounter_type = ${6} "
             + "                        AND o.concept_id = ${question} "
             + "                        AND o.value_coded = ${answer} "
