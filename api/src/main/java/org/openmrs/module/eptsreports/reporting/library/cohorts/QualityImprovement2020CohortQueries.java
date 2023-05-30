@@ -4074,11 +4074,8 @@ public class QualityImprovement2020CohortQueries {
           "I",
           EptsReportUtils.map(
               i,
-              "onOrAfter=${revisionEndDate-5m+1d},onOrBefore=${revisionEndDate-4m},location=${location}"));
+              "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}"));
     }
-
-    compositionCohortDefinition.addSearch(
-        "BABIES", EptsReportUtils.map(babies, "effectiveDate=${effectiveDate}"));
 
     compositionCohortDefinition.setCompositionString(
         "A and NOT C and NOT D and NOT E and NOT F AND I");
