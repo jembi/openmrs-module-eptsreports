@@ -6047,7 +6047,7 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND PatPrimeraLinha) AND NOT (B4 or B5 or E or F or DD)) AND adult");
+            "(((B1 AND PatPrimeraLinha) AND NOT (B4 or E or F or DD)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
             "(((B1 AND PatPrimeraLinha) AND NOT (B4 or B5 or E or F)) AND children");
@@ -6058,7 +6058,7 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 3) {
         compositionCohortDefinition.setCompositionString(
-            "(((B1 AND PatPrimeraLinha AND H) AND NOT (B4 or B5 or E or F or DD)) AND adult");
+            "(((B1 AND PatPrimeraLinha AND H) AND NOT (B4 or E or F or DD)) AND adult");
       } else if (line == 12) {
         compositionCohortDefinition.setCompositionString(
             "(((B1 AND PatPrimeraLinha AND H) AND NOT (B4 or B5 or E or F)) AND children");
@@ -6985,7 +6985,8 @@ public class QualityImprovement2020CohortQueries {
         getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
-    cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
+    cd.setCompositionString("B2");
+//    cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
 
     return cd;
   }
