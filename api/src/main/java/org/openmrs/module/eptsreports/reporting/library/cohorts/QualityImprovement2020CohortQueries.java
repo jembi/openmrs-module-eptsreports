@@ -6985,8 +6985,7 @@ public class QualityImprovement2020CohortQueries {
         getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt();
     cd.addSearch("ABANDONED", EptsReportUtils.map(pregnantAbandonedDuringPeriod, MAPPING1));
 
-    cd.setCompositionString("B2");
-//    cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
+    cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
 
     return cd;
   }
