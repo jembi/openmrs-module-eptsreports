@@ -7005,49 +7005,21 @@ public class QualityImprovement2020CohortQueries {
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
-    CohortDefinition transfOut = commonCohortQueries.getTranferredOutPatients();
+    CohortDefinition num13a15 = getMQC13P2Num1();
 
-    CohortDefinition breastfeeding =
-        commonCohortQueries.getMohMQPatientsOnCondition(
-            true,
-            false,
-            "once",
-            hivMetadata.getMasterCardEncounterType(),
-            commonMetadata.getBreastfeeding(),
-            Collections.singletonList(hivMetadata.getYesConcept()),
-            null,
-            null);
+    CohortDefinition num13a16 = getMQC13P2Num2();
 
-    CohortDefinition transferredIn =
-        QualityImprovement2020Queries.getTransferredInPatients(
-            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
-            hivMetadata.getPatientFoundYesConcept().getConceptId(),
-            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
-            hivMetadata.getArtStatus().getConceptId());
+    cd.addSearch("num13a15", EptsReportUtils.map(num13a15, MAPPING1));
 
-    CohortDefinition pregnant =
-        commonCohortQueries.getMOHPregnantORBreastfeeding(
-            commonMetadata.getPregnantConcept().getConceptId(),
-            hivMetadata.getYesConcept().getConceptId());
+    cd.addSearch("num13a16", EptsReportUtils.map(num13a16, MAPPING1));
 
-    cd.addSearch("A", EptsReportUtils.map(getMOHArtStartDate(), MAPPING));
-
-    cd.addSearch("B2", EptsReportUtils.map(getMQC13P2DenB2(), MAPPING));
-    cd.addSearch("B3", EptsReportUtils.map(getMQC13P2DenB3(), MAPPING));
-    cd.addSearch("B4", EptsReportUtils.map(getgetMQC13P2DenB4(), MAPPING));
-
-    cd.addSearch("C", EptsReportUtils.map(pregnant, MAPPING));
-    cd.addSearch("D", EptsReportUtils.map(breastfeeding, MAPPING));
-    cd.addSearch("E", EptsReportUtils.map(transferredIn, MAPPING));
-    cd.addSearch("F", EptsReportUtils.map(transfOut, MAPPING1));
     cd.addSearch("K", EptsReportUtils.map(getMQC13P2NumK(), MAPPING));
     cd.addSearch("L", EptsReportUtils.map(getMQC13P2NumL(), MAPPING));
     cd.addSearch("M", EptsReportUtils.map(getMQC13P2NumM(), MAPPING));
     cd.addSearch("N", EptsReportUtils.map(getMQC13P2NumN(), MAPPING));
 
     cd.setCompositionString(
-        "((A AND C AND B3 AND (K OR M)) AND NOT (D OR E OR F)) OR (B2 AND B4 AND (L OR N))");
+        "(num13a15 AND (K OR M)) OR (num13a16 AND (L OR N))");
 
     return cd;
   }
