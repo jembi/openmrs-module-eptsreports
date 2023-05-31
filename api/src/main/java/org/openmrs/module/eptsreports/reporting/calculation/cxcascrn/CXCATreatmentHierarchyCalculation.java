@@ -215,29 +215,4 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
     return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
   }
 
-  private Date pickTheOladestDateDuringThePeriod(Date b5Date, Obs b6Obs, Obs b7Obs) {
-
-    Date oldestDate = null;
-    List<Date> dates = new ArrayList<>();
-
-    if (b5Date != null) {
-      dates.add(b5Date);
-    }
-    if (b6Obs != null) {
-      dates.add(b6Obs.getValueDate());
-    }
-    if (b7Obs != null) {
-      dates.add(b7Obs.getValueDate());
-    }
-    for (Date d : dates) {
-      if (oldestDate == null) {
-        oldestDate = d;
-        continue;
-      }
-      if (oldestDate.compareTo(d) > 0) {
-        oldestDate = d;
-      }
-    }
-    return oldestDate;
-  }
 }
