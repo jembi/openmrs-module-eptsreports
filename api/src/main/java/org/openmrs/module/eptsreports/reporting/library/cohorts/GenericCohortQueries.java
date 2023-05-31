@@ -319,19 +319,8 @@ public class GenericCohortQueries {
             + "                                 AND e.encounter_type IN ( %d, %d, %d ) "
             + "                                 AND e.location_id = :location "
             + "                                 AND e.encounter_datetime > death_date "
-            + "                          UNION "
-            + "                          SELECT p.patient_id "
-            + "                          FROM   patient p "
-            + "                                 JOIN encounter e "
-            + "                                   ON p.patient_id = e.patient_id "
-            + "                                 JOIN obs o "
-            + "                                   ON e.encounter_id = o.encounter_id "
-            + "                          WHERE  p.voided = 0 "
-            + "                                 AND e.voided = 0 "
-            + "                                 AND e.encounter_type = %d "
-            + "                                 AND e.location_id = :location "
-            + "                                 AND o.concept_id = 23866 "
-            + "                                 AND o.value_datetime > death_date); ";
+            + "                         GROUP BY p.patient_id "
+            + "); ";
     cd.setQuery(
         String.format(
             sql,
