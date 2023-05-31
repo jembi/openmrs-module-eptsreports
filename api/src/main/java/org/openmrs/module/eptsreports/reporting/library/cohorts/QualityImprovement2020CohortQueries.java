@@ -7017,8 +7017,7 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("M", EptsReportUtils.map(getMQC13P2NumM(), MAPPING));
     cd.addSearch("N", EptsReportUtils.map(getMQC13P2NumN(), MAPPING));
 
-    cd.setCompositionString(
-        "(num13a15 AND (K OR M)) OR (num13a16 AND (L OR N))");
+    cd.setCompositionString("(num13a15 AND (K OR M)) OR (num13a16 AND (L OR N))");
 
     return cd;
   }
