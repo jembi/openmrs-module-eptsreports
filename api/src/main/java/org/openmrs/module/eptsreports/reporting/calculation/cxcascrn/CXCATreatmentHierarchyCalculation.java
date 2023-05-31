@@ -91,6 +91,18 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
         map.put(pId, new SimpleResult(b7Obs.getObsDatetime(), this));
       }
       // handling b6
+      if (treatmentType == TreatmentType.B6 && b5Date != null && b6Obs != null && b7Obs != null) {
+        if (b6Obs.getObsDatetime().compareTo(b5Date) < 0
+            && b6Obs.getObsDatetime().compareTo(b7Obs.getObsDatetime()) < 0) {
+          map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
+        }
+      }
+      if (treatmentType == TreatmentType.B6 && b5Date != null && b6Obs != null && b7Obs == null) {
+        if (b6Obs.getObsDatetime().compareTo(b5Date) < 0
+            || b6Obs.getObsDatetime().compareTo(b5Date) == 0) {
+          map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
+        }
+      }
       if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs != null) {
         if (b6Obs.getObsDatetime().compareTo(b7Obs.getObsDatetime()) == 0) {
           continue;
@@ -98,7 +110,7 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
           map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
         }
       }
-      if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs == null) {
+      if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs == null && b5Date == null) {
         map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
       }
       // handling b5
