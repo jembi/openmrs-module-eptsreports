@@ -3506,7 +3506,7 @@ public class IntensiveMonitoringCohortQueries {
     }
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     compositionCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "endDate", Date.class));
+        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     CohortDefinition startedArt = qualityImprovement2020CohortQueries.getMOHArtStartDate();

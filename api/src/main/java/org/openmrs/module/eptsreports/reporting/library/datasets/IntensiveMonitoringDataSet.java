@@ -1787,58 +1787,47 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
 
     // Category 18 Denominator
 
-    CohortIndicator MI18DEN89 =
-        eptsGeneralIndicator.getIndicator(
-            "MI18DEN89",
-            EptsReportUtils.map(
-                intensiveMonitoringCohortQueries.getPatientsOnMICat18Denominator(true, 1),
-                "endDate=${revisionEndDate},location=${location}"));
-    MI18DEN89.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+
     dataSetDefinition.addColumn(
         "MI18DEN89",
         "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T)",
-        EptsReportUtils.map(MI18DEN89, "endDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(
+          customCohortIndicator(
+                intensiveMonitoringCohortQueries.getPatientsOnMICat18Denominator(true, 1),
+         "endDate=${revisionEndDate},location=${location}"),
+        "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
-    CohortIndicator MI18DEN1014 =
-        eptsGeneralIndicator.getIndicator(
-            "MI18DEN1014",
-            EptsReportUtils.map(
-                intensiveMonitoringCohortQueries.getPatientsOnMICat18Denominator(true, 2),
-                "endDate=${revisionEndDate},location=${location}"));
-    MI18DEN1014.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     dataSetDefinition.addColumn(
-        "MI18DEN1014",
-        "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)",
-        EptsReportUtils.map(MI18DEN1014, "endDate=${revisionEndDate},location=${location}"),
-        "");
+            "MI18DEN1014",
+            "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)",
+            EptsReportUtils.map(
+                    customCohortIndicator(
+                            intensiveMonitoringCohortQueries.getPatientsOnMICat18Denominator(true, 2),
+                            "endDate=${revisionEndDate},location=${location}"),
+                    "revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
 
     // MI Cat 18 Numerator
-    CohortIndicator MI18NUM89 =
-        eptsGeneralIndicator.getIndicator(
+    dataSetDefinition.addColumn(
             "MI18NUM89",
+            "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T) NUM",
             EptsReportUtils.map(
-                intensiveMonitoringCohortQueries.getPatientsOnMICat18Denominator(false, 1),
-                "revisionEndDate=${revisionEndDate},location=${location}"));
-    MI18NUM89.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    dataSetDefinition.addColumn(
-        "MI18NUM89",
-        "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T) NUM",
-        EptsReportUtils.map(MI18NUM89, "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+                    customCohortIndicator(
+                            intensiveMonitoringCohortQueries.getPatientsOnMICat18Denominator(false, 1),
+                            "revisionEndDate=${revisionEndDate},location=${location}"),
+                    "revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
 
-    CohortIndicator MI18NUM1014 =
-        eptsGeneralIndicator.getIndicator(
-            "MI18NUM1014",
-            EptsReportUtils.map(
-                intensiveMonitoringCohortQueries.getPatientsOnMICat18Denominator(false, 2),
-                "revisionEndDate=${revisionEndDate},location=${location}"));
-    MI18NUM1014.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     dataSetDefinition.addColumn(
-        "MI18NUM1014",
-        "Adolescentes de 10 - 14 anos activos em TARV com RD Total  (T) NUM",
-        EptsReportUtils.map(MI18NUM1014, "revisionEndDate=${revisionEndDate},location=${location}"),
-        "");
+            "MI18NUM1014",
+            "Adolescentes de 10 - 14 anos activos em TARV com RD Total  (T) NUM",
+            EptsReportUtils.map(
+                    customCohortIndicator(
+                            intensiveMonitoringCohortQueries.getPatientsOnMICat18Denominator(false, 2),
+                            "revisionEndDate=${revisionEndDate},location=${location}"),
+                    "revisionEndDate=${revisionEndDate},location=${location}"),
+            "");
 
     return dataSetDefinition;
   }
