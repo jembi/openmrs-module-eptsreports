@@ -91,6 +91,17 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
         map.put(pId, new SimpleResult(b7Obs.getObsDatetime(), this));
       }
       // handling b6
+      if (treatmentType == TreatmentType.B6 && b5Date != null && b6Obs != null && b7Obs != null) {
+        if (b6Obs.getObsDatetime().compareTo(b5Date) < 0
+            && b6Obs.getObsDatetime().compareTo(b7Obs.getObsDatetime()) < 0) {
+          map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
+        }
+      }
+      if (treatmentType == TreatmentType.B6 && b5Date != null && b6Obs != null && b7Obs == null) {
+        if (b6Obs.getObsDatetime().compareTo(b5Date) <= 0) {
+          map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
+        }
+      }
       if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs != null) {
         if (b6Obs.getObsDatetime().compareTo(b7Obs.getObsDatetime()) == 0) {
           continue;
@@ -98,7 +109,7 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
           map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
         }
       }
-      if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs == null) {
+      if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs == null && b5Date == null) {
         map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
       }
       // handling b5
@@ -201,31 +212,5 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
     params.put("onOrBefore", context.getFromCache("onOrBefore"));
 
     return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
-  }
-
-  private Date pickTheOladestDateDuringThePeriod(Date b5Date, Obs b6Obs, Obs b7Obs) {
-
-    Date oldestDate = null;
-    List<Date> dates = new ArrayList<>();
-
-    if (b5Date != null) {
-      dates.add(b5Date);
-    }
-    if (b6Obs != null) {
-      dates.add(b6Obs.getValueDate());
-    }
-    if (b7Obs != null) {
-      dates.add(b7Obs.getValueDate());
-    }
-    for (Date d : dates) {
-      if (oldestDate == null) {
-        oldestDate = d;
-        continue;
-      }
-      if (oldestDate.compareTo(d) > 0) {
-        oldestDate = d;
-      }
-    }
-    return oldestDate;
   }
 }
