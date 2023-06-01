@@ -1810,7 +1810,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "MI18DEN1014",
         "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)",
-        EptsReportUtils.map(MI18DEN89, "endDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MI18DEN1014, "endDate=${revisionEndDate},location=${location}"),
         "");
 
     // MI Cat 18 Numerator
@@ -1824,7 +1824,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
     dataSetDefinition.addColumn(
         "MI18NUM89",
         "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T) NUM",
-        EptsReportUtils.map(MI18DEN89, "revisionEndDate=${revisionEndDate},location=${location}"),
+        EptsReportUtils.map(MI18NUM89, "revisionEndDate=${revisionEndDate},location=${location}"),
         "");
 
     CohortIndicator MI18NUM1014 =
