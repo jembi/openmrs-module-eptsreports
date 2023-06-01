@@ -98,8 +98,7 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
         }
       }
       if (treatmentType == TreatmentType.B6 && b5Date != null && b6Obs != null && b7Obs == null) {
-        if (b6Obs.getObsDatetime().compareTo(b5Date) < 0
-            || b6Obs.getObsDatetime().compareTo(b5Date) == 0) {
+        if (b6Obs.getObsDatetime().compareTo(b5Date) <= 0) {
           map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
         }
       }
@@ -214,5 +213,4 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
 
     return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
   }
-
 }
