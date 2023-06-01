@@ -35,6 +35,8 @@ public class IntensiveMonitoringCohortQueries {
 
   private GenericCohortQueries genericCohortQueries;
 
+  private AgeCohortQueries ageCohortQueries;
+
   private final String MAPPING2 =
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},location=${location}";
 
@@ -51,7 +53,8 @@ public class IntensiveMonitoringCohortQueries {
       CommonMetadata commonMetadata,
       TbMetadata tbMetadata,
       GenericCohortQueries genericCohortQueries,
-      ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      AgeCohortQueries ageCohortQueries) {
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonCohortQueries = commonCohortQueries;
@@ -59,6 +62,7 @@ public class IntensiveMonitoringCohortQueries {
     this.tbMetadata = tbMetadata;
     this.genericCohortQueries = genericCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.ageCohortQueries = ageCohortQueries;
   }
 
   @PostConstruct
@@ -3484,15 +3488,42 @@ public class IntensiveMonitoringCohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatientsOnMICat18Denominator() {
+  public CohortDefinition getPatientsOnMICat18Denominator(Boolean den, Integer line) {
+    CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Cat 18 Denominator");
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
+    if (den) {
+      if (line == 1) {
+        compositionCohortDefinition.setName(
+            "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T)");
+      } else if (line == 2) {
+        compositionCohortDefinition.setName(
+            "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T)");
+      }
+    } else {
+      if (line == 1) {
+        compositionCohortDefinition.setName(
+            "Crianças dos 8 - 9 anos activos em TARV com RD Total  (T) NUM");
+      } else if (line == 2) {
+        compositionCohortDefinition.setName(
+            "Crianças dos 10 - 14 anos activos em TARV com RD Total  (T) NUM");
+      }
+    }
+
+    compositionCohortDefinition.setName("Cat 18 Denominator");
+    compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(
+        new Parameter("revisionEndDate", "endDate", Date.class));
+    compositionCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition eightToNine = this.ageCohortQueries.createXtoYAgeCohort("eightToNine", 8, 9);
+
+    CohortDefinition tenToFourteen =
+        this.ageCohortQueries.createXtoYAgeCohort("tenToFourteen", 10, 14);
 
     CohortDefinition startedArt = qualityImprovement2020CohortQueries.getMOHArtStartDate();
+
     CohortDefinition inTarv = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
+
     CohortDefinition transferredIn =
         QualityImprovement2020Queries.getTransferredInPatients(
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
@@ -3501,45 +3532,50 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
             hivMetadata.getArtStatus().getConceptId());
 
-    cd.addSearch(
+    CohortDefinition diagnose =
+        QualityImprovement2020Queries.getDisclosureOfHIVDiagnosisToChildrenAdolescents();
+
+    compositionCohortDefinition.addSearch(
+        "eightToNine", EptsReportUtils.map(eightToNine, "effectiveDate=${revisionEndDate}"));
+    compositionCohortDefinition.addSearch(
+        "tenToFourteen", EptsReportUtils.map(tenToFourteen, "effectiveDate=${revisionEndDate}"));
+
+    compositionCohortDefinition.addSearch(
         "startedArt",
         EptsReportUtils.map(
             startedArt, "startDate=${endDate-14m+1d},endDate=${endDate-13m},location=${location}"));
 
-    cd.addSearch("inTarv", EptsReportUtils.map(inTarv, "endDate=${endDate},location=${location}"));
-    cd.addSearch(
+    compositionCohortDefinition.addSearch(
+        "inTarv", EptsReportUtils.map(inTarv, "endDate=${endDate},location=${location}"));
+    compositionCohortDefinition.addSearch(
         "transferredIn",
         EptsReportUtils.map(
             transferredIn, "startDate=${endDate},endDate=${endDate},location=${location}"));
 
-    cd.setCompositionString("(startedArt AND inTarv) AND NOT transferredIn");
-
-    return cd;
-  }
-
-  public CohortDefinition getPatientsOnMICat18Numerator() {
-
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Cat 18 Numerator");
-    cd.addParameter(new Parameter("revisionEndDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    CohortDefinition denominator = getPatientsOnMICat18Denominator();
-    CohortDefinition diagnose =
-        QualityImprovement2020Queries.getDisclosureOfHIVDiagnosisToChildrenAdolescents();
-
-    cd.addSearch(
-        "denominator",
-        EptsReportUtils.map(denominator, "endDate=${revisionEndDate},location=${location}"));
-
-    cd.addSearch(
+    compositionCohortDefinition.addSearch(
         "diagnose",
         EptsReportUtils.map(
             diagnose,
             "startDate=${revisionEndDate-14m+1d},endDate=${revisionEndDate-13m},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("denominator AND diagnose");
+    if (den) {
+      if (line == 1) {
+        compositionCohortDefinition.setCompositionString(
+            "(startedArt AND inTarv) AND NOT transferredIn AND eightToNine");
+      } else if (line == 2) {
+        compositionCohortDefinition.setCompositionString(
+            "(startedArt AND inTarv) AND NOT transferredIn AND tenToFourteen");
+      }
+    } else {
+      if (line == 1) {
+        compositionCohortDefinition.setCompositionString(
+            "((startedArt AND inTarv) AND NOT transferredIn) AND diagnose AND eightToNine");
+      } else if (line == 2) {
+        compositionCohortDefinition.setCompositionString(
+            "((startedArt AND inTarv) AND NOT transferredIn) AND diagnose AND tenToFourteen");
+      }
+    }
 
-    return cd;
+    return compositionCohortDefinition;
   }
 }

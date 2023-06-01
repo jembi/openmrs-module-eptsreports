@@ -9321,7 +9321,6 @@ public class QualityImprovement2020CohortQueries {
             Mq15withoutExclusions,
             "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-
     cd.setCompositionString("A");
     return cd;
   }
