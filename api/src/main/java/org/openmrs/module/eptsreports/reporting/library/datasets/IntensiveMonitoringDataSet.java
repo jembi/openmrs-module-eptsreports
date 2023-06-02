@@ -107,7 +107,7 @@ public class IntensiveMonitoringDataSet extends BaseDataSet {
         "ageBasedOnArtCat18",
         EptsReportUtils.map(
             eptsCommonDimension.ageBasedOnArtStartDateMOH(),
-            "onOrAfter=${revisionEndDate-13m+1d},onOrBefore=${revisionEndDate-12m},location=${location}"));
+            "onOrAfter=${revisionEndDate-14m+1d},onOrBefore=${revisionEndDate-13m},location=${location}"));
 
     dataSetDefinition.addDimension(
         "ageInMonths54",
