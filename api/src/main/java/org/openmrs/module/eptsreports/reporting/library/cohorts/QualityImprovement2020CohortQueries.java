@@ -8135,7 +8135,6 @@ public class QualityImprovement2020CohortQueries {
 
     cd.setCompositionString(
         "((A OR D OR breastfeedingOnPeriod) AND NOT (C OR E OR pregnantOnPeriod)) AND AGE");
-
     return cd;
   }
 
@@ -11899,6 +11898,8 @@ public class QualityImprovement2020CohortQueries {
             + "                        WHERE enc.encounter_datetime = primeira.first_consultation "
             + "                        AND enc.encounter_datetime >= :startDate "
             + "                        AND enc.encounter_datetime <= :endDate "
+            + "                        AND enc.voided = 0 "
+            + "                        AND o.voided = 0 "
             + "                        AND enc.encounter_type = ${6} "
             + "                        AND o.concept_id = ${question} "
             + "                        AND o.value_coded = ${answer} "
@@ -12294,7 +12295,7 @@ public class QualityImprovement2020CohortQueries {
             + "        OR "
             + "        (o2.concept_id = ${730} AND o2.value_numeric IS NOT NULL) "
             + "      ) "
-            + "  AND enc.encounter_datetime > consultation_date.first_consultation "
+            + "  AND enc.encounter_datetime >= consultation_date.first_consultation "
             + "  AND enc.encounter_datetime <= DATE_ADD(consultation_date.first_consultation, INTERVAL 33 DAY) "
             + "  AND enc.location_id = :location "
             + "GROUP BY pa.patient_id";
