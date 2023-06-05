@@ -3027,7 +3027,10 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "ABANDONED2LINE", EptsReportUtils.map(abandonedSecondLine, MAPPING1));
 
-    if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
+    if (indicator == 2)
+      compositionCohortDefinition.setCompositionString(
+          "((A AND NOT C) OR B1) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
+    if (indicator == 9 || indicator == 10 || indicator == 11)
       compositionCohortDefinition.setCompositionString(
           "((A AND NOT C) AND B1) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
     if (indicator == 5 || indicator == 14)
@@ -5474,7 +5477,10 @@ public class QualityImprovement2020CohortQueries {
     cd.addSearch("L", EptsReportUtils.map(getMQC13P3NUM_L(), MAPPING));
     cd.addSearch("DD", EptsReportUtils.map(getDeadPatientsCompositionMQ13(), MAPPING3));
 
-    if (indicator == 2 || indicator == 9 || indicator == 10 || indicator == 11)
+    if (indicator == 2)
+      cd.setCompositionString(
+          "((A AND NOT C AND (G OR J)) OR (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
+    if (indicator == 9 || indicator == 10 || indicator == 11)
       cd.setCompositionString(
           "((A AND NOT C AND (G OR J)) AND (B1 AND (H OR K))) AND NOT (F OR E OR DD OR ABANDONEDTARV) AND age");
     if (indicator == 5 || indicator == 14)
@@ -5513,46 +5519,50 @@ public class QualityImprovement2020CohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-        "SELECT art_tbl.patient_id "
-            + "FROM   (SELECT patient_id, "
-            + "               Min(data_inicio) data_inicio "
-            + "        FROM   (SELECT p.patient_id, "
-            + "                       Min(value_datetime) data_inicio "
-            + "                FROM   patient p "
-            + "                       inner join encounter e "
-            + "                               ON p.patient_id = e.patient_id "
-            + "                       inner join obs o "
-            + "                               ON e.encounter_id = o.encounter_id "
-            + "                WHERE  p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND o.voided = 0 "
-            + "                       AND e.encounter_type = ${53} "
-            + "                       AND o.concept_id = ${1190} "
-            + "                       AND o.value_datetime IS NOT NULL "
-            + "                       AND o.value_datetime <= :endDate "
-            + "                       AND e.location_id = :location "
-            + "                GROUP  BY p.patient_id ) inicio "
-            + "        WHERE  data_inicio BETWEEN :startDate AND :endDate "
-            + "        GROUP  BY patient_id) art_tbl "
-            + "       join (SELECT p.patient_id, "
-            + "                    e.encounter_datetime "
-            + "             FROM   patient p "
-            + "                    join encounter e "
-            + "                      ON e.patient_id = p.patient_id "
-            + "                    join obs o "
-            + "                      ON o.encounter_id = e.encounter_id "
-            + "             WHERE  e.encounter_type = ${6} "
-            + "                    AND e.voided = 0 "
-            + "                    AND e.location_id = :location "
-            + "                    AND ( ( o.concept_id = ${856} "
-            + "                            AND o.value_numeric IS NOT NULL ) "
-            + "                           OR ( o.concept_id = ${1305} "
-            + "                                AND o.value_coded IS NOT NULL ) ))G_tbl "
-            + "         ON G_tbl.patient_id = art_tbl.patient_id "
-            + "       WHERE  G_tbl.encounter_datetime BETWEEN Date_add(art_tbl.data_inicio, "
-            + "                                        interval 6 month) "
-            + "                                        AND "
-            + "       Date_add(art_tbl.data_inicio, interval 9 month)  ";
+            "SELECT cv.patient_id "
+            + "FROM   (SELECT p.patient_id, "
+            + "               e.encounter_datetime AS cv_encounter "
+            + "        FROM   patient p "
+            + "               JOIN encounter e "
+            + "                 ON e.patient_id = p.patient_id "
+            + "               JOIN obs o "
+            + "                 ON o.encounter_id = e.encounter_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               AND e.location_id = :location "
+            + "               AND ( ( o.concept_id = ${856} "
+            + "                       AND o.value_numeric IS NOT NULL ) "
+            + "                      OR ( o.concept_id = ${1305} "
+            + "                           AND o.value_coded IS NOT NULL ) ) "
+            + "        GROUP  BY p.patient_id)cv "
+            + "       INNER JOIN (SELECT inicio.patient_id, "
+            + "                          inicio.data_inicio AS data_inicio "
+            + "                   FROM   (SELECT p.patient_id, "
+            + "                                  Min(value_datetime) data_inicio "
+            + "                           FROM   patient p "
+            + "                                  INNER JOIN encounter e "
+            + "                                          ON p.patient_id = e.patient_id "
+            + "                                  INNER JOIN obs o "
+            + "                                          ON e.encounter_id = o.encounter_id "
+            + "                           WHERE  p.voided = 0 "
+            + "                                  AND e.voided = 0 "
+            + "                                  AND o.voided = 0 "
+            + "                                  AND e.encounter_type = ${53} "
+            + "                                  AND o.concept_id = ${1190} "
+            + "                                  AND o.value_datetime IS NOT NULL "
+            + "                                  AND o.value_datetime <= :endDate "
+            + "                                  AND e.location_id = :location "
+            + "                           GROUP  BY p.patient_id) inicio "
+            + "                   WHERE  data_inicio BETWEEN :startDate AND :endDate "
+            + "                   GROUP  BY patient_id) art_tbl "
+            + "               ON cv.patient_id = art_tbl.patient_id "
+            + "WHERE  cv.cv_encounter BETWEEN Date_add(art_tbl.data_inicio, INTERVAL 6 month) "
+            + "                               AND "
+            + "                                      Date_add(art_tbl.data_inicio, "
+            + "                                      INTERVAL 9 month)";
+
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
