@@ -582,6 +582,7 @@ public class TPTCompletionCohortQueries {
     valuesMap.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
     EptsQueriesUtil patientBuilder = new EptsQueriesUtil();
 
