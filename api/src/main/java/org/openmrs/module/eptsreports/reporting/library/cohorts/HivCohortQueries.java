@@ -400,7 +400,7 @@ public class HivCohortQueries {
 
     cd.addSearch(
         "arvPickup", EptsReportUtils.map(artPickup, "endDate=${onOrBefore},location=${location}"));
-    cd.setCompositionString("transferredOut AND NOT arvPickup");
+    cd.setCompositionString("transferredOut AND arvPickup");
 
     return cd;
   }
