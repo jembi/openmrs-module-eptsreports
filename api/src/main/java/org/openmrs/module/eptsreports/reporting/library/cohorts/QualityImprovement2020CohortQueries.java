@@ -5519,7 +5519,7 @@ public class QualityImprovement2020CohortQueries {
     map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
 
     String query =
-            "SELECT cv.patient_id "
+        "SELECT cv.patient_id "
             + "FROM   (SELECT p.patient_id, "
             + "               e.encounter_datetime AS cv_encounter "
             + "        FROM   patient p "
@@ -5562,7 +5562,6 @@ public class QualityImprovement2020CohortQueries {
             + "                               AND "
             + "                                      Date_add(art_tbl.data_inicio, "
             + "                                      INTERVAL 9 month)";
-
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
@@ -12217,11 +12216,12 @@ public class QualityImprovement2020CohortQueries {
 
   /**
    *
-   * <li>Filtrando os que tiveram registo do “Resultado de CD4” na consulta clínica decorrida em 33
-   *     dias após a consulta clínica com o primeiro registo de Gravidez no período de inclusão
+   * <li>Filtrando os que tiveram registo do “Resultado de CD4” numa consulta clínica decorrida em
+   *     33 dias da consulta clínica com o primeiro registo de Gravidez no período de inclusão
    *     (“Data Consulta Grávida” >= “Data Fim de Revisão” menos (-) 12 meses mais (+) 1 dia e “Data
    *     fim de Revisão” menos (-) 9 meses), ou seja, “Data Resultado de CD4” menos a “Data Primeira
-   *     Gravidez” <=33 dias.
+   *     Gravidez” <=33 dias <b>Nota: caso o resultado do CD4 esteja registado na consulta clínica
+   *     com o primeiro registo de Gravidez deve ser considerado</b>
    *
    * @return {@link CohortDefinition}
    */
