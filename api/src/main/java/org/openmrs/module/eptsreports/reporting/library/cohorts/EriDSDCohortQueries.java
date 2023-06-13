@@ -1815,7 +1815,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "Age",
         EptsReportUtils.map(
-            ageCohortQueries.createXtoYAgeCohort("greaterThan5", 5, 900),
+            ageCohortQueries.createXtoYAgeCohort("greaterThan5", 5, 9),
             "effectiveDate=${endDate}"));
 
     cd.addSearch(
