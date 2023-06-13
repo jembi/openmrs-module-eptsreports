@@ -19,6 +19,7 @@ import org.openmrs.module.eptsreports.reporting.calculation.melhoriaQualidade.Th
 import org.openmrs.module.eptsreports.reporting.cohort.definition.CalculationCohortDefinition;
 import org.openmrs.module.eptsreports.reporting.library.queries.QualityImprovement2020Queries;
 import org.openmrs.module.eptsreports.reporting.library.queries.ViralLoadQueries;
+import org.openmrs.module.eptsreports.reporting.utils.EptsQueriesUtil;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportConstants.MIMQ;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -4975,7 +4976,7 @@ public class QualityImprovement2020CohortQueries {
             b2New,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.addSearch("RESTARTED", EptsReportUtils.map(restartded, MAPPING));
+    compositionCohortDefinition.addSearch("RESTARTED", EptsReportUtils.map(restartded, MAPPING1));
 
     compositionCohortDefinition.addSearch(
         "ABANDONEDTARV", EptsReportUtils.map(abandonedExclusionInTheLastSixMonths, MAPPING1));
@@ -10839,6 +10840,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("All patients who restarted TARV for at least 6 months");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -10848,7 +10850,12 @@ public class QualityImprovement2020CohortQueries {
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
     map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
 
-    String query = QualityImprovement2020Queries.getRestartedArtQuery();
+    EptsQueriesUtil patientBuilder = new EptsQueriesUtil();
+
+    String query =
+        patientBuilder
+            .patientIdQueryBuilder(QualityImprovement2020Queries.getRestartedArtQuery())
+            .getQuery();
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
