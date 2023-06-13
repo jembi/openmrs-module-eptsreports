@@ -91,6 +91,7 @@ public class CommonQueries {
             + "  AND (pp.date_completed IS NULL "
             + "       OR pp.date_completed >   :endDate) "
             + "  AND p.voided=0 "
+            + "  AND pp.voided=0 "
             + "GROUP BY p.patient_id "
             + "UNION "
             + "  SELECT p.patient_id "
