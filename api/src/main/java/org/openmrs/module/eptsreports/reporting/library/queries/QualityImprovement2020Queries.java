@@ -2309,7 +2309,7 @@ public class QualityImprovement2020Queries {
         + "                                          INNER JOIN obs o "
         + "                                                     ON o.encounter_id = e.encounter_id "
         + "                               WHERE  e.encounter_type IN( ${6}, ${9} ) "
-        + "                                 AND e.encounter_datetime <= :endDate "
+        + "                                 AND e.encounter_datetime <= :revisionEndDate "
         + "                                 AND e.location_id = :location "
         + "                                 AND e.voided = 0 "
         + "                                 AND p.voided = 0 "
@@ -2326,8 +2326,8 @@ public class QualityImprovement2020Queries {
         + "          AND e.encounter_datetime <= :endDate "
         + "          AND e.location_id = :location "
         + "        GROUP  BY p.patient_id) restarted "
-        + "WHERE  Timestampdiff(month, restarted.last_consultation_date, "
-        + "                     restarted.the_time) >= 6";
+        + "WHERE  Timestampdiff(month, restarted.the_time,  "
+        + "                  restarted.last_consultation_date   ) >= 6";
   }
 
   /**
