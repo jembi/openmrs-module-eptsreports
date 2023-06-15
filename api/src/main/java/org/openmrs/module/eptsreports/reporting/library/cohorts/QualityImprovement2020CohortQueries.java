@@ -7623,7 +7623,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 2) {
       comp.setCompositionString("Den2 AND VL2Pedidos");
     } else if (num == 3) {
-      comp.setCompositionString("Den3  AND VLFL");
+      comp.setCompositionString("VLFL");
     } else if (num == 4) {
       comp.setCompositionString("Den4 AND LOWVLFL");
     } else if (num == 5 || num == 6) {
@@ -11486,7 +11486,13 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "SELECT two_dispensations.patient_id "
-            + "FROM   (SELECT patient_id, MIN(encounter_datetime) first_date, MAX(encounter_datetime) second_date "
+            + "FROM  ( "
+            + "SELECT p.patient_id, MIN(e.encounter_datetime) second_date "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN "
+            + " (SELECT patient_id, MIN(encounter_datetime) first_date "
             + "        FROM   (SELECT p.patient_id, e.encounter_datetime "
             + "                FROM   patient p "
             + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -11560,9 +11566,17 @@ public class QualityImprovement2020CohortQueries {
             + "                                                   AND o.voided = 0 "
             + "                                               GROUP  BY p.patient_id) most_recent "
             + "                                     GROUP  BY most_recent.patient_id) dispensation "
-            + "                                     WHERE  dispensation.patient_id = p.patient_id)) investigations "
-            + "                               GROUP  BY investigations.patient_id "
-            + "                                HAVING COUNT(investigations.encounter_datetime) >= 2) two_dispensations "
+            + "                                     WHERE  dispensation.patient_id = p.patient_id) GROUP BY patient_id )  first_dispensation GROUP BY first_dispensation.patient_id)"
+            + "                                     first_investigation ON first_investigation.patient_id = p.patient_id "
+            + "                                 WHERE e.encounter_type = ${6} "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND o.concept_id = ${23722} "
+            + "                                 AND o.value_coded = ${856} "
+            + "                                 AND e.encounter_datetime > first_investigation.first_date "
+            + "                                 AND e.encounter_datetime <= :revisionEndDate "
+            + "                                 GROUP BY p.patient_id ) two_dispensations"
             + "       INNER JOIN (SELECT p.patient_id, e.encounter_datetime AS vl_date "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -11577,7 +11591,6 @@ public class QualityImprovement2020CohortQueries {
             + "       AND vl_result.vl_date < :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
-
     cd.setQuery(sb.replace(query));
 
     return cd;
