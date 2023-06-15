@@ -2666,7 +2666,7 @@ public class QualityImprovement2020CohortQueries {
       }
       if (indicatorFlag == 2 || indicatorFlag == 4 || indicatorFlag == 7) {
         compositionCohortDefinition.addSearch(
-            "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING8));
+            "B1", EptsReportUtils.map(patientsFromFichaClinicaLinhaTerapeutica, MAPPING5));
 
         compositionCohortDefinition.addSearch(
             "B2", EptsReportUtils.map(patientsFromFichaClinicaCargaViral, MAPPING8));
