@@ -7184,7 +7184,7 @@ public class QualityImprovement2020CohortQueries {
     // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
     // data do 2o pedido de CV e Data de Revisao
     CohortDefinition VLFL =
-        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(mdsConcepts);
+        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecondVLRequest(mdsConcepts);
 
     comp.addSearch(
         "MDSHa24Meses",
@@ -7488,7 +7488,7 @@ public class QualityImprovement2020CohortQueries {
 
     // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
     // data do 2o pedido de CV e Data de Revisao
-    CohortDefinition VLFL = getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(concepts);
+    CohortDefinition VLFL = getPatientsWhoHadVLResultOnLaboratoryFormAfterSecondVLRequest(concepts);
 
     CohortDefinition LOWVLFL =
         getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecudondVLRequest(concepts);
@@ -11468,7 +11468,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(
+  public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecondVLRequest(
       List<Integer> dispensationTypes) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -11600,7 +11600,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result  ON two_dispensations.patient_id = vl_result.patient_id "
             + "WHERE  vl_result.vl_date > two_dispensations.second_date "
-            + "       AND vl_result.vl_date < :revisionEndDate";
+            + "       AND vl_result.vl_date <= :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
     cd.setQuery(sb.replace(query));
