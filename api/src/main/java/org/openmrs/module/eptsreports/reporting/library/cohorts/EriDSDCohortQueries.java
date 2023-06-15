@@ -2118,7 +2118,14 @@ public class EriDSDCohortQueries {
             DsdQueries.getTranferredInPatients(),
             "onOrAfter=${endDate-3m},onOrBefore=${endDate},location=${location}"));
 
-    cd.setCompositionString("treatmentInterruption AND filaOrDrugPickup AND NOT transferredIn");
+    cd.addSearch(
+        "B13",
+        EptsReportUtils.map(
+            resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString(
+        "(B13 and treatmentInterruption AND filaOrDrugPickup) AND NOT transferredIn");
 
     return cd;
   }
