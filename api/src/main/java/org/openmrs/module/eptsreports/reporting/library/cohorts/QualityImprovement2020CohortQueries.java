@@ -7623,7 +7623,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 2) {
       comp.setCompositionString("Den2 AND VL2Pedidos");
     } else if (num == 3) {
-      comp.setCompositionString("VLFL");
+      comp.setCompositionString("Den3 AND VLFL");
     } else if (num == 4) {
       comp.setCompositionString("Den4 AND LOWVLFL");
     } else if (num == 5 || num == 6) {
