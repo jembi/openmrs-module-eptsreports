@@ -1128,7 +1128,7 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addSearch(
         "RESTARTED",
         EptsReportUtils.map(
-            restartdedExclusion, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            restartdedExclusion, "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "RESTARTEDTARV",
@@ -2776,7 +2776,7 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addSearch(
         "RESTARTED",
         EptsReportUtils.map(
-            restartdedExclusion, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            restartdedExclusion, "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "RESTARTEDTARV",
