@@ -7491,7 +7491,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition VLFL = getPatientsWhoHadVLResultOnLaboratoryFormAfterSecondVLRequest(concepts);
 
     CohortDefinition LOWVLFL =
-        getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecudondVLRequest(concepts);
+        getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecondVLRequest(concepts);
 
     // Pacientes com pedidos de investigações depois de DT
     List<Integer> dtConcept = Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId());
@@ -11342,7 +11342,7 @@ public class QualityImprovement2020CohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition
-      getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecudondVLRequest(
+  getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecondVLRequest(
           List<Integer> dispensationTypes) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
