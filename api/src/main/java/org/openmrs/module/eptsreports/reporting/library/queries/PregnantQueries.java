@@ -216,7 +216,9 @@ public class PregnantQueries {
             + etvProgram
             + "      AND ps.state= "
             + gaveBirthPatientState
-            + "      AND pp.voided=0 AND ";
+            + "      AND pp.voided=0 "
+            + "      AND ps.voided=0 "
+            + "      AND ";
     if (dsd) {
       query += " ps.start_date BETWEEN DATE_SUB(:endDate, INTERVAL 18 MONTH) AND :endDate ";
     } else {
