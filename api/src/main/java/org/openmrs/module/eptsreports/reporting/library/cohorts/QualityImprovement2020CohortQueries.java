@@ -10677,6 +10677,7 @@ public class QualityImprovement2020CohortQueries {
     cd.setName("All patients who abandoned TARV on Art Restart Date");
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     cd.setQuery(
