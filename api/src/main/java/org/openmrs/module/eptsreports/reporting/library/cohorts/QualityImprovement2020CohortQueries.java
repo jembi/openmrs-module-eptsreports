@@ -5288,7 +5288,7 @@ public class QualityImprovement2020CohortQueries {
     if (den) {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 OR D) AND PrimeiraLinha) AND NOT C AND age");
+            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT C");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND age");
@@ -5302,7 +5302,7 @@ public class QualityImprovement2020CohortQueries {
     } else {
       if (line == 1) {
         compositionCohortDefinition.setCompositionString(
-            "((B1 OR D) AND PrimeiraLinha) AND NOT C AND G AND age");
+            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT C AND G");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND G AND age");
