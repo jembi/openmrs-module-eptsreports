@@ -3401,10 +3401,10 @@ public class IntensiveMonitoringCohortQueries {
 
     if (flag == 1 || flag == 3) {
       cd.setCompositionString(
-          "A AND requestCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+          "((A OR breastfeedingOnPeriod OR D) AND requestCd4) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     } else if (flag == 2 || flag == 4) {
       cd.setCompositionString(
-          "A AND resultCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+          "((A OR breastfeedingOnPeriod OR D) AND resultCd4) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     }
 
     return cd;
