@@ -11822,7 +11822,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 AND e.location_id = :location) max_vl_date "
             + "                                                 GROUP  BY patient_id "
             + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
-            + "                 WHERE  ee.encounter_datetime BETWEEN Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) AND  DATE_ADD( vl_date_tbl.vl_max_date,INTERVAL - 1 DAY) "
+            + "                 WHERE  ee.encounter_datetime BETWEEN Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) AND  vl_date_tbl.vl_max_date "
             + "                 AND oo.concept_id = ${165174} "
             + "                 AND oo.voided = 0 "
             + "                 AND ee.voided = 0 "
@@ -11844,7 +11844,6 @@ public class QualityImprovement2020CohortQueries {
             + "	GROUP BY   pp.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
-
     cd.setQuery(sb.replace(query));
 
     return cd;
