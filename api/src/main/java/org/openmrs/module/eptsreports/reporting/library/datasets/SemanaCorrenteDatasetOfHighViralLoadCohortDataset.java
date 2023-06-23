@@ -192,7 +192,6 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
             "startDate=${startDate},endDate=${endDate},location=${location}",
             null);
 
-    // 15 -  - Sheet 2: Column O
 
 
 
