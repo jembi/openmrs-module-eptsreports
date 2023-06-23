@@ -176,6 +176,26 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
         "endDate=${generationDate},location=${location}",
         new StoYesAndNtoNoConverter());
 
+
+    // 13 - Date of the VL Result reception - Sheet 2: Column M
+    pdd.addColumn(
+            "result_reception_date",
+            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(true),
+            "startDate=${startDate},endDate=${endDate},location=${location}",
+            null);
+
+
+    // 14 - The first VL Result > 1000 - Sheet 2: Column N
+    pdd.addColumn(
+            "vl_result",
+            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(false),
+            "startDate=${startDate},endDate=${endDate},location=${location}",
+            null);
+
+    // 15 -  - Sheet 2: Column O
+
+
+
     return pdd;
   }
 
