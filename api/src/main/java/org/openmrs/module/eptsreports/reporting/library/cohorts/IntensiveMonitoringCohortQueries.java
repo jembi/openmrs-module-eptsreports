@@ -2662,6 +2662,7 @@ public class IntensiveMonitoringCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition getMI13DEN1() {
+
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
