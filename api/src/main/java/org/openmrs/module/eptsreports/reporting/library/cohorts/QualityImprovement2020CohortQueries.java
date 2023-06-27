@@ -84,7 +84,6 @@ public class QualityImprovement2020CohortQueries {
   private final String MAPPING10 =
       "startDate=${revisionEndDate-5m+1d},endDate=${revisionEndDate-4m},revisionEndDate=${revisionEndDate},location=${location}";
 
-
   @Autowired
   public QualityImprovement2020CohortQueries(
       GenericCohortQueries genericCohortQueries,
