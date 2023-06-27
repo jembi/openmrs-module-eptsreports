@@ -847,7 +847,7 @@ public class TXTBCohortQueries {
         "marked-as-tratamento-tb-inicio",
         EptsReportUtils.map(
             getMarkedAsTratamentoTBInicio(),
-            "startDate=${startDate-6m},endDate=${startDate-1d},location=${location}"));
+            "startDate=${endDate-1095d},endDate=${endDate},location=${location}"));
     cd.addSearch(
         "in-tb-program",
         EptsReportUtils.map(
