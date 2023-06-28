@@ -2938,8 +2938,9 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "ABANDONED",
         EptsReportUtils.map(
-            getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            qualityImprovement2020CohortQueries
+                .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("B2 AND NOT ABANDONED");
 
@@ -2978,8 +2979,9 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "ABANDONED",
         EptsReportUtils.map(
-            getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            qualityImprovement2020CohortQueries
+                .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
 
