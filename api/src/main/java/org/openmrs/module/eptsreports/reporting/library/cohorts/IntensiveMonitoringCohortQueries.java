@@ -2728,6 +2728,8 @@ public class IntensiveMonitoringCohortQueries {
     CohortDefinition abandonedExclusionFirstLine =
         qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnFirstLineDate();
 
+    CohortDefinition PrimeiraLinha = qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha();
+
     compositionCohortDefinition.addSearch(
         "age",
         EptsReportUtils.map(
@@ -2793,8 +2795,14 @@ public class IntensiveMonitoringCohortQueries {
             abandonedExclusionFirstLine,
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
+    compositionCohortDefinition.addSearch(
+        "PrimeiraLinha",
+        EptsReportUtils.map(
+            PrimeiraLinha,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
     compositionCohortDefinition.setCompositionString(
-        "(B1 AND age OR D AND ((B2NEW AND NOT ABANDONEDTARV) OR ((RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE)) AND NOT B5E) AND NOT C");
+        "(((B1 AND age) OR D) AND PrimeiraLinha AND NOT C");
 
     return compositionCohortDefinition;
   }
@@ -2930,8 +2938,9 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "ABANDONED",
         EptsReportUtils.map(
-            getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            qualityImprovement2020CohortQueries
+                .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("B2 AND NOT ABANDONED");
 
@@ -2970,8 +2979,9 @@ public class IntensiveMonitoringCohortQueries {
     cd.addSearch(
         "ABANDONED",
         EptsReportUtils.map(
-            getPatientsWhoAbandonedTarvOnFirstPregnancyStateDate(),
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            qualityImprovement2020CohortQueries
+                .getPatientsWhoAbandonedOrRestartedTarvOnLast3MonthsArt(),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     cd.setCompositionString("(B2 AND NOT ABANDONED) AND J");
 
