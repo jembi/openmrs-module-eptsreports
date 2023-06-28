@@ -2114,6 +2114,82 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     return spdd;
   }
 
+
+
+
+
+  /**
+   * <b>The system will identify patients with and expected follow-up date that falls between the report and date and report end date + 7 days </b>
+   *
+   *
+   * @return {@link DataDefinition}
+   */
+
+  public DataDefinition getPatientsWithAnExpectedFollowUpDuringTheWeek() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Patients with an expected follow-up during the week");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+            "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+            "SELECT mosnter.patient_id, monster.expected_date "
+                    + "FROM ("
+                    + " SELECT inclusion1.patient_id, inclusion1.expected_date from ("
+                    +getExpectedClinicalOrApssConsultationDate()
+                    + " ) inclusion1 "
+                    + " WHERE inclusion1.patient_id NOT IN ("
+                    +getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(true)
+                    + " ) exclusion1 "
+                    + "UNION "
+                    + " SELECT inclusion2.patient_id from ("
+                    +getExpectedClinicalOrApssConsultationDate()
+                    + " ) inclusion2 "
+                    + " WHERE inclusion2.patient_id NOT IN ("
+                    +getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(false)
+                    + " ) exclusion2 "
+                    + " UNION "
+                    + " SELECT inclusion3.patient_id from ("
+                    +getExpectedApssSessionOneConsultationDate()
+                    + " ) inclusion3 "
+                    + " WHERE inclusion3.patient_id NOT IN ("
+                    +getFirstRegisteredApssAfterApssSessionZeroConsultationDate()
+                    + " ) exclusion3 "
+                    + " UNION "
+                    + " SELECT inclusion4.patient_id from ("
+                    +getExpectedApssSessionTwoConsultationDate()
+                    + " ) exclusion4 "
+                    + " WHERE inclusion4.patient_id NOT IN ("
+
+
+
+
+
+
+                    + " ) mosnter"
+                  ;
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+
+
+
+
   /**
    * <b>Patients with unsuppressed VL Result</b>
    *
