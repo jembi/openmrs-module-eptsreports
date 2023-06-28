@@ -3519,6 +3519,14 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.cryotherapyConceptUuid</property>
+		<defaultValue>0fe11796-b363-46c6-a594-c58d8858d3b7</defaultValue>
+		<description>
+			UUID for Cryotherapy Concept
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

@@ -1615,7 +1615,7 @@ public class EriDSDCohortQueries {
             getPatientsWhoAreStableA(atLeastXMonthsOnART),
             "onOrBefore=${endDate},location=${location}"));
     cd.addSearch(
-        "B",
+        "vlLess1000",
         EptsReportUtils.map(
             getPatientsWithViralLoadLessThan1000Within12Months(),
             "endDate=${endDate},location=${location}"));
@@ -1649,7 +1649,7 @@ public class EriDSDCohortQueries {
         EptsReportUtils.map(
             hivCohortQueries.getPatientsViralLoadWithin12Months(),
             "endDate=${endDate},location=${location}"));
-    cd.setCompositionString("A AND (B OR (C AND NOT patientsWithViralLoad)) AND NOT F");
+    cd.setCompositionString("A AND (vlLess1000 OR (C AND NOT patientsWithViralLoad)) AND NOT F");
 
     return cd;
   }
@@ -1815,7 +1815,7 @@ public class EriDSDCohortQueries {
     cd.addSearch(
         "Age",
         EptsReportUtils.map(
-            ageCohortQueries.createXtoYAgeCohort("greaterThan5", 5, 900),
+            ageCohortQueries.createXtoYAgeCohort("greaterThan5", 5, 9),
             "effectiveDate=${endDate}"));
 
     cd.addSearch(
@@ -1958,8 +1958,8 @@ public class EriDSDCohortQueries {
             + "            INNER JOIN obs o  "
             + "                    ON e.encounter_id=o.encounter_id  "
             + "        WHERE e.encounter_type IN (${adultoSeguimento},${pediatriaSeguimento},${misauLaboratorio},${fsr} )  "
-            + "            AND  o.concept_id IN (${hivViralLoad},${hivViralLoadQualitative} )  "
-            + "            AND e.encounter_datetime  "
+            + "            AND o.concept_id IN (${hivViralLoad},${hivViralLoadQualitative} )  "
+            + "            AND CAST(e.encounter_datetime AS DATE)  "
             + "                        BETWEEN date_add(:endDate, interval -12 MONTH) AND :endDate "
             + "            AND e.location_id=  :location "
             + "            AND p.voided=0  "
@@ -1974,7 +1974,7 @@ public class EriDSDCohortQueries {
             + "            INNER JOIN obs o  "
             + "                    ON o.encounter_id=e.encounter_id  "
             + "        WHERE e.encounter_type=${masterCard} "
-            + "            AND o.concept_id = ${hivViralLoad} "
+            + "            AND o.concept_id IN (${hivViralLoad},${hivViralLoadQualitative} )  "
             + "            AND  o.obs_datetime  "
             + "                        BETWEEN date_add(:endDate, interval -12 MONTH) AND :endDate  "
             + "            AND e.location_id=  :location  "
@@ -1999,7 +1999,7 @@ public class EriDSDCohortQueries {
             + "        AND e.location_id= :location "
             + "AND (  "
             + "                                       (e.encounter_type IN (${adultoSeguimento},${pediatriaSeguimento},${misauLaboratorio},${fsr})   "
-            + "                                             AND e.encounter_datetime    "
+            + "                                             AND CAST(e.encounter_datetime AS DATE)   "
             + "                        BETWEEN date_add(:endDate, interval -12 MONTH) AND :endDate  "
             + "                                           AND e.encounter_datetime = vl_max.max_date )  "
             + "                           OR   "

@@ -90,7 +90,8 @@ public class CommonCohortQueries {
             hivMetadata.getStartDrugs().getConceptId(),
             hivMetadata.getContinueRegimenConcept().getConceptId(),
             hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
-            tbMetadata.getPulmonaryTB().getConceptId()));
+            tbMetadata.getPulmonaryTB().getConceptId(),
+            hivMetadata.getOtherDiagnosis().getConceptId()));
 
     return cd;
   }

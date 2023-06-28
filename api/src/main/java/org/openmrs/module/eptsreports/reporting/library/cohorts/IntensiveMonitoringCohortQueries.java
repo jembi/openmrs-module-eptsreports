@@ -31,6 +31,8 @@ public class IntensiveMonitoringCohortQueries {
 
   private TbMetadata tbMetadata;
 
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
+
   private GenericCohortQueries genericCohortQueries;
 
   private final String MAPPING2 =
@@ -48,13 +50,15 @@ public class IntensiveMonitoringCohortQueries {
       CommonCohortQueries commonCohortQueries,
       CommonMetadata commonMetadata,
       TbMetadata tbMetadata,
-      GenericCohortQueries genericCohortQueries) {
+      GenericCohortQueries genericCohortQueries,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.qualityImprovement2020CohortQueries = qualityImprovement2020CohortQueries;
     this.hivMetadata = hivMetadata;
     this.commonCohortQueries = commonCohortQueries;
     this.commonMetadata = commonMetadata;
     this.tbMetadata = tbMetadata;
     this.genericCohortQueries = genericCohortQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   @PostConstruct
@@ -1124,13 +1128,14 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addSearch(
         "RESTARTED",
         EptsReportUtils.map(
-            restartdedExclusion, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            restartdedExclusion,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "RESTARTEDTARV",
         EptsReportUtils.map(
             abandonedExclusionByTarvRestartDate,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONEDTARV",
@@ -2357,7 +2362,7 @@ public class IntensiveMonitoringCohortQueries {
             + "                  INNER JOIN encounter e on p.patient_id = e.patient_id INNER JOIN obs o ON o.encounter_id=e.encounter_id "
             + "         WHERE p.voided = 0 AND e.voided = 0 AND e.location_id =:location AND e.encounter_type = ${6} "
             + "         AND ( ( o.concept_id=${856} AND o.value_numeric < 1000 ) OR (o.concept_id = ${1305} and o.value_coded is not null)) "
-            + "     ) juncao "
+            + "     GROUP BY p.patient_id) juncao "
             + " INNER JOIN( SELECT p.patient_id, MAX(e.encounter_datetime) AS last_consultation_date   "
             + "            FROM  patient p INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "            WHERE  p.voided = 0 AND e.voided = 0 AND e.location_id =:location AND e.encounter_type = ${6} "
@@ -2657,6 +2662,7 @@ public class IntensiveMonitoringCohortQueries {
    * @return CohortDefinition
    */
   public CohortDefinition getMI13DEN1() {
+
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -2772,13 +2778,14 @@ public class IntensiveMonitoringCohortQueries {
     compositionCohortDefinition.addSearch(
         "RESTARTED",
         EptsReportUtils.map(
-            restartdedExclusion, "startDate=${startDate},endDate=${endDate},location=${location}"));
+            restartdedExclusion,
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "RESTARTEDTARV",
         EptsReportUtils.map(
             abandonedExclusionByTarvRestartDate,
-            "startDate=${startDate},endDate=${endDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE",
@@ -2787,7 +2794,7 @@ public class IntensiveMonitoringCohortQueries {
             "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
-        "(B1 AND ((B2NEW AND NOT ABANDONEDTARV) OR ((RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE)) AND NOT B5E) AND NOT (C OR D) AND age");
+        "(B1 AND age OR D AND ((B2NEW AND NOT ABANDONEDTARV) OR ((RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE)) AND NOT B5E) AND NOT C");
 
     return compositionCohortDefinition;
   }
@@ -3207,7 +3214,7 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getMOHPregnantORBreastfeedingOnClinicalConsultation(
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
+            "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     cd.addSearch(
         "breastfeedingOnPeriod",
@@ -3215,10 +3222,10 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getMOHPregnantORBreastfeedingOnClinicalConsultation(
                 commonMetadata.getBreastfeeding().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
+            "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     cd.setCompositionString(
-        "A AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+        "((A OR breastfeedingOnPeriod OR D) AND NOT (C OR E OR pregnantOnPeriod)) AND AGE");
     return cd;
   }
 
@@ -3384,21 +3391,21 @@ public class IntensiveMonitoringCohortQueries {
             qualityImprovement2020CohortQueries.getMOHPregnantORBreastfeedingOnClinicalConsultation(
                 commonMetadata.getPregnantConcept().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
+            "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
     cd.addSearch(
         "breastfeedingOnPeriod",
         EptsReportUtils.map(
             qualityImprovement2020CohortQueries.getMOHPregnantORBreastfeedingOnClinicalConsultation(
                 commonMetadata.getBreastfeeding().getConceptId(),
                 hivMetadata.getYesConcept().getConceptId()),
-            inclusionPeriodMappings));
+            "revisionEndDate={revisionEndDate},startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     if (flag == 1 || flag == 3) {
       cd.setCompositionString(
-          "A AND requestCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+          "((A OR breastfeedingOnPeriod OR D) AND requestCd4) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     } else if (flag == 2 || flag == 4) {
       cd.setCompositionString(
-          "A AND resultCd4 AND NOT (C OR D OR E OR pregnantOnPeriod OR breastfeedingOnPeriod) AND AGE");
+          "((A OR breastfeedingOnPeriod OR D) AND resultCd4) AND NOT (C OR E OR pregnantOnPeriod) AND AGE");
     }
 
     return cd;
@@ -3476,6 +3483,65 @@ public class IntensiveMonitoringCohortQueries {
     } else if (flag == 6) {
       cd.setCompositionString("(pregnantOnPeriod AND resultCd4ForPregnant) AND NOT transferredIn");
     }
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsOnMICat18Denominator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Cat 18 Denominator");
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition startedArt = qualityImprovement2020CohortQueries.getMOHArtStartDate();
+    CohortDefinition inTarv = resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13();
+    CohortDefinition transferredIn =
+        QualityImprovement2020Queries.getTransferredInPatients(
+            hivMetadata.getMasterCardEncounterType().getEncounterTypeId(),
+            commonMetadata.getTransferFromOtherFacilityConcept().getConceptId(),
+            hivMetadata.getPatientFoundYesConcept().getConceptId(),
+            hivMetadata.getTypeOfPatientTransferredFrom().getConceptId(),
+            hivMetadata.getArtStatus().getConceptId());
+
+    cd.addSearch(
+        "startedArt",
+        EptsReportUtils.map(
+            startedArt, "startDate=${endDate-14m+1d},endDate=${endDate-13m},location=${location}"));
+
+    cd.addSearch("inTarv", EptsReportUtils.map(inTarv, "endDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "transferredIn",
+        EptsReportUtils.map(
+            transferredIn, "startDate=${endDate},endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(startedArt AND inTarv) AND NOT transferredIn");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsOnMICat18Numerator() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Cat 18 Numerator");
+    cd.addParameter(new Parameter("revisionEndDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    CohortDefinition denominator = getPatientsOnMICat18Denominator();
+    CohortDefinition diagnose =
+        QualityImprovement2020Queries.getDisclosureOfHIVDiagnosisToChildrenAdolescents();
+
+    cd.addSearch(
+        "denominator",
+        EptsReportUtils.map(denominator, "endDate=${revisionEndDate},location=${location}"));
+
+    cd.addSearch(
+        "diagnose",
+        EptsReportUtils.map(
+            diagnose,
+            "startDate=${revisionEndDate-14m+1d},endDate=${revisionEndDate-13m},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    cd.setCompositionString("denominator AND diagnose");
 
     return cd;
   }

@@ -55,7 +55,7 @@ public class CXCASCRNQueries {
       query.append("    AND o.value_coded = ${2093}  ");
     }
     if (cxcascrnResult == CXCASCRNCohortQueries.CXCASCRNResult.ANY) {
-      query.append("    AND o.value_coded IS NOT NULL ");
+      query.append("    AND o.value_coded IN (${2093}, ${664}, ${703}) ");
     }
     if (isAA1) {
       query.append("    AND e.encounter_datetime < :onOrAfter ");

@@ -60,10 +60,10 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
             cohort,
             location,
             Arrays.asList(c23972),
-            TimeQualifier.ANY,
+            TimeQualifier.LAST,
             startDate,
             endDate,
-            EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
+            EPTSMetadataDatetimeQualifier.OBS_DATETIME,
             context);
 
     CalculationResultMap b7Map =
@@ -73,10 +73,10 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
             cohort,
             location,
             Arrays.asList(c23970, c23973),
-            TimeQualifier.ANY,
+            TimeQualifier.LAST,
             startDate,
             endDate,
-            EPTSMetadataDatetimeQualifier.VALUE_DATETIME,
+            EPTSMetadataDatetimeQualifier.OBS_DATETIME,
             context);
 
     for (Integer pId : cohort) {
@@ -88,34 +88,45 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
       /** handling treatments in the same date */
       // handling b7
       if (treatmentType == TreatmentType.B7 && b7Obs != null) {
-        map.put(pId, new SimpleResult(b7Obs.getValueDatetime(), this));
+        map.put(pId, new SimpleResult(b7Obs.getObsDatetime(), this));
       }
       // handling b6
-      if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs != null) {
-        if (b6Obs.getValueDatetime().compareTo(b7Obs.getValueDatetime()) == 0) {
-          continue;
-        } else {
-          map.put(pId, new SimpleResult(b6Obs.getValueDatetime(), this));
+      if (treatmentType == TreatmentType.B6 && b5Date != null && b6Obs != null && b7Obs != null) {
+        if (b6Obs.getObsDatetime().compareTo(b5Date) < 0
+            && b6Obs.getObsDatetime().compareTo(b7Obs.getObsDatetime()) < 0) {
+          map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
         }
       }
-      if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs == null) {
-        map.put(pId, new SimpleResult(b6Obs.getValueDatetime(), this));
+      if (treatmentType == TreatmentType.B6 && b5Date != null && b6Obs != null && b7Obs == null) {
+        if (b6Obs.getObsDatetime().compareTo(b5Date) <= 0) {
+          map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
+        }
+      }
+      if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs != null) {
+        if (b6Obs.getObsDatetime().compareTo(b7Obs.getObsDatetime()) == 0) {
+          continue;
+        } else {
+          map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
+        }
+      }
+      if (treatmentType == TreatmentType.B6 && b6Obs != null && b7Obs == null && b5Date == null) {
+        map.put(pId, new SimpleResult(b6Obs.getObsDatetime(), this));
       }
       // handling b5
       if (treatmentType == TreatmentType.B5 && b5Date != null && b6Obs != null && b7Obs != null) {
-        if (b5Date.compareTo(b7Obs.getValueDatetime()) == 0) {
+        if (b5Date.compareTo(b7Obs.getObsDatetime()) == 0) {
           continue;
         }
-        if (b5Date.compareTo(b6Obs.getValueDatetime()) == 0) {
+        if (b5Date.compareTo(b6Obs.getObsDatetime()) == 0) {
           continue;
         }
-        if (b5Date.compareTo(b6Obs.getValueDatetime()) != 0
-            && b5Date.compareTo(b7Obs.getValueDatetime()) != 0) {
+        if (b5Date.compareTo(b6Obs.getObsDatetime()) != 0
+            && b5Date.compareTo(b7Obs.getObsDatetime()) != 0) {
           map.put(pId, new SimpleResult(b5Date, this));
         }
       }
       if (treatmentType == TreatmentType.B5 && b5Date != null && b6Obs != null && b7Obs == null) {
-        if (b5Date.compareTo(b6Obs.getValueDatetime()) == 0) {
+        if (b5Date.compareTo(b6Obs.getObsDatetime()) == 0) {
           continue;
         } else {
           map.put(pId, new SimpleResult(b5Date, this));
@@ -123,7 +134,7 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
       }
 
       if (treatmentType == TreatmentType.B5 && b5Date != null && b6Obs == null && b7Obs != null) {
-        if (b5Date.compareTo(b7Obs.getValueDatetime()) == 0) {
+        if (b5Date.compareTo(b7Obs.getObsDatetime()) == 0) {
           continue;
         } else {
           map.put(pId, new SimpleResult(b5Date, this));
@@ -151,11 +162,11 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("23967", hivMetadata.getCryotherapyDateConcept().getConceptId());
     map.put("2149", hivMetadata.getViaResultOnTheReferenceConcept().getConceptId());
-    map.put("23874", hivMetadata.getPediatricNursingConcept().getConceptId());
+    map.put("23974", hivMetadata.getCryotherapyConcept().getConceptId());
 
     String sql =
         ""
-            + " SELECT p.patient_id, e.encounter_datetime "
+            + " SELECT p.patient_id, e.encounter_datetime  as consultation_date "
             + " FROM patient p "
             + "    INNER JOIN encounter e "
             + "        ON e.patient_id = p.patient_id "
@@ -170,7 +181,11 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
             + "      AND e.encounter_datetime BETWEEN :onOrAfter AND :onOrBefore"
             + "    AND e.location_id = :location"
             + " UNION "
-            + " SELECT p.patient_id, o.value_datetime "
+            + " SELECT p.patient_id,   "
+            + "              CASE   "
+            + "                       WHEN o.value_coded IS NULL THEN o.value_datetime   "
+            + "                       else o.obs_datetime  "
+            + "              end as consultation_date  "
             + " FROM patient p "
             + "    INNER JOIN encounter e "
             + "        ON e.patient_id = p.patient_id "
@@ -182,11 +197,10 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
             + "    AND o.voided = 0 "
             + "    AND e.encounter_type = ${28} "
             + "    AND ( "
-            + "            (o.concept_id = ${23967} ) "
+            + "            (o.concept_id = ${23967} AND o.value_datetime BETWEEN :onOrAfter AND :onOrBefore) "
             + "            OR "
-            + "            (o.concept_id = ${2149} AND o.value_coded = ${23874}) "
+            + "            (o.concept_id = ${2149} AND o.value_coded = ${23974}) "
             + "        )    "
-            + "      AND o.value_datetime BETWEEN :onOrAfter AND :onOrBefore"
             + "    AND e.location_id = :location";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -198,31 +212,5 @@ public class CXCATreatmentHierarchyCalculation extends AbstractPatientCalculatio
     params.put("onOrBefore", context.getFromCache("onOrBefore"));
 
     return EptsCalculationUtils.evaluateWithReporting(def, cohort, params, null, context);
-  }
-
-  private Date pickTheOladestDateDuringThePeriod(Date b5Date, Obs b6Obs, Obs b7Obs) {
-
-    Date oldestDate = null;
-    List<Date> dates = new ArrayList<>();
-
-    if (b5Date != null) {
-      dates.add(b5Date);
-    }
-    if (b6Obs != null) {
-      dates.add(b6Obs.getValueDate());
-    }
-    if (b7Obs != null) {
-      dates.add(b7Obs.getValueDate());
-    }
-    for (Date d : dates) {
-      if (oldestDate == null) {
-        oldestDate = d;
-        continue;
-      }
-      if (oldestDate.compareTo(d) > 0) {
-        oldestDate = d;
-      }
-    }
-    return oldestDate;
   }
 }

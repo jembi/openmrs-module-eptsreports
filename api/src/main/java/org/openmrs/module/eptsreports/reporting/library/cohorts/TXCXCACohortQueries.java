@@ -48,10 +48,6 @@ public class TXCXCACohortQueries {
     CohortDefinition b1 =
         this.cxcascrnCohortQueries.getAA1OrAA2(
             CXCASCRNCohortQueries.CXCASCRNResult.ANY, true, false);
-    CohortDefinition b2 =
-        this.cxcascrnCohortQueries.getAA1OrAA2(
-            CXCASCRNCohortQueries.CXCASCRNResult.ANY, false, false);
-    ;
 
     cd.addSearch("B", EptsReportUtils.map(b, MAPPINGS));
     cd.addSearch(
@@ -59,7 +55,6 @@ public class TXCXCACohortQueries {
         EptsReportUtils.map(
             bb, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
     cd.addSearch("B1", EptsReportUtils.map(b1, "onOrAfter=${startDate},location=${location}"));
-    cd.addSearch("B2", EptsReportUtils.map(b2, "onOrAfter=${startDate},location=${location}"));
 
     cd.setCompositionString("B AND BB AND NOT B1");
     return cd;
@@ -152,6 +147,25 @@ public class TXCXCACohortQueries {
     return cd;
   }
 
+  /**
+   * <b> The system will generate CXCA_TX indicator numerator as number of patients on ART screened
+   * positive (TX_FR2) and who received a treatment type during the reporting period (TX_FR7) with
+   * the specified disaggregation (TX_FR5). </b>
+   *
+   * <p><b> fr7</b> The system will identify women patients who received a treatment type during the
+   * period as follows:
+   * <li>Patients who have Crioterapia Realizada no Mesmo dia que a via=Sim registered in Ficha de
+   *     Registo para Rastreio do Cancro do Colo Uterino between first First VIA Result Positive
+   *     (TX_FR6) and reporting period end date or
+   * <li>Patients who have Data da Realização da Crioterapia occurred in Ficha de Registo para
+   *     Rastreio do Cancro do Colo Uterino between first First VIA Result Positive (TX_FR6) and
+   *     reporting period end date or
+   * <li>Patients who have Resposta = (“Crioterapia Feita” or “Termocoagulação Feita” or “Leep
+   *     Feito” or “Conização Feita”) registered in Ficha de Registo para Rastreio do Cancro do Colo
+   *     Uterino between first First VIA Result Positive (TX_FR6) and reporting period end date.
+   *
+   * @return {@link CohortDefinition}
+   */
   private CohortDefinition getBB() {
     TXCXCACalculation cxcascrnCalculation =
         Context.getRegisteredComponents(TXCXCACalculation.class).get(0);

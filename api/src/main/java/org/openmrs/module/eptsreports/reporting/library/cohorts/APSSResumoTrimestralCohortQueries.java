@@ -1086,7 +1086,7 @@ public class APSSResumoTrimestralCohortQueries {
     return cd;
   }
 
-  private CohortDefinition getFichaAPSSAndMinArtStartDate() {
+  public CohortDefinition getFichaAPSSAndMinArtStartDate() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All Patients Registered In Encounter Ficha APSS AND PP");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -1108,11 +1108,6 @@ public class APSSResumoTrimestralCohortQueries {
     map.put("arvAdherenceRiskConcept", hivMetadata.getArvAdherenceRiskConcept().getConceptId());
     map.put("badConcept", hivMetadata.getBadConcept().getConceptId());
     map.put("artProgram", hivMetadata.getARTProgram().getProgramId());
-    map.put(
-        "transferredFromOtherHealthFacilityWorkflowState",
-        hivMetadata
-            .getTransferredFromOtherHealthFacilityWorkflowState()
-            .getProgramWorkflowStateId());
     map.put(
         "adultoSeguimentoEncounterType",
         hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -1152,7 +1147,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        (o.concept_id = ${adherenceEvaluationConcept} AND o.value_coded IN (${goodConcept}, ${arvAdherenceRiskConcept}, ${badConcept}) )"
             + "        ) "
             + "    AND encounter_datetime "
-            + "        > (SELECT DATE_ADD(min(art_startdate.min_date), INTERVAL 30 DAY) as min_min_date  "
+            + "        >= (SELECT DATE_ADD(min(art_startdate.min_date), INTERVAL 30 DAY) as min_min_date  "
             + "FROM  "
             + "(  "
             + "    SELECT  p.patient_id as patient_id, min(pp.date_enrolled) AS min_date  "
@@ -1168,7 +1163,6 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND ps.voided = 0  "
             + "        AND pp.voided = 0  "
             + "        AND pgr.program_id = ${artProgram}   "
-            + "        AND ps.state = ${transferredFromOtherHealthFacilityWorkflowState}   "
             + "    GROUP BY p.patient_id  "
             + "    UNION  "
             + "    SELECT p.patient_id as patient_id, min(o.value_datetime)  AS min_date  "
@@ -1239,7 +1233,7 @@ public class APSSResumoTrimestralCohortQueries {
             + "        AND o2.concept_id = ${artDatePickupMasterCard} AND o2.value_datetime <= :endDate  "
             + "        GROUP BY p.patient_id  "
             + ") art_startdate   "
-            + "    WHERE art_startdate.patient_id=external.patient_id ) AND encounter_datetime <=:endDate "
+            + "    WHERE art_startdate.patient_id=external.patient_id ) AND encounter_datetime BETWEEN :startDate AND :endDate "
             + "    AND e.location_id = :location";
 
     StringSubstitutor sb = new StringSubstitutor(map);

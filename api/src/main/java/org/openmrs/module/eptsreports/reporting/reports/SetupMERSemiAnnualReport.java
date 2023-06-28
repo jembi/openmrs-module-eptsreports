@@ -5,13 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.CXCASCRNDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.CXCASCRNPositiveDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TXCXCADataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TbPrevDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxMlDataset;
-import org.openmrs.module.eptsreports.reporting.library.datasets.TxTBDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.*;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
@@ -62,7 +56,7 @@ public class SetupMERSemiAnnualReport extends EptsDataExportManager {
     return "PEPFAR MER 2.6.1 Semi-Annual Report";
   }
 
-  @Deprecated
+  @Override
   public ReportDefinition constructReportDefinition() {
     ReportDefinition rd = new ReportDefinition();
     rd.setUuid(getUuid());
@@ -94,8 +88,8 @@ public class SetupMERSemiAnnualReport extends EptsDataExportManager {
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "PEPFAR_MER_2.6_SEMIANNUAL.xls",
-              "PEPFAR MER 2.6 Semi-Annual Report",
+              "Template_PEPFAR_MER_2.6.1_Semiannual_Report_v1.5.2.xls",
+              "PEPFAR MER 2.6.1 Semi-Annual Report",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();

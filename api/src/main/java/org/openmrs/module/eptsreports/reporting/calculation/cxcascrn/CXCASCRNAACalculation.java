@@ -100,7 +100,7 @@ public class CXCASCRNAACalculation extends AbstractPatientCalculation {
     List<Integer> intResults = this.getResultValue(result, hivMetadata);
 
     // getting the obs maps
-    CalculationResultMap finchaCCUResulMap =
+    CalculationResultMap fichaCCUResulMap =
         eptsCalculationService.getObs(
             resultadoViaConcept,
             rastreioDoCancroDoColoUterinoEncounterType,
@@ -114,11 +114,11 @@ public class CXCASCRNAACalculation extends AbstractPatientCalculation {
             context);
 
     for (Integer pId : cohort) {
-      Obs finchaCCU = EptsCalculationUtils.resultForPatient(finchaCCUResulMap, pId);
+      Obs fichaCCU = EptsCalculationUtils.resultForPatient(fichaCCUResulMap, pId);
 
-      if (finchaCCU != null) {
-        if (intResults.contains(finchaCCU.getValueCoded().getConceptId())) {
-          map.put(pId, new SimpleResult(finchaCCU, this));
+      if (fichaCCU != null) {
+        if (intResults.contains(fichaCCU.getValueCoded().getConceptId())) {
+          map.put(pId, new SimpleResult(fichaCCU, this));
         }
         continue;
       }
