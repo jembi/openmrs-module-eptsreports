@@ -4997,8 +4997,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch(
         "B5E",
-        EptsReportUtils.map(
-            B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        EptsReportUtils.map(B5E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.setCompositionString(
         "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5E)");
