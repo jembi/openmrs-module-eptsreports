@@ -2119,8 +2119,8 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
 
   /**
-   * <b>The system will identify patients with and expected follow-up date that falls between the report and date and report end date + 7 days </b>
-   *
+   * <b> The system will identify patients with and expected follow-up date that falls between the report and date and report end date + 7 days </b>
+   * <li> RF39
    *
    * @return {@link DataDefinition}
    */
@@ -2141,6 +2141,17 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     valuesMap.put(
             "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("6223", hivMetadata.getAdherenceEvaluationConcept().getConceptId());
+    valuesMap.put("1383", hivMetadata.getPatientIsDead().getConceptId());
+    valuesMap.put("1385", hivMetadata.getBadConcept().getConceptId());
+    valuesMap.put("1749", hivMetadata.getArvAdherenceRiskConcept().getConceptId());
+    valuesMap.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
+
+
+
+
 
     String query =
             "SELECT mosnter.patient_id, monster.expected_date "
@@ -2151,33 +2162,137 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
                     + " WHERE inclusion1.patient_id NOT IN ("
                     +getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(true)
                     + " ) exclusion1 "
+                    + " GROUP BY inclusion1.patient_id"
                     + "UNION "
-                    + " SELECT inclusion2.patient_id from ("
+                    + " SELECT inclusion2.patient_id, inclusion2.expected_date  from ("
                     +getExpectedClinicalOrApssConsultationDate()
                     + " ) inclusion2 "
                     + " WHERE inclusion2.patient_id NOT IN ("
                     +getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(false)
                     + " ) exclusion2 "
+                    + " GROUP BY inclusion2.patient_id"
                     + " UNION "
-                    + " SELECT inclusion3.patient_id from ("
+                    + " SELECT inclusion3.patient_id, inclusion3.expected_first_session_date as expected_date from ("
                     +getExpectedApssSessionOneConsultationDate()
                     + " ) inclusion3 "
                     + " WHERE inclusion3.patient_id NOT IN ("
                     +getFirstRegisteredApssAfterApssSessionZeroConsultationDate()
                     + " ) exclusion3 "
+                    + " GROUP BY inclusion3.patient_id"
                     + " UNION "
-                    + " SELECT inclusion4.patient_id from ("
+                    + " SELECT inclusion4.patient_id, inclusion4.expected_second_session_date as expected_date from ("
                     +getExpectedApssSessionTwoConsultationDate()
-                    + " ) exclusion4 "
+                    + " ) inclusion4 "
                     + " WHERE inclusion4.patient_id NOT IN ("
-
-
-
-
-
-
+                    +getFirstRegisteredApssAfterApssSessionOneConsultationDate()
+                    + " ) exclusion4 "
+                    + " GROUP BY inclusion4.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion5.patient_id, inclusion5.expected_third_session_date as expected_date from ("
+                    +getExpectedApssSessionThreeConsultationDate()
+                    + " ) inclusion5 "
+                    + " WHERE inclusion5.patient_id NOT IN ("
+                    +getFirstRegisteredApssAfterApssSessionOTwoConsultationDate()
+                    + " ) exclusion5 "
+                    + " GROUP BY inclusion5.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion6.patient_id, inclusion6.expected_date from ("
+                    +getExpectedClinicalConsultationDateAfterApssSessionTwoConsultationDate()
+                    + " ) inclusion6 "
+                    + " WHERE inclusion6.patient_id NOT IN ("
+                    +getRequestForLaboratoryInvestigationsAfterApssSessionTwo()
+                    + " ) exclusion6 "
+                    + " GROUP BY inclusion6.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion7.patient_id, inclusion7.expected_date from ("
+                    +getExpectedClinicalConsultationDateAfterApssSessionTwoConsultationDate()
+                    + " ) inclusion7 "
+                    + " WHERE inclusion7.patient_id NOT IN ("
+                    +getDateOfVLSampleCollectionAfterApssSessionTwoConsultationDate()
+                    + " ) exclusion7 "
+                    + " GROUP BY inclusion7.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion8.patient_id, inclusion8.result_date as expected_date from ("
+                    +getFirstLabOrFsrAfterApssSessionThreeConsultationDate()
+                    + " ) inclusion8 "
+                    + " WHERE inclusion8.patient_id NOT IN ("
+                    +getExpectedResultDateOfFirstLabOrFsrApssSessionThree()
+                    + " ) exclusion8 "
+                    + " GROUP BY inclusion8.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion9.patient_id, inclusion9.expected_date from ("
+                    +getExpectedClinicalConsultationDate()
+                    + " ) inclusion9 "
+                    + " WHERE inclusion9.patient_id NOT IN ("
+                    +getFirstClinicalConsultationAfterSecondHighVLResult()
+                    + " ) exclusion9 "
+                    + " GROUP BY inclusion9.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion10.patient_id, inclusion10.expected_date from ("
+                    +getExpectedApssConsultationAfterSecondHighVLResult()
+                    + " ) inclusion10 "
+                    + " WHERE inclusion10.patient_id NOT IN ("
+                    +getFirstApssConsultationAfterSecondHighVLResult()
+                    + " ) exclusion10 "
+                    + " GROUP BY inclusion10.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion11.patient_id, inclusion11.expected_date from ("
+                    +getExpectedFirstApssConsultationAfterFirstApssSessionZero()
+                    + " ) inclusion11 "
+                    + " WHERE inclusion11.patient_id NOT IN ("
+                    +getFirstApssConsultationAfterFirstApssSessionZero()
+                    + " ) exclusion11 "
+                    + " GROUP BY inclusion11.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion12.patient_id, inclusion12.expected_date from ("
+                    +getExpectedFirstApssConsultationAfterFirstApssSessionOne()
+                    + " ) inclusion12 "
+                    + " WHERE inclusion12.patient_id NOT IN ("
+                    +getFirstApssConsultationAfterFirstApssSessionOne()
+                    + " ) exclusion12 "
+                    + " GROUP BY inclusion12.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion13.patient_id, inclusion13.expected_date from ("
+                    +getExpectedFirstApssConsultationAfterFirstApssSessionTwo()
+                    + " ) inclusion13 "
+                    + " WHERE inclusion13.patient_id NOT IN ("
+                    +getFirstApssConsultationAfterFirstApssSessionTwo()
+                    + " ) exclusion13 "
+                    + " GROUP BY inclusion13.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion14.patient_id, inclusion14.expected_date from ("
+                    +getExpectedFirstApssConsultationAfterFirstApssSessionTwo()
+                    + " ) inclusion14 "
+                    + " WHERE inclusion14.patient_id NOT IN ("
+                    +getRequestForLaboratoryInvestigationsAfterSessionTwo()
+                    + " ) exclusion14 "
+                    + " GROUP BY inclusion14.patient_id"
+                    + "UNION "
+                    + " SELECT inclusion15.patient_id, inclusion15.expected_date from ("
+                    +getExpectedFirstApssConsultationAfterFirstApssSessionTwo()
+                    + " ) inclusion15 "
+                    + " WHERE inclusion15.patient_id NOT IN ("
+                    +getDateOfVLSampleCollectionAfterApssSessionTwo()
+                    + " ) exclusion15 "
+                    + " GROUP BY inclusion15.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion16.patient_id, inclusion16.expected_date from ("
+                    +getPredictedThirdHighVLResultDate()
+                    + " ) inclusion16 "
+                    + " WHERE inclusion16.patient_id NOT IN ("
+                    +getThirdVLResultOrResultDate(true)
+                    + " ) exclusion16 "
+                    + " GROUP BY inclusion16.patient_id"
+                    + " UNION "
+                    + " SELECT inclusion17.patient_id, inclusion17.expected_date from ("
+                    +getExpectedConsultationAfterThirdHighVLResultDate()
+                    + " ) inclusion17 "
+                    + " WHERE inclusion17.patient_id NOT IN ("
+                    +getFirstClinicalConsultationAfterThirdVLResultDate()
+                    + " ) exclusion17 "
+                    + " GROUP BY inclusion17.patient_id"
                     + " ) mosnter"
-                  ;
+                    + " GROUP BY mosnter.patient_id "  ;
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
