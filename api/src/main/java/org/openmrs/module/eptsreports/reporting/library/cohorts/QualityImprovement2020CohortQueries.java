@@ -4931,7 +4931,7 @@ public class QualityImprovement2020CohortQueries {
    * período de revisão.</i> <br>
    * <br>
    */
-  public CohortDefinition getUtentesPrimeiraLinha() {
+  public CohortDefinition getUtentesPrimeiraLinha(String report) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
@@ -4995,10 +4995,17 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));
 
-    compositionCohortDefinition.addSearch(
-        "B5E",
-        EptsReportUtils.map(
-            B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    if (report.equals("MQ")) {
+      compositionCohortDefinition.addSearch(
+          "B5E",
+          EptsReportUtils.map(
+              B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+    } else if (report.equals("MI")) {
+      compositionCohortDefinition.addSearch(
+          "B5E",
+          EptsReportUtils.map(
+              B5E, "startDate=${startDate},endDate=${endDate},location=${location}"));
+    }
 
     compositionCohortDefinition.setCompositionString(
         "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5E)");
@@ -5165,7 +5172,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition G = getMQ13G();
 
-    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha();
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha("MQ");
 
     CohortDefinition SegundaLinha = getUtentesSegundaLinha();
 
@@ -5962,7 +5969,7 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
 
-    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha();
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha("MQ");
 
     compositionCohortDefinition.addSearch(
         "children", EptsReportUtils.map(children, "effectiveDate=${revisionEndDate}"));
