@@ -2729,7 +2729,8 @@ public class IntensiveMonitoringCohortQueries {
         qualityImprovement2020CohortQueries.getPatientsWhoAbandonedTarvOnOnFirstLineDate();
 
     CohortDefinition PrimeiraLinha =
-        qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha("MI");
+        qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha(
+            QualityImprovement2020CohortQueries.UtPrimeiraLPreposition.MI, "DEN");
 
     compositionCohortDefinition.addSearch(
         "age",

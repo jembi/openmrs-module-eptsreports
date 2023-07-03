@@ -4930,9 +4930,13 @@ public class QualityImprovement2020CohortQueries {
    * <i> <b>Nota: “Data Última Consulta” é a data da última consulta clínica ocorrida durante o
    * período de revisão.</i> <br>
    * <br>
+   *
+   * @param preposition composition string and description
    */
-  public CohortDefinition getUtentesPrimeiraLinha(String report) {
+  public CohortDefinition getUtentesPrimeiraLinha(UtPrimeiraLPreposition preposition) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
+
+    compositionCohortDefinition.setName(preposition.getDescription());
 
     compositionCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
     compositionCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
@@ -4966,7 +4970,11 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition abandonedExclusionFirstLine = getPatientsWhoAbandonedTarvOnOnFirstLineDate();
 
-    CohortDefinition B5E =
+    CohortDefinition B5EMQ =
+        commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
+            false, true, 12);
+
+    CohortDefinition B5EMI =
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
 
@@ -4995,22 +5003,48 @@ public class QualityImprovement2020CohortQueries {
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));
 
-    if (report.equals("MQ")) {
-      compositionCohortDefinition.addSearch(
-          "B5E",
-          EptsReportUtils.map(
-              B5E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
-    } else if (report.equals("MI")) {
-      compositionCohortDefinition.addSearch(
-          "B5E",
-          EptsReportUtils.map(
-              B5E, "startDate=${startDate},endDate=${endDate},location=${location}"));
-    }
+    compositionCohortDefinition.addSearch(
+        "B5EMQ",
+        EptsReportUtils.map(
+            B5EMQ, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
 
-    compositionCohortDefinition.setCompositionString(
-        "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5E)");
+    compositionCohortDefinition.addSearch(
+        "B5EMI",
+        EptsReportUtils.map(
+            B5EMI, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    compositionCohortDefinition.setCompositionString(preposition.getCompositionString());
 
     return compositionCohortDefinition;
+  }
+
+  public enum UtPrimeiraLPreposition {
+    MQ {
+      @Override
+      public String getCompositionString() {
+        return "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "Utentes em Primeira Linha For MQ";
+      }
+    },
+    MI {
+      @Override
+      public String getCompositionString() {
+        return "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMI)";
+      }
+
+      @Override
+      public String getDescription() {
+        return "Utentes em Primeira Linha For MI";
+      }
+    };
+
+    public abstract String getCompositionString();
+
+    public abstract String getDescription();
   }
 
   /**
@@ -5172,7 +5206,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition G = getMQ13G();
 
-    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha("MQ");
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtPrimeiraLPreposition.MQ, "NUM");
 
     CohortDefinition SegundaLinha = getUtentesSegundaLinha();
 
@@ -5969,7 +6003,7 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
 
-    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha("MQ");
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtPrimeiraLPreposition.MQ, "DEN");
 
     compositionCohortDefinition.addSearch(
         "children", EptsReportUtils.map(children, "effectiveDate=${revisionEndDate}"));
@@ -6074,6 +6108,34 @@ public class QualityImprovement2020CohortQueries {
       }
     }
     return compositionCohortDefinition;
+  }
+
+  public CohortDefinition getUtentesPrimeiraLinha(
+      QualityImprovement2020CohortQueries.UtPrimeiraLPreposition preposition, String level) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Utentes em Primeira Linha Denominator and Numerator");
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("location", "location", Location.class));
+
+    cd.addSearch(
+        "DEN",
+        EptsReportUtils.map(
+            getUtentesPrimeiraLinha(preposition),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+    cd.addSearch(
+        "NUM",
+        EptsReportUtils.map(
+            getUtentesPrimeiraLinha(preposition),
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
+
+    if (level.equals("DEN")) {
+      cd.setCompositionString("DEN");
+    } else if (level.equals("NUM")) {
+      cd.setCompositionString("NUM");
+    }
+    return cd;
   }
 
   /**
