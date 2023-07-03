@@ -144,6 +144,47 @@ public class HighViralLoadQueries {
     return query;
   }
 
+
+
+  /**
+   * Date of the earliest Laboratory or FSR form with VL Result registered between the 3rd APSS/PP
+   * Consultation Date (value of column Y) and report end date
+   * This query returns the selection tittle
+   */
+  public static String getColumnFQuerySelectionTittle(boolean greaterThan1000) {
+    String query =
+            " SELECT p.patient_id, "
+                    + "       'Repeticao da CV - Segunda Carga Viral - Data do resultado da 2ª CV (Lab ou FSR)' as selection_Tittle"
+                    + "FROM   patient p "
+                    + "       INNER JOIN encounter e "
+                    + "               ON p.patient_id = e.patient_id "
+                    + "       INNER JOIN obs o "
+                    + "               ON e.encounter_id = o.encounter_id "
+                    + "INNER JOIN ( "
+                    + HighViralLoadQueries.getSessionThreeQuery()
+                    + "          ) session_three ON p.patient_id = session_three.patient_id "
+                    + "WHERE  p.voided = 0 "
+                    + "       AND e.voided = 0 "
+                    + "       AND o.voided = 0 "
+                    + "       AND o2.voided = 0 "
+                    + "       AND e.encounter_type IN ( ${13}, ${51} ) "
+                    + "       AND (o.concept_id = ${856} ";
+    if (greaterThan1000) {
+      query += "       AND o.value_numeric >= 1000) ";
+    } else {
+      query += "       AND o.value_numeric IS NOT NULL) ";
+    }
+    query +=
+            "       AND e.location_id = :location "
+                    + "       AND e.encounter_datetime > session_three.third_session_date "
+                    + "       AND e.encounter_datetime <= :endDate "
+                    + "GROUP  BY p.patient_id";
+
+    return query;
+  }
+
+
+
   /**
    * The date of first APSS/PP Consultation Date registered in Ficha APSS/SS between the Second High
    * Viral Load Result Date (HVL_FR22 - value of column AF) and report end date
