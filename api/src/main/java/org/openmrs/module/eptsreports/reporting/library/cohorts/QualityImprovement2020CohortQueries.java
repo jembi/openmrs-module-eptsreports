@@ -4990,10 +4990,16 @@ public class QualityImprovement2020CohortQueries {
         "ABANDONEDTARV", EptsReportUtils.map(abandonedExclusionInTheLastSixMonths, MAPPING1));
 
     compositionCohortDefinition.addSearch(
-        "B3",
+        "B3MQ",
         EptsReportUtils.map(
             changeRegimen6Months,
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B3MI",
+        EptsReportUtils.map(
+            changeRegimen6Months,
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B3E",
@@ -5022,7 +5028,7 @@ public class QualityImprovement2020CohortQueries {
     MQ {
       @Override
       public String getCompositionString() {
-        return "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
+        return "( B2NEW OR RESTARTED OR (B3MQ AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
       }
 
       @Override
@@ -5033,7 +5039,7 @@ public class QualityImprovement2020CohortQueries {
     MI {
       @Override
       public String getCompositionString() {
-        return "( B2NEW OR RESTARTED OR (B3 AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMI)";
+        return "( B2NEW OR RESTARTED OR (B3MI AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMI)";
       }
 
       @Override
@@ -12621,9 +12627,8 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setName(
         "utentes que Mudaram de Regime na 1ª Linha de TARV há pelo menos 6 meses");
     sqlCohortDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "location", Location.class));
-    sqlCohortDefinition.addParameter(
-        new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -12650,7 +12655,7 @@ public class QualityImprovement2020CohortQueries {
             + "                         AND e.location_id = :location  "
             + "                         AND o.voided = 0  "
             + "                         AND e.encounter_datetime BETWEEN  "
-            + "                           :startDate AND :revisionEndDate  "
+            + "                           :startDate AND :endDate  "
             + "                       GROUP  BY p.patient_id) last_consultation  "
             + "                      ON p.patient_id = last_consultation.patient_id  "
             + "           INNER JOIN (  "
@@ -12666,7 +12671,7 @@ public class QualityImprovement2020CohortQueries {
             + "      AND e.encounter_type = ${53}  "
             + "      AND o.concept_id = ${21190}  "
             + "      AND o.value_coded IS NOT NULL  "
-            + "      AND o.obs_datetime <= :revisionEndDate  "
+            + "      AND o.obs_datetime <= :endDate  "
             + "      AND e.location_id = :location  "
             + "    GROUP  BY p.patient_id  "
             + ") regimen_change on regimen_change.patient_id = p.patient_id  "

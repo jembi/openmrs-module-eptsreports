@@ -2763,7 +2763,7 @@ public class IntensiveMonitoringCohortQueries {
         "B3",
         EptsReportUtils.map(
             changeRegimen6Months,
-            "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B3E",
