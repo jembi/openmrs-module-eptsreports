@@ -4957,6 +4957,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getMasterCardEncounterType(),
             commonMetadata.getRegimenAlternativeToFirstLineConcept(),
+            commonMetadata.getAlternativeLineConcept(),
             Arrays.asList(
                 commonMetadata.getAlternativeFirstLineConcept(),
                 commonMetadata.getRegimeChangeConcept(),
@@ -5003,8 +5004,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch(
         "B3E",
-        EptsReportUtils.map(
-            B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+        EptsReportUtils.map(B3E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));
@@ -5186,6 +5186,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getMasterCardEncounterType(),
             commonMetadata.getRegimenAlternativeToFirstLineConcept(),
+            commonMetadata.getAlternativeLineConcept(),
             Arrays.asList(
                 commonMetadata.getAlternativeFirstLineConcept(),
                 commonMetadata.getRegimeChangeConcept(),
@@ -5212,7 +5213,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition G = getMQ13G();
 
-    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtPrimeiraLPreposition.MQ, "NUM");
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtPrimeiraLPreposition.MQ, "DEN");
 
     CohortDefinition SegundaLinha = getUtentesSegundaLinha();
 
@@ -5291,8 +5292,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch(
         "B3E",
-        EptsReportUtils.map(
-            B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+        EptsReportUtils.map(B3E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B5E",
@@ -5995,6 +5995,7 @@ public class QualityImprovement2020CohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getMasterCardEncounterType(),
             commonMetadata.getRegimenAlternativeToFirstLineConcept(),
+            commonMetadata.getAlternativeLineConcept(),
             Arrays.asList(
                 commonMetadata.getAlternativeFirstLineConcept(),
                 commonMetadata.getRegimeChangeConcept(),
@@ -6067,8 +6068,7 @@ public class QualityImprovement2020CohortQueries {
 
     compositionCohortDefinition.addSearch(
         "B3E",
-        EptsReportUtils.map(
-            B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+        EptsReportUtils.map(B3E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED1LINE", EptsReportUtils.map(abandonedExclusionFirstLine, MAPPING1));

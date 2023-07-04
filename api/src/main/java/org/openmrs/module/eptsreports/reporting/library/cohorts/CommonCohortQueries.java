@@ -771,6 +771,7 @@ public class CommonCohortQueries {
    * @param masterCard masterCard flag
    * @param treatmentEncounter The masterCard Encounter Type 53
    * @param treatmentConcept “PRIMEIRA LINHA” Concept Id 21150
+   * @param alternativeLineConcept “PRIMEIRA LINHA” Concept Id 23898
    * @param treatmentValueCoded The Concept List
    * @param clinicalEncounter The Clinical Consultation Encounter Type 6
    * @param exclusionEncounter The Clinical Consultation Encounter Type 6
@@ -783,6 +784,7 @@ public class CommonCohortQueries {
       EncounterType clinicalEncounter,
       EncounterType treatmentEncounter,
       Concept treatmentConcept,
+      Concept alternativeLineConcept,
       List<Concept> treatmentValueCoded,
       EncounterType exclusionEncounter,
       Concept exclusionConcept,
@@ -826,6 +828,7 @@ public class CommonCohortQueries {
             + "         patient p  "
             + "     INNER JOIN encounter e ON e.patient_id = p.patient_id  "
             + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "     INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
             + "     INNER JOIN (SELECT   "
             + "         p.patient_id, MAX(e.encounter_datetime) last_visit  "
             + "     FROM  "
@@ -838,16 +841,20 @@ public class CommonCohortQueries {
             + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "     GROUP BY p.patient_id) AS clinical ON clinical.patient_id = p.patient_id  "
             + "     WHERE  "
-            + "         p.voided = 0 AND e.voided = 0  "
+            + "         p.voided = 0 "
+            + "             AND e.voided = 0  "
             + "             AND o.voided = 0  "
+            + "             AND o2.voided = 0  "
             + "             AND e.encounter_type = ${treatmentEncounter}  "
             + "             AND e.location_id = :location  "
-            + "             AND o.concept_id = ${treatmentConcept}  ";
+            + "             AND ( (o.concept_id = ${alternativeLineConcept})  "
+            + "               AND ( o2.concept_id = ${treatmentConcept}  "
+            + "                    AND o2.value_coded IS NOT NULL ) ) "
+            + "             AND o.obs_id = o2.obs_group_id ";
     if (masterCard) {
       query +=
-          "             AND o.value_coded IS NOT NULL  "
-              + "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATE(o.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH)  "; // check
+          "             AND DATE(o2.obs_datetime) <= DATE(clinical.last_visit)  "
+              + "             AND DATE(o2.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH)  "; // check
       // other
       // queries for time they use
     } else {
@@ -884,6 +891,7 @@ public class CommonCohortQueries {
     map.put("clinicalEncounter", String.valueOf(clinicalEncounter.getEncounterTypeId()));
     map.put("treatmentEncounter", String.valueOf(treatmentEncounter.getEncounterTypeId()));
     map.put("treatmentConcept", String.valueOf(treatmentConcept.getConceptId()));
+    map.put("alternativeLineConcept", String.valueOf(alternativeLineConcept.getConceptId()));
     map.put("treatmentValueCoded", StringUtils.join(answerIds, ","));
     map.put("exclusionEncounter", String.valueOf(exclusionEncounter.getEncounterTypeId()));
     map.put("exclusionConcept", String.valueOf(exclusionConcept.getConceptId()));

@@ -1003,6 +1003,7 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getMasterCardEncounterType(),
             commonMetadata.getRegimenAlternativeToFirstLineConcept(),
+            commonMetadata.getAlternativeLineConcept(),
             Arrays.asList(
                 commonMetadata.getAlternativeFirstLineConcept(),
                 commonMetadata.getRegimeChangeConcept(),
@@ -1108,8 +1109,7 @@ public class IntensiveMonitoringCohortQueries {
 
     compositionCohortDefinition.addSearch(
         "B3E",
-        EptsReportUtils.map(
-            B3E, "startDate=${endDate},endDate=${revisionEndDate},location=${location}"));
+        EptsReportUtils.map(B3E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B5E",
@@ -2703,6 +2703,7 @@ public class IntensiveMonitoringCohortQueries {
             hivMetadata.getAdultoSeguimentoEncounterType(),
             hivMetadata.getMasterCardEncounterType(),
             commonMetadata.getRegimenAlternativeToFirstLineConcept(),
+            commonMetadata.getAlternativeLineConcept(),
             Arrays.asList(
                 commonMetadata.getAlternativeFirstLineConcept(),
                 commonMetadata.getRegimeChangeConcept(),
@@ -2767,8 +2768,7 @@ public class IntensiveMonitoringCohortQueries {
 
     compositionCohortDefinition.addSearch(
         "B3E",
-        EptsReportUtils.map(
-            B3E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+        EptsReportUtils.map(B3E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "B5E",
