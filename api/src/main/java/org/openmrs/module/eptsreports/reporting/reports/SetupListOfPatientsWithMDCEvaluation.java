@@ -74,7 +74,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "SESP_MDS_Evaluation_ V1.0 .xls",
+              "SESP_MDS_Evaluation_V1.0.xls",
               "List of Patients with MDS Evaluation Cohort Report",
               getExcelDesignUuid(),
               null);
