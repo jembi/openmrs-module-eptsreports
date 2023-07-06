@@ -5028,9 +5028,7 @@ public class QualityImprovement2020CohortQueries {
     MQ {
       @Override
       public String getCompositionString() {
-        return "B3MQ";
-        //        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3E) ) AND NOT (ABANDONEDTARV OR
-        // B5EMQ)";
+        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
       }
 
       @Override
@@ -5336,8 +5334,8 @@ public class QualityImprovement2020CohortQueries {
 
     if (den) {
       if (line == 1) {
-        compositionCohortDefinition.setCompositionString("PrimeiraLinha");
-        //            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT C");
+        compositionCohortDefinition.setCompositionString(
+            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT C");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND age");
