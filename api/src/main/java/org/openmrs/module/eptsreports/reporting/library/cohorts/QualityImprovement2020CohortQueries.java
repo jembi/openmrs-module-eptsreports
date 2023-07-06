@@ -5028,7 +5028,9 @@ public class QualityImprovement2020CohortQueries {
     MQ {
       @Override
       public String getCompositionString() {
-        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
+        return "B3MQ";
+        //        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3E) ) AND NOT (ABANDONEDTARV OR
+        // B5EMQ)";
       }
 
       @Override
@@ -5334,8 +5336,8 @@ public class QualityImprovement2020CohortQueries {
 
     if (den) {
       if (line == 1) {
-        compositionCohortDefinition.setCompositionString(
-            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT C");
+        compositionCohortDefinition.setCompositionString("PrimeiraLinha");
+        //            "(((B1 AND age) OR D) AND PrimeiraLinha) AND NOT C");
       } else if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND PrimeiraLinha) AND NOT (C OR D) AND age");
@@ -12662,7 +12664,7 @@ public class QualityImprovement2020CohortQueries {
             + "                   GROUP  BY p.patient_id) last_consultation "
             + "               ON p.patient_id = last_consultation.patient_id "
             + "       INNER JOIN (SELECT p.patient_id, "
-            + "                          Max(o.obs_datetime) first_line_date "
+            + "                          Max(o2.obs_datetime) first_line_date "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e "
             + "                                  ON p.patient_id = e.patient_id "
@@ -12687,11 +12689,11 @@ public class QualityImprovement2020CohortQueries {
             + "       AND ( o.concept_id = ${23898} "
             + "       AND ( o2.concept_id = ${21190} "
             + "             AND o2.value_coded IS NOT NULL ) ) "
-            + "       AND o.obs_datetime = regimen_change.first_line_date "
+            + "       AND o2.obs_datetime = regimen_change.first_line_date "
             + "       AND e.location_id = :location "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND Timestampdiff(month, o.obs_datetime, "
+            + "       AND Timestampdiff(month, o2.obs_datetime, "
             + "           last_consultation.encounter_datetime) >= 6";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
