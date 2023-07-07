@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -7,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.datasets.LocationDataSetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.QualityImprovement2020DataSet;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
@@ -58,6 +61,9 @@ public class SetupQualityImprovementReport20 extends EptsDataExportManager {
     reportDefinition.addDataSetDefinition(
         "ALL",
         Mapped.mapStraightThrough(initQltyImpDataSet.constructQualityImprovement2020DataSet()));
+
+    reportDefinition.addDataSetDefinition(
+        "HF", mapStraightThrough(new LocationDataSetDefinition()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
