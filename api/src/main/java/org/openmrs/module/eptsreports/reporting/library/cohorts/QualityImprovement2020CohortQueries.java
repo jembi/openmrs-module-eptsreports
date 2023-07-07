@@ -5003,7 +5003,12 @@ public class QualityImprovement2020CohortQueries {
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
-        "B3E",
+        "B3EMQ",
+        EptsReportUtils.map(
+            B3E, "startDate=${startDate},endDate=${revisionEndDate},location=${location}"));
+
+    compositionCohortDefinition.addSearch(
+        "B3EMI",
         EptsReportUtils.map(B3E, "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
@@ -5028,7 +5033,7 @@ public class QualityImprovement2020CohortQueries {
     MQ {
       @Override
       public String getCompositionString() {
-        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
+        return "(B2NEW OR RESTARTED OR (B3MQ AND NOT B3EMQ) ) AND NOT (ABANDONEDTARV OR B5EMQ)";
       }
 
       @Override
@@ -5039,7 +5044,7 @@ public class QualityImprovement2020CohortQueries {
     MI {
       @Override
       public String getCompositionString() {
-        return "(B2NEW OR RESTARTED OR (B3MI AND NOT B3E) ) AND NOT (ABANDONEDTARV OR B5EMI)";
+        return "(B2NEW OR RESTARTED OR (B3MI AND NOT B3EMI) ) AND NOT (ABANDONEDTARV OR B5EMI)";
       }
 
       @Override
