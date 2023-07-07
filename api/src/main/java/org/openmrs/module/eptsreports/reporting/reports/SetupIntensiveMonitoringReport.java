@@ -16,6 +16,8 @@ import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
 @Deprecated
 public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
 
@@ -71,6 +73,7 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
     reportDefinition.setName(getName());
     reportDefinition.setDescription(getDescription());
     reportDefinition.setParameters(getParameters());
+
     reportDefinition.addDataSetDefinition(
         "IM",
         Mapped.mapStraightThrough(
@@ -80,6 +83,8 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
         "DATIM", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     reportDefinition.addDataSetDefinition(
         "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+
+    reportDefinition.addDataSetDefinition("HF", mapStraightThrough(new LocationDataSetDefinition()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
