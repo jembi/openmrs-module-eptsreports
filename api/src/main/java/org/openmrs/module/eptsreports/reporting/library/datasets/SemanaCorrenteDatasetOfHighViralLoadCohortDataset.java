@@ -49,14 +49,14 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset,
-      ListOfPatientsEligibleForVLDataDefinitionQueries
-          listOfPatientsEligibleForVLDataDefinitionQueries) {
+      ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries) {
     this.listOfPatientsWithHighViralLoadCohortQueries =
         listOfPatientsWithHighViralLoadCohortQueries;
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.tptInitiationDataDefinitionQueries = tptInitiationDataDefinitionQueries;
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
+    this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
   }
 
   public DataSetDefinition contructDataset() {
@@ -152,7 +152,7 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
     pdd.addColumn(
         "cell",
         listOfPatientsWithHighViralLoadCohortQueries.getPatientCell(),
-        "location=${location}",
+        " ",
         null);
 
     // 10 - Data Inicio Tarv - Sheet 2: Column J
@@ -195,7 +195,7 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
 
     // 15 - Alert Description - Sheet 2: Column O
     pdd.addColumn(
-            "Alert_Description",
+            "Section_Tittle ",
             listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithAnExpectedFollowUpDuringTheWeekSectionTittle(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
             null);
@@ -208,9 +208,6 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
             listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithAnExpectedFollowUpDuringTheWeek(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
             null);
-
-
-
 
     return pdd;
   }

@@ -13,7 +13,8 @@ public class VlResultClassificationConverter implements DataConverter {
       return "N/A";
     }
 
-    int value = Integer.parseInt(o.toString());
+    double valueInDoubleform = Double.parseDouble(o.toString());
+    int value = (int) valueInDoubleform;
 
     if (value >= 1000) {
       return "S";

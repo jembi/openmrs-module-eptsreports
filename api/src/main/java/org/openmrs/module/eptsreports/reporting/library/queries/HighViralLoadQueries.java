@@ -127,7 +127,6 @@ public class HighViralLoadQueries {
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND o2.voided = 0 "
             + "       AND e.encounter_type IN ( ${13}, ${51} ) "
             + "       AND (o.concept_id = ${856} ";
     if (greaterThan1000) {
@@ -144,46 +143,41 @@ public class HighViralLoadQueries {
     return query;
   }
 
-
-
   /**
    * Date of the earliest Laboratory or FSR form with VL Result registered between the 3rd APSS/PP
    * Consultation Date (value of column Y) and report end date
-   * This query returns the selection tittle
+   *
+   * <p>This query returns the selection tittle
    */
   public static String getColumnFQuerySelectionTittle(boolean greaterThan1000) {
     String query =
-            " SELECT p.patient_id, "
-                    + "       'Repeticao da CV - Segunda Carga Viral - Data do resultado da 2ª CV (Lab ou FSR)' as selection_Tittle"
-                    + "FROM   patient p "
-                    + "       INNER JOIN encounter e "
-                    + "               ON p.patient_id = e.patient_id "
-                    + "       INNER JOIN obs o "
-                    + "               ON e.encounter_id = o.encounter_id "
-                    + "INNER JOIN ( "
-                    + HighViralLoadQueries.getSessionThreeQuery()
-                    + "          ) session_three ON p.patient_id = session_three.patient_id "
-                    + "WHERE  p.voided = 0 "
-                    + "       AND e.voided = 0 "
-                    + "       AND o.voided = 0 "
-                    + "       AND o2.voided = 0 "
-                    + "       AND e.encounter_type IN ( ${13}, ${51} ) "
-                    + "       AND (o.concept_id = ${856} ";
+        " SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "INNER JOIN ( "
+            + HighViralLoadQueries.getSessionThreeQuery()
+            + "          ) session_three ON p.patient_id = session_three.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type IN ( ${13}, ${51} ) "
+            + "       AND (o.concept_id = ${856} ";
     if (greaterThan1000) {
       query += "       AND o.value_numeric >= 1000) ";
     } else {
       query += "       AND o.value_numeric IS NOT NULL) ";
     }
     query +=
-            "       AND e.location_id = :location "
-                    + "       AND e.encounter_datetime > session_three.third_session_date "
-                    + "       AND e.encounter_datetime <= :endDate "
-                    + "GROUP  BY p.patient_id";
+        "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime > session_three.third_session_date "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id";
 
     return query;
   }
-
-
 
   /**
    * The date of first APSS/PP Consultation Date registered in Ficha APSS/SS between the Second High
@@ -193,6 +187,31 @@ public class HighViralLoadQueries {
 
     return "SELECT p.patient_id, "
         + "       Min(e.encounter_datetime) AS apss_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "        INNER JOIN ( "
+        + HighViralLoadQueries.getColumnFQuery(true)
+        + " ) af_date on p.patient_id = af_date.patient_id "
+        + " WHERE  p.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_type = ${35} "
+        + "        AND e.location_id = :location  "
+        + "        AND e.encounter_datetime > af_date.result_date "
+        + "        AND e.encounter_datetime <= :endDate "
+        + " GROUP BY p.patient_id";
+  }
+
+  /**
+   * The date of first APSS/PP Consultation Date registered in Ficha APSS/SS between the Second High
+   * Viral Load Result Date (HVL_FR22 - value of column AF) and report end date
+   */
+  public static String getApssSessionZeroTittle() {
+
+    return "SELECT p.patient_id "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -237,6 +256,30 @@ public class HighViralLoadQueries {
   }
 
   /**
+   * The date of first APSS/PP Consultation registered in Ficha APSS/PP between the APSS/PP Session
+   * 0 After Second High VL Consultation Date (HVL_FR27 - value of column AM) and report end date
+   */
+  public static String getApssSessionOneSectionTittle() {
+    return "SELECT p.patient_id "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "        INNER JOIN ( "
+        + HighViralLoadQueries.getApssSessionZero()
+        + " ) session_date on p.patient_id = session_date.patient_id "
+        + " WHERE  p.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_type = ${35} "
+        + "        AND e.location_id = :location  "
+        + "        AND e.encounter_datetime > session_date.apss_date "
+        + "        AND e.encounter_datetime <= :endDate "
+        + " GROUP BY p.patient_id";
+  }
+
+  /**
    * The date of first APSS/PP Consultation registered in Ficha APSS/PP between the 1st APSS/PP
    * Consultation Date after second high VL (HVL_FR28 - value of column AO) and report end date
    */
@@ -262,12 +305,60 @@ public class HighViralLoadQueries {
   }
 
   /**
+   * The date of first APSS/PP Consultation registered in Ficha APSS/PP between the 1st APSS/PP
+   * Consultation Date after second high VL (HVL_FR28 - value of column AO) and report end date
+   */
+  public static String getApssSessionTwoSectionTittle() {
+    return "SELECT p.patient_id "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "        INNER JOIN ( "
+        + HighViralLoadQueries.getApssSessionOne()
+        + " ) session_date on p.patient_id = session_date.patient_id "
+        + " WHERE  p.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_type = ${35} "
+        + "        AND e.location_id = :location  "
+        + "        AND e.encounter_datetime > session_date.apss_date "
+        + "        AND e.encounter_datetime <= :endDate "
+        + " GROUP BY p.patient_id";
+  }
+
+  /**
    * The date of first APSS/PP Consultation registered in Ficha APSS/PP between the 2nd APSS/PP
    * Consultation Date after second high VL (HVL_FR29- value of column AQ) and report end date
    */
   public static String getApssSessionThree() {
     return "SELECT p.patient_id, "
         + "       Min(e.encounter_datetime) AS apss_date "
+        + "FROM   patient p "
+        + "       INNER JOIN encounter e "
+        + "               ON p.patient_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + "        INNER JOIN ( "
+        + HighViralLoadQueries.getApssSessionTwo()
+        + " ) session_date on p.patient_id = session_date.patient_id "
+        + " WHERE  p.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_type = ${35} "
+        + "        AND e.location_id = :location  "
+        + "        AND e.encounter_datetime > session_date.apss_date "
+        + "        AND e.encounter_datetime <= :endDate "
+        + " GROUP BY p.patient_id";
+  }
+
+  /**
+   * The date of first APSS/PP Consultation registered in Ficha APSS/PP between the 2nd APSS/PP
+   * Consultation Date after second high VL (HVL_FR29- value of column AQ) and report end date
+   */
+  public static String getApssSessionThreeTittle() {
+    return "SELECT p.patient_id "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
