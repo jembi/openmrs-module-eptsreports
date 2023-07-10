@@ -693,44 +693,22 @@ public class CommonCohortQueries {
         + "          JOIN "
         + "     obs ob ON ob.encounter_id = enc.encounter_id "
         + "          JOIN "
-        + "      (SELECT "
-        + "          p.patient_id, filtered.encounter_datetime "
-        + "      FROM "
-        + "          patient p "
-        + "      JOIN encounter e ON e.patient_id = p.patient_id "
-        + "      JOIN obs o ON o.encounter_id = e.encounter_id "
-        + "      INNER JOIN (SELECT "
+        + "     (SELECT "
         + "          p.patient_id, "
         + "              MAX(e.encounter_datetime) AS encounter_datetime "
         + "      FROM "
         + "          patient p "
         + "     INNER JOIN encounter e ON e.patient_id = p.patient_id "
-        + "      WHERE "
-        + "          e.encounter_type = ${6} AND p.voided = 0 "
-        + "              AND e.voided = 0 "
-        + "             AND e.location_id = :location "
-        + "              AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
-        + "      GROUP BY p.patient_id) filtered ON filtered.patient_id = p.patient_id "
-        + "      WHERE "
-        + "          e.encounter_datetime = filtered.encounter_datetime "
-        + "              AND e.location_id = :location "
-        + "              AND o.concept_id = ${21151} "
-        + "              AND e.voided = 0 "
-        + "              AND o.voided = 0 "
-        + "              AND o.value_coded = ${21150} "
-        + "              AND e.encounter_type = ${6}) first_line ON first_line.patient_id = pa.patient_id "
-        + "          INNER JOIN "
-        + "      (SELECT "
-        + "          p.patient_id, MAX(e.encounter_datetime) last_visit "
-        + "      FROM "
-        + "          patient p "
-        + "      INNER JOIN encounter e ON e.patient_id = p.patient_id "
-        + "      WHERE "
-        + "          p.voided = 0 AND e.voided = 0 "
-        + "              AND e.encounter_type = ${6} "
-        + "              AND e.location_id = :location "
-        + "              AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
-        + "      GROUP BY p.patient_id) AS last_clinical ON last_clinical.patient_id = pa.patient_id "
+        + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + "      WHERE p.voided = 0 "
+        + "        AND e.voided = 0 "
+        + "        AND o.voided = 0 "
+        + "        AND e.encounter_type = ${6} "
+        + "        AND e.location_id = :location "
+        + "        AND o.concept_id = ${21151} "
+        + "        AND o.value_coded = ${21150} "
+        + "        AND e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
+        + "      GROUP BY p.patient_id) first_line ON first_line.patient_id = pa.patient_id "
         + "          INNER JOIN "
         + "      (SELECT "
         + "          p.patient_id, o.value_datetime AS arv_date "
@@ -745,7 +723,7 @@ public class CommonCohortQueries {
         + "              AND p.voided = 0 "
         + "              AND e.voided = 0 "
         + "              AND o.voided = 0) arv_start_date ON arv_start_date.patient_id = pa.patient_id "
-        + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(last_clinical.last_visit, INTERVAL 6 MONTH) "
+        + "          AND DATE(arv_start_date.arv_date) <= DATE_SUB(first_line.encounter_datetime, INTERVAL 6 MONTH) "
         + " GROUP BY pa.patient_id ";
   }
 
@@ -771,6 +749,7 @@ public class CommonCohortQueries {
    * @param masterCard masterCard flag
    * @param treatmentEncounter The masterCard Encounter Type 53
    * @param treatmentConcept “PRIMEIRA LINHA” Concept Id 21150
+   * @param alternativeLineConcept “PRIMEIRA LINHA” Concept Id 23898
    * @param treatmentValueCoded The Concept List
    * @param clinicalEncounter The Clinical Consultation Encounter Type 6
    * @param exclusionEncounter The Clinical Consultation Encounter Type 6
@@ -783,6 +762,7 @@ public class CommonCohortQueries {
       EncounterType clinicalEncounter,
       EncounterType treatmentEncounter,
       Concept treatmentConcept,
+      Concept alternativeLineConcept,
       List<Concept> treatmentValueCoded,
       EncounterType exclusionEncounter,
       Concept exclusionConcept,
@@ -826,6 +806,7 @@ public class CommonCohortQueries {
             + "         patient p  "
             + "     INNER JOIN encounter e ON e.patient_id = p.patient_id  "
             + "     INNER JOIN obs o ON o.encounter_id = e.encounter_id  "
+            + "     INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id  "
             + "     INNER JOIN (SELECT   "
             + "         p.patient_id, MAX(e.encounter_datetime) last_visit  "
             + "     FROM  "
@@ -838,16 +819,20 @@ public class CommonCohortQueries {
             + "             AND e.encounter_datetime BETWEEN :startDate AND :endDate  "
             + "     GROUP BY p.patient_id) AS clinical ON clinical.patient_id = p.patient_id  "
             + "     WHERE  "
-            + "         p.voided = 0 AND e.voided = 0  "
+            + "         p.voided = 0 "
+            + "             AND e.voided = 0  "
             + "             AND o.voided = 0  "
+            + "             AND o2.voided = 0  "
             + "             AND e.encounter_type = ${treatmentEncounter}  "
             + "             AND e.location_id = :location  "
-            + "             AND o.concept_id = ${treatmentConcept}  ";
+            + "             AND ( (o.concept_id = ${alternativeLineConcept})  "
+            + "               AND ( o2.concept_id = ${treatmentConcept}  "
+            + "                    AND o2.value_coded IS NOT NULL ) ) "
+            + "             AND o.obs_id = o2.obs_group_id ";
     if (masterCard) {
       query +=
-          "             AND o.value_coded IS NOT NULL  "
-              + "             AND DATE(o.obs_datetime) <= DATE(clinical.last_visit)  "
-              + "             AND DATE(o.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH)  "; // check
+          "             AND DATE(o2.obs_datetime) <= DATE(clinical.last_visit)  "
+              + "             AND DATE(o2.obs_datetime) <= DATE_SUB(clinical.last_visit,INTERVAL 6 MONTH)  "; // check
       // other
       // queries for time they use
     } else {
@@ -884,6 +869,7 @@ public class CommonCohortQueries {
     map.put("clinicalEncounter", String.valueOf(clinicalEncounter.getEncounterTypeId()));
     map.put("treatmentEncounter", String.valueOf(treatmentEncounter.getEncounterTypeId()));
     map.put("treatmentConcept", String.valueOf(treatmentConcept.getConceptId()));
+    map.put("alternativeLineConcept", String.valueOf(alternativeLineConcept.getConceptId()));
     map.put("treatmentValueCoded", StringUtils.join(answerIds, ","));
     map.put("exclusionEncounter", String.valueOf(exclusionEncounter.getEncounterTypeId()));
     map.put("exclusionConcept", String.valueOf(exclusionConcept.getConceptId()));
