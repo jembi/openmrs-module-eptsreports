@@ -2731,7 +2731,7 @@ public class IntensiveMonitoringCohortQueries {
 
     CohortDefinition PrimeiraLinha =
         qualityImprovement2020CohortQueries.getUtentesPrimeiraLinha(
-            QualityImprovement2020CohortQueries.UtPrimeiraLPreposition.MI, "DEN");
+            QualityImprovement2020CohortQueries.UtentesPrimeiraLinhaPreposition.MI);
 
     compositionCohortDefinition.addSearch(
         "age",

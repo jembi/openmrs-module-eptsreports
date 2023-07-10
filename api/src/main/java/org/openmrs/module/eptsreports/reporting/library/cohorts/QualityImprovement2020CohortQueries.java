@@ -4933,7 +4933,7 @@ public class QualityImprovement2020CohortQueries {
    *
    * @param preposition composition string and description
    */
-  public CohortDefinition getUtentesPrimeiraLinha(UtPrimeiraLPreposition preposition) {
+  public CohortDefinition getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition preposition) {
     CompositionCohortDefinition compositionCohortDefinition = new CompositionCohortDefinition();
 
     compositionCohortDefinition.setName(preposition.getDescription());
@@ -5029,7 +5029,7 @@ public class QualityImprovement2020CohortQueries {
     return compositionCohortDefinition;
   }
 
-  public enum UtPrimeiraLPreposition {
+  public enum UtentesPrimeiraLinhaPreposition {
     MQ {
       @Override
       public String getCompositionString() {
@@ -5218,7 +5218,7 @@ public class QualityImprovement2020CohortQueries {
 
     CohortDefinition G = getMQ13G();
 
-    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtPrimeiraLPreposition.MQ, "DEN");
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
     CohortDefinition SegundaLinha = getUtentesSegundaLinha();
 
@@ -6015,7 +6015,7 @@ public class QualityImprovement2020CohortQueries {
         commonCohortQueries.getMOHPatientsWithVLRequestorResultBetweenClinicalConsultations(
             false, true, 12);
 
-    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtPrimeiraLPreposition.MQ, "DEN");
+    CohortDefinition PrimeiraLinha = getUtentesPrimeiraLinha(UtentesPrimeiraLinhaPreposition.MQ);
 
     compositionCohortDefinition.addSearch(
         "children", EptsReportUtils.map(children, "effectiveDate=${revisionEndDate}"));
@@ -6119,34 +6119,6 @@ public class QualityImprovement2020CohortQueries {
       }
     }
     return compositionCohortDefinition;
-  }
-
-  public CohortDefinition getUtentesPrimeiraLinha(
-      QualityImprovement2020CohortQueries.UtPrimeiraLPreposition preposition, String level) {
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Utentes em Primeira Linha Denominator and Numerator");
-    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    cd.addSearch(
-        "DEN",
-        EptsReportUtils.map(
-            getUtentesPrimeiraLinha(preposition),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-    cd.addSearch(
-        "NUM",
-        EptsReportUtils.map(
-            getUtentesPrimeiraLinha(preposition),
-            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
-
-    if (level.equals("DEN")) {
-      cd.setCompositionString("DEN");
-    } else if (level.equals("NUM")) {
-      cd.setCompositionString("NUM");
-    }
-    return cd;
   }
 
   /**
@@ -12696,6 +12668,7 @@ public class QualityImprovement2020CohortQueries {
             + "       AND e.location_id = :location "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
             + "       AND Timestampdiff(month, o2.obs_datetime, "
             + "           last_consultation.encounter_datetime) >= 6";
 
