@@ -3,7 +3,7 @@ package org.openmrs.module.eptsreports.reporting.reports;
 import java.io.IOException;
 import java.util.*;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsWithMdcevaluationCohortDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsWithMdcEvaluationCohortDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingConstants;
@@ -17,12 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Deprecated
 public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager {
   @Autowired
-  private ListOfPatientsWithMdcevaluationCohortDataset listOfPatientsWithMdcevaluationCohortDataset;
+  private ListOfPatientsWithMdcEvaluationCohortDataset listOfPatientsWithMdcEvaluationCohortDataset;
 
   @Autowired
   public SetupListOfPatientsWithMdcEvaluation(
-      ListOfPatientsWithMdcevaluationCohortDataset listOfPatientsWithMdcevaluationCohortDataset) {
-    this.listOfPatientsWithMdcevaluationCohortDataset =
+          ListOfPatientsWithMdcEvaluationCohortDataset listOfPatientsWithMdcevaluationCohortDataset) {
+    this.listOfPatientsWithMdcEvaluationCohortDataset =
         listOfPatientsWithMdcevaluationCohortDataset;
   }
 
@@ -62,7 +62,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "MDC",
-        Mapped.mapStraightThrough(listOfPatientsWithMdcevaluationCohortDataset.contructDataset()));
+        Mapped.mapStraightThrough(listOfPatientsWithMdcEvaluationCohortDataset.contructDataset()));
 
     return rd;
   }
