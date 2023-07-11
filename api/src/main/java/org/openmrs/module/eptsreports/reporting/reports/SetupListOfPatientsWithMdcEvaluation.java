@@ -16,12 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated
 public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager {
+
   @Autowired
   private ListOfPatientsWithMdcEvaluationCohortDataset listOfPatientsWithMdcEvaluationCohortDataset;
 
   @Autowired
   public SetupListOfPatientsWithMdcEvaluation(
-          ListOfPatientsWithMdcEvaluationCohortDataset listOfPatientsWithMdcevaluationCohortDataset) {
+      ListOfPatientsWithMdcEvaluationCohortDataset listOfPatientsWithMdcevaluationCohortDataset) {
     this.listOfPatientsWithMdcEvaluationCohortDataset =
         listOfPatientsWithMdcevaluationCohortDataset;
   }
@@ -61,7 +62,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
-        "MDC",
+        "TEST",
         Mapped.mapStraightThrough(listOfPatientsWithMdcEvaluationCohortDataset.contructDataset()));
 
     return rd;
