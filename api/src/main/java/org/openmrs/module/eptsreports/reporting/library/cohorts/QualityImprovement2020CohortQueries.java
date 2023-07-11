@@ -7236,7 +7236,7 @@ public class QualityImprovement2020CohortQueries {
     // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
     // data do 2o pedido de CV e Data de Revisao
     CohortDefinition VLFL =
-        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(mdsConcepts);
+        getPatientsWhoHadVLResultOnLaboratoryFormAfterSecondVLRequest(mdsConcepts);
 
     comp.addSearch(
         "MDSHa24Meses",
@@ -7540,10 +7540,10 @@ public class QualityImprovement2020CohortQueries {
 
     // Utentes que têm o registo de Resultado de Carga Viral na Ficha Laboratório registada entre a
     // data do 2o pedido de CV e Data de Revisao
-    CohortDefinition VLFL = getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(concepts);
+    CohortDefinition VLFL = getPatientsWhoHadVLResultOnLaboratoryFormAfterSecondVLRequest(concepts);
 
     CohortDefinition LOWVLFL =
-        getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecudondVLRequest(concepts);
+        getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecondVLRequest(concepts);
 
     // Pacientes com pedidos de investigações depois de DT
     List<Integer> dtConcept = Arrays.asList(hivMetadata.getQuarterlyDispensation().getConceptId());
@@ -7675,7 +7675,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 2) {
       comp.setCompositionString("Den2 AND VL2Pedidos");
     } else if (num == 3) {
-      comp.setCompositionString("Den3  AND VLFL");
+      comp.setCompositionString("Den3 AND VLFL");
     } else if (num == 4) {
       comp.setCompositionString("Den4 AND LOWVLFL");
     } else if (num == 5 || num == 6) {
@@ -8895,6 +8895,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Denominator 15 - Pacientes elegíveis a MDS");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -8968,8 +8969,13 @@ public class QualityImprovement2020CohortQueries {
                     hivMetadata.getHepaticSteatosisWithHyperlactataemiaConcept())),
             "onOrAfter=${revisionEndDate-6m},onOrBefore=${revisionEndDate},locationList=${location}"));
 
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("Ages", 2, 200), "effectiveDate=${endDate}"));
+
     cd.setCompositionString(
-        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned)");
+        "A AND B1 AND NOT (C OR D OR F OR G OR MDS OR onTB OR adverseReaction OR onSK OR returned) AND AGE");
 
     return cd;
   }
@@ -9070,6 +9076,7 @@ public class QualityImprovement2020CohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.setName("Numerator MQ 15 - Pacientes elegíveis a MDS");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("revisionEndDate", "Revision End Date", Date.class));
     cd.addParameter(new Parameter("location", "Location", Location.class));
 
@@ -9103,7 +9110,12 @@ public class QualityImprovement2020CohortQueries {
             mds,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
 
-    cd.setCompositionString("MQ15DenMDS AND MDS");
+    cd.addSearch(
+        "AGE",
+        EptsReportUtils.map(
+            ageCohortQueries.createXtoYAgeCohort("Ages", 2, 200), "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("MQ15DenMDS AND MDS AND AGE");
     return cd;
   }
 
@@ -11153,7 +11165,7 @@ public class QualityImprovement2020CohortQueries {
             + "                      AND        e.location_id = :location "
             + "                      AND        o.concept_id = ${856} "
             + "                      AND        o.value_numeric >= 1000 "
-            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                      AND        e.encounter_datetime BETWEEN :startDate AND :revisionEndDate "
             + "                      AND        p.voided = 0 "
             + "                      AND        e.voided = 0 "
             + "                      AND        o.voided = 0 "
@@ -11164,13 +11176,11 @@ public class QualityImprovement2020CohortQueries {
             + "AND        e.encounter_datetime BETWEEN vl.vl_date AND :revisionEndDate "
             + "AND        o.value_datetime BETWEEN DATE_ADD(e.encounter_datetime, INTERVAL 23 DAY) AND  DATE_ADD(e.encounter_datetime, INTERVAL 37 DAY) "
             + "AND        e.voided = 0 "
-            + "AND        o.value_datetime <= :revisionEndDate "
             + "AND        p.voided = 0 "
             + "AND        o.voided = 0 "
             + "GROUP BY   p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
-
     cd.setQuery(sb.replace(query));
 
     return cd;
@@ -11382,9 +11392,8 @@ public class QualityImprovement2020CohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition
-      getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecudondVLRequest(
-          List<Integer> dispensationTypes) {
+  public CohortDefinition getPatientsWhoHadVLResultLessThen1000nLaboratoryFormAfterSecondVLRequest(
+      List<Integer> dispensationTypes) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Utentes que têm o registo de dois pedidos de CV na Ficha Clinica ");
@@ -11413,7 +11422,15 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "SELECT two_dispensations.patient_id "
-            + "FROM   (SELECT patient_id, MIN(encounter_datetime) first_date, MAX(encounter_datetime) second_date "
+            + "FROM  ( "
+            + "SELECT p.patient_id, MIN(e.encounter_datetime) second_date "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN encounter e2 ON e2.patient_id = p.patient_id "
+            + "INNER JOIN obs o2 ON o2.encounter_id = e2.encounter_id "
+            + "INNER JOIN "
+            + " (SELECT patient_id, MIN(encounter_datetime) first_date "
             + "        FROM   (SELECT p.patient_id, e.encounter_datetime "
             + "                FROM   patient p "
             + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -11486,9 +11503,29 @@ public class QualityImprovement2020CohortQueries {
             + "                                                                                 AND o.voided = 0 "
             + "                                                                                 GROUP  BY p.patient_id) most_recent "
             + "                                                                   GROUP  BY most_recent.patient_id) dispensation "
-            + "                                                         WHERE  dispensation.patient_id = p.patient_id)) investigations "
-            + "                                                         GROUP  BY investigations.patient_id "
-            + "        HAVING COUNT(investigations.encounter_datetime) >= 2) two_dispensations "
+            + "                                     WHERE  dispensation.patient_id = p.patient_id) GROUP BY patient_id )  first_dispensation GROUP BY first_dispensation.patient_id)"
+            + "                                     first_investigation ON first_investigation.patient_id = p.patient_id "
+            + "                                 WHERE e.encounter_type = ${6} "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND o.concept_id = ${23722} "
+            + "                                 AND o.value_coded = ${856} "
+            + "                                 AND e.encounter_datetime > first_investigation.first_date "
+            + "                                 AND e.encounter_datetime <= :revisionEndDate "
+            + "                                 AND e2.encounter_type = ${6} "
+            + "                                 AND e2.location_id = :location "
+            + "                                 AND e2.encounter_datetime > first_investigation.first_date "
+            + "                                 AND e2.encounter_datetime <= :revisionEndDate "
+            + "                                 AND e.encounter_datetime > e2.encounter_datetime "
+            + "                                 AND e2.voided = 0 "
+            + "                                 AND ( "
+            + "                                      (o2.concept_id = ${856} AND o2.value_numeric < 1000) "
+            + "                                      OR "
+            + "                                      (o2.concept_id = ${1305} AND o2.value_coded IS NOT NULL) "
+            + "                                    ) "
+            + "                                AND o2.voided = 0"
+            + "                                 GROUP BY p.patient_id ) two_dispensations"
             + "       INNER JOIN (SELECT p.patient_id, e.encounter_datetime AS vl_date "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -11509,7 +11546,7 @@ public class QualityImprovement2020CohortQueries {
     return cd;
   }
 
-  public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecoddVLRequest(
+  public CohortDefinition getPatientsWhoHadVLResultOnLaboratoryFormAfterSecondVLRequest(
       List<Integer> dispensationTypes) {
 
     SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -11539,7 +11576,15 @@ public class QualityImprovement2020CohortQueries {
 
     String query =
         "SELECT two_dispensations.patient_id "
-            + "FROM   (SELECT patient_id, MIN(encounter_datetime) first_date, MAX(encounter_datetime) second_date "
+            + "FROM  ( "
+            + "SELECT p.patient_id, MIN(e.encounter_datetime) second_date "
+            + "FROM patient p "
+            + "INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "INNER JOIN encounter e2 ON e2.patient_id = p.patient_id "
+            + "INNER JOIN obs o2 ON o2.encounter_id = e2.encounter_id "
+            + "INNER JOIN "
+            + " (SELECT patient_id, MIN(encounter_datetime) first_date "
             + "        FROM   (SELECT p.patient_id, e.encounter_datetime "
             + "                FROM   patient p "
             + "                       INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -11613,9 +11658,29 @@ public class QualityImprovement2020CohortQueries {
             + "                                                   AND o.voided = 0 "
             + "                                               GROUP  BY p.patient_id) most_recent "
             + "                                     GROUP  BY most_recent.patient_id) dispensation "
-            + "                                     WHERE  dispensation.patient_id = p.patient_id)) investigations "
-            + "                               GROUP  BY investigations.patient_id "
-            + "                                HAVING COUNT(investigations.encounter_datetime) >= 2) two_dispensations "
+            + "                                     WHERE  dispensation.patient_id = p.patient_id) GROUP BY patient_id )  first_dispensation GROUP BY first_dispensation.patient_id)"
+            + "                                     first_investigation ON first_investigation.patient_id = p.patient_id "
+            + "                                 WHERE e.encounter_type = ${6} "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND o.concept_id = ${23722} "
+            + "                                 AND o.value_coded = ${856} "
+            + "                                 AND e.encounter_datetime > first_investigation.first_date "
+            + "                                 AND e.encounter_datetime <= :revisionEndDate "
+            + "                                 AND e2.encounter_type = ${6} "
+            + "                                 AND e2.location_id = :location "
+            + "                                 AND e2.encounter_datetime > first_investigation.first_date "
+            + "                                 AND e2.encounter_datetime <= :revisionEndDate "
+            + "                                 AND e.encounter_datetime > e2.encounter_datetime "
+            + "                                 AND e2.voided = 0 "
+            + "                                 AND ( "
+            + "                                      (o2.concept_id = ${856} AND o2.value_numeric < 1000) "
+            + "                                      OR "
+            + "                                      (o2.concept_id = ${1305} AND o2.value_coded IS NOT NULL) "
+            + "                                    ) "
+            + "                                AND o2.voided = 0"
+            + "                                 GROUP BY p.patient_id ) two_dispensations"
             + "       INNER JOIN (SELECT p.patient_id, e.encounter_datetime AS vl_date "
             + "                   FROM   patient p "
             + "                          INNER JOIN encounter e ON e.patient_id = p.patient_id "
@@ -11627,10 +11692,9 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result  ON two_dispensations.patient_id = vl_result.patient_id "
             + "WHERE  vl_result.vl_date > two_dispensations.second_date "
-            + "       AND vl_result.vl_date < :revisionEndDate";
+            + "       AND vl_result.vl_date <= :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
-
     cd.setQuery(sb.replace(query));
 
     return cd;
@@ -11805,13 +11869,13 @@ public class QualityImprovement2020CohortQueries {
             + "                                                 AND e.voided = 0 "
             + "                                                 AND o.voided = 0 "
             + "                                                 AND e.encounter_type IN ( ${53} ) "
-            + "                                                 AND o.concept_id = ${856} "
-            + "                                                 AND o.value_numeric IS NOT NULL "
+            + "                                             AND ( ( o.concept_id = ${856} AND o.value_numeric IS NOT  NULL ) "
+            + "                                                     OR ( o.concept_id = ${1305}  AND o.value_coded IS NOT NULL ) ) "
             + "                                                 AND DATE(o.obs_datetime) BETWEEN :startDate AND :endDate "
             + "                                                 AND e.location_id = :location) max_vl_date "
             + "                                                 GROUP  BY patient_id "
             + "                   ) vl_date_tbl ON pp.patient_id = vl_date_tbl.patient_id "
-            + "                 WHERE  ee.encounter_datetime BETWEEN Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) AND  DATE_ADD( vl_date_tbl.vl_max_date,INTERVAL - 1 DAY) "
+            + "                 WHERE  ee.encounter_datetime BETWEEN Date_add( vl_date_tbl.vl_max_date, INTERVAL - 12 MONTH) AND  vl_date_tbl.vl_max_date "
             + "                 AND oo.concept_id = ${165174} "
             + "                 AND oo.voided = 0 "
             + "                 AND ee.voided = 0 "
@@ -11833,7 +11897,6 @@ public class QualityImprovement2020CohortQueries {
             + "	GROUP BY   pp.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(map);
-
     cd.setQuery(sb.replace(query));
 
     return cd;

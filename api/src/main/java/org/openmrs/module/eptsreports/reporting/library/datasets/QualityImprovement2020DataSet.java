@@ -2066,7 +2066,7 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
             "MQ15DEN13",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15DenMDS(),
-                "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ15DEN13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2075,15 +2075,15 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "15.13 - % de pacientes elegíveis a MDS, que foram inscritos em MDS",
         EptsReportUtils.map(
             MQ15DEN13,
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2+");
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
 
     CohortIndicator MQ15NUM13 =
         eptsGeneralIndicator.getIndicator(
             "MQ15NUM13",
             EptsReportUtils.map(
                 qualityImprovement2020CohortQueries.getMQ15NumeratorMDS(),
-                "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"));
+                "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"));
 
     MQ15NUM13.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
 
@@ -2092,8 +2092,8 @@ public class QualityImprovement2020DataSet extends BaseDataSet {
         "Numerator:  “# de pacientes elegíveis a MDS ",
         EptsReportUtils.map(
             MQ15NUM13,
-            "startDate=${startDate},revisionEndDate=${revisionEndDate},location=${location}"),
-        "age=2+");
+            "startDate=${startDate},endDate=${endDate},revisionEndDate=${revisionEndDate},location=${location}"),
+        "");
 
     CohortIndicator MQ15DEN14 =
         eptsGeneralIndicator.getIndicator(
