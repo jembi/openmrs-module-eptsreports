@@ -3109,7 +3109,7 @@ public class ResumoMensalCohortQueries {
             + "                                     ON o2.encounter_id = en.encounter_id "
             + "                      WHERE  en.encounter_type = ${6} "
             + "                             AND en.location_id = :location "
-            + "                             AND en.encounter_datetime = e.encounter_datetime "
+            + "                             AND en.encounter_id = e.encounter_id "
             + "                             AND en.patient_id = p.patient_id "
             + "                             AND o2.concept_id = ${1268} "
             + "                             AND o2.value_coded IS NOT NULL "
