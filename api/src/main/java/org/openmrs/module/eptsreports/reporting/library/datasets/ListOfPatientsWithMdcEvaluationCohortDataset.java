@@ -59,7 +59,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
 
-    pdd.setName("TEST");
+    pdd.setName("MDC");
 
     PatientIdentifierType identifierType =
         Context.getPatientService()
@@ -352,21 +352,21 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     // B.16 - N˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV - Sheet 1: Column AM
     pdd.addColumn(
-            "nr_clinicalConsultations_6thTo12thMonth",
+            "clinicalConsultations_6thTo12thMonth",
             tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
             null);
 
     // B.17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Sheet 1: Column AN
     pdd.addColumn(
-            "nr_apssPpConsultations_6thTo12thMonth",
+            "apssPpConsultations_6thTo12thMonth",
             tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
             null);
 
     // B.18 - Estado de permanência no 12˚ mês de TARV - Sheet 1: Column AO
     pdd.addColumn(
-            "nr_apssPpConsultations_sixthToTwelvethMonth",
+            "statePermanence_6thTo12thMonth",
             tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
             null);

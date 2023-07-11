@@ -62,7 +62,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
-        "TEST",
+        "MDC",
         Mapped.mapStraightThrough(listOfPatientsWithMdcEvaluationCohortDataset.contructDataset()));
 
     return rd;
@@ -80,7 +80,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:14,dataset:MDS");
+      props.put("repeatingSections", "sheet:1,row:13,dataset:MDS");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
