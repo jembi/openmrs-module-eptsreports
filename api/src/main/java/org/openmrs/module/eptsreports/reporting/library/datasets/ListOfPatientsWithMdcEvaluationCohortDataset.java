@@ -7,6 +7,7 @@ import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.DQACargaViralCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
 //import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsWithHighViralLoadCohortQueries;
@@ -34,6 +35,8 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
   private TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries;
 
+  private final DQACargaViralCohortQueries dQACargaViralCohortQueries;
+
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
   private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
@@ -44,6 +47,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
       ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries,
+      DQACargaViralCohortQueries dQACargaViralCohortQueries,
       ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
 //    this.listOfPatientsWithHighViralLoadCohortQueries =
@@ -51,6 +55,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.tptInitiationDataDefinitionQueries = tptInitiationDataDefinitionQueries;
+    this.dQACargaViralCohortQueries = dQACargaViralCohortQueries;
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
   }
@@ -60,18 +65,21 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
 
     pdd.setName("MDC");
+    pdd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    pdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    pdd.addParameter(new Parameter("location", "Location", Location.class));
 
     PatientIdentifierType identifierType =
         Context.getPatientService()
             .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
 
-    DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
+//    DataConverter identifierFormatter = new ObjectFormatter("{identifier}");
 
-    DataDefinition identifierDef =
-        new ConvertedPatientDataDefinition(
-            "identifier",
-            new PatientIdentifierDataDefinition(identifierType.getName(), identifierType),
-            identifierFormatter);
+//    DataDefinition identifierDef =
+//        new ConvertedPatientDataDefinition(
+//            "identifier",
+//            new PatientIdentifierDataDefinition(identifierType.getName(), identifierType),
+//            identifierFormatter);
 
     DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
 
@@ -89,10 +97,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     //  INFORMAÇÃO DO PACIENTE
 
     // A.1 - Nr Sequencial sheet 1 - Column A
-    pdd.addColumn(
-        "sequencial_nr",
-        tptListOfPatientsEligibleDataSet.getNID(identifierType.getPatientIdentifierTypeId()),
-        "");
+    pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
     // A.2 - Coorte - Sheet 1: Column B
     pdd.addColumn("coort", nameDef, "");
@@ -148,23 +153,23 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // B.1 - Data do pedido da 1ª CV - Sheet 1: Column J
     pdd.addColumn(
             "firstCv_date",
-            tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
+            dQACargaViralCohortQueries.getDataNotificouCV(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+            new ForwardSlashDateConverter());
 
     // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
     pdd.addColumn(
             "firstCv_result_date",
-            tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
+            dQACargaViralCohortQueries.getDataNotificouCV(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+            new ForwardSlashDateConverter());
 
     // B.3 - Resultado da 1ª CV - Sheet 1: Column L
     pdd.addColumn(
             "firstCv_result",
-            tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
+            dQACargaViralCohortQueries.getDataNotificouCV(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+            new ForwardSlashDateConverter());
 
     // B.4 - Resultado do 2˚ CD4 (2˚ CD4 feito nos 1˚s 12 meses de TARV) - Sheet 1: Column M
     pdd.addColumn(
@@ -377,23 +382,23 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // C.1 - Data do pedido da CV de seguimento - Sheet 1: Column AP
     pdd.addColumn(
             "cv_date",
-            tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
+            dQACargaViralCohortQueries.getDataNotificouCV(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+            new ForwardSlashDateConverter());
 
     // C.2 - Data de registo do resultado da CV de seguimento - Sheet 1: Column AQ
     pdd.addColumn(
             "cvResult_date",
-            tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
+            dQACargaViralCohortQueries.getDataNotificouCV(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+            new ForwardSlashDateConverter());
 
     // C.3 - Resultado da CV de seguimento - Sheet 1: Column AR
     pdd.addColumn(
             "cvResult",
-            tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
+            dQACargaViralCohortQueries.getDataNotificouCV(),
             "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+            new ForwardSlashDateConverter());
 
     // C.4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV - Sheet 1: Column AS
     pdd.addColumn(
@@ -603,11 +608,4 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     return pdd;
   }
 
-  @Override
-  public List<Parameter> getParameters() {
-    return Arrays.asList(
-        new Parameter("startDate", "Cohort Start Date", Date.class),
-        new Parameter("endDate", "Cohort End Date", Date.class),
-        new Parameter("location", "Location", Location.class));
-  }
 }

@@ -2,11 +2,11 @@ package org.openmrs.module.eptsreports.reporting.reports;
 
 import java.io.IOException;
 import java.util.*;
+import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsWithMdcEvaluationCohortDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
-import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.ReportingException;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
@@ -92,10 +92,9 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
 
   @Override
   public List<Parameter> getParameters() {
-    List<Parameter> parameters = new ArrayList<>();
-    parameters.add(ReportingConstants.START_DATE_PARAMETER);
-    parameters.add(ReportingConstants.END_DATE_PARAMETER);
-    parameters.add(ReportingConstants.LOCATION_PARAMETER);
-    return parameters;
+    return Arrays.asList(
+        new Parameter("startDate", "Data Inicial", Date.class),
+        new Parameter("endDate", "Data Final", Date.class),
+        new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }
