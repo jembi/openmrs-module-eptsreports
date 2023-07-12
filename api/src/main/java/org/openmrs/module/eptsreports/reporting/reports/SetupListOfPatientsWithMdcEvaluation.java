@@ -13,8 +13,9 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Deprecated
+@Component
 public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager {
 
   @Autowired
@@ -80,7 +81,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:13,dataset:MDS");
+      props.put("repeatingSections", "sheet:1,row:13,dataset:MDC");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
