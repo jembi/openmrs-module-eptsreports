@@ -93,7 +93,7 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.encounter_type = ${6}"
         + "       AND ((o.concept_id = ${23985} AND o.value_coded = ${23954}) "
         + "       AND (o2.concept_id = ${165308} AND o2.value_coded = ${1256} "
-        + "       AND o2.obs_datetime <= :endDate)) ";
+        + "       AND o2.obs_datetime < :endDate)) ";
   }
 
   /**
@@ -182,7 +182,7 @@ public class TPTEligiblePatientsQueries {
         + "       AND e.encounter_type = ${6} "
         + "       AND o.concept_id = ${1719} "
         + "       AND o.value_coded = ${165307} "
-        + "       AND e.encounter_datetime <= :endDate ";
+        + "       AND e.encounter_datetime < :endDate ";
   }
 
   /**
