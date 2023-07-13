@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.reports;
 
+import static org.openmrs.module.reporting.evaluation.parameter.Mapped.mapStraightThrough;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -71,6 +73,7 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
     reportDefinition.setName(getName());
     reportDefinition.setDescription(getDescription());
     reportDefinition.setParameters(getParameters());
+
     reportDefinition.addDataSetDefinition(
         "IM",
         Mapped.mapStraightThrough(
@@ -80,6 +83,9 @@ public class SetupIntensiveMonitoringReport extends EptsDataExportManager {
         "DATIM", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     reportDefinition.addDataSetDefinition(
         "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
+
+    reportDefinition.addDataSetDefinition(
+        "HF", mapStraightThrough(new LocationDataSetDefinition()));
 
     // add a base cohort here to help in calculations running
     reportDefinition.setBaseCohortDefinition(
