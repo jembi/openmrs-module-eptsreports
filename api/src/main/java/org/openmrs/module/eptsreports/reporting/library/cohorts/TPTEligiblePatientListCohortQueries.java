@@ -1200,12 +1200,10 @@ public class TPTEligiblePatientListCohortQueries {
     String query =
         " SELECT p.patient_id   "
             + "            FROM   patient p   "
-            + "            INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "            INNER JOIN(   "
             + unionQuery
             + " ) AS tabela  ON tabela.patient_id = p.patient_id    "
-            + "                    WHERE e.location_id= :location "
-            + "AND e.encounter_type IN ( ${6}, ${9}, ${53} ) "
+            + "                    WHERE p.voided = 0 "
             + "       AND( SELECT count(patient_id) "
             + "            FROM "
             + "            (SELECT ee.patient_id, o2.obs_datetime "
@@ -1854,30 +1852,18 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getMpart1())
-            .union(TPTEligiblePatientsQueries.getMpart3())
-            .union(TPTEligiblePatientsQueries.getMpart4())
-            .union(TPTEligiblePatientsQueries.getMpart5())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart4())
             .union(TPTEligiblePatientsQueries.getMpart6())
             .buildQuery();
 
     String query =
         "SELECT p.patient_id "
             + "             FROM   patient p "
-            + "                    inner join encounter e "
-            + "                            ON e.patient_id = p.patient_id "
-            + "                    inner join obs o "
-            + "                            ON o.encounter_id = e.encounter_id "
             + "                    inner join ( "
             + unionQuery
-            + "                     "
             + "                 ) AS tabela "
             + "                            ON tabela.patient_id = p.patient_id "
             + "             WHERE  p.voided = 0 "
-            + "                    AND e.voided = 0 "
-            + "                    AND o.voided = 0 "
-            + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_type = ${6} "
             + "                    AND ( (SELECT Count(*) "
             + "                           FROM   patient pp "
             + "                                  join encounter ee "
@@ -1900,7 +1886,8 @@ public class TPTEligiblePatientListCohortQueries {
             + "                                 AND o2.obs_datetime BETWEEN "
             + "                                     tabela.encounter_datetime AND "
             + "                         Date_add(tabela.encounter_datetime, "
-            + "                         INTERVAL 4 MONTH)))) >= 3 ) "
+            + "                         INTERVAL 4 MONTH) "
+            + "                          AND o2.obs_datetime <= :endDate))) >= 3 ) "
             + "             GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
@@ -1915,7 +1902,7 @@ public class TPTEligiblePatientListCohortQueries {
    *
    * <ul>
    *   <li>C: Select all patients from M and check if: The date from M is registered on Ficha
-   *       Clinica - Master Card (encounter type 6) or Ficha Resumo (encounter type 53) and:
+   *       Clinica - Master Card (encounter type 6):
    *   <li>At least 1 consultation registered on Ficha Clínica (encounter type 6) with DT-3HP
    *       (concept ID 1719, value_coded =165307) until a 4-month period from the 3HP Strat Date
    *       (date from M.1;) or
@@ -1952,50 +1939,30 @@ public class TPTEligiblePatientListCohortQueries {
     // this will generate one union separated query based on the given queries
     String unionQuery =
         unionBuilder
-            .unionBuilder(TPTEligiblePatientsQueries.getMpart1())
-            .union(TPTEligiblePatientsQueries.getMpart3())
-            .union(TPTEligiblePatientsQueries.getMpart4())
-            .union(TPTEligiblePatientsQueries.getMpart5())
+            .unionBuilder(TPTEligiblePatientsQueries.getMpart4())
             .union(TPTEligiblePatientsQueries.getMpart6())
             .buildQuery();
 
     String query =
         "SELECT p.patient_id "
-            + "             FROM   patient p "
-            + "                    inner join encounter e "
-            + "                            ON e.patient_id = p.patient_id "
-            + "                    inner join obs o "
-            + "                            ON o.encounter_id = e.encounter_id "
-            + "                    inner join ( "
+            + " FROM   patient p "
+            + "       inner join encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       inner join obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "       inner join ( "
             + unionQuery
-            + "                     "
-            + "                 ) AS tabela "
-            + "                            ON tabela.patient_id = p.patient_id "
-            + "             WHERE  p.voided = 0 "
-            + "                    AND e.voided = 0 "
-            + "                    AND o.voided = 0 "
-            + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_type = ${6} "
-            + "                    AND ( (SELECT Count(*) "
-            + "                           FROM   patient pp "
-            + "                                  join encounter ee "
-            + "                                    ON pp.patient_id = ee.patient_id "
-            + "                                  join obs oo "
-            + "                                    ON oo.encounter_id = ee.encounter_id "
-            + "                          WHERE  pp.voided = 0 "
-            + "                                 AND ee.voided = 0 "
-            + "                                 AND oo.voided = 0 "
-            + "                                 AND p.patient_id = pp.patient_id "
-            + "                                 AND ee.encounter_type = ${6} "
-            + "                                 AND ee.location_id = :location "
-            + "                                 AND ee.voided = 0 "
-            + "                                 AND oo.concept_id = ${1719} "
-            + "                                 AND oo.value_coded = ${165307} "
-            + "                                 AND ee.encounter_datetime BETWEEN "
-            + "                                     tabela.encounter_datetime AND "
-            + "                         Date_add(tabela.encounter_datetime, "
-            + "                         INTERVAL 4 MONTH)) >= 1 ) "
-            + "             GROUP  BY p.patient_id ";
+            + " ) AS tabela "
+            + "               ON tabela.patient_id = p.patient_id "
+            + " WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.concept_id = ${1719} "
+            + "       AND o.value_coded = ${165307} "
+            + "       and o.obs_datetime BETWEEN tabela.encounter_datetime and DATE_ADD(tabela.encounter_datetime, interval 4 month) "
+            + " GROUP  BY p.patient_id ";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
