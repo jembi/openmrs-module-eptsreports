@@ -187,7 +187,7 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
 
     // 15 - Alert Description - Sheet 2: Column O
     pdd.addColumn(
-        "Section_Tittle ",
+        "Section_Tittle",
         listOfPatientsWithHighViralLoadCohortQueries
             .getPatientsWithAnExpectedFollowUpDuringTheWeekSectionTittle(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
