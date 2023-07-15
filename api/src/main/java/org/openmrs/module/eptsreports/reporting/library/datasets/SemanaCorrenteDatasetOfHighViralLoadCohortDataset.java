@@ -12,7 +12,6 @@ import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNu
 import org.openmrs.module.eptsreports.reporting.data.converter.StoYesAndNtoNoConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsEligibleForVLDataDefinitionQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsWithHighViralLoadCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationDataDefinitionQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -149,11 +148,7 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
         null);
 
     // 9 Address (Célula) – Sheet 2: Column I */
-    pdd.addColumn(
-        "cell",
-        listOfPatientsWithHighViralLoadCohortQueries.getPatientCell(),
-        " ",
-        null);
+    pdd.addColumn("cell", listOfPatientsWithHighViralLoadCohortQueries.getPatientCell(), " ", null);
 
     // 10 - Data Inicio Tarv - Sheet 2: Column J
     pdd.addColumn(
@@ -176,38 +171,35 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
         "endDate=${generationDate},location=${location}",
         new StoYesAndNtoNoConverter());
 
-
     // 13 - Date of the VL Result reception - Sheet 2: Column M
     pdd.addColumn(
-            "result_reception_date",
-            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(true),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
-
+        "result_reception_date",
+        listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(true),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
     // 14 - The first VL Result > 1000 - Sheet 2: Column N
     pdd.addColumn(
-            "vl_result",
-            listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(false),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
-
+        "vl_result",
+        listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(false),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
     // 15 - Alert Description - Sheet 2: Column O
     pdd.addColumn(
-            "Section_Tittle ",
-            listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithAnExpectedFollowUpDuringTheWeekSectionTittle(),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
-
-
+        "Section_Tittle ",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getPatientsWithAnExpectedFollowUpDuringTheWeekSectionTittle(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
     // 16 - Follow-up Date - Sheet 2: Column P
     pdd.addColumn(
-            "Follow-up_Date",
-            listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithAnExpectedFollowUpDuringTheWeek(),
-            "startDate=${startDate},endDate=${endDate},location=${location}",
-            null);
+        "Follow-up_Date",
+        listOfPatientsWithHighViralLoadCohortQueries
+            .getPatientsWithAnExpectedFollowUpDuringTheWeek(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        null);
 
     return pdd;
   }

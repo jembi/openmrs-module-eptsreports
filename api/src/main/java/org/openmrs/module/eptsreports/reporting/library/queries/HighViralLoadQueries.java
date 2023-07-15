@@ -7,7 +7,7 @@ public class HighViralLoadQueries {
    * Viral Load Result Date (HVL_FR13) and report end date
    */
   public static String getSessionZeroQuery() {
-    return "           SELECT p.patient_id, MIN(e.encounter_datetime) as session_zero_date "
+    return "           SELECT p.patient_id, DATE(MIN(e.encounter_datetime)) as session_zero_date "
         + "                    FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
         + "                                   INNER JOIN ( "
         + "                                         SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
@@ -36,7 +36,7 @@ public class HighViralLoadQueries {
    */
   public static String getSessionOneQuery() {
     return "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS first_session_date "
+        + "       DATE(Min(e.encounter_datetime)) AS first_session_date "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -62,7 +62,7 @@ public class HighViralLoadQueries {
    */
   public static String getSessionTwoQuery() {
     return "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS second_session_date "
+        + "       DATE(Min(e.encounter_datetime)) AS second_session_date "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -115,7 +115,7 @@ public class HighViralLoadQueries {
   public static String getColumnFQuery(boolean greaterThan1000) {
     String query =
         " SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS result_date "
+            + "       DATE(Min(e.encounter_datetime)) AS result_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -186,7 +186,7 @@ public class HighViralLoadQueries {
   public static String getApssSessionZero() {
 
     return "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS apss_date "
+        + "       DATE(Min(e.encounter_datetime)) AS apss_date "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -236,7 +236,7 @@ public class HighViralLoadQueries {
    */
   public static String getApssSessionOne() {
     return "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS apss_date "
+        + "       DATE(Min(e.encounter_datetime)) AS apss_date "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -285,7 +285,7 @@ public class HighViralLoadQueries {
    */
   public static String getApssSessionTwo() {
     return "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS apss_date "
+        + "       DATE(Min(e.encounter_datetime)) AS apss_date "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -334,7 +334,7 @@ public class HighViralLoadQueries {
    */
   public static String getApssSessionThree() {
     return "SELECT p.patient_id, "
-        + "       Min(e.encounter_datetime) AS apss_date "
+        + "       DATE(Min(e.encounter_datetime)) AS apss_date "
         + "FROM   patient p "
         + "       INNER JOIN encounter e "
         + "               ON p.patient_id = e.patient_id "
@@ -389,7 +389,7 @@ public class HighViralLoadQueries {
     String query = " SELECT p.patient_id, ";
 
     if (resultDate) {
-      query += "       Min(e.encounter_datetime) AS result_date ";
+      query += "       DATE(Min(e.encounter_datetime)) AS result_date ";
     } else {
       query += "      o.value_numeric AS vl_result ";
     }

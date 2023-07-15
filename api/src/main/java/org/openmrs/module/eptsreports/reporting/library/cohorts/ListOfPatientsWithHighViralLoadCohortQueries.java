@@ -85,7 +85,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT p.patient_id, "
-            + "       Min(o2.value_datetime) AS collection_date "
+            + "       DATE(Min(o2.value_datetime)) AS collection_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -142,7 +142,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query = " SELECT p.patient_id, ";
     if (resultDate) {
-      query += "       Min(e.encounter_datetime) AS result_date ";
+      query += "       DATE(Min(e.encounter_datetime)) AS result_date ";
     } else {
       query += "       o.value_numeric AS vl_result ";
     }
@@ -322,7 +322,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
         "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-        " SELECT p.patient_id, MIN(e.encounter_datetime) as first_consultation "
+        " SELECT p.patient_id, DATE(MIN(e.encounter_datetime)) as first_consultation "
             + "FROM patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "               INNER JOIN ( "
             + "    SELECT p.patient_id, MIN(e.encounter_datetime) AS result_date "
@@ -385,7 +385,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
 
     String query =
-        " SELECT p.patient_id, DATE_ADD(MIN(e.encounter_datetime), interval 7 day) AS expected_date "
+        " SELECT p.patient_id, DATE(DATE_ADD(MIN(e.encounter_datetime), interval 7 day)) AS expected_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -440,7 +440,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS first_session_date "
+            + "       DATE(Min(e.encounter_datetime)) AS first_session_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -496,7 +496,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT apss_session_zero.patient_id, "
-            + "      DATE_ADD(apss_session_zero.session_zero_date, INTERVAL 30 DAY) AS expected_first_session_date "
+            + "      DATE(DATE_ADD(apss_session_zero.session_zero_date, INTERVAL 30 DAY)) AS expected_first_session_date "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionZeroQuery()
             + " ) apss_session_zero "
@@ -540,7 +540,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS second_session_date "
+            + "       DATE(Min(e.encounter_datetime)) AS second_session_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -595,7 +595,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT apss_session_zero.patient_id, "
-            + "      DATE_ADD(apss_session_zero.first_session_date, INTERVAL 30 DAY) AS expected_second_session_date "
+            + "      DATE(DATE_ADD(apss_session_zero.first_session_date, INTERVAL 30 DAY)) AS expected_second_session_date "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionOneQuery()
             + " ) apss_session_zero "
@@ -639,7 +639,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS third_session_date "
+            + "       DATE(Min(e.encounter_datetime)) AS third_session_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -694,7 +694,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT session_two.patient_id, "
-            + "      DATE_ADD(session_two.first_session_date, INTERVAL 30 DAY) AS expected_third_session_date "
+            + "      DATE(DATE_ADD(session_two.first_session_date, INTERVAL 30 DAY)) AS expected_third_session_date "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionOneQuery()
             + " ) session_two "
@@ -818,7 +818,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS expected_date "
+            + "       DATE(Min(e.encounter_datetime)) AS expected_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -878,7 +878,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT session_two.patient_id, "
-            + "      DATE_ADD(session_two.first_session_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(session_two.first_session_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionOneQuery()
             + " ) session_two "
@@ -920,7 +920,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT p.patient_id, "
-            + "       Min(o.value_datetime) AS collection_date "
+            + "       DATE(Min(o.value_datetime)) AS collection_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -1009,7 +1009,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT session_three.patient_id, "
-            + "      DATE_ADD(session_three.third_session_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(session_three.third_session_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionThreeQuery()
             + " ) session_three "
@@ -1111,7 +1111,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "           Min(e.encounter_datetime) AS first_consultation "
+            + "           DATE(Min(e.encounter_datetime)) AS first_consultation "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         p.patient_id = e.patient_id "
@@ -1189,7 +1189,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT af_date.patient_id, "
-            + "      DATE_ADD(af_date.result_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(af_date.result_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getColumnFQuery(true)
             + " ) af_date "
@@ -1251,7 +1251,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         "SELECT     p.patient_id, "
-            + "           Min(e.encounter_datetime) AS initiation_date "
+            + "           DATE(Min(e.encounter_datetime)) AS initiation_date "
             + "FROM       patient p "
             + "INNER JOIN encounter e "
             + "ON         p.patient_id = e.patient_id "
@@ -1423,7 +1423,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT af_date.patient_id, "
-            + "      DATE_ADD(af_date.result_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(af_date.result_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getColumnFQuery(false)
             + " ) af_date "
@@ -1500,7 +1500,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT am_date.patient_id, "
-            + "      DATE_ADD(am_date.apss_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(am_date.apss_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionZero()
             + " ) am_date "
@@ -1576,7 +1576,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT session_date.patient_id, "
-            + "      DATE_ADD(session_date.apss_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(session_date.apss_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionOne()
             + " ) session_date "
@@ -1652,7 +1652,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT session_date.patient_id, "
-            + "      DATE_ADD(session_date.apss_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(session_date.apss_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionTwo()
             + " ) session_date "
@@ -1694,7 +1694,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "       Min(e.encounter_datetime) AS expected_date "
+            + "       DATE(Min(e.encounter_datetime)) AS expected_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -1751,7 +1751,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT p.patient_id, "
-            + "       Min(o.value_datetime) AS collection_date "
+            + "       DATE(Min(o.value_datetime)) AS collection_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON p.patient_id = e.patient_id "
@@ -1844,7 +1844,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT session_date.patient_id, "
-            + "      DATE_ADD(session_date.apss_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(session_date.apss_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionThree()
             + " ) session_date "
@@ -1882,7 +1882,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
         "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
 
     String query =
-        "SELECT p.patient_id, MIN(e.encounter_datetime) as first_consultation "
+        "SELECT p.patient_id, DATE(MIN(e.encounter_datetime)) as first_consultation "
             + "FROM patient p "
             + "         INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "         INNER JOIN obs o ON e.encounter_id = o.encounter_id "
@@ -1934,7 +1934,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
 
     String query =
         " SELECT session_date.patient_id, "
-            + "      DATE_ADD(session_date.result_date, INTERVAL 30 DAY) AS expected_date "
+            + "      DATE(DATE_ADD(session_date.result_date, INTERVAL 30 DAY)) AS expected_date "
             + "FROM   ( "
             + HighViralLoadQueries.getThirdVLResultOrResultDateQuery(true)
             + " ) session_date "
