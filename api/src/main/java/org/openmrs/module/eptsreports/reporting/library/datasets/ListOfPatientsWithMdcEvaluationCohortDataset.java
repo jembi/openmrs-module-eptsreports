@@ -101,7 +101,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     // A.6 - Elegível ao TPT no início do TARV - Sheet 1: Column F
     pdd.addColumn(
-        "tpt_eligible",
+        "tpt_eligible_tarv",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -122,7 +122,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     // A.9 - Resultado do CD4 inicial - Sheet 1: Column I
     pdd.addColumn(
-        "cd4_result",
+        "initial_cd4_result",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -132,21 +132,21 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     // B.1 - Data do pedido da 1ª CV - Sheet 1: Column J
     pdd.addColumn(
-        "firstCv_date",
+        "first_cv_date",
         dQACargaViralCohortQueries.getDataNotificouCV(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
 
     // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
     pdd.addColumn(
-        "firstCv_result_date",
+        "first_cv_result_date",
         dQACargaViralCohortQueries.getDataNotificouCV(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
 
     // B.3 - Resultado da 1ª CV - Sheet 1: Column L
     pdd.addColumn(
-        "firstCv_result",
+        "first_cv_result",
         dQACargaViralCohortQueries.getDataNotificouCV(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
@@ -161,14 +161,14 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // B.5 - Teve registo de boa adesão em TODAS as consultas entre o 1˚ e 3˚ mês de TARV? - Sheet
     // 1: Column N
     pdd.addColumn(
-        "registed_firstToThirdMonthTarv",
+        "good_adherence_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.6 - Esteve grávida ou foi lactante entre 3˚ e 9˚ mês de TARV? - Sheet 1: Column O
     pdd.addColumn(
-        "pregnantBreastfeeding_thridToNinethmonthTarv",
+        "pregnant_breastfeeding_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -176,14 +176,14 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // B.7 - Teve condição clínica activa do estadio III ou IV entre 3˚ e 9˚ mês de  TARV - Sheet 1:
     // Column P
     pdd.addColumn(
-        "clinicalConditionIiiorIv_thridToNinethmonthTarv",
+        "clinical_condition_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.8 - Teve TB entre o 3˚ e 9˚ mês de  TARV - Sheet 1: Column Q
     pdd.addColumn(
-        "tb_thridToNinethmonthTarv",
+        "tb_tarv_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -197,105 +197,105 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     // B.10.1 - Tipo de MDS 1 - Sheet 1: Column S
     pdd.addColumn(
-        "bMds1",
+        "mds_one_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.2 - Data de Inicio MDS 1 - Sheet 1: Column T
     pdd.addColumn(
-        "bMds1_startDate",
+        "mds_one_start_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.3 - Data de Fim MDS 1 - Sheet 1: Column U
     pdd.addColumn(
-        "bMds1_endDate",
+        "mds_one_end_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.4 - Tipo de MDS 2 - Sheet 1: Column V
     pdd.addColumn(
-        "bMds2",
+        "mds_two_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.5 - Data de Inicio MDS 2 - Sheet 1: Column W
     pdd.addColumn(
-        "bMds2_startDate",
+        "mds_two_start_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.6 - Data de Fim MDS 2 - Sheet 1: Column X
     pdd.addColumn(
-        "bMds2_endDate",
+        "mds_two_end_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.7 - Tipo de MDS 3 - Sheet 1: Column Y
     pdd.addColumn(
-        "bMds3",
+        "mds_three_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.8 - Data de Inicio MDS 3 - Sheet 1: Column Z
     pdd.addColumn(
-        "bMds3_startDate",
+        "mds_three_start_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.9 - Data de Fim MDS 3 - Sheet 1: Column AA
     pdd.addColumn(
-        "bMds3_endDate",
+        "mds_three_end_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.10 - Tipo de MDS 4 - Sheet 1: Column AB
     pdd.addColumn(
-        "bMds4",
+        "mds_four_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.11 - Data de Inicio MDS 4 - Sheet 1: Column AC
     pdd.addColumn(
-        "bMds4_startDate",
+        "mds_four_start_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.12 - Data de Fim MDS 4 - Sheet 1: Column AD
     pdd.addColumn(
-        "bMds4_endDate",
+        "mds_four_end_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.13 - Tipo de MDS 5 - Sheet 1: Column AE
     pdd.addColumn(
-        "bMds5",
+        "mds_five_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.14 - Data de Inicio MDS 5 - Sheet 1: Column AF
     pdd.addColumn(
-        "bMds5_startDate",
+        "mds_five_start_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.10.15 - Data de Fim MDS 5 - Sheet 1: Column AG
     pdd.addColumn(
-        "bMds5_endDate",
+        "mds_five_end_date_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -305,7 +305,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // B.11 - Rastreado para TB em TODAS as consultas entre a data de inscrição no MDS e 12˚ mês de
     // TARV? - Sheet 1: Column AH
     pdd.addColumn(
-        "tb_screening",
+        "tb_screening_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -313,14 +313,14 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // B.12 - Elegível para TPT entre a data de inscrição no MDS e 12˚ mês de TARV? - Sheet 1:
     // Column AI
     pdd.addColumn(
-        "tpt_eligible",
+        "tpt_eligible_mds",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.13 - Recebeu TPT entre a data de inscrição no MDS e 12˚ mês de TARV? - Sheet 1: Column AJ
     pdd.addColumn(
-        "receivedTpt",
+        "received_tpt_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -328,7 +328,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // B.14 - PB/IMC registado em TODAS as consultas desde a inscrição no MDS até ao 12˚ mês de
     // TARV? - Sheet 1: Column AK
     pdd.addColumn(
-        "pbImc",
+        "pb_imc_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -336,28 +336,28 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // B.15 - Malnutrido recebeu tto para desnutrição entre a inscrição no MDS e o 12˚ mês de TARV?
     // - Sheet 1: Column AL
     pdd.addColumn(
-        "malnutrition",
+        "malnutrition_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.16 - N˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV - Sheet 1: Column AM
     pdd.addColumn(
-        "clinicalConsultations_6thTo12thMonth",
+        "clinical_consultations_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Sheet 1: Column AN
     pdd.addColumn(
-        "apssPpConsultations_6thTo12thMonth",
+        "apss_pp_consultations_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // B.18 - Estado de permanência no 12˚ mês de TARV - Sheet 1: Column AO
     pdd.addColumn(
-        "statePermanence_6thTo12thMonth",
+        "permanence_state_b",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -367,28 +367,28 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     // C.1 - Data do pedido da CV de seguimento - Sheet 1: Column AP
     pdd.addColumn(
-        "cv_date",
+        "cv_date_c",
         dQACargaViralCohortQueries.getDataNotificouCV(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
 
     // C.2 - Data de registo do resultado da CV de seguimento - Sheet 1: Column AQ
     pdd.addColumn(
-        "cvResult_date",
+        "cv_result_date_c",
         dQACargaViralCohortQueries.getDataNotificouCV(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
 
     // C.3 - Resultado da CV de seguimento - Sheet 1: Column AR
     pdd.addColumn(
-        "cvResult",
+        "cv_result_c",
         dQACargaViralCohortQueries.getDataNotificouCV(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
 
     // C.4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV - Sheet 1: Column AS
     pdd.addColumn(
-        "cd4Result_12thTo24thMonthTarv",
+        "cd4_result_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -396,14 +396,14 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // C.5 - Teve registo de boa adesão em TODAS consultas entre 12˚ e o 24˚ mês de TARV? - Sheet 1:
     // Column AT
     pdd.addColumn(
-        "goodAdherence_12thTo24thMonthTarv",
+        "good_adherence_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.6 - Esteve grávida ou foi lactante entre 12˚ e 24˚ mês de TARV - Sheet 1: Column AU
     pdd.addColumn(
-        "pregnantBreastfeeding_12thTo24thMonthTarv",
+        "pregnant_breastfeeding_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -411,126 +411,126 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // C.7 - Teve condição clínica activa do estadio III ou IV entre 12˚ e 24˚ mês de TARV - Sheet
     // 1: Column AV
     pdd.addColumn(
-        "clinicalConditionIiiOrIv_12thTo24thMonthTarv",
+        "clinical_condition_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.8 - Teve TB entre 12˚ e 24˚ mês de TARV - Sheet 1: Column AW
     pdd.addColumn(
-        "tb_12thTo24thMonthTarv",
+        "tb_tarv_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.9 - Inscrito em algum MDS entre 12˚ a 24˚ mês de TARV? - Sheet 1: Column AX
     pdd.addColumn(
-        "mds_12thTo24thMonthTarv",
+        "mds_tarv_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.1 - Tipo de MDS 1 - Sheet 1: Column AY
     pdd.addColumn(
-        "cMds1",
+        "mds_one_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.2 - Data de Inicio MDS1 - Sheet 1: Column AZ
     pdd.addColumn(
-        "cMds1_startDate",
+        "mds_one_start_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.3 - Data de Fim MDS1 - Sheet 1: Column BA
     pdd.addColumn(
-        "cMds1_endDate",
+        "mds_one_end_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.4 - Tipo de MDS 2 - Sheet 1: Column BB
     pdd.addColumn(
-        "cMds2",
+        "mds_two_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.5 - Data de Inicio MDS 2 - Sheet 1: Column BC
     pdd.addColumn(
-        "cMds2_startDate",
+        "mds_two_start_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.6 - Data de Fim MDS 2 - Sheet 1: Column BD
     pdd.addColumn(
-        "cMds2_endDate",
+        "mds_two_end_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.7 - Tipo de MDS 3 - Sheet 1: Column BE
     pdd.addColumn(
-        "cMds3",
+        "mds_three_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.8 - Data de Inicio MDS 3 - Sheet 1: Column BF
     pdd.addColumn(
-        "cMds3_startDate",
+        "mds_three_start_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.9 - Data de Fim MDS 3 - Sheet 1: Column BG
     pdd.addColumn(
-        "cMds3_endDate",
+        "mds_three_end_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.10 - Tipo de MDS 4 - Sheet 1: Column BH
     pdd.addColumn(
-        "cMds4",
+        "mds_four_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.11 - Data de Inicio MDS 4 - Sheet 1: Column BI
     pdd.addColumn(
-        "cMds4_startDate",
+        "mds_four_start_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.12 - Data de Fim MDS 4 - Sheet 1: Column BJ
     pdd.addColumn(
-        "cMds4_endDate",
+        "mds_four_end_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.13 - Tipo de MDS 5 - Sheet 1: Column BK
     pdd.addColumn(
-        "cMds5",
+        "mds_five_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.14 - Data de Inicio MDS 5 - Sheet 1: Column BL
     pdd.addColumn(
-        "cMds5_startDate",
+        "mds_five_start_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.10.15 - Data de Fim MDS 5 - Sheet 1: Column BM
     pdd.addColumn(
-        "cMds5_endDate",
+        "mds_five_end_date_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -540,21 +540,21 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // C.11 - Rastreado para TB em TODAS as consultas entre 12˚ e 24˚ mês de TARV? - Sheet 1: Column
     // BN
     pdd.addColumn(
-        "tbScreening_12thTo24thMonthTarv",
+        "tb_screening_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.12 - Elegível para TPT entre 12˚ e 24˚ mês de TARV - Sheet 1: Column BO
     pdd.addColumn(
-        "tptEligible_12thTo24thMonthTarv",
+        "tpt_eligible_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.13 - Recebeu TPT entre 12˚ e 24˚ mês de TARV? - Sheet 1: Column BP
     pdd.addColumn(
-        "receivedTpt_12thTo24thMonthTarv",
+        "received_tpt_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -562,7 +562,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // C.14 - PB/IMC registado em todas as consultas entre 12˚ a 24˚ mês de TARV? - Sheet 1: Column
     // BQ
     pdd.addColumn(
-        "pbImc_12thTo24thMonthTarv",
+        "pb_imc_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
@@ -570,28 +570,28 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // C.15 - Malnutrido que recebeu tto para desnutrição entre 12˚ e 24˚ mês de TARV? - Sheet 1:
     // Column BR
     pdd.addColumn(
-        "malnutrition_12thTo24thMonthTarv",
+        "malnutrition_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.16 - N˚ de consultas clínicas entre 12˚ e 24˚ mês de TARV - Sheet 1: Column BS
     pdd.addColumn(
-        "clinicalConsultations_12thTo24thMonthTarv",
+        "clinical_consultations_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.17 - N˚ de consultas de APSS/PP entre 12˚ e 24˚ mês de TARV - Sheet 1: Column BT
     pdd.addColumn(
-        "apssPpConsultations_12thTo24thMonthTarv",
+        "apss_pp_consultations_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
 
     // C.18 - Estado de permanência no 24˚ mês de TARV - Sheet 1: Column BU
     pdd.addColumn(
-        "statePermanence",
+        "permanence_state_c",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
         null);
