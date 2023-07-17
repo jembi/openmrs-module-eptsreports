@@ -187,7 +187,7 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
 
     // 15 - Alert Description - Sheet 2: Column O
     pdd.addColumn(
-        "Section_Tittle",
+        "section_tittle",
         listOfPatientsWithHighViralLoadCohortQueries
             .getPatientsWithAnExpectedFollowUpDuringTheWeekSectionTittle(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
@@ -195,7 +195,7 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
 
     // 16 - Follow-up Date - Sheet 2: Column P
     pdd.addColumn(
-        "Follow-up_Date",
+        "followup_date",
         listOfPatientsWithHighViralLoadCohortQueries
             .getPatientsWithAnExpectedFollowUpDuringTheWeek(),
         "startDate=${startDate},endDate=${endDate},location=${location}",

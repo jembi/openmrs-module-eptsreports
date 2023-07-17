@@ -718,7 +718,7 @@ public class CommonQueries {
 
     String fromSQL =
         " FROM ( "
-            + " SELECT p.patient_id, DATE(MIN(e.encounter_datetime)) first_pickup FROM patient p "
+            + " SELECT p.patient_id, MIN(e.encounter_datetime) first_pickup FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " WHERE e.encounter_type = ${18} "
             + " AND e.encounter_datetime <= :endDate "
@@ -729,7 +729,7 @@ public class CommonQueries {
             + "  "
             + " UNION "
             + "  "
-            + " SELECT p.patient_id, DATE(Min(e.encounter_datetime)) first_pickup  "
+            + " SELECT p.patient_id, Min(e.encounter_datetime) first_pickup  "
             + "                                 FROM patient p  "
             + "                           INNER JOIN encounter e  "
             + "                               ON p.patient_id = e.patient_id  "
@@ -745,7 +745,7 @@ public class CommonQueries {
             + "                           AND e.location_id = :location  "
             + "                       GROUP  BY p.patient_id  "
             + " UNION "
-            + " SELECT p.patient_id,  DATE(MIN(o.value_datetime)) first_pickup FROM patient p "
+            + " SELECT p.patient_id,  MIN(o.value_datetime) first_pickup FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + " WHERE e.encounter_type IN(${6},${9},${18},${53}) "
@@ -756,7 +756,7 @@ public class CommonQueries {
             + " AND p.voided = 0 AND o.voided = 0"
             + " GROUP BY p.patient_id "
             + " UNION "
-            + " SELECT p.patient_id, DATE(pg.date_enrolled) AS first_pickup "
+            + " SELECT p.patient_id, pg.date_enrolled AS first_pickup "
             + "     FROM   patient p   "
             + "           INNER JOIN patient_program pg  "
             + "                ON p.patient_id = pg.patient_id  "
@@ -767,7 +767,7 @@ public class CommonQueries {
             + "     "
             + "    UNION "
             + "     "
-            + " SELECT p.patient_id,  DATE(MIN(o.value_datetime)) AS first_pickup FROM patient p "
+            + " SELECT p.patient_id,  MIN(o.value_datetime) AS first_pickup FROM patient p "
             + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + " INNER JOIN obs o ON o.encounter_id = e.encounter_id "
             + " INNER JOIN obs oyes ON oyes.encounter_id = e.encounter_id  "
@@ -786,7 +786,7 @@ public class CommonQueries {
 
     String sql =
         startDate
-            ? "SELECT art.patient_id , DATE(MIN(art.first_pickup)) first_pickup ".concat(fromSQL)
+            ? "SELECT art.patient_id , MIN(art.first_pickup) first_pickup ".concat(fromSQL)
             : "SELECT art.patient_id ".concat(fromSQL);
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);

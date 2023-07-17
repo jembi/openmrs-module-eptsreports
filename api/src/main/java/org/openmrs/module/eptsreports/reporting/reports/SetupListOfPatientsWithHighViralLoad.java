@@ -94,8 +94,7 @@ public class SetupListOfPatientsWithHighViralLoad extends EptsDataExportManager 
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:13,dataset:HIGHVL");
-      props.put("repeatingSections", "sheet:2,row:11,dataset:SMNC");
+      props.put("repeatingSections", "sheet:1,row:13,dataset:HIGHVL|sheet:2,row:11,dataset:SMNC");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
