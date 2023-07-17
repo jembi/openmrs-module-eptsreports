@@ -2662,7 +2662,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     valuesMap.put("23821", commonMetadata.getSampleCollectionDateAndTime().getConceptId());
 
     String query =
-        " SELECT inclusion1.patient_id, " +sectionTittles.INCLUSION1.getSectionTittle() + " from ("
+        " SELECT inclusion1.patient_id, "
+            + sectionTittles.INCLUSION1.getSectionTittle()
+            + " from ("
             + " SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
@@ -2705,7 +2707,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion1.patient_id"
             + " UNION "
-            + " SELECT inclusion2.patient_id, " +sectionTittles.INCLUSION2.getSectionTittle()+ "  from ("
+            + " SELECT inclusion2.patient_id, "
+            + sectionTittles.INCLUSION2.getSectionTittle()
+            + "  from ("
             + " SELECT p.patient_id "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
@@ -2748,7 +2752,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion2.patient_id "
             + " UNION "
-            + " SELECT inclusion3.patient_id, " +sectionTittles.INCLUSION3.getSectionTittle()+ " from ("
+            + " SELECT inclusion3.patient_id, "
+            + sectionTittles.INCLUSION3.getSectionTittle()
+            + " from ("
             + " SELECT apss_session_zero.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionZeroQuery()
@@ -2777,7 +2783,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion3.patient_id "
             + " UNION "
-            + " SELECT inclusion4.patient_id, " +sectionTittles.INCLUSION4.getSectionTittle()+ " from ("
+            + " SELECT inclusion4.patient_id, "
+            + sectionTittles.INCLUSION4.getSectionTittle()
+            + " from ("
             + " SELECT apss_session_zero.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionOneQuery()
@@ -2806,7 +2814,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion4.patient_id"
             + " UNION "
-            + " SELECT inclusion5.patient_id, " +sectionTittles.INCLUSION5.getSectionTittle()+ " from ("
+            + " SELECT inclusion5.patient_id, "
+            + sectionTittles.INCLUSION5.getSectionTittle()
+            + " from ("
             + " SELECT session_two.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionOneQuery()
@@ -2835,7 +2845,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion5.patient_id "
             + " UNION "
-            + " SELECT inclusion6.patient_id, " +sectionTittles.INCLUSION6.getSectionTittle()+ " from ("
+            + " SELECT inclusion6.patient_id, "
+            + sectionTittles.INCLUSION6.getSectionTittle()
+            + " from ("
             + " SELECT session_two.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionOneQuery()
@@ -2866,7 +2878,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion6.patient_id "
             + " UNION "
-            + " SELECT inclusion7.patient_id, " +sectionTittles.INCLUSION7.getSectionTittle()+ " from ("
+            + " SELECT inclusion7.patient_id, "
+            + sectionTittles.INCLUSION7.getSectionTittle()
+            + " from ("
             + " SELECT session_two.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getSessionOneQuery()
@@ -2895,7 +2909,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion7.patient_id"
             + " UNION "
-            + " SELECT inclusion8.patient_id, " +sectionTittles.INCLUSION8.getSectionTittle()+ " from ("
+            + " SELECT inclusion8.patient_id, "
+            + sectionTittles.INCLUSION8.getSectionTittle()
+            + " from ("
             + HighViralLoadQueries.getColumnFQuerySelectionTittle(false)
             + " ) inclusion8 "
             + " WHERE inclusion8.patient_id NOT IN ("
@@ -2907,7 +2923,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion8.patient_id"
             + " UNION "
-            + " SELECT inclusion9.patient_id, " +sectionTittles.INCLUSION9.getSectionTittle()+ " from ("
+            + " SELECT inclusion9.patient_id, "
+            + sectionTittles.INCLUSION9.getSectionTittle()
+            + " from ("
             + " SELECT af_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getColumnFQuery(true)
@@ -2957,7 +2975,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion9.patient_id "
             + " UNION "
-            + " SELECT inclusion10.patient_id, " +sectionTittles.INCLUSION10.getSectionTittle()+ "  from ("
+            + " SELECT inclusion10.patient_id, "
+            + sectionTittles.INCLUSION10.getSectionTittle()
+            + "  from ("
             + " SELECT af_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getColumnFQuery(false)
@@ -2969,7 +2989,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion10.patient_id "
             + " UNION "
-            + " SELECT inclusion11.patient_id, " +sectionTittles.INCLUSION11.getSectionTittle()+ " from ("
+            + " SELECT inclusion11.patient_id, "
+            + sectionTittles.INCLUSION11.getSectionTittle()
+            + " from ("
             + " SELECT am_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionZero()
@@ -2981,7 +3003,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion11.patient_id"
             + " UNION "
-            + " SELECT inclusion12.patient_id, " +sectionTittles.INCLUSION12.getSectionTittle()+ " from ("
+            + " SELECT inclusion12.patient_id, "
+            + sectionTittles.INCLUSION12.getSectionTittle()
+            + " from ("
             + " SELECT session_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionOne()
@@ -2993,7 +3017,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion12.patient_id "
             + " UNION "
-            + " SELECT inclusion13.patient_id, " +sectionTittles.INCLUSION13.getSectionTittle()+ " from ("
+            + " SELECT inclusion13.patient_id, "
+            + sectionTittles.INCLUSION13.getSectionTittle()
+            + " from ("
             + " SELECT session_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionTwo()
@@ -3005,7 +3031,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion13.patient_id "
             + " UNION "
-            + " SELECT inclusion14.patient_id, " +sectionTittles.INCLUSION14.getSectionTittle()+ " from ("
+            + " SELECT inclusion14.patient_id, "
+            + sectionTittles.INCLUSION14.getSectionTittle()
+            + " from ("
             + " SELECT session_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionTwo()
@@ -3036,7 +3064,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion14.patient_id "
             + "UNION "
-            + " SELECT inclusion15.patient_id, " +sectionTittles.INCLUSION15.getSectionTittle()+ " from ("
+            + " SELECT inclusion15.patient_id, "
+            + sectionTittles.INCLUSION15.getSectionTittle()
+            + " from ("
             + " SELECT session_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionTwo()
@@ -3065,7 +3095,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion15.patient_id "
             + " UNION "
-            + " SELECT inclusion16.patient_id, " +sectionTittles.INCLUSION16.getSectionTittle()+ " from ("
+            + " SELECT inclusion16.patient_id, "
+            + sectionTittles.INCLUSION16.getSectionTittle()
+            + " from ("
             + " SELECT session_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getApssSessionThree()
@@ -3095,7 +3127,9 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + " )  "
             + " GROUP BY inclusion16.patient_id"
             + " UNION "
-            + " SELECT inclusion17.patient_id, " +sectionTittles.INCLUSION17.getSectionTittle()+ " from ( "
+            + " SELECT inclusion17.patient_id, "
+            + sectionTittles.INCLUSION17.getSectionTittle()
+            + " from ( "
             + " SELECT session_date.patient_id "
             + "FROM   ( "
             + HighViralLoadQueries.getThirdVLResultOrResultDateQuery(true)
@@ -3119,8 +3153,7 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
             + "  AND e.encounter_datetime <= :endDate "
             + "GROUP BY p.patient_id "
             + " )  "
-            + " GROUP BY inclusion17.patient_id "
-            ;
+            + " GROUP BY inclusion17.patient_id ";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -3129,107 +3162,113 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
     return spdd;
   }
 
-
-
   public enum sectionTittles {
+    INCLUSION1 {
+      @Override
+      public String getSectionTittle() {
+        return " ' Consulta Clínica com CV registada na Ficha Clínica e Comunicada ao Paciente ' ";
+      }
+    },
 
-  INCLUSION1{
-    public String getSectionTittle(){
-      return " ' Consulta Clínica com CV registada na Ficha Clínica e Comunicada ao Paciente ' ";
-    }
-  },
-
-    INCLUSION2{
-      public String getSectionTittle(){
+    INCLUSION2 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão após primeira CV alta - Sessão 0 de APSS ocorrida na Data do Resultado da CV acima de 1000 ' ";
       }
     },
-    INCLUSION3{
-      public String getSectionTittle(){
+    INCLUSION3 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão após primeira CV alta - Data da 1ª Consulta de APSS Após CV acima de 1000 ' ";
       }
     },
-    INCLUSION4{
-      public String getSectionTittle(){
+    INCLUSION4 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão após primeira CV alta - Data da 2ª Consulta de APSS Apos CV acima de 1000 ' ";
       }
     },
-    INCLUSION5{
-      public String getSectionTittle(){
+    INCLUSION5 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão após primeira CV alta - Data da 3ª Consulta de APSS/PP Após CV acima de 1000 ' ";
       }
     },
-    INCLUSION6{
-      public String getSectionTittle(){
+    INCLUSION6 {
+      @Override
+      public String getSectionTittle() {
         return " ' Repetição da CV - Segunda Carga Viral - Data da consulta clínica para repetição da 2ª CV (pedido) ficha clínica ' ";
       }
     },
-    INCLUSION7{
-      public String getSectionTittle(){
+    INCLUSION7 {
+      @Override
+      public String getSectionTittle() {
         return " ' Repetição da CV - Segunda Carga Viral- Data de Colheita da 2ª CV (se aplicável) do Laboratório ' ";
       }
     },
-    INCLUSION8{
-      public String getSectionTittle(){
+    INCLUSION8 {
+      @Override
+      public String getSectionTittle() {
         return " ' Repeticao da CV - Segunda Carga Viral - Data do resultado da 2ª CV (Lab ou FSR) ' ";
       }
     },
-    INCLUSION9{
-      public String getSectionTittle(){
+    INCLUSION9 {
+      @Override
+      public String getSectionTittle() {
         return " ' Mudança de Linha - A: Data da consulta Clínica para Mudança de linha ' ";
       }
     },
-    INCLUSION10{
-      public String getSectionTittle(){
+    INCLUSION10 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão - Seguimento após resposta Comité TARV: Data da  Sessão 0 da  APSS/PP após segunda CV alta (se aplicável) ' ";
       }
     },
-    INCLUSION11{
-      public String getSectionTittle(){
+    INCLUSION11 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão - Seguimento após resposta Comité TARV - Data da 1ª Consulta de APSS Após segunda CV Alta ' ";
       }
     },
-    INCLUSION12{
-      public String getSectionTittle(){
+    INCLUSION12 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão - Seguimento após resposta Comité TARV -Data da 2ª Consulta de APSS/PP Após segunda CV alta ' ";
       }
     },
-    INCLUSION13{
-      public String getSectionTittle(){
+    INCLUSION13 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão - Seguimento após resposta Comité TARV - Data da 3ª Consulta de APSS/PP Após CV acima de 1000 ' ";
       }
     },
-    INCLUSION14{
-      public String getSectionTittle(){
+    INCLUSION14 {
+      @Override
+      public String getSectionTittle() {
         return " ' Aconselhamento para Reforço a Adesão - Seguimento após resposta Comité TARV - Data da consulta clínica para pedido da CV (para os não aprovados) ficha clínica ' ";
       }
     },
-    INCLUSION15{
-      public String getSectionTittle(){
+    INCLUSION15 {
+      @Override
+      public String getSectionTittle() {
         return " ' Repetição da CV - Terceira Carga Viral: Data de Colheita da terceira CV (se aplicável) do Laboratório ' ";
       }
     },
-    INCLUSION16{
-      public String getSectionTittle(){
+    INCLUSION16 {
+      @Override
+      public String getSectionTittle() {
         return " ' Repetição da CV - Terceira Carga Viral: Data de Recepção do resultado da CV  (Lab ou FSR) ' ";
       }
     },
     INCLUSION17 {
+      @Override
       public String getSectionTittle() {
         return " ' Mudança da Linha - B: Data da Consulta Clínica para Mudança de Linha ' ";
       }
-
     };
 
-
     public abstract String getSectionTittle();
-
-
   }
-
-
-
-
 
   /**
    * <b>Patients with unsuppressed VL Result</b>
