@@ -119,7 +119,7 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
     pdd.addColumn(
         "age",
         listOfPatientsArtCohortCohortQueries.getAge(),
-        "endDate=${endDate}",
+        "evaluationDate=${endDate}",
         new NotApplicableIfNullConverter());
 
     // 4 - Sexo - Sheet 2: Column D

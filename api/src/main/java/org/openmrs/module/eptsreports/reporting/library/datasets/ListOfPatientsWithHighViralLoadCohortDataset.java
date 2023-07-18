@@ -116,7 +116,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "age",
         listOfPatientsArtCohortCohortQueries.getAge(),
-        "endDate=${endDate}",
+        "evaluationDate=${endDate}",
         new NotApplicableIfNullConverter());
 
     // 4 - Sexo - Sheet 1: Column D
