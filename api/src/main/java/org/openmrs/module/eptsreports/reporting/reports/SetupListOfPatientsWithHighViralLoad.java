@@ -44,12 +44,12 @@ public class SetupListOfPatientsWithHighViralLoad extends EptsDataExportManager 
 
   @Override
   public String getName() {
-    return "List of Patients with High Viral Load Cohort Report";
+    return "List for Follow-up of Patients with Unsuppressed Viral Load";
   }
 
   @Override
   public String getDescription() {
-    return "Lista de Pacientes com Carga Viral Alta";
+    return "Lista de Seguimento De Pacientes Com Carga Viral Não Suprimida";
   }
 
   @Override
@@ -109,7 +109,6 @@ public class SetupListOfPatientsWithHighViralLoad extends EptsDataExportManager 
     return Arrays.asList(
         new Parameter("startDate", "Cohort Start Date", Date.class),
         new Parameter("endDate", "Cohort End Date", Date.class),
-        new Parameter("evaluationDate", "Evaluation Date", Date.class),
         new Parameter("location", "Location", Location.class));
   }
 }

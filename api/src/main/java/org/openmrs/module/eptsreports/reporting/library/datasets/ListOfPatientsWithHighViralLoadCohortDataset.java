@@ -102,10 +102,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
 
     pdd.setParameters(getParameters());
 
-    pdd.addRowFilter(
-        listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithUnsuppressedVlResult(),
-        "startDate=${startDate},endDate=${endDate},location=${location}");
-    pdd.addColumn("id", new PersonIdDataDefinition(), "");
+
     // 1- NID sheet 1 - Column A
     pdd.addColumn(
         "nid",
@@ -119,7 +116,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "age",
         listOfPatientsArtCohortCohortQueries.getAge(),
-        "evaluationDate=${evaluationDate}",
+        "endDate=${endDate}",
         new NotApplicableIfNullConverter());
 
     // 4 - Sexo - Sheet 1: Column D
