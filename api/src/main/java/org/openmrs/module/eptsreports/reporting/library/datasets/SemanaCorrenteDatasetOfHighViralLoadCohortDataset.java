@@ -104,7 +104,6 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
 
     pdd.setParameters(getParameters());
 
-
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
     // 1- NID Sheet 2 - Column A
     pdd.addColumn(

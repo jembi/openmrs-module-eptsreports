@@ -102,7 +102,6 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
 
     pdd.setParameters(getParameters());
 
-
     // 1- NID sheet 1 - Column A
     pdd.addColumn(
         "nid",
