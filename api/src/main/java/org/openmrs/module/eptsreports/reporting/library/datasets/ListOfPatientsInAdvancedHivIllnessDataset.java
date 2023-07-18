@@ -85,7 +85,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     // 5 - Sexo - Sheet 1: Column E
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
-    // 6 - Cantacto - Sheet 1: Column F
+    // 6 - Contacto - Sheet 1: Column F
     pdd.addColumn("contact", contactDef, "");
 
     // 7 - Data Inicio Tarv - Sheet 1: Column F
