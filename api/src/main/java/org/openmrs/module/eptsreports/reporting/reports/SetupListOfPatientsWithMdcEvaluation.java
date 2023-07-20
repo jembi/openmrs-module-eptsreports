@@ -34,7 +34,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
 
   @Override
   public String getName() {
-    return "List of Patients with MDS Evaluation Cohort Report";
+    return "Lista De Pacientes com Avaliação da Implementação de MDS";
   }
 
   @Override
@@ -62,7 +62,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
     rd.addDataSetDefinition("DT", Mapped.mapStraightThrough(new DatimCodeDatasetDefinition()));
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
-        "MDC",
+        "MDS",
         Mapped.mapStraightThrough(listOfPatientsWithMdcEvaluationCohortDataset.contructDataset()));
 
     return rd;
@@ -76,11 +76,11 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
           createXlsReportDesign(
               reportDefinition,
               "SESP_MDS_Evaluation_V1.0.xls",
-              "List of Patients with MDS Evaluation Cohort Report",
+              "Lista De Pacientes com Avaliação da Implementação de MDS",
               getExcelDesignUuid(),
               null);
       Properties props = new Properties();
-      props.put("repeatingSections", "sheet:1,row:13,dataset:MDC");
+      props.put("repeatingSections", "sheet:1,row:13,dataset:MDS");
       props.put("sortWeight", "5000");
       reportDesign.setProperties(props);
     } catch (IOException e) {
@@ -93,7 +93,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("evaluationDate", "Evaluation Date", Date.class),
+        new Parameter("evaluationYear", "Ano de Avaliação", Integer.class),
         new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }

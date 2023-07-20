@@ -55,7 +55,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
 
-    pdd.setName("MDC");
+    pdd.setName("MDS");
     pdd.addParameter(new Parameter("startDate", "startDate", Date.class));
     pdd.addParameter(new Parameter("endDate", "endDate", Date.class));
     pdd.addParameter(new Parameter("location", "Location", Location.class));
