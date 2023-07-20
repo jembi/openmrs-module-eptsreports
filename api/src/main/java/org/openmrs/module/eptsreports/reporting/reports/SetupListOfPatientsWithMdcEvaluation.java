@@ -39,7 +39,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
 
   @Override
   public String getDescription() {
-    return "Lista de Pacientes com MDS Evaluation";
+    return "Avaliação da Implementação de MDS";
   }
 
   @Override
@@ -93,8 +93,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
   @Override
   public List<Parameter> getParameters() {
     return Arrays.asList(
-        new Parameter("startDate", "Data Inicial", Date.class),
-        new Parameter("endDate", "Data Final", Date.class),
+        new Parameter("evaluationDate", "Evaluation Date", Date.class),
         new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }

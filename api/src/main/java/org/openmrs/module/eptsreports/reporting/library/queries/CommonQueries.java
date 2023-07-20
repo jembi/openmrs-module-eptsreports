@@ -917,4 +917,41 @@ public class CommonQueries {
 
     return stringSubstitutor.replace(sql);
   }
+
+  /**
+   * <b>RF9 - Relatório – Informação do utente - Secção A1 a A9</b>
+   *
+   * <p>A5- Data início TARV: (coluna E) – Resposta = Data do Início TARV. A “Data do Início TARV” é
+   * a data registada na Ficha Resumo (Data do Início TARV). Nota: caso exista mais que uma “Ficha
+   * de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data mais antiga.
+   *
+   * @return {@link String}
+   */
+  public String getArtStartDateOnFichaResumo() {
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+
+    String sql =
+        "SELECT p.patient_id, "
+            + "       Min(o.value_datetime) art_start "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type = ${53} "
+            + "       AND o.concept_id = ${1190} "
+            + "       AND e.location_id = :location "
+            + "       AND o.value_datetime <= CURRENT_DATE() "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    return stringSubstitutor.replace(sql);
+  }
 }

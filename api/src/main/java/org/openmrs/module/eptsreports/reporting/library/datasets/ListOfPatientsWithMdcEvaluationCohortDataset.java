@@ -5,10 +5,7 @@ import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.DQACargaViralCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsDefaultersOrIITCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TPTInitiationDataDefinitionQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -21,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
+
+  private ListOfPatientsWithMdcEvaluationCohortQueries listOfPatientsWithMdcEvaluationCohortQueries;
   private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
 
   private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
@@ -35,12 +34,15 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
   @Autowired
   public ListOfPatientsWithMdcEvaluationCohortDataset(
+      ListOfPatientsWithMdcEvaluationCohortQueries listOfPatientsWithMdcEvaluationCohortQueries,
       ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries,
       DQACargaViralCohortQueries dQACargaViralCohortQueries,
       ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
+    this.listOfPatientsWithMdcEvaluationCohortQueries =
+        listOfPatientsWithMdcEvaluationCohortQueries;
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.tptInitiationDataDefinitionQueries = tptInitiationDataDefinitionQueries;
@@ -70,7 +72,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     pdd.setParameters(getParameters());
 
     pdd.addRowFilter(
-        dQACargaViralCohortQueries.getBaseCohort(),
+        listOfPatientsWithMdcEvaluationCohortQueries.getCoort(),
         "startDate=${startDate},endDate=${endDate},location=${location}");
 
     //  SECÇÃO A
