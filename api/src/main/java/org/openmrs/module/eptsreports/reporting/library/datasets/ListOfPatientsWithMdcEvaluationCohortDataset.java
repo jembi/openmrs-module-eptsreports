@@ -85,7 +85,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn("coort", nameDef, "");
 
     // A.3 - Sexo - Sheet 1: Column C
-    pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
+    pdd.addColumn("gender", new GenderDataDefinition(), "", new MaleFemaleConverter());
 
     // A.4 - Idade - Sheet 1: Column D
     pdd.addColumn(
