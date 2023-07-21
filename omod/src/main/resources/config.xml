@@ -3519,6 +3519,22 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.advancedHivIllnessEncounterTypeUuid</property>
+		<defaultValue>5f46b128-67f8-44e7-aec6-3a3df92df160</defaultValue>
+		<description>
+			UUID for Consulta de Doença Avançada por HIV Encounter Type
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cd4LabsetConceptUuid</property>
+		<defaultValue>68f51951-dedd-4ac4-900c-f243db35ba6c</defaultValue>
+		<description>
+			UUID for CD4 LABSET Concept
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

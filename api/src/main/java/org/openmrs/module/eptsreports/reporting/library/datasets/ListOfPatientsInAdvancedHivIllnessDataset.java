@@ -6,6 +6,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DataConverter;
@@ -22,13 +23,21 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
   private final ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
 
   private final TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
+  private final ListOfPatientsInAdvancedHivIllnessCohortQueries
+      listOfPatientsInAdvancedHivIllnessCohortQueries;
+
+  String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public ListOfPatientsInAdvancedHivIllnessDataset(
       ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
-      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet) {
+      TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
+      ListOfPatientsInAdvancedHivIllnessCohortQueries
+          listOfPatientsInAdvancedHivIllnessCohortQueries) {
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
+    this.listOfPatientsInAdvancedHivIllnessCohortQueries =
+        listOfPatientsInAdvancedHivIllnessCohortQueries;
   }
 
   public DataSetDefinition constructDataset() {
@@ -59,8 +68,9 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     pdd.setParameters(getParameters());
 
     pdd.addRowFilter(
-        listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART(),
-        "startDate=${startDate},endDate=${endDate},location=${location}");
+        listOfPatientsInAdvancedHivIllnessCohortQueries
+            .getPatientsOnFollowupOrWithCriteriaToStartFollowupOfDAH(),
+        mappings);
 
     // 1- NID sheet 1 - Column A
     pdd.addColumn(
@@ -88,7 +98,28 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     // 6 - Contacto - Sheet 1: Column F
     pdd.addColumn("contact", contactDef, "");
 
-    // 7 - Data Inicio Tarv - Sheet 1: Column F
+    // 7 - Data Inicio Tarv - Sheet 1: Column G
+    pdd.addColumn(
+        "art_start",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getARTStartDate(),
+        "endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 8 - Data de Último Levantamento TARV - Sheet 1: Column H
+    pdd.addColumn(
+        "last_pickup",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVPickupDate(),
+        mappings,
+        new NotApplicableIfNullConverter());
+
+    // 9 - Situação TARV no Início do Seguimento de DAH Sheet 1: Column I
+    pdd.addColumn(
+        "last_situation_date",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVSituationDate(),
+        "endDate=${endDate},location=${location}",
+        new NotApplicableIfNullConverter());
+
+    // 10 - Data de Início de Seguimento de DAH Sheet 1: Column J
 
     return pdd;
   }

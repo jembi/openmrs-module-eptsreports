@@ -5227,4 +5227,35 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.cryotherapyConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>encounterType_id = 90</b>
+   *
+   * <p><b>Name:</b> S.TARV: DAH
+   *
+   * <p><b>Description:</b> Consulta de Doença Avançada por HIV
+   *
+   * @return {@link EncounterType}
+   */
+  public EncounterType getAdvancedHivIllnessEncounterType() {
+    String uuid =
+        Context.getAdministrationService()
+            .getGlobalProperty("eptsreports.advancedHivIllnessEncounterTypeUuid");
+    return getEncounterType(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165389</b>
+   *
+   * <p><b>Name:</b> CD4 LABSET
+   *
+   * <p><b>Description:</b> CD4 LABSET Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCD4LabsetConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cd4LabsetConceptUuid");
+    return getConcept(uuid);
+  }
 }
