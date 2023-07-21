@@ -72,6 +72,11 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("A.5 - ART Start Date");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    String datePart = "-06-20";
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
@@ -88,7 +93,9 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "WHERE  e.encounter_type = ${53} "
             + "       AND o.concept_id = ${1190} "
             + "       AND e.location_id = :location "
-            + "       AND o.value_datetime <= CURRENT_DATE() "
+            + "       AND o.value_datetime <= "
+            + " :evaluationYear"
+            + datePart
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -97,6 +104,8 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    System.out.println(sqlPatientDataDefinition.getQuery());
 
     return sqlPatientDataDefinition;
   }
@@ -117,8 +126,15 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
   public DataDefinition getAgeOnMOHArtStartDate() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Age on MOH ART start date");
-    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("startDateDay", "startDateDay", Integer.class));
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("startDateMonth", "startDateMonth", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDateDay", "endDateDay", Integer.class));
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("endDateMonth", "endDateMonth", Integer.class));
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
@@ -135,11 +151,14 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "           WHERE pp.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "             AND e.encounter_type = ${53} and o.concept_id = ${1190} "
             + "             AND e.location_id = :location "
-            + "             AND o.value_datetime <= CURRENT_DATE() "
+            + "             AND o.value_datetime <= "
+            + ":evaluationYear"
+            + "-"
+            + ":endDateMonth"
+            + "-"
+            + ":endDateDay "
             + "           GROUP BY pp.patient_id ) AS A1 ON p.person_id = A1.patient_id "
-            + "WHERE A1.first_start_drugs >= :startDate "
-            + "  AND A1.first_start_drugs <= :endDate "
-            + "  AND TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) ";
+            + "  WHERE TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

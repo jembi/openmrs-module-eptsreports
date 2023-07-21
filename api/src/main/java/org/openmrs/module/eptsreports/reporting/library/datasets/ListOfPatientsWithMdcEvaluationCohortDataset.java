@@ -1,14 +1,8 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
-import java.util.Date;
 import org.openmrs.Location;
-import org.openmrs.PatientIdentifierType;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
-import org.openmrs.module.reporting.data.DataDefinition;
-import org.openmrs.module.reporting.data.converter.DataConverter;
-import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.person.definition.*;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
@@ -54,27 +48,9 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
   public DataSetDefinition contructDataset() {
 
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
-
     pdd.setName("MDS");
-    pdd.addParameter(new Parameter("startDate", "startDate", Date.class));
-    pdd.addParameter(new Parameter("endDate", "endDate", Date.class));
     pdd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
     pdd.addParameter(new Parameter("location", "Location", Location.class));
-
-    PatientIdentifierType identifierType =
-        Context.getPatientService()
-            .getPatientIdentifierTypeByUuid("e2b966d0-1d5f-11e0-b929-000c29ad1d07");
-
-    DataConverter formatter = new ObjectFormatter("{familyName}, {givenName}");
-
-    DataDefinition nameDef =
-        new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
-
-    pdd.setParameters(getParameters());
-
-    pdd.addRowFilter(
-        listOfPatientsWithMdcEvaluationCohortQueries.getCoort(),
-        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     //  SECÇÃO A
     //  INFORMAÇÃO DO PACIENTE
@@ -83,7 +59,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
     // A.2 - Coorte - Sheet 1: Column B
-    pdd.addColumn("coort", nameDef, "");
+    //    pdd.addColumn("coort", nameDef, "");
 
     // A.3 - Sexo - Sheet 1: Column C
     pdd.addColumn("gender", new GenderDataDefinition(), "", new MaleFemaleConverter());
@@ -92,14 +68,14 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "age",
         listOfPatientsWithMdcEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
 
     // A.5 - Data do início TARV - Sheet 1: Column E
     pdd.addColumn(
         "art_start",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
+        listOfPatientsWithMdcEvaluationCohortQueries.getArtStartDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // A.6 - Elegível ao TPT no início do TARV - Sheet 1: Column F
