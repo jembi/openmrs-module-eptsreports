@@ -58,6 +58,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     pdd.setName("MDS");
     pdd.addParameter(new Parameter("startDate", "startDate", Date.class));
     pdd.addParameter(new Parameter("endDate", "endDate", Date.class));
+    pdd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
     pdd.addParameter(new Parameter("location", "Location", Location.class));
 
     PatientIdentifierType identifierType =
@@ -90,8 +91,8 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // A.4 - Idade - Sheet 1: Column D
     pdd.addColumn(
         "age",
-        listOfPatientsArtCohortCohortQueries.getAge(),
-        "evaluationDate=${evaluationDate}",
+        listOfPatientsWithMdcEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
+        "startDate=${startDate},endDate=${endDate},location=${location}",
         new NotApplicableIfNullConverter());
 
     // A.5 - Data do início TARV - Sheet 1: Column E

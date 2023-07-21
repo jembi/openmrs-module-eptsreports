@@ -102,27 +102,50 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
   }
 
   /**
-   * <b> 4 - Idade </b>
+   * O sistema irá determinar a idade do utente na Data Início TARV, ou seja, irá calcular a idade
+   * com base na seguinte fórmula: Idade = Data Início TARV - Data de Nascimento
    *
-   * @return
+   * <p>Nota 1: A idade será calculada em anos.
+   *
+   * <p>Nota 2: A “Data Início TARV” é a data registada na Ficha Resumo (“Data do Início TARV”).
+   *
+   * <p>Nota 3: caso exista mais que uma “Ficha de Resumo” com “Data do Início TARV” diferente, deve
+   * ser considerada a data mais antiga.
+   *
+   * @return DataDefinition
    */
-  public DataDefinition getAge() {
+  public DataDefinition getAgeOnMOHArtStartDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Age on MOH ART start date");
+    sqlPatientDataDefinition.addParameter(new Parameter("startDate", "startDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
 
-    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+    String query =
+        "SELECT p.person_id, p.birthdate AS birth_date "
+            + "FROM person p "
+            + "     INNER JOIN ( "
+            + "           SELECT pp.patient_id, MIN(o.value_datetime) as first_start_drugs "
+            + "           FROM patient pp "
+            + "                INNER JOIN encounter e ON e.patient_id = pp.patient_id "
+            + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "           WHERE pp.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "             AND e.encounter_type = ${53} and o.concept_id = ${1190} "
+            + "             AND e.location_id = :location "
+            + "             AND o.value_datetime <= CURRENT_DATE() "
+            + "           GROUP BY pp.patient_id ) AS A1 ON p.person_id = A1.patient_id "
+            + "WHERE A1.first_start_drugs >= :startDate "
+            + "  AND A1.first_start_drugs <= :endDate "
+            + "  AND TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) ";
 
-    spdd.setName("Patient Age at Reporting Evaluation Date");
-    spdd.addParameter(new Parameter("evaluationDate", "evaluationDate", Date.class));
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
-    Map<String, Integer> valuesMap = new HashMap<>();
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
-    String sql =
-        "SELECT p.patient_id, FLOOR(DATEDIFF(:evaluationDate,ps.birthdate)/365) AS age FROM patient p "
-            + "    INNER JOIN person ps ON p.patient_id=ps.person_id WHERE p.voided=0 AND ps.voided=0";
-
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
-
-    spdd.setQuery(substitutor.replace(sql));
-    return spdd;
+    return sqlPatientDataDefinition;
   }
 
   private void addSqlPatientDataDefinitionParameters(
