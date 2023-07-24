@@ -140,6 +140,8 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
 
+    String datePart = "-06-20";
+
     String query =
         "SELECT p.person_id, p.birthdate AS birth_date "
             + "FROM person p "
@@ -152,11 +154,8 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "             AND e.encounter_type = ${53} and o.concept_id = ${1190} "
             + "             AND e.location_id = :location "
             + "             AND o.value_datetime <= "
-            + ":evaluationYear"
-            + "-"
-            + ":endDateMonth"
-            + "-"
-            + ":endDateDay "
+            + " :evaluationYear"
+            + datePart
             + "           GROUP BY pp.patient_id ) AS A1 ON p.person_id = A1.patient_id "
             + "  WHERE TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) ";
 
