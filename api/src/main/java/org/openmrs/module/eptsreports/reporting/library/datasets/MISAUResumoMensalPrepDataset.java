@@ -119,10 +119,10 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
     // B2
     dsd.addColumn(
         "TTB2",
-        "Total de de Novos Inícios que retornaram a PrEP durante o período de reporte",
+        "Nº de Novos inícios em PrEP que alguma vez estiveram em PrEP durante o período de reporte",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Total de Novos Inícios que retornaram a PrEP durante o período de reporte",
+                "Nº de Novos inícios em PrEP que alguma vez estiveram em PrEP durante o período de reporte",
                 EptsReportUtils.map(rmprepCohortQueries.getClientsReturnedToPrep(), mappings)),
             mappings),
         "");
