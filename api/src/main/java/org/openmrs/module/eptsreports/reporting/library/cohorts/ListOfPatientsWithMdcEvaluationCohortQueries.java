@@ -135,13 +135,13 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
 
     String query =
         "SELECT p.patient_id, FLOOR(DATEDIFF(A1.first_start_drugs,ps.birthdate)/365) AS age "
-            + "FROM person p "
+            + "FROM patient p "
             + "     INNER JOIN ( "
             + "           SELECT p.patient_id, MIN(o.value_datetime) as first_start_drugs "
-            + "           FROM patient pp "
-            + "                INNER JOIN encounter e ON e.patient_id = pp.patient_id "
+            + "           FROM patient p "
+            + "                INNER JOIN encounter e ON e.patient_id = p.patient_id "
             + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "           WHERE pp.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "           WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "             AND e.encounter_type = ${53} and o.concept_id = ${1190} "
             + "             AND e.location_id = :location "
             + "             AND o.value_datetime <= "
