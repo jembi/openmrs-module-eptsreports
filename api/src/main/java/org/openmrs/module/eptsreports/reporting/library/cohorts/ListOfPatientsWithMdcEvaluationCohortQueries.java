@@ -22,6 +22,8 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
 
   private HivMetadata hivMetadata;
 
+  String inclusionDayAndMonth = "'-06-20'";
+
   @Autowired
   public ListOfPatientsWithMdcEvaluationCohortQueries(
       CommonQueries commonQueries, HivMetadata hivMetadata) {
@@ -127,20 +129,11 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Age on MOH ART start date");
     sqlPatientDataDefinition.addParameter(
-        new Parameter("startDateDay", "startDateDay", Integer.class));
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("startDateMonth", "startDateMonth", Integer.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("endDateDay", "endDateDay", Integer.class));
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("endDateMonth", "endDateMonth", Integer.class));
-    sqlPatientDataDefinition.addParameter(
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-
-    String datePart = "-06-20";
 
     String query =
         "SELECT p.person_id, p.birthdate AS birth_date "
@@ -154,8 +147,9 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "             AND e.encounter_type = ${53} and o.concept_id = ${1190} "
             + "             AND e.location_id = :location "
             + "             AND o.value_datetime <= "
-            + " :evaluationYear"
-            + datePart
+            + "  CONCAT(:evaluationYear,"
+            + inclusionDayAndMonth
+            + " ) "
             + "           GROUP BY pp.patient_id ) AS A1 ON p.person_id = A1.patient_id "
             + "  WHERE TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) ";
 

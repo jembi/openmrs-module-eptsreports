@@ -49,7 +49,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
     pdd.setName("MDS");
-    pdd.addParameter(new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    pdd.addParameter(new Parameter("evaluationYear", "Ano de Avaliação", Integer.class));
     pdd.addParameter(new Parameter("location", "Location", Location.class));
 
     //  SECÇÃO A
