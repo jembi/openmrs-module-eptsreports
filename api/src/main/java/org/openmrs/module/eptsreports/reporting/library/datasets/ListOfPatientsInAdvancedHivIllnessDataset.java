@@ -128,7 +128,16 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
 
-    // COLUMNS K&L
+    // 11 - Data de Registo de CD4 Absoluto – Sheet 1: Column K
+    pdd.addColumn(
+        "cd4_resultdate",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4ResultDate(),
+        mappings,
+        new ForwardSlashDateConverter());
+
+    // 12 - Resultado de CD4 – Sheet 1: Column L
+    pdd.addColumn(
+        "cd4_result", listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4Result(), mappings);
 
     // 13 - Data de Registo de Estadio – Sheet 1: Column M
     pdd.addColumn(

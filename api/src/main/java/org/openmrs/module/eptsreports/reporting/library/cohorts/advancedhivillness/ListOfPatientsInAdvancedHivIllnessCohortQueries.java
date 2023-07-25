@@ -125,12 +125,29 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
 
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
 
+    String Cd4ResultOverOrEqualTo5yearsPid =
+        eptsQueriesUtil
+            .patientIdQueryBuilder(
+                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
+            .getQuery();
+
+    String getCd4ResultBetweenOneAnd5yearsPid =
+        eptsQueriesUtil
+            .patientIdQueryBuilder(
+                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
+            .getQuery();
+
+    String getCd4ResultBellowOneYearPid =
+        eptsQueriesUtil
+            .patientIdQueryBuilder(
+                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
+            .getQuery();
+
     String query =
         eptsQueriesUtil
-            .unionBuilder(
-                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
-            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
-            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
+            .unionBuilder(Cd4ResultOverOrEqualTo5yearsPid)
+            .union(getCd4ResultBetweenOneAnd5yearsPid)
+            .union(getCd4ResultBellowOneYearPid)
             .buildQuery();
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
@@ -552,6 +569,85 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> A data do registo do resultado de CD4 (absoluto) durante o período de avaliação </b>
+   *
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years() OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years() OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
+   * @return {@link CohortDefinition}
+   */
+  public DataDefinition getCd4ResultDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data de resultado de CD4 Absoluto");
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    valuesMap.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    valuesMap.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
+
+    EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
+
+    String query =
+        eptsQueriesUtil
+            .unionBuilder(
+                ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5years())
+            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5years())
+            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellowOneYear())
+            .buildQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> A data do registo do resultado de CD4 (absoluto) durante o período de avaliação </b>
+   *
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultOverOrEqualTo5years() OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBetweenOneAnd5years() OR
+   * @see ListOfPatientsOnAdvancedHivIllnessQueries#getCd4ResultBellowOneYear()
+   * @return {@link CohortDefinition}
+   */
+  public DataDefinition getCd4Result() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data de resultado de CD4 Absoluto");
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    valuesMap.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    valuesMap.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
+
+    EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
+
+    String query =
+        eptsQueriesUtil
+            .unionBuilder(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultOverOrEqualTo5y())
+            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBetweenOneAnd5y())
+            .union(ListOfPatientsOnAdvancedHivIllnessQueries.getCd4ResultBellow1y())
+            .buildQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlPatientDataDefinition;
   }
