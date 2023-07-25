@@ -89,7 +89,7 @@ public class SetupListOfPatientsWithHighViralLoad extends EptsDataExportManager 
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "test.xls",
+              "ListPatientWithHighViralLoad_v1.0.xls",
               "List of Patients with High Viral Load Cohort Report",
               getExcelDesignUuid(),
               null);

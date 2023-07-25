@@ -1814,6 +1814,59 @@ public class ListOfPatientsWithHighViralLoadCohortQueries {
   }
 
   /**
+   * terceira CV em cp/ml (Sheet 1: Column BA) </b>
+   *
+   * <p>Date of the earliest Laboratory or FSR form with VL Result registered between the 3rd
+   * APSS/PP Consultation Date after second high VL (value of column AS) and report end date
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getThirdVLResult() {
+
+    SqlPatientDataDefinition spdd = new SqlPatientDataDefinition();
+
+    spdd.setName("Data da Colheita Registada no Sistema");
+
+    spdd.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
+    spdd.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    spdd.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put(
+        "35", hivMetadata.getPrevencaoPositivaSeguimentoEncounterType().getEncounterTypeId());
+
+    String query =
+        " SELECT p.patient_id, o.value_numeric "
+            + " FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "INNER JOIN ( "
+            + HighViralLoadQueries.getApssSessionThree()
+            + "          ) session_three ON p.patient_id = session_three.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type IN ( ${13}, ${51} ) "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${856} "
+            + "       AND o.value_numeric >= 1000 "
+            + "       AND e.encounter_datetime > session_three.apss_date "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "GROUP  BY p.patient_id ";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    spdd.setQuery(substitutor.replace(query));
+
+    return spdd;
+  }
+
+  /**
    * <b>Data Prevista do Resultado da terceira CV (Sheet 1: Column AZ)</b>
    *
    * <p>The system will calculate the expected third VL result Date as follows: Predicted Third High

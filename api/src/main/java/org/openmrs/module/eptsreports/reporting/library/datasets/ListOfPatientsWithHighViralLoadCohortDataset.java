@@ -199,7 +199,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(true),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 18 - The expected Clinical Consultation date - Sheet 1: Column R - The Expected APSS/PP
     // Session 0 Consultation Date - Sheet 1: Column T
@@ -207,7 +207,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         "expected_clinical_apss_consultation_date",
         listOfPatientsWithHighViralLoadCohortQueries.getExpectedClinicalOrApssConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 19 - The date of first APSS/PP Consultation - Sheet 1: Column S
     pdd.addColumn(
@@ -215,7 +215,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstRegisteredClinicalOrApssConsultationAfterHighVlResultDate(false),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 20 - The date of the first APSS/PP Consultation after Session Zero - Sheet 1: Column U
     pdd.addColumn(
@@ -223,14 +223,14 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstRegisteredApssAfterApssSessionZeroConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 21 - The Expected 1st APSS/PP Consultation Date - Sheet 1: Column V
     pdd.addColumn(
         "apss_expected_date_session_one",
         listOfPatientsWithHighViralLoadCohortQueries.getExpectedApssSessionOneConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 22 - The date of the first APSS/PP Consultation after Session One - Sheet 1: Column W
     pdd.addColumn(
@@ -238,14 +238,14 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstRegisteredApssAfterApssSessionOneConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 23 - Expected 2nd APSS/PP Consultation Date - Sheet 1: Column X
     pdd.addColumn(
         "apss_expected_date_session_two",
         listOfPatientsWithHighViralLoadCohortQueries.getExpectedApssSessionTwoConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 24 - The date of the first APSS/PP Consultation after Session Two - Sheet 1: Column Y
     pdd.addColumn(
@@ -253,14 +253,14 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstRegisteredApssAfterApssSessionOTwoConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 25 - Expected 3rd APSS/PP Consultation Date - Sheet 1: Column Z
     pdd.addColumn(
         "apss_expected_date_session_three",
         listOfPatientsWithHighViralLoadCohortQueries.getExpectedApssSessionThreeConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 26 - The Adherence Evaluation Sheet 1: Column AA
     pdd.addColumn(
@@ -276,7 +276,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getRequestForLaboratoryInvestigationsAfterApssSessionTwo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 28 - The date of the first Clinical Consultation marked in Investigações - Pedidos
     // Laboratoriais Sheet 1: Column AC
@@ -285,7 +285,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedClinicalConsultationDateAfterApssSessionTwoConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 29 - The date of the first Clinical Consultation marked in Investigações - Pedidos
     // Laboratoriais Sheet 1: Column AD
@@ -294,7 +294,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getDateOfVLSampleCollectionAfterApssSessionTwoConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 30 - Expected Sample Collection Date - Sheet 1: Column AE
     pdd.addColumn(
@@ -302,7 +302,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedClinicalConsultationDateAfterApssSessionTwoConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 31 - Date of the earliest Laboratory or FSR form with VL Result - Sheet 1: Column AF
     pdd.addColumn(
@@ -310,7 +310,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstLabOrFsrAfterApssSessionThreeConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 32 - Expected second VL result  Date - Sheet 1: Column AG
     pdd.addColumn(
@@ -318,14 +318,14 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedResultDateOfFirstLabOrFsrApssSessionThree(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 33 - VL Result - Sheet 1: Column AH
     pdd.addColumn(
         "vl_result_after_session_three",
         listOfPatientsWithHighViralLoadCohortQueries.getVLResultOfFirstLabOrFsrApssSessionThree(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new IntegerConverter());
 
     // 34 - The Second VL Result Classification - Sheet 1: Column AI
     pdd.addColumn(
@@ -340,14 +340,14 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstClinicalConsultationAfterSecondHighVLResult(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 36 - The expected Consultation Date - Sheet 1: Column AK
     pdd.addColumn(
         "expected_consultation_date_after_second_high_vl",
         listOfPatientsWithHighViralLoadCohortQueries.getExpectedClinicalConsultationDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 37 - The first Clinical Consultation Date with 2nd or 3rd Line - Sheet 1: Column AL
     pdd.addColumn(
@@ -363,7 +363,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstApssConsultationAfterSecondHighVLResult(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 39 - Expected APSS/PP Session 0 Consultation Date  - Sheet 1: Column AN
     pdd.addColumn(
@@ -371,7 +371,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedApssConsultationAfterSecondHighVLResult(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 40 - The date of first APSS/PP Consultation registered in Ficha APSS/PP between the APSS/PP
     // Session 0  - Sheet 1: Column AO
@@ -380,7 +380,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstApssConsultationAfterFirstApssSessionZero(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 41 - Expected 1st APSS/PP Consultation Date - Sheet 1: Column AP
     pdd.addColumn(
@@ -388,7 +388,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedFirstApssConsultationAfterFirstApssSessionZero(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 42 - The date of first APSS/PP Consultation registered in Ficha APSS/PP between the APSS/PP
     // Session 1  - Sheet 1: Column AQ
@@ -397,7 +397,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstApssConsultationAfterFirstApssSessionOne(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 43 - Expected 2nd APSS/PP Consultation Date - Sheet 1: Column AR
     pdd.addColumn(
@@ -405,7 +405,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedFirstApssConsultationAfterFirstApssSessionOne(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 44 - The date of first APSS/PP Consultation registered in Ficha APSS/PP
     // between the APSS/PP Session 2 - Sheet 1: Column AS
@@ -414,7 +414,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstApssConsultationAfterFirstApssSessionTwo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 45 - Expected 3rd APSS/PP Consultation Date - Sheet 1: Column AT
     pdd.addColumn(
@@ -422,7 +422,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedFirstApssConsultationAfterFirstApssSessionTwo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 46 - The date of the first Clinical Consultation With Carga Viral marked in Investigações -
     // Pedidos
@@ -432,7 +432,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getRequestForLaboratoryInvestigationsAfterSessionTwo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 47 - VL Request Date Sheet 1: Column AV
     pdd.addColumn(
@@ -440,7 +440,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedFirstApssConsultationAfterFirstApssSessionTwo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 48 - Date of Sample collection on the earliest VL result date - Sheet 1: Column AW
     pdd.addColumn(
@@ -448,7 +448,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getDateOfVLSampleCollectionAfterApssSessionTwo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 49 - VL Sample Collection Date - Sheet 1: Column AX
     pdd.addColumn(
@@ -456,28 +456,28 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedFirstApssConsultationAfterFirstApssSessionTwo(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 50 - Date of the earliest Laboratory or FSR form with VL Result - Sheet 1: Column AY
     pdd.addColumn(
         "third_vl_result_date_after_apss_session_three",
         listOfPatientsWithHighViralLoadCohortQueries.getThirdVLResultOrResultDate(true),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 51 - Predicted Third High VL Result Date - Sheet 1: Column AZ
     pdd.addColumn(
         "predicted_third_vl_result_date",
         listOfPatientsWithHighViralLoadCohortQueries.getPredictedThirdHighVLResultDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 52 - VL Result in Laboratory or FSR on the Third Viral Load Result Date - Sheet 1: Column BA
     pdd.addColumn(
         "third_vl_result_after_apss_session_three",
-        listOfPatientsWithHighViralLoadCohortQueries.getThirdVLResultOrResultDate(false),
+        listOfPatientsWithHighViralLoadCohortQueries.getThirdVLResult(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new IntegerConverter());
 
     // 53 - The Third VL Result Classification - Sheet 1: Column BB
     pdd.addColumn(
@@ -492,7 +492,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getFirstClinicalConsultationAfterThirdVLResultDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 55 - Expected Clinical Consultation Date - Sheet 1: Column BD
     pdd.addColumn(
@@ -500,7 +500,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         listOfPatientsWithHighViralLoadCohortQueries
             .getExpectedConsultationAfterThirdHighVLResultDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 56 - The first Clinical Consultation Date with 2nd or 3rd Line - Sheet 1: Column BE
     pdd.addColumn(
