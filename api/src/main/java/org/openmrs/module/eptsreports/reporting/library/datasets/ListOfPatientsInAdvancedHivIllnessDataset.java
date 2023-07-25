@@ -3,8 +3,10 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.ForwardSlashDateConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.TreatmentSituationConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -103,23 +105,44 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "art_start",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getARTStartDate(),
         "endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 8 - Data de Último Levantamento TARV - Sheet 1: Column H
     pdd.addColumn(
         "last_pickup",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVPickupDate(),
         mappings,
-        new NotApplicableIfNullConverter());
+        new ForwardSlashDateConverter());
 
     // 9 - Situação TARV no Início do Seguimento de DAH Sheet 1: Column I
     pdd.addColumn(
-        "last_situation_date",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVSituationDate(),
+        "last_situation",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVSituation(),
         "endDate=${endDate},location=${location}",
-        new NotApplicableIfNullConverter());
+        new TreatmentSituationConverter());
 
     // 10 - Data de Início de Seguimento de DAH Sheet 1: Column J
+    pdd.addColumn(
+        "followup_startdate",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getFollowupStartDateDAH(),
+        "endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
+
+    // COLUMNS K&L
+
+    // 13 - Data de Registo de Estadio – Sheet 1: Column M
+    pdd.addColumn(
+        "estadio_date",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioOnPeriod(),
+        mappings,
+        new ForwardSlashDateConverter());
+
+    // 14 - Infecções Estadio OMS – Sheet 1: Column N
+    pdd.addColumn(
+        "estadio_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioOnPeriod(),
+        mappings,
+        new ForwardSlashDateConverter());
 
     return pdd;
   }

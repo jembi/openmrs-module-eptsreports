@@ -363,7 +363,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + " AND e.location_id = :location                 "
             + " GROUP BY p.patient_id "
             + " ) pickup  "
-            + " GROUP BY art.patient_id ";
+            + " GROUP BY pickup.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -373,40 +373,185 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
   }
 
   /**
-   * <b> Data de Último Levantamento TARV</b>
+   * <b> Situação TARV no Início do Seguimento de DAH </b>
+   * <li>O registo mais recente de “Situação de TARV” (Novo Inicio, Reinicio, em TARV, pré-TARV), na
+   *     “Ficha de Doença Avançada por HIV”, registada até o fim do período de avaliação.
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getLastARVSituationDate() {
+  public DataDefinition getLastARVSituation() {
 
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("Data de Situação TARV no Início do Seguimento de DAH");
+    sqlPatientDataDefinition.setName("Situação TARV no Início do Seguimento de DAH");
     sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
     valuesMap.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    valuesMap.put("1255", hivMetadata.getARVPlanConcept().getConceptId());
     valuesMap.put("1705", hivMetadata.getRestartConcept().getConceptId());
     valuesMap.put("6275", hivMetadata.getPreTarvConcept().getConceptId());
     valuesMap.put("6276", hivMetadata.getArtStatus().getConceptId());
 
     String query =
-        "SELECT p.patient_id, MAX(e.encounter_datetime) as start_date "
-            + "FROM "
-            + "    patient p INNER JOIN encounter e ON p.patient_id= e.patient_id "
-            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
-            + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+        "SELECT e.patient_id, o.value_coded AS situation "
+            + "FROM encounter e "
+            + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "         INNER JOIN     (SELECT p.patient_id, MAX(e.encounter_datetime) as start_date "
+            + "                         FROM "
+            + "                             patient p INNER JOIN encounter e ON p.patient_id= e.patient_id "
+            + "                                       INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "                         WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "                           AND e.encounter_type = ${90} "
+            + "                           AND o.concept_id = ${1255} "
+            + "                           AND o.value_coded IN (${1256},${1705},${6275},${6276}) "
+            + "                           AND e.encounter_datetime <= :endDate "
+            + "                           AND e.location_id = :location "
+            + "                         GROUP BY p.patient_id)last_situation ON last_situation.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${90} "
             + "  AND o.concept_id = ${1255} "
             + "  AND o.value_coded IN (${1256},${1705},${6275},${6276}) "
-            + "  AND e.encounter_datetime <= :endDate "
-            + " AND e.location_id = :location                 "
-            + "GROUP BY p.patient_id";
+            + "  AND e.encounter_datetime = last_situation.start_date "
+            + "  AND e.location_id = :location "
+            + "GROUP BY e.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Data de Início de Seguimento de DAH</b>
+   * <li>A data mais recente de “Início de Seguimento no Modelo de Doença Avançada”, registada até o
+   *     fim do período de avaliação, na “Ficha de Doença Avançada por HIV”
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getFollowupStartDateDAH() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data de Início de Seguimento de DAH");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+
+    String query =
+        " SELECT p.patient_id, MAX(e.encounter_datetime) AS most_recent "
+            + "FROM "
+            + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "WHERE p.voided = 0 AND e.voided = 0 "
+            + "  AND e.encounter_type = ${90} "
+            + "  AND e.encounter_datetime <= :endDate "
+            + "  AND e.location_id = :location "
+            + "GROUP BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(substitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * @see #getPatientsWithEstadioOnPeriod
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getDateOfEstadioOnPeriod() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName(" Data de Registo de Estadio");
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
+    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
+    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "               Min(e.encounter_datetime) AS consultation_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON p.patient_id = e.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON e.encounter_id = o.encounter_id "
+            + "        WHERE  p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               AND e.encounter_type IN ( ${6}, ${90} ) "
+            + "               AND o.concept_id = ${5356} "
+            + "               AND o.value_coded IN ( ${1206}, ${1207} ) "
+            + "               AND e.encounter_datetime >= :startDate "
+            + "               AND e.encounter_datetime <= :endDate "
+            + "               AND e.location_id = :location "
+            + "        GROUP  BY p.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(substitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * @see #getPatientsWithEstadioOnPeriod
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getResultOfEstadioOnPeriod() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Infecções Estadio OMS");
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
+    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
+    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
+
+    String query =
+        "SELECT e.patient_id, o.value_coded as estadio "
+            + "FROM encounter e "
+            + "         INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "         INNER JOIN     ( "
+            + "    SELECT p.patient_id, "
+            + "                        Min(e.encounter_datetime) AS consultation_date "
+            + "                             FROM   patient p "
+            + "                                    INNER JOIN encounter e "
+            + "                                            ON p.patient_id = e.patient_id "
+            + "                                    INNER JOIN obs o "
+            + "                                            ON e.encounter_id = o.encounter_id "
+            + "                             WHERE  p.voided = 0 "
+            + "                                    AND e.voided = 0 "
+            + "                                    AND o.voided = 0 "
+            + "                                    AND e.encounter_type IN ( ${6}, ${90} ) "
+            + "                                    AND o.concept_id = ${5356} "
+            + "                                    AND o.value_coded IN ( ${1206}, ${1207} ) "
+            + "                                    AND e.encounter_datetime >= :startDate "
+            + "                                    AND e.encounter_datetime <= :endDate "
+            + "                                    AND e.location_id = :location "
+            + "                             GROUP  BY p.patient_id "
+            + ")first_consultation ON first_consultation.patient_id = e.patient_id "
+            + "WHERE e.voided = 0 AND o.voided = 0 "
+            + "  AND e.encounter_type IN ( ${6}, ${90} ) "
+            + "  AND o.concept_id = ${5356} "
+            + "  AND o.value_coded IN (${1206}, ${1207}) "
+            + "  AND e.encounter_datetime = first_consultation.consultation_date "
+            + "  AND e.location_id = :location "
+            + "GROUP BY e.patient_id";
+
+    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
     return sqlPatientDataDefinition;
   }
