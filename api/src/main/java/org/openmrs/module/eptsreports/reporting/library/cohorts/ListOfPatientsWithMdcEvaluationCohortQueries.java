@@ -22,7 +22,8 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
 
   private HivMetadata hivMetadata;
 
-  String inclusionDayAndMonth = "'-06-20'";
+  String inclusionStartMonthAndDay = "'-01-21'";
+  String inclusionEndMonthAndDay = "'-06-20'";
 
   @Autowired
   public ListOfPatientsWithMdcEvaluationCohortQueries(
@@ -136,10 +137,10 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
 
     String query =
-        "SELECT p.person_id, p.birthdate AS birth_date "
+        "SELECT p.patient_id, FLOOR(DATEDIFF(A1.first_start_drugs,ps.birthdate)/365) AS age "
             + "FROM person p "
             + "     INNER JOIN ( "
-            + "           SELECT pp.patient_id, MIN(o.value_datetime) as first_start_drugs "
+            + "           SELECT p.patient_id, MIN(o.value_datetime) as first_start_drugs "
             + "           FROM patient pp "
             + "                INNER JOIN encounter e ON e.patient_id = pp.patient_id "
             + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
@@ -148,10 +149,10 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "             AND e.location_id = :location "
             + "             AND o.value_datetime <= "
             + "  CONCAT(:evaluationYear,"
-            + inclusionDayAndMonth
+            + inclusionEndMonthAndDay
             + " ) "
-            + "           GROUP BY pp.patient_id ) AS A1 ON p.person_id = A1.patient_id "
-            + "  WHERE TIMESTAMPDIFF(YEAR, p.birthdate, A1.first_start_drugs) ";
+            + "           GROUP BY p.patient_id ) AS A1 ON p.patient_id = A1.patient_id "
+            + "  INNER JOIN person ps ON p.patient_id=ps.person_id WHERE p.voided=0 AND ps.voided=0 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
