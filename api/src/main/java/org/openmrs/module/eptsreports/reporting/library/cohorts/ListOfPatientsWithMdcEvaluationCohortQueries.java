@@ -79,8 +79,6 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
-    String datePart = "-06-20";
-
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     valuesMap.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
@@ -97,8 +95,9 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "       AND o.concept_id = ${1190} "
             + "       AND e.location_id = :location "
             + "       AND o.value_datetime <= "
-            + " :evaluationYear"
-            + datePart
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
@@ -107,8 +106,6 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    System.out.println(sqlPatientDataDefinition.getQuery());
 
     return sqlPatientDataDefinition;
   }
