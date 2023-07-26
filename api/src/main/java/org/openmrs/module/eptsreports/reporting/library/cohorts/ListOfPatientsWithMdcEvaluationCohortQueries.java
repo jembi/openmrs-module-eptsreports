@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.library.queries.CommonQueries;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -22,14 +23,17 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
 
   private HivMetadata hivMetadata;
 
+  private TbMetadata tbMetadata;
+
   String inclusionStartMonthAndDay = "'-01-21'";
   String inclusionEndMonthAndDay = "'-06-20'";
 
   @Autowired
   public ListOfPatientsWithMdcEvaluationCohortQueries(
-      CommonQueries commonQueries, HivMetadata hivMetadata) {
+      CommonQueries commonQueries, HivMetadata hivMetadata, TbMetadata tbMetadata) {
     this.commonQueries = commonQueries;
     this.hivMetadata = hivMetadata;
+    this.tbMetadata = tbMetadata;
   }
 
   /**
@@ -81,7 +85,7 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses.");
     sqlPatientDataDefinition.addParameter(
-            new Parameter("evaluationYear", "evaluationYear", Integer.class));
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
@@ -91,16 +95,16 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     String arvStart = commonQueries.getArtStartDateOnFichaResumo();
 
     String query =
-            "SELECT patient_id, Min(o.value_datetime) art_start FROM ( "
-                    + arvStart
-                    + " ) initiated_art"
-                    + "   WHERE initiated_art.art_start BETWEEN CONCAT(:evaluationYear, "
-                    + inclusionStartMonthAndDay
-                    + " ) AND "
-                    + "  CONCAT(:evaluationYear,"
-                    + inclusionEndMonthAndDay
-                    + " ) "
-                    + "   GROUP BY patient_id";
+        "SELECT patient_id, Min(o.value_datetime) art_start FROM ( "
+            + arvStart
+            + " ) initiated_art"
+            + "   WHERE initiated_art.art_start BETWEEN CONCAT(:evaluationYear, "
+            + inclusionStartMonthAndDay
+            + " ) AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
+            + "   GROUP BY patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
@@ -197,6 +201,88 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + " ) "
             + "           GROUP BY p.patient_id ) AS A1 ON p.patient_id = A1.patient_id "
             + "  INNER JOIN person ps ON p.patient_id=ps.person_id WHERE p.voided=0 AND ps.voided=0 ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>RF13 - Data início do TPT - A.7 (coluna G)</b>
+   *
+   * <p>A7- Data de início do TPT: (coluna G) – Resposta = Data de Início TPT (RF13)
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getTptInitiationDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data de início do TPT.");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+
+    String query =
+        "SELECT p.patient_id, "
+            + "       Min(e.encounter_datetime) AS data_inicio_tpt "
+            + "FROM   patient p "
+            + "       JOIN encounter e "
+            + "         ON e.patient_id = p.patient_id "
+            + "       JOIN obs o "
+            + "         ON o.encounter_id = e.encounter_id "
+            + "       JOIN obs o2 "
+            + "         ON e.encounter_id = o2.encounter_id "
+            + "WHERE  e.encounter_type = ${6} "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "       AND ( ( o.concept_id = ${23985} "
+            + "               AND o.value_coded IN ( ${23954}, ${656}, 165305, 165306 ) ) " // ${165305}, ${165305} Not Available metadatas
+            + "             AND ( o2.concept_id = ${165308} "
+            + "                   AND o2.value_coded IN ( ${1256} ) ) ) "
+            + "       AND e.encounter_datetime BETWEEN CONCAT(:evaluationYear, "
+            + inclusionStartMonthAndDay
+            + " ) AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id, "
+            + "       Min(o2.obs_datetime) AS data_inicio_tpt "
+            + "FROM   patient p "
+            + "       JOIN encounter e "
+            + "         ON e.patient_id = p.patient_id "
+            + "       JOIN obs o "
+            + "         ON o.encounter_id = e.encounter_id "
+            + "       JOIN obs o2 "
+            + "         ON e.encounter_id = o2.encounter_id "
+            + "WHERE  e.encounter_type = ${53} "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "       AND ( ( o.concept_id = ${23985} "
+            + "               AND o.value_coded IN ( ${23954}, ${656}, 165305, 165306 ) ) " // ${165305}, ${165305} Not Available metadatas
+            + "             AND ( o2.concept_id = ${165308} "
+            + "                   AND o2.value_coded IN ( ${1256} ) ) ) "
+            + "       AND e.encounter_datetime BETWEEN CONCAT(:evaluationYear, "
+            + inclusionStartMonthAndDay
+            + " ) AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

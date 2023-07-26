@@ -100,8 +100,8 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // A.7 - Data de início do TPT - Sheet 1: Column G
     pdd.addColumn(
         "tpt_start_date",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
+        listOfPatientsWithMdcEvaluationCohortQueries.getTptInitiationDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // A.8 - Data de registo do resultado do CD4 inicial - Sheet 1: Column H
