@@ -70,6 +70,48 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
   /**
    * <b>RF9 - Relatório – Informação do utente - Secção A1 a A9</b>
    *
+   * <p>A2- Coorte: (coluna B) – Resposta = 12 meses, caso o utente tenha iniciado TARV na coorte de
+   * 12 meses, ou Resposta = 24 meses, caso o utente tenha iniciado TARV na coorte de 24 meses
+   * (RF4).
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getCoort12Or24Months() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses.");
+    sqlPatientDataDefinition.addParameter(
+            new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+
+    String arvStart = commonQueries.getArtStartDateOnFichaResumo();
+
+    String query =
+            "SELECT patient_id, Min(o.value_datetime) art_start FROM ( "
+                    + arvStart
+                    + " ) initiated_art"
+                    + "   WHERE initiated_art.art_start BETWEEN CONCAT(:evaluationYear, "
+                    + inclusionStartMonthAndDay
+                    + " ) AND "
+                    + "  CONCAT(:evaluationYear,"
+                    + inclusionEndMonthAndDay
+                    + " ) "
+                    + "   GROUP BY patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>RF9 - Relatório – Informação do utente - Secção A1 a A9</b>
+   *
    * <p>A5- Data início TARV: (coluna E) – Resposta = Data do Início TARV. A “Data do Início TARV” é
    * a data registada na Ficha Resumo (Data do Início TARV). Nota: caso exista mais que uma “Ficha
    * de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data mais antiga.
