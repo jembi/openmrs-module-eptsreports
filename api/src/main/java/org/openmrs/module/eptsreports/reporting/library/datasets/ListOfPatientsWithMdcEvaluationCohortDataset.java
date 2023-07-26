@@ -1,5 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.datasets;
 
+import java.util.Arrays;
+import java.util.List;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
@@ -49,8 +51,11 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
     pdd.setName("MDS");
-    pdd.addParameter(new Parameter("evaluationYear", "Ano de Avaliação", Integer.class));
-    pdd.addParameter(new Parameter("location", "Location", Location.class));
+    pdd.setParameters(getParameters());
+
+    pdd.addRowFilter(
+        listOfPatientsWithMdcEvaluationCohortQueries.getPatientsInitiatedART(),
+        "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO A
     //  INFORMAÇÃO DO PACIENTE
@@ -576,5 +581,12 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
         null);
 
     return pdd;
+  }
+
+  @Override
+  public List<Parameter> getParameters() {
+    return Arrays.asList(
+        new Parameter("evaluationYear", "Ano de Avaliação", Integer.class),
+        new Parameter("location", "Unidade Sanitária", Location.class));
   }
 }

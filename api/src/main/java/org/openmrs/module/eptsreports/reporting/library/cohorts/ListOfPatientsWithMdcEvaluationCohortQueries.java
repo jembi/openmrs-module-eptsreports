@@ -41,12 +41,12 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
    *
    * @return {CohortDefinition}
    */
-  public CohortDefinition getCoort() {
+  public CohortDefinition getPatientsInitiatedART() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Patients who initiated the ART between the cohort period");
-    sqlCohortDefinition.addParameter(new Parameter("startDate", "Cohort Start Date", Date.class));
-    sqlCohortDefinition.addParameter(new Parameter("endDate", "Cohort End Date", Date.class));
+    sqlCohortDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
 
     String arvStart = commonQueries.getArtStartDateOnFichaResumo();
@@ -55,7 +55,12 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
         "SELECT patient_id FROM ( "
             + arvStart
             + " ) initiated_art"
-            + "   WHERE initiated_art.art_start BETWEEN :startDate AND :endDate "
+            + "   WHERE initiated_art.art_start BETWEEN CONCAT(:evaluationYear, "
+            + inclusionStartMonthAndDay
+            + " ) AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
             + "   GROUP BY patient_id";
 
     sqlCohortDefinition.setQuery(query);
