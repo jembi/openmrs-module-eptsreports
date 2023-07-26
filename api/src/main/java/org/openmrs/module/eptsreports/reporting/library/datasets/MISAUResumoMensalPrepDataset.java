@@ -160,30 +160,6 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
             mappings),
         getColumnsDisaggregations());
 
-    // D1
-    dsd.addColumn(
-        "TTD1",
-        "Total de Utentes em PrEP por 3 meses consecutivos após terem iniciado a PrEP",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Total de Utentes em PrEP por 3 meses consecutivos após terem iniciado a PrEP",
-                EptsReportUtils.map(
-                    rmprepCohortQueries.getClientsFromB1PreviousPeriod(), mappings)),
-            mappings),
-        "");
-
-    addRow(
-        dsd,
-        "D1",
-        "Age and Gender",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Age and Gender",
-                EptsReportUtils.map(
-                    rmprepCohortQueries.getClientsFromB1PreviousPeriod(), mappings)),
-            mappings),
-        getColumnsDisaggregations());
-
     return dsd;
   }
 
