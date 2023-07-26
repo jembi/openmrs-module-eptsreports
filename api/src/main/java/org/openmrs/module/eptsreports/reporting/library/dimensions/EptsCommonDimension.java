@@ -401,6 +401,7 @@ public class EptsCommonDimension {
         hivCohortQueries.getMaleSexWorkersKeyPopCohortDefinition();
     CohortDefinition transgenderKeyPopCohort = hivCohortQueries.getTransgenderKeyPopCohort();
     CohortDefinition sexWorkersKeyPopCohort = hivCohortQueries.getSexWorkerKeyPopCohort();
+    CohortDefinition outroKeyPopCohort = hivCohortQueries.getOutroKeyPopCohort();
     dim.addCohortDefinition("PID", mapStraightThrough(drugUserKeyPopCohort));
     dim.addCohortDefinition("MSM", mapStraightThrough(homosexualKeyPopCohort));
     dim.addCohortDefinition("CSW", mapStraightThrough(femaleSexWorkerKeyPopCohort));
@@ -408,6 +409,7 @@ public class EptsCommonDimension {
     dim.addCohortDefinition("MSW", mapStraightThrough(maleSexWorkerKeyPopCohort));
     dim.addCohortDefinition("TG", mapStraightThrough(transgenderKeyPopCohort));
     dim.addCohortDefinition("SW", mapStraightThrough(sexWorkersKeyPopCohort));
+    dim.addCohortDefinition("OUT", mapStraightThrough(outroKeyPopCohort));
     return dim;
   }
 
