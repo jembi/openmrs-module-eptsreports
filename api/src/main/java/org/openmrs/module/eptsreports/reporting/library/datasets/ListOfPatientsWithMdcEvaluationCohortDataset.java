@@ -64,7 +64,14 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
     // A.2 - Coorte - Sheet 1: Column B
-    //    pdd.addColumn("coort", nameDef, "");
+    //        pdd.addColumn("coort_12_meses",
+    //                listOfPatientsWithMdcEvaluationCohortQueries.getArtStartDate(),
+    // "evaluationYear=${evaluationYear-1y},location=${location}", null);
+
+    // A.2 - Coorte - Sheet 1: Column B
+    //    pdd.addColumn("coort_12_meses",
+    //            listOfPatientsWithMdcEvaluationCohortQueries.getArtStartDate(),
+    // "evaluationYear=${evaluationYear-2y},location=${location}", null);
 
     // A.3 - Sexo - Sheet 1: Column C
     pdd.addColumn("gender", new GenderDataDefinition(), "", new MaleFemaleConverter());
