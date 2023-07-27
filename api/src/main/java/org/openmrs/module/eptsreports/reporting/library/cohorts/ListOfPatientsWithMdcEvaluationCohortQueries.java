@@ -362,7 +362,145 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "       AND enc.encounter_datetime <= Date_add(first_art.art_start, "
             + "                                     INTERVAL 33 day) "
             + "       AND enc.location_id = 398 "
-            + "GROUP  BY pa.patient_id;";
+            + "GROUP  BY pa.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>RF14 - Data de registo de resultado do CD4 inicial - A.8 (Coluna H)</b>
+   *
+   * <p>A9- Resultado do CD4 Inicial: (coluna I) - Resposta = Resultado de CD4 inicial (RF15)
+   *
+   * <p>O sistema irá identificar o resultado do CD4 inicial registrado em “Investigações-
+   * Resultados Laboratoriais" da primeira ou segunda Ficha Clínica ocorrido entre 0 e 33 dias
+   * depois da Data de Início TARV, durante o período de inclusão.
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getCd4Result() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado do CD4 inicial - A.9 (Coluna I)");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+
+    String arvStart = commonQueries.getArtStartDateOnFichaResumo();
+
+    String query =
+        "SELECT pt.patient_id, "
+            + "       o.value_numeric AS cd4_result "
+            + "FROM   patient pt "
+            + "       INNER JOIN (SELECT pa.patient_id, "
+            + "                          Min(enc.encounter_datetime) AS data_consulta "
+            + "                   FROM   patient pa "
+            + "                          INNER JOIN encounter enc "
+            + "                                  ON enc.patient_id = pa.patient_id "
+            + "                          INNER JOIN obs "
+            + "                                  ON obs.encounter_id = enc.encounter_id "
+            + "                          INNER JOIN (SELECT art.patient_id, "
+            + "                                             art.art_start "
+            + "                                      FROM   ( "
+            + arvStart
+            + "                                      ) art "
+            + "                                      WHERE  art.art_start >= "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + " ) "
+            + "                                             AND art.art_start <= "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
+            + "                                      GROUP  BY art.patient_id) first_art "
+            + "                                  ON first_art.patient_id = pa.patient_id "
+            + "                   WHERE  pa.voided = 0 "
+            + "                          AND enc.voided = 0 "
+            + "                          AND obs.voided = 0 "
+            + "                          AND enc.encounter_type = ${6} "
+            + "                          AND obs.concept_id = ${1695} "
+            + "                          AND obs.value_numeric IS NOT NULL "
+            + "                          AND enc.encounter_datetime >= first_art.art_start "
+            + "                          AND enc.encounter_datetime <= Date_add( "
+            + "                              first_art.art_start, "
+            + "                                                        INTERVAL 33 day) "
+            + "                          AND enc.location_id = :location "
+            + "                   GROUP  BY pa.patient_id "
+            + "                   UNION "
+            + "                   SELECT ee.patient_id, "
+            + "                          Min(ee.encounter_datetime) "
+            + "                   FROM   encounter ee "
+            + "                          INNER JOIN (SELECT pa.patient_id, "
+            + "                                             Min(enc.encounter_datetime) AS "
+            + "                                             data_consulta "
+            + "                                      FROM   patient pa "
+            + "                                             INNER JOIN encounter enc "
+            + "                                                     ON enc.patient_id = "
+            + "                                                        pa.patient_id "
+            + "                                             INNER JOIN obs "
+            + "                                                     ON obs.encounter_id = "
+            + "                                                        enc.encounter_id "
+            + "                                             INNER JOIN (SELECT art.patient_id, "
+            + "                                                                art.art_start "
+            + "                                                         FROM "
+            + "                                             ("
+            + arvStart
+            + ") art "
+            + "       WHERE  art.art_start >= "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + " ) "
+            + "       AND art.art_start <= "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
+            + "       GROUP  BY art.patient_id) first_art "
+            + "       ON first_art.patient_id = pa.patient_id "
+            + "       WHERE  pa.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND obs.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND obs.concept_id = ${1695} "
+            + "       AND obs.value_numeric IS NOT NULL "
+            + "       AND enc.encounter_datetime >= first_art.art_start "
+            + "       AND enc.encounter_datetime <= Date_add( "
+            + "       first_art.art_start, "
+            + "          INTERVAL 33 day) "
+            + "       AND enc.location_id = :location "
+            + "       GROUP  BY pa.patient_id) minn_encounter "
+            + "       ON minn_encounter.patient_id = ee.patient_id "
+            + "       WHERE  ee.voided = 0 "
+            + "       AND ee.encounter_type = ${6} "
+            + "       AND ee.encounter_datetime > minn_encounter.data_consulta) min_encounter "
+            + "               ON pt.patient_id = min_encounter.patient_id "
+            + "       INNER JOIN encounter enc "
+            + "               ON enc.patient_id = pt.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = enc.encounter_id "
+            + "WHERE  pt.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND o.concept_id = ${1695} "
+            + "       AND o.value_numeric IS NOT NULL "
+            + "       AND enc.encounter_datetime >= "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + " ) "
+            + "       AND enc.encounter_datetime <= "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
+            + "       AND enc.location_id = :location "
+            + "GROUP  BY pt.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

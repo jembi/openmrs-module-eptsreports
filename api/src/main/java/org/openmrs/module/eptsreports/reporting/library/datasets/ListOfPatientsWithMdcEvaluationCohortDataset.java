@@ -114,8 +114,8 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // A.9 - Resultado do CD4 inicial - Sheet 1: Column I
     pdd.addColumn(
         "initial_cd4_result",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
+        listOfPatientsWithMdcEvaluationCohortQueries.getCd4Result(),
+        "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     //  SECÇÃO B
