@@ -214,6 +214,16 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
    *
    * <p>A7- Data de início do TPT: (coluna G) – Resposta = Data de Início TPT (RF13)
    *
+   * <p>O sistema irá determinar a “Data Início do TPT” do utente selecionando a data mais antiga
+   * dos seguintes critérios:
+   *
+   * <p>registo de “Profilaxia TPT” (resposta = “INH” ou “3HP” ou “1HP” ou “LFX”) e o respectivo
+   * “Estado de Profilaxia TPT” (resposta = "Início") na Ficha Clínica (“Data Consulta”) durante o
+   * período de inclusão;
+   *
+   * <p>registo de “Última profilaxia TPT” (resposta = “INH” ou ”3HP” ou “1HP” ou “LFX”) com “Data
+   * Início” registada na Ficha Resumo durante o período de inclusão;
+   *
    * @return {DataDefinition}
    */
   public DataDefinition getTptInitiationDate() {
@@ -283,6 +293,74 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + inclusionEndMonthAndDay
             + " ) "
             + "GROUP  BY p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>RF14 - Data de registo de resultado do CD4 inicial - A.8 (Coluna H)</b>
+   *
+   * <p>A8- Data de registo do resultado de CD4 inicial: (coluna H) Resposta = Data do resultado de
+   * CD4 inicial (RF14)
+   *
+   * <p>O sistema irá determinar a “Data de Registo de Resultado do CD4 Inicial” identificando a
+   * consulta (Ficha Clínica) na qual foi efectuado o registo do resultado do CD4 inicial
+   * (“Investigações - Resultados Laboratoriais") ocorrido entre 0 e 33 dias após o Início TARV
+   * durante o período de inclusão.
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getCd4ResultDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName(
+        "Identificação de Data de registo do resultado de CD4 inicial\n");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+
+    String arvStart = commonQueries.getArtStartDateOnFichaResumo();
+
+    String query =
+        "SELECT pa.patient_id, "
+            + "       Min(enc.encounter_datetime) AS data_consulta "
+            + "FROM   patient pa "
+            + "       INNER JOIN encounter enc "
+            + "               ON enc.patient_id = pa.patient_id "
+            + "       INNER JOIN obs "
+            + "               ON obs.encounter_id = enc.encounter_id "
+            + "       INNER JOIN (SELECT arv.patient_id, "
+            + "                          arv.arv_date "
+            + "                   FROM   ( "
+            + arvStart
+            + "                   ) arv "
+            + "                   WHERE  arv.arv_date >= "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + " ) "
+            + "                          AND arv.arv_date <= "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + " ) "
+            + "                   GROUP  BY arv.patient_id) first_arv "
+            + "               ON first_arv.patient_id = pa.patient_id "
+            + "WHERE  pa.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND obs.voided = 0 "
+            + "       AND enc.encounter_type = 6 "
+            + "       AND obs.concept_id = 1695 "
+            + "       AND obs.value_numeric IS NOT NULL "
+            + "       AND enc.encounter_datetime >= first_arv.arv_date "
+            + "       AND enc.encounter_datetime <= Date_add(first_arv.arv_date, "
+            + "                                     INTERVAL 33 day) "
+            + "       AND enc.location_id = 398 "
+            + "GROUP  BY pa.patient_id;";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
