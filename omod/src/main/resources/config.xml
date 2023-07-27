@@ -3535,6 +3535,22 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.whoStageIConceptUuid</property>
+		<defaultValue>e1d9055e-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for WHO STAGE 1 ADULT Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.whoStageIIConceptUuid</property>
+		<defaultValue>e1d9066c-1d5f-11e0-b929-000c29ad1d07</defaultValue>
+		<description>
+			UUID for WHO STAGE 2 ADULT Concept
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

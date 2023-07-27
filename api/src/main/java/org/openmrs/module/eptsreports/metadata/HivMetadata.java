@@ -5258,4 +5258,34 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.cd4LabsetConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 1204</b>
+   *
+   * <p><b>Name:</b> WHO STAGE 1 ADULT
+   *
+   * <p><b>Description:</b> ESTADIO I OMS, ADULTO Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getWhoStageIConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.whoStageIConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 1205</b>
+   *
+   * <p><b>Name:</b> WHO STAGE 2 ADULT
+   *
+   * <p><b>Description:</b> ESTADIO II OMS, ADULTO Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getWhoStageIIConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.whoStageIIConceptUuid");
+    return getConcept(uuid);
+  }
 }

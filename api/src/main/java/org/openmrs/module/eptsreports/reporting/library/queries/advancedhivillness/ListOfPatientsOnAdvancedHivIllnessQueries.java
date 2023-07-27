@@ -144,18 +144,8 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  GROUP BY ps.person_id ";
   }
 
-  ///////////
-
   /**
-   *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
-   *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
-   *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 200 e idade do utente >= 5 anos ou
-   *
-   *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
-   *
+   * @see #getCd4ResultOverOrEqualTo5years()
    * @return {@link String}
    */
   public static String getCd4ResultOverOrEqualTo5y() {
@@ -171,15 +161,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   /**
-   *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
-   *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
-   *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 500 e idade do utente >= 1 ano e < 5 ou
-   *
-   *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
-   *
+   * @see #getCd4ResultBetweenOneAnd5years()
    * @return {@link String}
    */
   public static String getCd4ResultBetweenOneAnd5y() {
@@ -197,15 +179,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
   }
 
   /**
-   *
-   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
-   *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
-   *     Doença Avançada por HIV”, durante o período de avaliação (“Data Resultado CD4” >= “Data
-   *     Início Avaliação” e “Data Resultado CD4” <= “Data Fim Avaliação”) e com resultado CD4
-   *     (absoluto) < 750 e idade do utente < 1 ou
-   *
-   *     <p>Idade = Data Fim de Avaliação - Data de Nascimento
-   *
+   * @see #getCd4ResultBellowOneYear()
    * @return {@link String}
    */
   public static String getCd4ResultBellow1y() {

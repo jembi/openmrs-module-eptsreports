@@ -6,7 +6,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.eptsreports.reporting.data.converter.ForwardSlashDateConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
-import org.openmrs.module.eptsreports.reporting.data.converter.TreatmentSituationConverter;
+import org.openmrs.module.eptsreports.reporting.data.converter.ObservationToConceptNameConverter;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
 import org.openmrs.module.reporting.data.DataDefinition;
@@ -119,7 +119,7 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "last_situation",
         listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVSituation(),
         "endDate=${endDate},location=${location}",
-        new TreatmentSituationConverter());
+        new ObservationToConceptNameConverter());
 
     // 10 - Data de Início de Seguimento de DAH Sheet 1: Column J
     pdd.addColumn(
@@ -149,9 +149,37 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     // 14 - Infecções Estadio OMS – Sheet 1: Column N
     pdd.addColumn(
         "estadio_result",
-        listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioOnPeriod(),
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioDuringPeriod(),
         mappings,
+        new ObservationToConceptNameConverter());
+
+    //     15 - Data de Registo mais recente de Estadio OMS -  Column O
+    pdd.addColumn(
+        "last_estadio_date",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfMostRecentEstadioByEndOfPeriod(),
+        "endDate=${endDate},location=${location}",
         new ForwardSlashDateConverter());
+
+    // 16 - Estadio OMS no registo mais recente ate o fim do periodo -  Column P
+    pdd.addColumn(
+        "last_estadio_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfMostRecentEstadioByEndOfPeriod(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
+
+    // 17 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column Q
+    pdd.addColumn(
+        "reason_change_estadio",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio1(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
+
+    // 18 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column R
+    pdd.addColumn(
+        "reason_change_estadio2",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio2(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
 
     return pdd;
   }
