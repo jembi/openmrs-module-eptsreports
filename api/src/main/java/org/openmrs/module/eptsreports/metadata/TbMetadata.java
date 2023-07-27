@@ -661,4 +661,34 @@ public class TbMetadata extends ProgramsMetadata {
             .getGlobalProperty("eptsreports.notFoundTestResultConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 165305</b>
+   *
+   * <p><b>Name:</b> 1HP
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept get1HPConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.regime1HPConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165306</b>
+   *
+   * <p><b>Name:</b> LFX
+   *
+   * <p><b>Description: </b>
+   *
+   * @return {@link Concept}
+   */
+  public Concept getLFXConcept() {
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.regimeLFXConceptUuid");
+    return getConcept(uuid);
+  }
 }

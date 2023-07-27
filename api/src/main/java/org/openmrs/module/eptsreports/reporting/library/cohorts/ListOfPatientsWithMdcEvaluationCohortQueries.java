@@ -238,6 +238,8 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("165305", tbMetadata.get1HPConcept().getConceptId());
+    map.put("165306", tbMetadata.getLFXConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
@@ -252,12 +254,13 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "       JOIN obs o2 "
             + "         ON e.encounter_id = o2.encounter_id "
             + "WHERE  e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND o2.voided = 0 "
             + "       AND ( ( o.concept_id = ${23985} "
-            + "               AND o.value_coded IN ( ${23954}, ${656}, 165305, 165306 ) ) " // ${165305}, ${165305} Not Available metadatas
+            + "               AND o.value_coded IN ( ${23954}, ${656}, ${165305}, ${165306} ) ) "
             + "             AND ( o2.concept_id = ${165308} "
             + "                   AND o2.value_coded IN ( ${1256} ) ) ) "
             + "       AND e.encounter_datetime BETWEEN CONCAT(:evaluationYear, "
@@ -278,12 +281,13 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "       JOIN obs o2 "
             + "         ON e.encounter_id = o2.encounter_id "
             + "WHERE  e.encounter_type = ${53} "
+            + "       AND e.location_id = :location "
             + "       AND p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
             + "       AND o2.voided = 0 "
             + "       AND ( ( o.concept_id = ${23985} "
-            + "               AND o.value_coded IN ( ${23954}, ${656}, 165305, 165306 ) ) " // ${165305}, ${165305} Not Available metadatas
+            + "               AND o.value_coded IN ( ${23954}, ${656}, ${165305}, ${165306} ) ) "
             + "             AND ( o2.concept_id = ${165308} "
             + "                   AND o2.value_coded IN ( ${1256} ) ) ) "
             + "       AND e.encounter_datetime BETWEEN CONCAT(:evaluationYear, "
@@ -361,7 +365,7 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "       AND enc.encounter_datetime >= first_art.art_start "
             + "       AND enc.encounter_datetime <= Date_add(first_art.art_start, "
             + "                                     INTERVAL 33 day) "
-            + "       AND enc.location_id = 398 "
+            + "       AND enc.location_id = :location "
             + "GROUP  BY pa.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
