@@ -323,7 +323,9 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
 
     String arvStart = commonQueries.getArtStartDateOnFichaResumo();
 
@@ -335,29 +337,29 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
             + "               ON enc.patient_id = pa.patient_id "
             + "       INNER JOIN obs "
             + "               ON obs.encounter_id = enc.encounter_id "
-            + "       INNER JOIN (SELECT arv.patient_id, "
-            + "                          arv.arv_date "
+            + "       INNER JOIN (SELECT art.patient_id, "
+            + "                          art.art_start "
             + "                   FROM   ( "
             + arvStart
-            + "                   ) arv "
-            + "                   WHERE  arv.arv_date >= "
+            + "                   ) art "
+            + "                   WHERE  art.art_start >= "
             + "  CONCAT(:evaluationYear,"
             + inclusionStartMonthAndDay
             + " ) "
-            + "                          AND arv.arv_date <= "
+            + "                          AND art.art_start <= "
             + "  CONCAT(:evaluationYear,"
             + inclusionEndMonthAndDay
             + " ) "
-            + "                   GROUP  BY arv.patient_id) first_arv "
-            + "               ON first_arv.patient_id = pa.patient_id "
+            + "                   GROUP  BY art.patient_id) first_art "
+            + "               ON first_art.patient_id = pa.patient_id "
             + "WHERE  pa.voided = 0 "
             + "       AND enc.voided = 0 "
             + "       AND obs.voided = 0 "
-            + "       AND enc.encounter_type = 6 "
-            + "       AND obs.concept_id = 1695 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND obs.concept_id = ${1695} "
             + "       AND obs.value_numeric IS NOT NULL "
-            + "       AND enc.encounter_datetime >= first_arv.arv_date "
-            + "       AND enc.encounter_datetime <= Date_add(first_arv.arv_date, "
+            + "       AND enc.encounter_datetime >= first_art.art_start "
+            + "       AND enc.encounter_datetime <= Date_add(first_art.art_start, "
             + "                                     INTERVAL 33 day) "
             + "       AND enc.location_id = 398 "
             + "GROUP  BY pa.patient_id;";
