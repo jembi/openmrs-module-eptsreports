@@ -7,6 +7,7 @@ import org.openmrs.Location;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.eptsreports.reporting.data.converter.ForwardSlashDateConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.GenderConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.NotApplicableIfNullConverter;
 import org.openmrs.module.eptsreports.reporting.data.converter.StoYesAndNtoNoConverter;
@@ -104,6 +105,10 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
 
     pdd.setParameters(getParameters());
 
+    pdd.addRowFilter(
+        listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithUnsuppressedVlResult(),
+        "startDate=${startDate},endDate=${endDate},location=${location}");
+
     pdd.addColumn("id", new PersonIdDataDefinition(), "");
     // 1- NID Sheet 2 - Column A
     pdd.addColumn(
@@ -125,41 +130,39 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
     // 5 Contacto – Sheet 2: Column E */
-    pdd.addColumn("contact", conctactDef, "", null);
+    pdd.addColumn("contact", conctactDef, "");
 
     // 6 Contacto – Sheet 2: Column F */
-    pdd.addColumn("reference", referenceConctactDef, "", null);
+    pdd.addColumn("reference", referenceConctactDef, "");
 
     // 7 Address (Localidade) – Sheet 2: Column G */
     pdd.addColumn(
         "location",
         listOfPatientsDefaultersOrIITCohortQueries.getLocation(),
-        "location=${location}",
-        null);
+        "location=${location}");
 
     // 8 Address (Bairro) – Sheet 2: Column H */
     pdd.addColumn(
         "neighborhood",
         listOfPatientsDefaultersOrIITCohortQueries.getNeighborhood(),
-        "location=${location}",
-        null);
+        "location=${location}");
 
     // 9 Address (Célula) – Sheet 2: Column I */
-    pdd.addColumn("cell", listOfPatientsWithHighViralLoadCohortQueries.getPatientCell(), " ", null);
+    pdd.addColumn("cell", listOfPatientsWithHighViralLoadCohortQueries.getPatientCell(), "");
 
     // 10 - Data Inicio Tarv - Sheet 2: Column J
     pdd.addColumn(
         "inicio_tarv",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // 11 - Pregnant/Breastfeeding: - Sheet 2: Column K
     pdd.addColumn(
         "pregnant_breastfeeding",
         tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
         "location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // 12 - Patients active on TB Treatment - Sheet 2: Column L
     pdd.addColumn(
@@ -173,22 +176,20 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
         "result_reception_date",
         listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(true),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // 14 - The first VL Result > 1000 - Sheet 2: Column N
     pdd.addColumn(
         "vl_result",
         listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(false),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     // 15 - Alert Description - Sheet 2: Column O
     pdd.addColumn(
         "section_tittle",
         listOfPatientsWithHighViralLoadCohortQueries
             .getPatientsWithAnExpectedFollowUpDuringTheWeekSectionTittle(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     // 16 - Follow-up Date - Sheet 2: Column P
     pdd.addColumn(
@@ -196,7 +197,7 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
         listOfPatientsWithHighViralLoadCohortQueries
             .getPatientsWithAnExpectedFollowUpDuringTheWeek(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     return pdd;
   }
