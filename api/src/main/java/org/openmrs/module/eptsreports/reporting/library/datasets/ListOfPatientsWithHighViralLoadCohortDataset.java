@@ -102,6 +102,10 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
 
     pdd.setParameters(getParameters());
 
+    pdd.addRowFilter(
+        listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithUnsuppressedVlResult(),
+        "startDate=${startDate},endDate=${endDate},location=${location}");
+
     // 1- NID sheet 1 - Column A
     pdd.addColumn(
         "nid",
@@ -122,41 +126,38 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
     // 5 Contacto – Sheet 1: Column E */
-    pdd.addColumn("contact", conctactDef, "", null);
+    pdd.addColumn("contact", conctactDef, "");
 
     // 6 Contacto – Sheet 1: Column F */
-    pdd.addColumn("reference", referenceConctactDef, "", null);
+    pdd.addColumn("reference", referenceConctactDef, "");
 
     // 7 Address (Localidade) – Sheet 1: Column G */
     pdd.addColumn(
         "location",
         listOfPatientsDefaultersOrIITCohortQueries.getLocation(),
-        "location=${location}",
-        null);
+        "location=${location}");
 
     // 8 Address (Bairro) – Sheet 1: Column H */
     pdd.addColumn(
         "neighborhood",
         listOfPatientsDefaultersOrIITCohortQueries.getNeighborhood(),
-        "location=${location}",
-        null);
+        "location=${location}");
 
     // 9 Address (Célula) – Sheet 1: Column I */
-    pdd.addColumn("cell", listOfPatientsWithHighViralLoadCohortQueries.getPatientCell(), "", null);
+    pdd.addColumn("cell", listOfPatientsWithHighViralLoadCohortQueries.getPatientCell(), "");
 
     // 10 - Data Inicio Tarv - Sheet 1: Column J
     pdd.addColumn(
         "inicio_tarv",
         tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // 11 - Pregnant/Breastfeeding: - Sheet 1: Column K
     pdd.addColumn(
         "pregnant_breastfeeding",
         tptListOfPatientsEligibleDataSet.pregnantBreasfeediDefinition(),
-        "location=${location}",
-        null);
+        "location=${location}");
 
     // 12 - Patients active on TB Treatment - Sheet 1: Column L
     pdd.addColumn(
@@ -170,28 +171,26 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         "sample_collection_date",
         listOfPatientsWithHighViralLoadCohortQueries.getVLSampleCollectionDate(),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // 14 - Date of the VL Result reception - Sheet 1: Column N
     pdd.addColumn(
         "result_reception_date",
         listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(true),
         "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        new ForwardSlashDateConverter());
 
     // 15 - The first VL Result > 1000 - Sheet 1: Column O
     pdd.addColumn(
         "vl_result",
         listOfPatientsWithHighViralLoadCohortQueries.getVLResultReceptionDate(false),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     // 16 - ART Line on High VL Result Date - Sheet 1: Column P
     pdd.addColumn(
         "art_line",
         listOfPatientsWithHighViralLoadCohortQueries.getArtLineOnHighVLResultDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     // 17 - The first Clinical Consultation Date - Sheet 1: Column Q
     pdd.addColumn(
@@ -324,8 +323,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "vl_result_after_session_three",
         listOfPatientsWithHighViralLoadCohortQueries.getVLResultOfFirstLabOrFsrApssSessionThree(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        new IntegerConverter());
+        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     // 34 - The Second VL Result Classification - Sheet 1: Column AI
     pdd.addColumn(
@@ -476,8 +474,7 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "third_vl_result_after_apss_session_three",
         listOfPatientsWithHighViralLoadCohortQueries.getThirdVLResult(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        new IntegerConverter());
+        "startDate=${startDate},endDate=${endDate},location=${location}");
 
     // 53 - The Third VL Result Classification - Sheet 1: Column BB
     pdd.addColumn(
