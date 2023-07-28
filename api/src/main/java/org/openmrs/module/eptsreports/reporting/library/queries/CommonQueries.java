@@ -132,7 +132,7 @@ public class CommonQueries {
             + "     AND o.voided=0 "
             + "   GROUP BY p.patient_id) last ON p.patient_id = last.patient_id "
             + "AND o.obs_datetime = last.obs_datetime "
-            + "WHERE o.value_coded IN(${1256},${1257}) "
+            + "WHERE o.value_coded IN(${1256}) "
             + "  AND o.concept_id = ${1268} "
             + "  AND e.encounter_type IN (${6},${9}) "
             + "  AND e.voided=0 "
