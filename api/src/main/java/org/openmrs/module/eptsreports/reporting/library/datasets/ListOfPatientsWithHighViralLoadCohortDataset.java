@@ -323,7 +323,8 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "vl_result_after_session_three",
         listOfPatientsWithHighViralLoadCohortQueries.getVLResultOfFirstLabOrFsrApssSessionThree(),
-        "startDate=${startDate},endDate=${endDate},location=${location}");
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new IntegerConverter());
 
     // 34 - The Second VL Result Classification - Sheet 1: Column AI
     pdd.addColumn(
@@ -474,7 +475,8 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "third_vl_result_after_apss_session_three",
         listOfPatientsWithHighViralLoadCohortQueries.getThirdVLResult(),
-        "startDate=${startDate},endDate=${endDate},location=${location}");
+        "startDate=${startDate},endDate=${endDate},location=${location}",
+        new IntegerConverter());
 
     // 53 - The Third VL Result Classification - Sheet 1: Column BB
     pdd.addColumn(
