@@ -101,9 +101,6 @@ public class ListOfPatientsWithHighViralLoadCohortDataset extends BaseDataSet {
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
 
     pdd.setParameters(getParameters());
-    pdd.addRowFilter(
-            listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithUnsuppressedVlResult(),
-            "startDate=${startDate},endDate=${endDate},location=${location}");
 
     // 1- NID sheet 1 - Column A
     pdd.addColumn(

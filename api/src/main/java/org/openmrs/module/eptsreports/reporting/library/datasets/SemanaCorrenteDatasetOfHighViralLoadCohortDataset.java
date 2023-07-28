@@ -103,10 +103,8 @@ public class SemanaCorrenteDatasetOfHighViralLoadCohortDataset extends BaseDataS
         new ConvertedPersonDataDefinition("name", new PreferredNameDataDefinition(), formatter);
 
     pdd.setParameters(getParameters());
-    pdd.addRowFilter(
-            listOfPatientsWithHighViralLoadCohortQueries.getPatientsWithUnsuppressedVlResult(),
-            "startDate=${startDate},endDate=${endDate},location=${location}");
 
+    pdd.addColumn("id", new PersonIdDataDefinition(), "");
     // 1- NID Sheet 2 - Column A
     pdd.addColumn(
         "nid",
