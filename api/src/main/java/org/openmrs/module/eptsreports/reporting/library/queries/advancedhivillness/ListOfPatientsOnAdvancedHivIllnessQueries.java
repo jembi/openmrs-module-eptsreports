@@ -10,6 +10,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *     CD4” <= “Data Fim Avaliação”) e com resultado CD4 (absoluto) < <b>valueNumeric</b>
    *
    * @param valueNumeric Max value of CD4 result
+   * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
   public static String getPatientsWithCD4AbsoluteResultOnPeriodQuery(
@@ -47,6 +48,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
    *     CD4” <= “Data Fim Avaliação”) e com resultado CD4 (absoluto) < <b>valueNumeric</b>
    *
    * @param valueNumeric Max value of CD4 result
+   * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
    * @return {@link String}
    */
   public static String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
@@ -192,5 +194,113 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(750, false)
         + " AND TIMESTAMPDIFF(YEAR, ps.birthdate, :endDate) <1 "
         + "  GROUP BY ps.person_id ";
+  }
+
+  /**
+   *
+   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Clínica – Ficha Mestra” ou
+   *     “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV”, durante o
+   *     período de avaliação (“Data Resultado CD4” >= “Data Início Avaliação” e “Data Resultado
+   *     CD4” <= “Data Fim Avaliação”)
+   *
+   * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
+   * @return {@link String}
+   */
+  public static String getPatientsWithCD4AbsoluteResultOnPeriodQuery(boolean mostRecentDate) {
+
+    String fromSQL =
+        " FROM   person ps "
+            + "       INNER JOIN encounter e "
+            + "               ON ps.person_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + "WHERE  ps.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND ( ( ( e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "                 AND o.concept_id = ${1695} ) "
+            + "                OR ( e.encounter_type = ${90} "
+            + "                     AND o.concept_id = ${165389} "
+            + "                     AND o.value_coded = ${1695} ) ) "
+            + "             AND o.value_numeric IS NOT NULL "
+            + "             AND e.encounter_datetime >= :startDate "
+            + "             AND e.encounter_datetime <= :endDate ) "
+            + "       AND e.location_id = :location "
+            + " GROUP BY ps.person_id ";
+
+    return mostRecentDate
+        ? " SELECT ps.person_id, Max(e.encounter_datetime) AS most_recent ".concat(fromSQL)
+        : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
+  }
+
+  /**
+   *
+   * <li>Utentes com registo do resultado de CD4 (absoluto) na “Ficha Resumo – Ficha Mestra” durante
+   *     o período de avaliação (“Data Resultado CD4” >= “Data Início Avaliação” e “Data Resultado
+   *     CD4” <= “Data Fim Avaliação”)
+   *
+   * @param mostRecentDate Flag to return Most Recent date or Cd4 Result
+   * @return {@link String}
+   */
+  public static String getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(
+      boolean mostRecentDate) {
+
+    String fromSQL =
+        " FROM "
+            + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "  AND e.encounter_type = ${53} "
+            + "  AND o.concept_id = ${1695} "
+            + "  AND o.value_numeric IS NOT NULL "
+            + "  and o.obs_datetime >= :startDate "
+            + "  AND o.obs_datetime <= :endDate "
+            + "  AND e.location_id = :location "
+            + " GROUP BY ps.person_id";
+
+    return mostRecentDate
+        ? " SELECT ps.person_id, max(o.obs_datetime) as most_recent ".concat(fromSQL)
+        : " SELECT ps.person_id, o.value_numeric AS cd4_result ".concat(fromSQL);
+  }
+
+  public static String getLastCd4OrResultDateBeforeMostRecentCd4() {
+    return " SELECT ps.person_id, o.value_numeric, MAX(e.encounter_datetime) AS second_cd4_result "
+        + " FROM   person ps "
+        + "       INNER JOIN encounter e "
+        + "               ON ps.person_id = e.patient_id "
+        + "       INNER JOIN obs o "
+        + "               ON e.encounter_id = o.encounter_id "
+        + " INNER JOIN ( "
+        + ListOfPatientsOnAdvancedHivIllnessQueries.getPatientsWithCD4AbsoluteResultOnPeriodQuery(
+            true)
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
+        + "WHERE  ps.voided = 0 "
+        + "       AND e.voided = 0 "
+        + "       AND o.voided = 0 "
+        + "       AND ( ( ( e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+        + "                 AND o.concept_id = ${1695} ) "
+        + "                OR ( e.encounter_type = ${90} "
+        + "                     AND o.concept_id = ${165389} "
+        + "                     AND o.value_coded = ${1695} ) ) "
+        + "             AND o.value_numeric IS NOT NULL "
+        + "             AND e.encounter_datetime < last_cd4.most_recent ) "
+        + "       AND e.location_id = :location"
+        + "       GROUP BY ps.person_id "
+        + " UNION "
+        + " SELECT ps.person_id, o.value_numeric, MAX(o.obs_datetime) AS cd4_result "
+        + " FROM "
+        + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
+        + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+        + " INNER JOIN ( "
+        + ListOfPatientsOnAdvancedHivIllnessQueries
+            .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true)
+        + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
+        + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+        + "  AND e.encounter_type = ${53} "
+        + "  AND o.concept_id = ${1695} "
+        + "  AND o.value_numeric IS NOT NULL "
+        + "  AND o.obs_datetime < last_cd4.most_recent "
+        + "  AND e.location_id = :location "
+        + "       GROUP BY ps.person_id ";
   }
 }

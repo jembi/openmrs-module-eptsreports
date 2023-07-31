@@ -181,6 +181,30 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         "endDate=${endDate},location=${location}",
         new ObservationToConceptNameConverter());
 
+    // 19 - Resultado do Último CD4 – Sheet 1: Column S
+    pdd.addColumn(
+        "last_cd4_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4Result(),
+        mappings);
+
+    // 20 - Data do Último CD4 – Sheet 1: Column T
+    pdd.addColumn(
+        "last_cd4_resultdate",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDate(),
+        mappings,
+        new ForwardSlashDateConverter());
+
+    // 21 - Resultado do Penúltimo CD4 – Sheet 1: Column U
+    pdd.addColumn(
+        "second_cd4_result", listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultBeforeMostRecentCd4(), mappings);
+
+    // 22 - Data do Penúltimo CD4 – Sheet 1: Column V
+    pdd.addColumn(
+        "second_cd4_resultdate",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDateBeforeMostRecentCd4(),
+        mappings,
+        new ForwardSlashDateConverter());
+
     return pdd;
   }
 }

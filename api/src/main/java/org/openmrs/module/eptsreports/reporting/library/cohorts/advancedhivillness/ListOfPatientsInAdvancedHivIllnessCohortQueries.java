@@ -114,14 +114,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         " Utentes com critério de CD4 para início de seguimento no Modelo de DAH");
     sqlCohortDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    valuesMap.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
-    valuesMap.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
+    Map<String, Integer> valuesMap = getStringIntegerMap();
 
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
 
@@ -587,14 +580,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Data de resultado de CD4 Absoluto");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    valuesMap.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
-    valuesMap.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
+    Map<String, Integer> valuesMap = getStringIntegerMap();
 
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
 
@@ -627,14 +613,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setName("Resultado de CD4 Absoluto");
     sqlPatientDataDefinition.addParameters(getCohortParameters());
 
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
-    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    valuesMap.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
-    valuesMap.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
+    Map<String, Integer> valuesMap = getStringIntegerMap();
 
     EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
 
@@ -942,6 +921,172 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setQuery(substitutor.replace(query));
 
     return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Resultado do Último CD4 </b>
+   * <li>O registo mais recente de resultado de CD4 (absoluto) ocorrido até o fim do período de
+   *     avaliação, registado na “Ficha Clínica – Ficha Mestra” ou “Ficha Resumo – Ficha Mestra” ou
+   *     “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV”
+   *
+   * @return {@link CohortDefinition}
+   */
+  public DataDefinition getLastCd4Result() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado do Último CD4 Absoluto");
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> valuesMap = getStringIntegerMap();
+
+    String query =
+        " SELECT ps.person_id, o.value_numeric AS cd4_result "
+            + " FROM   person ps "
+            + "       INNER JOIN encounter e "
+            + "               ON ps.person_id = e.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON e.encounter_id = o.encounter_id "
+            + " INNER JOIN ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries
+                .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true)
+            + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
+            + "WHERE  ps.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND ( ( ( e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "                 AND o.concept_id = ${1695} ) "
+            + "                OR ( e.encounter_type = ${90} "
+            + "                     AND o.concept_id = ${165389} "
+            + "                     AND o.value_coded = ${1695} ) ) "
+            + "             AND o.value_numeric IS NOT NULL "
+            + "             AND e.encounter_datetime = last_cd4.most_recent ) "
+            + "       AND e.location_id = :location"
+            + " UNION "
+            + " SELECT ps.person_id, o.value_numeric AS cd4_result "
+            + " FROM "
+            + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
+            + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
+            + " INNER JOIN ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries
+                .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true)
+            + " ) last_cd4 ON last_cd4.person_id = ps.person_id "
+            + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
+            + "  AND e.encounter_type = ${53} "
+            + "  AND o.concept_id = ${1695} "
+            + "  AND o.value_numeric IS NOT NULL "
+            + "  AND o.obs_datetime = last_cd4.most_recent "
+            + "  AND e.location_id = :location";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Data do Último CD4 </b>
+   * <li>A data do registo mais recente de resultado de CD4 (absoluto) ocorrido até o fim do período
+   *     de avaliação, registado na “Ficha Clínica – Ficha Mestra” ou “Ficha Resumo – Ficha Mestra”
+   *     ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV”
+   *
+   * @return {@link CohortDefinition}
+   */
+  public DataDefinition getLastCd4ResultDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado do Último CD4 Absoluto");
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> valuesMap = getStringIntegerMap();
+
+    EptsQueriesUtil eptsQueriesUtil = new EptsQueriesUtil();
+
+    String query =
+        eptsQueriesUtil
+            .unionBuilder(
+                ListOfPatientsOnAdvancedHivIllnessQueries
+                    .getPatientsWithCD4AbsoluteResultOnPeriodQuery(true))
+            .union(
+                ListOfPatientsOnAdvancedHivIllnessQueries
+                    .getPatientsWithCD4AbsoluteResultFichaResumoOnPeriodQuery(true))
+            .buildQuery();
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Resultado do Penúltimo CD4 </b>
+   * <li>O registo que antecede o registo mais recente de resultado de CD4 (absoluto) ocorrido até o
+   *     fim do período de avaliação, registado na “Ficha Clínica – Ficha Mestra” ou “Ficha Resumo –
+   *     Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por
+   *     HIV”
+   *
+   * @return {@link CohortDefinition}
+   */
+  public DataDefinition getLastCd4ResultBeforeMostRecentCd4() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado do Penúltimo CD4 Absoluto");
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> valuesMap = getStringIntegerMap();
+
+    String query =
+        " SELECT result.person_id, result.value_numeric FROM ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
+            + " ) result ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b> Data do Resultado do Penúltimo CD4 </b>
+   * <li>A data do registo que antecede o registo mais recente de resultado de CD4 (absoluto)
+   *     ocorrido até o fim do período de avaliação, registado na “Ficha Clínica – Ficha Mestra” ou
+   *     “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório” ou “Ficha de
+   *     Doença Avançada por HIV”
+   *
+   * @return {@link CohortDefinition}
+   */
+  public DataDefinition getLastCd4ResultDateBeforeMostRecentCd4() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data do Resultado do Penúltimo CD4 Absoluto");
+    sqlPatientDataDefinition.addParameters(getCohortParameters());
+
+    Map<String, Integer> valuesMap = getStringIntegerMap();
+
+    String query =
+        " SELECT result.person_id, result.second_cd4_result FROM ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
+            + " ) result ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  private Map<String, Integer> getStringIntegerMap() {
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
+    valuesMap.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    valuesMap.put("165389", hivMetadata.getCD4LabsetConcept().getConceptId());
+    return valuesMap;
   }
 
   /** Add parameters to Cohort Definitions */
