@@ -1,6 +1,5 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
@@ -17,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ListOfPatientsWithMdcEvaluationCohortQueries {
+public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   private CommonQueries commonQueries;
 
@@ -29,7 +28,7 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
   String inclusionEndMonthAndDay = "'-06-20'";
 
   @Autowired
-  public ListOfPatientsWithMdcEvaluationCohortQueries(
+  public ListOfPatientsWithMdsEvaluationCohortQueries(
       CommonQueries commonQueries, HivMetadata hivMetadata, TbMetadata tbMetadata) {
     this.commonQueries = commonQueries;
     this.hivMetadata = hivMetadata;
@@ -513,9 +512,232 @@ public class ListOfPatientsWithMdcEvaluationCohortQueries {
     return sqlPatientDataDefinition;
   }
 
-  private void addSqlPatientDataDefinitionParameters(
-      SqlPatientDataDefinition sqlPatientDataDefinition) {
-    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+  /**
+   * <b>RF12 - Critérios de Não Elegibilidade ao TPT</b>
+   *
+   * <p>O sistema irá determinar se o utente não é elegível ao TPT se o utente tiver:
+   *
+   * <ul>
+   *   <li>o registo de “Diagnóstico TB Activa” (resposta = “Sim”) numa Ficha Clínica (“Data
+   *       Consulta”) registada no período de inclusão <br>
+   *   <li>o registo de “Tem Sintomas TB? (resposta = “Sim”) numa Ficha Clínica (“Data Consulta”)
+   *       registada no período de inclusão <br>
+   *   <li>o registo de “Quais Sintomas de TB?” (resposta = “Febre” ou “Emagrecimento” ou "Sudorese
+   *       noturna” ou “Tosse com ou sem sangue” ou “Astenia” ou “Contacto recente com TB” numa
+   *       Ficha Clínica (“Data Consulta”) registada no período de inclusão <br>
+   *   <li>o registo de “Tratamento TB” (resposta = “Início”, “Contínua”, “Fim”) na Ficha Clínica
+   *       com “Data de Tratamento” decorrida no período de inclusão <br>
+   *   <li>o registo de “TB” nas “Condições médicas Importantes” na Ficha Resumo com “Data”
+   *       decorrida no período de inclusão; <br>
+   *   <li>o registo de “Última profilaxia TPT” (resposta = “INH” ou “3HP” ou “1HP” ou “LFX”) na
+   *       Ficha Resumo com “Data Início” decorrida durante o período de inclusão. <br>
+   * </ul>
+   *
+   * <p>Nota: O período de inclusão deverá ser definido da seguinte forma:
+   *
+   * <ul>
+   *   <li>Utentes que iniciaram TARV na coorte de 12 meses: <br>
+   *       Data Início Inclusão = “21 de Janeiro” de “Ano de Avaliação” menos (-) 1 ano <br>
+   *       Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” menos (-) 1 ano <br>
+   *       <br>
+   *   <li>Utentes que iniciaram TARV na coorte de 24 meses: <br>
+   *       Data Início Inclusão = “21 de Janeiro” de “Ano de Avaliação” menos (-) 2 anos <br>
+   *       Data Fim Inclusão = “20 de Junho” de “Ano de Avaliação” menos (-) 2 anos <br>
+   * </ul>
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getPatientsTptNotEligible() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Elegível ao TPT no Início do TARV: (coluna F)");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+    map.put("1257", hivMetadata.getContinueRegimenConcept().getConceptId());
+    map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
+    map.put("23758", hivMetadata.getTBSymptomsConcept().getConceptId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
+    map.put("1766", tbMetadata.getObservationTB().getConceptId());
+    map.put("1763", tbMetadata.getFeverLastingMoraThan3Weeks().getConceptId());
+    map.put("1764", tbMetadata.getWeightLossOfMoreThan3KgInLastMonth().getConceptId());
+    map.put("1762", tbMetadata.getNightsWeatsLastingMoraThan3Weeks().getConceptId());
+    map.put("1760", tbMetadata.getCoughLastingMoraThan3Weeks().getConceptId());
+    map.put("23760", tbMetadata.getAsthenia().getConceptId());
+    map.put("1765", tbMetadata.getCohabitantBeingTreatedForTB().getConceptId());
+    map.put("161", tbMetadata.getLymphadenopathy().getConceptId());
+    map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
+    map.put("23954", tbMetadata.get3HPConcept().getConceptId());
+    map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
+    map.put("165305", tbMetadata.get1HPConcept().getConceptId());
+    map.put("165306", tbMetadata.getLFXConcept().getConceptId());
+    map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
+
+    String sql =
+        "SELECT final_query.patient_id, "
+            + "       CASE "
+            + "         WHEN final_query.encounter_date IS NULL THEN 'S' "
+            + "         WHEN final_query.encounter_date IS NOT NULL THEN 'N' "
+            + "         ELSE '' "
+            + "       end "
+            + "FROM   (SELECT p.patient_id, "
+            + "               o.obs_datetime AS encounter_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON o.encounter_id = e.encounter_id "
+            + "        WHERE  e.encounter_type = ${53} "
+            + "               AND e.location_id = :location "
+            + "               AND o.obs_datetime BETWEEN "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ) "
+            + "          AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) "
+            + "               AND o.concept_id = ${1406} "
+            + "               AND o.value_coded = ${42} "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               o.obs_datetime AS encounter_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON o.encounter_id = e.encounter_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "               AND e.location_id = :location "
+            + "               AND o.obs_datetime BETWEEN "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ) "
+            + "          AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) "
+            + "               AND o.concept_id = ${1268} "
+            + "               AND o.value_coded IN ( ${1256}, ${1257}, ${1267} ) "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               e.encounter_datetime AS encounter_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON o.encounter_id = e.encounter_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "               AND e.location_id = :location "
+            + "               AND e.encounter_datetime BETWEEN "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ) "
+            + "          AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) "
+            + "               AND o.concept_id = ${23758} "
+            + "               AND o.value_coded IN( ${1065} ) "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "        GROUP  BY p.patient_id "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               e.encounter_datetime AS encounter_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON o.encounter_id = e.encounter_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "               AND e.location_id = :location "
+            + "               AND e.encounter_datetime BETWEEN "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ) "
+            + "          AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) "
+            + "               AND o.concept_id = ${23761} "
+            + "               AND o.value_coded IN( ${1065} ) "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "        GROUP  BY p.patient_id "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               e.encounter_datetime AS encounter_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON o.encounter_id = e.encounter_id "
+            + "        WHERE  e.encounter_type = ${6} "
+            + "               AND e.location_id = :location "
+            + "               AND e.encounter_datetime BETWEEN "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ) "
+            + "          AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) "
+            + "               AND ( o.concept_id = ${1766} "
+            + "                     AND o.value_coded IN( ${1763}, ${1764}, ${1762}, ${1760}, "
+            + "                                           ${23760}, ${1765}, ${161} ) ) "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "        GROUP  BY p.patient_id "
+            + "        UNION "
+            + "        SELECT p.patient_id, "
+            + "               o2.obs_datetime AS encounter_date "
+            + "        FROM   patient p "
+            + "               INNER JOIN encounter e "
+            + "                       ON e.patient_id = p.patient_id "
+            + "               INNER JOIN obs o "
+            + "                       ON o.encounter_id = e.encounter_id "
+            + "               INNER JOIN obs o2 "
+            + "                       ON o2.encounter_id = e.encounter_id "
+            + "        WHERE  e.encounter_type = ${53} "
+            + "               AND e.location_id = :location "
+            + "               AND o2.obs_datetime BETWEEN "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ) "
+            + "          AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) "
+            + "               AND ( o.concept_id = ${23985} "
+            + "                     AND o.value_coded IN ( ${23954}, ${656}, ${165305}, ${165306} ) ) "
+            + "               AND ( o2.concept_id = ${165308} "
+            + "                     AND o2.value_coded = ${1256} ) "
+            + "               AND p.voided = 0 "
+            + "               AND e.voided = 0 "
+            + "               AND o.voided = 0 "
+            + "               AND o2.voided = 0) AS final_query";
+
+    StringSubstitutor substitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(substitutor.replace(sql));
+    return sqlPatientDataDefinition;
   }
 }

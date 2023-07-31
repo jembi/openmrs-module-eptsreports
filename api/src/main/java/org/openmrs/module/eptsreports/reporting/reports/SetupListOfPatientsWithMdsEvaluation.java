@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
-import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsWithMdcEvaluationCohortDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.ListOfPatientsWithMdsEvaluationCohortDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
 import org.openmrs.module.reporting.ReportingException;
@@ -15,16 +15,16 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated
-public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager {
+public class SetupListOfPatientsWithMdsEvaluation extends EptsDataExportManager {
 
   @Autowired
-  private ListOfPatientsWithMdcEvaluationCohortDataset listOfPatientsWithMdcEvaluationCohortDataset;
+  private ListOfPatientsWithMdsEvaluationCohortDataset listOfPatientsWithMdsEvaluationCohortDataset;
 
   @Autowired
-  public SetupListOfPatientsWithMdcEvaluation(
-      ListOfPatientsWithMdcEvaluationCohortDataset listOfPatientsWithMdcevaluationCohortDataset) {
-    this.listOfPatientsWithMdcEvaluationCohortDataset =
-        listOfPatientsWithMdcevaluationCohortDataset;
+  public SetupListOfPatientsWithMdsEvaluation(
+      ListOfPatientsWithMdsEvaluationCohortDataset listOfPatientsWithMdsEvaluationCohortDataset) {
+    this.listOfPatientsWithMdsEvaluationCohortDataset =
+        listOfPatientsWithMdsEvaluationCohortDataset;
   }
 
   @Override
@@ -63,7 +63,7 @@ public class SetupListOfPatientsWithMdcEvaluation extends EptsDataExportManager 
     rd.addDataSetDefinition("SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     rd.addDataSetDefinition(
         "MDS",
-        Mapped.mapStraightThrough(listOfPatientsWithMdcEvaluationCohortDataset.contructDataset()));
+        Mapped.mapStraightThrough(listOfPatientsWithMdsEvaluationCohortDataset.contructDataset()));
 
     return rd;
   }

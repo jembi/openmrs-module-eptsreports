@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
+public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
-  private ListOfPatientsWithMdcEvaluationCohortQueries listOfPatientsWithMdcEvaluationCohortQueries;
+  private ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries;
   private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
 
   private TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet;
@@ -29,16 +29,16 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
   private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
 
   @Autowired
-  public ListOfPatientsWithMdcEvaluationCohortDataset(
-      ListOfPatientsWithMdcEvaluationCohortQueries listOfPatientsWithMdcEvaluationCohortQueries,
+  public ListOfPatientsWithMdsEvaluationCohortDataset(
+      ListOfPatientsWithMdsEvaluationCohortQueries listOfPatientsWithMdsEvaluationCohortQueries,
       ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries,
       DQACargaViralCohortQueries dQACargaViralCohortQueries,
       ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
-    this.listOfPatientsWithMdcEvaluationCohortQueries =
-        listOfPatientsWithMdcEvaluationCohortQueries;
+    this.listOfPatientsWithMdsEvaluationCohortQueries =
+        listOfPatientsWithMdsEvaluationCohortQueries;
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.tptInitiationDataDefinitionQueries = tptInitiationDataDefinitionQueries;
@@ -54,7 +54,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     pdd.setParameters(getParameters());
 
     pdd.addRowFilter(
-        listOfPatientsWithMdcEvaluationCohortQueries.getPatientsInitiatedART(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsInitiatedART(),
         "evaluationYear=${evaluationYear},location=${location}");
 
     //  SECÇÃO A
@@ -65,12 +65,12 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
 
     // A.2 - Coorte - Sheet 1: Column B
     //        pdd.addColumn("coort_12_meses",
-    //                listOfPatientsWithMdcEvaluationCohortQueries.getArtStartDate(),
+    //                listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
     // "evaluationYear=${evaluationYear-1y},location=${location}", null);
 
     // A.2 - Coorte - Sheet 1: Column B
     //    pdd.addColumn("coort_12_meses",
-    //            listOfPatientsWithMdcEvaluationCohortQueries.getArtStartDate(),
+    //            listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
     // "evaluationYear=${evaluationYear-2y},location=${location}", null);
 
     // A.3 - Sexo - Sheet 1: Column C
@@ -79,42 +79,42 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
     // A.4 - Idade - Sheet 1: Column D
     pdd.addColumn(
         "age",
-        listOfPatientsWithMdcEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
         "evaluationYear=${evaluationYear},location=${location}",
         new NotApplicableIfNullConverter());
 
     // A.5 - Data do início TARV - Sheet 1: Column E
     pdd.addColumn(
         "art_start",
-        listOfPatientsWithMdcEvaluationCohortQueries.getArtStartDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // A.6 - Elegível ao TPT no início do TARV - Sheet 1: Column F
     pdd.addColumn(
         "tpt_eligible_tarv",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsTptNotEligible(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        new StoYesAndNtoNoConverter());
 
     // A.7 - Data de início do TPT - Sheet 1: Column G
     pdd.addColumn(
         "tpt_start_date",
-        listOfPatientsWithMdcEvaluationCohortQueries.getTptInitiationDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getTptInitiationDate(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // A.8 - Data de registo do resultado do CD4 inicial - Sheet 1: Column H
     pdd.addColumn(
         "cd4_register_date",
-        listOfPatientsWithMdcEvaluationCohortQueries.getCd4ResultDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultDate(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // A.9 - Resultado do CD4 inicial - Sheet 1: Column I
     pdd.addColumn(
         "initial_cd4_result",
-        listOfPatientsWithMdcEvaluationCohortQueries.getCd4Result(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getCd4Result(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
