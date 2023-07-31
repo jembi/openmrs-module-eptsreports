@@ -81,7 +81,7 @@ public class ListOfPatientsWithMdcEvaluationCohortDataset extends BaseDataSet {
         "age",
         listOfPatientsWithMdcEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new NotApplicableIfNullConverter());
 
     // A.5 - Data do início TARV - Sheet 1: Column E
     pdd.addColumn(
