@@ -121,9 +121,9 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B.1 - Data do pedido da 1ª CV - Sheet 1: Column J
     pdd.addColumn(
         "first_cv_date",
-        dQACargaViralCohortQueries.getDataNotificouCV(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        new ForwardSlashDateConverter());
+        listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(),
+        "evaluationYear=${evaluationYear-1},location=${location}",
+        null);
 
     // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
     pdd.addColumn(
