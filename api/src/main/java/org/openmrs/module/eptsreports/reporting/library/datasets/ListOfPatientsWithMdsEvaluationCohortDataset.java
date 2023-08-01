@@ -64,14 +64,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
     // A.2 - Coorte - Sheet 1: Column B
-    //        pdd.addColumn("coort_12_meses",
-    //                listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
-    // "evaluationYear=${evaluationYear-1y},location=${location}", null);
-
-    // A.2 - Coorte - Sheet 1: Column B
-    //    pdd.addColumn("coort_12_meses",
-    //            listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
-    // "evaluationYear=${evaluationYear-2y},location=${location}", null);
+    pdd.addColumn(
+        "coort",
+        listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
 
     // A.3 - Sexo - Sheet 1: Column C
     pdd.addColumn("gender", new GenderDataDefinition(), "", new MaleFemaleConverter());
@@ -81,7 +78,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "age",
         listOfPatientsWithMdsEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
         "evaluationYear=${evaluationYear},location=${location}",
-        new NotApplicableIfNullConverter());
+        null);
 
     // A.5 - Data do início TARV - Sheet 1: Column E
     pdd.addColumn(
@@ -95,7 +92,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "tpt_eligible_tarv",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsTptNotEligible(),
         "evaluationYear=${evaluationYear},location=${location}",
-        new StoYesAndNtoNoConverter());
+        null);
 
     // A.7 - Data de início do TPT - Sheet 1: Column G
     pdd.addColumn(
