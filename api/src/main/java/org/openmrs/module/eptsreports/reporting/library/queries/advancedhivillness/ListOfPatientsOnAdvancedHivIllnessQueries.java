@@ -303,4 +303,30 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
         + "  AND e.location_id = :location "
         + "       GROUP BY ps.person_id ";
   }
+
+  public static String getVLoadResultAndMostRecent() {
+    return " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(o.obs_datetime) AS most_recent FROM patient p "
+        + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + " WHERE e.encounter_type = ${53} "
+        + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
+        + " AND o.obs_datetime <= :endDate "
+        + " AND e.location_id = :location "
+        + " AND e.voided = 0 "
+        + " AND p.voided = 0 "
+        + " AND o.voided = 0 "
+        + " GROUP BY p.patient_id "
+        + " UNION "
+        + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(e.encounter_datetime) AS most_recent FROM patient p "
+        + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+        + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+        + " WHERE e.encounter_type IN(${6},${9},${13},${51}) "
+        + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
+        + " AND e.encounter_datetime <= :endDate "
+        + " AND e.location_id = :location "
+        + " AND e.voided = 0 "
+        + " AND p.voided = 0 "
+        + " AND o.voided = 0 "
+        + " GROUP BY p.patient_id ";
+  }
 }

@@ -3551,6 +3551,38 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.naConceptUuid</property>
+		<defaultValue>ab55f038-bc74-4cef-818e-eb509c5ee5b1</defaultValue>
+		<description>
+			UUID for N/A Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cragSoroConceptUuid</property>
+		<defaultValue>f3883e12-4883-461b-8440-2a02f3312a84</defaultValue>
+		<description>
+			UUID for CRAG Soro Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cragLRCConceptUuid</property>
+		<defaultValue>67e376f7-19c6-4810-b15b-121339cb21d3</defaultValue>
+		<description>
+			UUID for CRAG LCR Concept
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.cacuConceptUuid</property>
+		<defaultValue>fb867149-04a1-4c6e-8d91-fc4064aef630</defaultValue>
+		<description>
+			UUID for CONVSET Rastreio de CACU (E) Concept
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

@@ -5288,4 +5288,60 @@ public class HivMetadata extends ProgramsMetadata {
         Context.getAdministrationService().getGlobalProperty("eptsreports.whoStageIIConceptUuid");
     return getConcept(uuid);
   }
+
+  /**
+   * <b>concept_id = 21233</b>
+   *
+   * <p><b>Name:</b> N/A
+   *
+   * <p><b>Description:</b> N/A Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getNAConcept() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.naConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 23952</b>
+   *
+   * <p><b>Name:</b> CRAG Soro
+   *
+   * <p><b>Description:</b> CRAG Soro Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCragSoroConcept() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.cragSoroConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165362</b>
+   *
+   * <p><b>Name:</b> CrAg LCR
+   *
+   * <p><b>Description:</b> CrAg LCR Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCragLCRConcept() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.cragLRCConceptUuid");
+    return getConcept(uuid);
+  }
+
+  /**
+   * <b>concept_id = 165404</b>
+   *
+   * <p><b>Name:</b> CONVSET Rastreio de CACU (E)
+   *
+   * <p><b>Description:</b> CONVSET Rastreio de CACU (E) Concept
+   *
+   * @return {@link Concept}
+   */
+  public Concept getCacuConcept() {
+    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.cacuConceptUuid");
+    return getConcept(uuid);
+  }
 }

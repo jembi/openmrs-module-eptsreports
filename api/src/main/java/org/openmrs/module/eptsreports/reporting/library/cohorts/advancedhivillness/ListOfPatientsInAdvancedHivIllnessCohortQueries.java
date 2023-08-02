@@ -1,6 +1,7 @@
 package org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness;
 
 import java.util.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
@@ -1069,6 +1070,267 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         " SELECT result.person_id, result.second_cd4_result FROM ( "
             + ListOfPatientsOnAdvancedHivIllnessQueries.getLastCd4OrResultDateBeforeMostRecentCd4()
             + " ) result ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Resultado da Última Carga Viral</b>
+   * <li>O registo mais recente de resultado do Carga Viral (quantitativo), na “Ficha Clínica –
+   *     Ficha Mestra” ou “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de Laboratório”,
+   *     ocorrido até o fim do período de avaliação,
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getMostRecentVLResult() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado da Última Carga Viral");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        " SELECT vl_result.patient_id, vl_result.viral_load FROM ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + " ) AS vl_result GROUP BY vl_result.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Data da Última Carga Viral</b>
+   * <li>A data do registo mais recente de resultado de Carga Viral (quantitativo) na “Ficha Clínica
+   *     – Ficha Mestra” ou “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha de
+   *     Laboratório”, ocorrido até o fim do período de avaliação
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getMostRecentVLResultDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data da Última Carga Viral");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        " SELECT result_date.patient_id, MAX(result_date.most_recent) FROM ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + " ) AS result_date GROUP BY result_date.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Resultado da Penúltima Carga Viral</b>
+   * <li>O registro que antecede o registo mais recente de resultado de Carga Viral (quantitativo)
+   *     na “Ficha Clínica – Ficha Mestra” ou “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou
+   *     “Ficha de Laboratório”, ocorrido até o fim do período de avaliação
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastVLResultBeforeMostRecentVLResultDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado da Penúltima Carga Viral");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        " SELECT vl_result.patient_id, vl_result.viral_load FROM ( "
+            + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(o.obs_datetime) AS most_recent FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + "         ) last_vl ON last_vl.patient_id = p.patient_id "
+            + " WHERE e.encounter_type = ${53} "
+            + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
+            + " AND o.obs_datetime < last_vl.most_recent "
+            + " AND e.location_id = :location "
+            + " AND e.voided = 0 "
+            + " AND p.voided = 0 "
+            + " AND o.voided = 0 "
+            + " GROUP BY p.patient_id "
+            + " UNION "
+            + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(e.encounter_datetime) AS most_recent FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + "         ) last_vl ON last_vl.patient_id = p.patient_id "
+            + " WHERE e.encounter_type IN(${6},${9},${13},${51}) "
+            + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
+            + " AND e.encounter_datetime < last_vl.most_recent "
+            + " AND e.location_id = :location "
+            + " AND e.voided = 0 "
+            + " AND p.voided = 0 "
+            + " AND o.voided = 0 "
+            + " GROUP BY p.patient_id "
+            + " ) AS vl_result GROUP BY vl_result.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Data da Penúltima Carga Viral</b>
+   * <li>A data do registo que antecede o registo mais recente de Carga Viral (quantitativo) na
+   *     “Ficha Clínica – Ficha Mestra” ou “Ficha Resumo – Ficha Mestra” ou “Ficha e-Lab” ou “Ficha
+   *     de Laboratório”, ocorrido até o fim do período de avaliação
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getLastVLResultDateBeforeMostRecentVLResultDate() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado da Penúltima Carga Viral");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> valuesMap = new HashMap<>();
+    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
+    valuesMap.put("13", hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId());
+    valuesMap.put("51", hivMetadata.getFsrEncounterType().getEncounterTypeId());
+    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    valuesMap.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    valuesMap.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        " SELECT result_date.patient_id, MAX(result_date.most_recent) FROM ( "
+            + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(o.obs_datetime) AS most_recent FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + "         ) last_vl ON last_vl.patient_id = p.patient_id "
+            + " WHERE e.encounter_type = ${53} "
+            + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
+            + " AND o.obs_datetime < last_vl.most_recent "
+            + " AND e.location_id = :location "
+            + " AND e.voided = 0 "
+            + " AND p.voided = 0 "
+            + " AND o.voided = 0 "
+            + " GROUP BY p.patient_id "
+            + " UNION "
+            + " SELECT p.patient_id, o.value_numeric AS viral_load, MAX(e.encounter_datetime) AS most_recent FROM patient p "
+            + " INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "         INNER JOIN ( "
+            + ListOfPatientsOnAdvancedHivIllnessQueries.getVLoadResultAndMostRecent()
+            + "         ) last_vl ON last_vl.patient_id = p.patient_id "
+            + " WHERE e.encounter_type IN(${6},${9},${13},${51}) "
+            + " AND (o.concept_id = ${856} AND o.value_numeric IS NOT NULL) "
+            + " AND e.encounter_datetime < last_vl.most_recent "
+            + " AND e.location_id = :location "
+            + " AND e.voided = 0 "
+            + " AND p.voided = 0 "
+            + " AND o.voided = 0 "
+            + " GROUP BY p.patient_id "
+            + " ) AS result_date GROUP BY result_date.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Resultado do Última TB-LAM / Data do Último TB-LAM </b>
+   * <li>O registo mais recente de resultado TB-LAM= “positivo, negativo, NA, NF”, na “Ficha Clínica
+   *     –Ficha Mestra” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV” ocorrido até
+   *     o fim do período de avaliação. or
+   * <p>A data do registo mais recente de resultado de TB-LAM , na “Ficha Clínica –Ficha Mestra” ou
+   *     “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV” ocorrido até o fim do período
+   *     de avaliação.
+   *
+   * @param encounterTypeList EncounterTypes to be evaluated
+   * @param examConceptList Exam Concepts
+   * @param resultConceptList Result Concepts
+   * @param examResult Flag to return Exam result or Date
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getTbLaboratoryResearchResults(
+      List<Integer> encounterTypeList,
+      List<Integer> examConceptList,
+      List<Integer> resultConceptList,
+      boolean examResult) {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultados de Investigacoes laboratoriais");
+    sqlPatientDataDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, String> valuesMap = new HashMap<>();
+    valuesMap.put("encounterType", StringUtils.join(encounterTypeList, ","));
+    valuesMap.put("examConcept", StringUtils.join(examConceptList, ","));
+    valuesMap.put("resultConcept", StringUtils.join(resultConceptList, ","));
+
+    String fromSQL =
+        "  FROM ( "
+            + " SELECT p.patient_id, o.value_coded, MAX(e.encounter_datetime) AS recent_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = e.encounter_id "
+            + "WHERE  e.encounter_type IN ( ${encounterType} ) "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id IN ( ${examConcept} ) "
+            + "       AND o.value_coded IN ( ${resultConcept} ) "
+            + "       AND e.encounter_datetime <= :endDate "
+            + "       AND p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + " GROUP BY p.patient_id) exam_result ";
+
+    String query =
+        examResult
+            ? " SELECT exam_result.patient_id, exam_result.value_coded ".concat(fromSQL)
+            : " SELECT exam_result.patient_id, exam_result.recent_date ".concat(fromSQL);
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
 
