@@ -128,53 +128,15 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
     pdd.addColumn(
         "first_cv_result_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResult(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResultDate(),
         "evaluationYear=${evaluationYear-1},location=${location}",
         null);
 
-    // B.12 - Elegível para TPT entre a data de inscrição no MDS e 12˚ mês de TARV? - Sheet 1:
-    // Column AI
+    // B.3 - Resultado da 1ª CV - Sheet 1: Column L
     pdd.addColumn(
-        "tpt_eligible_mds",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
-
-    // B.13 - Recebeu TPT entre a data de inscrição no MDS e 12˚ mês de TARV? - Sheet 1: Column AJ
-    pdd.addColumn(
-        "received_tpt_b",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
-
-    // B.14 - PB/IMC registado em TODAS as consultas desde a inscrição no MDS até ao 12˚ mês de
-    // TARV? - Sheet 1: Column AK
-    pdd.addColumn(
-        "pb_imc_b",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
-
-    // B.15 - Malnutrido recebeu tto para desnutrição entre a inscrição no MDS e o 12˚ mês de TARV?
-    // - Sheet 1: Column AL
-    pdd.addColumn(
-        "malnutrition_b",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
-
-    // B.16 - N˚ de consultas clínicas entre 6˚ e 12˚ mês de TARV - Sheet 1: Column AM
-    pdd.addColumn(
-        "clinical_consultations_b",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
-        null);
-
-    // B.17 - N˚ de consultas de APSS/PP entre 6˚ e 12˚ mês de TARV - Sheet 1: Column AN
-    pdd.addColumn(
-        "apss_pp_consultations_b",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
+        "first_cv_result",
+        listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResult(),
+        "evaluationYear=${evaluationYear-1},location=${location}",
         null);
 
     // B.18 - Estado de permanência no 12˚ mês de TARV - Sheet 1: Column AO
