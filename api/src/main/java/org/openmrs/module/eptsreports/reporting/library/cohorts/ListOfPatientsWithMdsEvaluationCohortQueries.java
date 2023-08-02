@@ -967,4 +967,86 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     return sqlPatientDataDefinition;
   }
+
+  /**
+   * <b>RF18 - Data do resultado da 1a CV- B.2 (Coluna K)</b>
+   *
+   * <p>O sistema irá determinar a Data do Resultado da 1ª Carga Viral do utente identificando a
+   * data da primeira consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na
+   * qual foi efectuado o registo de resultado da Carga Viral. <br>
+   * <br>
+   *
+   * <p>Nota 1: A “Data Início TARV” é a data registada na Ficha Resumo (“Data do Início TARV”).
+   * <br>
+   * <br>
+   *
+   * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
+   * na coorte de 24 meses, conforme definido no RF4.
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getFirstViralLoadResult() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("B2- Data de registo do resultado da 1ª CV");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1305", hivMetadata.getHivViralLoadQualitative().getConceptId());
+
+    String query =
+        "SELECT     p.patient_id, "
+            + "           MIN(e.encounter_datetime) AS first_vl_date  "
+            + "FROM       patient p "
+            + "INNER JOIN encounter e "
+            + "ON         e.patient_id = p.patient_id "
+            + "INNER JOIN obs o "
+            + "ON         o.encounter_id = e.encounter_id "
+            + "INNER JOIN "
+            + "           ( "
+            + "                      SELECT     p.patient_id, "
+            + "                                 Min(o.value_datetime) art_start "
+            + "                      FROM       patient p "
+            + "                      INNER JOIN encounter e "
+            + "                      ON         e.patient_id = p.patient_id "
+            + "                      INNER JOIN obs o "
+            + "                      ON         o.encounter_id = e.encounter_id "
+            + "                      WHERE      e.encounter_type = ${53} "
+            + "                      AND        o.concept_id = ${1190} "
+            + "                      AND        o.value_datetime BETWEEN "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionStartMonthAndDay
+            + "        ) "
+            + "          AND "
+            + "  CONCAT(:evaluationYear,"
+            + inclusionEndMonthAndDay
+            + "        ) "
+            + "                      AND        e.location_id = :location "
+            + "                      AND        p.voided = 0 "
+            + "                      AND        e.voided = 0 "
+            + "                      AND        o.voided = 0 "
+            + "                      GROUP BY   p.patient_id ) art "
+            + "where      e.encounter_type = ${6} "
+            + "AND        ( ( "
+            + "                                 o.concept_id= ${856} ) "
+            + "           OR         ( "
+            + "                                 o.concept_id = ${1305} "
+            + "                      AND        o.value_coded IS NOT NULL)) "
+            + "AND        e.location_id = :location "
+            + "AND        e.encounter_datetime >= art.art_start "
+            + "AND        p.voided = 0 "
+            + "AND        e.voided = 0 "
+            + "AND        o.voided = 0 "
+            + "GROUP BY   p.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
 }
