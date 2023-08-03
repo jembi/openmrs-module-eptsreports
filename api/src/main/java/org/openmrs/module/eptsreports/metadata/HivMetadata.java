@@ -5313,7 +5313,8 @@ public class HivMetadata extends ProgramsMetadata {
    * @return {@link Concept}
    */
   public Concept getCragSoroConcept() {
-    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.cragSoroConceptUuid");
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cragSoroConceptUuid");
     return getConcept(uuid);
   }
 
@@ -5327,7 +5328,8 @@ public class HivMetadata extends ProgramsMetadata {
    * @return {@link Concept}
    */
   public Concept getCragLCRConcept() {
-    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.cragLRCConceptUuid");
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cragLRCConceptUuid");
     return getConcept(uuid);
   }
 
@@ -5341,7 +5343,8 @@ public class HivMetadata extends ProgramsMetadata {
    * @return {@link Concept}
    */
   public Concept getCacuConcept() {
-    String uuid = Context.getAdministrationService().getGlobalProperty("eptsreports.cacuConceptUuid");
+    String uuid =
+        Context.getAdministrationService().getGlobalProperty("eptsreports.cacuConceptUuid");
     return getConcept(uuid);
   }
 }

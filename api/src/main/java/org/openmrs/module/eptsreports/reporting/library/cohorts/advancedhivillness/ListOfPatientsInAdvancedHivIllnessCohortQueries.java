@@ -46,7 +46,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
     cd.setName(
-        "Lista de Utentes em seguimento do Modelo de DAH ou com critérios para iniciar o seguimento do Modelo de DA");
+        "Lista de Utentes em seguimento do Modelo de DAH ou com critérios para iniciar o seguimento do Modelo de DAH");
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
@@ -60,6 +60,34 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
         EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
 
     cd.setCompositionString("STARTEDFOLLOWUP OR CD4 OR ESTADIO");
+
+    return cd;
+  }
+
+  /**
+   * <b>Total de Utentes Eligiveis a MDS de DAH</b>
+   * <li>Utentes com critério de CD4 para início de seguimento no Modelo de DAH OR
+   * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH
+   *
+   * @see #getPatientsWithCD4CriteriaToStartFollowupOnDAH()
+   * @see #getPatientsWithCriterioEstadiamentoInicioSeguimento()
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getTotalOfPatientsWithCriteriaToStartFollowupOfDAH() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+    cd.setName("Lista de Utentes com critérios para iniciar o seguimento do Modelo de DAH");
+    cd.addParameters(getCohortParameters());
+
+    cd.addSearch(
+        "CD4", EptsReportUtils.map(getPatientsWithCD4CriteriaToStartFollowupOnDAH(), mappings));
+
+    cd.addSearch(
+        "ESTADIO",
+        EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
+
+    cd.setCompositionString("CD4 OR ESTADIO");
 
     return cd;
   }
@@ -1283,9 +1311,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>O registo mais recente de resultado TB-LAM= “positivo, negativo, NA, NF”, na “Ficha Clínica
    *     –Ficha Mestra” ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV” ocorrido até
    *     o fim do período de avaliação. or
-   * <p>A data do registo mais recente de resultado de TB-LAM , na “Ficha Clínica –Ficha Mestra” ou
-   *     “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV” ocorrido até o fim do período
-   *     de avaliação.
+   *
+   *     <p>A data do registo mais recente de resultado de TB-LAM , na “Ficha Clínica –Ficha Mestra”
+   *     ou “Ficha de Laboratório” ou “Ficha de Doença Avançada por HIV” ocorrido até o fim do
+   *     período de avaliação.
    *
    * @param encounterTypeList EncounterTypes to be evaluated
    * @param examConceptList Exam Concepts

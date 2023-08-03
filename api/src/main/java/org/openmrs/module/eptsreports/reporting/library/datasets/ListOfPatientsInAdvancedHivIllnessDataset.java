@@ -11,13 +11,17 @@ import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.ListOfPatientsArtCohortCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.advancedhivillness.ListOfPatientsInAdvancedHivIllnessCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
+import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.data.DataDefinition;
 import org.openmrs.module.reporting.data.converter.BirthdateConverter;
 import org.openmrs.module.reporting.data.converter.DataConverter;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.person.definition.*;
+import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.PatientDataSetDefinition;
+import org.openmrs.module.reporting.indicator.CohortIndicator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +40,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
 
   private final CommonMetadata commonMetadata;
 
+  private EptsGeneralIndicator eptsGeneralIndicator;
+
   String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
@@ -46,7 +52,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
           listOfPatientsInAdvancedHivIllnessCohortQueries,
       TbMetadata tbMetadata,
       HivMetadata hivMetadata,
-      CommonMetadata commonMetadata) {
+      CommonMetadata commonMetadata,
+      EptsGeneralIndicator eptsGeneralIndicator) {
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.listOfPatientsInAdvancedHivIllnessCohortQueries =
@@ -54,9 +61,10 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
     this.tbMetadata = tbMetadata;
     this.hivMetadata = hivMetadata;
     this.commonMetadata = commonMetadata;
+    this.eptsGeneralIndicator = eptsGeneralIndicator;
   }
 
-  public DataSetDefinition constructDataset() {
+  public DataSetDefinition listOfPatientsInAdvancedHivIllnessColumnsDataset() {
 
     PatientDataSetDefinition pdd = new PatientDataSetDefinition();
 
@@ -88,142 +96,138 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
             .getPatientsOnFollowupOrWithCriteriaToStartFollowupOfDAH(),
         mappings);
 
-        // 1- NID sheet 1 - Column A
-        pdd.addColumn(
-            "nid",
-            tptListOfPatientsEligibleDataSet.getNID(identifierType.getPatientIdentifierTypeId()),
-            "");
+    // 1- NID sheet 1 - Column A
+    pdd.addColumn(
+        "nid",
+        tptListOfPatientsEligibleDataSet.getNID(identifierType.getPatientIdentifierTypeId()),
+        "");
 
-        // 2 - Name - Sheet 1: Column B
-        pdd.addColumn("name", nameDef, "");
+    // 2 - Name - Sheet 1: Column B
+    pdd.addColumn("name", nameDef, "");
 
-        // 3 - Data Nascimento - Sheet 1: Column C
-        pdd.addColumn(
-            "birthdate", new BirthdateDataDefinition(), "", new BirthdateConverter("dd/MM/yyyy"));
+    // 3 - Data Nascimento - Sheet 1: Column C
+    pdd.addColumn(
+        "birthdate", new BirthdateDataDefinition(), "", new BirthdateConverter("dd/MM/yyyy"));
 
-        // 4 - Idade - Sheet 1: Column D
-        pdd.addColumn(
-            "age",
-            listOfPatientsArtCohortCohortQueries.getAge(),
-            "evaluationDate=${endDate}",
-            new NotApplicableIfNullConverter());
+    // 4 - Idade - Sheet 1: Column D
+    pdd.addColumn(
+        "age",
+        listOfPatientsArtCohortCohortQueries.getAge(),
+        "evaluationDate=${endDate}",
+        new NotApplicableIfNullConverter());
 
-        // 5 - Sexo - Sheet 1: Column E
-        pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
+    // 5 - Sexo - Sheet 1: Column E
+    pdd.addColumn("gender", new GenderDataDefinition(), "", new GenderConverter());
 
-        // 6 - Contacto - Sheet 1: Column F
-        pdd.addColumn("contact", contactDef, "");
+    // 6 - Contacto - Sheet 1: Column F
+    pdd.addColumn("contact", contactDef, "");
 
-        // 7 - Data Inicio Tarv - Sheet 1: Column G
-        pdd.addColumn(
-            "art_start",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getARTStartDate(),
-            "endDate=${endDate},location=${location}",
-            new ForwardSlashDateConverter());
+    // 7 - Data Inicio Tarv - Sheet 1: Column G
+    pdd.addColumn(
+        "art_start",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getARTStartDate(),
+        "endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
 
-        // 8 - Data de Último Levantamento TARV - Sheet 1: Column H
-        pdd.addColumn(
-            "last_pickup",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVPickupDate(),
-            mappings,
-            new ForwardSlashDateConverter());
+    // 8 - Data de Último Levantamento TARV - Sheet 1: Column H
+    pdd.addColumn(
+        "last_pickup",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVPickupDate(),
+        mappings,
+        new ForwardSlashDateConverter());
 
-        // 9 - Situação TARV no Início do Seguimento de DAH Sheet 1: Column I
-        pdd.addColumn(
-            "last_situation",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVSituation(),
-            "endDate=${endDate},location=${location}",
-            new ObservationToConceptNameConverter());
+    // 9 - Situação TARV no Início do Seguimento de DAH Sheet 1: Column I
+    pdd.addColumn(
+        "last_situation",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastARVSituation(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
 
-        // 10 - Data de Início de Seguimento de DAH Sheet 1: Column J
-        pdd.addColumn(
-            "followup_startdate",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getFollowupStartDateDAH(),
-            "endDate=${endDate},location=${location}",
-            new ForwardSlashDateConverter());
+    // 10 - Data de Início de Seguimento de DAH Sheet 1: Column J
+    pdd.addColumn(
+        "followup_startdate",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getFollowupStartDateDAH(),
+        "endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
 
-        // 11 - Data de Registo de CD4 Absoluto – Sheet 1: Column K
-        pdd.addColumn(
-            "cd4_resultdate",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4ResultDate(),
-            mappings,
-            new ForwardSlashDateConverter());
+    // 11 - Data de Registo de CD4 Absoluto – Sheet 1: Column K
+    pdd.addColumn(
+        "cd4_resultdate",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4ResultDate(),
+        mappings,
+        new ForwardSlashDateConverter());
 
-        // 12 - Resultado de CD4 – Sheet 1: Column L
-        pdd.addColumn(
-            "cd4_result", listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4Result(),
-     mappings);
+    // 12 - Resultado de CD4 – Sheet 1: Column L
+    pdd.addColumn(
+        "cd4_result", listOfPatientsInAdvancedHivIllnessCohortQueries.getCd4Result(), mappings);
 
-        // 13 - Data de Registo de Estadio – Sheet 1: Column M
-        pdd.addColumn(
-            "estadio_date",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioOnPeriod(),
-            mappings,
-            new ForwardSlashDateConverter());
+    // 13 - Data de Registo de Estadio – Sheet 1: Column M
+    pdd.addColumn(
+        "estadio_date",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfEstadioOnPeriod(),
+        mappings,
+        new ForwardSlashDateConverter());
 
-        // 14 - Infecções Estadio OMS – Sheet 1: Column N
-        pdd.addColumn(
-            "estadio_result",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioDuringPeriod(),
-            mappings,
-            new ObservationToConceptNameConverter());
+    // 14 - Infecções Estadio OMS – Sheet 1: Column N
+    pdd.addColumn(
+        "estadio_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfEstadioDuringPeriod(),
+        mappings,
+        new ObservationToConceptNameConverter());
 
-        //     15 - Data de Registo mais recente de Estadio OMS -  Column O
-        pdd.addColumn(
-            "last_estadio_date",
+    //     15 - Data de Registo mais recente de Estadio OMS -  Column O
+    pdd.addColumn(
+        "last_estadio_date",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfMostRecentEstadioByEndOfPeriod(),
+        "endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
 
-     listOfPatientsInAdvancedHivIllnessCohortQueries.getDateOfMostRecentEstadioByEndOfPeriod(),
-            "endDate=${endDate},location=${location}",
-            new ForwardSlashDateConverter());
+    // 16 - Estadio OMS no registo mais recente ate o fim do periodo -  Column P
+    pdd.addColumn(
+        "last_estadio_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfMostRecentEstadioByEndOfPeriod(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
 
-        // 16 - Estadio OMS no registo mais recente ate o fim do periodo -  Column P
-        pdd.addColumn(
-            "last_estadio_result",
+    // 17 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column Q
+    pdd.addColumn(
+        "reason_change_estadio",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio1(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
 
-     listOfPatientsInAdvancedHivIllnessCohortQueries.getResultOfMostRecentEstadioByEndOfPeriod(),
-            "endDate=${endDate},location=${location}",
-            new ObservationToConceptNameConverter());
+    // 18 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column R
+    pdd.addColumn(
+        "reason_change_estadio2",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio2(),
+        "endDate=${endDate},location=${location}",
+        new ObservationToConceptNameConverter());
 
-        // 17 - Motivo de Mudança de Estadiamento Clínico - 1 – Sheet 1: Column Q
-        pdd.addColumn(
-            "reason_change_estadio",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio1(),
-            "endDate=${endDate},location=${location}",
-            new ObservationToConceptNameConverter());
+    // 19 - Resultado do Último CD4 – Sheet 1: Column S
+    pdd.addColumn(
+        "last_cd4_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4Result(),
+        mappings);
 
-        // 18 - Motivo de Mudança de Estadiamento Clínico - 2 – Sheet 1: Column R
-        pdd.addColumn(
-            "reason_change_estadio2",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getReasonToChangeEstadio2(),
-            "endDate=${endDate},location=${location}",
-            new ObservationToConceptNameConverter());
+    // 20 - Data do Último CD4 – Sheet 1: Column T
+    pdd.addColumn(
+        "last_cd4_resultdate",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDate(),
+        mappings,
+        new ForwardSlashDateConverter());
 
-        // 19 - Resultado do Último CD4 – Sheet 1: Column S
-        pdd.addColumn(
-            "last_cd4_result",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4Result(),
-            mappings);
+    // 21 - Resultado do Penúltimo CD4 – Sheet 1: Column U
+    pdd.addColumn(
+        "second_cd4_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultBeforeMostRecentCd4(),
+        mappings);
 
-        // 20 - Data do Último CD4 – Sheet 1: Column T
-        pdd.addColumn(
-            "last_cd4_resultdate",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDate(),
-            mappings,
-            new ForwardSlashDateConverter());
-
-        // 21 - Resultado do Penúltimo CD4 – Sheet 1: Column U
-        pdd.addColumn(
-            "second_cd4_result",
-     listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultBeforeMostRecentCd4(),
-     mappings);
-
-        // 22 - Data do Penúltimo CD4 – Sheet 1: Column V
-        pdd.addColumn(
-            "second_cd4_resultdate",
-
-     listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDateBeforeMostRecentCd4(),
-            mappings,
-            new ForwardSlashDateConverter());
+    // 22 - Data do Penúltimo CD4 – Sheet 1: Column V
+    pdd.addColumn(
+        "second_cd4_resultdate",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getLastCd4ResultDateBeforeMostRecentCd4(),
+        mappings,
+        new ForwardSlashDateConverter());
 
     // 23 - Resultado da Última Carga Viral – Sheet 1: Column W
     pdd.addColumn(
@@ -291,95 +295,144 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
 
     // 29 - Resultado do Última CrAG Soro – Sheet 1: Column AC
     pdd.addColumn(
-            "crag_soro_result",
-            listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
-                    Arrays.asList(
-                            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                            hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                            hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-                    Collections.singletonList(hivMetadata.getCragSoroConcept().getConceptId()),
-                    Arrays.asList(
-                            commonMetadata.getPositive().getConceptId(),
-                            commonMetadata.getNegative().getConceptId(),
-                            hivMetadata.getNAConcept().getConceptId(),
-                            tbMetadata.getIndeterminate().getConceptId()),
-                    true),
-            "endDate=${endDate},location=${location}",
-            new TestResultConverter());
-
+        "crag_soro_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
+            Arrays.asList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
+            Collections.singletonList(hivMetadata.getCragSoroConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId(),
+                hivMetadata.getNAConcept().getConceptId(),
+                tbMetadata.getIndeterminate().getConceptId()),
+            true),
+        "endDate=${endDate},location=${location}",
+        new TestResultConverter());
 
     // 30 - Data do Último CrAG Soro – Sheet 1: Column AD
-      pdd.addColumn(
-              "crag_soro_result_date",
-              listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
-                      Arrays.asList(
-                              hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                              hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                              hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-                      Collections.singletonList(hivMetadata.getCragSoroConcept().getConceptId()),
-                      Arrays.asList(
-                              commonMetadata.getPositive().getConceptId(),
-                              commonMetadata.getNegative().getConceptId(),
-                              hivMetadata.getNAConcept().getConceptId(),
-                              tbMetadata.getIndeterminate().getConceptId()),
-                      false),
-              "endDate=${endDate},location=${location}",
-              new ForwardSlashDateConverter());
+    pdd.addColumn(
+        "crag_soro_result_date",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
+            Arrays.asList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
+            Collections.singletonList(hivMetadata.getCragSoroConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId(),
+                hivMetadata.getNAConcept().getConceptId(),
+                tbMetadata.getIndeterminate().getConceptId()),
+            false),
+        "endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
 
-      // 31 - Resultado do último CrAG LCR – Sheet 1: Column AE
-      pdd.addColumn(
-              "crag_lrc_result",
-              listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
-                      Arrays.asList(
-                              hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                              hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                              hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-                      Collections.singletonList(hivMetadata.getCragLCRConcept().getConceptId()),
-                      Arrays.asList(
-                              commonMetadata.getPositive().getConceptId(),
-                              commonMetadata.getNegative().getConceptId(),
-                              hivMetadata.getNAConcept().getConceptId(),
-                              tbMetadata.getIndeterminate().getConceptId()),
-                      true),
-              "endDate=${endDate},location=${location}",
-              new TestResultConverter());
+    // 31 - Resultado do último CrAG LCR – Sheet 1: Column AE
+    pdd.addColumn(
+        "crag_lrc_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
+            Arrays.asList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
+            Collections.singletonList(hivMetadata.getCragLCRConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId(),
+                hivMetadata.getNAConcept().getConceptId(),
+                tbMetadata.getIndeterminate().getConceptId()),
+            true),
+        "endDate=${endDate},location=${location}",
+        new TestResultConverter());
 
+    // 32 - Data do último CrAG LCR – Sheet 1: Column AF
+    pdd.addColumn(
+        "crag_lrc_result_date",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
+            Arrays.asList(
+                hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
+                hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
+                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
+            Collections.singletonList(hivMetadata.getCragLCRConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId(),
+                hivMetadata.getNAConcept().getConceptId(),
+                tbMetadata.getIndeterminate().getConceptId()),
+            false),
+        "endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
 
-      // 32 - Data do último CrAG LCR – Sheet 1: Column AF
-      pdd.addColumn(
-              "crag_lrc_result_date",
-              listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
-                      Arrays.asList(
-                              hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId(),
-                              hivMetadata.getMisauLaboratorioEncounterType().getEncounterTypeId(),
-                              hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-                      Collections.singletonList(hivMetadata.getCragLCRConcept().getConceptId()),
-                      Arrays.asList(
-                              commonMetadata.getPositive().getConceptId(),
-                              commonMetadata.getNegative().getConceptId(),
-                              hivMetadata.getNAConcept().getConceptId(),
-                              tbMetadata.getIndeterminate().getConceptId()),
-                      false),
-              "endDate=${endDate},location=${location}",
-              new ForwardSlashDateConverter());
+    // 33 - Resultado do Último Rastreio de CACU – Sheet 1: Column AG
+    pdd.addColumn(
+        "cacu_result",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
+            Collections.singletonList(hivMetadata.getCacuConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId()),
+            true),
+        "endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
 
-      // 33 - Resultado do Último Rastreio de CACU – Sheet 1: Column AG
-//      pdd.addColumn(
-//              "crag_lrc_result_date",
-//              listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
-//                      Collections.singletonList(
-//                              hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
-//                      Collections.singletonList(hivMetadata.getCacuConcept().getConceptId()),
-//                      Arrays.asList(
-//                              commonMetadata.getPositive().getConceptId(),
-//                              commonMetadata.getNegative().getConceptId(),
-//                              hivMetadata.getNAConcept().getConceptId(),
-//                              tbMetadata.getIndeterminate().getConceptId()),
-//                      true),
-//              "endDate=${endDate},location=${location}",
-//              new ForwardSlashDateConverter());
+    // 34 - Data do Último Rastreio de CACU – Sheet 1: Column AH
+    pdd.addColumn(
+        "cacu_result_date",
+        listOfPatientsInAdvancedHivIllnessCohortQueries.getTbLaboratoryResearchResults(
+            Collections.singletonList(
+                hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId()),
+            Collections.singletonList(hivMetadata.getCacuConcept().getConceptId()),
+            Arrays.asList(
+                commonMetadata.getPositive().getConceptId(),
+                commonMetadata.getNegative().getConceptId()),
+            false),
+        "endDate=${endDate},location=${location}",
+        new ForwardSlashDateConverter());
 
-      // 34 - Data do Último Rastreio de CACU – Sheet 1: Column AH
     return pdd;
+  }
+
+  public DataSetDefinition listOfPatientsInAdvancedHivIllnessTotalsDataset() {
+
+    CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
+    dataSetDefinition.setName("DAH Cohort Totals");
+
+    dataSetDefinition.addParameters(getParameters());
+
+    // Total de Utentes Eligiveis a MDS de DAH
+    CohortIndicator DAHTotalOfEligible =
+        eptsGeneralIndicator.getIndicator(
+            "ELIGIBLE_MDS",
+            EptsReportUtils.map(
+                listOfPatientsInAdvancedHivIllnessCohortQueries
+                    .getTotalOfPatientsWithCriteriaToStartFollowupOfDAH(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "ELIGIBLE_MDS",
+        "Total de Utentes Eligiveis a MDS de DAH",
+        EptsReportUtils.map(DAHTotalOfEligible, mappings),
+        "");
+
+    // Total de Utentes em MDS de DAH
+    CohortIndicator DAHTotalOfPatientsOnFollowupDAH =
+        eptsGeneralIndicator.getIndicator(
+            "ON_MDS",
+            EptsReportUtils.map(
+                listOfPatientsInAdvancedHivIllnessCohortQueries
+                    .getPatientsWhoStartedFollowupOnDAH(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "ON_MDS",
+        "Total de Utentes em MDS de DAH",
+        EptsReportUtils.map(DAHTotalOfPatientsOnFollowupDAH, mappings),
+        "");
+
+    return dataSetDefinition;
   }
 }

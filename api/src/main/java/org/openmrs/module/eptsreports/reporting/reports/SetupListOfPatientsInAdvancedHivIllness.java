@@ -72,7 +72,15 @@ public class SetupListOfPatientsInAdvancedHivIllness extends EptsDataExportManag
     // Cohort datasets
     reportDefinition.addDataSetDefinition(
         "DAH",
-        Mapped.mapStraightThrough(listOfPatientsInAdvancedHivIllnessDataset.constructDataset()));
+        Mapped.mapStraightThrough(
+            listOfPatientsInAdvancedHivIllnessDataset
+                .listOfPatientsInAdvancedHivIllnessColumnsDataset()));
+
+    reportDefinition.addDataSetDefinition(
+        "TOTAL",
+        Mapped.mapStraightThrough(
+            listOfPatientsInAdvancedHivIllnessDataset
+                .listOfPatientsInAdvancedHivIllnessTotalsDataset()));
 
     return reportDefinition;
   }
