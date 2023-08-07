@@ -147,6 +147,68 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * 12 meses, ou Resposta = 24 meses, caso o utente tenha iniciado TARV na coorte de 24 meses
    * (RF4).
    *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getCoort12Or24Months() {
+
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses.");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+
+    String query =
+        "SELECT art_patient.patient_id, art_patient.coort "
+            + " FROM   ( "
+            + "      SELECT art_patient_12.patient_id, '12 Meses' AS coort "
+            + "     FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+            + "     ) art_patient_12 "
+            + " WHERE  art_patient_12.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 1)
+            + " )"
+            + " UNION "
+            + "     SELECT art_patient_24.patient_id, '24 Meses' AS coort "
+            + "     FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+            + "     ) art_patient_24 "
+            + " WHERE  art_patient_24.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 2)
+            + " )"
+            + " ) art_patient";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>RF9 - Relatório – Informação do utente - Secção A1 a A9</b>
+   *
+   * <p>A2- Coorte: (coluna B) – Resposta = 12 meses, caso o utente tenha iniciado TARV na coorte de
+   * 12 meses, ou Resposta = 24 meses, caso o utente tenha iniciado TARV na coorte de 24 meses
+   * (RF4).
+   *
    * @return {CohortDefinition}
    */
   public CohortDefinition getPatientsInitiatedART24Months() {
@@ -192,150 +254,6 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     return sqlCohortDefinition;
   }
 
-  /**
-   * <b>RF9 - Relatório – Informação do utente - Secção A1 a A9</b>
-   *
-   * <p>A2- Coorte: (coluna B) – Resposta = 12 meses, caso o utente tenha iniciado TARV na coorte de
-   * 12 meses, ou Resposta = 24 meses, caso o utente tenha iniciado TARV na coorte de 24 meses
-   * (RF4).
-   *
-   * @return {DataDefinition}
-   */
-  public DataDefinition getCoort12Or24Months() {
-
-    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName("A.2 - Coorte: – Resposta = 12 meses ou Resposta = 24 meses.");
-    sqlPatientDataDefinition.addParameter(
-        new Parameter("evaluationYear", "evaluationYear", Integer.class));
-    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
-
-    String query =
-        "SELECT final_query.patient_id, "
-            + "       CASE "
-            + "         WHEN final_query.art_start_date BETWEEN Date_sub( "
-            + "              final_query.art_start_date, INTERVAL 12 month) AND "
-            + "final_query.art_start_date THEN '12 Meses' "
-            + "		  WHEN final_query.art_start_date BETWEEN Date_sub( "
-            + "               final_query.art_start_date, INTERVAL 24 month) AND "
-            + "Date_sub(final_query.art_start_date, INTERVAL 12 month) "
-            + "						   THEN '24 Meses' "
-            + "ELSE '' "
-            + "end "
-            + "FROM   (SELECT art_patient.patient_id, "
-            + "               art_patient.art_start AS art_start_date "
-            + "        FROM   (SELECT p.patient_id, "
-            + "                       MIN(o.value_datetime) art_start "
-            + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON e.patient_id = p.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON o.encounter_id = e.encounter_id "
-            + "                WHERE  e.encounter_type = ${53} "
-            + "                       AND o.concept_id = ${1190} "
-            + "                       AND e.location_id = :location "
-            + "                       AND o.value_datetime BETWEEN "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ) "
-            + "          AND "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) "
-            + "                       AND p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND o.voided = 0 "
-            + "                GROUP  BY p.patient_id) art_patient "
-            + "        WHERE  art_patient.patient_id NOT IN "
-            + "               (SELECT p.patient_id "
-            + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = "
-            + "                                  e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = "
-            + "                                  o.encounter_id "
-            + "                       INNER JOIN obs o2 "
-            + "                               ON e.encounter_id = "
-            + "                                  o2.encounter_id "
-            + "                WHERE  p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND o.voided = 0 "
-            + "                       AND o2.voided = 0 "
-            + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = ${53} "
-            + "                       AND o.concept_id = ${1369} "
-            + "                       AND o.value_coded = ${1065} "
-            + "                       AND o2.concept_id = ${6300} "
-            + "                       AND o2.value_coded = ${6276} "
-            + "                UNION "
-            + "                SELECT p.patient_id "
-            + "                FROM   patient p "
-            + "                       INNER JOIN encounter e "
-            + "                               ON p.patient_id = "
-            + "                                  e.patient_id "
-            + "                       INNER JOIN obs o "
-            + "                               ON e.encounter_id = "
-            + "                                  o.encounter_id "
-            + "                WHERE  p.voided = 0 "
-            + "                       AND e.voided = 0 "
-            + "                       AND o.voided = 0 "
-            + "                       AND e.location_id = :location "
-            + "                       AND e.encounter_type = ${6} "
-            + "                       AND o.concept_id = ${6273} "
-            + "                       AND o.value_coded = ${1706} "
-            + "                UNION "
-            + "                SELECT obs.patient_id "
-            + "                FROM "
-            + "               (SELECT p.patient_id, "
-            + "                       MAX(o.obs_datetime) "
-            + "                       AS "
-            + "                       obs_date "
-            + "                FROM   patient p "
-            + "                                              INNER JOIN encounter e "
-            + "                                                      ON p.patient_id = "
-            + "                                                         e.patient_id "
-            + "                                              INNER JOIN obs o "
-            + "                                                      ON e.encounter_id "
-            + "                                                         = "
-            + "                                                         o.encounter_id "
-            + "                                                      WHERE  p.voided = 0 "
-            + "                                                             AND e.voided = 0 "
-            + "                                                             AND o.voided = 0 "
-            + "                                                             AND e.location_id = "
-            + "                                                                 :location "
-            + "                                                             AND "
-            + "               e.encounter_type = ${53} "
-            + "                                                             AND "
-            + "               o.concept_id = ${6272} "
-            + "                                                             AND "
-            + "               o.value_coded = ${1706} "
-            + "                                                             AND "
-            + "               o.obs_datetime <= "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) "
-            + "                                                      GROUP  BY "
-            + "               p.patient_id)obs)) AS "
-            + "       final_query";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
-
-    return sqlPatientDataDefinition;
-  }
 
   /**
    * <b>RF9 - Relatório – Informação do utente - Secção A1 a A9</b>
