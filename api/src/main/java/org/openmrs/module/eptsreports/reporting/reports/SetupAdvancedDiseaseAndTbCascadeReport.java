@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.GenericCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.datasets.AdvancedDeseaseAndTbCascadeDataset;
+import org.openmrs.module.eptsreports.reporting.library.datasets.AdvancedDiseaseAndTbCascadeDataset;
 import org.openmrs.module.eptsreports.reporting.library.datasets.DatimCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.library.datasets.SismaCodeDatasetDefinition;
 import org.openmrs.module.eptsreports.reporting.reports.manager.EptsDataExportManager;
@@ -19,11 +19,11 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Deprecated
-public class SetupAdvancedDeseaseAndTbCascadeReport extends EptsDataExportManager {
+public class SetupAdvancedDiseaseAndTbCascadeReport extends EptsDataExportManager {
 
   @Autowired private GenericCohortQueries genericCohortQueries;
 
-  @Autowired private AdvancedDeseaseAndTbCascadeDataset advancedDeseaseAndTbCascadeDataset;
+  @Autowired private AdvancedDiseaseAndTbCascadeDataset advancedDiseaseAndTbCascadeDataset;
 
   @Override
   public String getExcelDesignUuid() {
@@ -65,7 +65,7 @@ public class SetupAdvancedDeseaseAndTbCascadeReport extends EptsDataExportManage
     reportDefinition.addDataSetDefinition(
         "ADTBC",
         Mapped.mapStraightThrough(
-            advancedDeseaseAndTbCascadeDataset.constructAdvancedDeseaseAndTbCascadeDataset()));
+            advancedDiseaseAndTbCascadeDataset.constructAdvancedDiseaseAndTbCascadeDataset()));
     reportDefinition.setBaseCohortDefinition(
         EptsReportUtils.map(
             genericCohortQueries.getBaseCohort(), "endDate=${endDate},location=${location}"));

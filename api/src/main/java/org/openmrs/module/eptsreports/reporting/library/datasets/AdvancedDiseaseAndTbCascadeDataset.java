@@ -5,9 +5,9 @@ import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AdvancedDeseaseAndTbCascadeDataset extends BaseDataSet {
+public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
 
-  public DataSetDefinition constructAdvancedDeseaseAndTbCascadeDataset() {
+  public DataSetDefinition constructAdvancedDiseaseAndTbCascadeDataset() {
 
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
     dataSetDefinition.setName("TB7 Dataset");
