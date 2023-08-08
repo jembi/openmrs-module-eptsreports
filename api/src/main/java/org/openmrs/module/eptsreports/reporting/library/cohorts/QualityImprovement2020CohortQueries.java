@@ -7687,7 +7687,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 11) {
       comp.setCompositionString("Den11 AND G2 AND LOWVLFL");
     } else if (num == 12) {
-      comp.setCompositionString("Den11  AND G2 LOWVLFL");
+      comp.setCompositionString("Den11 AND G2 AND LOWVLFL");
     }
     return comp;
   }
@@ -8906,7 +8906,7 @@ public class QualityImprovement2020CohortQueries {
     CohortDefinition Mq15F = intensiveMonitoringCohortQueries.getMI15F();
     CohortDefinition Mq15G = intensiveMonitoringCohortQueries.getMI15G();
     CohortDefinition alreadyMds = getPatientsAlreadyEnrolledInTheMdc();
-    CohortDefinition onTB = getPatientsOnTBTreatmentinTheLast7Months();
+    CohortDefinition onTB = commonCohortQueries.getPatientsOnTbTreatment();
     CohortDefinition onSK = getPatientsWithSarcomaKarposi();
     CohortDefinition returned = eriDSDCohortQueries.getPatientsWhoReturned();
 
@@ -11535,7 +11535,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result "
             + "               ON two_dispensations.patient_id = vl_result.patient_id "
-            + "WHERE  vl_result.vl_date > two_dispensations.second_date AND vl_result.vl_date < :revisionEndDate";
+            + "WHERE  vl_result.vl_date > two_dispensations.second_date AND vl_result.vl_date <= :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -11656,7 +11656,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                   AND o.voided = 0 "
             + "                                               GROUP  BY p.patient_id) most_recent "
             + "                                     GROUP  BY most_recent.patient_id) dispensation "
-            + "                                     WHERE  dispensation.patient_id = p.patient_id) GROUP BY patient_id )  first_dispensation GROUP BY first_dispensation.patient_id)"
+            + "                                     WHERE  dispensation.patient_id = p.patient_id) )  first_dispensation GROUP BY first_dispensation.patient_id)"
             + "                                     first_investigation ON first_investigation.patient_id = p.patient_id "
             + "                                 WHERE e.encounter_type = ${6} "
             + "                                 AND e.voided = 0 "
@@ -13100,149 +13100,5 @@ public class QualityImprovement2020CohortQueries {
     sqlCohortDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlCohortDefinition;
-  }
-
-  /**
-   * <b> RF 45 Utentes que estão em tratamento de TB (para exclusão)</b>
-   *
-   * <blockquote>
-   *
-   * <p>O Sistema irá identificar todos os utentes em TARV que estiveram no tratamento TB nos
-   * últimos 7 meses até a data fim de revisão seleccionando::
-   *
-   * <p><b>a.</b> Todos os utentes marcados com Tratamento TB= Inicio (I) numa consulta clínica
-   * (Ficha Clínica- MasterCard) ocorrida no período compreendido entre “Data fim de revisão menos
-   * (-) 7 meses” e Data fim de revisão (Data de registro de Tratamento TB = “I” >= “Data fim de
-   * revisão menos (-) 7 meses” e <= Data fim de revisão); ou
-   *
-   * <p><b>b.</b> Todos os utentes com registro de Registro Clínico de TARV do utente – (Ficha de
-   * Seguimento (adulto e pediátrico)” com pelo menos data de início do Tratamento de TB ocorrida no
-   * período compreendido entre “Data fim de revisão menos (-) 7 meses” e Data fim de revisão (Data
-   * de Início de Tratamento de TB >= “Data fim de revisão menos (-) 7 meses” e <= Data fim de
-   * revisão); ou
-   *
-   * <p><b>c.</b> Todos os utentes com um registro de Data de TB na Ficha Resumo – MasterCard, na
-   * secção de Condições Medicas Importantes, ocorrido no período compreendido entre “Data fim de
-   * revisão menos (-) 7 meses” e Data fim de revisão (Data de registro de TB >= “Data fim de
-   * revisão menos (-) 7 meses” e <= Data fim de revisão) ou
-   *
-   * <p><b>d.</b> Todos os utentes inscritos no Programa de TB com Data de Admissão ocorrida no
-   * período compreendido entre “Data fim de revisão menos (-) 7 meses” e Data fim de revisão (Data
-   * de registro de Admissão ao Programa TB >= “Data fim de revisão menos (-) 7 meses” e <= Data fim
-   * de revisão);
-   *
-   * <p><b>d.</b> Todos os utentes marcados com Diagnóstico TB activo – Sim (S) na Ficha Clinica –
-   * MasterCard no período compreendido entre “Data fim de revisão menos (-) 7 meses” e “Data fim de
-   * revisão” (Data de registro de Diagnóstico de TB activo = “S” >= “Data fim de revisão menos (-)
-   * 7 meses” e <= Data fim de revisão);
-   *
-   * <p><b>Nota:.</b> Para os utentes com registro de mais de uma fonte na mesma Unidade Sanitária,
-   * o sistema irá selecionar a informação do utente da fonte mais recente até ao fim do período de
-   * revisão;
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsOnTBTreatmentinTheLast7Months() {
-    SqlCohortDefinition cd = new SqlCohortDefinition();
-    cd.setName("Utentes que estão em tratamento de TB ");
-    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
-    cd.addParameter(new Parameter("location", "location", Location.class));
-
-    Map<String, Integer> map = new HashMap<>();
-    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    map.put("9", hivMetadata.getPediatriaSeguimentoEncounterType().getEncounterTypeId());
-    map.put("1113", hivMetadata.getTBDrugStartDateConcept().getConceptId());
-    map.put("6120", hivMetadata.getTBDrugEndDateConcept().getConceptId());
-    map.put("5", hivMetadata.getTBProgram().getProgramId());
-    map.put(
-        "16", hivMetadata.getPatientActiveOnTBProgramWorkflowState().getProgramWorkflowStateId());
-    map.put("23761", hivMetadata.getActiveTBConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("1268", hivMetadata.getTBTreatmentPlanConcept().getConceptId());
-    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("42", tbMetadata.getPulmonaryTB().getConceptId());
-    map.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
-
-    String query =
-        "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       JOIN encounter e "
-            + "         ON p.patient_id = e.patient_id "
-            + "       JOIN obs start "
-            + "         ON e.encounter_id = start.encounter_id "
-            + "WHERE  e.encounter_type IN ( ${6}, ${9} ) "
-            + "       AND start.concept_id = ${1113} "
-            + "       AND start.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND start.value_datetime IS NOT NULL "
-            + "       AND start.value_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 month) AND :endDate "
-            + "       AND e.location_id = :location "
-            + "GROUP  BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       JOIN patient_program pp "
-            + "         ON p.patient_id = pp.patient_id "
-            + "WHERE  pp.program_id = ${5} "
-            + "       AND pp.location_id = :location "
-            + "       AND pp.date_enrolled BETWEEN Date_sub(:endDate, INTERVAL 7 month) AND :endDate "
-            + "       AND ( pp.date_completed IS NULL "
-            + "              OR pp.date_completed > :endDate ) "
-            + "       AND p.voided = 0 "
-            + "       AND pp.voided = 0 "
-            + "GROUP  BY p.patient_id "
-            + "UNION "
-            + "SELECT p.patient_id "
-            + "FROM   patient p "
-            + "       INNER JOIN encounter e "
-            + "               ON p.patient_id = e.patient_id "
-            + "       INNER JOIN obs o "
-            + "               ON e.encounter_id = o.encounter_id "
-            + "WHERE  e.location_id = :location "
-            + "       AND e.encounter_type = ${53} "
-            + "       AND o.concept_id = ${1406} "
-            + "       AND o.value_coded = ${42} "
-            + "       AND o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 month) AND :endDate "
-            + "       AND p.voided = 0 "
-            + "       AND e.voided = 0 "
-            + "       AND o.voided = 0 "
-            + " GROUP  BY p.patient_id "
-            + " UNION "
-            + " SELECT p.patient_id "
-            + "             FROM   patient p "
-            + "                    JOIN encounter e "
-            + "                      ON p.patient_id = e.patient_id "
-            + "                    JOIN obs o "
-            + "                      ON e.encounter_id = o.encounter_id "
-            + "             WHERE  o.concept_id = ${1268} "
-            + "             AND o.value_coded = ${1256} "
-            + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_type IN ( ${6}, ${9} ) "
-            + "                    AND o.obs_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 month) AND :endDate "
-            + "                    AND p.voided = 0 "
-            + "                    AND e.voided = 0 "
-            + "                    AND o.voided = 0 "
-            + " UNION "
-            + " SELECT p.patient_id "
-            + "                   FROM   patient p "
-            + "                          INNER JOIN encounter e "
-            + "                                  ON p.patient_id = e.patient_id "
-            + "                          INNER JOIN obs o "
-            + "                                  ON e.encounter_id = o.encounter_id "
-            + "                   WHERE  o.concept_id = ${23761} "
-            + "                   and o.value_coded = ${1065} "
-            + "                          AND e.location_id = :location "
-            + "                          AND e.encounter_type IN ( ${6}, ${9} ) "
-            + "                          AND e.encounter_datetime BETWEEN Date_sub(:endDate, INTERVAL 7 month) AND :endDate "
-            + "                          AND p.voided = 0 "
-            + "                          AND e.voided = 0 "
-            + "                          AND o.voided = 0  ";
-
-    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
-
-    cd.setQuery(stringSubstitutor.replace(query));
-
-    return cd;
   }
 }
