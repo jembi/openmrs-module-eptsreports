@@ -60,55 +60,55 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     //  SECÇÃO A
     //  INFORMAÇÃO DO PACIENTE
 
-    // A.1 - Nr Sequencial sheet 1 - Column A
+    // A1- Nr. Sequencial: (Coluna A)
     pdd.addColumn("counter", new PersonIdDataDefinition(), "", new ObjectCounterConverter());
 
-    // A.2 - Coorte - Sheet 1: Column B
+    // A2- Coorte: (coluna B)
     pdd.addColumn(
         "coort",
         listOfPatientsWithMdsEvaluationCohortQueries.getCoort12Or24Months(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // A.3 - Sexo - Sheet 1: Column C
+    // A3- Sexo: (coluna C)
     pdd.addColumn("gender", new GenderDataDefinition(), "", new MaleFemaleConverter());
 
-    // A.4 - Idade - Sheet 1: Column D
+    // A4- Idade: (coluna D)
     pdd.addColumn(
         "age",
         listOfPatientsWithMdsEvaluationCohortQueries.getAgeOnMOHArtStartDate(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // A.5 - Data do início TARV - Sheet 1: Column E
+    // A5- Data início TARV: (coluna E)
     pdd.addColumn(
         "art_start",
         listOfPatientsWithMdsEvaluationCohortQueries.getArtStartDate(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // A.6 - Elegível ao TPT no início do TARV - Sheet 1: Column F
+    // A6- Elegível ao TPT no Início do TARV: (coluna F)
     pdd.addColumn(
         "tpt_eligible_tarv",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsTptNotEligible(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // A.7 - Data de início do TPT - Sheet 1: Column G
+    // A7- Data de início do TPT: (coluna G)
     pdd.addColumn(
         "tpt_start_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getTptInitiationDate(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // A.8 - Data de registo do resultado do CD4 inicial - Sheet 1: Column H
+    // A8- Data de registo do resultado de CD4 inicial: (coluna H)
     pdd.addColumn(
         "cd4_register_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultDate(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // A.9 - Resultado do CD4 inicial - Sheet 1: Column I
+    // A9- Resultado do CD4 Inicial: (coluna I)
     pdd.addColumn(
         "initial_cd4_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4Result(),
@@ -145,6 +145,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondCd4Result(),
         "evaluationYear=${evaluationYear-1},location=${location}",
         null);
+
+    // B5- Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?
+    pdd.addColumn(
+            "good_adherence_b",
+            listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(),
+            "evaluationYear=${evaluationYear},location=${location}",
+            null);
 
     // C.18 - Estado de permanência no 24˚ mês de TARV - Sheet 1: Column BU
     pdd.addColumn(
