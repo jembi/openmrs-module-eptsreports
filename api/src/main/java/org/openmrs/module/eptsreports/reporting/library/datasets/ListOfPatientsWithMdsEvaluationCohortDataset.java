@@ -122,36 +122,43 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "first_cv_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoad(),
-        "evaluationYear=${evaluationYear-1},location=${location}",
+        "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B.2 - Data de registo do resultado da 1ª CV - Sheet 1: Column K
     pdd.addColumn(
         "first_cv_result_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResultDate(),
-        "evaluationYear=${evaluationYear-1},location=${location}",
+        "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B.3 - Resultado da 1ª CV - Sheet 1: Column L
     pdd.addColumn(
         "first_cv_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getFirstViralLoadResult(),
-        "evaluationYear=${evaluationYear-1},location=${location}",
+        "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B.4 - Resultado do 2˚ CD4 (2˚ CD4 feito nos 1˚s 12 meses de TARV) - Sheet 1: Column M
     pdd.addColumn(
         "second_cd4_result",
         listOfPatientsWithMdsEvaluationCohortQueries.getSecondCd4Result(),
-        "evaluationYear=${evaluationYear-1},location=${location}",
+        "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B5- Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV?
     pdd.addColumn(
-            "good_adherence_b",
-            listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(),
-            "evaluationYear=${evaluationYear},location=${location}",
-            null);
+        "good_adherence_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesion(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou Não (RF22)
+    pdd.addColumn(
+        "pregnant_breastfeeding_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsPregnantBreastfeeding3MonthsTarv(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
 
     // C.18 - Estado de permanência no 24˚ mês de TARV - Sheet 1: Column BU
     pdd.addColumn(
