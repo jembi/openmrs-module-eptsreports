@@ -7687,7 +7687,7 @@ public class QualityImprovement2020CohortQueries {
     } else if (num == 11) {
       comp.setCompositionString("Den11 AND G2 AND LOWVLFL");
     } else if (num == 12) {
-      comp.setCompositionString("Den11  AND G2 LOWVLFL");
+      comp.setCompositionString("Den11 AND G2 AND LOWVLFL");
     }
     return comp;
   }
@@ -8940,9 +8940,7 @@ public class QualityImprovement2020CohortQueries {
             alreadyMds,
             "startDate=${revisionEndDate-12m+1d},endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
-        "onTB",
-        EptsReportUtils.map(
-            onTB, "startDate=${revisionEndDate},endDate=${revisionEndDate},location=${location}"));
+        "onTB", EptsReportUtils.map(onTB, "endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
         "onSK", EptsReportUtils.map(onSK, "endDate=${revisionEndDate},location=${location}"));
     cd.addSearch(
@@ -11537,7 +11535,7 @@ public class QualityImprovement2020CohortQueries {
             + "                          AND e.voided = 0 "
             + "                          AND o.voided = 0) vl_result "
             + "               ON two_dispensations.patient_id = vl_result.patient_id "
-            + "WHERE  vl_result.vl_date > two_dispensations.second_date AND vl_result.vl_date < :revisionEndDate";
+            + "WHERE  vl_result.vl_date > two_dispensations.second_date AND vl_result.vl_date <= :revisionEndDate";
 
     StringSubstitutor sb = new StringSubstitutor(map);
 
@@ -11658,7 +11656,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                   AND o.voided = 0 "
             + "                                               GROUP  BY p.patient_id) most_recent "
             + "                                     GROUP  BY most_recent.patient_id) dispensation "
-            + "                                     WHERE  dispensation.patient_id = p.patient_id) GROUP BY patient_id )  first_dispensation GROUP BY first_dispensation.patient_id)"
+            + "                                     WHERE  dispensation.patient_id = p.patient_id) )  first_dispensation GROUP BY first_dispensation.patient_id)"
             + "                                     first_investigation ON first_investigation.patient_id = p.patient_id "
             + "                                 WHERE e.encounter_type = ${6} "
             + "                                 AND e.voided = 0 "
