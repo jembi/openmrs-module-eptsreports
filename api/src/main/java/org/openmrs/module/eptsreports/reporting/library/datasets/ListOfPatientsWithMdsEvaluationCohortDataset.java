@@ -161,11 +161,11 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // C.18 - Estado de permanência no 24˚ mês de TARV - Sheet 1: Column BU
+    // B8- Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)
     pdd.addColumn(
-        "permanence_state_c",
-        tptInitiationDataDefinitionQueries.getPatientsAndARTStartDate(),
-        "startDate=${startDate},endDate=${endDate},location=${location}",
+        "tb_tarv_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(),
+        "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     return pdd;
