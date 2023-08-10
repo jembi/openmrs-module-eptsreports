@@ -11501,7 +11501,7 @@ public class QualityImprovement2020CohortQueries {
             + "                                                                                 AND o.voided = 0 "
             + "                                                                                 GROUP  BY p.patient_id) most_recent "
             + "                                                                   GROUP  BY most_recent.patient_id) dispensation "
-            + "                                     WHERE  dispensation.patient_id = p.patient_id) GROUP BY patient_id )  first_dispensation GROUP BY first_dispensation.patient_id)"
+            + "                                     WHERE  dispensation.patient_id = p.patient_id) )  first_dispensation GROUP BY first_dispensation.patient_id)"
             + "                                     first_investigation ON first_investigation.patient_id = p.patient_id "
             + "                                 WHERE e.encounter_type = ${6} "
             + "                                 AND e.voided = 0 "
