@@ -168,6 +168,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
+    // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
+    pdd.addColumn(
+        "mds_date",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
     return pdd;
   }
 
