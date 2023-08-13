@@ -1174,47 +1174,79 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
     Map<String, Integer> map = new HashMap<>();
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
 
-    String arvStart = commonQueries.getArtStartDateOnFichaResumo();
-
     String query =
-        "SELECT pa.patient_id, "
-            + "       Min(enc.encounter_datetime) AS data_consulta "
-            + "FROM   patient pa "
-            + "       INNER JOIN encounter enc "
-            + "               ON enc.patient_id = pa.patient_id "
-            + "       INNER JOIN obs "
-            + "               ON obs.encounter_id = enc.encounter_id "
-            + "       INNER JOIN (SELECT art.patient_id, "
-            + "                          art.art_start "
-            + "                   FROM   ( "
-            + arvStart
-            + "                   ) art "
-            + "                   WHERE  art.art_start >= "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
+        "         SELECT     p.patient_id, "
+            + "                    MIN(e.encounter_datetime) AS encounter_date "
+            + "         FROM       patient p "
+            + "         INNER JOIN encounter e "
+            + "         ON         e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o "
+            + "         ON         o.encounter_id = e.encounter_id "
+            + "         INNER JOIN "
+            + "                    ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.art_start AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 1)
             + " ) "
-            + "                          AND art.art_start <= "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
+            + " ) art ON art.patient_id = e.patient_id "
+            + " WHERE  p.voided = 0 "
+            + " AND e.voided = 0 "
+            + " AND o.voided = 0 "
+            + " AND e.encounter_type = ${6} "
+            + " AND e.location_id = :location "
+            + " AND o.concept_id = ${1695} "
+            + " AND e.encounter_datetime >= art.art_encounter "
+            + " AND e.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 33 DAY) "
+            + " UNION "
+            + "         SELECT     p.patient_id, "
+            + "                    MIN(e.encounter_datetime) AS encounter_date "
+            + "         FROM       patient p "
+            + "         INNER JOIN encounter e "
+            + "         ON         e.patient_id = p.patient_id "
+            + "         INNER JOIN obs o "
+            + "         ON         o.encounter_id = e.encounter_id "
+            + "         INNER JOIN "
+            + "                    ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.art_start AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 2)
             + " ) "
-            + "                   GROUP  BY art.patient_id) first_art "
-            + "               ON first_art.patient_id = pa.patient_id "
-            + "WHERE  pa.voided = 0 "
-            + "       AND enc.voided = 0 "
-            + "       AND obs.voided = 0 "
-            + "       AND enc.encounter_type = ${6} "
-            + "       AND obs.concept_id = ${1695} "
-            + "       AND obs.value_numeric IS NOT NULL "
-            + "       AND enc.encounter_datetime >= first_art.art_start "
-            + "       AND enc.encounter_datetime <= Date_add(first_art.art_start, "
-            + "                                     INTERVAL 33 day) "
-            + "       AND enc.location_id = :location "
-            + "GROUP  BY pa.patient_id";
+            + " ) art ON art.patient_id = e.patient_id "
+            + " WHERE  p.voided = 0 "
+            + " AND e.voided = 0 "
+            + " AND o.voided = 0 "
+            + " AND e.encounter_type = ${6} "
+            + " AND e.location_id = :location "
+            + " AND o.concept_id = ${1695} "
+            + " AND e.encounter_datetime >= art.art_encounter "
+            + " AND e.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 33 DAY) "
+            + " GROUP  BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
