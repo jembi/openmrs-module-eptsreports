@@ -44,9 +44,10 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
 
   @Autowired
   public MISAUKeyPopsDataSetDefinition(
-          MISAUKeyPopsCohortQueries mISAUKeyPopsCohortQueries,
-          EptsGeneralIndicator eptsGeneralIndicator,
-          EptsCommonDimension eptsCommonDimension, ResumoMensalCohortQueries resumoMensalCohortQueries) {
+      MISAUKeyPopsCohortQueries mISAUKeyPopsCohortQueries,
+      EptsGeneralIndicator eptsGeneralIndicator,
+      EptsCommonDimension eptsCommonDimension,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.mISAUKeyPopsCohortQueries = mISAUKeyPopsCohortQueries;
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.eptsCommonDimension = eptsCommonDimension;
@@ -99,14 +100,14 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "getPatientsStartedARTInLast12MonthsIndicator",
             EptsReportUtils.map(
-                    resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1(), mappings));
+                mISAUKeyPopsCohortQueries.getPatientsStartedARTInLast12Months(), mappings));
 
     CohortIndicator getPatientsOnARTInLast12MonthsIndicator =
         eptsGeneralIndicator.getIndicator(
             "getPatientsOnARTInLast12MonthsIndicator",
             EptsReportUtils.map(
                 resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
-                    "endDate=${endDate},location=${location}"));
+                "endDate=${endDate},location=${location}"));
 
     // This returns total adult patients Started ART B1
     addRow(

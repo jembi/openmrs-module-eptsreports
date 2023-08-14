@@ -410,4 +410,40 @@ public class MISAUKeyPopsCohortQueries {
     cd.setCompositionString("MTS AND REC");
     return cd;
   }
+
+  /**
+   * <b>Name: Número de adultos na coorte 12 meses - inicio de TARV</b>
+   * <li>Filtrando os utentes incluídos no indicador B1 do relatório “Resumo Mensal de HIV/SIDA” (Nº
+   *     de utentes que iniciaram TARV durante o mês) para o período do relatório correspondente ao
+   *     ano anterior (>= “Data Início Relatório Ano Anterior” e <= “Data Fim de Relatório Ano
+   *     Anterior”)
+   * <li>Excluindo todos os utentes “Transferidos para” outra US até ao fim do período do relatório
+   *
+   * @see ResumoMensalCohortQueries#getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsStartedARTInLast12Months() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Number of patients who started ART in last 12 Months");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "Location", Location.class));
+
+    CohortDefinition c = resumoTrimestralCohortQueries.getC();
+    CohortDefinition rm =
+        resumoMensalCohortQueries.getPatientsWhoInitiatedTarvAtThisFacilityDuringCurrentMonthB1();
+
+    cd.addSearch(
+        "RM",
+        EptsReportUtils.map(rm, "startDate=${startDate},endDate=${endDate},location=${location}"));
+
+    cd.addSearch(
+        "TRANSFERREDOUT",
+        EptsReportUtils.map(
+            c, "onOrAfter=${startDate},onOrBefore=${endDate},location=${location}"));
+
+    cd.setCompositionString("RM AND NOT TRANSFERREDOUT");
+
+    return cd;
+  }
 }
