@@ -30,9 +30,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   @Autowired
   public ListOfPatientsWithMdsEvaluationCohortQueries(
-      HivMetadata hivMetadata,
-      TbMetadata tbMetadata,
-      CommonMetadata commonMetadata) {
+      HivMetadata hivMetadata, TbMetadata tbMetadata, CommonMetadata commonMetadata) {
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.commonMetadata = commonMetadata;
@@ -1372,6 +1370,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
     map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
     map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, "
@@ -1382,34 +1388,23 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                    INNER JOIN obs o "
             + "                            ON o.encounter_id = e.encounter_id "
             + "                    INNER JOIN ( "
-            + "								SELECT p.patient_id, "
-            + "                    Min(o.value_datetime) art_start "
-            + "             FROM   patient p "
-            + "                    INNER JOIN encounter e "
-            + "                            ON e.patient_id = p.patient_id "
-            + "                    INNER JOIN obs o "
-            + "                            ON o.encounter_id = e.encounter_id "
-            + "             WHERE  e.encounter_type = ${53} "
-            + "                    AND o.concept_id = ${1190} "
-            + "                    AND o.value_datetime BETWEEN "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ) "
-            + "          AND "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) "
-            + "                    AND e.location_id = :location "
-            + "                    AND p.voided = 0 "
-            + "                    AND e.voided = 0 "
-            + "                    AND o.voided = 0 "
-            + "             GROUP  BY p.patient_id "
-            + "							   ) art "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.art_start AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 1)
+            + " ) "
+            + " ) art ON art.patient_id = e.patient_id "
             + "             WHERE  e.encounter_type = ${6} "
             + "                    AND o.concept_id = ${23722} "
             + "                    AND o.value_coded = ${856} "
             + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_datetime >= art.art_start "
+            + "                    AND e.encounter_datetime >= art.art_encounter "
             + "                    AND p.voided = 0 "
             + "                    AND e.voided = 0 "
             + "                    AND o.voided = 0 "
