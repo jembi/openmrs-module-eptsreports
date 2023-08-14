@@ -125,6 +125,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *       the result date during the inclusion period
    * </ul>
    *
+   * <p>Note: For clients with more than one CD4 count result registered within this period, the
+   * most recent result will be considered
+   *
    * @return CohortDefinition
    */
   public CohortDefinition getPatientsWithCD4Count() {
@@ -147,7 +150,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.concept_id = ${1695} "
             + "                          AND o.value_numeric IS NOT NULL "
             + "                          AND e.location_id = :location "
-            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "                          AND DATE(e.encounter_datetime) BETWEEN :startDate AND :endDate "
             + "                   GROUP  BY e.patient_id "
             + "                   UNION "
             + "                   SELECT e.patient_id, Max(o.obs_datetime) AS result_date "
@@ -169,6 +172,61 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     return cd;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>TB LAM result with ANY RESULT registered in the Investigações – resultados laboratoriais
+   *       in Ficha Clínica – Mastercard
+   *   <li>TB LAM result with ANY RESULT registered in the Laboratory form
+   *   <li>TB-LAM urina with ``pos`` or ``neg`` result registered in the Ficha da Doença Avançada
+   *       por HIV
+   * </ul>
+   *
+   * @return CohortDefinition *
+   */
+  public CohortDefinition getPatientsWithTbLamResult() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Number of clients with TB LAM results by report generation date ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN (SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type IN ( ${6}, ${13} ) "
+            + "                          AND o.concept_id = ${23951} "
+            + "                          AND o.value_coded IS NOT NULL "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+            + "                   GROUP  BY e.patient_id "
+            + "                   UNION "
+            + "                   SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND e.encounter_type = ${90} "
+            + "                          AND o.concept_id = ${23951} "
+            + "                          AND o.value_coded IN ( ${703}, ${664} ) "
+            + "                          AND e.location_id = :location "
+            + "                          AND o.obs_datetime BETWEEN :startDate AND :endDate"
+            + "                   GROUP  BY e.patient_id) tb_lam "
+            + "               ON tb_lam.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
   private Map<String, Integer> getMetadata() {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -180,6 +238,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("6272", hivMetadata.getStateOfStayPriorArtPatientConcept().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
     map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("703", hivMetadata.getPositive().getConceptId());
+    map.put("664", hivMetadata.getNegative().getConceptId());
+    map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
     return map;
   }
 }
