@@ -29,6 +29,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
   private final String reportingPeriod =
       "startDate=${endDate}-2m,endDate=${generationDate},location=${location}";
+  private final String inclusionPeriod =
+      "startDate=${endDate}-2m,endDate=${endDate-1m},location=${location}";
 
   @Autowired
   public AdvancedDiseaseAndTBCascadeCohortQueries(
@@ -248,7 +250,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition *
    */
-  public CohortDefinition getPatientsWithPositiveTbLamResult() {
+  public CohortDefinition getPatientsWithTbLamResult(TbLamResult tbLamResult) {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Clients with positive TB LAM");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -265,7 +267,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.voided = 0 "
             + "                          AND e.encounter_type IN ( ${6}, ${13} ) "
             + "                          AND o.concept_id = ${23951} "
-            + "                          AND o.value_coded = ${703} "
+            + "                          AND o.value_coded = ".concat(tbLamResult.getValueCoded())
             + "                          AND e.location_id = :location "
             + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
             + "                   GROUP  BY e.patient_id "
@@ -277,7 +279,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "                          AND o.voided = 0 "
             + "                          AND e.encounter_type = ${90} "
             + "                          AND o.concept_id = ${23951} "
-            + "                          AND o.value_coded = ${703} "
+            + "                          AND o.value_coded =  ".concat(tbLamResult.getValueCoded())
             + "                          AND e.location_id = :location "
             + "                          AND o.obs_datetime BETWEEN :startDate AND :endDate"
             + "                   GROUP  BY e.patient_id) tb_lam "
@@ -458,5 +460,21 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("165189", tbMetadata.getTestXpertMtbUuidConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     return map;
+  }
+   enum TbLamResult{
+     POSITIVE {
+       @Override
+       public String getValueCoded(){
+         return "${703}";
+       }
+     },
+     NEGATIVE {
+       @Override
+       public String getValueCoded() {
+         return "${664}";
+       }
+     };
+
+     public abstract String getValueCoded();
   }
 }
