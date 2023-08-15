@@ -507,6 +507,83 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     return cd;
   }
 
+  public CohortDefinition getPatientsWithPositiveTbLamAndGradeFourPlus() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with positive TB LAM and Grade 3+");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    return getPatientsWithPositiveTbLamAndGrade(hivMetadata.getFourPlusConcept());
+  }
+
+  public CohortDefinition getPatientsWithPositiveTbLamAndGradeThreePlus() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with positive TB LAM and Grade 4+");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition positiveThreePlus =
+        getPatientsWithPositiveTbLamAndGrade(hivMetadata.getThreePlusConcept());
+
+    cd.addSearch(
+        "positiveFourPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeFourPlus(), reportingPeriod));
+
+    cd.addSearch("positiveThreePlus", EptsReportUtils.map(positiveThreePlus, reportingPeriod));
+
+    cd.setCompositionString("positiveThreePlus AND NOT positiveFourPlus");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithPositiveTbLamAndGradeTwoPlus() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with positive TB LAM and Grade 2+");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition positiveTwoPlus =
+        getPatientsWithPositiveTbLamAndGrade(hivMetadata.getTwoPlusConcept());
+
+    cd.addSearch(
+        "positiveThreePlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeThreePlus(), reportingPeriod));
+
+    cd.addSearch("positiveTwoPlus", EptsReportUtils.map(positiveTwoPlus, reportingPeriod));
+
+    cd.setCompositionString("positiveTwoPlus AND NOT positiveThreePlus");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsWithPositiveTbLamAndGradeOnePlus() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with positive TB LAM and Grade 1+");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition positiveOnePlus =
+        getPatientsWithPositiveTbLamAndGrade(hivMetadata.getOnePlusConcept());
+
+    cd.addSearch(
+        "positiveTwoPlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeTwoPlus(), reportingPeriod));
+
+    cd.addSearch("positiveOnePlus", EptsReportUtils.map(positiveOnePlus, reportingPeriod));
+
+    cd.setCompositionString("positiveOnePlus AND NOT positiveTwoPlus");
+
+    return cd;
+  }
+
   private Map<String, Integer> getMetadata() {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
