@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.text.StringSubstitutor;
+import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.module.eptsreports.metadata.HivMetadata;
 import org.openmrs.module.eptsreports.metadata.TbMetadata;
@@ -441,6 +442,71 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     return cd;
   }
 
+  /**
+   *
+   *
+   * <ul>
+   *   <li>TB LAM result registered in the Investigações – Resultados Laboratoriais as Positive and
+   *       grade @tbLamGrade marked for the positive result in Ficha Clínica or
+   *   <li>TB LAM result marked as Positive and with grade @tbLamGrade marked for the positive
+   *       result in the Laboratory Form or TB LAM result marked as Positive and with
+   *       grade @tbLamGrade marked for the positive result in Ficha DAH
+   *   <li>
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWithPositiveTbLamAndGrade(Concept tbLamGrade) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Clients with positive TB LAM and Grade");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN (SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND o2.voided = 0 "
+            + "                          AND e.encounter_type IN ( ${6}, ${13} ) "
+            + "                          AND o.concept_id = ${23951} "
+            + "                          AND o.value_coded = ${703} "
+            + "                          AND o2.concept_id = ${165185} "
+            + "                          AND o2.value_coded = "
+                .concat(tbLamGrade.getConceptId().toString())
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+            + "                   GROUP  BY e.patient_id "
+            + "                   UNION "
+            + "                   SELECT e.patient_id "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          INNER JOIN obs o2 ON o2.encounter_id = e.encounter_id "
+            + "                   WHERE  e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                          AND o2.voided = 0 "
+            + "                          AND e.encounter_type = ${90} "
+            + "                          AND o.concept_id = ${23951} "
+            + "                          AND o2.concept_id = ${165185} "
+            + "                          AND o2.value_coded =  "
+                .concat(tbLamGrade.getConceptId().toString())
+            + "                          AND e.location_id = :location "
+            + "                          AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + "                   GROUP  BY e.patient_id) positive_grade "
+            + "               ON positive_grade.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
   private Map<String, Integer> getMetadata() {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
@@ -461,20 +527,21 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     return map;
   }
-   enum TbLamResult{
-     POSITIVE {
-       @Override
-       public String getValueCoded(){
-         return "${703}";
-       }
-     },
-     NEGATIVE {
-       @Override
-       public String getValueCoded() {
-         return "${664}";
-       }
-     };
 
-     public abstract String getValueCoded();
+  enum TbLamResult {
+    POSITIVE {
+      @Override
+      public String getValueCoded() {
+        return "${703}";
+      }
+    },
+    NEGATIVE {
+      @Override
+      public String getValueCoded() {
+        return "${664}";
+      }
+    };
+
+    public abstract String getValueCoded();
   }
 }
