@@ -1381,7 +1381,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "SELECT p.patient_id, "
-            + "                    Min(e.encounter_datetime) AS first_vl "
+            + "                    Min(e.encounter_datetime) AS encounter_date "
             + "             FROM   patient p "
             + "                    INNER JOIN encounter e "
             + "                            ON e.patient_id = p.patient_id "
@@ -1400,15 +1400,197 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
                 inclusionEndMonthAndDay, 1)
             + " ) "
             + " ) art ON art.patient_id = e.patient_id "
-            + "             WHERE  e.encounter_type = ${6} "
-            + "                    AND o.concept_id = ${23722} "
-            + "                    AND o.value_coded = ${856} "
-            + "                    AND e.location_id = :location "
-            + "                    AND e.encounter_datetime >= art.art_encounter "
-            + "                    AND p.voided = 0 "
-            + "                    AND e.voided = 0 "
-            + "                    AND o.voided = 0 "
-            + "             GROUP  BY p.patient_id";
+            + "       WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${856} "
+            + "       AND enc.encounter_datetime >= art.art_encounter "
+            + "             GROUP  BY p.patient_id "
+            + "UNION"
+            + "SELECT p.patient_id, "
+            + "                    Min(e.encounter_datetime) AS encounter_date "
+            + "             FROM   patient p "
+            + "                    INNER JOIN encounter e "
+            + "                            ON e.patient_id = p.patient_id "
+            + "                    INNER JOIN obs o "
+            + "                            ON o.encounter_id = e.encounter_id "
+            + "                    INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.art_start AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 2)
+            + " ) "
+            + " ) art ON art.patient_id = e.patient_id "
+            + "       WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND e.location_id = :location "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${856} "
+            + "       AND enc.encounter_datetime >= art.art_encounter "
+            + "             GROUP  BY p.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
+   * <b>Data do pedido da CV de seguimento- C.1 (coluna AP)</b>
+   *
+   * <p>O sistema irá determinar a Data do Pedido da CV de seguimento do utente identificando a data
+   * da consulta clínica (Ficha Clínica), após o início TARV (Data Início TARV), na qual foi
+   * efectuado o registo do segundo Pedido de Carga Viral..<br>
+   * <br>
+   *
+   * <p>Nota 1: A “Data Início TARV” é a data registada na Ficha Resumo (“Data do Início TARV”).
+   * <br>
+   * <br>
+   *
+   * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
+   * na coorte de 24 meses, conforme definido no RF4.
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getSecondtViralLoad() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Data do pedido da CV de seguimento");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("23722", hivMetadata.getApplicationForLaboratoryResearch().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
+
+    String query =
+        "                   SELECT ee.patient_id, "
+            + "                          Min(ee.encounter_datetime) AS encounter_date "
+            + "                   FROM   encounter ee "
+            + "                          INNER JOIN (SELECT pa.patient_id, "
+            + "                                             Min(enc.encounter_datetime) AS "
+            + "                                             encounter_date "
+            + "                                      FROM   patient pa "
+            + "                                             INNER JOIN encounter enc "
+            + "                                                     ON enc.patient_id = "
+            + "                                                        pa.patient_id "
+            + "                                             INNER JOIN obs "
+            + "                                                     ON obs.encounter_id = "
+            + "                                                        enc.encounter_id "
+            + "                                             INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.art_start AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 1)
+            + " ) "
+            + " ) art ON art.patient_id = enc.patient_id "
+            + "       WHERE  pa.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND obs.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND enc.location_id = :location "
+            + "       AND obs.concept_id = ${23722} "
+            + "       AND obs.value_coded = ${856} "
+            + "       AND enc.encounter_datetime >= art.art_encounter "
+            + "       GROUP  BY pa.patient_id) first_encounter "
+            + "       ON first_encounter.patient_id = ee.patient_id "
+            + "       WHERE  ee.voided = 0 "
+            + "       AND ee.encounter_type = ${6} "
+            + "       AND ee.encounter_datetime > first_encounter.encounter_date) second_encounter "
+            + "               ON pt.patient_id = second_encounter.patient_id "
+            + "       INNER JOIN encounter enc "
+            + "               ON enc.patient_id = pt.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = enc.encounter_id "
+            + "WHERE  pt.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${856} "
+            + "       AND enc.location_id = :location "
+            + "GROUP  BY pt.patient_id "
+            + "UNION "
+            + "                   SELECT ee.patient_id, "
+            + "                          Min(ee.encounter_datetime) AS encounter_date "
+            + "                   FROM   encounter ee "
+            + "                          INNER JOIN (SELECT pa.patient_id, "
+            + "                                             Min(enc.encounter_datetime) AS "
+            + "                                             encounter_date "
+            + "                                      FROM   patient pa "
+            + "                                             INNER JOIN encounter enc "
+            + "                                                     ON enc.patient_id = "
+            + "                                                        pa.patient_id "
+            + "                                             INNER JOIN obs "
+            + "                                                     ON obs.encounter_id = "
+            + "                                                        enc.encounter_id "
+            + "                                             INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.art_start AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 2)
+            + " ) "
+            + " ) art ON art.patient_id = enc.patient_id "
+            + "       WHERE  pa.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND obs.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND enc.location_id = :location "
+            + "       AND obs.concept_id = ${23722} "
+            + "       AND obs.value_coded = ${856} "
+            + "       AND enc.encounter_datetime >= art.art_encounter "
+            + "       GROUP  BY pa.patient_id) first_encounter "
+            + "       ON first_encounter.patient_id = ee.patient_id "
+            + "       WHERE  ee.voided = 0 "
+            + "       AND ee.encounter_type = ${6} "
+            + "       AND ee.encounter_datetime > first_encounter.encounter_date) second_encounter "
+            + "               ON pt.patient_id = second_encounter.patient_id "
+            + "       INNER JOIN encounter enc "
+            + "               ON enc.patient_id = pt.patient_id "
+            + "       INNER JOIN obs o "
+            + "               ON o.encounter_id = enc.encounter_id "
+            + "WHERE  pt.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND o.concept_id = ${23722} "
+            + "       AND o.value_coded = ${856} "
+            + "       AND enc.location_id = :location "
+            + "GROUP  BY pt.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
