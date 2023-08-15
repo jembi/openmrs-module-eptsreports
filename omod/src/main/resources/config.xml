@@ -3519,6 +3519,46 @@
 		</description>
 	</globalProperty>
 
+	<globalProperty>
+		<property>@MODULE_ID@.positivityLevelConceptUuid</property>
+		<defaultValue>303a4480-f2b3-4192-a446-725a401ebb09</defaultValue>
+		<description>
+			UUID for Positivity Level
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.fourPlusConceptUuid</property>
+		<defaultValue>16c13c13-2f85-4492-ae9b-4358b34070e7</defaultValue>
+		<description>
+			UUID for Four Plus
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.threePlusConceptUuid</property>
+		<defaultValue>a4e43a4d-37ea-4767-a700-9fe1d43a8042</defaultValue>
+		<description>
+			UUID for Three Plus
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.twoPlusConceptUuid</property>
+		<defaultValue>79f4bd59-0dbb-41ba-9d78-3efc0b737b75</defaultValue>
+		<description>
+			UUID for Two Plus
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>@MODULE_ID@.onePlusConceptUuid</property>
+		<defaultValue>03d4b7c8-c8cd-4f84-be40-67975bd5b667</defaultValue>
+		<description>
+			UUID for One Plus
+		</description>
+	</globalProperty>
+
 	<!-- <dwr> <allow> <create creator="new" javascript="DWRFormEntryService">
 		<param name="class" value="org.openmrs.module.@MODULE_ID@.web.DWRFormEntryService"/> 
 		<include method="enterForm"/> </create> </allow> <signatures> <![CDATA[ import 

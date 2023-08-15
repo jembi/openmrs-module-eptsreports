@@ -523,8 +523,12 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("23951", tbMetadata.getTestTBLAM().getConceptId());
     map.put("23723", tbMetadata.getTBGenexpertTestConcept().getConceptId());
     map.put("165189", tbMetadata.getTestXpertMtbUuidConcept().getConceptId());
-    map.put("165189", tbMetadata.getTestXpertMtbUuidConcept().getConceptId());
     map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
+    map.put("165185", hivMetadata.getPositivityLevelConcept().getConceptId());
+    map.put("165348", hivMetadata.getFourPlusConcept().getConceptId());
+    map.put("165188", hivMetadata.getThreePlusConcept().getConceptId());
+    map.put("165187", hivMetadata.getTwoPlusConcept().getConceptId());
+    map.put("165186", hivMetadata.getOnePlusConcept().getConceptId());
     return map;
   }
 
