@@ -718,7 +718,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
       }
     },
 
-    GreaterThanOrEqualTo300mm3 {
+    GreaterThanOrEqualTo200mm3 {
       @Override
       public String getProposition() {
         return "o.value_numeric >= 200 AND o.value_numeric < 500";
