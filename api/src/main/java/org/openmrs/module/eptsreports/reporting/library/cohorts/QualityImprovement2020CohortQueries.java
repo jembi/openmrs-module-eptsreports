@@ -7332,12 +7332,10 @@ public class QualityImprovement2020CohortQueries {
               + " AND G2 AND VL2Pedidos AND VLFL AND NOT (CD OR F OR VL)) ");
     } else if (den == 5 || den == 6) {
       comp.setCompositionString(
-          "(DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
-              + " AND  NOT (CD OR F OR dead)");
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias)  AND  NOT (CD OR F OR dead))");
     } else if (den == 7 || den == 8) {
       comp.setCompositionString(
-          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
-              + " AND  NOT (CD OR F OR VL)) AND G2 ");
+          "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias) AND  NOT (CD OR F OR VL)) AND G2 ");
     } else if (den == 11 || den == 12) {
       comp.setCompositionString(
           "((DT OR tipoDispensa OR proxLevtoFILA83a97Dias OR proxLevtoFILA173a187Dias OR proxLevtoFILA335a395Dias) "
