@@ -2825,7 +2825,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getMdsDate() {
+  public DataDefinition getMdsDate(int minnumberYears, int maxnumberYearsYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)");
@@ -2877,8 +2877,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 3 MONTH) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 9 MONTH) "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minnumberYears
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxnumberYearsYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -2914,8 +2918,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        ostate.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 3 MONTH) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 9 MONTH) "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minnumberYears
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxnumberYearsYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "

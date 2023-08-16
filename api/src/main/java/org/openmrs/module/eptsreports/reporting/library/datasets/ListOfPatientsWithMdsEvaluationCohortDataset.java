@@ -172,7 +172,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)
     pdd.addColumn(
         "mds_date",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(3, 9),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
@@ -210,6 +210,14 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "tb_tarv_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithTbThirdToNineMonth(12, 24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C9 - Data de inscrição no MDS entre 12º e 24º mês de TAV: (coluna AX) - Resposta = Data de
+    // Inscrição (RF39)
+    pdd.addColumn(
+        "mds_tarv_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(12, 24),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
