@@ -182,12 +182,19 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // C.4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
+    // C4 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)
     pdd.addColumn(
         "cd4_result_c",
         listOfPatientsWithMdsEvaluationCohortQueries.getCd4ResultSectionC(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
+
+    // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
+    pdd.addColumn(
+            "good_adherence_c",
+            listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesionAfterAYearInTarv(),
+            "evaluationYear=${evaluationYear},location=${location}",
+            null);
 
     return pdd;
   }
