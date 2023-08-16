@@ -2654,7 +2654,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getPatientsWithTbThirdToNineMonth() {
+  public DataDefinition getPatientsWithTbThirdToNineMonth(
+      int minnumberYears, int maxnumberYearsYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B8-Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)");
@@ -2723,8 +2724,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        o3.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime BETWEEN date_add( art.art_encounter, INTERVAL 3 MONTH) "
-            + "                  AND        date_add( art.art_encounter, INTERVAL 9 MONTH) "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minnumberYears
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxnumberYearsYears
+            + " MONTH ) "
             + "                  AND    (   ( o.concept_id = ${23758} "
             + "                               AND o.value_coded IN ( ${1065} ) ) "
             + "                  OR         ( o2.concept_id = ${1766} "
@@ -2767,8 +2772,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        o3.voided = 0 "
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
-            + "                  AND        e.encounter_datetime BETWEEN date_add( art.art_encounter, INTERVAL 3 MONTH) "
-            + "                  AND        date_add( art.art_encounter, INTERVAL 9 MONTH) "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
+            + minnumberYears
+            + " MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + maxnumberYearsYears
+            + " MONTH ) "
             + "                  AND    (   ( o.concept_id = ${23758} "
             + "                               AND o.value_coded IN ( ${1065} ) ) "
             + "                  OR         ( o2.concept_id = ${1766} "
