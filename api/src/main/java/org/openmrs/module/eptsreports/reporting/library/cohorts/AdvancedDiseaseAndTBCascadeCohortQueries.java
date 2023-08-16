@@ -606,6 +606,130 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
+   *
+   *
+   * <ul>
+   *   <li>Who have a VL Result > 1000 copies/ml registered in Ficha de Laboratório Geral or e-lab
+   *       with the VL Result Date during the inclusion period
+   *   <li>Who have a previous VL result > 1000 copies/ml registered in the most recent Ficha de
+   *       Laboratório Geral or e-lab prior to the VL Result > 1000 copies/ml identified above
+   * </ul>
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWithTwoConsecutiveVLGreaterThan1000() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName(
+        "Clients with two consecutive Viral Load results > 1000 copies/mm3 for which the second one falls in the inclusion period");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    cd.addSearch(
+        "vlOnPeriod",
+        EptsReportUtils.map(getPatientsUnsuppressedVLDuringInclusion(), reportingPeriod));
+
+    cd.addSearch(
+        "vlBeforePeriod",
+        EptsReportUtils.map(
+            getPatientsUnsuppressedVLPreviousInclusion(),
+            "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("vlOnPeriod AND vlBeforePeriod");
+
+    return cd;
+  }
+
+  /**
+   * Who have a VL Result > 1000 copies/ml registered in Ficha de Laboratório Geral or e-lab with
+   * the VL Result Date during the inclusion period
+   *
+   * @return CohortDefinition
+   */
+  private CohortDefinition getPatientsUnsuppressedVLDuringInclusion() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Clients who had a second consecutive unsuppressed VL ");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT e.patient_id, Min(Date(e.encounter_datetime)) vl_date "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                     AND e.voided = 0 "
+            + "                                     AND o.voided = 0 "
+            + "                                     AND e.encounter_type IN ( ${13}, ${51} ) "
+            + "                                     AND e.location_id = :location "
+            + "                                     AND o.concept_id = ${856} "
+            + "                                     AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
+            + "                   GROUP  BY e.patient_id)vl_inclusion "
+            + "               ON vl_inclusion.patient_id = e.patient_id "
+            + "WHERE  e.encounter_type IN( ${13}, ${51} ) "
+            + "       AND e.location_id = :location "
+            + "       AND Date(e.encounter_datetime) = vl_inclusion.vl_date "
+            + "       AND e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o.concept_id = ${856} "
+            + "       AND o.value_numeric > 1000 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  /**
+   * Who have a previous VL result > 1000 copies/ml registered in the most recent Ficha de
+   * Laboratório Geral or e-lab prior to the VL Result > 1000 copies/ml identified above {@link
+   * #getPatientsUnsuppressedVLDuringInclusion()}
+   *
+   * @return CohortDefinition
+   */
+  private CohortDefinition getPatientsUnsuppressedVLPreviousInclusion() {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Clients Who have a previous VL result > 1000");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON e.patient_id = p.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT e.patient_id, MAX(Date(e.encounter_datetime)) vl_date "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                                     AND e.voided = 0 "
+            + "                                     AND o.voided = 0 "
+            + "                                     AND e.encounter_type IN ( ${13}, ${51} ) "
+            + "                                     AND e.location_id = :location "
+            + "                                     AND o.concept_id = ${856} "
+            + "                                     AND Date(e.encounter_datetime) < :endDate "
+            + "                   GROUP  BY e.patient_id)vl_inclusion "
+            + "               ON vl_inclusion.patient_id = e.patient_id "
+            + "WHERE  e.encounter_type IN( ${13}, ${51} ) "
+            + "       AND e.location_id = :location "
+            + "       AND Date(e.encounter_datetime) = vl_inclusion.vl_date "
+            + "       AND e.voided = 0 "
+            + "       AND p.voided = 0 "
+            + "       AND o.voided = 0 "
+            + "       AND o.concept_id = ${856} "
+            + "       AND o.value_numeric > 1000 "
+            + "GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  /**
    * Absolute CD4 Count
    *
    * @return CohortDefinition
@@ -796,6 +920,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     map.put("165188", hivMetadata.getThreePlusConcept().getConceptId());
     map.put("165187", hivMetadata.getTwoPlusConcept().getConceptId());
     map.put("165186", hivMetadata.getOnePlusConcept().getConceptId());
+    map.put("856", hivMetadata.getHivViralLoadConcept().getConceptId());
     return map;
   }
 

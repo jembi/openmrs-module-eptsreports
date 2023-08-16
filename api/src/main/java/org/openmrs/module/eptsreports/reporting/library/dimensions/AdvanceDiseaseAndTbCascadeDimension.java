@@ -71,39 +71,51 @@ public class AdvanceDiseaseAndTbCascadeDimension {
     dim.setName("Clients with CD4 count ");
 
     dim.addCohortDefinition(
-            "200-",
-            EptsReportUtils.map(
-                    advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo200mm3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "200-",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
+                    .LessThanOrEqualTo200mm3),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
-            "500-",
-            EptsReportUtils.map(
-                    advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo500mm3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "500-",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
+                    .LessThanOrEqualTo500mm3),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dim.addCohortDefinition(
-            "750-",
-            EptsReportUtils.map(
-                    advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.LessThanOrEqualTo750mm3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "750-",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
+                    .LessThanOrEqualTo750mm3),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dim.addCohortDefinition(
-            "200+",
-            EptsReportUtils.map(
-                    advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo200mm3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "200+",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
+                    .GreaterThanOrEqualTo200mm3),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
     dim.addCohortDefinition(
-            "500+",
-            EptsReportUtils.map(
-                    advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo500mm3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "500+",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
+                    .GreaterThanOrEqualTo500mm3),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     dim.addCohortDefinition(
-            "750+",
-            EptsReportUtils.map(
-                    advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison.GreaterThanOrEqualTo750mm3),
-                    "startDate=${startDate},endDate=${endDate},location=${location}"));
+        "750+",
+        EptsReportUtils.map(
+            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithAbsoluteCd4Count(
+                AdvancedDiseaseAndTBCascadeCohortQueries.Cd4CountComparison
+                    .GreaterThanOrEqualTo750mm3),
+            "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     return dim;
   }
-  }
+}
