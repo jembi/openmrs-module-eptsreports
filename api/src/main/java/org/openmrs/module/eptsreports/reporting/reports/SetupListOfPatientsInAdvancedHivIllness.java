@@ -94,7 +94,7 @@ public class SetupListOfPatientsInAdvancedHivIllness extends EptsDataExportManag
       reportDesign =
           createXlsReportDesign(
               reportDefinition,
-              "Template_Lista_Utentes_Doenca_Avancada_HIV_DAH_v1.2.xls",
+              "Template_Lista_Utentes_DAH_v1.6.xls",
               "Lista de Utentes em Doença Avançada por HIV (DAH)",
               getExcelDesignUuid(),
               null);
