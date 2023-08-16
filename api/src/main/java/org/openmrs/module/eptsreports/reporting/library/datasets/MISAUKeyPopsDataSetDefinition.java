@@ -15,6 +15,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import java.util.Arrays;
 import java.util.List;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.MISAUKeyPopsCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.ResumoMensalCohortQueries;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
@@ -35,6 +36,8 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
 
   private EptsCommonDimension eptsCommonDimension;
 
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
+
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
   private AgeDimensionCohortInterface ageDimensionCohort;
@@ -43,10 +46,12 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
   public MISAUKeyPopsDataSetDefinition(
       MISAUKeyPopsCohortQueries mISAUKeyPopsCohortQueries,
       EptsGeneralIndicator eptsGeneralIndicator,
-      EptsCommonDimension eptsCommonDimension) {
+      EptsCommonDimension eptsCommonDimension,
+      ResumoMensalCohortQueries resumoMensalCohortQueries) {
     this.mISAUKeyPopsCohortQueries = mISAUKeyPopsCohortQueries;
     this.eptsGeneralIndicator = eptsGeneralIndicator;
     this.eptsCommonDimension = eptsCommonDimension;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
   }
 
   public CohortIndicatorDataSetDefinition constructMISAUKeyPopsDataset() {
@@ -101,7 +106,8 @@ public class MISAUKeyPopsDataSetDefinition extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "getPatientsOnARTInLast12MonthsIndicator",
             EptsReportUtils.map(
-                mISAUKeyPopsCohortQueries.getPatientsOnARTInLast12Months(), mappings));
+                resumoMensalCohortQueries.getPatientsWhoWereActiveByEndOfMonthB13(),
+                "endDate=${endDate},location=${location}"));
 
     // This returns total adult patients Started ART B1
     addRow(
