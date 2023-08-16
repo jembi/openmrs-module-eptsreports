@@ -2050,6 +2050,146 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
+   * <b>RF35 - Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV- C.4 (Coluna AS)</b>
+   *
+   * <p>O sistema irá determinar o Resultado do CD4 do utente seleccionando o resultado do CD4 mais
+   * recente registado na consulta Clínica (Ficha Clínica) entre 12 e 24 meses do Início TARV (“Data
+   * da Consulta” <= “Data Início TARV” + 12 meses e >= “Data Início TARV” + 24 meses). .
+   *
+   * <p>Nota 1: Nota 1: A “Data Início TARV” é definida no RF46. <br>
+   * <br>
+   *
+   * <p>Nota 2: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
+   * na coorte de 24 meses, conforme definido no RF4.
+   *
+   * @return {DataDefinition}
+   */
+  public DataDefinition getCd4ResultSectionC() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("Resultado do CD4 feito entre 12˚ e 24˚ mês de TARV");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("1695", hivMetadata.getCD4AbsoluteOBSConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+
+    String query =
+        "       SELECT cd4.patient_id, "
+            + "         obs.value_numeric AS cd4_result "
+            + "  FROM   patient cd4 "
+            + "         INNER JOIN encounter enc "
+            + "                ON enc.patient_id = cd4.patient_id "
+            + "         INNER JOIN obs  "
+            + "                ON enc.encounter_id = obs.encounter_id "
+            + "      INNER JOIN (SELECT pa.patient_id, "
+            + "    MAX(enc.encounter_datetime) AS "
+            + "                encounter_date "
+            + "    FROM   patient pa "
+            + "           INNER JOIN encounter enc "
+            + "                   ON enc.patient_id = "
+            + "                      pa.patient_id "
+            + "           INNER JOIN obs "
+            + "                   ON obs.encounter_id = "
+            + "                      enc.encounter_id "
+            + "           INNER JOIN ( "
+            + "     SELECT art_patient.patient_id, "
+            + "            art_patient.art_start AS art_encounter "
+            + "     FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 1)
+            + " ) "
+            + " ) art ON art.patient_id = enc.patient_id "
+            + "       WHERE  pa.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND obs.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND enc.location_id = :location "
+            + "       AND obs.concept_id = ${1695} "
+            + "       AND obs.value_numeric IS NOT NULL "
+            + "       AND enc.encounter_datetime >= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
+            + "       AND enc.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 24 MONTH) "
+            + "       GROUP  BY pa.patient_id) most_recent_cd4 "
+            + "       ON most_recent_cd4.patient_id = cd4.patient_id "
+            + "       WHERE  cd4.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND obs.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND obs.concept_id = ${1695} "
+            + "       AND obs.value_numeric IS NOT NULL "
+            + "       GROUP BY cd4.patient_id "
+            + "UNION "
+            + "       SELECT cd4.patient_id, "
+            + "         obs.value_numeric AS cd4_result "
+            + "  FROM   patient cd4 "
+            + "         INNER JOIN encounter enc "
+            + "                ON enc.patient_id = cd4.patient_id "
+            + "         INNER JOIN obs  "
+            + "                ON enc.encounter_id = obs.encounter_id "
+            + "      INNER JOIN (SELECT pa.patient_id, "
+            + "    MAX(enc.encounter_datetime) AS "
+            + "                encounter_date "
+            + "    FROM   patient pa "
+            + "           INNER JOIN encounter enc "
+            + "                   ON enc.patient_id = "
+            + "                      pa.patient_id "
+            + "           INNER JOIN obs "
+            + "                   ON obs.encounter_id = "
+            + "                      enc.encounter_id "
+            + "           INNER JOIN ( "
+            + "     SELECT art_patient.patient_id, "
+            + "            art_patient.art_start AS art_encounter "
+            + "     FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 2)
+            + " ) "
+            + " ) art ON art.patient_id = enc.patient_id "
+            + "       WHERE  pa.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND obs.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND enc.location_id = :location "
+            + "       AND obs.concept_id = ${1695} "
+            + "       AND obs.value_numeric IS NOT NULL "
+            + "       AND enc.encounter_datetime >= DATE_ADD(art.art_encounter, INTERVAL 12 MONTH) "
+            + "       AND enc.encounter_datetime <= DATE_ADD(art.art_encounter, INTERVAL 24 MONTH) "
+            + "       GROUP  BY pa.patient_id) most_recent_cd4 "
+            + "       ON most_recent_cd4.patient_id = cd4.patient_id "
+            + "       WHERE  cd4.voided = 0 "
+            + "       AND enc.voided = 0 "
+            + "       AND obs.voided = 0 "
+            + "       AND enc.encounter_type = ${6} "
+            + "       AND obs.concept_id = ${1695} "
+            + "       AND obs.value_numeric IS NOT NULL "
+            + "       GROUP BY cd4.patient_id ";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
    * <b>RF21 - Teve registo de boa adesão em TODAS consultas entre 1˚ e 3˚ mês de TARV? - B.5
    * (Coluna N)</b><br>
    * <br>
