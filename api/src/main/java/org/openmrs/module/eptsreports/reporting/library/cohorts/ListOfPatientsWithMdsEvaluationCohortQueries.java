@@ -2328,27 +2328,34 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
-   * <b>RF36 - Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?- C5 (coluna AT)</b><br>
+   * <b>RF36 - Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?- C5
+   * (coluna AT)</b><br>
    * <br>
    *
    * <p>O sistema irá determinar se o utente “Teve registo de boa adesão em TODAS consultas entre 1˚
    * e 3˚ mês de TARV?” com as seguintes respostas:
    *
-   * <p>Resposta= Sim, se o utente teve o registo do campo de "Seguimento da Adesão - Adesão ao TARV” com resposta = “BOA” em todas as consultas de APSS/PP decorridas entre 12  e 24 meses do Início TARV (“Data da Consulta APSS/PP” >= “Data Início TARV” + 12 meses e <= “Data Início TARV” + 24 meses)<br>
+   * <p>Resposta= Sim, se o utente teve o registo do campo de "Seguimento da Adesão - Adesão ao
+   * TARV” com resposta = “BOA” em todas as consultas de APSS/PP decorridas entre 12 e 24 meses do
+   * Início TARV (“Data da Consulta APSS/PP” >= “Data Início TARV” + 12 meses e <= “Data Início
+   * TARV” + 24 meses)<br>
    * <br>
    *
-   * <p>Resposta= Não, se o utente teve pelo menos um registo no campo de "Seguimento da Adesão - Adesão ao TARV” com resposta = “RISCO” ou “MÁ” decorrida entre 12 e 24 meses do Início TARV (“Data da Consulta APSS/PP” >= “Data Início TARV” + 12 meses e <= “Data Início TARV” + 24 meses)
-   * <br>
-   * <br>
-   *
-   * <p>Nota 1: Caso o utente não satisfaça o critério definido para resposta = Sim e resposta = Não, o sistema não irá preencher nenhuma informação. <br>
-   * <br>
-   *
-   * <p>Nota 2: A “Data Início TARV” é definida no RF46.
-   * <br>
+   * <p>Resposta= Não, se o utente teve pelo menos um registo no campo de "Seguimento da Adesão -
+   * Adesão ao TARV” com resposta = “RISCO” ou “MÁ” decorrida entre 12 e 24 meses do Início TARV
+   * (“Data da Consulta APSS/PP” >= “Data Início TARV” + 12 meses e <= “Data Início TARV” + 24
+   * meses) <br>
    * <br>
    *
-   * <p>Nota 3: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou na coorte de 24 meses, conforme definido no RF4.
+   * <p>Nota 1: Caso o utente não satisfaça o critério definido para resposta = Sim e resposta =
+   * Não, o sistema não irá preencher nenhuma informação. <br>
+   * <br>
+   *
+   * <p>Nota 2: A “Data Início TARV” é definida no RF46. <br>
+   * <br>
+   *
+   * <p>Nota 3: O utente a ser considerado nesta definição iniciou TARV ou na coorte de 12 meses ou
+   * na coorte de 24 meses, conforme definido no RF4.
    *
    * @return {DataDefinition}
    */

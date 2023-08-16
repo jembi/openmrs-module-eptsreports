@@ -191,10 +191,10 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
     // C5- Teve registo de boa adesão em TODAS consultas entre 12˚ e 24˚ mês de TARV?
     pdd.addColumn(
-            "good_adherence_c",
-            listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesionAfterAYearInTarv(),
-            "evaluationYear=${evaluationYear},location=${location}",
-            null);
+        "good_adherence_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getPatientsWithGoodAdhesionAfterAYearInTarv(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
 
     return pdd;
   }
