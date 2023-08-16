@@ -56,7 +56,8 @@ public class AdvanceDiseaseAndTbCascadeDimension {
     dim.addCohortDefinition(
         "notReported",
         EptsReportUtils.map(
-            advancedDiseaseAndTBCascadeCohortQueries.getPatientsWithPositiveTbLamAndGradeOnePlus(),
+            advancedDiseaseAndTBCascadeCohortQueries
+                .getPatientsWithPositiveTbLamAndGradeNotReported(),
             "startDate=${startDate},endDate=${endDate},location=${location}"));
 
     return dim;

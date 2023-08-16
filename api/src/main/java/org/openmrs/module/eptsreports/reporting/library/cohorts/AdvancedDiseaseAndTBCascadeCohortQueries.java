@@ -197,7 +197,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition *
    */
-  public CohortDefinition getPatientsWithTbLamResult() {
+  public CohortDefinition getPatientsWithAnyTbLamResult() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("Number of clients with TB LAM results by report generation date ");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
@@ -243,8 +243,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    *
    * <ul>
-   *   <li>TB LAM result registered in the Investigações – Resultados Laboratoriais as Positive in
-   *       Ficha Clínica or
+   *   <li>TB LAM result registered in the Investigações – Resultados Laboratoriais as @tbLamResult
+   *       in Ficha Clínica or
    *   <li>TB LAM result marked as Positive in the Laboratory Form or
    *   <li>TB LAM result marked as Positive in Ficha DAH
    * </ul>
@@ -582,6 +582,196 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.setCompositionString("positiveOnePlus AND NOT positiveTwoPlus");
 
     return cd;
+  }
+
+  public CohortDefinition getPatientsWithPositiveTbLamAndGradeNotReported() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with positive TB LAM and Not Reported Grade");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    cd.addSearch(
+        "positive",
+        EptsReportUtils.map(getPatientsWithTbLamResult(TbLamResult.POSITIVE), reportingPeriod));
+
+    cd.addSearch(
+        "positiveOnePlus",
+        EptsReportUtils.map(getPatientsWithPositiveTbLamAndGradeOnePlus(), reportingPeriod));
+
+    cd.setCompositionString("positive AND NOT positiveOnePlus");
+
+    return cd;
+  }
+
+  /**
+   * Absolute CD4 Count
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWithCd4Count(Cd4CountComparison cd4CountComparison) {
+    SqlCohortDefinition cd = new SqlCohortDefinition();
+    cd.setName("Clients with Absolute CD4 Count");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    String query =
+        "SELECT p.patient_id "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
+            + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "       INNER JOIN (SELECT e.patient_id, Max(e.encounter_datetime) cd4_date "
+            + "                   FROM   encounter e "
+            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                   WHERE  e.encounter_type = ${6} "
+            + "                          AND e.location_id = :location "
+            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
+            + "                          AND o.concept_id = ${1695} "
+            + "                          AND e.voided = 0 "
+            + "                          AND o.voided = 0 "
+            + "                   GROUP  BY e.patient_id) cd4 "
+            + "               ON cd4.patient_id = p.patient_id "
+            + "WHERE  p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.encounter_type = ${6} "
+            + "       AND o.voided = 0 "
+            + "       AND e.location_id = :location "
+            + "       AND e.encounter_datetime = cd4.cd4_date "
+            + "       AND o.concept_id = ${1695} "
+            + "       AND ".concat(cd4CountComparison.getProposition())
+            + " GROUP  BY p.patient_id";
+
+    StringSubstitutor sb = new StringSubstitutor(getMetadata());
+    cd.setQuery(sb.replace(query));
+    return cd;
+  }
+
+  /**
+   * Absolute CD4 Count
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWithAbsoluteCd4Count(Cd4CountComparison cd4CountComparison) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with Absolute CD4 Count");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    cd.addSearch(
+        cd4CountComparison.getSearchKey(),
+        EptsReportUtils.map(getPatientsWithCd4Count(cd4CountComparison), reportingPeriod));
+
+    cd.setCompositionString(cd4CountComparison.getCompositionString());
+    return cd;
+  }
+
+  public enum Cd4CountComparison {
+    LessThanOrEqualTo200mm3 {
+      @Override
+      public String getProposition() {
+        return " o.value_numeric < 200";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "A";
+      }
+    },
+    LessThanOrEqualTo500mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_numeric >= 200 AND o.value_numeric < 500";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "B";
+      }
+    },
+    LessThanOrEqualTo750mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_numeric >= 500 AND o.value_numeric < 750";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "C";
+      }
+    },
+
+    GreaterThanOrEqualTo300mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_numeric >= 200 AND o.value_numeric < 500";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "D";
+      }
+    },
+    GreaterThanOrEqualTo500mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_numeric >= 500 AND o.value_numeric < 750";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "E";
+      }
+    },
+    GreaterThanOrEqualTo750mm3 {
+      @Override
+      public String getProposition() {
+        return "o.value_numeric >= 750";
+      }
+
+      @Override
+      public String getCompositionString() {
+        return getSearchKey();
+      }
+
+      @Override
+      public String getSearchKey() {
+        return "F";
+      }
+    };
+
+    public abstract String getProposition();
+
+    public abstract String getCompositionString();
+
+    public abstract String getSearchKey();
   }
 
   private Map<String, Integer> getMetadata() {
