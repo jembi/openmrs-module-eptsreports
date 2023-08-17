@@ -4,8 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.openmrs.Location;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.AdvancedDiseaseAndTBCascadeCohortQueries;
-import org.openmrs.module.eptsreports.reporting.library.cohorts.TXTBCohortQueries;
+import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.AgeDimensionCohortInterface;
 import org.openmrs.module.eptsreports.reporting.library.dimensions.EptsCommonDimension;
 import org.openmrs.module.eptsreports.reporting.library.indicators.EptsGeneralIndicator;
@@ -25,8 +24,13 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
 
   @Autowired private EptsGeneralIndicator eptsGeneralIndicator;
   @Autowired private EptsCommonDimension eptsCommonDimension;
+  @Autowired private TxNewCohortQueries txNewCohortQueries;
 
-  @Autowired private TXTBCohortQueries txtbCohortQueries;
+  @Autowired private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
+
+  @Autowired private TransferredInCohortQueries transferredInCohortQueries;
+
+  @Autowired private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   @Autowired
   @Qualifier("commonAgeDimensionCohort")
@@ -47,6 +51,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "age",
         EptsReportUtils.map(
             eptsCommonDimension.age(ageDimensionCohort), "effectiveDate=${endDate}"));
+
     dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
 
     return dataSetDefinition;
