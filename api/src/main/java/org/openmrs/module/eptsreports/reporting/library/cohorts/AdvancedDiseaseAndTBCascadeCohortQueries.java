@@ -633,7 +633,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         "vlBeforePeriod",
         EptsReportUtils.map(
             getPatientsUnsuppressedVLPreviousInclusion(),
-            "endDate=${endDate},location=${location}"));
+            "endDate=${startDate-1d},location=${location}"));
 
     cd.setCompositionString("vlOnPeriod AND vlBeforePeriod");
 
@@ -746,26 +746,39 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
             + "FROM   patient p "
             + "       INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "       INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "       INNER JOIN (SELECT e.patient_id, Max(e.encounter_datetime) cd4_date "
-            + "                   FROM   encounter e "
-            + "                          INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "                   WHERE  e.encounter_type = ${6} "
-            + "                          AND e.location_id = :location "
-            + "                          AND e.encounter_datetime BETWEEN :startDate AND :endDate"
-            + "                          AND o.concept_id = ${1695} "
-            + "                          AND e.voided = 0 "
-            + "                          AND o.voided = 0 "
-            + "                   GROUP  BY e.patient_id) cd4 "
+            + "       INNER JOIN (SELECT recent_cd4.patient_id, Max(cd4_date) recent_date "
+            + "                   FROM  (SELECT e.patient_id, Date(e.encounter_datetime) cd4_date "
+            + "                          FROM   encounter e "
+            + "                                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          WHERE  e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND Date(e.encounter_datetime) BETWEEN :startDate AND :endDate "
+            + "                                 AND o.concept_id = ${1695} "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                          UNION "
+            + "                          SELECT e.patient_id, o.obs_datetime AS cd4_date "
+            + "                          FROM   encounter e "
+            + "                                 INNER JOIN obs o ON o.encounter_id = e.encounter_id "
+            + "                          WHERE  e.encounter_type IN ( ${90}, ${53} ) "
+            + "                                 AND e.location_id = :location "
+            + "                                 AND e.voided = 0 "
+            + "                                 AND o.voided = 0 "
+            + "                                 AND o.concept_id = ${1695} "
+            + "                                 AND o.obs_datetime BETWEEN :startDate AND :endDate "
+            + "                           ) recent_cd4 "
+            + "                   GROUP  BY recent_cd4.patient_id) cd4 "
             + "               ON cd4.patient_id = p.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
-            + "       AND e.encounter_type = ${6} "
             + "       AND o.voided = 0 "
             + "       AND e.location_id = :location "
-            + "       AND e.encounter_datetime = cd4.cd4_date "
             + "       AND o.concept_id = ${1695} "
-            + "       AND ".concat(cd4CountComparison.getProposition())
-            + " GROUP  BY p.patient_id";
+            + "       AND  ".concat(cd4CountComparison.getProposition())
+            + "       AND ( ( Date(e.encounter_datetime) = cd4.recent_date AND e.encounter_type IN ( ${6}, ${13}, ${51} ) ) "
+            + "              OR ( Date(o.obs_datetime) = cd4.recent_date  AND e.encounter_type IN ( ${90}, ${53} ) )"
+            + "    ) "
+            + "GROUP  BY p.patient_id";
 
     StringSubstitutor sb = new StringSubstitutor(getMetadata());
     cd.setQuery(sb.replace(query));
