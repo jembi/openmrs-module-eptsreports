@@ -2947,8 +2947,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    */
   public DataDefinition getMds1() {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
-    sqlPatientDataDefinition.setName(
-        "B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)");
+    sqlPatientDataDefinition.setName("B10- Tipo de MDS - (MDS1) Coluna S");
     sqlPatientDataDefinition.addParameter(
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
@@ -2970,7 +2969,17 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
 
     String query =
-        "                  SELECT     p.patient_id, "
+        "                  SELECT     mds1.patient_id, "
+            + "                             MIN(otype1.value_coded) AS first_mds "
+            + "                  FROM       patient mds1 "
+            + "                  INNER JOIN encounter enc "
+            + "                  ON         enc.patient_id = mds1.patient_id "
+            + "                  INNER JOIN obs otype1 "
+            + "                  ON         otype1.encounter_id = enc.encounter_id "
+            + "                  INNER JOIN obs ostate1 "
+            + "                  ON         ostate1.encounter_id = enc.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                  SELECT     p.patient_id, "
             + "                             MIN(e.encounter_datetime) AS encounter_date "
             + "                  FROM       patient p "
             + "                  INNER JOIN encounter e "
@@ -3005,7 +3014,76 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND         ( ostate.concept_id = ${165322} "
             + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
             + "                  AND  otype.obs_group_id = ostate.obs_group_id "
-            + "                  GROUP BY   p.patient_id ";
+            + "                  GROUP BY   p.patient_id ) mds_one "
+            + "                  ON mds_one.patient_id = mds1.patient_id "
+            + "                  WHERE mds1.voided = 0 "
+            + "                  AND enc.voided = 0 "
+            + "                  AND otype1.voided = 0 "
+            + "                  AND ostate1.voided = 0 "
+            + "                  AND    (   ( otype1.concept_id = ${165174} "
+            + "                               AND otype1.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate1.concept_id = ${165322} "
+            + "                                 AND  ostate1.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype1.obs_group_id = ostate1.obs_group_id "
+            + "       GROUP BY mds1.patient_id "
+            + "UNION "
+            + "                  SELECT     mds1.patient_id, "
+            + "                             MIN(otype1.value_coded) AS first_mds "
+            + "                  FROM       patient mds1 "
+            + "                  INNER JOIN encounter enc "
+            + "                  ON         enc.patient_id = mds1.patient_id "
+            + "                  INNER JOIN obs otype1 "
+            + "                  ON         otype1.encounter_id = enc.encounter_id "
+            + "                  INNER JOIN obs ostate1 "
+            + "                  ON         ostate1.encounter_id = enc.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                  SELECT     p.patient_id, "
+            + "                             MIN(e.encounter_datetime) AS encounter_date "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs otype "
+            + "                  ON         otype.encounter_id = e.encounter_id "
+            + "                  INNER JOIN obs ostate "
+            + "                  ON         ostate.encounter_id = e.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.art_start AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 2)
+            + " ) "
+            + "                             ) art "
+            + "                  ON         art.patient_id = p.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        otype.voided = 0 "
+            + "                  AND        ostate.voided = 0 "
+            + "                  AND        e.encounter_type = ${6} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND    (   ( otype.concept_id = ${165174} "
+            + "                               AND otype.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate.concept_id = ${165322} "
+            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                  GROUP BY   p.patient_id ) mds_one "
+            + "                  ON mds_one.patient_id = mds1.patient_id "
+            + "                  WHERE mds1.voided = 0 "
+            + "                  AND enc.voided = 0 "
+            + "                  AND otype1.voided = 0 "
+            + "                  AND ostate1.voided = 0 "
+            + "                  AND    (   ( otype1.concept_id = ${165174} "
+            + "                               AND otype1.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate1.concept_id = ${165322} "
+            + "                                 AND  ostate1.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype1.obs_group_id = ostate1.obs_group_id "
+            + "       GROUP BY mds1.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 

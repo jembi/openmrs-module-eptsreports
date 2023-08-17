@@ -181,12 +181,12 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
-    // B10
+    // B10 -Tipo de MDS: (MDS1) Coluna S
     pdd.addColumn(
-        "mds_tarv_c",
+        "mds_one_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds1(),
         "evaluationYear=${evaluationYear},location=${location}",
-        null);
+        new DispensationTypeMdcConverter());
 
     // C1- Data do pedido da CV de seguimento: (coluna AP)
     pdd.addColumn(
