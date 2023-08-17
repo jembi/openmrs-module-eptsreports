@@ -3,6 +3,7 @@ package org.openmrs.module.eptsreports.reporting.library.datasets;
 import java.util.Arrays;
 import java.util.List;
 import org.openmrs.Location;
+import org.openmrs.module.eptsreports.metadata.TbMetadata;
 import org.openmrs.module.eptsreports.reporting.data.converter.*;
 import org.openmrs.module.eptsreports.reporting.library.cohorts.*;
 import org.openmrs.module.reporting.data.person.definition.*;
@@ -24,6 +25,8 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
 
   private final DQACargaViralCohortQueries dQACargaViralCohortQueries;
 
+  private final TbMetadata tbMetadata;
+
   private ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset;
 
   private ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries;
@@ -35,6 +38,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
       TPTListOfPatientsEligibleDataSet tptListOfPatientsEligibleDataSet,
       TPTInitiationDataDefinitionQueries tptInitiationDataDefinitionQueries,
       DQACargaViralCohortQueries dQACargaViralCohortQueries,
+      TbMetadata tbMetadata,
       ListOfPatientsDefaultersOrIITCohortQueries listOfPatientsDefaultersOrIITCohortQueries,
       ListChildrenOnARTandFormulationsDataset listChildrenOnARTandFormulationsDataset) {
     this.listOfPatientsWithMdsEvaluationCohortQueries =
@@ -43,6 +47,7 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     this.tptListOfPatientsEligibleDataSet = tptListOfPatientsEligibleDataSet;
     this.tptInitiationDataDefinitionQueries = tptInitiationDataDefinitionQueries;
     this.dQACargaViralCohortQueries = dQACargaViralCohortQueries;
+    this.tbMetadata = tbMetadata;
     this.listOfPatientsDefaultersOrIITCohortQueries = listOfPatientsDefaultersOrIITCohortQueries;
     this.listChildrenOnARTandFormulationsDataset = listChildrenOnARTandFormulationsDataset;
   }
@@ -173,6 +178,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     pdd.addColumn(
         "mds_date",
         listOfPatientsWithMdsEvaluationCohortQueries.getMdsDate(3, 9),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // B10
+    pdd.addColumn(
+        "mds_tarv_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
