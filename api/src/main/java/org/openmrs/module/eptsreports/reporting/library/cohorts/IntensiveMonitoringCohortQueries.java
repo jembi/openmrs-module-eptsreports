@@ -1146,7 +1146,7 @@ public class IntensiveMonitoringCohortQueries {
         "ABANDONED1LINE",
         EptsReportUtils.map(
             abandonedExclusionFirstLine,
-            "revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED2LINE",
@@ -1713,6 +1713,8 @@ public class IntensiveMonitoringCohortQueries {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients who abandoned or restarted tarv during the period ");
     cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
+    cd.addParameter(new Parameter("startDate", "startDate", Date.class));
+    cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> map = new HashMap<>();
@@ -1728,24 +1730,49 @@ public class IntensiveMonitoringCohortQueries {
             + "inner join encounter e on e.patient_id=p.patient_id "
             + "inner join obs o on o.encounter_id=e.encounter_id "
             + "inner join( "
-            + "    select encounter_Onperiod.patient_id, MAX(last_encounter) as last_encounter "
+            + "    select encounteronperiod.patient_id, MAX(last_encounter) as last_encounter "
             + "    from ( "
             + "    select e.patient_id, e.encounter_datetime as last_encounter "
             + "    from encounter e "
-            + "    where e.encounter_datetime BETWEEN DATE_ADD(DATE_SUB(:revisionEndDate, interval 2 month), interval 1 day) AND DATE_SUB(:revisionEndDate, interval 1 month) "
+            + "    where e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "    and e.voided=0 "
             + "    and e.encounter_type = ${6} "
-            + "    ) encounter_Onperiod "
-            + "    GROUP BY encounter_Onperiod.patient_id "
-            + ")enc on enc.patient_id = p.patient_id "
+            + "    ) encounteronperiod "
+            + "    GROUP BY encounteronperiod.patient_id "
+            + ")last_consultation on last_consultation.patient_id = p.patient_id "
             + "where o.concept_id = ${6273} "
             + "and o.value_coded in (${1707}, ${1705}) "
-            + "and e.encounter_type in (${6}, ${53}) "
+            + "and e.encounter_type = ${6} "
             + "and p.voided=0 "
             + "and e.voided=0 "
             + "and o.voided=0 "
             + "and e.location_id = :location "
-            + "and e.encounter_datetime BETWEEN DATE_SUB(enc.last_encounter, interval 6 MONTH) and enc.last_encounter "
+            + "and e.encounter_datetime BETWEEN DATE_SUB(last_consultation.last_encounter, interval 6 MONTH) and last_consultation.last_encounter "
+            + "GROUP BY p.patient_id "
+            + " UNION "
+            + "select p.patient_id "
+            + "FROM patient p "
+            + "inner join encounter e on e.patient_id=p.patient_id "
+            + "inner join obs o on o.encounter_id=e.encounter_id "
+            + "inner join( "
+            + "    select encounteronperiod.patient_id, MAX(last_encounter) as last_encounter "
+            + "    from ( "
+            + "    select e.patient_id, e.encounter_datetime as last_encounter "
+            + "    from encounter e "
+            + "    where e.encounter_datetime BETWEEN :startDate AND :endDate "
+            + "    and e.voided=0 "
+            + "    and e.encounter_type = ${6} "
+            + "    ) encounteronperiod "
+            + "    GROUP BY encounteronperiod.patient_id "
+            + ")last_consultation on last_consultation.patient_id = p.patient_id "
+            + "where o.concept_id = ${6273} "
+            + "and o.value_coded in (${1707}, ${1705}) "
+            + "and e.encounter_type = ${53} "
+            + "and p.voided=0 "
+            + "and e.voided=0 "
+            + "and o.voided=0 "
+            + "and e.location_id = :location "
+            + "and o.obs_datetime BETWEEN DATE_SUB(last_consultation.last_encounter, interval 6 MONTH) and last_consultation.last_encounter "
             + "GROUP BY p.patient_id ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
