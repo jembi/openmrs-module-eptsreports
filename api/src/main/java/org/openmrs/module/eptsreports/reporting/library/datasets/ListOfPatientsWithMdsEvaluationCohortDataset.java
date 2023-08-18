@@ -216,6 +216,13 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
+    // B10.6 - Data Fim de MDS2: Coluna X
+    pdd.addColumn(
+        "mds_two_end_date_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
     // B10.7 - Tipo de MDS: (MDS3) Coluna Y
     pdd.addColumn(
         "mds_three_b",
