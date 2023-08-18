@@ -1146,7 +1146,7 @@ public class IntensiveMonitoringCohortQueries {
         "ABANDONED1LINE",
         EptsReportUtils.map(
             abandonedExclusionFirstLine,
-            "startDate=${revisionEndDate-2m+1},endDate=${revisionEndDate-1m},location=${location}"));
+            "startDate=${revisionEndDate-2m+1d},endDate=${revisionEndDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED2LINE",
