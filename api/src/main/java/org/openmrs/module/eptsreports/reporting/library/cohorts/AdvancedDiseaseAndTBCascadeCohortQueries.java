@@ -52,7 +52,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
   public CohortDefinition getClientsEligibleForCd4() {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Clients with positive TB LAM and Grade 2+");
+    cd.setName("Clients Eligible For Cd4");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "End Date", Location.class));
@@ -77,6 +77,29 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.setCompositionString(
         "(initiatedArt OR pregnant OR consecutiveVL OR reinitiatedArt) NOT (transferredOut OR death)");
+
+    return cd;
+  }
+
+  /**
+   * TB_DA_FR18 Number of clients with a CD4 count during inclusion period
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithCd4Count() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients Eligible For Cd4");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition eligibleCd4 = getClientsEligibleForCd4();
+    CohortDefinition anyResult = getPatientsWithCD4Count();
+
+    cd.addSearch("eligibleCd4", EptsReportUtils.map(eligibleCd4, mappings));
+    cd.addSearch("anyResult", EptsReportUtils.map(anyResult, mappings));
+
+    cd.setCompositionString("eligibleCd4 AND anyResult");
 
     return cd;
   }
