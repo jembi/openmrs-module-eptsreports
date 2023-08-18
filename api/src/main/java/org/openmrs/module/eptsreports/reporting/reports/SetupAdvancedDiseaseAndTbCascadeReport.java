@@ -17,8 +17,9 @@ import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Deprecated
+@Component
 public class SetupAdvancedDiseaseAndTbCascadeReport extends EptsDataExportManager {
 
   @Autowired private GenericCohortQueries genericCohortQueries;
@@ -63,7 +64,7 @@ public class SetupAdvancedDiseaseAndTbCascadeReport extends EptsDataExportManage
     reportDefinition.addDataSetDefinition(
         "SM", Mapped.mapStraightThrough(new SismaCodeDatasetDefinition()));
     reportDefinition.addDataSetDefinition(
-        "ADTBC",
+        "AD",
         Mapped.mapStraightThrough(
             advancedDiseaseAndTbCascadeDataset.constructAdvancedDiseaseAndTbCascadeDataset()));
     reportDefinition.setBaseCohortDefinition(

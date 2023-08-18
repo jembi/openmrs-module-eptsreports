@@ -12,6 +12,7 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
+import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,12 +22,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
   private HivMetadata hivMetadata;
   private TbMetadata tbMetadata;
-
   private TXTBCohortQueries txtbCohortQueries;
-
   private ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries;
-
   private TxNewCohortQueries txNewCohortQueries;
+  private TransferredInCohortQueries transferredInCohortQueries;
+  private ResumoMensalCohortQueries resumoMensalCohortQueries;
 
   private final String reportingPeriod =
       "startDate=${endDate}-2m,endDate=${generationDate},location=${location}";
@@ -39,13 +39,33 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
       TbMetadata tbMetadata,
       ListOfPatientsArtCohortCohortQueries listOfPatientsArtCohortCohortQueries,
       TxNewCohortQueries txNewCohortQueries,
-      TXTBCohortQueries txtbCohortQueries) {
+      TXTBCohortQueries txtbCohortQueries,
+      ResumoMensalCohortQueries resumoMensalCohortQueries,
+      TransferredInCohortQueries transferredInCohortQueries) {
 
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
     this.listOfPatientsArtCohortCohortQueries = listOfPatientsArtCohortCohortQueries;
     this.txNewCohortQueries = txNewCohortQueries;
     this.txtbCohortQueries = txtbCohortQueries;
+    this.resumoMensalCohortQueries = resumoMensalCohortQueries;
+    this.transferredInCohortQueries = transferredInCohortQueries;
+  }
+
+  public CohortDefinition getClientsEligibleForCd4() {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.setName("Clients with positive TB LAM and Grade 2+");
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("location", "End Date", Location.class));
+
+    CohortDefinition initiatedArt = listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART();
+
+    cd.addSearch("initiatedArt", Mapped.mapStraightThrough(initiatedArt));
+
+    cd.setCompositionString("initiatedArt");
+
+    return cd;
   }
 
   /**
