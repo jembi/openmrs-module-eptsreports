@@ -1163,7 +1163,8 @@ public class IntensiveMonitoringCohortQueries {
     if (den) {
       if (line == 6 || line == 7 || line == 8) {
         compositionCohortDefinition.setCompositionString(
-            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND age");
+            "ABANDONED1LINE");
+//            "(B1 AND ( (B2NEW AND NOT ABANDONEDTARV) OR  ( (RESTARTED AND NOT RESTARTEDTARV) OR (B3 AND NOT B3E AND NOT ABANDONED1LINE) )) AND NOT B5E) AND NOT (C OR D) AND age");
       } else if (line == 4 || line == 13) {
         compositionCohortDefinition.setCompositionString(
             "((B1 AND (secondLineB2 AND NOT B2E AND NOT ABANDONED2LINE)) AND NOT B5E) AND NOT (C OR D) AND age");
@@ -1742,8 +1743,7 @@ public class IntensiveMonitoringCohortQueries {
             + "                    GROUP BY e.patient_id )last_consultation "
             + "ON         last_consultation.patient_id = p.patient_id "
             + "WHERE      o.concept_id = ${6273} "
-            + "AND        o.value_coded IN (${1707}, "
-            + "                             ${1705}) "
+            + "AND        o.value_coded IN (${1707}, ${1705}) "
             + "AND        e.encounter_type = ${6} "
             + "AND        p.voided=0 "
             + "AND        e.voided=0 "
@@ -1761,7 +1761,7 @@ public class IntensiveMonitoringCohortQueries {
             + "INNER JOIN "
             + "           ( "
             + "                    SELECT   e.patient_id, "
-            + "                             max(e.encounter_datetime) AS last_encounter "
+            + "                             Max(e.encounter_datetime) AS last_encounter "
             + "                    FROM     encounter e "
             + "                    WHERE    e.encounter_datetime BETWEEN :startDate AND :endDate "
             + "                    AND      e.voided=0 "
@@ -1769,8 +1769,7 @@ public class IntensiveMonitoringCohortQueries {
             + "                    GROUP BY e.patient_id )last_consultation "
             + "ON         last_consultation.patient_id = p.patient_id "
             + "WHERE      o.concept_id = ${6273} "
-            + "AND        o.value_coded IN (${1707}, "
-            + "                             ${1705}) "
+            + "AND        o.value_coded IN (${1707},${1705}) "
             + "AND        e.encounter_type = ${53} "
             + "AND        p.voided=0 "
             + "AND        e.voided=0 "
