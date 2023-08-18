@@ -12,7 +12,6 @@ import org.openmrs.module.eptsreports.reporting.utils.EptsReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,8 +29,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
   private final String reportingPeriod =
       "startDate=${endDate}-2m,endDate=${generationDate},location=${location}";
-  private final String inclusionPeriod =
-      "startDate=${endDate}-2m,endDate=${endDate-1m},location=${location}";
+  private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
 
   @Autowired
   public AdvancedDiseaseAndTBCascadeCohortQueries(
@@ -60,10 +58,25 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("location", "End Date", Location.class));
 
     CohortDefinition initiatedArt = listOfPatientsArtCohortCohortQueries.getPatientsInitiatedART();
+    CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
+    CohortDefinition consecutiveVL = getPatientsWithTwoConsecutiveVLGreaterThan1000();
+    CohortDefinition reinitiatedArt = getPatientsWhoReinitiatedArt();
+    CohortDefinition transferredOut = transferredInCohortQueries.getTrfOut();
+    CohortDefinition death = resumoMensalCohortQueries.getPatientsWhoDied(false);
 
-    cd.addSearch("initiatedArt", Mapped.mapStraightThrough(initiatedArt));
+    cd.addSearch("initiatedArt", EptsReportUtils.map(initiatedArt, mappings));
+    cd.addSearch("pregnant", EptsReportUtils.map(pregnant, mappings));
+    cd.addSearch("consecutiveVL", EptsReportUtils.map(consecutiveVL, mappings));
+    cd.addSearch("reinitiatedArt", EptsReportUtils.map(reinitiatedArt, mappings));
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(transferredOut, "startDate=${generationDate},location=${location}"));
+    cd.addSearch(
+        "death",
+        EptsReportUtils.map(death, "onOrBefore=${generationDate},locationList=${location}"));
 
-    cd.setCompositionString("initiatedArt");
+    cd.setCompositionString(
+        "(initiatedArt OR pregnant OR consecutiveVL OR reinitiatedArt) NOT (transferredOut OR death)");
 
     return cd;
   }

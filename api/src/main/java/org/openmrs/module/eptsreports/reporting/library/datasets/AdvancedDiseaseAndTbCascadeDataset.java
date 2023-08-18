@@ -32,7 +32,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
   private final String reportingPeriod =
       "startDate=${endDate}-2m,endDate=${generationDate},location=${location}";
   private final String inclusionPeriod =
-      "startDate=${endDate}-2m,endDate=${endDate-1m},location=${location}";
+      "startDate=${endDate-2m},endDate=${endDate-1m},location=${location}";
 
   public DataSetDefinition constructAdvancedDiseaseAndTbCascadeDataset() {
 
