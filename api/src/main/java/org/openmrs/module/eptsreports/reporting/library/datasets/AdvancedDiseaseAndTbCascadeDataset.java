@@ -67,6 +67,26 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(eligibleCd4Ind, inclusionPeriod),
         "");
 
+    CohortIndicator cd4CountInd =
+            eptsGeneralIndicator.getIndicator(
+                    "cd4CountInd",
+                    EptsReportUtils.map(
+                            advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4(),
+                            inclusionPeriod));
+
+    addRow(
+            dataSetDefinition,
+            "cd4Count",
+            "ClientsWithCd4Count",
+            EptsReportUtils.map(cd4CountInd, inclusionPeriod),
+            dissagregations());
+
+    dataSetDefinition.addColumn(
+            "cd4CountTotal",
+            "ClientsWithCd4Total",
+            EptsReportUtils.map(cd4CountInd, inclusionPeriod),
+            "");
+
     return dataSetDefinition;
   }
 
