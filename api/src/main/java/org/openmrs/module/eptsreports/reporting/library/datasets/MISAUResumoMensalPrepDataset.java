@@ -119,10 +119,10 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
     // B2
     dsd.addColumn(
         "TTB2",
-        "Total de de Novos Inícios que retornaram a PrEP durante o período de reporte",
+        "Nº de Novos inícios em PrEP que alguma vez estiveram em PrEP durante o período de reporte",
         EptsReportUtils.map(
             eptsGeneralIndicator.getIndicator(
-                "Total de Novos Inícios que retornaram a PrEP durante o período de reporte",
+                "Nº de Novos inícios em PrEP que alguma vez estiveram em PrEP durante o período de reporte",
                 EptsReportUtils.map(rmprepCohortQueries.getClientsReturnedToPrep(), mappings)),
             mappings),
         "");
@@ -157,30 +157,6 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
             eptsGeneralIndicator.getIndicator(
                 "Age and Gender",
                 EptsReportUtils.map(rmprepCohortQueries.getClientsWhoReceivedPrep(), mappings)),
-            mappings),
-        getColumnsDisaggregations());
-
-    // D1
-    dsd.addColumn(
-        "TTD1",
-        "Total de Utentes em PrEP por 3 meses consecutivos após terem iniciado a PrEP",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Total de Utentes em PrEP por 3 meses consecutivos após terem iniciado a PrEP",
-                EptsReportUtils.map(
-                    rmprepCohortQueries.getClientsFromB1PreviousPeriod(), mappings)),
-            mappings),
-        "");
-
-    addRow(
-        dsd,
-        "D1",
-        "Age and Gender",
-        EptsReportUtils.map(
-            eptsGeneralIndicator.getIndicator(
-                "Age and Gender",
-                EptsReportUtils.map(
-                    rmprepCohortQueries.getClientsFromB1PreviousPeriod(), mappings)),
             mappings),
         getColumnsDisaggregations());
 
@@ -309,6 +285,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
     ColumnParameters pri =
         new ColumnParameters("pri", "People in prison and other closed settings", "KP=PRI", "20");
     ColumnParameters tg = new ColumnParameters("tg", "Transgender", "KP=TG", "22");
+    ColumnParameters outro = new ColumnParameters("outro", "Outro", "KP=OUT", "30");
 
     // Target group
     ColumnParameters ayr =
@@ -340,6 +317,7 @@ public class MISAUResumoMensalPrepDataset extends BaseDataSet {
         above15breastfeeding,
         totalBreastfeeding,
         pid,
+        outro,
         msm,
         sw,
         pri,
