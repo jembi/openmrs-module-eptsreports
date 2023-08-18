@@ -30,9 +30,9 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
   private AgeDimensionCohortInterface ageDimensionCohort;
 
   private final String reportingPeriod =
-      "startDate=${endDate}-2m,endDate=${generationDate},location=${location}";
+      "startDate=${endDate-2m+1d},endDate=${generationDate},location=${location}";
   private final String inclusionPeriod =
-      "startDate=${endDate-2m},endDate=${endDate-1m},location=${location}";
+      "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}";
 
   public DataSetDefinition constructAdvancedDiseaseAndTbCascadeDataset() {
 
@@ -68,24 +68,24 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "");
 
     CohortIndicator cd4CountInd =
-            eptsGeneralIndicator.getIndicator(
-                    "cd4CountInd",
-                    EptsReportUtils.map(
-                            advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4(),
-                            inclusionPeriod));
+        eptsGeneralIndicator.getIndicator(
+            "cd4CountInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4Count(),
+                inclusionPeriod));
 
     addRow(
-            dataSetDefinition,
-            "cd4Count",
-            "ClientsWithCd4Count",
-            EptsReportUtils.map(cd4CountInd, inclusionPeriod),
-            dissagregations());
+        dataSetDefinition,
+        "cd4Count",
+        "ClientsWithCd4Count",
+        EptsReportUtils.map(cd4CountInd, inclusionPeriod),
+        dissagregations());
 
     dataSetDefinition.addColumn(
-            "cd4CountTotal",
-            "ClientsWithCd4Total",
-            EptsReportUtils.map(cd4CountInd, inclusionPeriod),
-            "");
+        "cd4CountTotal",
+        "ClientsWithCd4Total",
+        EptsReportUtils.map(cd4CountInd, inclusionPeriod),
+        "");
 
     return dataSetDefinition;
   }
