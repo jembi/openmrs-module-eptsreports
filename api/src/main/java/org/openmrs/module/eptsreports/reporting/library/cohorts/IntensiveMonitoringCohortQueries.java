@@ -1146,7 +1146,7 @@ public class IntensiveMonitoringCohortQueries {
         "ABANDONED1LINE",
         EptsReportUtils.map(
             abandonedExclusionFirstLine,
-            "startDate=${revisionEndDate-2m+1},endDate=${revisionEndDate-1m},revisionEndDate=${revisionEndDate},location=${location}"));
+            "startDate=${revisionEndDate-2m+1},endDate=${revisionEndDate-1m},location=${location}"));
 
     compositionCohortDefinition.addSearch(
         "ABANDONED2LINE",
@@ -1712,7 +1712,6 @@ public class IntensiveMonitoringCohortQueries {
   public CohortDefinition getpatientsWhoAbandonedOrRestartedTarv() {
     SqlCohortDefinition cd = new SqlCohortDefinition();
     cd.setName("All patients who abandoned or restarted tarv during the period ");
-    cd.addParameter(new Parameter("revisionEndDate", "revisionEndDate", Date.class));
     cd.addParameter(new Parameter("startDate", "startDate", Date.class));
     cd.addParameter(new Parameter("endDate", "endDate", Date.class));
     cd.addParameter(new Parameter("location", "location", Location.class));
