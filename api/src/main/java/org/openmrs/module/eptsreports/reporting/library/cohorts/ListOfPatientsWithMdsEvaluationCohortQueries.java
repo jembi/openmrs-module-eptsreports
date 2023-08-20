@@ -3318,8 +3318,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        enc2.encounter_datetime > mds_1st.first_mds_date "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
-            + "                               AND otype2.value_coded IS NOT NULL ) " // OR
-                                                                                     // otype2.value_coded > mds_1st.first_mds
+            + "                               AND otype2.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate2.concept_id = ${165322} "
             + "                                 AND  ostate2.value_coded = ${1256} ) ) "
             + "                  AND  otype2.obs_group_id = ostate2.obs_group_id "
@@ -3404,8 +3403,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        enc2.encounter_datetime > mds_1st.first_mds_date "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
-            + "                               AND otype2.value_coded IS NOT NULL ) " // OR
-                                                                                     // otype2.value_coded > mds_1st.first_mds
+            + "                               AND otype2.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate2.concept_id = ${165322} "
             + "                                 AND  ostate2.value_coded = ${1256} ) ) "
             + "                  AND  otype2.obs_group_id = ostate2.obs_group_id "
@@ -3544,20 +3542,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ee2.voided = 0 "
             + "                  AND ot2.voided = 0 "
             + "                  AND os2.voided = 0 "
-            + "                  AND ee2.encounter_datetime > mds1_end.mds1_end_date " // Does it
-            // realy have
-            // to be
-            // checked on
-            // the next
-            // encounter?
-            // Can't the
-            // next mds
-            // be on the
-            // clinical
-            // record?
+            + "                  AND ee2.encounter_datetime > mds1_end.mds1_end_date "
             + "                  AND ( (ot2.concept_id = ${165174} "
-            + "                  AND ot2.value_coded IS NOT NULL ) " // OR ot2.value_coded >
-            // mds1_end.mds1_type_end
+            + "                  AND ot2.value_coded IS NOT NULL ) "
             + "                  AND ( os2.concept_id = ${165322} "
             + "                  AND os2.value_coded = ${1267} ) ) "
             + "                  AND  ot2.obs_group_id = os2.obs_group_id "
@@ -3656,20 +3643,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND ee2.voided = 0 "
             + "                  AND ot2.voided = 0 "
             + "                  AND os2.voided = 0 "
-            + "                  AND ee2.encounter_datetime > mds1_end.mds1_end_date " // Does it
-            // realy have
-            // to be
-            // checked on
-            // the next
-            // encounter?
-            // Can't the
-            // next mds
-            // be on the
-            // clinical
-            // record?
+            + "                  AND ee2.encounter_datetime > mds1_end.mds1_end_date "
             + "                  AND ( (ot2.concept_id = ${165174} "
-            + "                  AND ot2.value_coded IS NOT NULL ) " // OR ot2.value_coded >
-            // mds1_end.mds1_type_end
+            + "                  AND ot2.value_coded IS NOT NULL ) "
             + "                  AND ( os2.concept_id = ${165322} "
             + "                  AND os2.value_coded = ${1267} ) ) "
             + "                  AND  ot2.obs_group_id = os2.obs_group_id ";
@@ -3920,6 +3896,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     mds1.patient_id, "
+            + "                             MIN(enc.encounter_datetime) AS first_mds_date, "
             + "                             MIN(otype1.value_coded) AS first_mds "
             + "                  FROM       patient mds1 "
             + "                  INNER JOIN encounter enc "
@@ -3980,13 +3957,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       GROUP BY mds1.patient_id ) mds_1st "
             + "                  ON mds_1st.patient_id = mds2.patient_id "
             + "                  WHERE mds2.voided = 0 "
+            + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
             + "                  AND enc2.voided = 0 "
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
-            + "                               AND otype2.value_coded > mds_1st.first_mds ) "
+            + "                               AND otype2.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate2.concept_id = ${165322} "
             + "                                 AND  ostate2.value_coded = ${1256} ) ) "
             + "                  AND  otype2.obs_group_id = ostate2.obs_group_id "
@@ -4003,6 +3981,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  ON         ostate2.encounter_id = enc2.encounter_id "
             + "                  INNER JOIN ( "
             + "                  SELECT     mds1.patient_id, "
+            + "                             MIN(enc.encounter_datetime) AS first_mds_date, "
             + "                             MIN(otype1.value_coded) AS first_mds "
             + "                  FROM       patient mds1 "
             + "                  INNER JOIN encounter enc "
@@ -4063,13 +4042,14 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       GROUP BY mds1.patient_id ) mds_1st "
             + "                  ON mds_1st.patient_id = mds2.patient_id "
             + "                  WHERE mds2.voided = 0 "
+            + "                  AND enc2.encounter_datetime > mds_1st.first_mds_date "
             + "                  AND enc2.voided = 0 "
             + "                  AND otype2.voided = 0 "
             + "                  AND ostate2.voided = 0 "
             + "                  AND        enc2.encounter_type = ${6} "
             + "                  AND        enc2.location_id = :location "
             + "                  AND    (   ( otype2.concept_id = ${165174} "
-            + "                               AND otype2.value_coded > mds_1st.first_mds ) "
+            + "                               AND otype2.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate2.concept_id = ${165322} "
             + "                                 AND  ostate2.value_coded = ${1256} ) ) "
             + "                  AND  otype2.obs_group_id = ostate2.obs_group_id "

@@ -230,6 +230,20 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         new DispensationTypeMdcConverter());
 
+    // B10.8 - Data Início de MDS3: Coluna Z
+    pdd.addColumn(
+        "mds_three_start_date_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // B10.9 - Data Fim de MDS3: Coluna AA
+    pdd.addColumn(
+        "mds_three_end_date_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
     // B10.10 - Tipo de MDS: (MDS4) Coluna AB
     pdd.addColumn(
         "mds_four_b",
@@ -237,12 +251,40 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         new DispensationTypeMdcConverter());
 
+    // B10.11 - Data Início de MDS4: Coluna AC
+    pdd.addColumn(
+        "mds_four_start_date_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // B10.12 - Data Fim de MDS4: Coluna AD
+    pdd.addColumn(
+        "mds_four_end_date_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
     // B10.13 - Tipo de MDS: (MDS5) Coluna AE
     pdd.addColumn(
         "mds_five_b",
         listOfPatientsWithMdsEvaluationCohortQueries.getMds5(),
         "evaluationYear=${evaluationYear},location=${location}",
         new DispensationTypeMdcConverter());
+
+    // B10.14 - Data Início de MDS5: Coluna AF
+    pdd.addColumn(
+        "mds_five_start_date_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // B10.15 - Data Fim de MDS5: Coluna AG
+    pdd.addColumn(
+        "mds_five_end_date_b",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
 
     // C1- Data do pedido da CV de seguimento: (coluna AP)
     pdd.addColumn(
