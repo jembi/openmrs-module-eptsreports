@@ -4313,6 +4313,262 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   }
 
   /**
+   * MDS3 - Coluna Z - Data da consulta (Ficha Clínica) em que o terceiro MDS foi marcado como "Início", ocorrido entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33 dias e <= “Data Início TARV” + 12 meses)
+   *
+   * @return {@link DataDefinition}
+   */
+  public DataDefinition getMds3StartDate() {
+    SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
+    sqlPatientDataDefinition.setName("B10- Data Início de MDS3: Coluna Z");
+    sqlPatientDataDefinition.addParameter(
+        new Parameter("evaluationYear", "evaluationYear", Integer.class));
+    sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
+    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
+    map.put("6276", hivMetadata.getArtStatus().getConceptId());
+    map.put("1065", hivMetadata.getYesConcept().getConceptId());
+    map.put("1066", hivMetadata.getNoConcept().getConceptId());
+    map.put("165174", hivMetadata.getLastRecordOfDispensingModeConcept().getConceptId());
+    map.put("165322", hivMetadata.getMdcState().getConceptId());
+    map.put("1256", hivMetadata.getStartDrugs().getConceptId());
+
+    String query =
+        "                  SELECT     mds3.patient_id, "
+            + "                             MIN(enc3.encounter_datetime) AS third_mds_date "
+            + "                  FROM       patient mds3 "
+            + "                  INNER JOIN encounter enc3 "
+            + "                  ON         enc3.patient_id = mds3.patient_id "
+            + "                  INNER JOIN obs otype3 "
+            + "                  ON         otype3.encounter_id = enc3.encounter_id "
+            + "                  INNER JOIN obs ostate3 "
+            + "                  ON         ostate3.encounter_id = enc3.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                  SELECT     mds2.patient_id, "
+            + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
+            + "                             MIN(otype2.value_coded) AS second_mds "
+            + "                  FROM       patient mds2 "
+            + "                  INNER JOIN encounter enc2 "
+            + "                  ON         enc2.patient_id = mds2.patient_id "
+            + "                  INNER JOIN obs otype2 "
+            + "                  ON         otype2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN obs ostate2 "
+            + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                  SELECT     mds1.patient_id, "
+            + "                             MIN(enc.encounter_datetime) AS first_mds_date, "
+            + "                             MIN(otype1.value_coded) AS first_mds "
+            + "                  FROM       patient mds1 "
+            + "                  INNER JOIN encounter enc "
+            + "                  ON         enc.patient_id = mds1.patient_id "
+            + "                  INNER JOIN obs otype1 "
+            + "                  ON         otype1.encounter_id = enc.encounter_id "
+            + "                  INNER JOIN obs ostate1 "
+            + "                  ON         ostate1.encounter_id = enc.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                  SELECT     p.patient_id, "
+            + "                             MIN(e.encounter_datetime) AS encounter_date "
+            + "                  FROM       patient p "
+            + "                  INNER JOIN encounter e "
+            + "                  ON         e.patient_id = p.patient_id "
+            + "                  INNER JOIN obs otype "
+            + "                  ON         otype.encounter_id = e.encounter_id "
+            + "                  INNER JOIN obs ostate "
+            + "                  ON         ostate.encounter_id = e.encounter_id "
+            + "                  INNER JOIN ( "
+            + "                           SELECT art_patient.patient_id, "
+            + "                                  art_patient.art_start AS art_encounter "
+            + "                           FROM   ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+            + "                           ) art_patient "
+            + " WHERE  art_patient.patient_id  "
+            + " NOT IN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 1)
+            + " ) "
+            + "                             ) art "
+            + "                  ON         art.patient_id = p.patient_id "
+            + "                  WHERE      p.voided = 0 "
+            + "                  AND        otype.voided = 0 "
+            + "                  AND        ostate.voided = 0 "
+            + "                  AND        e.encounter_type = ${6} "
+            + "                  AND        e.location_id = :location "
+            + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND    (   ( otype.concept_id = ${165174} "
+            + "                               AND otype.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate.concept_id = ${165322} "
+            + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+            + "                  GROUP BY   p.patient_id ) mds_one "
+            + "                  ON mds_one.patient_id = mds1.patient_id "
+            + "                  WHERE mds1.voided = 0 "
+            + "                  AND enc.voided = 0 "
+            + "                  AND otype1.voided = 0 "
+            + "                  AND ostate1.voided = 0 "
+            + "                  AND        enc.encounter_type = ${6} "
+            + "                  AND        enc.location_id = :location "
+            + "                  AND    (   ( otype1.concept_id = ${165174} "
+            + "                               AND otype1.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate1.concept_id = ${165322} "
+            + "                                 AND  ostate1.value_coded IN (${1256}) ) ) "
+            + "                  AND  otype1.obs_group_id = ostate1.obs_group_id "
+            + "       GROUP BY mds1.patient_id ) mds_1st "
+            + "                  ON mds_1st.patient_id = mds2.patient_id "
+            + "                  WHERE mds2.voided = 0 "
+            + "                  AND enc2.voided = 0 "
+            + "                  AND otype2.voided = 0 "
+            + "                  AND ostate2.voided = 0 "
+            + "                  AND        enc2.encounter_type = ${6} "
+            + "                  AND        enc2.encounter_datetime > mds_1st.first_mds_date "
+            + "                  AND        enc2.location_id = :location "
+            + "                  AND    (   ( otype2.concept_id = ${165174} "
+            + "                               AND otype2.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate2.concept_id = ${165322} "
+            + "                                 AND  ostate2.value_coded = ${1256} ) ) "
+            + "                  AND  otype2.obs_group_id = ostate2.obs_group_id "
+            + "       GROUP BY mds2.patient_id ) mds_2nd "
+            + "                  ON mds_2nd.patient_id = mds3.patient_id "
+            + "                  WHERE mds3.voided = 0 "
+            + "                  AND enc3.voided = 0 "
+            + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date"
+            + "                  AND otype3.voided = 0 "
+            + "                  AND ostate3.voided = 0 "
+            + "                  AND        enc3.encounter_type = ${6} "
+            + "                  AND        enc3.location_id = :location "
+            + "                  AND    (   ( otype3.concept_id = ${165174} "
+            + "                               AND otype3.value_coded IS NOT NULL ) "
+            + "                  AND         ( ostate3.concept_id = ${165322} "
+            + "                                 AND  ostate3.value_coded = ${1256} ) ) "
+            + "                  AND  otype3.obs_group_id = ostate3.obs_group_id "
+            + "       GROUP BY mds3.patient_id "
+            + "UNION "
+            +   "                  SELECT     mds3.patient_id, "
+                + "                             MIN(enc3.encounter_datetime) AS third_mds_date "
+                + "                  FROM       patient mds3 "
+                + "                  INNER JOIN encounter enc3 "
+                + "                  ON         enc3.patient_id = mds3.patient_id "
+                + "                  INNER JOIN obs otype3 "
+                + "                  ON         otype3.encounter_id = enc3.encounter_id "
+                + "                  INNER JOIN obs ostate3 "
+                + "                  ON         ostate3.encounter_id = enc3.encounter_id "
+                + "                  INNER JOIN ( "
+                + "                  SELECT     mds2.patient_id, "
+                + "                             MIN(enc2.encounter_datetime) AS second_mds_date, "
+                + "                             MIN(otype2.value_coded) AS second_mds "
+                + "                  FROM       patient mds2 "
+                + "                  INNER JOIN encounter enc2 "
+                + "                  ON         enc2.patient_id = mds2.patient_id "
+                + "                  INNER JOIN obs otype2 "
+                + "                  ON         otype2.encounter_id = enc2.encounter_id "
+                + "                  INNER JOIN obs ostate2 "
+                + "                  ON         ostate2.encounter_id = enc2.encounter_id "
+                + "                  INNER JOIN ( "
+                + "                  SELECT     mds1.patient_id, "
+                + "                             MIN(enc.encounter_datetime) AS first_mds_date, "
+                + "                             MIN(otype1.value_coded) AS first_mds "
+                + "                  FROM       patient mds1 "
+                + "                  INNER JOIN encounter enc "
+                + "                  ON         enc.patient_id = mds1.patient_id "
+                + "                  INNER JOIN obs otype1 "
+                + "                  ON         otype1.encounter_id = enc.encounter_id "
+                + "                  INNER JOIN obs ostate1 "
+                + "                  ON         ostate1.encounter_id = enc.encounter_id "
+                + "                  INNER JOIN ( "
+                + "                  SELECT     p.patient_id, "
+                + "                             MIN(e.encounter_datetime) AS encounter_date "
+                + "                  FROM       patient p "
+                + "                  INNER JOIN encounter e "
+                + "                  ON         e.patient_id = p.patient_id "
+                + "                  INNER JOIN obs otype "
+                + "                  ON         otype.encounter_id = e.encounter_id "
+                + "                  INNER JOIN obs ostate "
+                + "                  ON         ostate.encounter_id = e.encounter_id "
+                + "                  INNER JOIN ( "
+                + "                           SELECT art_patient.patient_id, "
+                + "                                  art_patient.art_start AS art_encounter "
+                + "                           FROM   ( "
+                + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                + "                           ) art_patient "
+                + " WHERE  art_patient.patient_id  "
+                + " NOT IN ( "
+                + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
+                inclusionEndMonthAndDay, 2)
+                + " ) "
+                + "                             ) art "
+                + "                  ON         art.patient_id = p.patient_id "
+                + "                  WHERE      p.voided = 0 "
+                + "                  AND        otype.voided = 0 "
+                + "                  AND        ostate.voided = 0 "
+                + "                  AND        e.encounter_type = ${6} "
+                + "                  AND        e.location_id = :location "
+                + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
+                + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+                + "                  AND    (   ( otype.concept_id = ${165174} "
+                + "                               AND otype.value_coded IS NOT NULL ) "
+                + "                  AND         ( ostate.concept_id = ${165322} "
+                + "                                 AND  ostate.value_coded IN (${1256}) ) ) "
+                + "                  AND  otype.obs_group_id = ostate.obs_group_id "
+                + "                  GROUP BY   p.patient_id ) mds_one "
+                + "                  ON mds_one.patient_id = mds1.patient_id "
+                + "                  WHERE mds1.voided = 0 "
+                + "                  AND enc.voided = 0 "
+                + "                  AND otype1.voided = 0 "
+                + "                  AND ostate1.voided = 0 "
+                + "                  AND        enc.encounter_type = ${6} "
+                + "                  AND        enc.location_id = :location "
+                + "                  AND    (   ( otype1.concept_id = ${165174} "
+                + "                               AND otype1.value_coded IS NOT NULL ) "
+                + "                  AND         ( ostate1.concept_id = ${165322} "
+                + "                                 AND  ostate1.value_coded IN (${1256}) ) ) "
+                + "                  AND  otype1.obs_group_id = ostate1.obs_group_id "
+                + "       GROUP BY mds1.patient_id ) mds_1st "
+                + "                  ON mds_1st.patient_id = mds2.patient_id "
+                + "                  WHERE mds2.voided = 0 "
+                + "                  AND enc2.voided = 0 "
+                + "                  AND otype2.voided = 0 "
+                + "                  AND ostate2.voided = 0 "
+                + "                  AND        enc2.encounter_type = ${6} "
+                + "                  AND        enc2.encounter_datetime > mds_1st.first_mds_date "
+                + "                  AND        enc2.location_id = :location "
+                + "                  AND    (   ( otype2.concept_id = ${165174} "
+                + "                               AND otype2.value_coded IS NOT NULL ) "
+                + "                  AND         ( ostate2.concept_id = ${165322} "
+                + "                                 AND  ostate2.value_coded = ${1256} ) ) "
+                + "                  AND  otype2.obs_group_id = ostate2.obs_group_id "
+                + "       GROUP BY mds2.patient_id ) mds_2nd "
+                + "                  ON mds_2nd.patient_id = mds3.patient_id "
+                + "                  WHERE mds3.voided = 0 "
+                + "                  AND enc3.voided = 0 "
+                + "                  AND enc3.encounter_datetime > mds_2nd.second_mds_date"
+                + "                  AND otype3.voided = 0 "
+                + "                  AND ostate3.voided = 0 "
+                + "                  AND        enc3.encounter_type = ${6} "
+                + "                  AND        enc3.location_id = :location "
+                + "                  AND    (   ( otype3.concept_id = ${165174} "
+                + "                               AND otype3.value_coded IS NOT NULL ) "
+                + "                  AND         ( ostate3.concept_id = ${165322} "
+                + "                                 AND  ostate3.value_coded = ${1256} ) ) "
+                + "                  AND  otype3.obs_group_id = ostate3.obs_group_id "
+                + "       GROUP BY mds3.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+
+    sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
+
+    return sqlPatientDataDefinition;
+  }
+
+  /**
    * MDS4 - Coluna AB - Quarto MDS marcado como "Início" numa consulta clínica (Ficha Clínica)
    * ocorrida entre 33 dias e 12 meses do início TARV (Data da Consulta >= “Data Início TARV” + 33
    * dias e <= “Data Início TARV” + 12 meses)
