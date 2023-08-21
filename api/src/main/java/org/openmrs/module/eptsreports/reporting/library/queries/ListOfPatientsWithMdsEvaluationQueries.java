@@ -3,7 +3,10 @@ package org.openmrs.module.eptsreports.reporting.library.queries;
 public class ListOfPatientsWithMdsEvaluationQueries {
 
   public static String getPatientsInitiatedART12Or24Months(
-      String inclusionStartMonthAndDay, String inclusionEndMonthAndDay, int numberOfYears) {
+      String inclusionStartMonthAndDay,
+      String inclusionEndMonthAndDay,
+      int numberOfYearsStartDate,
+      int numberOfYearsEndDate) {
     return "SELECT p.patient_id, "
         + "               Min(o.value_datetime) art_start "
         + "        FROM   patient p "
@@ -19,13 +22,13 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + inclusionStartMonthAndDay
         + "        ) "
         + "                                            ,INTERVAL "
-        + numberOfYears
+        + numberOfYearsStartDate
         + " YEAR) AND DATE_SUB( "
         + "  CONCAT(:evaluationYear,"
         + inclusionEndMonthAndDay
         + "        ) "
         + "                   ,INTERVAL "
-        + numberOfYears
+        + numberOfYearsEndDate
         + " YEAR) "
         + "               AND p.voided = 0 "
         + "               AND e.voided = 0 "
@@ -33,7 +36,8 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + "        GROUP  BY p.patient_id";
   }
 
-  public static String getTranferredPatients(String inclusionEndMonthAndDay, int numberOfYears) {
+  public static String getTranferredPatients(
+      String inclusionEndMonthAndDay, int numberOfYearsEndDate) {
     return "SELECT p.patient_id "
         + "		        FROM   patient p "
         + "		                INNER JOIN encounter e ON p.patient_id = e.patient_id "
@@ -64,7 +68,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + inclusionEndMonthAndDay
         + "        ) "
         + "                                            ,INTERVAL "
-        + numberOfYears
+        + numberOfYearsEndDate
         + " YEAR) "
         + "                 "
         + "                UNION "
@@ -86,7 +90,7 @@ public class ListOfPatientsWithMdsEvaluationQueries {
         + inclusionEndMonthAndDay
         + "        ) "
         + "                                            ,INTERVAL "
-        + numberOfYears
+        + numberOfYearsEndDate
         + " YEAR) "
         + "                  GROUP BY   p.patient_id "
         + "         )trf_out_resumo ";

@@ -25,7 +25,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
   private final CommonMetadata commonMetadata;
 
-  String inclusionStartMonthAndDay = "'-01-21'";
+  String inclusionStartMonthAndDay = "'-12-21'";
   String inclusionEndMonthAndDay = "'-06-20'";
 
   @Autowired
@@ -71,7 +71,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "      SELECT art_patient_12.patient_id "
             + "     FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "     ) art_patient_12 "
             + " WHERE  art_patient_12.patient_id  "
             + " NOT IN ( "
@@ -82,7 +82,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "     SELECT art_patient_24.patient_id "
             + "     FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "     ) art_patient_24 "
             + " WHERE  art_patient_24.patient_id  "
             + " NOT IN ( "
@@ -157,7 +157,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -245,7 +245,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "      SELECT art_patient_12.patient_id, '12 Meses' AS coort "
             + "     FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "     ) art_patient_12 "
             + " WHERE  art_patient_12.patient_id  "
             + " NOT IN ( "
@@ -256,7 +256,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "     SELECT art_patient_24.patient_id, '24 Meses' AS coort "
             + "     FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "     ) art_patient_24 "
             + " WHERE  art_patient_24.patient_id  "
             + " NOT IN ( "
@@ -412,7 +412,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -449,7 +449,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -486,7 +486,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -523,7 +523,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -560,7 +560,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -598,7 +598,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -636,7 +636,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -673,7 +673,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -710,7 +710,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -747,7 +747,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -786,7 +786,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -828,7 +828,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -968,7 +968,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1010,7 +1010,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1052,7 +1052,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1094,7 +1094,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                           SELECT art_patient.patient_id "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1176,7 +1176,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1206,7 +1206,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1277,7 +1277,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1316,7 +1316,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1369,7 +1369,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1408,7 +1408,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1504,7 +1504,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1534,7 +1534,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1621,7 +1621,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1671,7 +1671,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -1938,7 +1938,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2005,7 +2005,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2106,7 +2106,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "            art_patient.art_start AS art_encounter "
             + "     FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2155,7 +2155,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "            art_patient.art_start AS art_encounter "
             + "     FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2266,7 +2266,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2299,7 +2299,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2403,7 +2403,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2436,7 +2436,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2541,7 +2541,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2583,7 +2583,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2709,7 +2709,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2757,7 +2757,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2863,7 +2863,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2904,7 +2904,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -2993,7 +2993,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3053,7 +3053,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3141,7 +3141,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3178,7 +3178,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3274,7 +3274,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3359,7 +3359,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3494,7 +3494,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3604,7 +3604,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3741,7 +3741,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3820,7 +3820,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -3938,7 +3938,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -4023,7 +4023,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -4155,7 +4155,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -4261,7 +4261,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -4407,7 +4407,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -4517,7 +4517,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -4677,7 +4677,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -4811,7 +4811,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -4983,7 +4983,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -5118,7 +5118,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -5291,7 +5291,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -5426,7 +5426,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -5611,7 +5611,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -5771,7 +5771,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -5965,7 +5965,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 1)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
@@ -6117,7 +6117,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                                  art_patient.art_start AS art_encounter "
             + "                           FROM   ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2)
+                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
             + "                           ) art_patient "
             + " WHERE  art_patient.patient_id  "
             + " NOT IN ( "
