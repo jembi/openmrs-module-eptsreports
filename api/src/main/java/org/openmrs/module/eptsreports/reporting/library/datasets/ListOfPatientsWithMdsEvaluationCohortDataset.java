@@ -184,105 +184,105 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
     // B10.1 -Tipo de MDS: (MDS1) Coluna S
     pdd.addColumn(
         "mds_one_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(12),
         "evaluationYear=${evaluationYear},location=${location}",
         new DispensationTypeMdcConverter());
 
     // B10.2 - Data Início de MDS1: Coluna T
     pdd.addColumn(
         "mds_one_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.3 - Data Fim de MDS1: Coluna U
     pdd.addColumn(
         "mds_one_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.4 - Tipo de MDS: (MDS2) Coluna V
     pdd.addColumn(
         "mds_two_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(12),
         "evaluationYear=${evaluationYear},location=${location}",
         new DispensationTypeMdcConverter());
 
     // B10.5 - Data Início de MDS2: Coluna W
     pdd.addColumn(
         "mds_two_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.6 - Data Fim de MDS2: Coluna X
     pdd.addColumn(
         "mds_two_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.7 - Tipo de MDS: (MDS3) Coluna Y
     pdd.addColumn(
         "mds_three_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(12),
         "evaluationYear=${evaluationYear},location=${location}",
         new DispensationTypeMdcConverter());
 
     // B10.8 - Data Início de MDS3: Coluna Z
     pdd.addColumn(
         "mds_three_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.9 - Data Fim de MDS3: Coluna AA
     pdd.addColumn(
         "mds_three_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.10 - Tipo de MDS: (MDS4) Coluna AB
     pdd.addColumn(
         "mds_four_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(12),
         "evaluationYear=${evaluationYear},location=${location}",
         new DispensationTypeMdcConverter());
 
     // B10.11 - Data Início de MDS4: Coluna AC
     pdd.addColumn(
         "mds_four_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.12 - Data Fim de MDS4: Coluna AD
     pdd.addColumn(
         "mds_four_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.13 - Tipo de MDS: (MDS5) Coluna AE
     pdd.addColumn(
         "mds_five_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(12),
         "evaluationYear=${evaluationYear},location=${location}",
         new DispensationTypeMdcConverter());
 
     // B10.14 - Data Início de MDS5: Coluna AF
     pdd.addColumn(
         "mds_five_start_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
     // B10.15 - Data Fim de MDS5: Coluna AG
     pdd.addColumn(
         "mds_five_end_date_b",
-        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(),
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(12),
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 

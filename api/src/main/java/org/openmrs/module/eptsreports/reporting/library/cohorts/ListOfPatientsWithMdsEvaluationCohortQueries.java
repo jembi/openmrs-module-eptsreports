@@ -2497,7 +2497,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getPatientsPregnantBreastfeeding3MonthsTarv(
-      int minnumberYears, int maxnumberYearsYears) {
+      int minnumberYears, int maxnumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou Não");
@@ -2559,7 +2559,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + minnumberYears
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberYearsYears
+            + maxnumberOfYears
             + " MONTH ) "
             + "                  AND        o.concept_id = ${1982} "
             + "                  AND        o.value_coded IN ( ${1065}, "
@@ -2601,7 +2601,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + minnumberYears
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberYearsYears
+            + maxnumberOfYears
             + " MONTH ) "
             + "                  AND        o.concept_id = ${1982} "
             + "                  AND        o.value_coded IN ( ${1065}, "
@@ -2655,7 +2655,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getPatientsWithTbThirdToNineMonth(
-      int minnumberYears, int maxnumberYearsYears) {
+      int minnumberYears, int maxnumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B8-Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)");
@@ -2728,7 +2728,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + minnumberYears
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberYearsYears
+            + maxnumberOfYears
             + " MONTH ) "
             + "                  AND    (   ( o.concept_id = ${23758} "
             + "                               AND o.value_coded IN ( ${1065} ) ) "
@@ -2776,7 +2776,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + minnumberYears
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberYearsYears
+            + maxnumberOfYears
             + " MONTH ) "
             + "                  AND    (   ( o.concept_id = ${23758} "
             + "                               AND o.value_coded IN ( ${1065} ) ) "
@@ -2825,7 +2825,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getMdsDate(int minnumberYears, int maxnumberYearsYears) {
+  public DataDefinition getMdsDate(int minnumberYears, int maxnumberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)");
@@ -2881,7 +2881,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + minnumberYears
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberYearsYears
+            + maxnumberOfYears
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2922,7 +2922,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + minnumberYears
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberYearsYears
+            + maxnumberOfYears
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2945,7 +2945,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1() {
+  public DataDefinition getMds1(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS - (MDS1) Coluna S");
     sqlPatientDataDefinition.addParameter(
@@ -3008,7 +3008,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3068,7 +3070,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3103,7 +3107,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1StartDate() {
+  public DataDefinition getMds1StartDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Início de MDS1: Coluna T");
     sqlPatientDataDefinition.addParameter(
@@ -3156,7 +3160,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3193,7 +3199,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3215,7 +3223,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds2StartDate() {
+  public DataDefinition getMds2StartDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Início de MDS2: Coluna W");
     sqlPatientDataDefinition.addParameter(
@@ -3289,7 +3297,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3374,7 +3384,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3423,7 +3435,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds2EndDate() {
+  public DataDefinition getMds2EndDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Fim de MDS2: Coluna X");
     sqlPatientDataDefinition.addParameter(
@@ -3509,7 +3521,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3619,7 +3633,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3682,7 +3698,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds1EndDate() {
+  public DataDefinition getMds1EndDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("Data Fim de MDS1: Coluna U");
     sqlPatientDataDefinition.addParameter(
@@ -3756,7 +3772,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3835,7 +3853,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -3879,7 +3899,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds2() {
+  public DataDefinition getMds2(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS2) Coluna V");
     sqlPatientDataDefinition.addParameter(
@@ -3953,7 +3973,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -4038,7 +4060,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -4087,7 +4111,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds3() {
+  public DataDefinition getMds3(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS3) Coluna Y");
     sqlPatientDataDefinition.addParameter(
@@ -4170,7 +4194,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -4276,7 +4302,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -4337,7 +4365,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds3StartDate() {
+  public DataDefinition getMds3StartDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Início de MDS3: Coluna Z");
     sqlPatientDataDefinition.addParameter(
@@ -4422,7 +4450,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -4532,7 +4562,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -4595,7 +4627,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds3EndDate() {
+  public DataDefinition getMds3EndDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Fim de MDS3: Coluna AA");
     sqlPatientDataDefinition.addParameter(
@@ -4692,7 +4724,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -4826,7 +4860,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -4902,7 +4938,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds4() {
+  public DataDefinition getMds4(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS4) Coluna AB");
     sqlPatientDataDefinition.addParameter(
@@ -4998,7 +5034,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -5133,7 +5171,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -5210,7 +5250,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds4StartDate() {
+  public DataDefinition getMds4StartDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Início de MDS4: Coluna AC");
     sqlPatientDataDefinition.addParameter(
@@ -5306,7 +5346,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -5441,7 +5483,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -5518,7 +5562,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds4EndDate() {
+  public DataDefinition getMds4EndDate(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Data Fim de MDS4: Coluna AD");
     sqlPatientDataDefinition.addParameter(
@@ -5626,7 +5670,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -5786,7 +5832,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -5877,7 +5925,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {@link DataDefinition}
    */
-  public DataDefinition getMds5() {
+  public DataDefinition getMds5(int numberOfYears) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName("B10- Tipo de MDS: (MDS5) Coluna AE");
     sqlPatientDataDefinition.addParameter(
@@ -5980,7 +6028,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
@@ -6132,7 +6182,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL 33 DAY ) "
-            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL 12 MONTH ) "
+            + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
+            + numberOfYears
+            + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
             + "                  AND         ( ostate.concept_id = ${165322} "
