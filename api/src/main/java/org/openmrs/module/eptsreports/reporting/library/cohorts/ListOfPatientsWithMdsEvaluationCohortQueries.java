@@ -3416,7 +3416,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     String query =
         "                  SELECT     mds2_end.patient_id, "
             + "                             MIN(ee22.encounter_datetime) AS second_mds_end_date "
-            + "                  FROM       patient mds_2nd "
+            + "                  FROM       patient mds2_end "
             + "                  INNER JOIN encounter ee22 "
             + "                  ON         ee22.patient_id = mds2_end.patient_id "
             + "                  INNER JOIN obs ot22 "
