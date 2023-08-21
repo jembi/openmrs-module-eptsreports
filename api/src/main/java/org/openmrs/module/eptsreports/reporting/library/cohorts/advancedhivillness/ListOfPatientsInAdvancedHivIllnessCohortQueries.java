@@ -36,7 +36,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * <li>Utentes com critério de CD4 para início de seguimento no Modelo de DAH OR
    * <li>Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH
    *
-   * @see #getPatientsWhoStartedFollowupOnDAH()
+   * @see #getPatientsWhoStartedFollowupOnDAH(boolean) ()
    * @see #getPatientsWithCD4CriteriaToStartFollowupOnDAH()
    * @see #getPatientsWithCriterioEstadiamentoInicioSeguimento()
    * @return {@link CohortDefinition}
@@ -50,16 +50,20 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     cd.addParameters(getCohortParameters());
 
     cd.addSearch(
-        "STARTEDFOLLOWUP", EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(), mappings));
+        "STARTEDFOLLOWUP", EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(true), mappings));
 
     cd.addSearch(
         "CD4", EptsReportUtils.map(getPatientsWithCD4CriteriaToStartFollowupOnDAH(), mappings));
 
-    cd.addSearch(
-        "ESTADIO",
-        EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
+    cd.addSearch("ESTADIO", EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
 
-    cd.setCompositionString("STARTEDFOLLOWUP OR CD4 OR ESTADIO");
+    //EXCLUSIONS
+
+    cd.addSearch("FOLLOWUPBEFORESTARTDATE", EptsReportUtils.map(getPatientsWhoStartedFollowupOnDAH(false),mappings));
+
+    cd.addSearch("TRANSFERREDOUT", EptsReportUtils.map(getPatientsTransferredOutByTheEndOfPeriod(),"endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(STARTEDFOLLOWUP OR CD4 OR ESTADIO) AND NOT (FOLLOWUPBEFORESTARTDATE OR TRANSFERREDOUT)");
 
     return cd;
   }
@@ -83,9 +87,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     cd.addSearch(
         "CD4", EptsReportUtils.map(getPatientsWithCD4CriteriaToStartFollowupOnDAH(), mappings));
 
-    cd.addSearch(
-        "ESTADIO",
-        EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
+    cd.addSearch("ESTADIO", EptsReportUtils.map(getPatientsWithCriterioEstadiamentoInicioSeguimento(), mappings));
 
     cd.setCompositionString("CD4 OR ESTADIO");
 
@@ -99,9 +101,10 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
    * - encounter_datetime) na Ficha de DAH (encounter type = 90) durante o período de avaliação, ou
    * seja, “Data Início DAH” >= “Data Início Avaliação” e “Data Início DAH” <= “Data Fim Avaliação”
    *
+   * @param duringThePeriod Flag to change the evaluation period
    * @return {@link CohortDefinition}
    */
-  public CohortDefinition getPatientsWhoStartedFollowupOnDAH() {
+  public CohortDefinition getPatientsWhoStartedFollowupOnDAH(boolean duringThePeriod) {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName("Utentes que Iniciaram o seguimento na Ficha DAH");
@@ -115,11 +118,14 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "FROM "
             + "    patient p INNER JOIN encounter e ON p.patient_id = e.patient_id "
             + "WHERE p.voided = 0 AND e.voided = 0 "
-            + "  AND e.encounter_type = ${90} "
-            + "  AND e.encounter_datetime >= :startDate "
-            + "  AND e.encounter_datetime <= :endDate "
-            + "  AND e.location_id = :location "
-            + "GROUP BY p.patient_id";
+            + "  AND e.encounter_type = ${90} ";
+    query +=
+        duringThePeriod
+            ? "  AND e.encounter_datetime >= :startDate "
+                + "  AND e.encounter_datetime <= :endDate "
+            : " AND e.encounter_datetime < :startDate ";
+
+    query += "  AND e.location_id = :location " + "GROUP BY p.patient_id";
 
     StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
 
@@ -179,87 +185,25 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     return sqlCohortDefinition;
   }
 
-  /**
-   * <b>Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH</b>
+  /** <b> Utentes com critério de Estadiamento para início de seguimento no Modelo de DAH</b>
    *
-   * @see #getPatientsWithEstadioOnPeriod() OR
-   * @see #getPatientsWithOpportunisticDiseases()
+   * <li>
+   *     pelo menos um registo da lista representativa de Estadio IV (DAH_RF28),
+   *     no campo de “Infecções Oportunistas incluindo Sarcoma de Kaposi e outras
+   *     doenças”, na “Ficha Clínica – Ficha Mestra”, registada durante o período de
+   *     avaliação (“Data Consulta” >= “Data Início” e “Data Consulta” <= “Data Fim”) ou
+   * </li>
+   *
+   * <li>
+   *     pelo menos um registo da lista representativa de Estadio III (DAH_RF27),
+   *     no campo de “Infecções Oportunistas incluindo Sarcoma de Kaposi e outras
+   *     doenças”, na “Ficha Clínica – Ficha Mestra”, registada durante o período de
+   *     avaliação (“Data Consulta” >= “Data Início” e “Data Consulta” <= “Data Fim”)
+   * </li>
+   *
    * @return {@link CohortDefinition}
    */
   public CohortDefinition getPatientsWithCriterioEstadiamentoInicioSeguimento() {
-
-    CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-    cd.setName("Utentes com critério de Estadiamento para início de seguimento do Modelo dee DAH");
-    cd.addParameters(getCohortParameters());
-
-    cd.addSearch("ESTADIO", EptsReportUtils.map(getPatientsWithEstadioOnPeriod(), mappings));
-
-    cd.addSearch("DISEASES", EptsReportUtils.map(getPatientsWithOpportunisticDiseases(), mappings));
-
-    cd.setCompositionString("ESTADIO OR DISEASES");
-
-    return cd;
-  }
-
-  /**
-   *
-   * <li>Utentes com primeiro registo de “Estadio III” ou primeiro registo de “Estadio IV” decorrido
-   *     durante o período de avaliação (“Data Consulta” >= “Data Início Avaliação” e “Data
-   *     Consulta” <= “Data Fim Avaliação”)
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsWithEstadioOnPeriod() {
-
-    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
-    sqlCohortDefinition.setName(" Utentes com  Estadio III ou Estadio IV");
-    sqlCohortDefinition.addParameters(getCohortParameters());
-
-    Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
-    valuesMap.put("90", hivMetadata.getAdvancedHivIllnessEncounterType().getEncounterTypeId());
-    valuesMap.put("1206", hivMetadata.getWho3AdultStageConcept().getConceptId());
-    valuesMap.put("1207", hivMetadata.getWho4AdultStageConcept().getConceptId());
-    valuesMap.put("5356", hivMetadata.getcurrentWhoHivStageConcept().getConceptId());
-
-    String query =
-        "SELECT estadio.patient_id "
-            + "FROM   (SELECT p.patient_id, "
-            + "               Min(e.encounter_datetime) AS most_recent "
-            + "        FROM   patient p "
-            + "               INNER JOIN encounter e "
-            + "                       ON p.patient_id = e.patient_id "
-            + "               INNER JOIN obs o "
-            + "                       ON e.encounter_id = o.encounter_id "
-            + "        WHERE  p.voided = 0 "
-            + "               AND e.voided = 0 "
-            + "               AND o.voided = 0 "
-            + "               AND e.encounter_type IN ( ${6}, ${90} ) "
-            + "               AND o.concept_id = ${5356} "
-            + "               AND o.value_coded IN ( ${1206}, ${1207} ) "
-            + "               AND e.encounter_datetime >= :startDate "
-            + "               AND e.encounter_datetime <= :endDate "
-            + "               AND e.location_id = :location "
-            + "        GROUP  BY p.patient_id) estadio";
-
-    StringSubstitutor substitutor = new StringSubstitutor(valuesMap);
-
-    sqlCohortDefinition.setQuery(substitutor.replace(query));
-
-    return sqlCohortDefinition;
-  }
-
-  /**
-   *
-   * <li>Utentes com pelo menos um registo de “Infecções Oportunistas” da seguinte lista
-   *     representativa de Estadio III ou Estadio IV, na “Ficha Clínica – Ficha Mestra” durante o
-   *     período de avaliação (“Data Consulta” >= “Data Início Avaliação” e “Data Consulta” <= “Data
-   *     Fim Avaliação”)
-   *
-   * @return {@link CohortDefinition}
-   */
-  public CohortDefinition getPatientsWithOpportunisticDiseases() {
 
     SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
     sqlCohortDefinition.setName(" Utentes com Infecções Oportunistas");
@@ -269,6 +213,22 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     Map<String, Integer> valuesMap = new HashMap<>();
     valuesMap.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     valuesMap.put("1406", hivMetadata.getOtherDiagnosis().getConceptId());
+    valuesMap.put("5018", hivMetadata.getChronicDiarrheaConcept().getConceptId());
+    valuesMap.put("3", hivMetadata.getAnemiaConcept().getConceptId());
+    valuesMap.put("5945", hivMetadata.getFeverConcept().getConceptId());
+    valuesMap.put("43", hivMetadata.getPneumoniaConcept().getConceptId());
+    valuesMap.put("60", hivMetadata.getMeningitisConcept().getConceptId());
+    valuesMap.put("126", hivMetadata.getGingivitisConcept().getConceptId());
+    valuesMap.put("6783", hivMetadata.getEstomatiteUlcerativaNecrotizanteConcept().getConceptId());
+    valuesMap.put("5334", hivMetadata.getCandidiaseOralConcept().getConceptId());
+    valuesMap.put("1294", hivMetadata.getCryptococcalMeningitisConcept().getConceptId());
+    valuesMap.put("1570", hivMetadata.getCervicalCancerConcept().getConceptId());
+    valuesMap.put("5340", hivMetadata.getCandidiaseEsofagicaConcept().getConceptId());
+    valuesMap.put("5344", hivMetadata.getHerpesSimplesConcept().getConceptId());
+    valuesMap.put("14656", hivMetadata.getCachexiaConcept().getConceptId());
+    valuesMap.put("7180", hivMetadata.getToxoplasmoseConcept().getConceptId());
+    valuesMap.put(
+        "6990", hivMetadata.getHivDiseaseResultingInEncephalopathyConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id "
@@ -278,7 +238,7 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
             + "WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
             + "  AND e.encounter_type = ${6} "
             + "  AND o.concept_id = ${1406} "
-            + "  AND o.value_coded IS NOT NULL "
+            + "  AND o.value_coded IN (${3},${43},${126},${60},${1294},${1570},${5018},${5334},${5344},${5340},${5945},${6783},${6990},${7180},${14656}) "
             + "  AND e.encounter_datetime >= :startDate "
             + "  AND e.encounter_datetime <= :endDate "
             + "  AND e.location_id = :location";
@@ -1366,6 +1326,144 @@ public class ListOfPatientsInAdvancedHivIllnessCohortQueries {
     sqlPatientDataDefinition.setQuery(stringSubstitutor.replace(query));
 
     return sqlPatientDataDefinition;
+  }
+
+  /** <b> Utentes Transferidos paraOutra US</b>
+   *
+   * <li>
+   *     utentes registados como ‘Suspensos’ (último estado de inscrição) no programa
+   *     SERVIÇO TARV TRATAMENTO com “Data de Suspensão” <= “Data Fim” ou
+   * </li>
+   *
+   * <li>
+   *     utentes com registo do último estado [“Mudança Estado Permanência TARV” (Coluna 21)
+   *     = “T” (Transferido Para) na Ficha Clínica com “Data da Consulta Actual” (Coluna 1,
+   *     durante a qual se fez o registo da mudança do estado de permanência TARV) <= “Data Fim”; ou
+   * </li>
+   *
+   * <li>
+   *     utentes com último registo de “Mudança Estado Permanência TARV” = “Transferido Para”
+   *     na Ficha Resumo com “Data da Transferência” <= “Data Fim”;
+   * </li>
+   *
+   * <p>
+   *     excepto os utentes que tenham tido uma consulta clínica (Ficha Clínica) ou levantamento de ARV
+   *     (FILA) após a “Data de Transferência” (a data mais recente entre os critérios acima identificados)
+   *     e até “Data Fim”;
+   * </p>
+   *
+   * @return {@link CohortDefinition}
+   */
+  public CohortDefinition getPatientsTransferredOutByTheEndOfPeriod() {
+    SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition();
+
+    sqlCohortDefinition.setName("get Patients Transferred Out by end of the period ");
+    sqlCohortDefinition.addParameter(new Parameter("endDate", "endDate", Date.class));
+    sqlCohortDefinition.addParameter(new Parameter("location", "Location", Location.class));
+
+    Map<String, Integer> map = new HashMap<>();
+    map.put(
+            "6",
+            hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
+    map.put(
+            "53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put(
+            "6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
+    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("2", hivMetadata.getARTProgram().getProgramId());
+    map.put("7", hivMetadata.getTransferredOutToAnotherHealthFacilityWorkflowState().getProgramWorkflowStateId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+
+    String query =
+            "  SELECT mostrecent.patient_id "
+                    + "FROM ("
+                    + " SELECT lastest.patient_id ,Max(lastest.last_date) as  last_date "
+                    + " FROM (  "
+                    + "    SELECT p.patient_id ,ps.start_date AS last_date  "
+                    + "    FROM patient p   "
+                    + "        INNER JOIN patient_program pg   "
+                    + "            ON p.patient_id=pg.patient_id   "
+                    + "        INNER JOIN patient_state ps   "
+                    + "            ON pg.patient_program_id=ps.patient_program_id   "
+                    + "    WHERE pg.voided=0   "
+                    + "        AND ps.voided=0   "
+                    + "        AND p.voided=0   "
+                    + "        AND pg.program_id= ${2}  "
+                    + "        AND ps.state = ${7}   "
+                    + "        AND ps.end_date is null "
+                    + "        AND ps.start_date <= :endDate   "
+                    + "        AND pg.location_id= :location   "
+                    + "         GROUP BY p.patient_id  "
+                    + "  "
+                    + "    UNION  "
+                    + "  "
+                    + "    SELECT  p.patient_id,  Max(e.encounter_datetime) AS last_date  "
+                    + "    FROM patient p    "
+                    + "        INNER JOIN encounter e   "
+                    + "            ON e.patient_id=p.patient_id   "
+                    + "        INNER JOIN obs o   "
+                    + "            ON o.encounter_id=e.encounter_id   "
+                    + "    WHERE  p.voided = 0   "
+                    + "        AND e.voided = 0   "
+                    + "        AND o.voided = 0   "
+                    + "        AND e.encounter_type = ${6}   "
+                    + "        AND o.concept_id = ${6273}  "
+                    + "        AND o.value_coded =  ${1706}   "
+                    + "        AND e.encounter_datetime <= :endDate   "
+                    + "        AND e.location_id =  :location   "
+                    + "         GROUP BY p.patient_id  "
+                    + "  "
+                    + "    UNION   "
+                    + "  "
+                    + "    SELECT  p.patient_id , Max(o.obs_datetime) AS last_date  "
+                    + "    FROM patient p    "
+                    + "        INNER JOIN encounter e   "
+                    + "            ON e.patient_id=p.patient_id   "
+                    + "        INNER JOIN obs o   "
+                    + "            ON o.encounter_id=e.encounter_id   "
+                    + "    WHERE  p.voided = 0   "
+                    + "        AND e.voided = 0   "
+                    + "        AND o.voided = 0   "
+                    + "        AND e.encounter_type = ${53}  "
+                    + "        AND o.concept_id = ${6272}  "
+                    + "        AND o.value_coded = ${1706}   "
+                    + "        AND o.obs_datetime <= :endDate   "
+                    + "        AND e.location_id =  :location  "
+                    + "         GROUP BY p.patient_id  "
+                    + ") lastest   "
+                    + " WHERE lastest.patient_id NOT IN( "
+                    + " SELECT p.patient_id  "
+                    + "      FROM   patient p  "
+                    + "             JOIN encounter e  "
+                    + "               ON p.patient_id = e.patient_id  "
+                    + "      WHERE  p.voided = 0  "
+                    + "             AND e.voided = 0  "
+                    + "             AND e.encounter_type = ${6}   "
+                    + "             AND e.location_id = :location  "
+                    + "             AND e.encounter_datetime > lastest.last_date  "
+                    + "                 UNION"
+                    + "  SELECT p.patient_id"
+                    + "      FROM   patient p"
+                    + "            JOIN encounter e ON p.patient_id = e.patient_id "
+                    + "            JOIN obs o ON e.encounter_id = o.encounter_id "
+                    + "     WHERE  p.voided = 0"
+                    + "            AND e.voided = 0 "
+                    + "            AND o.voided = 0 "
+                    + "            AND e.encounter_type = ${52}   " +
+                    "              AND o.concept_id = ${23866}   " +
+                    "              AND o.value_datetime > lastest.last_date )  "
+                    + " GROUP BY lastest.patient_id )mostrecent "
+                    + " GROUP BY mostrecent.patient_id";
+
+    StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
+    
+    String mappedQuery = stringSubstitutor.replace(query);
+
+    sqlCohortDefinition.setQuery(mappedQuery);
+
+    return sqlCohortDefinition;
   }
 
   private Map<String, Integer> getStringIntegerMap() {

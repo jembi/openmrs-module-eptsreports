@@ -423,8 +423,8 @@ public class ListOfPatientsInAdvancedHivIllnessDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "ON_MDS",
             EptsReportUtils.map(
-                listOfPatientsInAdvancedHivIllnessCohortQueries
-                    .getPatientsWhoStartedFollowupOnDAH(),
+                listOfPatientsInAdvancedHivIllnessCohortQueries.getPatientsWhoStartedFollowupOnDAH(
+                    true),
                 mappings));
 
     dataSetDefinition.addColumn(

@@ -25,15 +25,12 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "WHERE  ps.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
-            + "       AND ( ( ( e.encounter_type IN ( ${6}, ${13}, ${51} ) "
-            + "                 AND o.concept_id = ${1695} ) "
-            + "                OR ( e.encounter_type = ${90} "
-            + "                     AND o.concept_id = ${165389} "
-            + "                     AND o.value_coded = ${1695} ) ) "
-            + "             AND o.value_numeric < "
+            + "       AND e.encounter_type IN ( ${6}, ${13}, ${51} ) "
+            + "       AND o.concept_id = ${1695}  "
+            + "       AND o.value_numeric < "
             + valueNumeric
-            + "             AND e.encounter_datetime >= :startDate "
-            + "             AND e.encounter_datetime <= :endDate ) "
+            + "       AND e.encounter_datetime >= :startDate "
+            + "       AND e.encounter_datetime <= :endDate "
             + "       AND e.location_id = :location";
 
     return mostRecentDate
@@ -59,7 +56,7 @@ public class ListOfPatientsOnAdvancedHivIllnessQueries {
             + "    person ps INNER JOIN encounter e ON ps.person_id= e.patient_id "
             + "              INNER JOIN obs o on e.encounter_id = o.encounter_id "
             + "WHERE ps.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "  AND e.encounter_type = ${53} "
+            + "  AND e.encounter_type IN ( ${53}, ${90} ) "
             + "  AND o.concept_id = ${1695} "
             + "  AND o.value_numeric < "
             + valueNumeric
