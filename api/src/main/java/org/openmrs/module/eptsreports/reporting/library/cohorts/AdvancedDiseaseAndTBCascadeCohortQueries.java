@@ -61,22 +61,18 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     CohortDefinition pregnant = txNewCohortQueries.getPatientsPregnantEnrolledOnART(false);
     CohortDefinition consecutiveVL = getPatientsWithTwoConsecutiveVLGreaterThan1000();
     CohortDefinition reinitiatedArt = getPatientsWhoReinitiatedArt();
-    CohortDefinition transferredOut = transferredInCohortQueries.getTrfOut();
-    CohortDefinition death = resumoMensalCohortQueries.getPatientsWhoDied(false);
+    CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
     cd.addSearch("initiatedArt", EptsReportUtils.map(initiatedArt, mappings));
     cd.addSearch("pregnant", EptsReportUtils.map(pregnant, mappings));
     cd.addSearch("consecutiveVL", EptsReportUtils.map(consecutiveVL, mappings));
     cd.addSearch("reinitiatedArt", EptsReportUtils.map(reinitiatedArt, mappings));
     cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(transferredOut, "startDate=${generationDate},location=${location}"));
-    cd.addSearch(
-        "death",
-        EptsReportUtils.map(death, "onOrBefore=${generationDate},locationList=${location}"));
+        "exclusion",
+        EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
 
     cd.setCompositionString(
-        "(initiatedArt OR pregnant OR consecutiveVL OR reinitiatedArt) NOT (transferredOut OR death)");
+        "(initiatedArt OR pregnant OR consecutiveVL OR reinitiatedArt) NOT exclusion");
 
     return cd;
   }
@@ -91,7 +87,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.setName("Clients Eligible For Cd4");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-    cd.addParameter(new Parameter("location", "End Date", Location.class));
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
 
     CohortDefinition eligibleCd4 = getClientsEligibleForCd4();
     CohortDefinition anyResult = getPatientsWithCD4Count();
@@ -100,6 +96,24 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch("anyResult", EptsReportUtils.map(anyResult, mappings));
 
     cd.setCompositionString("eligibleCd4 AND anyResult");
+
+    return cd;
+  }
+
+  public CohortDefinition getPatientsTransferredOutOrDead() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition transferredOut = transferredInCohortQueries.getTrfOut();
+    CohortDefinition death = resumoMensalCohortQueries.getPatientsWhoDied(false);
+
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(transferredOut, "startDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "death", EptsReportUtils.map(death, "onOrBefore=${endDate},locationList=${location}"));
 
     return cd;
   }
