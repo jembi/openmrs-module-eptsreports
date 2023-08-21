@@ -3414,11 +3414,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1267", hivMetadata.getCompletedConcept().getConceptId());
 
     String query =
-        "                  SELECT     mds_2nd.patient_id, "
+        "                  SELECT     mds2_end.patient_id, "
             + "                             MIN(ee22.encounter_datetime) AS second_mds_end_date "
             + "                  FROM       patient mds_2nd "
             + "                  INNER JOIN encounter ee22 "
-            + "                  ON         ee22.patient_id = mds_2nd.patient_id "
+            + "                  ON         ee22.patient_id = mds2_end.patient_id "
             + "                  INNER JOIN obs ot22 "
             + "                  ON         ot22.encounter_id = ee22.encounter_id "
             + "                  INNER JOIN obs os22 "
@@ -3503,11 +3503,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND  ot22.obs_group_id = os22.obs_group_id "
             + "       GROUP BY mds2_end.patient_id "
             + "UNION "
-            + "                  SELECT     mds_2nd.patient_id, "
+            + "                  SELECT     mds2_end.patient_id, "
             + "                             MIN(ee22.encounter_datetime) AS second_mds_end_date "
-            + "                  FROM       patient mds_2nd "
+            + "                  FROM       patient mds2_end "
             + "                  INNER JOIN encounter ee22 "
-            + "                  ON         ee22.patient_id = mds_2nd.patient_id "
+            + "                  ON         ee22.patient_id = mds2_end.patient_id "
             + "                  INNER JOIN obs ot22 "
             + "                  ON         ot22.encounter_id = ee22.encounter_id "
             + "                  INNER JOIN obs os22 "
