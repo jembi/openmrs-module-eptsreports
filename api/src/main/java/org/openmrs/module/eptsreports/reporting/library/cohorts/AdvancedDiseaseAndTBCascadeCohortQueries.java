@@ -114,6 +114,31 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         EptsReportUtils.map(transferredOut, "startDate=${endDate},location=${location}"));
     cd.addSearch(
         "death", EptsReportUtils.map(death, "onOrBefore=${endDate},locationList=${location}"));
+    cd.setCompositionString("transferredOut OR death");
+
+    return cd;
+  }
+
+  /**
+   * Number of clients with CD count during inclusion period showing severe immunodepression
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getPatientsWithSevereImmunodepression() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition transferredOut = transferredInCohortQueries.getTrfOut();
+    CohortDefinition death = resumoMensalCohortQueries.getPatientsWhoDied(false);
+
+    cd.addSearch(
+        "transferredOut",
+        EptsReportUtils.map(transferredOut, "startDate=${endDate},location=${location}"));
+    cd.addSearch(
+        "death", EptsReportUtils.map(death, "onOrBefore=${endDate},locationList=${location}"));
+    cd.setCompositionString("transferredOut OR death");
 
     return cd;
   }
