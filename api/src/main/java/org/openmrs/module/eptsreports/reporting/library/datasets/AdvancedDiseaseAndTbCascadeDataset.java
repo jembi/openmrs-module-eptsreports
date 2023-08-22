@@ -35,6 +35,8 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
   private final String inclusionPeriod =
       "startDate=${endDate-2m+1d},endDate=${endDate-1m},location=${location}";
 
+  private final String mappings = "startDate=${startDate},endDate=${endDate},location=${location}";
+
   public DataSetDefinition constructAdvancedDiseaseAndTbCascadeDataset() {
 
     CohortIndicatorDataSetDefinition dataSetDefinition = new CohortIndicatorDataSetDefinition();
@@ -56,8 +58,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "eligibleCd4Ind",
             EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4(),
-                inclusionPeriod));
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsEligibleForCd4(), mappings));
 
     addRow(
         dataSetDefinition,
@@ -76,8 +77,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         eptsGeneralIndicator.getIndicator(
             "cd4CountInd",
             EptsReportUtils.map(
-                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4Count(),
-                inclusionPeriod));
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithCd4Count(), mappings));
 
     addRow(
         dataSetDefinition,
@@ -90,6 +90,27 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "cd4CountTotal",
         "ClientsWithCd4Total",
         EptsReportUtils.map(cd4CountInd, inclusionPeriod),
+        "");
+
+    // Severe Immunosuppression
+    CohortIndicator severeIndicator =
+        eptsGeneralIndicator.getIndicator(
+            "severeIndicator",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithSevereImmunodepression(),
+                mappings));
+
+    addRow(
+        dataSetDefinition,
+        "severeCount",
+        "ClientsWithSevereImmunodepression",
+        EptsReportUtils.map(severeIndicator, inclusionPeriod),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeCountTotal",
+        "ClientsWithSevereImmunodepressionTotal",
+        EptsReportUtils.map(severeIndicator, inclusionPeriod),
         "");
 
     return dataSetDefinition;

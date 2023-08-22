@@ -26,6 +26,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   private TxNewCohortQueries txNewCohortQueries;
   private TransferredInCohortQueries transferredInCohortQueries;
   private ResumoMensalCohortQueries resumoMensalCohortQueries;
+  private AgeCohortQueries ageCohortQueries;
 
   private final String reportingPeriod =
       "startDate=${endDate}-2m,endDate=${generationDate},location=${location}";
@@ -39,7 +40,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
       TxNewCohortQueries txNewCohortQueries,
       TXTBCohortQueries txtbCohortQueries,
       ResumoMensalCohortQueries resumoMensalCohortQueries,
-      TransferredInCohortQueries transferredInCohortQueries) {
+      TransferredInCohortQueries transferredInCohortQueries,
+      AgeCohortQueries ageCohortQueries) {
 
     this.hivMetadata = hivMetadata;
     this.tbMetadata = tbMetadata;
@@ -48,6 +50,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     this.txtbCohortQueries = txtbCohortQueries;
     this.resumoMensalCohortQueries = resumoMensalCohortQueries;
     this.transferredInCohortQueries = transferredInCohortQueries;
+    this.ageCohortQueries = ageCohortQueries;
   }
 
   public CohortDefinition getClientsEligibleForCd4() {
@@ -124,21 +127,54 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-  public CohortDefinition getPatientsWithSevereImmunodepression() {
+  public CohortDefinition getClientsWithSevereImmunodepression() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
     cd.addParameter(new Parameter("location", "Facility", Location.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition transferredOut = transferredInCohortQueries.getTrfOut();
-    CohortDefinition death = resumoMensalCohortQueries.getPatientsWhoDied(false);
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition cd4Count = getClientsWithCd4Count();
+
+    CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
     cd.addSearch(
-        "transferredOut",
-        EptsReportUtils.map(transferredOut, "startDate=${endDate},location=${location}"));
+        "anyTbLam",
+        EptsReportUtils.map(
+            anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+    cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
+
     cd.addSearch(
-        "death", EptsReportUtils.map(death, "onOrBefore=${endDate},locationList=${location}"));
-    cd.setCompositionString("transferredOut OR death");
+        "exclusion",
+        EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
+
+    cd.setCompositionString("(anyTbLam OR cd4Count) NOT exclusion");
+
+    return cd;
+  }
+
+  /**
+   * @param cd4 - Absolute CD4 count
+   * @param minAge minimum age of patient base on effective date
+   * @param maxAge maximum age of patent base on effective date
+   * @return CohortDefinition */
+
+  private CohortDefinition getPatientsWithCd4AndAge(
+      Cd4CountComparison cd4, Integer minAge, Integer maxAge) {
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition absoluteCd4 = getPatientsWithAbsoluteCd4Count(cd4);
+    CohortDefinition age = ageCohortQueries.createXtoYAgeCohort("Age", minAge, maxAge);
+
+    cd.addSearch("absoluteCd4", EptsReportUtils.map(absoluteCd4, mappings));
+
+    cd.addSearch("age", EptsReportUtils.map(age, "effectiveDate=${endDate}"));
+
+    cd.setCompositionString("absoluteCd4 AND age");
 
     return cd;
   }
@@ -340,8 +376,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    * <ul>
    *   <li>TB LAM result registered in the Investigações – Resultados Laboratoriais as @tbLamResult
    *       in Ficha Clínica or
-   *   <li>TB LAM result marked as Positive in the Laboratory Form or
-   *   <li>TB LAM result marked as Positive in Ficha DAH
+   *   <li>TB LAM result marked as @tbLamResult in the Laboratory Form or
+   *   <li>TB LAM result marked as @tbLamResult in Ficha DAH
    * </ul>
    *
    * @return CohortDefinition *
