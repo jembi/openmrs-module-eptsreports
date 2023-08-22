@@ -4395,7 +4395,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
 
     String query =
         "                  SELECT     mds3_end.patient_id, "
-            + "                             MIN(enc3.encounter_datetime) AS third_mds_date "
+            + "                             MIN(ee33.encounter_datetime) AS third_mds_end_date "
             + "                  FROM       patient mds3_end "
             + "                  INNER JOIN encounter ee33 "
             + "                  ON         ee33.patient_id = mds3_end.patient_id "
@@ -4509,7 +4509,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "       GROUP BY mds3_end.patient_id "
             + "UNION "
             + "                  SELECT     mds3_end.patient_id, "
-            + "                             MIN(enc3.encounter_datetime) AS third_mds_date "
+            + "                             MIN(ee33.encounter_datetime) AS third_mds_end_date "
             + "                  FROM       patient mds3_end "
             + "                  INNER JOIN encounter ee33 "
             + "                  ON         ee33.patient_id = mds3_end.patient_id "
