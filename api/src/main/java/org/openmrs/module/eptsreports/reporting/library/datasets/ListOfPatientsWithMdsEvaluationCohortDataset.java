@@ -331,6 +331,111 @@ public class ListOfPatientsWithMdsEvaluationCohortDataset extends BaseDataSet {
         "evaluationYear=${evaluationYear},location=${location}",
         null);
 
+    // C10.1 -Tipo de MDS: (MDS1) Coluna AY
+    pdd.addColumn(
+        "mds_one_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // C10.2 - Data Início de MDS1: Coluna AZ
+    pdd.addColumn(
+        "mds_one_start_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1StartDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.3 - Data Fim de MDS1: Coluna BA
+    pdd.addColumn(
+        "mds_one_end_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds1EndDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.4 - Tipo de MDS: (MDS2) Coluna BB
+    pdd.addColumn(
+        "mds_two_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // C10.5 - Data Início de MDS2: Coluna BC
+    pdd.addColumn(
+        "mds_two_start_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2StartDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.6 - Data Fim de MDS2: Coluna BD
+    pdd.addColumn(
+        "mds_two_end_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds2EndDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.7 - Tipo de MDS: (MDS3) Coluna BE
+    pdd.addColumn(
+        "mds_three_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // C10.8 - Data Início de MDS3: Coluna BF
+    pdd.addColumn(
+        "mds_three_start_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3StartDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.9 - Data Fim de MDS3: Coluna BG
+    pdd.addColumn(
+        "mds_three_end_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds3EndDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.10 - Tipo de MDS: (MDS4) Coluna BH
+    pdd.addColumn(
+        "mds_four_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // C10.11 - Data Início de MDS4: Coluna BI
+    pdd.addColumn(
+        "mds_four_start_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4StartDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.12 - Data Fim de MDS4: Coluna BJ
+    pdd.addColumn(
+        "mds_four_end_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds4EndDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.13 - Tipo de MDS: (MDS5) Coluna BK
+    pdd.addColumn(
+        "mds_five_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        new DispensationTypeMdcConverter());
+
+    // C10.14 - Data Início de MDS5: Coluna BL
+    pdd.addColumn(
+        "mds_five_start_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5StartDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
+    // C10.15 - Data Fim de MDS5: Coluna BM
+    pdd.addColumn(
+        "mds_five_end_date_c",
+        listOfPatientsWithMdsEvaluationCohortQueries.getMds5EndDate(24),
+        "evaluationYear=${evaluationYear},location=${location}",
+        null);
+
     return pdd;
   }
 
