@@ -158,8 +158,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    * @param cd4 - Absolute CD4 count
    * @param minAge minimum age of patient base on effective date
    * @param maxAge maximum age of patent base on effective date
-   * @return CohortDefinition */
-
+   * @return CohortDefinition
+   */
   private CohortDefinition getPatientsWithCd4AndAge(
       Cd4CountComparison cd4, Integer minAge, Integer maxAge) {
     CompositionCohortDefinition cd = new CompositionCohortDefinition();

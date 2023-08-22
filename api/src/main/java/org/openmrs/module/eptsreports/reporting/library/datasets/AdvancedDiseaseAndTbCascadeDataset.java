@@ -215,32 +215,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             EptsCommonDimensionKey.of(DimensionKeyForAge.unknown)
                 .and(DimensionKeyForGender.male)
                 .getDimensions(),
-            "MUN"),
-        // CD4 Dimensions
-        new ColumnParameters(
-            "CD4<750Female<1", "CD4<750 Female <1 ", "age=<1|gender=F|cd4=750-", "CF1"),
-        new ColumnParameters(
-            "CD4<500Female1-4", "CD4<500 Female 1-4 ", "age=1-4|gender=F|cd4=500-", "CF4"),
-        new ColumnParameters(
-            "CD4<200Female5-9", "CD4<200 Female 5-9 ", "age=5-9|gender=F|cd4=200-", "CF9"),
-        new ColumnParameters(
-            "CD4<200Female10-14", "CD4<200 Female 10-14 ", "age=10-14|gender=F|cd4=200-", "CF14"),
-        new ColumnParameters(
-            "CD4<200Female15-19", "CD4<200 Female 15-19 ", "age=15-19|gender=F|cd4=200-", "CF19"),
-        new ColumnParameters(
-            "CD4<200Female20+", "CD4<200 Female 20+ ", "age=20+|gender=F|cd4=200-", "CF20"),
-        new ColumnParameters(
-            "CD4<750Male<1", "CD4<750 Male <1 ", "age=<1|gender=M|cd4=750-", "CM1"),
-        new ColumnParameters(
-            "CD4<500Male1-4", "CD4<500 Male 1-4 ", "age=1-4|gender=M|cd4=500-", "CM4"),
-        new ColumnParameters(
-            "CD4<200Male5-9", "CD4<200 Male 5-9 ", "age=5-9|gender=M|cd4=200-", "CM9"),
-        new ColumnParameters(
-            "CD4<200Male10-14", "CD4<200 Male 10-14 ", "age=10-14|gender=M|cd4=200-", "CM14"),
-        new ColumnParameters(
-            "CD4<200Male15-19", "CD4<200 Male 15-19 ", "age=15-19|gender=M|cd4=200-", "CM19"),
-        new ColumnParameters(
-            "CD4<200Male20+", "CD4<200 Male 20+ ", "age=20+|gender=M|cd4=200-", "CM20"));
+            "MUN"));
   }
 
   @Override
