@@ -43,7 +43,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "       INNER JOIN ( "
-        + HighViralLoadQueries.getSessionZeroQuery()
+        + getSessionZeroQuery()
         + " ) apss_session_zero "
         + "       ON p.patient_id = apss_session_zero.patient_id "
         + "WHERE  p.voided = 0 "
@@ -69,7 +69,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "       INNER JOIN ( "
-        + HighViralLoadQueries.getSessionOneQuery()
+        + getSessionOneQuery()
         + "              ) apss_session_one "
         + "       ON p.patient_id = apss_session_one.patient_id "
         + "WHERE  p.voided = 0 "
@@ -95,7 +95,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "       INNER JOIN ( "
-        + HighViralLoadQueries.getSessionTwoQuery()
+        + getSessionTwoQuery()
         + "        ) apss_session_two "
         + "           ON p.patient_id = apss_session_two.patient_id "
         + " WHERE  p.voided = 0 "
@@ -122,7 +122,7 @@ public class HighViralLoadQueries {
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
             + "INNER JOIN ( "
-            + HighViralLoadQueries.getSessionThreeQuery()
+            + getSessionThreeQuery()
             + "          ) session_three ON p.patient_id = session_three.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
@@ -158,7 +158,7 @@ public class HighViralLoadQueries {
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
             + "INNER JOIN ( "
-            + HighViralLoadQueries.getSessionThreeQuery()
+            + getSessionThreeQuery()
             + "          ) session_three ON p.patient_id = session_three.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
@@ -193,7 +193,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "        INNER JOIN ( "
-        + HighViralLoadQueries.getColumnFQuery(true)
+        + getColumnFQuery(true)
         + " ) af_date on p.patient_id = af_date.patient_id "
         + " WHERE  p.voided = 0 "
         + "        AND e.voided = 0 "
@@ -218,7 +218,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "        INNER JOIN ( "
-        + HighViralLoadQueries.getColumnFQuery(true)
+        + getColumnFQuery(true)
         + " ) af_date on p.patient_id = af_date.patient_id "
         + " WHERE  p.voided = 0 "
         + "        AND e.voided = 0 "
@@ -243,7 +243,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "        INNER JOIN ( "
-        + HighViralLoadQueries.getApssSessionZero()
+        + getApssSessionZero()
         + " ) session_date on p.patient_id = session_date.patient_id "
         + " WHERE  p.voided = 0 "
         + "        AND e.voided = 0 "
@@ -267,7 +267,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "        INNER JOIN ( "
-        + HighViralLoadQueries.getApssSessionZero()
+        + getApssSessionZero()
         + " ) session_date on p.patient_id = session_date.patient_id "
         + " WHERE  p.voided = 0 "
         + "        AND e.voided = 0 "
@@ -292,7 +292,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "        INNER JOIN ( "
-        + HighViralLoadQueries.getApssSessionOne()
+        + getApssSessionOne()
         + " ) session_date on p.patient_id = session_date.patient_id "
         + " WHERE  p.voided = 0 "
         + "        AND e.voided = 0 "
@@ -316,7 +316,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "        INNER JOIN ( "
-        + HighViralLoadQueries.getApssSessionOne()
+        + getApssSessionOne()
         + " ) session_date on p.patient_id = session_date.patient_id "
         + " WHERE  p.voided = 0 "
         + "        AND e.voided = 0 "
@@ -341,7 +341,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "        INNER JOIN ( "
-        + HighViralLoadQueries.getApssSessionTwo()
+        + getApssSessionTwo()
         + " ) session_date on p.patient_id = session_date.patient_id "
         + " WHERE  p.voided = 0 "
         + "        AND e.voided = 0 "
@@ -365,7 +365,7 @@ public class HighViralLoadQueries {
         + "       INNER JOIN obs o "
         + "               ON e.encounter_id = o.encounter_id "
         + "        INNER JOIN ( "
-        + HighViralLoadQueries.getApssSessionTwo()
+        + getApssSessionTwo()
         + " ) session_date on p.patient_id = session_date.patient_id "
         + " WHERE  p.voided = 0 "
         + "        AND e.voided = 0 "
@@ -401,7 +401,7 @@ public class HighViralLoadQueries {
             + "       INNER JOIN obs o "
             + "               ON e.encounter_id = o.encounter_id "
             + "INNER JOIN ( "
-            + HighViralLoadQueries.getApssSessionThree()
+            + getApssSessionThree()
             + "          ) session_three ON p.patient_id = session_three.patient_id "
             + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
