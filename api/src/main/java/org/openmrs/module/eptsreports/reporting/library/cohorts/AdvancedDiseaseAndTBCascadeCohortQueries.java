@@ -213,6 +213,97 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
+   * Clients With Cd4 count without- severe immunodepression by report generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithoutSevereImmunodepression() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition cd4Count = getClientsWithCd4Count();
+    CohortDefinition cd200AgeFiveOrOver =
+            getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo200mm3, 5, null);
+    CohortDefinition cd500AgeBetweenOneAndFour =
+            getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo500mm3, 1, 4);
+    CohortDefinition cd750AgeUnderYear =
+            getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo750mm3, 1, null);
+
+    CohortDefinition exclusion = getPatientsTransferredOutOrDead();
+
+    cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
+    cd.addSearch("cd4Over200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
+    cd.addSearch("cd4Over500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
+    cd.addSearch("cd4Over750", EptsReportUtils.map(cd750AgeUnderYear, mappings));
+
+    cd.addSearch(
+            "exclusion",
+            EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
+
+    cd.setCompositionString(
+            "((cd4Over200 OR cd4Over500 OR cd4Over750) AND cd4Count) AND NOT exclusion");
+
+    return cd;
+  }
+
+  /**
+   * Clients With Cd4 count and without immunodepression and without TB Lam Result by report generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithoutSevereImmunodepressionAndWithTbLamResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition severeImmunodepression = getClientsWithoutSevereImmunodepression();
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+
+    cd.addSearch("severeImmunodepression", EptsReportUtils.map(severeImmunodepression, mappings));
+    cd.addSearch(
+            "anyTbLam",
+            EptsReportUtils.map(
+                    anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+
+    cd.setCompositionString("(severeImmunodepression AND anyTbLam)");
+
+    return cd;
+  }
+
+  /**
+   * Clients With Cd4 count and without immunodepression and without TB Lam Result by report generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithoutSevereImmunodepressionAndWithoutTbLamResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition severeImmunodepression = getClientsWithoutSevereImmunodepression();
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+
+    cd.addSearch("severeImmunodepression", EptsReportUtils.map(severeImmunodepression, mappings));
+    cd.addSearch(
+            "anyTbLam",
+            EptsReportUtils.map(
+                    anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+
+    cd.setCompositionString("(severeImmunodepression AND NOT anyTbLam)");
+
+    return cd;
+  }
+
+  /**
    * @param cd4 - Absolute CD4 count
    * @param minAge minimum age of patient base on effective date
    * @param maxAge maximum age of patent base on effective date
