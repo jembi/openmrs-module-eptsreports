@@ -75,7 +75,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
         EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
 
     cd.setCompositionString(
-        "(initiatedArt OR pregnant OR consecutiveVL OR reinitiatedArt) NOT exclusion");
+        "(initiatedArt OR pregnant OR consecutiveVL OR reinitiatedArt) AND NOT exclusion");
 
     return cd;
   }
@@ -134,22 +134,53 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 
-    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
     CohortDefinition cd4Count = getClientsWithCd4Count();
+    CohortDefinition cd200AgeFiveOrOver =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo200mm3, 5, null);
+    CohortDefinition cd500AgeBetweenOneAndFour =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo500mm3, 1, 4);
+    CohortDefinition cd750AgeUnderYear =
+        getPatientsWithCd4AndAge(Cd4CountComparison.LessThanOrEqualTo750mm3, 1, null);
 
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
-    cd.addSearch(
-        "anyTbLam",
-        EptsReportUtils.map(
-            anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
     cd.addSearch("cd4Count", EptsReportUtils.map(cd4Count, mappings));
+    cd.addSearch("cd4Under200", EptsReportUtils.map(cd200AgeFiveOrOver, mappings));
+    cd.addSearch("cd4Under500", EptsReportUtils.map(cd500AgeBetweenOneAndFour, mappings));
+    cd.addSearch("cd4Under750", EptsReportUtils.map(cd750AgeUnderYear, mappings));
 
     cd.addSearch(
         "exclusion",
         EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
 
-    cd.setCompositionString("(anyTbLam OR cd4Count) NOT exclusion");
+    cd.setCompositionString(
+        "((cd4Under200 OR cd4Under500 OR cd4Under750) AND cd4Count) AND NOT exclusion");
+
+    return cd;
+  }
+  /**
+   * Clients With Cd4 count and TB Lam Result by report generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithSevereImmunodepressionAndTbLamResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition severeImmunodepression = getClientsWithSevereImmunodepression();
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+
+    cd.addSearch("severeImmunodepression", EptsReportUtils.map(severeImmunodepression, mappings));
+    cd.addSearch(
+        "anyTbLam",
+        EptsReportUtils.map(
+            anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+
+    cd.setCompositionString("(severeImmunodepression AND anyTbLam)");
 
     return cd;
   }
