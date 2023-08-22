@@ -186,6 +186,33 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
+   * Clients With Cd4 count and TB Lam Result by report generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithSevereImmunodepressionAndWithoutTbLamResult() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition severeImmunodepression = getClientsWithSevereImmunodepression();
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+
+    cd.addSearch("severeImmunodepression", EptsReportUtils.map(severeImmunodepression, mappings));
+    cd.addSearch(
+        "anyTbLam",
+        EptsReportUtils.map(
+            anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+
+    cd.setCompositionString("(severeImmunodepression AND NOT anyTbLam)");
+
+    return cd;
+  }
+
+  /**
    * @param cd4 - Absolute CD4 count
    * @param minAge minimum age of patient base on effective date
    * @param maxAge maximum age of patent base on effective date

@@ -123,7 +123,27 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
     dataSetDefinition.addColumn(
         "severeTbLamTotal",
         "ClientsWithSevereImmunodepressionTbLamTotal",
-        EptsReportUtils.map(severeIndicator, inclusionPeriod),
+        EptsReportUtils.map(severeTbLam, inclusionPeriod),
+        "");
+
+    CohortIndicator severeWithoutTbLam =
+        eptsGeneralIndicator.getIndicator(
+            "severeWithoutTbLamInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithSevereImmunodepressionAndWithoutTbLamResult(),
+                mappings));
+    addRow(
+        dataSetDefinition,
+        "severeWithoutTbLam",
+        "ClientsWithSevereImmunodepressionAndWithoutTbLam",
+        EptsReportUtils.map(severeWithoutTbLam, inclusionPeriod),
+        dissagregations());
+
+    dataSetDefinition.addColumn(
+        "severeWithoutTbLamTotal",
+        "ClientsWithSevereImmunodepressionWithoutTbLamTotal",
+        EptsReportUtils.map(severeWithoutTbLam, inclusionPeriod),
         "");
 
     return dataSetDefinition;
