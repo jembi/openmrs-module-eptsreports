@@ -376,7 +376,7 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         new ColumnParameters("Grade2+", "Grade 2+", "grade=2+", "2"),
         new ColumnParameters("Grade1+", "Grade 1+", "grade=1+", "1"),
         new ColumnParameters(
-            "GradeNotReporte", "Grade Not Reported", "grade=notReported+", "notReported"));
+            "GradeNotReporte", "Grade Not Reported", "grade=notReported", "notReported"));
   }
 
   @Override
