@@ -923,21 +923,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id, FLOOR(DATEDIFF(A1.first_start_drugs,ps.birthdate)/365) AS age "
+        "SELECT p.patient_id, FLOOR(DATEDIFF(art.first_start_drugs,ps.birthdate)/365) AS age "
             + "FROM patient p "
             + "     INNER JOIN ( "
-            + "           SELECT p.patient_id, MIN(o.value_datetime) as first_start_drugs "
-            + "           FROM patient p "
-            + "                INNER JOIN encounter e ON e.patient_id = p.patient_id "
-            + "                INNER JOIN obs o ON o.encounter_id = e.encounter_id "
-            + "           WHERE p.voided = 0 AND e.voided = 0 AND o.voided = 0 "
-            + "             AND e.encounter_type = ${53} and o.concept_id = ${1190} "
-            + "             AND e.location_id = :location "
-            + "             AND o.value_datetime <= "
-            + "  CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + " ) "
-            + "           GROUP BY p.patient_id ) AS A1 ON p.patient_id = A1.patient_id "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + "   ) AS art ON art.patient_id = p.patient_id "
             + "  INNER JOIN person ps ON p.patient_id=ps.person_id WHERE p.voided=0 AND ps.voided=0 ";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
