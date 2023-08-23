@@ -1720,6 +1720,7 @@ public class IntensiveMonitoringCohortQueries {
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
     map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
+    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
     map.put("1707", hivMetadata.getAbandonedConcept().getConceptId());
     map.put("1705", hivMetadata.getRestartConcept().getConceptId());
 
@@ -1766,7 +1767,7 @@ public class IntensiveMonitoringCohortQueries {
             + "                    AND      e.encounter_type = ${6} "
             + "                    GROUP BY e.patient_id )last_consultation "
             + "ON         last_consultation.patient_id = p.patient_id "
-            + "WHERE      o.concept_id = ${6273} "
+            + "WHERE      o.concept_id = ${6272} "
             + "AND        o.value_coded IN (${1707},${1705}) "
             + "AND        e.encounter_type = ${53} "
             + "AND        p.voided=0 "
