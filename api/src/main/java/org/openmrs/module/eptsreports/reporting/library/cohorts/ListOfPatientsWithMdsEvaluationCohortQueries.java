@@ -956,6 +956,12 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * <p>registo de “Última profilaxia TPT” (resposta = “INH” ou ”3HP” ou “1HP” ou “LFX”) com “Data
    * Início” registada na Ficha Resumo durante o período de inclusão;
    *
+   * <p>registo de “Outras Prescrições” (resposta= “DT-3HP”) na Ficha Clínica (“Data Consulta”)
+   * registada em 33 dias do Início TARV, ou seja, entre “Data Início TARV” e “Data Início TARV” +
+   * 33 dias.
+   *
+   * <p>Nota 1: A “Data Início TARV” é definida no RF46.
+   *
    * @return {DataDefinition}
    */
   public DataDefinition getTptInitiationDate() {
@@ -967,6 +973,11 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     Map<String, Integer> map = new HashMap<>();
     map.put("6", hivMetadata.getAdultoSeguimentoEncounterType().getEncounterTypeId());
     map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
     map.put("23985", tbMetadata.getRegimeTPTConcept().getConceptId());
     map.put("23954", tbMetadata.get3HPConcept().getConceptId());
     map.put("656", tbMetadata.getIsoniazidConcept().getConceptId());
@@ -974,14 +985,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     map.put("165306", tbMetadata.getLFXConcept().getConceptId());
     map.put("165308", tbMetadata.getDataEstadoDaProfilaxiaConcept().getConceptId());
     map.put("1256", hivMetadata.getStartDrugs().getConceptId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
-    map.put("1369", commonMetadata.getTransferFromOtherFacilityConcept().getConceptId());
-    map.put("1065", hivMetadata.getYesConcept().getConceptId());
-    map.put("6300", hivMetadata.getTypeOfPatientTransferredFrom().getConceptId());
-    map.put("6276", hivMetadata.getArtStatus().getConceptId());
-    map.put("6273", hivMetadata.getStateOfStayOfArtPatient().getConceptId());
-    map.put("6272", hivMetadata.getStateOfStayOfPreArtPatient().getConceptId());
-    map.put("1706", hivMetadata.getTransferredOutConcept().getConceptId());
+    map.put("1719", tbMetadata.getTreatmentPrescribedConcept().getConceptId());
+    map.put("165307", tbMetadata.getDT3HPConcept().getConceptId());
 
     String query =
         "         SELECT     p.patient_id, "
@@ -993,19 +998,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         ON         o.encounter_id = e.encounter_id "
             + "         INNER JOIN obs o2 "
             + "         ON         o2.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
-            + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 1)
-            + " ) "
-            + " ) art ON art.patient_id = e.patient_id "
+            + "         INNER JOIN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
             + " AND e.voided = 0 "
             + " AND o.voided = 0 "
@@ -1016,56 +1011,8 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND o.value_coded IN ( ${23954}, ${656}, ${165305}, ${165306} ) ) "
             + " AND ( o2.concept_id = ${165308} "
             + " AND o2.value_coded IN ( ${1256} ) ) ) "
-            + " AND e.encounter_datetime BETWEEN "
-            + "  DATE_SUB( CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ) ,INTERVAL 1 YEAR) "
-            + " AND "
-            + "  DATE_SUB( CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL 1 YEAR) "
-            + " GROUP  BY p.patient_id "
-            + " UNION "
-            + "         SELECT     p.patient_id, "
-            + "                    MIN(e.encounter_datetime) AS encounter_date "
-            + "         FROM       patient p "
-            + "         INNER JOIN encounter e "
-            + "         ON         e.patient_id = p.patient_id "
-            + "         INNER JOIN obs o "
-            + "         ON         o.encounter_id = e.encounter_id "
-            + "         INNER JOIN obs o2 "
-            + "         ON         o2.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
-            + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 2)
-            + " ) "
-            + " ) art ON art.patient_id = e.patient_id "
-            + " WHERE  p.voided = 0 "
-            + " AND e.voided = 0 "
-            + " AND o.voided = 0 "
-            + " AND o2.voided = 0 "
-            + " AND e.encounter_type = ${6} "
-            + " AND e.location_id = :location "
-            + " AND ( ( o.concept_id = ${23985} "
-            + " AND o.value_coded IN ( ${23954}, ${656}, ${165305}, ${165306} ) ) "
-            + " AND ( o2.concept_id = ${165308} "
-            + " AND o2.value_coded IN ( ${1256} ) ) ) "
-            + " AND e.encounter_datetime BETWEEN "
-            + "  DATE_SUB( CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ) ,INTERVAL 2 YEAR) "
-            + " AND "
-            + "  DATE_SUB( CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL 2 YEAR) "
+            + " AND e.encounter_datetime >= art.art_pickup_date "
+            + " AND e.encounter_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY) "
             + " GROUP  BY p.patient_id "
             + " UNION "
             + "        SELECT     p.patient_id, "
@@ -1077,19 +1024,9 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "         ON         o.encounter_id = e.encounter_id "
             + "         INNER JOIN obs o2 "
             + "         ON         o2.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 2, 1)
-            + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 1)
-            + " ) "
-            + " ) art ON art.patient_id = e.patient_id "
+            + "         INNER JOIN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
             + " AND e.voided = 0 "
             + " AND o.voided = 0 "
@@ -1100,57 +1037,30 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + " AND o.value_coded IN ( ${23954}, ${656}, ${165305}, ${165306} ) ) "
             + " AND ( o2.concept_id = ${165308} "
             + " AND o2.value_coded IN ( ${1256} ) ) ) "
-            + " AND o2.obs_datetime BETWEEN "
-            + "  DATE_SUB( CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ) ,INTERVAL 1 YEAR) "
-            + " AND "
-            + "  DATE_SUB( CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL 1 YEAR) "
+            + " AND o2.obs_datetime >= art.art_pickup_date "
+            + " AND o2.obs_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY) "
             + " GROUP  BY p.patient_id "
             + " UNION "
             + "         SELECT     p.patient_id, "
-            + "                    MIN(o2.obs_datetime) AS encounter_date "
+            + "                    MIN(e.encounter_datetime) AS encounter_date "
             + "         FROM       patient p "
             + "         INNER JOIN encounter e "
             + "         ON         e.patient_id = p.patient_id "
             + "         INNER JOIN obs o "
             + "         ON         o.encounter_id = e.encounter_id "
-            + "         INNER JOIN obs o2 "
-            + "         ON         o2.encounter_id = e.encounter_id "
-            + "         INNER JOIN "
-            + "                    ( "
-            + "                           SELECT art_patient.patient_id "
-            + "                           FROM   ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getPatientsInitiatedART12Or24Months(
-                inclusionStartMonthAndDay, inclusionEndMonthAndDay, 3, 2)
-            + "                           ) art_patient "
-            + " WHERE  art_patient.patient_id  "
-            + " NOT IN ( "
-            + ListOfPatientsWithMdsEvaluationQueries.getTranferredPatients(
-                inclusionEndMonthAndDay, 2)
-            + " ) "
-            + " ) art ON art.patient_id = e.patient_id "
+            + "         INNER JOIN ( "
+            + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
+            + " ) art ON art.patient_id = p.patient_id "
             + " WHERE  p.voided = 0 "
             + " AND e.voided = 0 "
             + " AND o.voided = 0 "
-            + " AND o2.voided = 0 "
-            + " AND e.encounter_type = ${53} "
+            + " AND e.encounter_type = ${6} "
             + " AND e.location_id = :location "
-            + " AND ( ( o.concept_id = ${23985} "
-            + " AND o.value_coded IN ( ${23954}, ${656}, ${165305}, ${165306} ) ) "
-            + " AND ( o2.concept_id = ${165308} "
-            + " AND o2.value_coded IN ( ${1256} ) ) ) "
-            + " AND o2.obs_datetime BETWEEN "
-            + "  DATE_SUB( CONCAT(:evaluationYear,"
-            + inclusionStartMonthAndDay
-            + "        ) ,INTERVAL 2 YEAR) "
-            + " AND "
-            + "  DATE_SUB( CONCAT(:evaluationYear,"
-            + inclusionEndMonthAndDay
-            + "        ) ,INTERVAL 2 YEAR) "
-            + " GROUP  BY p.patient_id ";
+            + " AND o.concept_id = ${1719} "
+            + " AND o.value_coded = ${165307} "
+            + " AND e.encounter_datetime >= art.art_pickup_date "
+            + " AND e.encounter_datetime <= DATE_ADD( art.art_pickup_date, INTERVAL 33 DAY) "
+            + " GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(map);
 
