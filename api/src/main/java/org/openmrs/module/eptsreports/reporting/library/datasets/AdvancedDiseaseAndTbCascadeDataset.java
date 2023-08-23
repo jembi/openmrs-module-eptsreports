@@ -261,13 +261,6 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(negativeTbLam, reportingPeriod),
         "");
 
-    addRow(
-        dataSetDefinition,
-        "negativeTbLam",
-        "ClientsWithNegativeTbLam",
-        EptsReportUtils.map(negativeTbLam, inclusionPeriod),
-        dissagregations());
-
     return dataSetDefinition;
   }
 
