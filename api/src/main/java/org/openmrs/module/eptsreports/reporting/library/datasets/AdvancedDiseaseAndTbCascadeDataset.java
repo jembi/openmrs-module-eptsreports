@@ -261,6 +261,65 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         EptsReportUtils.map(negativeTbLam, reportingPeriod),
         "");
 
+    // Clients with positive TB Lam but Not tested with GeneXpert
+    CohortIndicator positiveTbLamNotGen =
+        eptsGeneralIndicator.getIndicator(
+            "positiveTbLamNotGenInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithTbLamPositiveButNotTestedGeneXPert(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "positiveTbLamNotGen",
+        "ClientsWithPositiveButNotTestedForGenex",
+        EptsReportUtils.map(positiveTbLamNotGen, reportingPeriod),
+        "");
+
+    // Clients with positive Tb Lam also tested with GeneXpert
+    CohortIndicator positiveTbLamAndGen =
+        eptsGeneralIndicator.getIndicator(
+            "positiveTbLamAndGenInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithTbLamPositiveTestedGeneXPert(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "positiveTbLamAndGen",
+        "ClientsWithPositiveTestedForGenex",
+        EptsReportUtils.map(positiveTbLamAndGen, reportingPeriod),
+        "");
+    // Clients with positive Tb lam and GeneXpert Positive For TB
+    CohortIndicator positiveTbLamPositiveGen =
+        eptsGeneralIndicator.getIndicator(
+            "positiveTbLamPositiveGenInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithTbLamPositiveTestedPositiveGeneXPert(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "positiveTbLamPositiveGen",
+        "ClientsWithPositiveTestedPositiveForGenexTb",
+        EptsReportUtils.map(positiveTbLamPositiveGen, reportingPeriod),
+        "");
+
+    // Clients with positive Tb lam and on Tb treatment
+
+    CohortIndicator positiveTbLamOnTreatmentInd =
+        eptsGeneralIndicator.getIndicator(
+            "positiveTbLamOnTreatmentInd ",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithTbLamPositiveOnTbTreatment(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "positiveTbLamOnTreatment",
+        "ClientsWithPositiveTbLamOnTbTreatment",
+        EptsReportUtils.map(positiveTbLamOnTreatmentInd, reportingPeriod),
+        "");
+
     return dataSetDefinition;
   }
 

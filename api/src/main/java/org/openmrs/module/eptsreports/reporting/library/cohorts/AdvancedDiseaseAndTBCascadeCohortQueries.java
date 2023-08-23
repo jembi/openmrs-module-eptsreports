@@ -411,6 +411,109 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
+   * Number of clients with TB LAM Positive results and Not Tested with GeneXpert by report
+   * generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithTbLamPositiveButNotTestedGeneXPert() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+    CohortDefinition genXpert = getPatientsWithAnyGeneXpertResult();
+
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
+    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
+    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings));
+
+    cd.setCompositionString("(anyTbLam AND positiveTbLam) AND NOT genXpert");
+
+    return cd;
+  }
+
+  /**
+   * Number of clients with TB LAM Positive results and Tested with GeneXpert by report generation
+   * date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithTbLamPositiveTestedGeneXPert() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+    CohortDefinition genXpert = getPatientsWithAnyGeneXpertResult();
+
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
+    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
+    cd.addSearch("genXpert", EptsReportUtils.map(genXpert, mappings));
+
+    cd.setCompositionString("anyTbLam AND positiveTbLam AND genXpert");
+
+    return cd;
+  }
+
+  /**
+   * Number of clients with TB LAM Positive results and Tested Positive For GeneXpert by report
+   * generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithTbLamPositiveTestedPositiveGeneXPert() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+    CohortDefinition positiveGen = getPatientsWithPositiveGeneXpertResult();
+
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
+    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
+    cd.addSearch("positiveGen", EptsReportUtils.map(positiveGen, mappings));
+
+    cd.setCompositionString("anyTbLam AND positiveTbLam AND positiveGen");
+
+    return cd;
+  }
+  /**
+   * Number of clients with TB LAM Positive results and on Tb treatment by report generation date
+   *
+   * @return CohortDefinition
+   */
+
+  public CohortDefinition getClientsWithTbLamPositiveOnTbTreatment() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+    CohortDefinition onTb = getPatientsOnTbTreatment();
+
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
+    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
+    cd.addSearch("onTb", EptsReportUtils.map(onTb, mappings));
+
+    cd.setCompositionString("anyTbLam AND positiveTbLam AND onTb");
+
+    return cd;
+  }
+
+  /**
    * @param cd4 - Absolute CD4 count
    * @param minAge minimum age of patient base on effective date
    * @param maxAge maximum age of patent base on effective date
