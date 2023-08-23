@@ -315,10 +315,17 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
                 mappings));
 
     dataSetDefinition.addColumn(
-        "positiveTbLamOnTreatment",
+        "positiveTbLamOnTreatmentTotal",
         "ClientsWithPositiveTbLamOnTbTreatment",
         EptsReportUtils.map(positiveTbLamOnTreatmentInd, reportingPeriod),
         "");
+
+    addRow(
+        dataSetDefinition,
+        "positiveTbLamOnTreatment",
+        "ClientsWithPositiveTbLamOnTbTreatment",
+        EptsReportUtils.map(positiveTbLamOnTreatmentInd, inclusionPeriod),
+        dissagregations());
 
     return dataSetDefinition;
   }

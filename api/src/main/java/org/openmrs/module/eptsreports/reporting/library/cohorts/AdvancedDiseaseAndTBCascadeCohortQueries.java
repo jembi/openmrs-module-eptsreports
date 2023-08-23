@@ -492,7 +492,6 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
    *
    * @return CohortDefinition
    */
-
   public CohortDefinition getClientsWithTbLamPositiveOnTbTreatment() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
