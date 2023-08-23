@@ -275,9 +275,19 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
   /**
    * <b>RF9 - Relatório – Informação do utente - Secção A1 a A9</b>
    *
-   * <p>A5- Data início TARV: (coluna E) – Resposta = Data do Início TARV. A “Data do Início TARV” é
-   * a data registada na Ficha Resumo (Data do Início TARV). Nota: caso exista mais que uma “Ficha
-   * de Resumo” com “Data do Início TARV” diferente, deve ser considerada a data mais antiga.
+   * <p>O sistema irá determinar a Data Início TARV do utente da seguinte forma:
+   *
+   * <ul>
+   *   <li>seleccionando, a data mais antiga entre: o 1º levantamento de ARVs registado no FILA
+   *       (“Data de Levantamento”) e <br>
+   *   <li>o 1º levantamento registado na “Ficha Recepção/ Levantou ARVs?” com “Levantou ARV” = Sim
+   *       (“Data de Levantamento”) <br>
+   *       <p>sendo a data mais antiga dos critérios acima<= “Data Fim Inclusão”. <br>
+   *       <p>Data Fim = “20 de Junho” de “Ano de Avaliação” Nota 1: Deve-se confirmar que a data
+   *       início TARV é realmente a primeira ocorrência (data mais antiga) até a “Data Fim”
+   *       Inclusão. Isto irá prevenir situações em que utentes que, por algum motivo, possam ter
+   *       mais do que uma data de início TARV registado no sistema. <br>
+   * </ul>
    *
    * @return {DataDefinition}
    */
@@ -290,23 +300,49 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
 
     Map<String, Integer> valuesMap = new HashMap<>();
-    valuesMap.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    valuesMap.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    valuesMap.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    valuesMap.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    valuesMap.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    valuesMap.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    valuesMap.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
         "SELECT p.patient_id, "
-            + "       Min(o.value_datetime) art_start "
+            + "       Min(e.encounter_datetime) art_pickup_date "
+            + "FROM   patient p "
+            + "       INNER JOIN encounter e "
+            + "               ON e.patient_id = p.patient_id "
+            + "WHERE p.voided = 0 "
+            + "       AND e.voided = 0 "
+            + "       AND e.encounter_type = ${18} "
+            + "       AND e.location_id = :location "
+            + "            AND e.encounter_datetime <= CONCAT(:evaluationYear, "
+            + inclusionEndMonthAndDay
+            + "        ) "
+            + "GROUP  BY p.patient_id "
+            + "UNION "
+            + "SELECT p.patient_id, "
+            + "       Min(o2.value_datetime) art_pickup_date "
             + "FROM   patient p "
             + "       INNER JOIN encounter e "
             + "               ON e.patient_id = p.patient_id "
             + "       INNER JOIN obs o "
             + "               ON o.encounter_id = e.encounter_id "
-            + "WHERE  e.encounter_type = ${53} "
-            + "       AND o.concept_id = ${1190} "
-            + "       AND e.location_id = :location "
-            + "       AND p.voided = 0 "
+            + "       INNER JOIN obs o2 "
+            + "               ON o2.encounter_id = e.encounter_id "
+            + "WHERE  p.voided = 0 "
             + "       AND e.voided = 0 "
             + "       AND o.voided = 0 "
+            + "       AND o2.voided = 0 "
+            + "            AND e.encounter_type = ${52} "
+            + "            AND e.location_id = :location "
+            + "            AND o.concept_id = ${23865} "
+            + "            AND o.value_coded = ${1065} "
+            + "            AND o2.concept_id = ${23866} "
+            + "            AND o2.value_datetime IS NOT NULL "
+            + "            AND o2.value_datetime <= CONCAT(:evaluationYear, "
+            + inclusionEndMonthAndDay
+            + "        ) "
             + "GROUP  BY p.patient_id";
 
     StringSubstitutor stringSubstitutor = new StringSubstitutor(valuesMap);
@@ -2497,7 +2533,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getPatientsPregnantBreastfeeding3MonthsTarv(
-      int minnumberYears, int maxnumberOfYears) {
+      int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B6- Esteve grávida ou foi lactante entre 3˚ e 9º mês de TARV?: (coluna M)- Resposta = Sim ou Não");
@@ -2556,10 +2592,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minnumberYears
+            + minNumberOfMonths
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberOfYears
+            + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND        o.concept_id = ${1982} "
             + "                  AND        o.value_coded IN ( ${1065}, "
@@ -2598,10 +2634,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minnumberYears
+            + minNumberOfMonths
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberOfYears
+            + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND        o.concept_id = ${1982} "
             + "                  AND        o.value_coded IN ( ${1065}, "
@@ -2655,7 +2691,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    * @return {DataDefinition}
    */
   public DataDefinition getPatientsWithTbThirdToNineMonth(
-      int minnumberYears, int maxnumberOfYears) {
+      int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B8-Teve TB nos 1˚s 12 meses de TARV: (coluna Q) - Resposta = Sim ou Não (RF23)");
@@ -2725,10 +2761,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minnumberYears
+            + minNumberOfMonths
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberOfYears
+            + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( o.concept_id = ${23758} "
             + "                               AND o.value_coded IN ( ${1065} ) ) "
@@ -2773,10 +2809,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minnumberYears
+            + minNumberOfMonths
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberOfYears
+            + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( o.concept_id = ${23758} "
             + "                               AND o.value_coded IN ( ${1065} ) ) "
@@ -2825,7 +2861,7 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
    *
    * @return {DataDefinition}
    */
-  public DataDefinition getMdsDate(int minnumberYears, int maxnumberOfYears) {
+  public DataDefinition getMdsDate(int minNumberOfMonths, int maxNumberOfMonths) {
     SqlPatientDataDefinition sqlPatientDataDefinition = new SqlPatientDataDefinition();
     sqlPatientDataDefinition.setName(
         "B9- Data de inscrição no MDS: (coluna R) - Resposta = Data de Inscrição (RF24)");
@@ -2878,10 +2914,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minnumberYears
+            + minNumberOfMonths
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberOfYears
+            + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
@@ -2919,10 +2955,10 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
             + "                  AND        e.encounter_type = ${6} "
             + "                  AND        e.location_id = :location "
             + "                  AND        e.encounter_datetime >= date_add( art.art_encounter, INTERVAL "
-            + minnumberYears
+            + minNumberOfMonths
             + " MONTH ) "
             + "                  AND        e.encounter_datetime <= date_add( art.art_encounter, INTERVAL "
-            + maxnumberOfYears
+            + maxNumberOfMonths
             + " MONTH ) "
             + "                  AND    (   ( otype.concept_id = ${165174} "
             + "                               AND otype.value_coded IS NOT NULL ) "
