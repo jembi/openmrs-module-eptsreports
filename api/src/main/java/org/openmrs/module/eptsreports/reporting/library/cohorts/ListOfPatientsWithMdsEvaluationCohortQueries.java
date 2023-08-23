@@ -918,12 +918,16 @@ public class ListOfPatientsWithMdsEvaluationCohortQueries {
     sqlPatientDataDefinition.addParameter(
         new Parameter("evaluationYear", "evaluationYear", Integer.class));
     sqlPatientDataDefinition.addParameter(new Parameter("location", "location", Location.class));
+
     Map<String, Integer> map = new HashMap<>();
-    map.put("53", hivMetadata.getMasterCardEncounterType().getEncounterTypeId());
-    map.put("1190", hivMetadata.getARVStartDateConcept().getConceptId());
+    map.put("18", hivMetadata.getARVPharmaciaEncounterType().getEncounterTypeId());
+    map.put("23866", hivMetadata.getArtDatePickupMasterCard().getConceptId());
+    map.put("23865", hivMetadata.getArtPickupConcept().getConceptId());
+    map.put("52", hivMetadata.getMasterCardDrugPickupEncounterType().getEncounterTypeId());
+    map.put("1065", hivMetadata.getPatientFoundYesConcept().getConceptId());
 
     String query =
-        "SELECT p.patient_id, FLOOR(DATEDIFF(art.first_start_drugs,ps.birthdate)/365) AS age "
+        "SELECT p.patient_id, FLOOR(DATEDIFF(art.art_pickup_date,ps.birthdate)/365) AS age "
             + "FROM patient p "
             + "     INNER JOIN ( "
             + ListOfPatientsWithMdsEvaluationQueries.getPatientArtStart(inclusionEndMonthAndDay)
