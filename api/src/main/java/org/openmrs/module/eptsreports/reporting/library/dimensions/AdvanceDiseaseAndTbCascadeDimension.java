@@ -26,7 +26,7 @@ public class AdvanceDiseaseAndTbCascadeDimension {
     dim.addParameter(new Parameter("startDate", "startDate", Date.class));
     dim.addParameter(new Parameter("endDate", "endDate", Date.class));
     dim.addParameter(new Parameter("location", "location", Location.class));
-    dim.setName("Patients having Positive TB LAM and Grade 4+");
+    dim.setName("Patients having Positive TB LAM and Grade - Dimension");
 
     dim.addCohortDefinition(
         "4+",

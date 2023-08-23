@@ -226,11 +226,11 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     CohortDefinition cd4Count = getClientsWithCd4Count();
     CohortDefinition cd200AgeFiveOrOver =
-            getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo200mm3, 5, null);
+        getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo200mm3, 5, null);
     CohortDefinition cd500AgeBetweenOneAndFour =
-            getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo500mm3, 1, 4);
+        getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo500mm3, 1, 4);
     CohortDefinition cd750AgeUnderYear =
-            getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo750mm3, 1, null);
+        getPatientsWithCd4AndAge(Cd4CountComparison.GreaterThanOrEqualTo750mm3, 1, null);
 
     CohortDefinition exclusion = getPatientsTransferredOutOrDead();
 
@@ -240,17 +240,18 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
     cd.addSearch("cd4Over750", EptsReportUtils.map(cd750AgeUnderYear, mappings));
 
     cd.addSearch(
-            "exclusion",
-            EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
+        "exclusion",
+        EptsReportUtils.map(exclusion, "endDate=${generationDate},location=${location}"));
 
     cd.setCompositionString(
-            "((cd4Over200 OR cd4Over500 OR cd4Over750) AND cd4Count) AND NOT exclusion");
+        "((cd4Over200 OR cd4Over500 OR cd4Over750) AND cd4Count) AND NOT exclusion");
 
     return cd;
   }
 
   /**
-   * Clients With Cd4 count and without immunodepression and without TB Lam Result by report generation date
+   * Clients With Cd4 count and without immunodepression and without TB Lam Result by report
+   * generation date
    *
    * @return CohortDefinition
    */
@@ -267,9 +268,9 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch("severeImmunodepression", EptsReportUtils.map(severeImmunodepression, mappings));
     cd.addSearch(
-            "anyTbLam",
-            EptsReportUtils.map(
-                    anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+        "anyTbLam",
+        EptsReportUtils.map(
+            anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
 
     cd.setCompositionString("(severeImmunodepression AND anyTbLam)");
 
@@ -277,7 +278,8 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   }
 
   /**
-   * Clients With Cd4 count and without immunodepression and without TB Lam Result by report generation date
+   * Clients With Cd4 count and without immunodepression and without TB Lam Result by report
+   * generation date
    *
    * @return CohortDefinition
    */
@@ -294,11 +296,116 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
 
     cd.addSearch("severeImmunodepression", EptsReportUtils.map(severeImmunodepression, mappings));
     cd.addSearch(
-            "anyTbLam",
-            EptsReportUtils.map(
-                    anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
+        "anyTbLam",
+        EptsReportUtils.map(
+            anyTbLam, "startDate=${startDate},endDate=${generationDate},location=${location}"));
 
     cd.setCompositionString("(severeImmunodepression AND NOT anyTbLam)");
+
+    return cd;
+  }
+
+  /**
+   * Clients With Cd4 count and without immunodepression and without TB Lam Result by report
+   * generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithoutCd4CountButWithTbLam() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+
+    CohortDefinition withCd4Count = getPatientsWithCD4Count();
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition transfDead = getPatientsTransferredOutOrDead();
+
+    cd.addSearch("withCd4Count", EptsReportUtils.map(withCd4Count, mappings));
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
+    cd.addSearch(
+        "transfDead",
+        EptsReportUtils.map(transfDead, "endDate=${generationDate},location=${location}"));
+
+    cd.setCompositionString("anyTbLam AND NOT (withCd4Count OR transfDead)");
+
+    return cd;
+  }
+
+  /**
+   * Number of clients with TB LAM results by report generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithAnyTbLam() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition transfDead = getPatientsTransferredOutOrDead();
+
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
+    cd.addSearch(
+        "transfDead", EptsReportUtils.map(transfDead, "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("anyTbLam AND NOT transfDead");
+
+    return cd;
+  }
+
+  /**
+   * Number of clients with TB LAM Positive results by report generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithTbLamPositive() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition positiveTbLam = getPatientsWithTbLamResult(TbLamResult.POSITIVE);
+    CohortDefinition transfDead = getPatientsTransferredOutOrDead();
+
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
+    cd.addSearch("positiveTbLam", EptsReportUtils.map(positiveTbLam, mappings));
+    cd.addSearch(
+        "transfDead", EptsReportUtils.map(transfDead, "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(anyTbLam AND positiveTbLam) AND NOT transfDead");
+
+    return cd;
+  }
+
+  /**
+   * Number of clients with TB LAM Negative results by report generation date
+   *
+   * @return CohortDefinition
+   */
+  public CohortDefinition getClientsWithTbLamNegative() {
+
+    CompositionCohortDefinition cd = new CompositionCohortDefinition();
+    cd.addParameter(new Parameter("location", "Facility", Location.class));
+    cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+    cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+    CohortDefinition anyTbLam = getPatientsWithAnyTbLamResult();
+    CohortDefinition negativeTbLam = getPatientsWithTbLamResult(TbLamResult.NEGATIVE);
+    CohortDefinition transfDead = getPatientsTransferredOutOrDead();
+
+    cd.addSearch("anyTbLam", EptsReportUtils.map(anyTbLam, mappings));
+    cd.addSearch("negativeTbLam", EptsReportUtils.map(negativeTbLam, mappings));
+    cd.addSearch(
+        "transfDead", EptsReportUtils.map(transfDead, "endDate=${endDate},location=${location}"));
+
+    cd.setCompositionString("(anyTbLam AND negativeTbLam) AND NOT transfDead");
 
     return cd;
   }
@@ -790,7 +897,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getPatientsWithPositiveTbLamAndGradeFourPlus() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Clients with positive TB LAM and Grade 3+");
+    cd.setName("Clients with positive TB LAM and Grade 4+");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "End Date", Location.class));
@@ -801,7 +908,7 @@ public class AdvancedDiseaseAndTBCascadeCohortQueries {
   public CohortDefinition getPatientsWithPositiveTbLamAndGradeThreePlus() {
 
     CompositionCohortDefinition cd = new CompositionCohortDefinition();
-    cd.setName("Clients with positive TB LAM and Grade 4+");
+    cd.setName("Clients with positive TB LAM and Grade 3+");
     cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
     cd.addParameter(new Parameter("endDate", "End Date", Date.class));
     cd.addParameter(new Parameter("location", "End Date", Location.class));

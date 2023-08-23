@@ -50,9 +50,10 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
 
     dataSetDefinition.addDimension("gender", EptsReportUtils.map(eptsCommonDimension.gender(), ""));
     dataSetDefinition.addDimension(
-        "cd4",
+        "grade",
         EptsReportUtils.map(
-            advanceDiseaseAndTbCascadeDimension.getPatientsAbsoluteCd4Count(), inclusionPeriod));
+            advanceDiseaseAndTbCascadeDimension.getPatientWithPositiveTbLamAndGradeDimension(),
+            reportingPeriod));
 
     CohortIndicator eligibleCd4Ind =
         eptsGeneralIndicator.getIndicator(
@@ -147,18 +148,125 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
         "");
 
     CohortIndicator withoutImmunodepression =
-            eptsGeneralIndicator.getIndicator(
-                    "withoutImmunodepression",
-                    EptsReportUtils.map(
-                            advancedDiseaseAndTBCascadeCohortQueries
-                                    .getClientsWithoutSevereImmunodepression(),
-                            mappings));
+        eptsGeneralIndicator.getIndicator(
+            "withoutImmunodepression",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithoutSevereImmunodepression(),
+                mappings));
 
     dataSetDefinition.addColumn(
-            "withoutImmunodepressionTotal",
-            "ClientsWithoutSevereImmunodepressionTotal",
-            EptsReportUtils.map(withoutImmunodepression, inclusionPeriod),
-            "");
+        "withoutImmunodepressionTotal",
+        "ClientsWithoutSevereImmunodepressionTotal",
+        EptsReportUtils.map(withoutImmunodepression, inclusionPeriod),
+        "");
+
+    CohortIndicator withoutImmunodepressionWithoutTbLam =
+        eptsGeneralIndicator.getIndicator(
+            "withoutImmunodepressionWithoutTbLam",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithoutSevereImmunodepressionAndWithoutTbLamResult(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "withoutImmunodepressionWithoutTbLamTotal",
+        "ClientsWithoutSevereImmunodepressionAndWithoutTbLam",
+        EptsReportUtils.map(withoutImmunodepressionWithoutTbLam, inclusionPeriod),
+        "");
+
+    CohortIndicator withoutImmunodepressionWithTbLam =
+        eptsGeneralIndicator.getIndicator(
+            "withoutImmunodepressionWithTbLam",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries
+                    .getClientsWithoutSevereImmunodepressionAndWithTbLamResult(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "withoutImmunodepressionWithTbLamTotal",
+        "ClientsWithoutSevereImmunodepressionAndWithTbLamTotal",
+        EptsReportUtils.map(withoutImmunodepressionWithTbLam, inclusionPeriod),
+        "");
+
+    addRow(
+        dataSetDefinition,
+        "withoutImmunodepressionWithTbLam",
+        "ClientsWithSevereImmunodepressionAndWithTbLam",
+        EptsReportUtils.map(withoutImmunodepressionWithTbLam, inclusionPeriod),
+        dissagregations());
+    // Number of clients with TB LAM results by report generation date
+
+    CohortIndicator withoutCd4Tblam =
+        eptsGeneralIndicator.getIndicator(
+            "withoutCd4TbLamInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithoutCd4CountButWithTbLam(),
+                mappings));
+
+    dataSetDefinition.addColumn(
+        "withoutCd4WithTbLamTotal",
+        "ClientsWithoutCd4CountButWithTbLamTotal",
+        EptsReportUtils.map(withoutCd4Tblam, inclusionPeriod),
+        "");
+
+    addRow(
+        dataSetDefinition,
+        "withoutCd4WithTbLam",
+        "ClientsWithoutCd4CountWithButWithTbLam",
+        EptsReportUtils.map(withoutCd4Tblam, inclusionPeriod),
+        dissagregations());
+    // Clients with TbLam
+    CohortIndicator withTbLam =
+        eptsGeneralIndicator.getIndicator(
+            "withTbLamInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithAnyTbLam(), mappings));
+
+    dataSetDefinition.addColumn(
+        "withTbLamTotal",
+        "ClientsWithLamTotal",
+        EptsReportUtils.map(withTbLam, reportingPeriod),
+        "");
+
+    // Clients with positive Tb Lam
+    CohortIndicator positiveTbLam =
+        eptsGeneralIndicator.getIndicator(
+            "positiveTbLamInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithTbLamPositive(), mappings));
+
+    dataSetDefinition.addColumn(
+        "positiveTbLamTotal",
+        "ClientsWithPositiveTbLamTotal",
+        EptsReportUtils.map(positiveTbLam, reportingPeriod),
+        "");
+
+    addRow(
+        dataSetDefinition,
+        "positiveTbLam",
+        "ClientsWithPositiveTbLam",
+        EptsReportUtils.map(positiveTbLam, inclusionPeriod),
+        dissagregations());
+
+    // Clients with negative Tb Lam
+    CohortIndicator negativeTbLam =
+        eptsGeneralIndicator.getIndicator(
+            "negativeTbLamInd",
+            EptsReportUtils.map(
+                advancedDiseaseAndTBCascadeCohortQueries.getClientsWithTbLamNegative(), mappings));
+
+    dataSetDefinition.addColumn(
+        "negativeTbLamTotal",
+        "ClientsWithNegativeTbLamTotal",
+        EptsReportUtils.map(negativeTbLam, reportingPeriod),
+        "");
+
+    addRow(
+        dataSetDefinition,
+        "negativeTbLam",
+        "ClientsWithNegativeTbLam",
+        EptsReportUtils.map(negativeTbLam, inclusionPeriod),
+        dissagregations());
 
     return dataSetDefinition;
   }
@@ -262,7 +370,13 @@ public class AdvancedDiseaseAndTbCascadeDataset extends BaseDataSet {
             EptsCommonDimensionKey.of(DimensionKeyForAge.unknown)
                 .and(DimensionKeyForGender.male)
                 .getDimensions(),
-            "MUN"));
+            "MUN"),
+        new ColumnParameters("Grade4+", "Grade 4+", "grade=4+", "4"),
+        new ColumnParameters("Grade3+", "Grade 3+", "grade=3+", "3"),
+        new ColumnParameters("Grade2+", "Grade 2+", "grade=2+", "2"),
+        new ColumnParameters("Grade1+", "Grade 1+", "grade=1+", "1"),
+        new ColumnParameters(
+            "GradeNotReporte", "Grade Not Reported", "grade=notReported+", "notReported"));
   }
 
   @Override
